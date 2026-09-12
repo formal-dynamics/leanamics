@@ -5,7 +5,7 @@ related distributed processes. Each project is paired with a
 [leanblueprint](https://github.com/PatrickMassot/leanblueprint) connecting the
 paper proof to the Lean code statement-by-statement.
 
-**[leanamycs.github.io/leanamycs/](https://leanamycs.github.io/leanamycs/)** — landing
+**[https://formal-dynamics.github.io/leanamycs/](https://formal-dynamics.github.io/leanamycs/)** — landing
 page, blueprints, dependency graphs and API docs for everything below.
 
 | Project | Result | Main theorem |
