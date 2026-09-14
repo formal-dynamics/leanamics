@@ -9,8 +9,8 @@ usemathjax: true
 **Leanamycs** is a collection of Lean 4 + Mathlib formalizations of classical
 results on opinion dynamics and related distributed processes, each paired
 with a [leanblueprint](https://github.com/PatrickMassot/leanblueprint) page
-connecting the paper proof to the Lean code statement-by-statement. Both
-developments below are complete and `sorry`-free, and both are built on a
+connecting the paper proof to the Lean code statement-by-statement. The
+developments below are complete and `sorry`-free, and are built on a
 minimal finite-probability layer — no measure theory, no `PMF`/`ENNReal`, no
 martingales. More protocols are expected to join over time.
 
@@ -40,9 +40,35 @@ opinion with probability $1 - O(1/n)$. The main theorem is
 * [API docs]({{ '/3-majority/docs/' | relative_url }})
 * [Source](https://github.com/leanamycs/leanamycs/tree/main/3-majority)
 
+## Weighted synchronous voter dynamics
+
+For a finite connected nonbipartite undirected graph, each vertex independently
+samples a neighbor according to a stochastic matrix and copies its previous
+color. The eventual probability of consensus in a color equals the initial
+stationary weight of vertices with that color. Uniform neighbor sampling gives
+degree weights, and regular graphs give the initial color fraction.
+The main theorem is `Voter.consensus_probability`, formalizing Hassin–Peleg
+Sections 2.1–2.3.
+
+* [Blueprint]({{ '/voter/blueprint/' | relative_url }}) · [as pdf]({{ '/voter/blueprint.pdf' | relative_url }}) ·
+  [dependency graph]({{ '/voter/blueprint/dep_graph_document.html' | relative_url }})
+* [API docs]({{ '/voter/docs/' | relative_url }})
+* [Source](https://github.com/leanamycs/leanamycs/tree/main/voter)
+
+## Shared finite dynamics library
+
+`Dynamics` supplies uniform and weighted finite expectations, independent
+products, pushforward, kernels, stationary distributions, and geometric
+absorption. It is shared by voter dynamics and 3-majority.
+
+* [Blueprint]({{ '/dynamics/blueprint/' | relative_url }}) · [as pdf]({{ '/dynamics/blueprint.pdf' | relative_url }}) ·
+  [dependency graph]({{ '/dynamics/blueprint/dep_graph_document.html' | relative_url }})
+* [API docs]({{ '/dynamics/docs/' | relative_url }})
+* [Source](https://github.com/leanamycs/leanamycs/tree/main/dynamics)
+
 ---
 
 Each project is an independent Lean package (its own `lakefile.toml` and
 toolchain) living in its own subdirectory of the repository; this page is the
-shared landing page linking out to both. See each subdirectory's own
+shared landing page linking to each development. See each subdirectory's own
 `README.md` for build instructions.

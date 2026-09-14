@@ -11,12 +11,14 @@ page, blueprints, dependency graphs and API docs for everything below.
 | Project | Result | Main theorem |
 | --- | --- | --- |
 | [`rumor_spread/`](rumor_spread) | In the uniform *push* model on the complete graph `K_n`, one initially informed node informs all `n` nodes within `O(log n)` rounds w.h.p. | `RumorPush.push_informs_all_whp` |
+| [`dynamics/`](dynamics) | Shared finite weighted distributions, trajectory expectations, stationary distributions, and geometric absorption | `Dynamics.Kernel.finite_absorption` |
+| [`voter/`](voter) | Hassin–Peleg Sections 2.1–2.3: weighted synchronous consensus probabilities, uniform-neighbor and multiple-color corollaries | `Voter.consensus_probability` |
 | [`3-majority/`](3-majority) | `n` fully-mixing agents, each adopting the majority opinion among three uniformly sampled agents, reach consensus within `O(log n)` rounds with probability `1 - O(1/n)` from a `60%` initial majority. | `ThreeMajority.majority3_consensus_whp` |
 
-Both developments are complete and `sorry`-free, and both are built on a
+The developments are complete and `sorry`-free, and are built on a
 minimal finite-probability layer: no measure theory, no `PMF`/`ENNReal`, no
-martingales, no appeal to Mathlib's `ProbabilityTheory` library. The two sit
-in different regimes — the push protocol's informed set only grows, so a
+martingales, no appeal to Mathlib's `ProbabilityTheory` library. Push and
+3-majority sit in different regimes — the push protocol's informed set only grows, so a
 counting argument over "good rounds" suffices, whereas the 3-majority opinion
 count is not monotone in the round index and so needs genuine concentration
 in every round, supplied by a self-contained Chernoff bound proved from
@@ -24,19 +26,21 @@ in every round, supplied by a self-contained Chernoff bound proved from
 
 ## Layout
 
-Every project is an **independent Lake package** with its own `lakefile.toml`,
-`lake-manifest.json` and `lean-toolchain`, resolved separately from its
-siblings; there is no root-level Lake package. Each has the same shape:
+Every project is a **separate Lake package** with its own `lakefile.toml`,
+`lake-manifest.json` and `lean-toolchain`. The `dynamics/` package is shared by
+`3-majority/` and `voter/`, using the same
+Lean 4.32.0 toolchain and exact Mathlib revision. Rumor spreading retains its
+independent Lean 4.26.0-rc2 pin; there is no root-level Lake package. Each has the same shape:
 
 ```
 <project>/
   README.md            what it proves, how it is proved, how to build it
-  CLAUDE.md            orientation for automated contributors
+  CLAUDE.md            optional orientation for automated contributors
   lakefile.toml        the Lake package (Mathlib + checkdecls)
   lean-toolchain       the pinned Lean version
   <Lib>.lean, <Lib>/   the formalization
   blueprint/src/       the leanblueprint sources
-  latex/               a standalone paper proof mirroring the formalization
+  latex/               optional standalone paper proof
 ```
 
 Shared at the repository root:
@@ -49,7 +53,7 @@ home_page/             the Jekyll landing page, deployed at the Pages root
 To work on one project, `cd` into it and use Lake as usual:
 
 ```bash
-cd rumor_spread        # or: cd 3-majority
+cd voter               # or: dynamics, 3-majority, rumor_spread
 lake exe cache get     # download prebuilt Mathlib oleans (once)
 lake build             # verifies every proof in that project
 ```
@@ -57,8 +61,10 @@ lake build             # verifies every proof in that project
 ## Continuous integration
 
 - `.github/workflows/rumor_spread-ci.yml`, `.github/workflows/three_majority-ci.yml` —
-  `lake build` + lint for one project each, triggered only by changes under
-  that project's directory.
+  `lake build` + lint for one project each. Shared-library changes also rebuild
+  3-majority.
+- `.github/workflows/dynamics-ci.yml` builds the shared library and voter package
+  and audits the main theorem axioms.
 - `.github/workflows/pages.yml` — builds every project's blueprint (web and
   pdf) and API docs, checks that every declaration named in a blueprint
   actually exists (`lake exe checkdecls`), assembles them under `home_page/`

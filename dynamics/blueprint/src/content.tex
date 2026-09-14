@@ -1,0 +1,89 @@
+\begin{abstract}
+A shared library for finite stochastic dynamics using normalized real weights,
+finite sums, and limits of finite-time probabilities. These are generic library
+results, rather than statements attributed to a particular opinion-dynamics paper.
+\end{abstract}
+
+\section{Uniform expectations}
+\begin{definition}[Finite uniform average]\label{def:avg}
+\lean{Dynamics.avg}\leanok
+For a finite type $A$, set $\operatorname{avg}(f)=\sum_{a\in A}f(a)/|A|$.
+When $A$ is empty this is zero, following Lean's division convention.
+\end{definition}
+\begin{lemma}[Product independence]\label{lem:uniform-product}
+\lean{Dynamics.avg_prod_pi,Dynamics.avg_equiv}\leanok\uses{def:avg}
+Uniform averages factor over independent coordinates and are invariant under
+bijections of the sample space.
+\end{lemma}
+\begin{lemma}[Finite trajectories]\label{lem:uniform-trajectory}
+\lean{Dynamics.expList,Dynamics.expList_eq_avg_ofFn}\leanok\uses{def:avg}
+The recursively defined expectation over $T$ independent draws equals the
+uniform average over functions $\{0,\ldots,T-1\}\to A$.
+\end{lemma}
+\begin{proof}\leanok
+Separate the first coordinate using the finite-function/product equivalence,
+then induct on $T$. The empty sample space is handled separately.
+\end{proof}
+
+\section{Weighted distributions and kernels}
+\begin{definition}[Normalized real weights]\label{def:distribution}
+\lean{Dynamics.Distribution,Dynamics.Distribution.expect,Dynamics.Distribution.prob}\leanok
+A distribution consists of nonnegative real weights $p_a$ with $\sum_a p_a=1$.
+Its expectation is $\sum_a p_a f(a)$, and an event probability is the expectation
+of its indicator. Such a distribution cannot exist on an empty type.
+\end{definition}
+\begin{lemma}[Uniform agreement]\label{lem:uniform-agreement}
+\lean{Dynamics.Distribution.uniform_expect}\leanok\uses{def:distribution,def:avg}
+On a nonempty finite type the normalized uniform distribution agrees with the
+existing finite average.
+\end{lemma}
+\begin{lemma}[Independent products and pushforward]\label{lem:weighted-product}
+\lean{Dynamics.Distribution.independent_expect_prod,Dynamics.Distribution.independent_expect_eval,Dynamics.Distribution.map_expect}\leanok\uses{def:distribution}
+Independent coordinates have product weights. Expectations of product
+observables factor, and transporting weights along a function commutes with expectation.
+\end{lemma}
+\begin{proof}\leanok
+Distribute products over finite sums; for pushforward interchange the two sums
+and evaluate each fiber indicator.
+\end{proof}
+\begin{definition}[Transition kernel]\label{def:kernel}
+\lean{Dynamics.Kernel,Dynamics.Kernel.iterate,Dynamics.Kernel.trajectory}\leanok\uses{def:distribution}
+A finite kernel assigns a distribution to every state. Its operator iterates
+compute expectations at finite times; trajectory functionals additionally
+record the history.
+\end{definition}
+\begin{lemma}[Endpoint agreement]\label{lem:endpoint}
+\lean{Dynamics.Kernel.trajectory_endpoint}\leanok\uses{def:kernel}
+Ignoring history in a trajectory expectation recovers the iterated transition operator.
+\end{lemma}
+
+\section{Stationarity and absorption}
+\begin{theorem}[Existence of stationary weights]\label{thm:stationary}
+\lean{Dynamics.Kernel.exists_stationary}\leanok\uses{def:kernel}
+Every stochastic kernel on a nonempty finite type has a distribution $p$ with $pK=p$.
+\end{theorem}
+\begin{proof}\leanok
+Average the first $n+1$ evolved distributions. The stationarity defect of this
+Ces\`aro average is $(p_{n+1}-p_0)/(n+1)$, which tends to zero coordinatewise.
+Compactness of the finite probability simplex gives a convergent subsequence;
+continuity of finite sums implies that its limit is stationary.
+\end{proof}
+\begin{lemma}[Uniform absorption block]\label{lem:block}
+\lean{Dynamics.Kernel.exists_uniform_block}\leanok\uses{def:kernel}
+Let $f$ be a zero-one survival indicator with $Kf\le f$. Suppose for each
+state $a$ there is $n_a$ with $(K^{n_a}f)(a)<1$. There are $m>0$ and
+$0\le q<1$ such that $K^m f\le qf$.
+\end{lemma}
+\begin{proof}\leanok
+Take one plus the maximum of the finitely many access times. Antitonicity of
+survival probabilities puts every state below one at that time. Their finite
+maximum supplies $q$. At states with $f=0$, absorption keeps the expectation zero.
+\end{proof}
+\begin{theorem}[Geometric decay and convergence]\label{thm:absorption}
+\lean{Dynamics.Kernel.geometric_blocks,Dynamics.Kernel.finite_absorption}\leanok\uses{lem:block}
+Under these hypotheses, $K^{nm}f\le q^n f$, and $K^t f(a)\to0$ for every state $a$.
+\end{theorem}
+\begin{proof}\leanok
+Induct over blocks using positivity and linearity. The geometric bound tends
+to zero. For arbitrary $t$, compare with $m\lfloor t/m\rfloor$ by antitonicity.
+\end{proof}

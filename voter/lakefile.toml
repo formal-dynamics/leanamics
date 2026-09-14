@@ -1,13 +1,9 @@
-name = "three_majority"
+name = "voter"
 version = "0.1.0"
-keywords = ["math"]
-defaultTargets = ["ThreeMajority"]
+defaultTargets = ["Voter"]
 
 [leanOptions]
-pp.unicode.fun = true # pretty-prints `fun a ↦ b`
 relaxedAutoImplicit = false
-weak.linter.mathlibStandardSet = true
-maxSynthPendingDepth = 3
 
 [[require]]
 name = "mathlib"
@@ -24,4 +20,4 @@ name = "dynamics"
 path = "../dynamics"
 
 [[lean_lib]]
-name = "ThreeMajority"
+name = "Voter"
