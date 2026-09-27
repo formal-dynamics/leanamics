@@ -131,7 +131,7 @@
    "configFile": "lakefile.toml"
   }
  ],
- "name": "three_majority",
+ "name": "voter",
  "lakeDir": ".lake",
  "fixedToolchain": false
 }

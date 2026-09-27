@@ -3,9 +3,10 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 > **Note:** this project lives in the `3-majority/` subdirectory of the
-> `Leanamycs` monorepo and is an independent Lake package (its own
-> `lakefile.toml`, `lake-manifest.json` and toolchain, resolved separately
-> from the sibling `rumor_spread/`). GitHub only reads workflow files from
+> `Leanamycs` monorepo and is a separate Lake package (its own
+> `lakefile.toml`, `lake-manifest.json` and toolchain). It requires the shared
+> sibling package `../dynamics` by path, with the same Lean toolchain and exact
+> Mathlib revision; `rumor_spread/` remains fully independent. GitHub only reads workflow files from
 > the true repo root, so CI for this directory is
 > `/.github/workflows/three_majority-ci.yml` (build + lint, scoped here via
 > `lake-package-directory: 3-majority`) plus `/.github/workflows/pages.yml`,
@@ -19,7 +20,7 @@ A complete (`sorry`-free) Lean 4 + Mathlib formalization of the **3-majority opi
 Module structure (all under the `ThreeMajority` namespace, dependency order):
 
 - `Bounds.lean` — elementary real inequalities: a quadratically-tight lower bound on `log` near `1` (the crude `1 - 1/x ≤ log x` is *exactly* tangent at `x = 1` and so gives a useless `0` in the Chernoff exponent), `xᵏ/k! ≤ exp x`, and tangent-line bounds on `log` at an arbitrary reference point.
-- `Prob.lean` — finite uniform probability: `avg` (sum / cardinality) and `expList α T F` (expectation over `T` i.i.d. uniform draws, defined by recursion on `T`). Largely shared with `rumor_spread/RumorSpread/Prob.lean`; the addition here is `avg_prod_pi`, the independence fact for products over distinct coordinates.
+- `Prob.lean` — compatibility layer: keeps the `ThreeMajority` names `avg` (sum / cardinality) and `expList α T F` (expectation over `T` i.i.d. uniform draws, defined by recursion on `T`) together with their laws, each stated as an alias of the corresponding declaration in the shared `Dynamics.Uniform` (package `../dynamics`), which now owns the finite uniform probability layer including `avg_prod_pi`, the independence fact for products over distinct coordinates.
 - `Model.lean` — round configurations `Tgt3 n := Fin n → Fin n × Fin n × Fin n`, the `step`/`run` dynamics, and `step_mono` (monotone in `I` for fixed `r`).
 - `Chernoff.lean` — the exponential-moment bound `𝔼[exp(tX)] ≤ exp(μ(eᵗ-1))` and the closed-form tail bounds at the optimal `t = log(k/μ)`, from `1 + x ≤ exp x` plus `avg_prod_pi`.
 - `OneRound.lean` — the exact cubic majority map `p(x) = 3x² - 2x³` (`avg_card_step`), via `maj(a,b,c) = ab+bc+ac-2abc` on `{0,1}`, plus the per-agent `{0,1}` decomposition `Y_maj` that the Chernoff bounds consume.
@@ -29,7 +30,7 @@ Module structure (all under the `ThreeMajority` namespace, dependency order):
 
 Design constraint to preserve: **no measure theory, no `PMF`/`ENNReal`, no martingales**, and no appeal to Mathlib's `ProbabilityTheory` library — everything is finite uniform sums. Unlike the sibling `rumor_spread`, a Chernoff bound *is* required (the opinion count is not monotone in the round index, so no "good rounds" counting argument is available), but it is proved from scratch in `Chernoff.lean` rather than imported.
 
-Toolchain is pinned in [lean-toolchain](lean-toolchain); the dependencies are Mathlib and `checkdecls` (see [lakefile.toml](lakefile.toml)).
+Toolchain is pinned in [lean-toolchain](lean-toolchain); the dependencies are Mathlib, `checkdecls` and the path package `../dynamics` (see [lakefile.toml](lakefile.toml)).
 
 ## Commands
 
@@ -57,7 +58,7 @@ There is no test suite or linter beyond the Lean elaborator itself: `lake build`
   lake exe checkdecls blueprint/lean_decls   # verify every \lean{} name exists
   ```
 - There is no `home_page/` here: the monorepo has a single Jekyll landing page at `/home_page/` (repo root) that links to both projects' blueprints and API docs. `blueprint/src/web.tex` sets `\home{../..}` accordingly, since this project's blueprint is deployed at `/3-majority/blueprint/`.
-- Do not add `doc-gen4` as a direct dependency in `lakefile.toml` — the CI docs build resolves it in an isolated `docbuild/` directory (gitignored) to avoid forcing a Mathlib/toolchain bump in the main project; only `checkdecls` is a real dependency here (needed for `lake exe checkdecls`).
+- Do not add `doc-gen4` as a direct dependency in `lakefile.toml` — the CI docs build resolves it in an isolated `docbuild/` directory (gitignored) to avoid forcing a Mathlib/toolchain bump in the main project; the real dependencies here are `checkdecls` (needed for `lake exe checkdecls`) and `../dynamics`.
 
 ## Working in this codebase
 

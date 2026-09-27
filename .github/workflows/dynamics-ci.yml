@@ -1,0 +1,37 @@
+name: Shared dynamics and voter CI
+on:
+  push:
+    paths:
+      - 'dynamics/**'
+      - 'voter/**'
+      - 'scripts/check_axioms.py'
+      - '.github/workflows/dynamics-ci.yml'
+  pull_request:
+    paths:
+      - 'dynamics/**'
+      - 'voter/**'
+      - 'scripts/check_axioms.py'
+      - '.github/workflows/dynamics-ci.yml'
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [dynamics, voter]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: leanprover/lean-action@434f25c2f80ded67bba02502ad3a86f25db50709
+        with:
+          lake-package-directory: ${{ matrix.package }}
+      - name: Audit theorem axioms
+        working-directory: ${{ matrix.package }}
+        run: python3 ../scripts/check_axioms.py
+      - name: Reject proof placeholders and new axioms
+        run: |
+          # `sorry`/`admit` anywhere; `axiom` only as a declaration keyword, so that
+          # prose such as "no axiom beyond Lean core" in a docstring does not fail CI.
+          if grep -R -n -E '\b(sorry|admit)\b|^\s*((private|protected|noncomputable|unsafe)\s+)*axiom\s' dynamics/Dynamics.lean dynamics/Dynamics voter/Voter.lean voter/Voter; then
+            exit 1
+          fi

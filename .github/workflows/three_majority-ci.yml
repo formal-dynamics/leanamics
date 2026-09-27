@@ -4,10 +4,12 @@ on:
   push:
     paths:
       - '3-majority/**'
+      - 'dynamics/**'
       - '.github/workflows/three_majority-ci.yml'
   pull_request:
     paths:
       - '3-majority/**'
+      - 'dynamics/**'
       - '.github/workflows/three_majority-ci.yml'
   workflow_dispatch:
 

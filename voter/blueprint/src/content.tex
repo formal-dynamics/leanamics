@@ -1,0 +1,159 @@
+\begin{abstract}
+We formalize Sections 2.1--2.3 of Hassin and Peleg,
+\emph{Distributed Probabilistic Polling and Applications to Proportionate Agreement},
+Information and Computation 171 (2001), 248--268.
+The synchronous process uses independent neighbor samples with directional weights.
+On a finite connected nonbipartite undirected graph it reaches consensus with
+probability one, and each color wins with its initial stationary vertex weight.
+No path-space measure is needed: eventual probabilities are suprema of increasing
+finite-time consensus probabilities.
+\end{abstract}
+
+\section{Shared foundation (generic library results)}
+\begin{definition}[Finite weighted expectations]\label{def:weights}
+\lean{Dynamics.Distribution,Dynamics.Kernel}\leanok
+A distribution has nonnegative real weights summing to one. A kernel is a
+family of such distributions, one for each state. Expectations are finite sums.
+These are shared library definitions, not numbered results of the paper.
+\end{definition}
+\begin{theorem}[Stationary distribution exists]\label{thm:stationary}
+\lean{Dynamics.Kernel.exists_stationary}\leanok\uses{def:weights}
+Every finite nonempty stochastic matrix has a stationary distribution.
+\end{theorem}
+\begin{proof}\leanok
+The shared library uses Ces\`aro averages of evolved distributions and
+compactness of the finite probability simplex. This supplies the existence
+fact recalled before Lemma 2.2; uniqueness is not required.
+\end{proof}
+\begin{theorem}[Finite-chain absorption]\label{thm:generic-absorption}
+\lean{Dynamics.Kernel.exists_uniform_block,Dynamics.Kernel.geometric_blocks,Dynamics.Kernel.finite_absorption}\leanok\uses{def:weights}
+An absorbing target accessible from every state of a finite chain admits a
+uniform positive success probability in a fixed number of rounds. The survival
+probability decays geometrically in blocks and tends to zero.
+\end{theorem}
+\begin{proof}\leanok
+Take a common block length exceeding all finitely many access times, then a
+maximum survival probability strictly below one. Iterate the resulting contraction.
+\end{proof}
+
+\section{Section 2.1: model}
+\begin{definition}[Synchronous copying]\label{def:step}
+\lean{Voter.step,Voter.round,Voter.transition}\leanok\uses{def:weights}
+A configuration is $s:V\to C$. Independently sample $r(i)$ according to row
+$H_i$, then set the next configuration to $i\mapsto s(r(i))$.
+\end{definition}
+\begin{lemma}[Configuration transition formula]\label{lem:product}
+\lean{Voter.transition_product,Voter.transition_product_bool}\leanok\uses{def:step}
+For configurations $s,t$, the transition probability is
+\[P_{st}=\prod_i\sum_{j:s(j)=t(i)}H_{ij}.\]
+For Boolean colors a white target vertex contributes $\sum_j H_{ij}s(j)$;
+a black target contributes its complement, giving the paper's product formula.
+\end{lemma}
+\begin{proof}\leanok
+The configuration distribution is the pushforward of the independently sampled
+neighbors. Factor its equality indicator into a product over vertices.
+\end{proof}
+
+\section{Section 2.2: absorption and consensus probability}
+\begin{lemma}[Monochromatic-edge propagation]\label{lem:propagation}
+\lean{Voter.monochromatic_edge,Voter.propagate_region,Voter.possible_consensus}\leanok\uses{def:step}
+On a connected nonbipartite graph every Boolean configuration has a possible
+finite path to a constant configuration.
+\end{lemma}
+\begin{proof}\leanok
+A coloring without a monochromatic edge would be a proper two-coloring.
+Starting with a monochromatic edge, each vertex of its region can keep that
+color by sampling an internal neighbor. Connectedness supplies an edge leaving
+every proper region. One more vertex can copy across that edge. Induction on
+the number of vertices outside the region gives consensus.
+\end{proof}
+\begin{lemma}[Lemma 2.1: absorption]\label{lem:21}
+\lean{Voter.transition_constant,Voter.possible_positive,Voter.consensus_tendsto}\leanok\uses{lem:propagation,thm:generic-absorption,lem:product}
+Assume $H_{ij}>0$ whenever $i,j$ are adjacent; extra support, such as
+self-loops, is allowed. Both constant configurations
+are absorbing, and the probability of remaining nonconstant tends to zero.
+This is the finite-time survival formulation of the paper's transience claim.
+\end{lemma}
+\begin{proof}\leanok
+Every possible copying round has positive probability. Thus graph propagation
+gives accessibility. Apply the shared finite-chain absorption theorem.
+\end{proof}
+\begin{lemma}[Lemma 2.3: invariant stationary weight]\label{lem:23}
+\lean{Voter.round_mass,Voter.iterate_mass}\leanok\uses{def:step,thm:stationary}
+For any stationary distribution $\pi$, the expected white mass at every finite
+time is the initial mass $\sum_i\pi_i s(i)$. No graph connectivity assumption
+is imposed on this invariant.
+\end{lemma}
+\begin{proof}\leanok
+A vertex's expected next color indicator is $\sum_jH_{ij}s(j)$.
+Interchanging finite sums and using $\pi H=\pi$ proves one-step preservation;
+induction proves the iterated statement.
+\end{proof}
+\begin{lemma}[Lemma 2.2: limiting identification]\label{lem:22}
+\lean{Voter.whiteMass_bounds,Voter.whiteProbability_error,Voter.whiteProbability_tendsto}\leanok\uses{lem:21,lem:23}
+The discrepancy between expected stationary white mass and all-white
+probability lies between zero and nonconsensus probability. Consequently
+all-white probability converges to initial stationary white mass.
+The implementation combines the paper's limiting identification with the
+invariant from Lemma 2.3 when stating the limit.
+\end{lemma}
+\begin{proof}\leanok
+Pointwise, the white mass agrees with the all-white indicator on constant
+configurations and lies in $[0,1]$ elsewhere. Take finite-time expectations
+and squeeze the discrepancy using Lemma 2.1.
+\end{proof}
+\begin{theorem}[Theorem 2.1]\label{thm:21}
+\lean{Voter.eventualColor,Voter.colorProbability_mono,Voter.consensus_probability}\leanok\uses{lem:22}
+Define eventual all-white probability as the supremum of the increasing
+finite-time all-white probabilities. It equals the initial stationary white mass.
+\end{theorem}
+\begin{proof}\leanok
+Consensus is absorbing, so the probabilities increase and are bounded by one.
+Their supremum is their limit. Identify this limit using Lemma 2.2.
+\end{proof}
+\begin{theorem}[Corollary 2.2 and regular graphs]\label{cor:22}
+\lean{Voter.degree_stationary,Voter.uniform_consensus_probability,Voter.regular_consensus_probability}\leanok\uses{thm:21}
+For uniform neighbor sampling, $\pi_i=d_i/(2|E|)$, so all-white consensus has
+probability $\sum_{i:s(i)=1}d_i/(2|E|)$. On a regular graph this is the initial
+fraction of white vertices.
+\end{theorem}
+\begin{proof}\leanok
+The degree-sum formula normalizes these weights. In the stationarity equation,
+the degree cancels the reciprocal sampling degree; undirected adjacency gives
+the remaining column sum. Equal degrees then give uniform vertex weights.
+\end{proof}
+
+\section{Section 2.3: multiple colors}
+\begin{theorem}[Consensus in a specified color]\label{thm:colors}
+\lean{Voter.step_project,Voter.iterate_project,Voter.colorProbability_project,Voter.color_consensus_probability,Voter.sum_color_consensus_probability}\leanok\uses{thm:21}
+For a finite color set and any specified color $c$, its eventual consensus
+probability is $\sum_{i:s(i)=c}\pi_i$. These probabilities sum to one.
+\end{theorem}
+\begin{proof}\leanok
+The color-indicator projection commutes with every copying step and with
+iterated expectations. Its all-white event is exactly all-$c$ consensus.
+Apply Theorem 2.1 to this Boolean projection.
+\end{proof}
+
+\section{Examples and scope}
+\begin{lemma}[Triangle and a nonuniform matrix]\label{lem:examples}
+\lean{Voter.Examples.triangle_one_white,Voter.Examples.biased_stationary}\leanok\uses{cor:22,lem:23}
+One white vertex on a triangle wins with probability $1/3$.
+The stochastic matrix whose two rows are $(1/3,2/3)$ has stationary
+weights $(1/3,2/3)$, providing a nonuniform invariant example.
+\end{lemma}
+\begin{lemma}[Wright--Fisher sampling]\label{lem:wf}
+\lean{Voter.Examples.wrightFisher,Voter.Examples.wrightFisher_stationary,Voter.Examples.wrightFisher_one_third}\leanok\uses{thm:21}
+On three individuals, let every offspring pick a uniform parent, itself included.
+This kernel has self-loops, so it is supported beyond the edges of the triangle.
+Theorem~2.1 still applies, and one allele copy fixes with probability $1/3$.
+\end{lemma}
+\begin{lemma}[Bipartite two-cycle]\label{lem:cycle}
+\lean{Voter.Examples.twoVertex_unique_neighbor,Voter.Examples.twoVertex_flip,Voter.Examples.twoVertex_cycle,Voter.Examples.twoVertex_never_consensus}\leanok\uses{def:step}
+On the two-vertex graph, every vertex must copy the other vertex.
+The alternating coloring flips each round and returns after two rounds;
+neither coloring is constant. Thus connectedness alone is insufficient.
+\end{lemma}
+Convergence-time bounds, dynamic networks, and extremal coalition results
+are future work beyond this milestone. Chernoff bounds remain in the
+3-majority package until another theorem requires their extraction.

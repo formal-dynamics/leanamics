@@ -17,3 +17,6 @@
 
 # Each project has its own .gitignore for its Lake, blueprint and LaTeX
 # build artifacts.
+
+/home_page/dynamics/
+/home_page/voter/
