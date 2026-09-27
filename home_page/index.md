@@ -24,7 +24,7 @@ with high probability. The main theorem is `RumorPush.push_informs_all_whp`.
 * [Blueprint]({{ '/rumor_spread/blueprint/' | relative_url }}) · [as pdf]({{ '/rumor_spread/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/rumor_spread/blueprint/dep_graph_document.html' | relative_url }})
 * [API docs]({{ '/rumor_spread/docs/' | relative_url }})
-* [Source](https://github.com/leanamycs/leanamycs/tree/main/rumor_spread)
+* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/rumor_spread)
    
 ## 3-majority dynamics
 
@@ -38,7 +38,7 @@ opinion with probability $1 - O(1/n)$. The main theorem is
 * [Blueprint]({{ '/3-majority/blueprint/' | relative_url }}) · [as pdf]({{ '/3-majority/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/3-majority/blueprint/dep_graph_document.html' | relative_url }})
 * [API docs]({{ '/3-majority/docs/' | relative_url }})
-* [Source](https://github.com/leanamycs/leanamycs/tree/main/3-majority)
+* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/3-majority)
 
 ## Weighted synchronous voter dynamics
 
@@ -53,7 +53,7 @@ Sections 2.1–2.3.
 * [Blueprint]({{ '/voter/blueprint/' | relative_url }}) · [as pdf]({{ '/voter/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/voter/blueprint/dep_graph_document.html' | relative_url }})
 * [API docs]({{ '/voter/docs/' | relative_url }})
-* [Source](https://github.com/leanamycs/leanamycs/tree/main/voter)
+* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/voter)
 
 ## Shared finite dynamics library
 
@@ -64,11 +64,12 @@ absorption. It is shared by voter dynamics and 3-majority.
 * [Blueprint]({{ '/dynamics/blueprint/' | relative_url }}) · [as pdf]({{ '/dynamics/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/dynamics/blueprint/dep_graph_document.html' | relative_url }})
 * [API docs]({{ '/dynamics/docs/' | relative_url }})
-* [Source](https://github.com/leanamycs/leanamycs/tree/main/dynamics)
+* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/dynamics)
 
 ---
 
-Each project is an independent Lean package (its own `lakefile.toml` and
-toolchain) living in its own subdirectory of the repository; this page is the
+Each project is a separate Lean package (its own `lakefile.toml` and
+toolchain) living in its own subdirectory of the repository, with `dynamics/`
+shared by `3-majority/` and `voter/`; this page is the
 shared landing page linking to each development. See each subdirectory's own
 `README.md` for build instructions.

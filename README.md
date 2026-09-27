@@ -36,7 +36,7 @@ independent Lean 4.26.0-rc2 pin; there is no root-level Lake package. Each has t
 <project>/
   README.md            what it proves, how it is proved, how to build it
   CLAUDE.md            optional orientation for automated contributors
-  lakefile.toml        the Lake package (Mathlib + checkdecls)
+  lakefile.toml        the Lake package (Mathlib + checkdecls, + dynamics if shared)
   lean-toolchain       the pinned Lean version
   <Lib>.lean, <Lib>/   the formalization
   blueprint/src/       the leanblueprint sources

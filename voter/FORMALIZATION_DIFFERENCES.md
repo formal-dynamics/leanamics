@@ -13,21 +13,21 @@ and its Lean 4 formalization in the `voter` package (`leanamycs/voter`).
 
 | Paper Result | Informal Content | Lean 4 Declaration | File |
 | :--- | :--- | :--- | :--- |
-| **Section 2.1** | Synchronous copying round | [`Voter.step`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Model.lean#L17) | [Voter/Model.lean](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Model.lean) |
-| **Section 2.1** | Configuration transition kernel | [`Voter.transition`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Model.lean#L30) | [Voter/Model.lean](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Model.lean) |
-| **Section 2.1** | Transition probability formula ($P_{ab}$) | [`Voter.transition_product`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Model.lean#L50), [`Voter.transition_product_bool`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Model.lean#L70) | [Voter/Model.lean](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Model.lean) |
-| **Preamble to Lemma 2.2** | Stationary distribution existence | [`Dynamics.Kernel.exists_stationary`](file:///home/ndarchiv/work/leanymics/leanamycs/dynamics/Dynamics/Stationary.lean#L53) | [Dynamics/Stationary.lean](file:///home/ndarchiv/work/leanymics/leanamycs/dynamics/Dynamics/Stationary.lean) |
-| **Lemma 2.1** | Monochromatic edge in nonbipartite graph | [`Voter.monochromatic_edge`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Graph.lean#L17) | [Voter/Graph.lean](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Graph.lean) |
-| **Lemma 2.1** | Monochromatic region propagation | [`Voter.propagate_region`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Graph.lean#L45), [`Voter.possible_consensus`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Graph.lean#L89) | [Voter/Graph.lean](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Graph.lean) |
-| **Lemma 2.1** | Consensus states absorbing & nonconsensus survival vanishes | [`Voter.transition_constant`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Absorption.lean#L30), [`Voter.consensus_tendsto`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Absorption.lean#L87) | [Voter/Absorption.lean](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Absorption.lean) |
-| **Lemma 2.3** | Expected stationary weight invariance (martingale) | [`Voter.round_mass`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Model.lean#L99), [`Voter.iterate_mass`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Model.lean#L113) | [Voter/Model.lean](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Model.lean) |
-| **Lemma 2.2** | Finite-time discrepancy bound & limit of white probability | [`Voter.whiteMass_bounds`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Main.lean#L91), [`Voter.whiteProbability_error`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Main.lean#L107), [`Voter.whiteProbability_tendsto`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Main.lean#L122) | [Voter/Main.lean](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Main.lean) |
-| **Theorem 2.1** | Eventual all-white absorption probability $\rho_{s1} = \sum_{i \in W_s} \pi_H(i)$ | [`Voter.consensus_probability`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Main.lean#L134) | [Voter/Main.lean](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Main.lean) |
-| **Corollary 2.2** | Degree weights are stationary; uniform consensus probability $\sum_{i \in W_s} \frac{d_i}{2m}$ | [`Voter.degree_stationary`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Uniform.lean#L42), [`Voter.uniform_consensus_probability`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Corollaries.lean#L24) | [Voter/Uniform.lean](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Uniform.lean), [Voter/Corollaries.lean](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Corollaries.lean) |
-| **Section 4.3.1** | Consensus on $d$-regular graph equals initial white fraction $x/n$ | [`Voter.regular_consensus_probability`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Corollaries.lean#L34) | [Voter/Corollaries.lean](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Corollaries.lean) |
-| **Section 2.3** | Many colors: projections commute with dynamics | [`Voter.step_project`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Model.lean#L22), [`Voter.iterate_project`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Colors.lean#L9), [`Voter.colorProbability_project`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Colors.lean#L34) | [Voter/Model.lean](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Model.lean), [Voter/Colors.lean](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Colors.lean) |
-| **Section 2.3** | Many colors: consensus probability $\rho_{sc} = \sum_{i \in A_c^s} \pi_H(i)$ | [`Voter.color_consensus_probability`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Colors.lean#L47), [`Voter.sum_color_consensus_probability`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Colors.lean#L57) | [Voter/Colors.lean](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Colors.lean) |
-| **Figure 1** | Bipartite 2-cycle alternating coloring flips and cycles without consensus | [`Voter.Examples.twoVertex_flip`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Examples.lean#L65), [`Voter.Examples.twoVertex_cycle`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Examples.lean#L68), [`Voter.Examples.twoVertex_never_consensus`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Examples.lean#L72) | [Voter/Examples.lean](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Examples.lean) |
+| **Section 2.1** | Synchronous copying round | [`Voter.step`](Voter/Model.lean#L17) | [Voter/Model.lean](Voter/Model.lean) |
+| **Section 2.1** | Configuration transition kernel | [`Voter.transition`](Voter/Model.lean#L32) | [Voter/Model.lean](Voter/Model.lean) |
+| **Section 2.1** | Transition probability formula ($P_{ab}$) | [`Voter.transition_product`](Voter/Model.lean#L52), [`Voter.transition_product_bool`](Voter/Model.lean#L72) | [Voter/Model.lean](Voter/Model.lean) |
+| **Preamble to Lemma 2.2** | Stationary distribution existence | [`Dynamics.Kernel.exists_stationary`](../dynamics/Dynamics/Stationary.lean#L53) | [Dynamics/Stationary.lean](../dynamics/Dynamics/Stationary.lean) |
+| **Lemma 2.1** | Monochromatic edge in nonbipartite graph | [`Voter.monochromatic_edge`](Voter/Graph.lean#L18) | [Voter/Graph.lean](Voter/Graph.lean) |
+| **Lemma 2.1** | Monochromatic region propagation | [`Voter.propagate_region`](Voter/Graph.lean#L46), [`Voter.possible_consensus`](Voter/Graph.lean#L90) | [Voter/Graph.lean](Voter/Graph.lean) |
+| **Lemma 2.1** | Consensus states absorbing & nonconsensus survival vanishes | [`Voter.transition_constant`](Voter/Absorption.lean#L34), [`Voter.consensus_tendsto`](Voter/Absorption.lean#L91) | [Voter/Absorption.lean](Voter/Absorption.lean) |
+| **Lemma 2.3** | Expected stationary weight invariance (martingale) | [`Voter.round_mass`](Voter/Model.lean#L101), [`Voter.iterate_mass`](Voter/Model.lean#L115) | [Voter/Model.lean](Voter/Model.lean) |
+| **Lemma 2.2** | Finite-time discrepancy bound & limit of white probability | [`Voter.whiteMass_bounds`](Voter/Main.lean#L101), [`Voter.whiteProbability_error`](Voter/Main.lean#L117), [`Voter.whiteProbability_tendsto`](Voter/Main.lean#L132) | [Voter/Main.lean](Voter/Main.lean) |
+| **Theorem 2.1** | Eventual all-white absorption probability $\rho_{s1} = \sum_{i \in W_s} \pi_H(i)$ | [`Voter.consensus_probability`](Voter/Main.lean#L144) | [Voter/Main.lean](Voter/Main.lean) |
+| **Corollary 2.2** | Degree weights are stationary; uniform consensus probability $\sum_{i \in W_s} \frac{d_i}{2m}$ | [`Voter.degree_stationary`](Voter/Uniform.lean#L43), [`Voter.uniform_consensus_probability`](Voter/Corollaries.lean#L26) | [Voter/Uniform.lean](Voter/Uniform.lean), [Voter/Corollaries.lean](Voter/Corollaries.lean) |
+| **Section 4.3.1** | Consensus on $d$-regular graph equals initial white fraction $x/n$ | [`Voter.regular_consensus_probability`](Voter/Corollaries.lean#L36) | [Voter/Corollaries.lean](Voter/Corollaries.lean) |
+| **Section 2.3** | Many colors: projections commute with dynamics | [`Voter.step_project`](Voter/Model.lean#L24), [`Voter.iterate_project`](Voter/Colors.lean#L10), [`Voter.colorProbability_project`](Voter/Colors.lean#L37) | [Voter/Model.lean](Voter/Model.lean), [Voter/Colors.lean](Voter/Colors.lean) |
+| **Section 2.3** | Many colors: consensus probability $\rho_{sc} = \sum_{i \in A_c^s} \pi_H(i)$ | [`Voter.color_consensus_probability`](Voter/Colors.lean#L51), [`Voter.sum_color_consensus_probability`](Voter/Colors.lean#L61) | [Voter/Colors.lean](Voter/Colors.lean) |
+| **Figure 1** | Bipartite 2-cycle alternating coloring flips and cycles without consensus | [`Voter.Examples.twoVertex_flip`](Voter/Examples.lean#L65), [`Voter.Examples.twoVertex_cycle`](Voter/Examples.lean#L68), [`Voter.Examples.twoVertex_never_consensus`](Voter/Examples.lean#L72) | [Voter/Examples.lean](Voter/Examples.lean) |
 
 ---
 
@@ -64,11 +64,11 @@ The following portions of the paper were not formalized:
 * **The issue**:
   Assuming "without loss of generality" that the monochromatic edge is white is invalid when analyzing an arbitrary non-monochromatic state $s$. An initial state $s$ could contain monochromatic *black* edges but *no* monochromatic white edges (e.g. if the white vertices form an independent set). From such an edge, the region propagation argument can only guarantee reaching the *all-black* state in $\text{Diam}(V)$ steps, not necessarily the all-white state directly.
 * **Lean's rigorous treatment**:
-  [`Voter.possible_consensus`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Graph.lean#L89) explicitly proves:
+  [`Voter.possible_consensus`](Voter/Graph.lean#L90) explicitly proves:
   ```lean
   ∃ c, Relation.ReflTransGen (Possible G) s (fun _ => c)
   ```
-  That is, consensus is reachable in **some** color $c \in \{\text{true}, \text{false}\}$ (the color of the monochromatic edge found by [`monochromatic_edge`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Graph.lean#L17)). This suffices to prove that the probability of staying in non-consensus states decays to 0 ([`consensus_tendsto`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Absorption.lean#L87)), fixing the paper's informal leap.
+  That is, consensus is reachable in **some** color $c \in \{\text{true}, \text{false}\}$ (the color of the monochromatic edge found by [`monochromatic_edge`](Voter/Graph.lean#L18)). This suffices to prove that the probability of staying in non-consensus states decays to 0 ([`consensus_tendsto`](Voter/Absorption.lean#L91)), fixing the paper's informal leap.
 
 ---
 
@@ -86,7 +86,7 @@ The following portions of the paper were not formalized:
   noncomputable def eventualColor [Fintype C] (H : Kernel V) (c : C)
       (s : Config V C) : ℝ := ⨆ n, colorProbability H c n s
   ```
-  Since consensus states are absorbing fixed points ([`transition_constant`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Absorption.lean#L30)), $n \mapsto \text{colorProbability } H\ c\ n\ s$ is monotone increasing ([`colorProbability_mono`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Main.lean#L42)) and converges to its supremum ([`colorProbability_tendsto`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Main.lean#L60)). This gives a fully constructive and rigorous definition using only standard real analysis.
+  Since consensus states are absorbing fixed points ([`transition_constant`](Voter/Absorption.lean#L34)), $n \mapsto \text{colorProbability } H\ c\ n\ s$ is monotone increasing ([`colorProbability_mono`](Voter/Main.lean#L46)) and converges to its supremum ([`colorProbability_tendsto`](Voter/Main.lean#L65)). This gives a fully constructive and rigorous definition using only standard real analysis.
 
 ---
 
@@ -98,13 +98,13 @@ The following portions of the paper were not formalized:
   2. **Lemma 2.3** is proved second: $\forall t \ge 0, \mathbb{E}_s(\pi_H(S_t)) = \sum_{i \in W_s} \pi_H(i)$ (martingale property).
   3. **Theorem 2.1** equates the two limits.
 * **Lean structure**:
-  1. **Lemma 2.3** ([`round_mass`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Model.lean#L99), [`iterate_mass`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Model.lean#L113)) is proved **first** in `Model.lean`.
+  1. **Lemma 2.3** ([`round_mass`](Voter/Model.lean#L101), [`iterate_mass`](Voter/Model.lean#L115)) is proved **first** in `Model.lean`.
   2. **Lemma 2.2** is then formalized in `Main.lean` through explicit error bounds:
-     - [`whiteMass_bounds`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Main.lean#L91): $\mathbf{1}_{\{s=\mathbf{1}\}} \le \text{whiteMass } p\ s \le \mathbf{1}_{\{s=\mathbf{1}\}} + \text{survival } s$.
-     - [`whiteProbability_error`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Main.lean#L107): sandwiching the difference:
+     - [`whiteMass_bounds`](Voter/Main.lean#L101): $\mathbf{1}_{\{s=\mathbf{1}\}} \le \text{whiteMass } p\ s \le \mathbf{1}_{\{s=\mathbf{1}\}} + \text{survival } s$.
+     - [`whiteProbability_error`](Voter/Main.lean#L117): sandwiching the difference:
        $$0 \le \text{whiteMass } p\ s - \text{colorProbability } H\ \text{true } n\ s \le (transition\ H)^n (\text{survival})(s)$$
-     - [`whiteProbability_tendsto`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Main.lean#L122): by squeezing with [`consensus_tendsto`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Absorption.lean#L87), $\text{colorProbability } n \to \text{whiteMass}$.
-  3. **Theorem 2.1** ([`consensus_probability`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Main.lean#L134)) identifies the limit with `eventualColor`.
+     - [`whiteProbability_tendsto`](Voter/Main.lean#L132): by squeezing with [`consensus_tendsto`](Voter/Absorption.lean#L91), $\text{colorProbability } n \to \text{whiteMass}$.
+  3. **Theorem 2.1** ([`consensus_probability`](Voter/Main.lean#L144)) identifies the limit with `eventualColor`.
 * **Rationale**:
   This rearrangement avoids summing over the exponential state space $\mathcal{S}$ and avoids having to classify recurrent/transient states in full generality.
 
@@ -114,7 +114,7 @@ The following portions of the paper were not formalized:
 * **In the paper**:
   Lemma 2.3 is stated under the standing hypotheses of Section 2.1 (connected, nonbipartite, undirected graph).
 * **In Lean**:
-  [`round_mass`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Model.lean#L99) and [`iterate_mass`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Model.lean#L113) are generalized:
+  [`round_mass`](Voter/Model.lean#L101) and [`iterate_mass`](Voter/Model.lean#L115) are generalized:
   - They require **no graph structure** at all, holding for any stochastic transition kernel `H : Kernel V`.
   - They require no connectivity, nonbipartiteness, or symmetry.
   - They hold for any real-valued observable $f : C \to \mathbb{R}$ on any finite color palette $C$, not just Boolean indicators.
@@ -125,8 +125,8 @@ The following portions of the paper were not formalized:
 * **In the paper (page 253)**:
   The authors cite Motwani & Raghavan [MR95] asserting that for a strongly connected graph, there exists a *unique* stationary distribution $\pi_H$.
 * **In Lean**:
-  - **Uniqueness is not needed**: Theorem 2.1 ([`consensus_probability`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Main.lean#L134)) is parameterized by *any* stationary distribution `p` (`hp : H.Stationary p`). Because the LHS (`eventualColor`) does not depend on `p`, any stationary distribution must yield identical mass on Boolean indicators.
-  - **Constructive existence**: Existence is proved from scratch in the generic library ([`Dynamics.Kernel.exists_stationary`](file:///home/ndarchiv/work/leanymics/leanamycs/dynamics/Dynamics/Stationary.lean#L53)) using Cesàro averages of iterated distributions and compactness of the probability simplex in $\mathbb{R}^{|V|}$, requiring no black-box citations.
+  - **Uniqueness is not needed**: Theorem 2.1 ([`consensus_probability`](Voter/Main.lean#L144)) is parameterized by *any* stationary distribution `p` (`hp : H.Stationary p`). Because the LHS (`eventualColor`) does not depend on `p`, any stationary distribution must yield identical mass on Boolean indicators.
+  - **Constructive existence**: Existence is proved from scratch in the generic library ([`Dynamics.Kernel.exists_stationary`](../dynamics/Dynamics/Stationary.lean#L53)) using Cesàro averages of iterated distributions and compactness of the probability simplex in $\mathbb{R}^{|V|}$, requiring no black-box citations.
 
 ---
 
@@ -147,9 +147,9 @@ The following portions of the paper were not formalized:
   $$\rho_{sc} = \sum_{i \in A_c^s} \pi_H(i) = \sum_{i \in A_c^s} \frac{d_i}{2m}$$
 * **In Lean**:
   - Lean establishes a general projection commutativity lemma:
-    [`Voter.iterate_project`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Colors.lean#L9): for any color map $g : C \to D$,
+    [`Voter.iterate_project`](Voter/Colors.lean#L10): for any color map $g : C \to D$,
     $$(transition\ H)^n f (g \circ s) = (transition\ H)^n (f \circ (g \circ \cdot))(s)$$
-  - Using $g = \text{colorIndicator } c$, this cleanly reduces consensus in color $c$ to Theorem 2.1 without duplicating the absorption analysis ([`Voter.color_consensus_probability`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Colors.lean#L47)).
+  - Using $g = \text{colorIndicator } c$, this cleanly reduces consensus in color $c$ to Theorem 2.1 without duplicating the absorption analysis ([`Voter.color_consensus_probability`](Voter/Colors.lean#L51)).
   - Lean additionally proves that the color probabilities form a complete distribution over colors:
-    [`Voter.sum_color_consensus_probability`](file:///home/ndarchiv/work/leanymics/leanamycs/voter/Voter/Colors.lean#L57): $\sum_{c \in C} \text{eventualColor } H\ c\ s = 1$.
+    [`Voter.sum_color_consensus_probability`](Voter/Colors.lean#L61): $\sum_{c \in C} \text{eventualColor } H\ c\ s = 1$.
   - *Note*: The uniform degree-weight corollary ($\sum_{i \in A_c^s} d_i / 2m$) was formalized for Boolean colors in `uniform_consensus_probability`, but not explicitly restated as a separate lemma for the general $C$ case.
