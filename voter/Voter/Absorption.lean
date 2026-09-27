@@ -11,18 +11,22 @@ noncomputable def survival (s : Config V Bool) : ℝ := by
   classical
   exact if ∃ c, s = fun _ => c then 0 else 1
 
+omit [DecidableEq V] in
 lemma survival_binary (s : Config V Bool) : survival s = 0 ∨ survival s = 1 := by
   classical
   unfold survival
   split <;> simp
 
+omit [DecidableEq V] in
 @[simp] lemma survival_constant (c : Bool) : survival (fun _ : V => c) = 0 := by
   unfold survival
   exact if_pos ⟨c, rfl⟩
 
+omit [DecidableEq V] in
 lemma survival_nonneg (s : Config V Bool) : 0 ≤ survival s := by
   rcases survival_binary s with h | h <;> simp [h]
 
+omit [DecidableEq V] in
 lemma survival_le_one (s : Config V Bool) : survival s ≤ 1 := by
   rcases survival_binary s with h | h <;> simp [h]
 
@@ -53,7 +57,7 @@ lemma possible_positive (G : SimpleGraph V) (H : Kernel V)
   obtain ⟨r, hr, rfl⟩ := h
   dsimp only [transition, Distribution.map]
   apply lt_of_lt_of_le ?_ (single_le_sum (fun a _ => ?_) (mem_univ r))
-  · simp only [if_pos rfl]
+  · simp only
     exact prod_pos fun i _ => hsupport i (r i) (hr i)
   · split
     · exact (Distribution.independent H).nonneg _

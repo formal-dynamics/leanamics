@@ -6,12 +6,14 @@ namespace Voter
 open Dynamics Finset
 variable {V : Type*} [Fintype V] [DecidableEq V] [Nonempty V]
 
+omit [Nonempty V] [DecidableEq V] in
 lemma graph_degree_pos (G : SimpleGraph V) [DecidableRel G.Adj]
     (hc : G.Connected) (hn : ¬ G.Colorable 2) (v : V) : 0 < G.degree v := by
   obtain ⟨i, j, hij, _⟩ := monochromatic_edge G hn (fun _ => false)
   haveI : Nontrivial V := ⟨⟨i, j, hij.ne⟩⟩
   exact (G.degree_pos_iff_exists_adj v).mpr (hc.preconnected.exists_adj_of_nontrivial v)
 
+omit [DecidableEq V] [Nonempty V] in
 lemma uniformNeighbor_support (G : SimpleGraph V) [DecidableRel G.Adj]
     (hd : ∀ i, 0 < G.degree i) (i j : V) :
     0 < (uniformNeighbor G hd i).weight j ↔ G.Adj i j := by

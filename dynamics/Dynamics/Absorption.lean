@@ -7,7 +7,7 @@ variable {α : Type*} [Fintype α]
 
 /-- If a nonnegative survival observable contracts every `m` rounds, its
 expectation has a geometric bound at multiples of `m`. -/
-lemma geometric_blocks (K : Dynamics.Kernel α) (f : α → ℝ) (hf : ∀ a, 0 ≤ f a)
+lemma geometric_blocks (K : Dynamics.Kernel α) (f : α → ℝ)
     (q : ℝ) (hq : 0 ≤ q) (m : ℕ)
     (hblock : ∀ a, K.iterate m f a ≤ q * f a) (n : ℕ) (a : α) :
     K.iterate (n * m) f a ≤ q ^ n * f a := by
@@ -28,7 +28,7 @@ lemma geometric_blocks_tendsto (K : Dynamics.Kernel α) (f : α → ℝ) (hf : �
     (hblock : ∀ a, K.iterate m f a ≤ q * f a) (a : α) :
     Tendsto (fun n => K.iterate (n * m) f a) atTop (nhds 0) := by
   apply squeeze_zero (fun n => K.iterate_nonneg _ hf a)
-    (fun n => K.geometric_blocks f hf q hq m hblock n a)
+    (fun n => K.geometric_blocks f q hq m hblock n a)
   simpa using (tendsto_pow_atTop_nhds_zero_of_lt_one hq hq1).mul_const (f a)
 
 /-- An observable satisfying `K f ≤ f` has antitone finite-time expectations. -/

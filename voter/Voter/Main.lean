@@ -24,21 +24,25 @@ noncomputable def colorProbability [Fintype C] (H : Kernel V) (c : C) (n : ℕ)
 noncomputable def eventualColor [Fintype C] (H : Kernel V) (c : C)
     (s : Config V C) : ℝ := ⨆ n, colorProbability H c n s
 
+omit [DecidableEq V] [Nonempty V] in
 lemma allColor_nonneg (c : C) (s : Config V C) : 0 ≤ allColor c s := by
   classical
   unfold allColor
   split <;> norm_num
 
+omit [DecidableEq V] [Nonempty V] in
 lemma allColor_le_one (c : C) (s : Config V C) : allColor c s ≤ 1 := by
   classical
   unfold allColor
   split <;> norm_num
 
+omit [Nonempty V] in
 lemma colorProbability_le_one [Fintype C] (H : Kernel V) (c : C) (n : ℕ)
     (s : Config V C) : colorProbability H c n s ≤ 1 := by
   simpa [colorProbability, Kernel.iterate_const] using
     (transition H).iterate_mono n (allColor_le_one c) s
 
+omit [Nonempty V] in
 lemma colorProbability_mono [Fintype C] (H : Kernel V) (c : C) (s : Config V C) :
     Monotone (fun n => colorProbability H c n s) := by
   classical
@@ -57,11 +61,13 @@ lemma colorProbability_mono [Fintype C] (H : Kernel V) (c : C) (s : Config V C) 
   rw [Kernel.iterate_add_time]
   exact (transition H).iterate_mono n hstep s
 
+omit [Nonempty V] in
 lemma colorProbability_tendsto [Fintype C] (H : Kernel V) (c : C) (s : Config V C) :
     Tendsto (fun n => colorProbability H c n s) atTop (𝓝 (eventualColor H c s)) :=
   tendsto_atTop_ciSup (colorProbability_mono H c s)
     ⟨1, by rintro _ ⟨n, rfl⟩; exact colorProbability_le_one H c n s⟩
 
+omit [Nonempty V] in
 /-- A constant configuration retains its color at every finite time. -/
 lemma colorProbability_constant [Fintype C] (H : Kernel V) (c : C) (n : ℕ) :
     colorProbability H c n (fun _ => c) = 1 := by
@@ -72,6 +78,7 @@ lemma colorProbability_constant [Fintype C] (H : Kernel V) (c : C) (n : ℕ) :
     rw [transition_constant]
     exact ih
 
+omit [Nonempty V] in
 /-- A constant configuration reaches its own consensus color with probability one. -/
 lemma eventualColor_constant [Fintype C] (H : Kernel V) (c : C) :
     eventualColor H c (fun _ => c) = 1 := by
@@ -81,13 +88,16 @@ lemma eventualColor_constant [Fintype C] (H : Kernel V) (c : C) :
 noncomputable def whiteMass (p : Distribution V) : Config V Bool → ℝ :=
   mass p (fun b => if b then 1 else 0)
 
+omit [DecidableEq V] [Nonempty V] in
 lemma whiteMass_nonneg (p : Distribution V) (s : Config V Bool) : 0 ≤ whiteMass p s :=
   p.expect_nonneg (fun i => by dsimp; split <;> norm_num)
 
+omit [DecidableEq V] [Nonempty V] in
 lemma whiteMass_le_one (p : Distribution V) (s : Config V Bool) : whiteMass p s ≤ 1 := by
   calc whiteMass p s ≤ p.expect (fun _ => 1) := p.expect_mono (fun i => by dsimp; split <;> norm_num)
        _ = 1 := p.expect_const 1
 
+omit [DecidableEq V] in
 lemma whiteMass_bounds (p : Distribution V) (s : Config V Bool) :
     allColor true s ≤ whiteMass p s ∧ whiteMass p s ≤ allColor true s + survival s := by
   classical

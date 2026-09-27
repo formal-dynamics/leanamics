@@ -16,8 +16,10 @@ abbrev Config (V C : Type*) := V → C
 /-- Simultaneous copying for a fixed vector of sampled neighbors. -/
 def step (s : Config V C) (r : V → V) : Config V C := fun i => s (r i)
 
+omit [Fintype V] [DecidableEq V] in
 @[simp] lemma step_constant (c : C) (r : V → V) : step (fun _ => c) r = fun _ => c := rfl
 
+omit [Fintype V] [DecidableEq V] in
 /-- Color projections commute with every realization of a round. -/
 lemma step_project (f : C → D) (s : Config V C) (r : V → V) :
     step (f ∘ s) r = f ∘ step s r := rfl

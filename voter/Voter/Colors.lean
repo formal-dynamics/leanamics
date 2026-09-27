@@ -5,6 +5,7 @@ namespace Voter
 open Dynamics Filter Topology
 variable {V C D : Type*} [Fintype V] [DecidableEq V] [Nonempty V]
 
+omit [Nonempty V] in
 /-- Transition expectations commute with arbitrary color projections. -/
 lemma iterate_project [Fintype C] [Fintype D] (H : Kernel V) (g : C → D)
     (f : Config V D → ℝ) (n : ℕ) (s : Config V C) :
@@ -24,6 +25,7 @@ noncomputable def colorIndicator (c : C) (x : C) : Bool := by
   classical
   exact decide (x = c)
 
+omit [DecidableEq V] [Nonempty V] in
 lemma allColor_project (c : C) (s : Config V C) :
     allColor true (colorIndicator c ∘ s) = allColor c s := by
   classical
@@ -31,6 +33,7 @@ lemma allColor_project (c : C) (s : Config V C) :
     simp [funext_iff, colorIndicator]
   simp only [allColor, he]
 
+omit [Nonempty V] in
 lemma colorProbability_project [Fintype C] (H : Kernel V) (c : C) (n : ℕ)
     (s : Config V C) :
     colorProbability H true n (colorIndicator c ∘ s) = colorProbability H c n s := by
@@ -38,6 +41,7 @@ lemma colorProbability_project [Fintype C] (H : Kernel V) (c : C) (n : ℕ)
   rw [iterate_project]
   simp_rw [allColor_project]
 
+omit [Nonempty V] in
 lemma eventualColor_project [Fintype C] (H : Kernel V) (c : C) (s : Config V C) :
     eventualColor H true (colorIndicator c ∘ s) = eventualColor H c s := by
   unfold eventualColor

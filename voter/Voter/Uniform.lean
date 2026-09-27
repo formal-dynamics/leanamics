@@ -3,7 +3,7 @@ import Voter.Model
 /-! # Uniform neighbor sampling and degree weights (Corollary 2.2) -/
 namespace Voter
 open Finset Dynamics
-variable {V : Type*} [Fintype V] [DecidableEq V] [Nonempty V]
+variable {V : Type*} [Fintype V] [Nonempty V]
 
 /-- Uniform sampling among adjacent vertices. -/
 noncomputable def uniformNeighbor (G : SimpleGraph V) [DecidableRel G.Adj]
@@ -22,6 +22,7 @@ noncomputable def volume (G : SimpleGraph V) [DecidableRel G.Adj] : ℝ := ∑ i
 lemma volume_pos (G : SimpleGraph V) [DecidableRel G.Adj] (hd : ∀ i, 0 < G.degree i) :
     0 < volume G := sum_pos (fun i _ => by exact_mod_cast hd i) univ_nonempty
 
+omit [Nonempty V] in
 lemma volume_eq_twice_edges (G : SimpleGraph V) [DecidableRel G.Adj] :
     volume G = 2 * (G.edgeFinset.card : ℝ) := by
   unfold volume

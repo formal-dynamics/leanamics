@@ -13,11 +13,12 @@ variable {V C : Type*} [Fintype V] [DecidableEq V]
 def Possible (G : SimpleGraph V) (s t : Config V C) : Prop :=
   ∃ r : V → V, (∀ i, G.Adj i (r i)) ∧ step s r = t
 
+omit [Fintype V] [DecidableEq V] in
 /-- A nonbipartite graph has a monochromatic edge in every Boolean configuration. -/
 lemma monochromatic_edge (G : SimpleGraph V) (hn : ¬ G.Colorable 2) (s : Config V Bool) :
     ∃ i j, G.Adj i j ∧ s i = s j := by
   by_contra h
-  push_neg at h
+  push Not at h
   apply hn
   have hc : G.Coloring Bool := SimpleGraph.Coloring.mk s (fun hij => h _ _ hij)
   simpa using hc.colorable
@@ -27,7 +28,7 @@ lemma boundary_edge (G : SimpleGraph V) (hc : G.Connected) (S : Finset V)
     (hne : S.Nonempty) (hproper : S ≠ univ) :
     ∃ i ∈ S, ∃ j, j ∉ S ∧ G.Adj i j := by
   by_contra h
-  push_neg at h
+  push Not at h
   have hclosed {i j : V} (hi : i ∈ S) (hij : G.Adj i j) : j ∈ S := by
     by_contra hj
     exact h i hi j hj hij
@@ -64,7 +65,7 @@ lemma propagate_region (G : SimpleGraph V) (hc : G.Connected)
           · subst v
             exact ⟨i, hij.symm, fun _ => hi⟩
           · obtain ⟨u, hu⟩ := neighbors v
-            exact ⟨u, hu, fun habs => False.elim (by simpa [hv, hvj] using habs)⟩
+            exact ⟨u, hu, fun habs => False.elim (by simp [hv, hvj] at habs)⟩
       choose r hr using hr
       have hsmaller : (univ \ insert j S).card < d := by
         rw [← hd]
@@ -74,7 +75,7 @@ lemma propagate_region (G : SimpleGraph V) (hc : G.Connected)
         intro heq
         have hjmem : j ∈ univ \ S := by simp [hj]
         rw [← heq] at hjmem
-        simpa using hjmem
+        simp at hjmem
       have hnext := ih _ hsmaller (step s r) (insert j S) (by simp)
         (fun v hv => hcolor (r v) ((hr v).2 hv))
         (by
