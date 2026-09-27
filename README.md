@@ -80,3 +80,16 @@ Copy the layout above into a new top-level directory, then add a
 docs to build). Set `\home{../..}` and `\dochome{../docs}` in the project's
 `blueprint/src/web.tex`, since blueprints are served one level below the
 landing page, and add a section for it to `home_page/index.md`.
+
+## Contributing
+
+Contributions are very welcome. [ROADMAP.md](ROADMAP.md) lists the results we would
+like to formalize next (voter model and Wright–Fisher, Moran process, epidemics and
+percolation, majority and undecided-state dynamics, averaging), each with an ID, a
+source, the infrastructure it needs and a size estimate.
+
+To take one on, **pick a target and open an issue** titled `[ID] short name` (for
+example `[EPI-1] Reed–Frost ⇔ bond percolation`) saying that you are working on it.
+That is all it takes to claim it, and it keeps two people from formalizing the same
+result. Then open a (draft) pull request whenever you have something to show. To
+propose a result that is not on the roadmap, just open an issue.
