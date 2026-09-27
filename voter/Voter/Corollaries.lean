@@ -25,7 +25,7 @@ theorem uniform_consensus_probability (G : SimpleGraph V) [DecidableRel G.Adj]
     (hc : G.Connected) (hn : ¬ G.Colorable 2) (s : Config V Bool) :
     eventualColor (uniformNeighbor G (graph_degree_pos G hc hn)) true s =
       ∑ i ∈ univ.filter (fun i => s i = true), (G.degree i : ℝ) / (2 * G.edgeFinset.card) := by
-  rw [consensus_probability G hc hn _ (uniformNeighbor_support G _) _ (degree_stationary G _)]
+  rw [consensus_probability G hc hn _ (fun i j h => (uniformNeighbor_support G _ i j).mpr h) _ (degree_stationary G _)]
   unfold whiteMass mass Distribution.expect
   simp_rw [degree_weight]
   simp [sum_filter, mul_ite]
@@ -36,7 +36,7 @@ theorem regular_consensus_probability (G : SimpleGraph V) [DecidableRel G.Adj]
     (s : Config V Bool) :
     eventualColor (uniformNeighbor G (graph_degree_pos G hc hn)) true s =
       ((univ.filter fun i => s i = true).card : ℝ) / Fintype.card V := by
-  rw [consensus_probability G hc hn _ (uniformNeighbor_support G _) _ (degree_stationary G _)]
+  rw [consensus_probability G hc hn _ (fun i j h => (uniformNeighbor_support G _ i j).mpr h) _ (degree_stationary G _)]
   exact degree_mass_regular G _ d hreg s
 
 end Voter

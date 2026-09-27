@@ -120,7 +120,7 @@ lemma whiteProbability_error (H : Kernel V) (p : Distribution V) (hp : H.Station
 
 /-- Finite-time all-white probability converges to initial stationary white mass. -/
 theorem whiteProbability_tendsto (G : SimpleGraph V) (hc : G.Connected) (hn : ¬ G.Colorable 2)
-    (H : Kernel V) (hsupport : ∀ i j, 0 < (H i).weight j ↔ G.Adj i j)
+    (H : Kernel V) (hsupport : ∀ i j, G.Adj i j → 0 < (H i).weight j)
     (p : Distribution V) (hp : H.Stationary p) (s : Config V Bool) :
     Tendsto (fun n => colorProbability H true n s) atTop (𝓝 (whiteMass p s)) := by
   have hz : Tendsto (fun n => whiteMass p s - colorProbability H true n s) atTop (𝓝 0) :=
@@ -132,7 +132,7 @@ theorem whiteProbability_tendsto (G : SimpleGraph V) (hc : G.Connected) (hn : ¬
 /-- **Hassin–Peleg Theorem 2.1.** Eventual all-white consensus probability is
 exactly the stationary weight of the initially white vertices. -/
 theorem consensus_probability (G : SimpleGraph V) (hc : G.Connected) (hn : ¬ G.Colorable 2)
-    (H : Kernel V) (hsupport : ∀ i j, 0 < (H i).weight j ↔ G.Adj i j)
+    (H : Kernel V) (hsupport : ∀ i j, G.Adj i j → 0 < (H i).weight j)
     (p : Distribution V) (hp : H.Stationary p) (s : Config V Bool) :
     eventualColor H true s = whiteMass p s :=
   tendsto_nhds_unique (colorProbability_tendsto H true s)

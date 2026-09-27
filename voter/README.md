@@ -7,7 +7,8 @@ Information and Computation 171 (2001), 248–268, DOI: 10.1006/inco.2001.3088.
 For a finite nonempty vertex type, each round independently samples a neighbor
 at each vertex from a stochastic matrix `H`, then simultaneously copies its
 previous color. On a connected nonbipartite undirected graph with
-`0 < H i j ↔ G.Adj i j`, eventual all-white consensus probability is exactly the
+`G.Adj i j → 0 < H i j` (extra support such as self-loops is allowed, which
+covers lazy chains and Wright–Fisher sampling), eventual all-white consensus probability is exactly the
 initial white mass under any stationary distribution. Uniform neighbor sampling
 gives `degree / (2 * edge count)`, regular graphs give the initial white fraction,
 and indicator projections give the probability for every color in a finite palette.

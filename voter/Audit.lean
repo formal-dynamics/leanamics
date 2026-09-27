@@ -12,4 +12,5 @@ import Voter
 #print axioms Voter.eventualColor_constant
 #print axioms Voter.Examples.triangle_one_white
 #print axioms Voter.Examples.biased_stationary
+#print axioms Voter.Examples.wrightFisher_one_third
 #print axioms Voter.Examples.twoVertex_cycle

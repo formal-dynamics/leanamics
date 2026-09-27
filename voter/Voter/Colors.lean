@@ -46,7 +46,7 @@ lemma eventualColor_project [Fintype C] (H : Kernel V) (c : C) (s : Config V C) 
 /-- **Section 2.3.** Consensus in any specified color has its initial stationary mass. -/
 theorem color_consensus_probability [Fintype C]
     (G : SimpleGraph V) (hc : G.Connected) (hn : ¬ G.Colorable 2)
-    (H : Kernel V) (hsupport : ∀ i j, 0 < (H i).weight j ↔ G.Adj i j)
+    (H : Kernel V) (hsupport : ∀ i j, G.Adj i j → 0 < (H i).weight j)
     (p : Distribution V) (hp : H.Stationary p) (s : Config V C) (c : C) :
     eventualColor H c s = p.prob (fun i => s i = c) := by
   classical
@@ -56,7 +56,7 @@ theorem color_consensus_probability [Fintype C]
 /-- The eventual probabilities over all colors sum to one. -/
 theorem sum_color_consensus_probability [Fintype C]
     (G : SimpleGraph V) (hc : G.Connected) (hn : ¬ G.Colorable 2)
-    (H : Kernel V) (hsupport : ∀ i j, 0 < (H i).weight j ↔ G.Adj i j)
+    (H : Kernel V) (hsupport : ∀ i j, G.Adj i j → 0 < (H i).weight j)
     (p : Distribution V) (hp : H.Stationary p) (s : Config V C) :
     ∑ c, eventualColor H c s = 1 := by
   classical

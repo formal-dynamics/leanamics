@@ -85,19 +85,16 @@ lemma reachable_success (G : SimpleGraph V) (H : Kernel V)
 
 /-- Nonconsensus probability tends to zero (Lemma 2.1). -/
 theorem consensus_tendsto (G : SimpleGraph V) (hc : G.Connected) (hn : ¬ G.Colorable 2)
-    (H : Kernel V) (hsupport : ∀ i j, 0 < (H i).weight j ↔ G.Adj i j)
+    (H : Kernel V) (hsupport : ∀ i j, G.Adj i j → 0 < (H i).weight j)
     (s : Config V Bool) :
     Tendsto (fun n => (transition H).iterate n survival s) atTop (𝓝 0) := by
   have neighbors (i : V) : ∃ j, G.Adj i j := by
-    by_contra h
-    push_neg at h
-    have hzero (j : V) : (H i).weight j = 0 :=
-      le_antisymm (le_of_not_gt (fun hj => h j ((hsupport i j).mp hj))) ((H i).nonneg j)
-    have hsum := (H i).sum_one
-    simp [hzero] at hsum
+    obtain ⟨a, b, hab, _⟩ := monochromatic_edge G hn (fun _ => false)
+    haveI : Nontrivial V := ⟨⟨a, b, hab.ne⟩⟩
+    exact hc.preconnected.exists_adj_of_nontrivial i
   apply (transition H).finite_absorption survival survival_binary (survival_step H)
   intro t
   obtain ⟨c, hpath⟩ := possible_consensus G hc hn neighbors t
-  exact reachable_success G H (fun i j hij => (hsupport i j).mpr hij) hpath
+  exact reachable_success G H hsupport hpath
 
 end Voter

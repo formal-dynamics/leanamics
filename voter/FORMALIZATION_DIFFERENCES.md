@@ -136,8 +136,8 @@ The following portions of the paper were not formalized:
   - Page 254 Remark: *"Given an initial bipartite graph, one can always add self-loops, with arbitrary chosen weights (even to a single node), hence converting the graph into a nonbipartite one. In this case Theorem 2.1 holds without the requirement that the graph is nonbipartite."*
 * **In Lean**:
   - $G$ is modeled as a Mathlib `SimpleGraph V`, which is irreflexive by definition ($\neg G.\text{Adj } i\ i$).
-  - The support condition `hsupport : ∀ i j, 0 < (H i).weight j ↔ G.Adj i j` strictly implies $(H i).\text{weight } i = 0$ for all $i$.
-  - Consequently, the formalization covers the strict loopless case, and the Remark on bipartite graphs with self-loops is not formalized.
+  - The support condition is `hsupport : ∀ i j, G.Adj i j → 0 < (H i).weight j`: every edge has positive weight, and `H` may put additional weight elsewhere, in particular on self-loops ($(H i).\text{weight } i > 0$). This covers lazy chains and Wright–Fisher sampling ([`wrightFisher_one_third`](Voter/Examples.lean)).
+  - The underlying `SimpleGraph` must still be nonbipartite, because the propagation argument starts from a monochromatic *edge* of `G`. The Remark's stronger claim (a bipartite graph with at least one self-loop suffices) is therefore not formalized.
 
 ---
 

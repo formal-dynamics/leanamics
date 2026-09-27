@@ -69,7 +69,8 @@ the number of vertices outside the region gives consensus.
 \end{proof}
 \begin{lemma}[Lemma 2.1: absorption]\label{lem:21}
 \lean{Voter.transition_constant,Voter.possible_positive,Voter.consensus_tendsto}\leanok\uses{lem:propagation,thm:generic-absorption,lem:product}
-Assume $H_{ij}>0$ exactly when $i,j$ are adjacent. Both constant configurations
+Assume $H_{ij}>0$ whenever $i,j$ are adjacent; extra support, such as
+self-loops, is allowed. Both constant configurations
 are absorbing, and the probability of remaining nonconstant tends to zero.
 This is the finite-time survival formulation of the paper's transience claim.
 \end{lemma}
@@ -140,6 +141,12 @@ Apply Theorem 2.1 to this Boolean projection.
 One white vertex on a triangle wins with probability $1/3$.
 The stochastic matrix whose two rows are $(1/3,2/3)$ has stationary
 weights $(1/3,2/3)$, providing a nonuniform invariant example.
+\end{lemma}
+\begin{lemma}[Wright--Fisher sampling]\label{lem:wf}
+\lean{Voter.Examples.wrightFisher,Voter.Examples.wrightFisher_stationary,Voter.Examples.wrightFisher_one_third}\leanok\uses{thm:21}
+On three individuals, let every offspring pick a uniform parent, itself included.
+This kernel has self-loops, so it is supported beyond the edges of the triangle.
+Theorem~2.1 still applies, and one allele copy fixes with probability $1/3$.
 \end{lemma}
 \begin{lemma}[Bipartite two-cycle]\label{lem:cycle}
 \lean{Voter.Examples.twoVertex_unique_neighbor,Voter.Examples.twoVertex_flip,Voter.Examples.twoVertex_cycle,Voter.Examples.twoVertex_never_consensus}\leanok\uses{def:step}

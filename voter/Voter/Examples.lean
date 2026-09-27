@@ -79,4 +79,20 @@ lemma twoVertex_never_consensus : ¬ (∃ c, (fun b : Bool => b) = fun _ => c) �
     have hbad : (false : Bool) = true := (congrFun h true).trans (congrFun h false).symm
     cases hbad
 
+
+/-- Wright–Fisher on three individuals: every offspring picks a uniform parent,
+itself included (`H i i > 0`), so the kernel is not supported on graph edges only. -/
+noncomputable def wrightFisher : Kernel (Fin 3) := fun _ => Distribution.uniform (Fin 3)
+
+lemma wrightFisher_stationary : wrightFisher.Stationary (Distribution.uniform (Fin 3)) := by
+  intro b
+  simp only [wrightFisher, ← Finset.sum_mul, (Distribution.uniform (Fin 3)).sum_one, one_mul]
+
+/-- One allele copy among three fixes with probability one third. -/
+lemma wrightFisher_one_third :
+    eventualColor wrightFisher true (fun i => decide (i = 0)) = 1 / 3 := by
+  rw [consensus_probability triangle triangle_connected triangle_nonbipartite wrightFisher
+    (fun i j _ => by simp [wrightFisher, Distribution.uniform]) _ wrightFisher_stationary]
+  norm_num [whiteMass, mass, Distribution.expect, Distribution.uniform, Fin.sum_univ_succ]
+
 end Voter.Examples

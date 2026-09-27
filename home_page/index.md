@@ -43,8 +43,8 @@ opinion with probability $1 - O(1/n)$. The main theorem is
 ## Weighted synchronous voter dynamics
 
 For a finite connected nonbipartite undirected graph, each vertex independently
-samples a neighbor according to a stochastic matrix and copies its previous
-color. The eventual probability of consensus in a color equals the initial
+samples a neighbor according to a stochastic matrix (self-loops allowed) and
+copies its previous color. The eventual probability of consensus in a color equals the initial
 stationary weight of vertices with that color. Uniform neighbor sampling gives
 degree weights, and regular graphs give the initial color fraction.
 The main theorem is `Voter.consensus_probability`, formalizing Hassin–Peleg
