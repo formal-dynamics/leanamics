@@ -31,10 +31,11 @@ measure theory, no `PMF`/`ENNReal`, and no appeal to Mathlib's `ProbabilityTheor
 probabilities ("eventually reaches consensus") are limits of finite-time probabilities, not
 events in a path space. Most targets below fit this layer. The few that cannot are marked.
 
-**Build on PR #3.** Open PR [#3](https://github.com/formal-dynamics/leanamycs/pull/3) adds
-the shared `dynamics/` package (weighted finite distributions, finite kernels, stationary
-distributions, geometric absorption) and the `voter/` project. New targets should use
-`dynamics/` rather than growing another private copy of the probability layer.
+**Build on `dynamics/`.** The shared `dynamics/` package (merged in
+[#3](https://github.com/formal-dynamics/leanamycs/pull/3), together with `voter/`) provides
+weighted finite distributions, finite kernels, stationary distributions and geometric
+absorption. New targets should use `dynamics/` rather than growing another private copy of
+the probability layer.
 
 ## The dictionary behind the tracks
 
@@ -62,10 +63,10 @@ it under dB).
 
 | ID | Item | Needs | Size | Status |
 | --- | --- | --- | --- | --- |
-| FND-1 | Shared `dynamics/` package (uniform and weighted finite distributions, independent products, pushforward). | – | – | in review (#3) |
-| FND-2 | Finite kernels and absorption: uniform absorption blocks ⇒ geometric survival bound ⇒ absorption limit (`Dynamics.Kernel.finite_absorption`). | FND-1 | – | in review (#3) |
+| FND-1 | Shared `dynamics/` package (uniform and weighted finite distributions, independent products, pushforward). | – | – | done (#3) |
+| FND-2 | Finite kernels and absorption: uniform absorption blocks ⇒ geometric survival bound ⇒ absorption limit (`Dynamics.Kernel.finite_absorption`). | FND-1 | – | done (#3) |
 | FND-3 | **Chernoff for independent, non-identical Bernoulli(pᵢ)** on `Distribution` products. Today's Chernoff lives in `3-majority/` and is stated for uniform sampling. | FND-1 | M | open |
-| FND-4 | **Finite-horizon optional stopping.** If `𝔼[φ(X_T)] = φ(X₀)` for all `T` and survival → 0, then the absorption probability is `(φ(x₀) − φ(B))/(φ(A) − φ(B))`. PR #3 proves this pattern inside `voter/`; extract it as a reusable lemma. | FND-2 | S | open |
+| FND-4 | **Finite-horizon optional stopping.** If `𝔼[φ(X_T)] = φ(X₀)` for all `T` and survival → 0, then the absorption probability is `(φ(x₀) − φ(B))/(φ(A) − φ(B))`. `voter/` proves this pattern inline (`whiteProbability_error`); extract it as a reusable lemma. | FND-2 | S | open |
 | FND-5 | **Expectation-level drift lemma.** If a nonnegative potential satisfies `𝔼[Ψ_{t+1} ∣ X_t] ≤ Ψ_t − c/Ψ_t` while not absorbed, then (by Jensen and iterating on `𝔼[Ψ_t]`) absorption happens by time `O(Ψ₀²/c)` with probability `≥ 1/2`. This is the argument of Berenbrink et al. (ICALP 2016, Lemma 2.2); it uses no concentration, so it fits the finite layer directly. | FND-2 | S–M | open |
 | FND-6 | **Time reversal of i.i.d. rounds:** `expList α T (F ∘ List.reverse) = expList α T F` (from `Equivalence`). | FND-1 | S | open |
 | FND-7 | **Graph-indexed rounds:** every vertex samples a uniform neighbour (product of subtypes, as `rumor_spread`'s `Tgt`), plus a sequential "one random node/edge per step" round type. | FND-1 | S | open |
@@ -74,8 +75,8 @@ it under dB).
 
 | ID | Result | Source | Needs | Size | Status |
 | --- | --- | --- | --- | --- | --- |
-| VOT-1 | **Hassin–Peleg proportionate agreement.** Weighted synchronous voter: colour `i` wins with probability equal to its initial stationary mass (`d(v)/2m` for uniform neighbours). | Hassin–Peleg 2001; Survey Thm 4 | FND-2 | – | in review (#3) |
-| VOT-2 | **Neutral Wright–Fisher and the lazy voter.** Allele `i` fixes with probability `cᵢ/n`. PR #3 requires `0 < H i j ↔ G.Adj i j` for a `SimpleGraph`, which excludes self-loops (`H i i = 0`); Wright–Fisher and the lazy voter (`H = (I + D⁻¹A)/2`, needed by VOT-5) both need them. Generalize the hypothesis (e.g. irreducible + aperiodic `H`, which also removes the non-bipartiteness assumption for lazy chains) and derive both as corollaries. | classical | VOT-1 | S | open |
+| VOT-1 | **Hassin–Peleg proportionate agreement.** Weighted synchronous voter: colour `i` wins with probability equal to its initial stationary mass (`d(v)/2m` for uniform neighbours). | Hassin–Peleg 2001; Survey Thm 4 | FND-2 | – | done (#3) |
+| VOT-2 | **Neutral Wright–Fisher and the lazy voter.** Allele `i` fixes with probability `cᵢ/n`. Since #3 the voter theorem only needs `G.Adj i j → 0 < H i j`, so kernels with self-loops are allowed (example: `Voter.Examples.wrightFisher_one_third`, three individuals). Remaining: state Wright–Fisher on `K_n` (`n ≥ 3`) and the lazy voter (`H = (I + D⁻¹A)/2`, needed by VOT-5) as corollaries. Optional extension: drop non-bipartiteness when some `H i i > 0` (Hassin–Peleg's Remark, p. 254), which needs self-loop rounds in the propagation argument. | classical | VOT-1 | S | open |
 | VOT-3 | **Voter ⇔ coalescing random walks; `O(n log n)` consensus on `K_n`.** Pathwise, `c_T(u) = c₀(r₁(r₂(⋯r_T(u))))`, so consensus follows once the composed map has a singleton image, i.e. once walks driven by the *reversed* rounds have coalesced. On `K_n` with loops two walks meet w.p. `1/n` per round; a union bound over pairs gives consensus within `3n ln n` rounds w.p. `≥ 1 − 1/n`. | Survey Thms 6–7; Hassin–Peleg §2.4 | FND-6 | M | open |
 | VOT-4 | **Push vs pull neutral fixation (sequential).** From mutant set `S` on a connected graph: pull (dB) fixes w.p. `vol(S)/2m`; push (Bd) fixes w.p. `∑_{v∈S} 1/d(v) / ∑_{v∈V} 1/d(v)`. Each follows exactly from a one-step invariant (`φ = d`, resp. `φ = 1/d`); both formulas were checked against exact absorbing-chain solutions on an irregular 6-vertex graph. | Antal–Redner–Sood, PRL 2006 ("voter model dynamics" ∝ `k`, "invasion process" ∝ `1/k`, derived there by approximation for heterogeneous networks) | FND-4, FND-7 | S–M | open |
 | VOT-5 | **Consensus time `O(m/(d_min·φ))`** for the *lazy* synchronous voter (adopt the sampled neighbour's opinion w.p. 1/2) on any graph with `m` edges, conductance `φ` and minimum degree `d_min`. Precisely: w.p. `≥ 1/2`, `T ≤ min{m/(d_min φ), n log n/φ²}` up to constants, hence the expectation bound by restarting; dynamic graphs with fixed degrees too. Proof plan from the paper: the concave potential `Ψ = √vol(minority side)` drops by `∑_u λ_u d_u / (32Ψ³)` per round in expectation (Lemma 2.1; the paper notes the plain volume does not work), FND-5 turns this into time (Lemma 2.2), and a phase argument handles `κ > 2` opinions (Lemma 2.3). A 2026 follow-up (Rocha Avila–Dell–Lapinskas, arXiv:2606.13374) extends the bound to temporal conductance and proves it tight. | **Berenbrink, Giakkoupis, Kermarrec, Mallmann-Trenn**, *Bounds on the voter model in dynamic networks*, ICALP 2016, [arXiv:1603.01895](https://arxiv.org/abs/1603.01895) | VOT-2, FND-5, FND-7 | M–L | open |
@@ -134,7 +135,7 @@ it under dB).
 
 ## Suggested order
 
-1. **Land PR #3** (FND-1, FND-2, VOT-1). Most tracks build on `dynamics/`.
+1. ~~Land PR #3~~ **Done** (FND-1, FND-2, VOT-1). Most tracks build on `dynamics/`.
 2. **Quick wins on top of it:** VOT-2, FND-4, VOT-4, then MOR-1 and MOR-2 (the isothermal theorem, the headline of the population-genetics track).
 3. **FND-3 (weighted Chernoff)** unlocks EPI-2, EPI-3 and UND-1. EPI-1 needs nothing new and can start in parallel.
 4. **VOT-3 (duality)**, which MAJ-6(b) and EPI-4 reuse.
