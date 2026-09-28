@@ -107,7 +107,7 @@ it under dB).
 | ID | Result | Source | Needs | Size | Status |
 | --- | --- | --- | --- | --- | --- |
 | MAJ-1 | **2-Choices (= binary Median) from a 60% majority in `O(log n)`.** Its expected one-round map is the same cubic as 3-majority's: `x(1−(1−x)²) + (1−x)x² = 3x² − 2x³`. Per-agent adoptions are independent but not identically distributed, which the existing Chernoff handles. Best done by refactoring `3-majority/` into a generic "binary majority-like dynamics" theorem with two instances. | Survey Cor 12 | – | S–M | open |
-| MAJ-2 | **Sharp bias threshold:** plurality consensus from bias `s ≥ c√(n log n)` for 3-Majority and 2-Choices (the bias grows by a constant factor per round w.h.p.). | Survey §4 (Cases 1–2), Cor 12 | MAJ-1 | M–L | open |
+| MAJ-2 | **From constant to vanishing bias.** `ThreeMajority.majority3_consensus_whp` currently assumes `(3/5)·n ≤ \|I₀\|`, a *constant* advantage of `n/10` over one half. Improve it in two separately claimable steps. **MAJ-2a (any constant advantage):** opinion-1 fraction `≥ 1/2 + ε` for every fixed `ε > 0`, consensus in `O(log(1/ε) + log n)` rounds w.h.p. In expectation the existing growth step already works: `p(1/2 + d) − 1/2 = d(3/2 − 2d²)`, so the bias still grows by a factor `≥ 5/4` for all `d ≤ √2/4`. What must change are the concentration constants in `Growth.lean`, which currently force `d ≳ 0.02`. **MAJ-2b (vanishing advantage):** bias `s ≥ c√(n log n)`, i.e. fraction `1/2 + Θ(√(log n / n)) → 1/2`, consensus in `O(log n)` rounds w.h.p. Now the expected gain per round (`≈ s/2`) is of the same order as the Chernoff deviation, so `c` must dominate it. This is essentially optimal: with `s = O(√n)` the bias shrinks in one round with constant probability. Both steps then transfer to 2-Choices once MAJ-1 exists. | BCN+17a (Survey Thm 18 with `k = 2`, tightness in §5.2); Survey §4 Cases 1–2 and Cor 12 for 2-Choices | – (3-majority); MAJ-1 (2-Choices) | S–M (2a) / M–L (2b) | open |
 | MAJ-3 | **F-bounded adaptive adversary** that recolours `≤ F = o(s)` nodes per round as a function of the history. Modelling the adversary inside `expList` is the interesting part. | Survey Thm 10, Cor 12 | MAJ-2 | M | open |
 | MAJ-4 | **k-party 2-Choices.** For `k = O(n^ε)` and initial gap `c₁ − c₂ = Ω(√(n log n))`, 2-Choices converges to the plurality in `O(k log n)` rounds w.h.p. (tight for some configurations; a gap of `O(√n)` can lose with constant probability). The crux is aggregating the minority colours instead of applying Chernoff colour by colour. | **Elsässer, Friedetzky, Kaaser, Mallmann-Trenn, Trinker**, *Efficient k-party voting with two choices*, [arXiv:1602.04667](https://arxiv.org/abs/1602.04667) (PODC 2017 BA); Survey Thm 13 | MAJ-2 | L | open |
 | MAJ-5 | **2-Choices on expanders.** (a) *Warm-up (paper's Thm 4):* on a `d`-regular graph with `λ_G = max{λ₂, \|λ_n\|} = 3/5 − ε`, a minority of size `≤ (ε/5)n` disappears and the majority wins in `O(log n)` steps. (b) *Main (paper's Thm 2):* on any `d`-regular graph, an initial imbalance `\|A − B\| ≥ K·λ_G·n` (absolute constant `K`, no degree condition) gives the same conclusion. Both hold w.p. `1 − o(1)`. Key tool: the expander mixing lemma with `λ_G` (Survey Lemma 16; check Mathlib first). | **Cooper, Elsässer, Radzik**, *The power of two choices in distributed voting*, ICALP 2014, [arXiv:1404.7479](https://arxiv.org/abs/1404.7479); Survey Thm 17 | MAJ-1, FND-7, AVG-1 | M (a) / L (b) | open |
@@ -136,10 +136,10 @@ it under dB).
 ## Suggested order
 
 1. ~~Land PR #3~~ **Done** (FND-1, FND-2, VOT-1). Most tracks build on `dynamics/`.
-2. **Quick wins on top of it:** VOT-2, FND-4, VOT-4, then MOR-1 and MOR-2 (the isothermal theorem, the headline of the population-genetics track).
+2. **Quick wins on top of it:** VOT-2, FND-4, VOT-4, then MOR-1 and MOR-2 (the isothermal theorem, the headline of the population-genetics track). Independently, **MAJ-2a** strengthens the existing 3-majority theorem and can start any time.
 3. **FND-3 (weighted Chernoff)** unlocks EPI-2, EPI-3 and UND-1. EPI-1 needs nothing new and can start in parallel.
 4. **VOT-3 (duality)**, which MAJ-6(b) and EPI-4 reuse.
-5. **MAJ-1 (refactor 3-majority into a generic binary theorem)**, then MAJ-2 → MAJ-4.
+5. **MAJ-2b** (vanishing bias for 3-majority) and **MAJ-1** (refactor into a generic binary theorem), then MAJ-4.
 6. **AVG-1 → AVG-2**, the first project built mainly on Mathlib linear algebra.
 
 ## Out of scope for now
@@ -157,7 +157,7 @@ abstract only: VOT-6, MOR-3, EPI-3, MAJ-2–MAJ-4, MAJ-6–MAJ-9, UND-1–UND-3,
 marked "classical" rest on textbook results. Formulas derived for this roadmap were checked
 independently: the Moran formula (MOR-1), the isothermal property on a regular graph (MOR-2)
 and both push/pull fixation formulas (VOT-4) against exact absorbing-chain solutions over all
-mutant sets on small graphs; the 2-Choices cubic (MAJ-1) symbolically; and the explicit
+mutant sets on small graphs; the 2-Choices cubic (MAJ-1) and the bias-growth identity (MAJ-2a) symbolically; and the explicit
 recovery time in the AVG-2 hint by simulation on random clustered expanders. Claimers
 should still read the source before formalizing.
 
