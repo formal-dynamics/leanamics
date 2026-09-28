@@ -217,13 +217,15 @@ jobs:
           retention-days: 1
           if-no-files-found: error
 
-  deploy:
-    name: Assemble and deploy
+  # Assembly runs on every event, including pull requests, so the Jekyll build and
+  # the completeness check below are exercised before merge. It deliberately has
+  # no `environment:`: the `github-pages` environment only accepts deployments
+  # from `main`, and GitHub rejects a job that names it on a pull-request ref
+  # before any step runs, which is what used to fail every PR.
+  assemble:
+    name: Assemble site
     needs: build
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - uses: actions/checkout@v5
@@ -279,7 +281,18 @@ jobs:
         with:
           path: home_page/_site
 
+  # Only this job targets the protected environment, and it is skipped (not
+  # failed) on pull requests.
+  deploy:
+    name: Deploy
+    needs: assemble
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
       - name: Deploy to GitHub Pages
-        if: github.event_name != 'pull_request'
         id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
