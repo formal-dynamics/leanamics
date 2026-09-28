@@ -220,8 +220,8 @@ jobs:
   # Assembly runs on every event, including pull requests, so the Jekyll build and
   # the completeness check below are exercised before merge. It deliberately has
   # no `environment:`: the `github-pages` environment only accepts deployments
-  # from `main`, and GitHub rejects a job that names it on a pull-request ref
-  # before any step runs, which is what used to fail every PR.
+  # from `main`, and GitHub rejects a job that names it on any other ref before
+  # any step runs, which is what used to fail every PR.
   assemble:
     name: Assemble site
     needs: build
@@ -276,17 +276,19 @@ jobs:
           exit $status
 
       - name: Upload the assembled site
-        if: github.event_name != 'pull_request'
+        if: github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
           path: home_page/_site
 
-  # Only this job targets the protected environment, and it is skipped (not
-  # failed) on pull requests.
+  # Only this job targets the protected environment, which accepts deployments
+  # from `main` only. Gating on the ref (not just the event) also skips manual
+  # `workflow_dispatch` runs from other branches instead of letting them fail
+  # environment admission; on pull requests the ref is refs/pull/N/merge.
   deploy:
     name: Deploy
     needs: assemble
-    if: github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
