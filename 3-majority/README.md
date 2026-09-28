@@ -19,10 +19,10 @@ for a minimal analytic toolkit.
 A self-contained paper proof, written to mirror the formalization
 lemma-for-lemma, is in [latex/three_majority.tex](latex/three_majority.tex).
 
-**[Blueprint](https://leanamycs.github.io/leanamycs/3-majority/blueprint/)** ·
-**[Blueprint as pdf](https://leanamycs.github.io/leanamycs/3-majority/blueprint.pdf)** ·
-**[Dependency graph](https://leanamycs.github.io/leanamycs/3-majority/blueprint/dep_graph_document.html)** ·
-**[API docs](https://leanamycs.github.io/leanamycs/3-majority/docs/)**
+**[Blueprint](https://formal-dynamics.github.io/leanamycs/3-majority/blueprint/)** ·
+**[Blueprint as pdf](https://formal-dynamics.github.io/leanamycs/3-majority/blueprint.pdf)** ·
+**[Dependency graph](https://formal-dynamics.github.io/leanamycs/3-majority/blueprint/dep_graph_document.html)** ·
+**[API docs](https://formal-dynamics.github.io/leanamycs/3-majority/docs/)**
 
 The blueprint ([blueprint/src/content.tex](blueprint/src/content.tex)) states
 every lemma with a `\lean{}` tag pointing to its Lean declaration and a
