@@ -91,7 +91,8 @@ landing page, and add a section for it to `home_page/index.md`.
 
 Contributions are very welcome. [ROADMAP.md](ROADMAP.md) lists the results we would
 like to formalize next (voter model and Wright–Fisher, Moran process, epidemics and
-percolation, majority and undecided-state dynamics, averaging), each with an ID, a
+percolation, majority and undecided-state dynamics, chemical reaction networks, averaging),
+each with an ID, a
 source, the infrastructure it needs and a size estimate.
 
 To take one on, **pick a target and open an issue** titled `[ID] short name` (for

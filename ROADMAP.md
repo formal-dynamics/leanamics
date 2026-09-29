@@ -40,18 +40,27 @@ the probability layer.
 ## The dictionary behind the tracks
 
 The same few Markov chains appear under different names in distributed computing,
-population genetics and epidemiology. Several targets turn this dictionary into theorems.
+population genetics, epidemiology and chemistry. Several targets turn this dictionary into
+theorems.
 
-| Distributed computing | Population genetics | Epidemiology |
-| --- | --- | --- |
-| Synchronous PULL voter on `K_n` with self-loops | Neutral Wright–Fisher (each offspring picks a uniform parent) | – |
-| Sequential PULL voter on a graph | Neutral Moran, death–Birth (dB) | – |
-| Sequential PUSH voter on a graph | Neutral Moran, Birth–death (Bd) | – |
-| PUSH with fitness-biased senders | Moran Bd with mutant fitness `r` | – |
-| Voter ⇔ coalescing random walks | Wright–Fisher/Moran ⇔ coalescent | – |
-| PUSH rumor spreading (`rumor_spread/`) | – | SI epidemic |
-| COBRA walk (push to `k` neighbours) | – | BIPS infection (dual process) |
-| Independent Cascade | – | Reed–Frost SIR ⇔ bond percolation |
+| Distributed computing | Population genetics | Epidemiology | Chemistry (CRN) |
+| --- | --- | --- | --- |
+| Synchronous PULL voter on `K_n` with self-loops | Neutral Wright–Fisher (each offspring picks a uniform parent) | – | – (synchronous rounds) |
+| Sequential PULL voter on a graph | Neutral Moran, death–Birth (dB) | – | on `K_n`: `X + Y → X + X`, `X + Y → Y + Y` (equal rates) |
+| Sequential PUSH voter on a graph | Neutral Moran, Birth–death (Bd) | – | on `K_n`: same as the row above |
+| PUSH with fitness-biased senders | Moran Bd with mutant fitness `r` | – | `M + W → M + M` (rate `r`), `M + W → W + W` (rate `1`): same jump chain |
+| Voter ⇔ coalescing random walks | Wright–Fisher/Moran ⇔ coalescent | – | – |
+| Sequential Undecided-State dynamics | – | – | approximate majority `X + Y → X + B`, `X + Y → Y + B`, `B + X → X + X`, `B + Y → Y + Y` (the cell-cycle switch) |
+| PUSH rumor spreading (`rumor_spread/`, synchronous) | – | SI epidemic | sequential version: `S + I → I + I` |
+| – | – | Daley–Kendall rumour model | `X + Y → 2Y`, `2Y → 2Z`, `Y + Z → 2Z` (ignorant, spreader, stifler) |
+| COBRA walk (push to `k` neighbours) | – | BIPS infection (dual process) | – (synchronous rounds) |
+| Independent Cascade | – | Reed–Frost SIR ⇔ bond percolation | continuous-time SIR `S + I → 2I`, `I → R`; its mass-action ODE is Kermack–McKendrick |
+
+In the chemistry column, reactions belong to a well-mixed stochastic CRN. Count-conserving
+bimolecular reactions with a common rate constant are exactly population protocols on `K_n`
+(CRN-1), and unequal rate constants give a weighted scheduler, as for Moran fitness.
+Synchronous-round dynamics (Wright–Fisher, 3-Majority, the rounds of `rumor_spread/`) have no
+CRN counterpart, since a CRN has no global clock (Doty, SODA 2014); their sequential versions do.
 
 On graphs, the push/pull asymmetry is exactly the Bd/dB asymmetry of evolutionary graph
 theory (Hindersin–Traulsen 2015: most random graphs amplify selection under Bd but suppress
@@ -121,8 +130,22 @@ it under dB).
 | ID | Result | Source | Needs | Size | Status |
 | --- | --- | --- | --- | --- | --- |
 | UND-1 | **Synchronous, binary, majority phase:** from bias `Ω(√(n log n))` (start with a constant fraction), convergence to the plurality in `O(log n)` w.h.p. The non-monotone undecided count is the new difficulty. | Survey Thm 28; Clementi et al. 2018 | FND-3 | M–L | open |
-| UND-2 | **Sequential (population protocol) version:** `O(n log n)` interactions, plurality-preserving above `ω(√(n log n))`, via the Angluin–Aspnes–Eisenstat potential function. | Survey Thm 23; AAE08 | FND-2 | L–XL | open |
+| UND-2 | **Sequential (population protocol) version:** `O(n log n)` interactions, plurality-preserving above `ω(√(n log n))`, via the Angluin–Aspnes–Eisenstat potential function. The canonical CRN result: Cardelli–Csikász-Nagy (2012) show that the cell-cycle switch computes this approximate majority. | Survey Thm 23; AAE08 | FND-2 | L–XL | open |
 | UND-3 | **Many colours:** convergence in `O(md(c) log n)`, where `md` is the monochromatic distance. | Becchetti, Clementi, Natale, Pasquale, Silvestri, *Plurality consensus in the gossip model*, SODA 2015, [arXiv:1407.2565](https://arxiv.org/abs/1407.2565); Survey Thm 29 | UND-1 | XL | open |
+
+## CRN: chemical reaction networks
+
+Well-mixed stochastic CRNs under mass-action kinetics are continuous-time Markov chains on
+species counts, and their natural (biological or epidemiological) instances are dynamics in the
+survey's sense (Definition 1), in the random sequential model. Designed CRNs that rely on a
+leader or on phases (e.g. the Turing-universal constructions of Soloveichik–Cook–Winfree–Bruck)
+are not dynamics, but their computability results still suit Lean well.
+
+| ID | Result | Source | Needs | Size | Status |
+| --- | --- | --- | --- | --- | --- |
+| CRN-1 | **CRNs ⇔ population protocols.** For a CRN whose reactions are all count-conserving and bimolecular (`A + B → C + D`) with a common rate constant, the jump chain of stochastic mass-action kinetics equals the chain of the population protocol that picks a uniformly random pair of distinct agents, conditioned on the pair reacting. Key identity: the pair has species `{A, B}` with probability `#A·#B / C(n,2)` (`C(#A,2) / C(n,2)` if `A = B`), which is the mass-action propensity up to a common factor. Unequal rate constants give a weighted scheduler. Makes the voter, Moran, SI and approximate-majority rows of the dictionary instances of one model. | Anderson–Kurtz 2011 (CRNs as CTMCs); elementary | FND-1, FND-2 | S–M | open |
+| CRN-2 | **Kurtz's law of large numbers for SIR.** For `S + I → 2I` (rate `β/N`) and `I → R` (rate `γ`), the scaled counts `(S, I, R)/N` converge, uniformly on `[0, T]` and in probability, to the Kermack–McKendrick ODE (EPI-7) as `N → ∞`. Bridges the deterministic epidemiology target and the stochastic tracks; the same argument gives the classical Daley–Kendall limit (a fraction ≈ 0.203 never hears the rumour). Needs a finite-horizon martingale concentration bound plus Gronwall, beyond today's layer. | Kurtz, J. Appl. Probab. 1970 and J. Chem. Phys. 1972; Daley–Kendall 1965 | EPI-7, FND-3 | L | open |
+| CRN-3 | **Stably computable predicates.** *Easy direction:* threshold predicates (`∑ aᵢxᵢ ≥ c`) and remainder predicates (`∑ aᵢxᵢ ≡ c mod m`) are stably computable by population protocols, hence by count-conserving CRNs, and closure under Boolean combinations gives every semilinear (Presburger) predicate. Stable computation quantifies over fair executions, so this is purely combinatorial (no probability). *Converse* (nothing else is stably computable): research-level. | Angluin–Aspnes–Diamadi–Fischer–Peralta 2006 (constructions); Angluin–Aspnes–Eisenstat–Ruppert 2007 (converse); Chen–Doty–Soloveichik 2014 (functions) | CRN-1 | M (easy) / XL (converse) | open |
 
 ## AVG: averaging dynamics and community detection
 
@@ -136,7 +159,7 @@ it under dB).
 ## Suggested order
 
 1. ~~Land PR #3~~ **Done** (FND-1, FND-2, VOT-1). Most tracks build on `dynamics/`.
-2. **Quick wins on top of it:** VOT-2, FND-4, VOT-4, then MOR-1 and MOR-2 (the isothermal theorem, the headline of the population-genetics track). Independently, **MAJ-2a** strengthens the existing 3-majority theorem and can start any time.
+2. **Quick wins on top of it:** VOT-2, FND-4, VOT-4, then MOR-1 and MOR-2 (the isothermal theorem, the headline of the population-genetics track). Independently, **MAJ-2a** strengthens the existing 3-majority theorem and can start any time, and **CRN-1** and the easy direction of **CRN-3** (no probability at all) are good entry points.
 3. **FND-3 (weighted Chernoff)** unlocks EPI-2, EPI-3 and UND-1. EPI-1 needs nothing new and can start in parallel.
 4. **VOT-3 (duality)**, which MAJ-6(b) and EPI-4 reuse.
 5. **MAJ-2b** (vanishing bias for 3-majority) and **MAJ-1** (refactor into a generic binary theorem), then MAJ-4.
@@ -145,19 +168,17 @@ it under dB).
 ## Out of scope for now
 
 Population-protocol memory lower bounds (Survey §6.2, arbitrary schedulers); Interval-Consensus
-convergence times (Survey Thms 26–27); Oja-style distributed eigenvector computation (MTMM18);
-the Daley–Kendall/Maki–Thompson rumour limit ≈ 0.203 (needs law-of-large-numbers/ODE
-approximation).
+convergence times (Survey Thms 26–27); Oja-style distributed eigenvector computation (MTMM18).
 
 ## How the entries were checked
 
 Checked against the original paper's theorem statements: VOT-1 (via PR #3), VOT-5, MOR-2,
 EPI-1, EPI-2, EPI-4, EPI-6, MAJ-5. Checked against the survey's statement and/or the paper's
-abstract only: VOT-6, MOR-3, EPI-3, MAJ-2–MAJ-4, MAJ-6–MAJ-9, UND-1–UND-3, AVG-1. Entries
+abstract only: VOT-6, MOR-3, EPI-3, MAJ-2–MAJ-4, MAJ-6–MAJ-9, UND-1–UND-3, AVG-1, CRN-2, CRN-3. Entries
 marked "classical" rest on textbook results. Formulas derived for this roadmap were checked
 independently: the Moran formula (MOR-1), the isothermal property on a regular graph (MOR-2)
 and both push/pull fixation formulas (VOT-4) against exact absorbing-chain solutions over all
-mutant sets on small graphs; the 2-Choices cubic (MAJ-1) and the bias-growth identity (MAJ-2a) symbolically; and the explicit
+mutant sets on small graphs; the 2-Choices cubic (MAJ-1) and the bias-growth identity (MAJ-2a) symbolically; the pair-sampling identity behind CRN-1 by hand; the Daley–Kendall rates against their restatement by Lebensztayn–Rodriguez (2025); and the explicit
 recovery time in the AVG-2 hint by simulation on random clustered expanders. Claimers
 should still read the source before formalizing.
 
@@ -188,5 +209,8 @@ Statements must use the corrected forms of these typos and citation slips:
 - L. Hindersin, A. Traulsen. *Most undirected random graphs are amplifiers of selection for Birth-death dynamics, but suppressors of selection for death-Birth dynamics.* PLoS Comput. Biol., 2015.
 - M. Krivelevich, B. Sudakov. *The phase transition in random graphs: a simple proof.* Random Struct. Algorithms 43(2):131–138, 2013.
 - L. Lovász. *Random walks on graphs: a survey.* Combinatorics, Paul Erdős is Eighty, Vol. 2, 1993.
+- CRNs: T. G. Kurtz, *Solutions of ordinary differential equations as limits of pure jump Markov processes*, J. Appl. Probab. 7, 1970, and *The relationship between stochastic and deterministic models for chemical reactions*, J. Chem. Phys. 57, 1972; D. F. Anderson, T. G. Kurtz, *Continuous time Markov chain models for chemical reaction networks*, in Design and Analysis of Biomolecular Circuits, Springer, 2011; L. Cardelli, A. Csikász-Nagy, *The cell cycle switch computes approximate majority*, Sci. Rep. 2, 2012; D. Soloveichik, M. Cook, E. Winfree, J. Bruck, *Computation with finite stochastic chemical reaction networks*, Nat. Comput. 7, 2008; D. Doty, *Timing in chemical reaction networks*, SODA 2014; H.-L. Chen, D. Doty, D. Soloveichik, *Deterministic function computation with chemical reaction networks*, Nat. Comput. 13, 2014.
+- Population protocols: D. Angluin, J. Aspnes, Z. Diamadi, M. J. Fischer, R. Peralta, *Computation in networks of passively mobile finite-state sensors*, Distrib. Comput. 18, 2006; D. Angluin, J. Aspnes, D. Eisenstat, E. Ruppert, *The computational power of population protocols*, Distrib. Comput. 20, 2007.
+- D. J. Daley, D. G. Kendall. *Stochastic rumours.* IMA J. Appl. Math. 1, 1965; rates as restated in E. Lebensztayn, P. M. Rodriguez, [arXiv:2507.07914](https://arxiv.org/abs/2507.07914).
 - D. Kempe, J. Kleinberg, É. Tardos. *Maximizing the spread of influence through a social network.* Theory of Computing 11, 2015.
 - Author picks (full entries in the tables): Berenbrink et al. [arXiv:1702.04921](https://arxiv.org/abs/1702.04921) and [arXiv:1603.01895](https://arxiv.org/abs/1603.01895); Cooper, Elsässer, Radzik [arXiv:1404.7479](https://arxiv.org/abs/1404.7479); Cooper, Radzik, Rivera [arXiv:1602.05768](https://arxiv.org/abs/1602.05768); Elsässer et al. [arXiv:1602.04667](https://arxiv.org/abs/1602.04667).
