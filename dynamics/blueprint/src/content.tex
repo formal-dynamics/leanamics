@@ -24,6 +24,15 @@ uniform average over functions $\{0,\ldots,T-1\}\to A$.
 Separate the first coordinate using the finite-function/product equivalence,
 then induct on $T$. The empty sample space is handled separately.
 \end{proof}
+\begin{lemma}[Averages commute]\label{lem:avg-commute}
+\lean{Dynamics.avg_avg_swap,Dynamics.expList_avg_comm,Dynamics.expList_zero_fun,Dynamics.expList_finset_sum}\leanok\uses{lem:uniform-trajectory}
+Iterated uniform averages over two finite sets commute; in particular an outer
+average commutes with the trajectory expectation $\mathrm{expList}$, which also
+commutes with finite sums and vanishes on the zero functional.
+\end{lemma}
+\begin{proof}\leanok
+Exchange the order of finite summation; for $\mathrm{expList}$, induct on $T$.
+\end{proof}
 
 \section{Weighted distributions and kernels}
 \begin{definition}[Normalized real weights]\label{def:distribution}

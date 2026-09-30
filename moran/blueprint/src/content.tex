@@ -1,0 +1,97 @@
+\begin{abstract}
+We formalize the Birth--death Moran process on a finite graph and the ``if'' direction of the
+isothermal theorem of Lieberman, Hauert and Nowak (2005): on a connected regular graph, a
+mutant population of size $k$ with fitness $r\neq 1$ takes over the whole population with
+probability $(1-r^{-k})/(1-r^{-n})$, and with probability $k/n$ when $r=1$. The complete graph
+gives Moran's formula (1958). As in the voter project, eventual probabilities are suprema of
+increasing finite-time probabilities; no path-space measure is used.
+\end{abstract}
+
+\section{The model}
+\begin{definition}[Birth--death Moran kernel]\label{def:moran}
+\lean{Moran.Config,Moran.mutants,Moran.fitness,Moran.totalFitness,Moran.target,Moran.pairDist,Moran.moranKernel}\leanok
+Mutants have fitness $r>0$ and residents fitness $1$. A step chooses a parent $u$ with
+probability proportional to its fitness and an offspring position $w$ uniformly among the
+neighbours of $u$ (or $w=u$ if $u$ is isolated); the individual at $w$ is replaced by a copy
+of the parent.
+\end{definition}
+\begin{lemma}[The kernel is well defined]\label{lem:well-defined}
+\lean{Moran.target_nonneg,Moran.target_sum_one,Moran.totalFitness_pos,Moran.pair_weight_nonneg,Moran.pair_weight_sum_one}\leanok\uses{def:moran}
+The weights of (parent, offspring position) pairs are nonnegative and sum to one.
+\end{lemma}
+\begin{proof}\leanok
+Sum over the offspring position first: each parent's placement weights sum to one.
+The remaining sum of fitnesses over the total fitness is one.
+\end{proof}
+
+\section{Invariance on regular graphs}
+\begin{lemma}[Birth mass is $r$ times death mass]\label{lem:birth-death}
+\lean{Moran.orientedCut,Moran.orientedCut_symm,Moran.birthMass,Moran.deathMass,Moran.typed_mass,Moran.birth_eq_r_death}\leanok\uses{lem:well-defined}
+On a $d$-regular graph, the probability that a step adds a mutant equals $r$ times the
+probability that it removes one: both are proportional to the number of edges between the two
+types, counted from either side.
+\end{lemma}
+\begin{proof}\leanok
+For $d>0$ both masses are the oriented cut divided by $Fd$, weighted by the parent's fitness;
+the cut is symmetric under swapping endpoints. For $d=0$ both masses vanish.
+\end{proof}
+\begin{theorem}[Invariant potentials]\label{thm:invariance}
+\lean{Moran.apply_affine,Moran.moran_potential_invariant,Moran.moran_mutants_invariant}\leanok\uses{lem:birth-death}
+On a regular graph, $(1/r)^{\#\text{mutants}}$ is preserved in expectation by one step; when
+$r=1$, so is the number of mutants.
+\end{theorem}
+\begin{proof}\leanok
+A step changes the number of mutants by $\pm1$ or not at all, so its expectation is affine in
+the birth and death masses, and these cancel by the previous lemma.
+\end{proof}
+
+\section{Absorption on connected graphs}
+\begin{theorem}[Fixation or extinction]\label{thm:absorption}
+\lean{Moran.unfixed,Moran.moran_constant,Moran.unfixed_step,Moran.unfixed_access,Moran.moran_unfixed_tendsto}\leanok\uses{lem:well-defined}
+On a connected graph, the probability that neither type has taken over tends to zero.
+\end{theorem}
+\begin{proof}\leanok
+Constant configurations are absorbing. From a mixed configuration, a mutant adjacent to a
+resident (which exists by connectivity) reproduces onto it with positive probability; by
+induction on the number of residents, fixation is reachable. Apply the shared finite-chain
+absorption theorem.
+\end{proof}
+
+\section{Fixation probabilities}
+\begin{lemma}[Fixation as a limit]\label{lem:fixation-limit}
+\lean{Moran.allMutant,Moran.fixation,Moran.fixation_mono,Moran.fixation_tendsto,Moran.fixation_eq_of_invariant}\leanok\uses{thm:absorption}
+The finite-time fixation probabilities increase to the fixation probability. If an invariant
+observable agrees with the fixation indicator on constant configurations and lies between it
+and the indicator plus the unfixed indicator elsewhere, it equals the fixation probability.
+\end{lemma}
+\begin{proof}\leanok
+The all-mutant configuration is absorbing, so the finite-time probabilities are monotone and
+bounded. The observable differs from the fixation indicator by at most the unfixed indicator,
+whose expectation tends to zero.
+\end{proof}
+\begin{theorem}[Isothermal theorem]\label{thm:isothermal}
+\lean{Moran.moranPsi,Moran.moranPsi_invariant,Moran.moranPsi_sandwich,Moran.isothermal}\leanok\uses{thm:invariance,lem:fixation-limit}
+On a connected regular graph with $r\neq1$, the fixation probability from $k$ mutants is
+$(1-r^{-k})/(1-r^{-n})$.
+\end{theorem}
+\begin{proof}\leanok
+Apply the previous lemma to $\psi=(1-(1/r)^{\#\text{mutants}})/(1-(1/r)^n)$, invariant by the
+invariance theorem, equal to $1$ and $0$ on the two constant configurations and in $[0,1]$
+otherwise.
+\end{proof}
+\begin{theorem}[Neutral case]\label{thm:neutral}
+\lean{Moran.neutralPsi,Moran.neutralPsi_invariant,Moran.neutralPsi_sandwich,Moran.isothermal_neutral}\leanok\uses{thm:invariance,lem:fixation-limit}
+On a connected regular graph with $r=1$, the fixation probability is $k/n$.
+\end{theorem}
+\begin{proof}\leanok
+The same argument with $\psi=\#\text{mutants}/n$.
+\end{proof}
+\begin{theorem}[Moran's formula]\label{thm:moran}
+\lean{Moran.moran_formula}\leanok\uses{thm:isothermal}
+On the complete graph, the fixation probability from $k$ mutants is $(1-r^{-k})/(1-r^{-n})$.
+\end{theorem}
+\begin{proof}\leanok
+The complete graph is connected and $(n-1)$-regular.
+\end{proof}
+The converse of the isothermal theorem is false (Galanis, Göbel, Goldberg, Lapinskas and
+Richerby, Proposition~12), so only this direction is formalized.

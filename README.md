@@ -12,7 +12,8 @@ page, blueprints, dependency graphs and API docs for everything below.
 | --- | --- | --- |
 | [`rumor_spread/`](rumor_spread) | In the uniform *push* model on the complete graph `K_n`, one initially informed node informs all `n` nodes within `O(log n)` rounds w.h.p. | `RumorPush.push_informs_all_whp` |
 | [`dynamics/`](dynamics) | Shared finite weighted distributions, trajectory expectations, stationary distributions, and geometric absorption | `Dynamics.Kernel.finite_absorption` |
-| [`voter/`](voter) | Hassin–Peleg Sections 2.1–2.3: weighted synchronous consensus probabilities, uniform-neighbor and multiple-color corollaries | `Voter.consensus_probability` |
+| [`voter/`](voter) | Hassin–Peleg Sections 2.1–2.3: weighted synchronous consensus probabilities, uniform-neighbor and multiple-color corollaries. On the complete graph, a duality with coalescing random walks gives consensus within `2 n log n` rounds with probability `≥ 1 - 1/n`. | `Voter.consensus_probability`, `Voter.voter_consensus_whp` |
+| [`moran/`](moran) | Birth–death Moran process with mutant fitness `r`: on a connected regular graph the fixation probability from `k` mutants is `(1 - r^-k)/(1 - r^-n)` (`k/n` if `r = 1`), the "if" direction of the isothermal theorem; Moran's formula on the complete graph. | `Moran.isothermal`, `Moran.moran_formula` |
 | [`3-majority/`](3-majority) | `n` fully-mixing agents, each adopting the majority opinion among three uniformly sampled agents, reach consensus within `O(log n)` rounds with probability `1 - O(1/n)` from a `60%` initial majority. | `ThreeMajority.majority3_consensus_whp` |
 | [`plurality/`](plurality) | 3-majority with `k` colors: if the plurality color has `≥ n/λ` nodes and a bias `≥ 22√(λ n log n)`, all nodes adopt it within `O(λ log n)` rounds w.h.p. (Becchetti et al., SPAA 2014; also its `Ω(k log n)` lower bound, the characterization of good 3-input rules, and `h`-plurality). | `Plurality.theorem_3_8` |
 
@@ -29,7 +30,7 @@ in every round, supplied by a self-contained Chernoff bound proved from
 
 Every project is a **separate Lake package** with its own `lakefile.toml`,
 `lake-manifest.json` and `lean-toolchain`. The `dynamics/` package is shared by
-`3-majority/`, `voter/` and `plurality/` (which also requires `3-majority/`), using the same
+`3-majority/`, `voter/`, `moran/` and `plurality/` (which also requires `3-majority/`), using the same
 Lean 4.32.0 toolchain and exact Mathlib revision. Rumor spreading retains its
 independent Lean 4.26.0-rc2 pin; there is no root-level Lake package. Each has the same shape:
 
@@ -54,7 +55,7 @@ home_page/             the Jekyll landing page, deployed at the Pages root
 To work on one project, `cd` into it and use Lake as usual:
 
 ```bash
-cd voter               # or: dynamics, 3-majority, plurality, rumor_spread
+cd voter               # or: dynamics, moran, 3-majority, plurality, rumor_spread
 lake exe cache get     # download prebuilt Mathlib oleans (once)
 lake build             # verifies every proof in that project
 ```
@@ -67,7 +68,7 @@ lake build             # verifies every proof in that project
 - `.github/workflows/plurality-ci.yml` builds the plurality package, audits its
   main theorem axioms and rejects `sorry`; changes to `dynamics/` or `3-majority/`
   also rebuild it.
-- `.github/workflows/dynamics-ci.yml` builds the shared library and voter package
+- `.github/workflows/dynamics-ci.yml` builds the shared library and the voter and moran packages
   and audits the main theorem axioms.
 - `.github/workflows/pages.yml` — builds every project's blueprint (web and
   pdf) and API docs, checks that every declaration named in a blueprint
@@ -95,7 +96,8 @@ landing page, and add a section for it to `home_page/index.md`.
 
 Contributions are very welcome. [ROADMAP.md](ROADMAP.md) lists the results we would
 like to formalize next (voter model and Wright–Fisher, Moran process, epidemics and
-percolation, majority and undecided-state dynamics, averaging), each with an ID, a
+percolation, majority and undecided-state dynamics, chemical reaction networks, averaging),
+each with an ID, a
 source, the infrastructure it needs and a size estimate.
 
 To take one on, **pick a target and open an issue** titled `[ID] short name` (for
