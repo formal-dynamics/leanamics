@@ -9,7 +9,7 @@ with probability proportional to its fitness, and its offspring replaces a unifo
 neighbour (an isolated parent replaces itself). This is the "invasion process", i.e. a
 sequential PUSH voter with fitness-biased senders.
 
-**Main results** (all in [`Moran/Isothermal.lean`](Moran/Isothermal.lean), namespace `Moran`):
+**Main results** (in [`Moran/Isothermal.lean`](Moran/Isothermal.lean) unless noted, namespace `Moran`):
 
 | Result | Lean declaration |
 | --- | --- |
@@ -20,6 +20,7 @@ sequential PUSH voter with fitness-biased senders.
 | **Isothermal theorem:** on a connected regular graph, `P(fixation from k mutants) = (1 - r^-k)/(1 - r^-n)` | `isothermal` |
 | Neutral case `r = 1`: `P(fixation) = k/n` | `isothermal_neutral` |
 | **Moran's formula** on the complete graph | `moran_formula` |
+| **Push vs pull** (in [`Moran/PushPull.lean`](Moran/PushPull.lean)): on a connected graph, neutral push fixes a mutant set `S` with probability `∑_{v∈S} 1/deg v / ∑_v 1/deg v`, pull with probability `∑_{v∈S} deg v / 2|E|` | `push_fixation`, `pull_fixation` |
 
 The key identity is that on a regular graph a step adds a mutant with exactly `r` times the
 probability that it removes one, in every configuration, because the numbers of
@@ -34,7 +35,7 @@ Only the "if" direction is formalized: the commonly quoted "if and only if" is f
 needs care because that projection is not Markov in general (Keller and Uğurlu,
 arXiv:2403.12598).
 
-**Provenance.** The statements were written and pinned by hand; the proofs were produced by a
+**Provenance.** The statements were written and pinned by hand; the proofs (of both files) were produced by a
 Grok agent under a fixed-statement protocol and verified mechanically (statements unchanged,
 no placeholders, warning-free build, axiom audit).
 

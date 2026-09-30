@@ -4,3 +4,8 @@ import Moran
 #print axioms Moran.isothermal
 #print axioms Moran.isothermal_neutral
 #print axioms Moran.moran_formula
+#print axioms Moran.push_value_invariant
+#print axioms Moran.pull_value_invariant
+#print axioms Moran.pull_unfixed_tendsto
+#print axioms Moran.push_fixation
+#print axioms Moran.pull_fixation
