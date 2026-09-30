@@ -24,6 +24,8 @@ and indicator projections give the probability for every color in a finite palet
 | Corollary 2.2 | `degree_stationary`, `uniform_consensus_probability` |
 | Regular graphs | `regular_consensus_probability` |
 | Section 2.3 | `iterate_project`, `color_consensus_probability` |
+| Section 2.4 on the complete graph: duality with coalescing random walks | `runRounds_eq_comp`, `disagreement_runRounds_eq_zero` |
+| Section 2.4 on the complete graph: consensus within `2 n log n` rounds w.p. `≥ 1 - 1/n` | `expList_backward_ne`, `iterate_disagreement_le`, `voter_consensus_whp` |
 
 All names in the table except the explicitly qualified shared declaration are
 in namespace `Voter`. The invariant-weight results have no graph assumptions.
@@ -57,5 +59,10 @@ results to declarations, separates generic library results, and generates the
 dependency graph. The repository's Pages workflow builds the blueprint and API
 documentation alongside the existing projects.
 
-Future work: convergence-time bounds, dynamic networks, and extremal coalition
-results. These are outside this milestone.
+On the complete graph with self-loops (Wright–Fisher sampling), `Coalescence.lean`
+proves the duality with coalescing random walks and the consensus-time bound; the
+backward walks from two distinct vertices fail to meet in `T` rounds with probability
+exactly `(1 - 1/n)^T`.
+
+Future work: convergence-time bounds on general graphs, dynamic networks, and extremal
+coalition results.

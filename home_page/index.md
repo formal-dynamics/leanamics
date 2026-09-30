@@ -48,7 +48,9 @@ copies its previous color. The eventual probability of consensus in a color equa
 stationary weight of vertices with that color. Uniform neighbor sampling gives
 degree weights, and regular graphs give the initial color fraction.
 The main theorem is `Voter.consensus_probability`, formalizing Hassin–Peleg
-Sections 2.1–2.3.
+Sections 2.1–2.3. On the complete graph, a duality with coalescing random walks gives
+consensus within $2n\log n$ rounds with probability at least $1 - 1/n$
+(`Voter.voter_consensus_whp`).
 
 * [Blueprint]({{ '/voter/blueprint/' | relative_url }}) · [as pdf]({{ '/voter/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/voter/blueprint/dep_graph_document.html' | relative_url }})

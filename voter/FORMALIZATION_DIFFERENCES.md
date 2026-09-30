@@ -34,8 +34,11 @@ and its Lean 4 formalization in the `voter` package (`leanamycs/voter`).
 ### 1.2 Unformalized Results
 
 The following portions of the paper were not formalized:
-1. **Section 2.4: Time Bounds**
-   - Dual coalescing random walks backward in time.
+1. **Section 2.4: Time Bounds** (partially formalized since VOT-3: on the complete graph with
+   self-loops, the backward coalescing-walk duality [`runRounds_eq_comp`](Voter/Coalescence.lean) and
+   consensus within `2 n log n` rounds with probability `≥ 1 - 1/n`
+   [`voter_consensus_whp`](Voter/Coalescence.lean); the general-graph bounds below remain open)
+   - Dual coalescing random walks backward in time on general graphs (the complete graph with self-loops is formalized in [`Coalescence.lean`](Voter/Coalescence.lean)).
    - Lemma 2.4: Bound on meeting time $M = O(n Z_{\max})$.
    - Fact 2.3: Hitting time sum $Z_{i,j} + Z_{j,i} \le 1 / (\pi_H(i) h_{ij})$ for reversible Markov chains.
    - Theorem 2.4: Expected time to monochromatic absorption $O(M \log n)$ via Chernoff bounds (Proposition 2.1).
