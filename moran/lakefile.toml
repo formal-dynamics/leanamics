@@ -1,0 +1,23 @@
+name = "moran"
+version = "0.1.0"
+defaultTargets = ["Moran"]
+
+[leanOptions]
+relaxedAutoImplicit = false
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "2d8c533bd0a0515caa32f18c0ab4485bd6229378"
+
+[[require]]
+name = "checkdecls"
+git = "https://github.com/PatrickMassot/checkdecls.git"
+rev = "3d425859e73fcfbef85b9638c2a91708ef4a22d4"
+
+[[require]]
+name = "dynamics"
+path = "../dynamics"
+
+[[lean_lib]]
+name = "Moran"
