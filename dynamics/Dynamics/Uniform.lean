@@ -203,4 +203,45 @@ lemma avg_eval {γ : Type*} [Fintype γ] [Nonempty γ] (n : ℕ) (v : Fin n) (G 
   · intro h
     exact absurd (mem_univ v) h
 
+/-- Finite uniform averages over a product of index sets commute. -/
+lemma avg_avg_swap {β : Type*} [Fintype β] (F : α → β → ℝ) :
+    avg (fun a => avg (fun b => F a b)) = avg (fun b => avg (fun a => F a b)) := by
+  unfold avg
+  dsimp only
+  rw [← Finset.sum_div, div_div, sum_comm, mul_comm, ← div_div, Finset.sum_div]
+
+/-- `expList` is an iterated average, so it commutes with an outer uniform average. -/
+lemma expList_avg_comm {β : Type*} [Fintype β] (T : ℕ) (G : α → List β → ℝ) :
+    avg (fun a => expList β T (G a)) = expList β T (fun l => avg (fun a => G a l)) := by
+  induction T generalizing G with
+  | zero => simp [expList_zero]
+  | succ T ih =>
+    simp_rw [expList_succ]
+    rw [avg_avg_swap]
+    refine congrArg avg (funext fun b => ?_)
+    exact ih (fun a l => G a (b :: l))
+
+/-- The expectation of the zero functional vanishes (no nonemptiness needed). -/
+lemma expList_zero_fun (T : ℕ) : expList α T (fun _ => (0 : ℝ)) = 0 := by
+  induction T with
+  | zero => rfl
+  | succ T ih =>
+    rw [expList_succ, ih]
+    simp [avg]
+
+/-- `expList` commutes with finite sums. -/
+lemma expList_finset_sum {ι : Type*} (T : ℕ) (s : Finset ι) (F : ι → List α → ℝ) :
+    expList α T (fun l => ∑ i ∈ s, F i l) = ∑ i ∈ s, expList α T (F i) := by
+  classical
+  induction s using Finset.induction with
+  | empty =>
+    simp only [Finset.sum_empty]
+    exact expList_zero_fun T
+  | @insert i s hi ih =>
+    have hfun :
+        (fun l => ∑ j ∈ insert i s, F j l) = fun l => F i l + ∑ j ∈ s, F j l := by
+      funext l
+      rw [Finset.sum_insert hi]
+    rw [hfun, expList_add, ih, Finset.sum_insert hi]
+
 end Dynamics
