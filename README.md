@@ -13,6 +13,7 @@ page, blueprints, dependency graphs and API docs for everything below.
 | [`rumor_spread/`](rumor_spread) | In the uniform *push* model on the complete graph `K_n`, one initially informed node informs all `n` nodes within `O(log n)` rounds w.h.p. | `RumorPush.push_informs_all_whp` |
 | [`dynamics/`](dynamics) | Shared finite weighted distributions, trajectory expectations, stationary distributions, and geometric absorption | `Dynamics.Kernel.finite_absorption` |
 | [`voter/`](voter) | Hassin–Peleg Sections 2.1–2.3: weighted synchronous consensus probabilities, uniform-neighbor and multiple-color corollaries | `Voter.consensus_probability` |
+| [`moran/`](moran) | Birth–death Moran process with mutant fitness `r`: on a connected regular graph the fixation probability from `k` mutants is `(1 - r^-k)/(1 - r^-n)` (`k/n` if `r = 1`), the "if" direction of the isothermal theorem; Moran's formula on the complete graph. | `Moran.isothermal`, `Moran.moran_formula` |
 | [`3-majority/`](3-majority) | `n` fully-mixing agents, each adopting the majority opinion among three uniformly sampled agents, reach consensus within `O(log n)` rounds with probability `1 - O(1/n)` from a `60%` initial majority. | `ThreeMajority.majority3_consensus_whp` |
 
 The developments are complete and `sorry`-free, and are built on a
@@ -28,7 +29,7 @@ in every round, supplied by a self-contained Chernoff bound proved from
 
 Every project is a **separate Lake package** with its own `lakefile.toml`,
 `lake-manifest.json` and `lean-toolchain`. The `dynamics/` package is shared by
-`3-majority/` and `voter/`, using the same
+`3-majority/`, `voter/` and `moran/`, using the same
 Lean 4.32.0 toolchain and exact Mathlib revision. Rumor spreading retains its
 independent Lean 4.26.0-rc2 pin; there is no root-level Lake package. Each has the same shape:
 
@@ -53,7 +54,7 @@ home_page/             the Jekyll landing page, deployed at the Pages root
 To work on one project, `cd` into it and use Lake as usual:
 
 ```bash
-cd voter               # or: dynamics, 3-majority, rumor_spread
+cd voter               # or: dynamics, moran, 3-majority, rumor_spread
 lake exe cache get     # download prebuilt Mathlib oleans (once)
 lake build             # verifies every proof in that project
 ```
@@ -63,7 +64,7 @@ lake build             # verifies every proof in that project
 - `.github/workflows/rumor_spread-ci.yml`, `.github/workflows/three_majority-ci.yml` —
   `lake build` + lint for one project each. Shared-library changes also rebuild
   3-majority.
-- `.github/workflows/dynamics-ci.yml` builds the shared library and voter package
+- `.github/workflows/dynamics-ci.yml` builds the shared library and the voter and moran packages
   and audits the main theorem axioms.
 - `.github/workflows/pages.yml` — builds every project's blueprint (web and
   pdf) and API docs, checks that every declaration named in a blueprint
