@@ -63,6 +63,9 @@ On a connected regular graph, $k$ mutants take over with probability
 $(1 - r^{-k})/(1 - r^{-n})$ ($k/n$ when $r = 1$): the "if" direction of the isothermal theorem of
 Lieberman, Hauert and Nowak, whose widely quoted "if and only if" form is false. The main
 theorem is `Moran.isothermal`; `Moran.moran_formula` is Moran's 1958 formula on the complete graph.
+On an arbitrary connected graph, the neutral push (Birth–death) and pull (death–Birth) processes
+fix a mutant set $S$ with probabilities proportional to $\sum_{v \in S} 1/\deg v$ and to
+$\sum_{v \in S} \deg v$ respectively (`Moran.push_fixation`, `Moran.pull_fixation`).
 
 * [Blueprint]({{ '/moran/blueprint/' | relative_url }}) · [as pdf]({{ '/moran/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/moran/blueprint/dep_graph_document.html' | relative_url }})

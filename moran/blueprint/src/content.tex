@@ -95,3 +95,55 @@ The complete graph is connected and $(n-1)$-regular.
 \end{proof}
 The converse of the isothermal theorem is false (Galanis, Göbel, Goldberg, Lapinskas and
 Richerby, Proposition~12), so only this direction is formalized.
+
+\section{Push versus pull on arbitrary graphs}
+On the complete graph the neutral push and pull voter processes coincide; on an irregular graph
+they fix a mutant set with different probabilities, weighted by $1/\deg$ and by $\deg$
+respectively. In population genetics this is the difference between Birth--death and
+death--Birth updating.
+\begin{definition}[Death--Birth kernel]\label{def:pull}
+\lean{Moran.pullWeight,Moran.pullDist,Moran.pullKernel,Moran.pull_weight_nonneg,Moran.pull_weight_sum_one}\leanok\uses{def:moran}
+In one pull (death--Birth) step, a uniformly random vertex $u$ adopts the type of a uniformly
+random neighbour $w$ (an isolated vertex keeps its type), so the pair $(u,w)$ has weight
+$\frac1n\cdot\frac1{\deg u}$ for $w\sim u$. The neutral push (Birth--death) process is the
+Moran kernel with $r=1$.
+\end{definition}
+\begin{definition}[Reproductive values]\label{def:repro}
+\lean{Moran.pushValue,Moran.pullValue}\leanok
+For a configuration with mutant set $S$, $\Phi_{\mathrm{push}}(S)=\sum_{v\in S}1/\deg v$ and
+$\Phi_{\mathrm{pull}}(S)=\sum_{v\in S}\deg v$.
+\end{definition}
+\begin{theorem}[Reproductive values are invariant]\label{thm:pushpull-invariance}
+\lean{Moran.pushValue_update,Moran.pullValue_update,Moran.push_increment,Moran.pull_increment,Moran.sum_swap_neg,Moran.push_value_invariant,Moran.pull_value_invariant}\leanok\uses{def:pull,def:repro}
+On every finite graph, $\Phi_{\mathrm{push}}$ is invariant in expectation under neutral push and
+$\Phi_{\mathrm{pull}}$ is invariant in expectation under pull.
+\end{theorem}
+\begin{proof}\leanok
+Write $x_v\in\{0,1\}$ for the type of $v$. Under push, the pair (parent $u$, target $w\sim u$)
+has weight $\frac1n\frac1{\deg u}$ and changes $\Phi_{\mathrm{push}}$ by $(x_u-x_w)/\deg w$, so
+the expected change is $\frac1n\sum_{u\sim w}(x_u-x_w)/(\deg u\deg w)$. Under pull, $u$ copies
+$w\sim u$ with weight $\frac1n\frac1{\deg u}$ and changes $\Phi_{\mathrm{pull}}$ by
+$(x_w-x_u)\deg u$, so the expected change is $\frac1n\sum_{u\sim w}(x_w-x_u)$. Both sums are
+over ordered adjacent pairs of an antisymmetric function, hence vanish.
+\end{proof}
+\begin{theorem}[Fixation or extinction under pull]\label{thm:pull-absorption}
+\lean{Moran.pull_constant,Moran.pull_unfixed_step,Moran.pull_move_weight_pos,Moran.pull_unfixed_access,Moran.pull_allMutant_step,Moran.pull_unfixed_tendsto}\leanok\uses{def:pull}
+On a connected graph, the probability that the pull process has not reached a constant
+configuration after $t$ steps tends to $0$.
+\end{theorem}
+\begin{proof}\leanok
+As for push: constant configurations are absorbing, and from any other configuration a resident
+adjacent to a mutant copies it with positive probability, so the number of mutants reaches $n$
+with positive probability; the shared absorption theorem concludes.
+\end{proof}
+\begin{theorem}[Push and pull fixation]\label{thm:pushpull}
+\lean{Moran.pushRatio_invariant,Moran.pullRatio_invariant,Moran.pushRatio_sandwich,Moran.pullRatio_sandwich,Moran.push_fixation,Moran.pull_fixation}\leanok\uses{thm:pushpull-invariance,thm:absorption,thm:pull-absorption,lem:fixation-limit}
+On a connected graph with at least two vertices, the fixation probability of a mutant set $S$
+is $\sum_{v\in S}\frac1{\deg v}\big/\sum_{v\in V}\frac1{\deg v}$ under neutral push and
+$\sum_{v\in S}\deg v/(2|E|)$ under pull.
+\end{theorem}
+\begin{proof}\leanok
+Apply the fixation-limit lemma to the normalized reproductive values, which are invariant, equal
+to $1$ and $0$ on the two constant configurations, and in $[0,1]$ otherwise; the denominators are
+positive because every degree is at least $1$.
+\end{proof}

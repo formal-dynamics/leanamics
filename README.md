@@ -13,7 +13,7 @@ page, blueprints, dependency graphs and API docs for everything below.
 | [`rumor_spread/`](rumor_spread) | In the uniform *push* model on the complete graph `K_n`, one initially informed node informs all `n` nodes within `O(log n)` rounds w.h.p. | `RumorPush.push_informs_all_whp` |
 | [`dynamics/`](dynamics) | Shared finite weighted distributions, trajectory expectations, stationary distributions, and geometric absorption | `Dynamics.Kernel.finite_absorption` |
 | [`voter/`](voter) | Hassin–Peleg Sections 2.1–2.3: weighted synchronous consensus probabilities, uniform-neighbor and multiple-color corollaries | `Voter.consensus_probability` |
-| [`moran/`](moran) | Birth–death Moran process with mutant fitness `r`: on a connected regular graph the fixation probability from `k` mutants is `(1 - r^-k)/(1 - r^-n)` (`k/n` if `r = 1`), the "if" direction of the isothermal theorem; Moran's formula on the complete graph. | `Moran.isothermal`, `Moran.moran_formula` |
+| [`moran/`](moran) | Birth–death Moran process with mutant fitness `r`: on a connected regular graph the fixation probability from `k` mutants is `(1 - r^-k)/(1 - r^-n)` (`k/n` if `r = 1`), the "if" direction of the isothermal theorem; Moran's formula on the complete graph; neutral push vs pull fixation on arbitrary connected graphs (weights `1/deg` vs `deg`). | `Moran.isothermal`, `Moran.moran_formula`, `Moran.push_fixation`, `Moran.pull_fixation` |
 | [`3-majority/`](3-majority) | `n` fully-mixing agents, each adopting the majority opinion among three uniformly sampled agents, reach consensus within `O(log n)` rounds with probability `1 - O(1/n)` from a `60%` initial majority. | `ThreeMajority.majority3_consensus_whp` |
 
 The developments are complete and `sorry`-free, and are built on a
