@@ -68,6 +68,9 @@ jobs:
           - dir: moran
             package: moran
             lib: Moran
+          - dir: plurality
+            package: plurality
+            lib: Plurality
 
     steps:
       - name: Cleanup to free disk space
@@ -203,7 +206,7 @@ jobs:
             for d in "$DOC"/*/; do
               name="$(basename "$d")"
               case "$name" in
-                "$LIB" | Dynamics | declarations | find) ;;
+                "$LIB" | Dynamics | ThreeMajority | declarations | find) ;;
                 *) rm -rf "$d" ;;
               esac
             done
@@ -265,7 +268,7 @@ jobs:
           check() {
             if [ -e "$1" ]; then echo "ok       $1"; else echo "MISSING  $1"; status=1; fi
           }
-          for p in rumor_spread 3-majority dynamics voter moran; do
+          for p in rumor_spread 3-majority dynamics voter moran plurality; do
             check "_site/$p/blueprint/index.html"
             check "_site/$p/blueprint/dep_graph_document.html"
             check "_site/$p/blueprint.pdf"

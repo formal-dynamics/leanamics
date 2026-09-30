@@ -13,6 +13,9 @@ uses Lean 4.32.0 and Mathlib revision
 | `Trajectory` | Weighted history/endpoint expectations and agreement with kernel iteration |
 | `Stationary` | Stationary-distribution existence by Cesàro averages and compactness of the finite simplex |
 | `Absorption` | Uniform absorption blocks, geometric survival bounds, convergence to zero |
+| `Rounds` | The kernel `ofStep` of a process driven by i.i.d. uniform rounds, its agreement with `expList`, and `expList_escape` (union bound over rounds for a moving target) |
+| `Concentration` | Hoeffding's and Bernstein's inequalities for sums of independent coordinates |
+| `Phases` | Progress through nested phases (`nested_phases`, Lemma A.4 of Becchetti et al., SPAA 2014) |
 
 `avg` remains zero on an empty sample type. Normalized distributions require
 mass one and therefore cannot inhabit an empty sample space; `uniform` requires
@@ -39,5 +42,5 @@ documentation. The same workflow as the existing packages is used; doc-gen4 is
 resolved separately to preserve the main project's dependency pins.
 
 3-majority retains all original `ThreeMajority` probability declarations and
-blueprint links through compatibility declarations. Chernoff bounds remain in
-3-majority until another theorem needs them.
+blueprint links through compatibility declarations. The mean-scaled Chernoff bounds remain in 3-majority; `Concentration` adds
+the Hoeffding and Bernstein inequalities used by `plurality/`.

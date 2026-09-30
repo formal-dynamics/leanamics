@@ -1,0 +1,27 @@
+import Plurality
+#print axioms Plurality.expected_count
+#print axioms Plurality.lemma_3_1_c
+#print axioms Plurality.lemma_3_3
+#print axioms Plurality.lemma_3_4
+#print axioms Plurality.lemma_3_5
+#print axioms Plurality.lemma_3_6
+#print axioms Plurality.lemma_3_7_i
+#print axioms Plurality.lemma_3_7_ii
+#print axioms Plurality.phases_le
+#print axioms Plurality.theorem_3_8
+#print axioms Plurality.theorem_3_8_bigO
+#print axioms Plurality.binary_consensus_whp
+#print axioms Plurality.corollary_3_10
+#print axioms Plurality.corollary_3_11
+#print axioms Plurality.corollary_3_12
+#print axioms Plurality.lemma_4_1
+#print axioms Plurality.theorem_4_2
+#print axioms Plurality.theorem_4_2_log
+#print axioms Plurality.not_solver_of_drift
+#print axioms Plurality.theorem_4_8_a
+#print axioms Plurality.not_solver_of_nonuniform
+#print axioms Plurality.theorem_4_8_b
+#print axioms Plurality.lemma_4_11
+#print axioms Plurality.lemma_4_11_paper
+#print axioms Plurality.theorem_4_12
+#print axioms Plurality.theorem_4_12_log

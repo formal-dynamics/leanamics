@@ -1,0 +1,664 @@
+% Blueprint for the formalization of
+%   L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri, L. Trevisan,
+%   "Simple Dynamics for Plurality Consensus", SPAA 2014 (arXiv:1310.2858).
+% Numbering follows the SPAA 2014 proceedings version. Every statement carries
+% \lean{...} / \leanok / \uses{...} tags matched to the Lean declarations in
+% Plurality/*.lean (namespace `Plurality`). Statements without \leanok are
+% not formalized yet. Where the Lean proof departs from the paper, this file
+% follows the Lean proof; the departures are listed in
+% FORMALIZATION_DIFFERENCES.md.
+
+\begin{abstract}
+\noindent
+$n$ anonymous nodes each support one of $k$ colors. In every round each node
+samples three nodes uniformly at random (with repetition, possibly itself)
+and adopts the majority color among them, or the first one if all three
+differ. If some color $m$ leads every other color by a sufficiently large
+\emph{bias} $s$, the process reaches consensus on $m$. The paper proves that
+this takes $O(\lambda\log n)$ rounds w.h.p.\ whenever $c_m \ge n/\lambda$
+and $s \ge c\sqrt{\lambda n\log n}$ (Theorem~\ref{thm:3_8}), that
+$\Omega(k\log n)$ rounds are needed from balanced configurations, that
+3-majority is essentially the only 3-input rule that solves plurality
+consensus, and that sampling $h > 3$ nodes speeds the process up by at most
+a factor $O(h^2)$.
+
+The upper bound (Section~\ref{sec:upper}), including the headline bound
+$O(\min\{k,(n/\log n)^{1/3}\}\log n)$ of Corollary~\ref{cor:3_10}, is fully
+formalized, with no
+\texttt{sorry}, on the finite probability layer of the shared
+\texttt{dynamics} package: all randomness is uniform over finite types,
+multi-round probabilities are iterates of a finite Markov kernel, and the
+concentration inequalities (Chernoff, Hoeffding, Bernstein) are proved from
+scratch. The lower bounds of Section~\ref{sec:lower} are formalized as well,
+with two exceptions where the paper's argument does not go through: the
+$\Omega(k\log n)$ bound is proved for $k \le n^{1/4-\delta}$ rather than up to
+$(n/\log n)^{1/4}$, and part~(a) of Theorem~4.8 (Theorem~\ref{thm:4_8_a}) leaves open rules
+with $\Delta_r, \Delta_b \le 1$. Observation~3.9 (an adversary) is not
+formalized.
+\end{abstract}
+
+\section{The model}\label{sec:model}
+
+\begin{definition}[Colorings and color counts]\label{def:config}
+  \lean{Plurality.Config, Plurality.count, Plurality.sum_count}
+  \leanok
+  A \emph{coloring} is a map $x \colon [n] \to [k]$. The number of nodes of
+  color $j$ is $c_j = |\{v : x(v) = j\}|$, and $\sum_j c_j = n$. The vector
+  $c = (c_1,\dots,c_k)$ is the paper's $k$-color distribution ($k$-cd).
+\end{definition}
+
+\begin{definition}[3-input rules and the 3-majority rule]\label{def:rule}
+  \lean{Plurality.maj3, Plurality.maj3_mem}
+  \leanok
+  A \emph{3-input rule} is a map $f \colon [k]^3 \to [k]$ with
+  $f(a,b,c) \in \{a,b,c\}$. The \emph{3-majority rule} is
+  $\mathrm{maj}_3(a,b,c) = b$ if $b = c$ and $a$ otherwise; it returns the
+  majority color, and the first color if all three differ.
+\end{definition}
+
+\begin{definition}[One round and the process]\label{def:step}
+  \lean{Plurality.stepWith, Plurality.step, Plurality.runWith, Plurality.run}
+  \leanok
+  \uses{def:config, def:rule}
+  A round is a map $r \colon [n] \to [n]^3$ (the three samples of every node),
+  drawn uniformly. The next coloring under rule $f$ is
+  $v \mapsto f(x(r_v^1), x(r_v^2), x(r_v^3))$. The process after $T$ rounds
+  folds this step over $T$ independent uniform rounds.
+\end{definition}
+
+\begin{definition}[Consensus]\label{def:mono}
+  \lean{Plurality.Mono, Plurality.mono_iff_count, Plurality.stepWith_mono, Plurality.run_mono}
+  \leanok
+  \uses{def:step}
+  $x$ is in \emph{consensus on $m$} if every node has color $m$, i.e.\
+  $c_m = n$. For every 3-input rule, consensus is absorbing.
+\end{definition}
+
+\begin{definition}[The Markov kernel]\label{def:kernel}
+  \lean{Plurality.kernel, Plurality.kernel_event, Dynamics.Kernel.ofStep, Dynamics.Kernel.iterate_ofStep}
+  \leanok
+  \uses{def:step}
+  The process with rule $f$ is the finite Markov kernel on colorings whose
+  row at $x$ is the law of one round of $f$ from $x$. Its $T$-step event
+  probabilities are the expectations over $T$ independent uniform rounds.
+\end{definition}
+
+\section{The next expected coloring}\label{sec:expected}
+
+\begin{lemma}[Adoption probability]\label{lem:adopt}
+  \lean{Plurality.count_stepWith_eq_sum, Plurality.avg_adopt, Plurality.sum_triple_maj3, Plurality.avg_adopt_maj3}
+  \leanok
+  \uses{def:step}
+  The new count of color $j$ is a sum of $n$ independent indicators, one per
+  node. Under 3-majority, a node adopts $j$ with probability
+  $x_j^2 + x_j(1 - \sum_h x_h^2)$, where $x_h = c_h/n$.
+\end{lemma}
+
+\begin{proof}
+  The three samples are independent with law $(x_h)_h$. Summing the
+  indicator of $\mathrm{maj}_3(a,b,c) = j$ first over $c$, then $b$, then $a$
+  gives the polynomial.
+\end{proof}
+
+\begin{lemma}[Lemma 2.1, next expected coloring]\label{lem:2_1}
+  \lean{Plurality.expected_count}
+  \leanok
+  \uses{lem:adopt}
+  For every coloring and every color $j$,
+  \[
+    \mu_j(c) = \E[C_{j,t+1} \mid C_t = c]
+      = c_j\Bigl(1 + \frac{1}{n^2}\Bigl(n c_j - \sum_h c_h^2\Bigr)\Bigr).
+  \]
+\end{lemma}
+
+\begin{proof}
+  Multiply the adoption probability of Lemma~\ref{lem:adopt} by $n$.
+\end{proof}
+
+\section{The upper bound}\label{sec:upper}
+
+\subsection{Plurality, bias, \texorpdfstring{$\alpha$}{alpha} and \texorpdfstring{$\gamma$}{gamma}}
+
+\begin{definition}[Section 3 quantities]\label{def:quantities}
+  \lean{Plurality.maxc, Plurality.argmaxSet, Plurality.secondc, Plurality.bias, Plurality.alpha, Plurality.gamma, Plurality.mu}
+  \leanok
+  For a $k$-cd $c$ with $\sum_h c_h = n$: $m(c) = \max_h c_h$,
+  $M(c) = \{j : c_j = m(c)\}$, the \emph{bias}
+  $s(c) = m(c) - \max_{h \notin M(c)} c_h$ if $|M(c)| = 1$ and $0$ otherwise,
+  $\alpha(c) = (n - m(c))\,s(c)/n^2$ and
+  $\gamma(c) = (n\,m(c) - \sum_h c_h^2)/n^2 - \alpha(c)$.
+\end{definition}
+
+\begin{lemma}[Every other color trails by the bias]\label{lem:bias_gap}
+  \lean{Plurality.add_bias_le, Plurality.exists_add_bias_eq, Plurality.gamma_mul_sq}
+  \leanok
+  \uses{def:quantities}
+  If $c_m = m(c)$ then $c_h + s(c) \le m(c)$ for every $h \ne m$, with
+  equality for some $h$ when $k \ge 2$. Moreover
+  $\gamma(c)\,n^2 = \sum_{h \ne m} c_h\,(m(c) - s(c) - c_h)$.
+\end{lemma}
+
+\begin{lemma}[Lemma 3.1]\label{lem:3_1}
+  \lean{Plurality.lemma_3_1_a, Plurality.lemma_3_1_b, Plurality.lemma_3_1_c}
+  \leanok
+  \uses{lem:bias_gap}
+  For every $k$-cd $c$:
+  (a) $0 \le s(c) \le m(c) - (n - m(c))/(k-1)$;
+  (b) $0 \le \alpha(c) \le \min\{s(c)/n,\ 1/4\}$;
+  (c) $0 \le \gamma(c) \le 1/8$.
+\end{lemma}
+
+\begin{proof}
+  (a) The $k-1$ other colors each have at most $m(c) - s(c)$ nodes.
+  (b) $(n - m)m \le n^2/4$ and $s \le m$.
+  (c) Use the identity of Lemma~\ref{lem:bias_gap}: every summand is
+  nonnegative, the color attaining the bias contributes $0$, and the rest is
+  at most $d(n - m - d) \le n^2/8$ with $d = m(c) - s(c)$.
+\end{proof}
+
+\begin{lemma}[Lemma 3.2]\label{lem:3_2}
+  \lean{Plurality.lemma_3_2_a, Plurality.lemma_3_2_b, Plurality.lemma_3_2_c}
+  \leanok
+  \uses{def:quantities, lem:bias_gap}
+  Let $m \in M(c)$ and let $\ell \ne m$ have the most nodes among the other
+  colors. Then (a) $\mu_m(c) = c_m(1 + \gamma + \alpha)$;
+  (b) $\mu_j(c) = c_j(1 + \gamma + \alpha - (m(c) - c_j)/n)$ for every $j$;
+  (c) $\mu_\ell(c) = c_\ell(1 + \gamma + \alpha - s(c)/n)$.
+\end{lemma}
+
+\subsection{Concentration}
+
+\begin{lemma}[Concentration for sums of independent coordinates]\label{lem:tails}
+  \lean{Dynamics.avg_bernstein, Dynamics.avg_hoeffding, Plurality.chernoff_lower, Plurality.markov_one}
+  \leanok
+  For $X = \sum_i Y_i(\omega_i)$ with independent uniform coordinates:
+  Bernstein's inequality
+  $\Pr(X \ge \E X + \lambda) \le \exp(-\lambda^2/(2\sigma^2(1 + b\lambda/(3\sigma^2))))$
+  when $Y_i - \E Y_i \le b$ and $\sum_i \mathrm{Var}\,Y_i \le \sigma^2$;
+  Hoeffding's inequality for $\{0,1\}$ coordinates; the multiplicative
+  Chernoff lower tail $\Pr(X \le (1-\delta)\mu) \le \exp(-\delta^2\mu/2)$;
+  and Markov's inequality $\Pr(X \ge 1) \le \E X$ for $\{0,1\}$ coordinates.
+\end{lemma}
+
+\subsection{Growth of the bias}
+
+\begin{lemma}[Lemma 3.3, increasing rate of the bias]\label{lem:3_3}
+  \lean{Plurality.lemma_3_3}
+  \leanok
+  \uses{lem:2_1, lem:3_1, lem:3_2, lem:tails}
+  If $M(c) = \{m\}$ then for every $j \ne m$,
+  \[
+    \Pr\Bigl(C_{m,t+1} - C_{j,t+1} \le s(c)\Bigl(1 + \gamma(c)
+      + \frac{c_m\alpha(c)}{2s(c)}\Bigr) \Bigm| C_t = c\Bigr)
+      \le \exp\Bigl(-\frac{c_m\alpha(c)^2}{25}\Bigr).
+  \]
+\end{lemma}
+
+\begin{proof}
+  By Lemmas~\ref{lem:3_1} and~\ref{lem:3_2},
+  $\E[C_{m,t+1} - C_{j,t+1}] \ge s(1+\gamma) + c_m\alpha$. The difference is
+  a sum of per-node variables in $\{-1,0,1\}$ with variance at most $3c_m$;
+  apply Bernstein's inequality with $b = 2$ and $\lambda = c_m\alpha/2$.
+\end{proof}
+
+\begin{lemma}[Lemma 3.4]\label{lem:3_4}
+  \lean{Plurality.lemma_3_4}
+  \leanok
+  \uses{lem:3_1, lem:3_2, lem:tails}
+  If $M(c) = \{m\}$ then
+  $\Pr(C_{m,t+1} \le c_m(1 + \gamma + \alpha/2) \mid C_t = c)
+  \le \exp(-c_m\alpha^2/11)$.
+\end{lemma}
+
+\begin{proof}
+  The multiplicative Chernoff lower tail with
+  $\delta = \alpha/(2(1 + \gamma + \alpha))$.
+\end{proof}
+
+\begin{lemma}[Lemma 3.5, large plurality and large bias]\label{lem:3_5}
+  \lean{Plurality.lemma_3_5}
+  \leanok
+  \uses{lem:3_3, lem:3_4}
+  If $M(c) = \{m\}$, $0 < \lambda \le 2/3$, $\lambda n \le c_m \le (2/3)n$
+  and $s(c) \ge 22\sqrt{(1/\lambda)\,n\log n}$, then for every $j \ne m$
+  \[
+    \Pr\bigl(C_{m,t+1} - C_{j,t+1} \le s(c)(1 + \lambda/6)\bigr) \le 1/n^2
+    \quad\text{and}\quad
+    \Pr\bigl(C_{m,t+1} \le c_m\bigr) \le 1/n^2.
+  \]
+\end{lemma}
+
+\begin{proof}
+  Under the hypotheses $c_m\alpha/(2s) \ge \lambda/6$ and
+  $c_m\alpha^2/25 \ge 2\log n$; conclude with Lemmas~\ref{lem:3_3}
+  and~\ref{lem:3_4}.
+\end{proof}
+
+\subsection{Saturation}
+
+\begin{lemma}[Lemma 3.6]\label{lem:3_6}
+  \lean{Plurality.lemma_3_6}
+  \leanok
+  \uses{lem:2_1, lem:3_1}
+  For every $m \in M(c)$, writing $\bar C_{m,t+1} = n - C_{m,t+1}$,
+  \[
+    (n - c_m)\Bigl(1 - \frac{c_m^2}{n^2}\Bigr)
+      \le \E[\bar C_{m,t+1} \mid C_t = c]
+      \le (n - c_m)\Bigl(1 - \frac{s(c)\,c_m}{n^2}\Bigr).
+  \]
+\end{lemma}
+
+\begin{lemma}[Lemma 3.7, very large plurality]\label{lem:3_7}
+  \lean{Plurality.lemma_3_7_i, Plurality.lemma_3_7_ii, Plurality.bias_ge_of_singleton}
+  \leanok
+  \uses{lem:3_6, lem:tails}
+  Let $\log n \ge 40$, $M(c) = \{m\}$.
+  (i) If $s(c) \ge n/3$ and $n - c_m \ge n^{1/4}\log n$ then
+  $\Pr(\bar C_{m,t+1} \ge \frac{17}{18}(n - c_m)) \le 1/n^2$.
+  (ii) If $n - c_m < n^{1/4}\log n$ then $\Pr(\bar C_{m,t+1} > 0) \le n^{-1/5}$
+  and $\Pr(\bar C_{m,t+1} \ge n^{1/4}\log n) \le 1/n^2$.
+\end{lemma}
+
+\begin{proof}
+  The paper omits this proof. (i) By Lemma~\ref{lem:3_6} and
+  $s\,c_m \ge n^2/9$, $\E\bar C_{m,t+1} \le \frac89(n - c_m)$; apply the
+  closed-form Chernoff upper tail at ratio $17/16$. (ii) Here
+  $s(c) \ge n - 2(n - c_m)$, so $\E\bar C_{m,t+1} \le 3(n-c_m)^2/n
+  \le 3\log^2 n\, e^{-(\log n)/2}$; apply Markov's inequality for the first
+  bound and the Chernoff upper tail for the second.
+\end{proof}
+
+\subsection{Nested phases and the main theorem}
+
+\begin{lemma}[Lemma A.4, nested phases]\label{lem:A_4}
+  \lean{Dynamics.Kernel.nested_phases}
+  \leanok
+  Let $A_1 \supseteq \cdots \supseteq A_T$ be sets of states of a finite
+  Markov chain such that from every state of $A_i$ the chain stays in $A_i$
+  with probability $\ge 1-\varepsilon$ and, for $i < T$, moves into
+  $A_{i+1}$ with probability $\ge 1 - \nu$. Then from any state of $A_1$,
+  after $\ell T$ steps the chain is in $A_T$ with probability at least
+  $1 - T(\ell\varepsilon + \nu^\ell)$.
+\end{lemma}
+
+\begin{proof}
+  The paper omits this proof. Phase by phase: within $\ell$ steps the chain
+  leaves $A_i$ with probability at most $\ell\varepsilon$, and fails to jump
+  into $A_{i+1}$ in each of the $\ell$ steps with probability at most
+  $\nu^\ell$. The hypothesis $\varepsilon \le \nu$ of the paper is not needed.
+\end{proof}
+
+\begin{definition}[The phases]\label{def:phases}
+  \lean{Plurality.growthSet, Plurality.satSet, Plurality.monoSet}
+  \leanok
+  \uses{def:quantities, def:mono}
+  Fix $m$, $\lambda$, $\Lambda$ and let $q = 1 + 1/(6\lambda)$,
+  $B = n^{1/4}\log n$.
+  \emph{Growth phase $i$}: $c_m > \frac23 n$, or $M(c) = \{m\}$,
+  $c_m \ge n/\lambda$ and $s(c) \ge \Lambda q^i$.
+  \emph{Saturation phase $j$}:
+  $n - c_m < \max\{\frac n3 (\frac{17}{18})^j,\ B\}$.
+  \emph{Consensus}: $c_m = n$.
+\end{definition}
+
+\begin{remark}
+  The paper's saturation phases also require $s(c) \ge n/3$, which
+  Lemma~\ref{lem:3_7} does not show to be preserved. Here the saturation
+  phases only bound $n - c_m < n/3$, which already implies $M(c) = \{m\}$
+  and $s(c) \ge n/3$ (Lemma~\ref{lem:dissent}).
+\end{remark}
+
+\begin{lemma}[A clear majority]\label{lem:dissent}
+  \lean{Plurality.of_dissent_lt, Plurality.argmaxSet_eq_of_lt, Plurality.le_bias_of_gap, Plurality.count_step_eq_zero}
+  \leanok
+  \uses{def:quantities}
+  If $n - c_m < n/3$ then $M(c) = \{m\}$ and $s(c) \ge n/3$. If $m$ leads
+  every other color by at least $g > 0$ and $c_m \ge g$, then $M(c) = \{m\}$
+  and $s(c) \ge g$. A color without nodes stays without nodes.
+\end{lemma}
+
+\begin{lemma}[One round of each phase]\label{lem:phase_steps}
+  \lean{Plurality.growth_step, Plurality.sat_step, Plurality.mono_step, Plurality.mono_stay, Plurality.growthSet_succ_sub, Plurality.satSet_succ_sub, Plurality.growthSet_sub_of_lt, Plurality.satSet_zero_sub}
+  \leanok
+  \uses{def:phases, def:kernel, lem:3_5, lem:3_7, lem:dissent}
+  Let $\log n \ge 40$, $k \ge 2$, $\lambda \ge 3$ and
+  $\Lambda \ge 22\sqrt{\lambda n \log n}$.
+  From growth phase $i$ the chain enters growth phase $i+1$ with probability
+  $\ge 1 - 1/n$. From saturation phase $j$ it enters saturation phase $j+1$
+  with probability $\ge 1 - 1/n^2$. From fewer than $B$ dissenting nodes it
+  reaches consensus with probability $\ge 1 - n^{-1/5}$, and consensus is
+  kept with probability $1$. The phase sets are nested, and growth phase $i$
+  lies in saturation phase $0$ once $\Lambda q^i > n$.
+\end{lemma}
+
+\begin{proof}
+  \emph{Growth, case $c_m > \frac23 n$}: saturation phase $0$ moves into
+  saturation phase $1$, which lies in $\{c_m > \frac23 n\}$.
+  \emph{Growth, otherwise}: apply Lemma~\ref{lem:3_5} with $1/\lambda$ to each
+  other color $j$ that currently has a node, and to the growth of $c_m$. There
+  are fewer than $n - c_m$ such colors, so a union bound gives failure
+  probability at most $n/n^2$. Colors without nodes stay empty, and the color
+  attaining the bias has a node (otherwise $c_m = n$), so after a successful
+  round $m$ leads every other color by $s(c)\,q$ and
+  Lemma~\ref{lem:dissent} applies.
+  \emph{Saturation}: Lemma~\ref{lem:3_7}(i) above $B$ dissenters and
+  Lemma~\ref{lem:3_7}(ii) below.
+\end{proof}
+
+\begin{lemma}[Number of phases]\label{lem:phases}
+  \lean{Plurality.growthPhases, Plurality.satPhases, Plurality.phases, Plurality.phases_le}
+  \leanok
+  \uses{def:phases}
+  With $T_1 = \lceil \log n/\log q\rceil$ growth phases,
+  $T_2 = \lceil \log n/\log(18/17)\rceil + 1$ saturation phases and one
+  consensus phase, $T = T_1 + T_2 + 1 \le 13\lambda\log n$ for $\lambda \ge 3$
+  and $\log n \ge 40$.
+\end{lemma}
+
+\begin{proof}
+  $\log(1+x) \ge x/(1+x)$ gives $\log q \ge 1/(6\lambda+1)$ and
+  $\log(18/17) \ge 1/18$.
+\end{proof}
+
+\begin{theorem}[Theorem 3.8, the general upper bound]\label{thm:3_8}
+  \lean{Plurality.theorem_3_8, Plurality.theorem_3_8_bigO}
+  \leanok
+  \uses{lem:A_4, lem:phase_steps, lem:phases}
+  Let $\log n \ge 40$, $k \ge 2$ and $\lambda \ge 3$. If $M(c) = \{m\}$,
+  $c_m \ge n/\lambda$ and $s(c) \ge 22\sqrt{\lambda n\log n}$, then after
+  $10T \le 130\lambda\log n$ rounds all nodes support $m$ with probability
+  at least $1 - 11T/n \ge 1 - 143\lambda\log n/n$.
+\end{theorem}
+
+\begin{proof}
+  Apply Lemma~\ref{lem:A_4} to the kernel of 3-majority with the $T_1$
+  growth phases, the $T_2$ saturation phases and consensus,
+  $\varepsilon = 1/n$, $\nu = n^{-1/5}$ and $\ell = 10$, so that
+  $\nu^\ell = n^{-2}$. The initial coloring is in growth phase $0$; growth
+  phase $T_1$ lies in saturation phase $0$ because $\Lambda q^{T_1} \ge 22n$;
+  saturation phase $T_2 - 1$ lies below $B$ dissenters because
+  $\frac n3(\frac{17}{18})^{T_2-1} \le \frac13$.
+\end{proof}
+
+\begin{remark}
+  The paper states the failure probability as $11T/n^2$; the extra factor
+  $n$ comes from the union bound over competing colors in
+  Lemma~\ref{lem:phase_steps}, which the paper omits. The paper's
+  hypothesis $\lambda < \sqrt n$ is not used; it only makes the hypothesis
+  on $s(c)$ satisfiable.
+\end{remark}
+
+\begin{corollary}[Corollary 3.10]\label{cor:3_10}
+  \lean{Plurality.corollary_3_10, Plurality.lamK, Plurality.le_mul_maxc}
+  \leanok
+  \uses{thm:3_8}
+  If $M(c) = \{m\}$ and
+  $s(c) \ge 22\sqrt{\min\{2k, (n/\log n)^{1/3}\}\,n\log n}$, then 3-majority
+  reaches consensus on $m$ in $O(\min\{2k, (n/\log n)^{1/3}\}\log n)$
+  rounds w.h.p. Precisely, for $\log n \ge 40$ and $k \ge 2$: at most
+  $130\lambda\log n$ rounds with probability at least
+  $1 - 143\lambda\log n/n$.
+\end{corollary}
+
+\begin{proof}
+  \leanok
+  Take $\lambda = \min\{2k, (n/\log n)^{1/3}\}$. If $\lambda = 2k$ then
+  $c_m \ge n/k$ by pigeonhole; otherwise $\lambda^3 = n/\log n$, so
+  $22\sqrt{\lambda n\log n} = 22n/\lambda$ and $c_m \ge s(c) \ge n/\lambda$.
+  Moreover $\lambda \ge 3$ because $k \ge 2$ and $n = e^{\log n} \ge 27\log n$.
+\end{proof}
+
+\begin{corollary}[Corollaries 3.11 and 3.12]\label{cor:3_11}
+  \lean{Plurality.corollary_3_11, Plurality.corollary_3_12}
+  \leanok
+  \uses{thm:3_8}
+  If $c_m \ge n/\log^\ell n$ and $s(c) \ge 22\sqrt{n\log^{\ell+1}n}$,
+  consensus takes $O(\log^{\ell+1} n)$ rounds w.h.p. If $c_m \ge n/\beta$
+  and $s(c) \ge 22\sqrt{\beta n\log n}$ for a constant $\beta \ge 3$, it
+  takes $O(\log n)$ rounds w.h.p.
+\end{corollary}
+
+\begin{proof}
+  \leanok
+  Take $\lambda = \log^\ell n$ (with $\ell \ge 1$, so that $\lambda \ge 3$)
+  and $\lambda = \beta$ in Theorem~\ref{thm:3_8}.
+\end{proof}
+
+\subsection{Two colors}
+
+\begin{theorem}[Binary case]\label{thm:binary}
+  \lean{Plurality.colorSet_step, Plurality.colorSet_run, Plurality.binary_consensus_whp}
+  \leanok
+  \uses{def:step}
+  With $k = 2$ the set of nodes of color $1$ evolves exactly as the binary
+  3-majority process of the \texttt{three\_majority} package. Hence, if
+  $c_1 \ge \frac35 n$ and $\log n \ge 30$, all nodes support color $1$ after
+  $O(\log n)$ rounds with probability at least $1 - 500/n$.
+\end{theorem}
+
+\section{Lower bounds}\label{sec:lower}
+
+\subsection{Lower bound for 3-majority}
+
+\begin{lemma}[Escaping a moving target]\label{lem:escape}
+  \lean{Dynamics.expList_escape, Dynamics.expList_sum}
+  \leanok
+  If a round-based process starts in $G_0$ and, for every $t < T$, one round
+  from any state of $G_t$ misses $G_{t+1}$ with probability at most $p$, then
+  after $T$ rounds it lies outside $G_T$ with probability at most $Tp$.
+\end{lemma}
+
+\begin{proof}
+  \leanok
+  Induction on $T$, conditioning on the first round.
+\end{proof}
+
+\begin{lemma}[Lemma 4.1]\label{lem:4_1}
+  \lean{Plurality.lemma_4_1, Plurality.mu_le_of_count_le, Plurality.sq_div_le_sum_sq}
+  \leanok
+  \uses{lem:2_1, lem:tails}
+  Let $k\sqrt{n\log n} \le b \le n/k$. If $c_j \le n/k + b$, then
+  $\Pr(C_{j,t+1} \ge n/k + (1 + 3/k)b \mid C_t = c) \le 1/n^2$.
+\end{lemma}
+
+\begin{proof}
+  \leanok
+  By Cauchy--Schwarz $\sum_h c_h^2 \ge n^2/k$, so
+  $\mu_j \le c_j(1 + c_j/n - 1/k)$. Writing $c_j = n/k + a$ with $a \le b$,
+  this is at most $n/k + (1+1/k)b + b^2/n \le n/k + (1+2/k)b$. Hoeffding's
+  inequality with deviation $b/k \ge \sqrt{n\log n}$ gives $1/n^2$.
+\end{proof}
+
+\begin{theorem}[Theorem 4.2, lower bound for 3-majority]\label{thm:4_2}
+  \lean{Plurality.theorem_4_2, Plurality.theorem_4_2_log, Plurality.color_stays_small, Plurality.balancedSet}
+  \leanok
+  \uses{lem:4_1, lem:escape}
+  Let $k \ge 3$ and suppose every color starts with at most $n/k + b$ nodes,
+  where $b \ge k\sqrt{n\log n}$. If $b(1 + 3/k)^T \le n/k$, in particular if
+  $T \le \frac k3 \log\frac{n}{kb}$, then the coloring after $T$ rounds is
+  monochromatic with probability at most $kT/n^2$.
+\end{theorem}
+
+\begin{proof}
+  \leanok
+  For each color apply Lemma~\ref{lem:escape} to the thresholds
+  $n/k + b(1+3/k)^t$, with Lemma~\ref{lem:4_1} for each round. A
+  monochromatic coloring has a color with $n > 2n/k$ nodes, above its final
+  threshold; sum over the $k$ colors.
+\end{proof}
+
+\begin{remark}
+  With $b = \max\{(n/k)^{1-\varepsilon}, k\sqrt{n\log n}\}$ this gives
+  $\Omega(k\log(n/(kb)))$ rounds, which is $\Omega(k\log n)$ for
+  $k \le n^{1/4-\delta}$. The paper states $\Omega(k\log n)$ for all
+  $k \le (n/\log n)^{1/4}$, but at that end $n/k = k\sqrt{n\log n}$ and the
+  argument gives nothing. The paper's proof also chooses the thresholds after
+  seeing the trajectory; the union bound needs the fixed schedule used here.
+\end{remark}
+
+\subsection{Which 3-input rules solve plurality consensus}
+
+\begin{definition}[Rules, $\Delta$, $\delta$ and solvers]\label{def:good_rules}
+  \lean{Plurality.Rule, Plurality.Conservative, Plurality.ClearMajority, Plurality.majCount, Plurality.deltaCount, Plurality.UniformRule, Plurality.Solver}
+  \leanok
+  \uses{def:rule, def:kernel}
+  A rule is \emph{conservative} if it returns one of its inputs. It has the
+  \emph{clear-majority} property if it returns the majority color whenever two
+  inputs agree. For colors $r \ne b$, $\Delta_r$ counts the orderings of
+  $(r,r,b)$ on which the rule returns $r$. For distinct $r,g,b$, $\delta_c$
+  counts the orderings of $(r,g,b)$ on which it returns $c$; the rule is
+  \emph{uniform} if $\delta_r = 2$ for all distinct triples. It is an
+  \emph{$(s,\varepsilon)$-solver} if from every coloring whose unique plurality
+  color $m$ has bias at least $s$, consensus on $m$ is eventually reached with
+  probability at least $1-\varepsilon$.
+\end{definition}
+
+\begin{lemma}[Consensus needs survival]\label{lem:alive}
+  \lean{Plurality.mono_le_alive, Plurality.count_runWith_eq_zero}
+  \leanok
+  \uses{def:good_rules}
+  Under a conservative rule a color without nodes never returns. Hence for all
+  $T, T_0$, the probability of consensus on $m$ at time $T$ is at most the
+  probability that $m$ has a node at time $T_0$.
+\end{lemma}
+
+\begin{theorem}[Theorem 4.8(a), clear majority]\label{thm:4_8_a}
+  \lean{Plurality.theorem_4_8_a, Plurality.not_solver_of_drift, Plurality.expected_red_le, Plurality.expected_red_le_iter}
+  \leanok
+  \uses{def:good_rules, lem:adopt}
+  Let $8 \mid n$. With only colors $r, b$ present and $x$ the fraction of $r$,
+  a node adopts $r$ with probability $p(x)$, where
+  $p(x) - x = x(1-x)\bigl(x(\Delta_r - 2) + (1-x)(2 - \Delta_b)\bigr)$. If
+  $\Delta_r \le 2 \le \Delta_b$, the number of $r$ nodes is a supermartingale,
+  so from $5n/8$ nodes of $r$ (bias $n/4$) consensus on $r$ has probability at
+  most $5/8$ at every time: the rule is not an $(n/4, 1/4)$-solver.
+  Consequently, for an $(n/4, 1/4)$-solver and every pair $r \ne b$, either
+  $\Delta_r = \Delta_b = 3$ or $\Delta_r, \Delta_b \le 1$.
+\end{theorem}
+
+\begin{proof}
+  \leanok
+  $\E[X_T] \le X_0$ by induction on $T$, and $\Pr(X_T = n) \le \E[X_T]/n$.
+\end{proof}
+
+\begin{remark}
+  The paper claims that an $(n/4,1/4)$-solver has the clear-majority
+  property, i.e.\ that $\Delta_r, \Delta_b \le 1$ is also impossible. Its
+  proof uses the supermartingale property, but checks it only when red is the
+  majority; for $\Delta_r, \Delta_b \le 1$ it fails when red is the minority,
+  because the process is pulled to the interior point
+  $x^* = (2 - \Delta_b)/(4 - \Delta_r - \Delta_b)$. That case is not
+  formalized.
+\end{remark}
+
+\begin{lemma}[Adopting $r$ among three colors]\label{lem:adopt3}
+  \lean{Plurality.adopt_r_le, Plurality.avg_adopt_r_le, Plurality.expected_count_le, Plurality.jump_prob_le}
+  \leanok
+  \uses{def:good_rules, lem:adopt, lem:tails}
+  Let the rule be conservative with the clear-majority property, let only
+  $r, g, b$ be present and $\delta_r \le 1$. Then
+  $p(r) \le 3x^2 - 2x^3 + \delta_r x_r x_g x_b \le x(3x - 2x^2 + (1-x)^2/4)$,
+  which is at most $0.97x$ for $x \le 2/5$; and from $x \le 2/5$ one round
+  ends above $2n/5$ with probability at most $e^{-9n/31250}$.
+\end{lemma}
+
+\begin{lemma}[$r$ dies out]\label{lem:extinct}
+  \lean{Plurality.frozenStep, Plurality.potential, Plurality.frozen_potential_le, Plurality.frozen_stop_le, Plurality.foldl_frozen_eq, Plurality.alive_le}
+  \leanok
+  \uses{lem:adopt3, lem:escape}
+  Under the hypotheses of Lemma~\ref{lem:adopt3}, starting with at most $2n/5$
+  nodes of $r$, the probability that $r$ still has a node after $T$ rounds is
+  at most $0.97^T c_r + T e^{-9n/31250}$.
+\end{lemma}
+
+\begin{proof}
+  \leanok
+  Consider the chain frozen once $r$ exceeds $2n/5$. On it,
+  $\Phi = C_r\,\mathbb 1[C_r \le 2n/5]$ contracts by $0.97$ in every state,
+  it is frozen within $T$ rounds with probability at most $Te^{-9n/31250}$,
+  and it agrees with the real chain until it is frozen.
+\end{proof}
+
+\begin{theorem}[Theorem 4.8(b), uniform property]\label{thm:4_8_b}
+  \lean{Plurality.theorem_4_8_b, Plurality.not_solver_of_nonuniform, Plurality.extinctRounds, Plurality.deltaCount_sum}
+  \leanok
+  \uses{lem:extinct, lem:alive}
+  Let $60 \mid n$ and $\log n \ge 20$. A rule with the clear-majority property
+  that is an $(n/20, 1/4)$-solver has the uniform property.
+\end{theorem}
+
+\begin{proof}
+  \leanok
+  If a triple is not uniform, some color $r$ of it has $\delta_r \le 1$,
+  since the three counts sum to $6$. Start from $23n/60$ nodes of $r$, $n/3$
+  of $g$ and $17n/60$ of $b$: $r$ is the unique plurality color with bias
+  $n/20$. By Lemmas~\ref{lem:extinct} and~\ref{lem:alive}, with
+  $T_0 = \lceil\log(8n)/\log(100/97)\rceil$, consensus on $r$ has probability
+  at most $1/8 + 1/8$ at every time.
+\end{proof}
+
+\begin{remark}
+  The paper's proof (Lemma 4.10) is a sketch that treats $\delta_r = 1$ with
+  $(\delta_g,\delta_b) \in \{(3,2),(4,1)\}$ and asserts that $r$ ``will not
+  converge'' by iterating a one-round estimate. The proof here covers every
+  non-uniform triple and makes the iteration rigorous.
+\end{remark}
+
+\subsection{A lower bound for \texorpdfstring{$h$}{h}-plurality}
+
+\begin{definition}[$h$-plurality]\label{def:hplur}
+  \lean{Plurality.HSample, Plurality.HRound, Plurality.mult, Plurality.hplur, Plurality.hstep, Plurality.hrun}
+  \leanok
+  \uses{def:config}
+  Every node samples $h$ nodes and a uniformly random ordering $\sigma$ of the
+  $h$ sample positions, and adopts the color of the position of smallest
+  $\sigma$-rank among those whose color is most frequent. All tied colors
+  appear equally often, so each is chosen with the same probability.
+\end{definition}
+
+\begin{lemma}[Adoption under $h$-plurality]\label{lem:hadopt}
+  \lean{Plurality.hplur_first, Plurality.avg_hadopt_le, Plurality.avg_eval_two, Plurality.avg_prod_iter}
+  \leanok
+  \uses{def:hplur}
+  A node adopts $j$ with probability at most $x_j + \frac{h^2}{2}x_j^2$.
+\end{lemma}
+
+\begin{proof}
+  \leanok
+  If $j$ wins and is seen exactly once, all $h$ sampled colors are distinct
+  and $j$ is at the position ranked first, which has probability $x_j$.
+  Otherwise $j$ is seen at least twice, and
+  $\Pr(N_j \ge 2) \le \E[N_j(N_j-1)]/2 = \binom h2 x_j^2$.
+\end{proof}
+
+\begin{lemma}[Lemma 4.11]\label{lem:4_11}
+  \lean{Plurality.lemma_4_11, Plurality.lemma_4_11_paper, Plurality.exp_bound_le}
+  \leanok
+  \uses{lem:hadopt, lem:tails}
+  If $c_j \le a \le 2n/k$, then
+  $\Pr(C_{j,t+1} \ge a(1 + 2h^2/k)) \le \exp(-2(ah^2/k)^2/n)$, which is at
+  most $e^{-2nh^4/k^4}$ when $a \ge n/k$.
+\end{lemma}
+
+\begin{remark}
+  The paper states the factor $1 + h^2/k$ but its proof gives
+  $1 + 2h^2/k$, which is also what Theorem~\ref{thm:4_12} uses. Allowing
+  $c_j \le a$ instead of $c_j = a$ covers colors below $n/k$, which the
+  paper's proof of Theorem~\ref{thm:4_12} needs but the lemma excludes.
+\end{remark}
+
+\begin{theorem}[Theorem 4.12, lower bound for $h$-plurality]\label{thm:4_12}
+  \lean{Plurality.theorem_4_12, Plurality.theorem_4_12_log, Plurality.hBalancedSet}
+  \leanok
+  \uses{lem:4_11, lem:escape}
+  Let $k \ge 3$. If every color starts with at most $\frac32\cdot\frac nk$
+  nodes and $T \le \frac{k}{2h^2}\log\frac43$, then after $T$ rounds of
+  $h$-plurality the coloring is monochromatic with probability at most
+  $kT e^{-2nh^4/k^4}$.
+\end{theorem}
+
+\begin{proof}
+  \leanok
+  As for Theorem~\ref{thm:4_2}, with thresholds
+  $\frac32\cdot\frac nk(1 + 2h^2/k)^t \le 2n/k$.
+\end{proof}

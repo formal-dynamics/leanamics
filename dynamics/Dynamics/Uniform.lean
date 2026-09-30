@@ -104,6 +104,15 @@ lemma expList_const [Nonempty α] (T : ℕ) (c : ℝ) :
     rw [expList_succ]
     simpa [ih] using avg_const (α := α) c
 
+lemma expList_sum {ι : Type*} (s : Finset ι) (T : ℕ) (F : ι → List α → ℝ) :
+    expList α T (fun l => ∑ i ∈ s, F i l) = ∑ i ∈ s, expList α T (F i) := by
+  induction T generalizing F with
+  | zero => rfl
+  | succ T ih =>
+    rw [expList_succ]
+    simp_rw [ih, expList_succ]
+    exact avg_sum s _
+
 lemma expList_append (T₁ T₂ : ℕ) (F : List α → ℝ) :
     expList α (T₁ + T₂) F
       = expList α T₁ fun l₁ => expList α T₂ fun l₂ => F (l₁ ++ l₂) := by
