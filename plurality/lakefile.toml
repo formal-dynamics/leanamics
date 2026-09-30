@@ -1,0 +1,31 @@
+name = "plurality"
+version = "0.1.0"
+keywords = ["math"]
+defaultTargets = ["Plurality"]
+
+[leanOptions]
+pp.unicode.fun = true # pretty-prints `fun a ↦ b`
+relaxedAutoImplicit = false
+weak.linter.mathlibStandardSet = true
+maxSynthPendingDepth = 3
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "2d8c533bd0a0515caa32f18c0ab4485bd6229378"
+
+[[require]]
+name = "checkdecls"
+git = "https://github.com/PatrickMassot/checkdecls.git"
+rev = "3d425859e73fcfbef85b9638c2a91708ef4a22d4"
+
+[[require]]
+name = "dynamics"
+path = "../dynamics"
+
+[[require]]
+name = "three_majority"
+path = "../3-majority"
+
+[[lean_lib]]
+name = "Plurality"

@@ -87,3 +87,40 @@ Under these hypotheses, $K^{nm}f\le q^n f$, and $K^t f(a)\to0$ for every state $
 Induct over blocks using positivity and linearity. The geometric bound tends
 to zero. For arbitrary $t$, compare with $m\lfloor t/m\rfloor$ by antitonicity.
 \end{proof}
+
+\section{Rounds, concentration and phases}
+\begin{definition}[Kernel of a round-based process]\label{def:ofstep}
+\lean{Dynamics.Kernel.ofStep,Dynamics.Kernel.iterate_ofStep,Dynamics.Kernel.event_ofStep}\leanok\uses{def:kernel}
+A deterministic update $\mathrm{step}\colon S\times R\to S$ driven by a uniform
+round $r\in R$ defines the kernel $K(s)=\mathrm{law}(\mathrm{step}(s,r))$. Its
+$T$-step expectations are expectations over $T$ i.i.d.\ uniform rounds.
+\end{definition}
+\begin{proof}\leanok
+Induction on $T$, unfolding one round of $\mathrm{expList}$.
+\end{proof}
+\begin{theorem}[Hoeffding and Bernstein inequalities]\label{thm:concentration}
+\lean{Dynamics.avg_hoeffding,Dynamics.avg_bernstein}\leanok\uses{def:avg}
+Let $X=\sum_{i<n}Y_i(\omega_i)$ with independent uniform coordinates. If each
+$Y_i$ is $\{0,1\}$-valued, $\Pr(X\ge\E X+\lambda)\le e^{-2\lambda^2/n}$. If
+$Y_i-\E Y_i\le b$ and $\sum_i\mathrm{Var}\,Y_i\le\sigma^2$, then
+$\Pr(X\ge\E X+\lambda)\le\exp\bigl(-\lambda^2/(2\sigma^2(1+b\lambda/(3\sigma^2)))\bigr)$.
+\end{theorem}
+\begin{proof}\leanok
+Markov's inequality applied to $e^{tX}$, which factors over the coordinates.
+Hoeffding's lemma bounds each Bernoulli factor; for Bernstein,
+$e^y\le1+y+y^2/(2(1-u/3))$ for $y\le u<3$ bounds each factor, and $t$ is
+chosen as $\lambda/(\sigma^2+b\lambda/3)$.
+\end{proof}
+\begin{theorem}[Nested phases]\label{thm:phases}
+\lean{Dynamics.Kernel.nested_phases}\leanok\uses{def:kernel}
+Let $A_1\supseteq\cdots\supseteq A_T$ be sets of states such that from $A_i$
+the chain stays in $A_i$ with probability at least $1-\varepsilon$ and, for
+$i<T$, enters $A_{i+1}$ with probability at least $1-\nu$. From $A_1$, after
+$\ell T$ steps the chain is in $A_T$ with probability at least
+$1-T(\ell\varepsilon+\nu^\ell)$.
+\end{theorem}
+\begin{proof}\leanok
+Track the indicator of lying outside a set. In $\ell$ steps the chain leaves
+$A_i$ with probability at most $\ell\varepsilon$, and misses $A_{i+1}$ in all
+$\ell$ steps with probability at most $\nu^\ell$. Sum over the $T$ phases.
+\end{proof}

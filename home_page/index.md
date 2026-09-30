@@ -40,6 +40,24 @@ opinion with probability $1 - O(1/n)$. The main theorem is
 * [API docs]({{ '/3-majority/docs/' | relative_url }})
 * [Source](https://github.com/formal-dynamics/leanamycs/tree/main/3-majority)
 
+## Plurality consensus with $k$ colors
+
+The *3-majority* dynamics with $k$ colors: every round, each node adopts the
+majority color among three nodes sampled uniformly at random (the first one if
+all three differ). If the plurality color $m$ has at least $n/\lambda$ nodes
+and leads every other color by at least $22\sqrt{\lambda n \log n}$, then after
+$O(\lambda \log n)$ rounds **all** nodes support $m$ with high probability.
+The main theorem is `Plurality.theorem_3_8`, formalizing the upper bound of
+Becchetti–Clementi–Natale–Pasquale–Silvestri–Trevisan, *Simple Dynamics for
+Plurality Consensus* (SPAA 2014), together with its lower bounds: $\Omega(k \log n)$
+rounds from balanced starts, the characterization of 3-input rules that solve
+plurality consensus, and $\Omega(k/h^2)$ rounds for $h$-plurality.
+
+* [Blueprint]({{ '/plurality/blueprint/' | relative_url }}) · [as pdf]({{ '/plurality/blueprint.pdf' | relative_url }}) ·
+  [dependency graph]({{ '/plurality/blueprint/dep_graph_document.html' | relative_url }})
+* [API docs]({{ '/plurality/docs/' | relative_url }})
+* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/plurality)
+
 ## Weighted synchronous voter dynamics
 
 For a finite connected nonbipartite undirected graph, each vertex independently
@@ -59,7 +77,7 @@ Sections 2.1–2.3.
 
 `Dynamics` supplies uniform and weighted finite expectations, independent
 products, pushforward, kernels, stationary distributions, and geometric
-absorption. It is shared by voter dynamics and 3-majority.
+absorption. It is shared by voter dynamics, 3-majority and plurality consensus.
 
 * [Blueprint]({{ '/dynamics/blueprint/' | relative_url }}) · [as pdf]({{ '/dynamics/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/dynamics/blueprint/dep_graph_document.html' | relative_url }})

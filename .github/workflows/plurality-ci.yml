@@ -1,0 +1,43 @@
+name: Plurality CI
+
+on:
+  push:
+    paths:
+      - 'plurality/**'
+      - '3-majority/**'
+      - 'dynamics/**'
+      - 'scripts/check_axioms.py'
+      - '.github/workflows/plurality-ci.yml'
+  pull_request:
+    paths:
+      - 'plurality/**'
+      - '3-majority/**'
+      - 'dynamics/**'
+      - 'scripts/check_axioms.py'
+      - '.github/workflows/plurality-ci.yml'
+  workflow_dispatch:
+
+# NOTE: this only runs `lake build`, the axiom audit and the placeholder check,
+# scoped to plurality/. The blueprint, the API docs and their deployment to
+# GitHub Pages are handled for every project at once by
+# .github/workflows/pages.yml.
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: leanprover/lean-action@434f25c2f80ded67bba02502ad3a86f25db50709 # 2025-07-02
+        with:
+          lake-package-directory: plurality
+      - name: Audit theorem axioms
+        working-directory: plurality
+        run: python3 ../scripts/check_axioms.py
+      - name: Reject proof placeholders and new axioms
+        run: |
+          # `sorry`/`admit` anywhere; `axiom` only as a declaration keyword, so that
+          # prose such as "no axiom beyond Lean core" in a docstring does not fail CI.
+          if grep -R -n -E '\b(sorry|admit)\b|^\s*((private|protected|noncomputable|unsafe)\s+)*axiom\s' plurality/Plurality.lean plurality/Plurality; then
+            exit 1
+          fi

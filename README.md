@@ -14,6 +14,7 @@ page, blueprints, dependency graphs and API docs for everything below.
 | [`dynamics/`](dynamics) | Shared finite weighted distributions, trajectory expectations, stationary distributions, and geometric absorption | `Dynamics.Kernel.finite_absorption` |
 | [`voter/`](voter) | Hassin–Peleg Sections 2.1–2.3: weighted synchronous consensus probabilities, uniform-neighbor and multiple-color corollaries | `Voter.consensus_probability` |
 | [`3-majority/`](3-majority) | `n` fully-mixing agents, each adopting the majority opinion among three uniformly sampled agents, reach consensus within `O(log n)` rounds with probability `1 - O(1/n)` from a `60%` initial majority. | `ThreeMajority.majority3_consensus_whp` |
+| [`plurality/`](plurality) | 3-majority with `k` colors: if the plurality color has `≥ n/λ` nodes and a bias `≥ 22√(λ n log n)`, all nodes adopt it within `O(λ log n)` rounds w.h.p. (Becchetti et al., SPAA 2014; also its `Ω(k log n)` lower bound, the characterization of good 3-input rules, and `h`-plurality). | `Plurality.theorem_3_8` |
 
 The developments are complete and `sorry`-free, and are built on a
 minimal finite-probability layer: no measure theory, no `PMF`/`ENNReal`, no
@@ -28,7 +29,7 @@ in every round, supplied by a self-contained Chernoff bound proved from
 
 Every project is a **separate Lake package** with its own `lakefile.toml`,
 `lake-manifest.json` and `lean-toolchain`. The `dynamics/` package is shared by
-`3-majority/` and `voter/`, using the same
+`3-majority/`, `voter/` and `plurality/` (which also requires `3-majority/`), using the same
 Lean 4.32.0 toolchain and exact Mathlib revision. Rumor spreading retains its
 independent Lean 4.26.0-rc2 pin; there is no root-level Lake package. Each has the same shape:
 
@@ -53,7 +54,7 @@ home_page/             the Jekyll landing page, deployed at the Pages root
 To work on one project, `cd` into it and use Lake as usual:
 
 ```bash
-cd voter               # or: dynamics, 3-majority, rumor_spread
+cd voter               # or: dynamics, 3-majority, plurality, rumor_spread
 lake exe cache get     # download prebuilt Mathlib oleans (once)
 lake build             # verifies every proof in that project
 ```
@@ -63,6 +64,9 @@ lake build             # verifies every proof in that project
 - `.github/workflows/rumor_spread-ci.yml`, `.github/workflows/three_majority-ci.yml` —
   `lake build` + lint for one project each. Shared-library changes also rebuild
   3-majority.
+- `.github/workflows/plurality-ci.yml` builds the plurality package, audits its
+  main theorem axioms and rejects `sorry`; changes to `dynamics/` or `3-majority/`
+  also rebuild it.
 - `.github/workflows/dynamics-ci.yml` builds the shared library and voter package
   and audits the main theorem axioms.
 - `.github/workflows/pages.yml` — builds every project's blueprint (web and
