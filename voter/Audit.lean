@@ -14,3 +14,8 @@ import Voter
 #print axioms Voter.Examples.biased_stationary
 #print axioms Voter.Examples.wrightFisher_one_third
 #print axioms Voter.Examples.twoVertex_cycle
+#print axioms Voter.runRounds_eq_comp
+#print axioms Voter.iterate_wfKernel_eq_expList
+#print axioms Voter.expList_backward_ne
+#print axioms Voter.iterate_disagreement_le
+#print axioms Voter.voter_consensus_whp
