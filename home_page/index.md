@@ -57,11 +57,25 @@ consensus within $2n\log n$ rounds with probability at least $1 - 1/n$
 * [API docs]({{ '/voter/docs/' | relative_url }})
 * [Source](https://github.com/formal-dynamics/leanamycs/tree/main/voter)
 
+## The Moran process and the isothermal theorem
+
+In the Birth–death Moran process, an individual chosen with probability proportional to its
+fitness (mutants $r$, residents $1$) places a copy of itself on a uniformly random neighbour.
+On a connected regular graph, $k$ mutants take over with probability
+$(1 - r^{-k})/(1 - r^{-n})$ ($k/n$ when $r = 1$): the "if" direction of the isothermal theorem of
+Lieberman, Hauert and Nowak, whose widely quoted "if and only if" form is false. The main
+theorem is `Moran.isothermal`; `Moran.moran_formula` is Moran's 1958 formula on the complete graph.
+
+* [Blueprint]({{ '/moran/blueprint/' | relative_url }}) · [as pdf]({{ '/moran/blueprint.pdf' | relative_url }}) ·
+  [dependency graph]({{ '/moran/blueprint/dep_graph_document.html' | relative_url }})
+* [API docs]({{ '/moran/docs/' | relative_url }})
+* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/moran)
+
 ## Shared finite dynamics library
 
 `Dynamics` supplies uniform and weighted finite expectations, independent
 products, pushforward, kernels, stationary distributions, and geometric
-absorption. It is shared by voter dynamics and 3-majority.
+absorption. It is shared by voter dynamics, the Moran process and 3-majority.
 
 * [Blueprint]({{ '/dynamics/blueprint/' | relative_url }}) · [as pdf]({{ '/dynamics/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/dynamics/blueprint/dep_graph_document.html' | relative_url }})
@@ -72,6 +86,6 @@ absorption. It is shared by voter dynamics and 3-majority.
 
 Each project is a separate Lean package (its own `lakefile.toml` and
 toolchain) living in its own subdirectory of the repository, with `dynamics/`
-shared by `3-majority/` and `voter/`; this page is the
+shared by `3-majority/`, `voter/` and `moran/`; this page is the
 shared landing page linking to each development. See each subdirectory's own
 `README.md` for build instructions.
