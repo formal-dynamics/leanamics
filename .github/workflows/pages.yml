@@ -218,10 +218,11 @@ jobs:
             echo "doc-gen4 $DOC_GEN_REV has no docInfo facet: no dependency cache for $DIR"
           fi
 
-      # The bibliography pre-pass is left out of the entry: besides its tracked
-      # output doc-data/references.json it writes doc/references.bib, which is not
-      # cached, so it must run in every job (it takes a second, and it produces the
-      # same file, so the cached data that depends on it stays valid).
+      # The bibliography pre-pass must run in every job: besides its tracked output
+      # doc-data/references.json (part of the entry) it writes doc/references.bib,
+      # which is not cached. The docs step below deletes the restored output so
+      # that it runs again; it takes a second and produces the same file, so the
+      # cached data that depends on it stays valid.
       - name: Restore the dependencies' documentation data
         id: depdocs
         if: github.event_name != 'pull_request' && steps.docws.outputs.cacheable == 'true'
@@ -230,7 +231,6 @@ jobs:
           path: |
             .docbuild/.lake/build/api-docs.db
             .docbuild/.lake/build/doc-data
-            !.docbuild/.lake/build/doc-data/references.json*
           key: ${{ steps.docws.outputs.key }}
 
       - name: Build the dependencies' documentation data
@@ -261,7 +261,6 @@ jobs:
           path: |
             .docbuild/.lake/build/api-docs.db
             .docbuild/.lake/build/doc-data
-            !.docbuild/.lake/build/doc-data/references.json*
           key: ${{ steps.docws.outputs.key }}
 
       - name: Build the API documentation
@@ -271,8 +270,10 @@ jobs:
           LIB: ${{ matrix.lib }}
         run: |
           set -euo pipefail
-          # Make the bibliography pre-pass run again (see above): its restored
-          # output would mark it up to date although doc/references.bib is missing.
+          # Make the bibliography pre-pass run again (see above): its restored output
+          # would mark it up to date although doc/references.bib is missing. (An
+          # exclusion pattern in the cache paths would not help: actions/cache
+          # archives a listed directory whole.)
           rm -f .lake/build/doc-data/references.json*
           ~/.elan/bin/lake build "$LIB:docs"
 
