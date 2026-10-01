@@ -70,6 +70,9 @@ jobs:
           - dir: moran
             package: moran
             lib: Moran
+          - dir: epidemics
+            package: epidemics
+            lib: Epidemics
           - dir: plurality
             package: plurality
             lib: Plurality
@@ -361,7 +364,7 @@ jobs:
           check() {
             if [ -e "$1" ]; then echo "ok       $1"; else echo "MISSING  $1"; status=1; fi
           }
-          for p in rumor_spread 3-majority dynamics voter moran plurality; do
+          for p in rumor_spread 3-majority dynamics voter moran epidemics plurality; do
             check "_site/$p/blueprint/index.html"
             check "_site/$p/blueprint/dep_graph_document.html"
             check "_site/$p/blueprint.pdf"
