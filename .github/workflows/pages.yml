@@ -209,6 +209,10 @@ jobs:
           echo "key=$KEY" >> "$GITHUB_OUTPUT"
           echo "$KEY: $DEPS"
 
+      # The bibliography pre-pass is left out of the entry: besides its tracked
+      # output doc-data/references.json it writes doc/references.bib, which is not
+      # cached, so it must run in every job (it takes a second, and it produces the
+      # same file, so the cached data that depends on it stays valid).
       - name: Restore the dependencies' documentation data
         id: depdocs
         if: github.event_name != 'pull_request'
@@ -217,6 +221,7 @@ jobs:
           path: |
             .docbuild/.lake/build/api-docs.db
             .docbuild/.lake/build/doc-data
+            !.docbuild/.lake/build/doc-data/references.json*
           key: ${{ steps.docws.outputs.key }}
 
       - name: Build the dependencies' documentation data
@@ -247,6 +252,7 @@ jobs:
           path: |
             .docbuild/.lake/build/api-docs.db
             .docbuild/.lake/build/doc-data
+            !.docbuild/.lake/build/doc-data/references.json*
           key: ${{ steps.docws.outputs.key }}
 
       - name: Build the API documentation
