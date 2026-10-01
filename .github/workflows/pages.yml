@@ -25,8 +25,9 @@ on:
     branches: [main]
   # On a pull request everything except the API docs is built (blueprint,
   # checkdecls, Jekyll) and nothing is deployed. The API docs are skipped
-  # there because both projects `import Mathlib`, so a full doc-gen4 run costs
-  # the better part of an hour and would say nothing a `main` build won't.
+  # there because every project imports all of Mathlib: without the cache of
+  # the dependencies' documentation data (see below), a doc-gen4 run costs
+  # more than an hour, and it would say nothing a `main` build won't.
   pull_request:
   workflow_dispatch:
 
@@ -36,11 +37,12 @@ permissions:
   id-token: write
 
 # Never let two deployments race, and don't cancel one in flight: a
-# half-deployed Pages site is worse than a slightly stale one. Pull-request
-# runs deploy nothing, so those are grouped per branch and are cancellable.
+# half-deployed Pages site is worse than a slightly stale one. Runs on any
+# other ref (pull requests, manual runs on a branch) deploy nothing, so those
+# are grouped per ref, are cancellable, and never queue behind a deployment.
 concurrency:
-  group: pages-${{ github.event_name == 'pull_request' && github.head_ref || 'deploy' }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: pages-${{ github.ref == 'refs/heads/main' && 'deploy' || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   build:
@@ -96,6 +98,11 @@ jobs:
         with:
           lake-package-directory: ${{ matrix.dir }}
           build-args: --log-level=warning
+          # Its GitHub cache stores the whole `.lake` (about 2.6 GB, almost all of
+          # it Mathlib, which `lake exe cache get` downloads in seconds anyway) per
+          # project and commit. That overflows the 10 GB repository cache on every
+          # run and would evict the documentation cache below.
+          use-github-cache: false
 
       - name: Build the blueprint
         uses: xu-cheng/texlive-action@f886de8159e5952a131848a5fa9c3196a2132b5d # v2
@@ -149,43 +156,129 @@ jobs:
         working-directory: ${{ matrix.dir }}
         run: ~/.elan/bin/lake exe checkdecls blueprint/lean_decls
 
-      - name: Build the API documentation
+      # The API docs of a project cover everything it imports, and every project
+      # reaches `import Mathlib`. doc-gen4 first stores per-module data in an
+      # SQLite database (the `docInfo` facet: over an hour for Lean core and
+      # Mathlib), then renders the HTML (a couple of minutes). The dependencies'
+      # part is the same for every project and every commit until Mathlib or
+      # doc-gen4 changes, so it is built once and cached, in a single entry shared
+      # by all projects. Lake still checks every restored entry against the hashes
+      # of its inputs and rebuilds what does not match, so the cache can only save
+      # time, never change the output.
+      - name: Set up the documentation workspace
+        id: docws
         if: github.event_name != 'pull_request'
-        working-directory: ${{ matrix.dir }}
         env:
+          DIR: ${{ matrix.dir }}
           PACKAGE: ${{ matrix.package }}
-          LIB: ${{ matrix.lib }}
         run: |
           set -euo pipefail
           # Resolve doc-gen4 against this project's own toolchain, in a
           # throwaway package, so that adding docs never forces a Mathlib or
-          # toolchain bump on the project itself.
-          DOC_GEN_REV="$(cut -f2 -d: lean-toolchain)"
-          mkdir -p docbuild
-          cat > docbuild/lakefile.toml <<EOF
+          # toolchain bump on the project itself. It lives at the same path in
+          # every job, with this project's packages moved into it (nothing below
+          # needs them in place any more), so that every dependency, and hence
+          # every cached file, has the same absolute path in every job.
+          DOC_GEN_REV="$(cut -f2 -d: "$DIR/lean-toolchain")"
+          mkdir -p .docbuild/.lake
+          mv "$DIR/.lake/packages" .docbuild/.lake/packages
+          cp "$DIR/lean-toolchain" .docbuild/lean-toolchain
+          cat > .docbuild/lakefile.toml <<EOF
           name = "docbuild"
           reservoir = false
           version = "0.1.0"
-          packagesDir = "../.lake/packages"
 
           [[require]]
           name = "$PACKAGE"
-          path = "../"
+          path = "../$DIR"
 
           [[require]]
           scope = "leanprover"
           name = "doc-gen4"
           rev = "$DOC_GEN_REV"
           EOF
-          cd docbuild
+          cd .docbuild
           # MATHLIB_NO_CACHE_ON_UPDATE: works around a non-blocking error
           # message from Mathlib's post-update hook.
           MATHLIB_NO_CACHE_ON_UPDATE=1 ~/.elan/bin/lake update "$PACKAGE"
+          # Cache key: the toolchain and the revision of every git dependency
+          # (Mathlib and its dependencies, doc-gen4 and its dependencies), but
+          # not the path dependencies, i.e. the projects themselves.
+          DEPS="$(jq -c '[.packages[] | select(.type == "git") | [.name, .rev]] | sort' lake-manifest.json)"
+          KEY="docinfo-v1-$(printf '%s %s' "$(cat lean-toolchain)" "$DEPS" | sha256sum | cut -c1-16)"
+          echo "key=$KEY" >> "$GITHUB_OUTPUT"
+          echo "$KEY: $DEPS"
+          # Versions of doc-gen4 before its SQLite database (e.g. the one matching
+          # rumor_spread's older toolchain) have no `docInfo` facet: those projects
+          # skip the cache and build their docs in one go, as before.
+          if grep -q 'module_facet docInfo' .lake/packages/doc-gen4/lakefile.lean; then
+            echo "cacheable=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "cacheable=false" >> "$GITHUB_OUTPUT"
+            echo "doc-gen4 $DOC_GEN_REV has no docInfo facet: no dependency cache for $DIR"
+          fi
+
+      # The bibliography pre-pass must run in every job: besides its tracked output
+      # doc-data/references.json (part of the entry) it writes doc/references.bib,
+      # which is not cached. The docs step below deletes the restored output so
+      # that it runs again; it takes a second and produces the same file, so the
+      # cached data that depends on it stays valid.
+      - name: Restore the dependencies' documentation data
+        id: depdocs
+        if: github.event_name != 'pull_request' && steps.docws.outputs.cacheable == 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            .docbuild/.lake/build/api-docs.db
+            .docbuild/.lake/build/doc-data
+          key: ${{ steps.docws.outputs.key }}
+
+      - name: Build the dependencies' documentation data
+        if: github.event_name != 'pull_request' && steps.docws.outputs.cacheable == 'true' && steps.depdocs.outputs.cache-hit != 'true'
+        working-directory: .docbuild
+        run: |
+          set -euo pipefail
+          # Lean core and the import closure of `Mathlib`, and nothing from the
+          # projects, so the entry is valid for all of them.
+          ~/.elan/bin/lake build +Mathlib:docInfo
+          # Fold the write-ahead log into the database file before caching it.
+          python3 - <<'EOF'
+          import sqlite3
+          con = sqlite3.connect(".lake/build/api-docs.db")
+          con.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+          status = con.execute("PRAGMA quick_check").fetchone()[0]
+          con.close()
+          assert status == "ok", status
+          EOF
+          du -sh .lake/build/api-docs.db .lake/build/doc-data
+
+      - name: Cache the dependencies' documentation data
+        # On a cold start every project builds the same entry; the first to
+        # finish saves it and the others only log that it already exists.
+        if: github.event_name != 'pull_request' && steps.docws.outputs.cacheable == 'true' && steps.depdocs.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            .docbuild/.lake/build/api-docs.db
+            .docbuild/.lake/build/doc-data
+          key: ${{ steps.docws.outputs.key }}
+
+      - name: Build the API documentation
+        if: github.event_name != 'pull_request'
+        working-directory: .docbuild
+        env:
+          LIB: ${{ matrix.lib }}
+        run: |
+          set -euo pipefail
+          # Make the bibliography pre-pass run again (see above): its restored output
+          # would mark it up to date although doc/references.bib is missing. (An
+          # exclusion pattern in the cache paths would not help: actions/cache
+          # archives a listed directory whole.)
+          rm -f .lake/build/doc-data/references.json*
           ~/.elan/bin/lake build "$LIB:docs"
 
       - name: Assemble the API documentation
         if: github.event_name != 'pull_request'
-        working-directory: ${{ matrix.dir }}
         env:
           LIB: ${{ matrix.lib }}
           # A full doc-gen4 run over `import Mathlib` produces ~1.3 GB, almost
@@ -198,7 +291,7 @@ jobs:
           PRUNE_DEPENDENCY_DOCS: "true"
         run: |
           set -euo pipefail
-          DOC=docbuild/.lake/build/doc
+          DOC=.docbuild/.lake/build/doc
           if [ "$PRUNE_DEPENDENCY_DOCS" = "true" ]; then
             # Keep: this project's modules, `declarations/` (the search
             # index), `find/` (the search redirector), and every top-level
