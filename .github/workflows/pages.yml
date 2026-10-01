@@ -208,6 +208,15 @@ jobs:
           KEY="docinfo-v1-$(printf '%s %s' "$(cat lean-toolchain)" "$DEPS" | sha256sum | cut -c1-16)"
           echo "key=$KEY" >> "$GITHUB_OUTPUT"
           echo "$KEY: $DEPS"
+          # Versions of doc-gen4 before its SQLite database (e.g. the one matching
+          # rumor_spread's older toolchain) have no `docInfo` facet: those projects
+          # skip the cache and build their docs in one go, as before.
+          if grep -q 'module_facet docInfo' .lake/packages/doc-gen4/lakefile.lean; then
+            echo "cacheable=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "cacheable=false" >> "$GITHUB_OUTPUT"
+            echo "doc-gen4 $DOC_GEN_REV has no docInfo facet: no dependency cache for $DIR"
+          fi
 
       # The bibliography pre-pass is left out of the entry: besides its tracked
       # output doc-data/references.json it writes doc/references.bib, which is not
@@ -215,7 +224,7 @@ jobs:
       # same file, so the cached data that depends on it stays valid).
       - name: Restore the dependencies' documentation data
         id: depdocs
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.docws.outputs.cacheable == 'true'
         uses: actions/cache/restore@v4
         with:
           path: |
@@ -225,7 +234,7 @@ jobs:
           key: ${{ steps.docws.outputs.key }}
 
       - name: Build the dependencies' documentation data
-        if: github.event_name != 'pull_request' && steps.depdocs.outputs.cache-hit != 'true'
+        if: github.event_name != 'pull_request' && steps.docws.outputs.cacheable == 'true' && steps.depdocs.outputs.cache-hit != 'true'
         working-directory: .docbuild
         run: |
           set -euo pipefail
@@ -246,7 +255,7 @@ jobs:
       - name: Cache the dependencies' documentation data
         # On a cold start every project builds the same entry; the first to
         # finish saves it and the others only log that it already exists.
-        if: github.event_name != 'pull_request' && steps.depdocs.outputs.cache-hit != 'true'
+        if: github.event_name != 'pull_request' && steps.docws.outputs.cacheable == 'true' && steps.depdocs.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           path: |
