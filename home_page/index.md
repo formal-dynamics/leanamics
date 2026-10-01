@@ -33,7 +33,11 @@ two opinions and every round adopts the majority opinion among three agents
 sampled uniformly at random. Starting from an imbalance of at least $60\%$
 vs. $40\%$, after $O(\log n)$ rounds **all** agents hold the initial majority
 opinion with probability $1 - O(1/n)$. The main theorem is
-`ThreeMajority.majority3_consensus_whp`.
+`ThreeMajority.majority3_consensus_whp`. With two colors, the plurality theorem below
+(`Plurality.theorem_3_8`) needs only a vanishing imbalance: an initial gap of
+$22\sqrt{3 n \log n}$ between the two opinions, i.e. a fraction
+$1/2 + O(\sqrt{\log n / n})$, suffices for consensus within $O(\log n)$ rounds with
+probability $1 - O(\log n / n)$.
 
 * [Blueprint]({{ '/3-majority/blueprint/' | relative_url }}) · [as pdf]({{ '/3-majority/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/3-majority/blueprint/dep_graph_document.html' | relative_url }})
