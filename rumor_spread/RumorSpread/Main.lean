@@ -52,7 +52,7 @@ lemma prNotAllInformed_le (hn : 2 ≤ n) (v₀ : Fin n) (L T₁ T₂ : ℕ)
       have h2 : (0 : ℝ) ≤ ((2 : ℝ) / 3) ^ T₂ * n := by positivity
       linarith
     · rw [if_neg hA]
-      push_neg at hA
+      push Not at hA
       have hpt : ∀ l₂ : List (Tgt n),
           (if run {v₀} (l₁ ++ l₂) = univ then (0 : ℝ) else 1)
             ≤ (n : ℝ) - (run (run {v₀} l₁) l₂).card := by

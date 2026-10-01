@@ -33,7 +33,7 @@ instance (n : ℕ) : DecidableEq (Tgt n) :=
 lemma tgt_nonempty {n : ℕ} (hn : 2 ≤ n) : Nonempty (Tgt n) := by
   have : ∀ v : Fin n, Nonempty {u : Fin n // u ≠ v} := by
     intro v
-    have h2 : 1 < Fintype.card (Fin n) := by simpa using hn
+    have h2 : 1 < Fintype.card (Fin n) := by simp only [Fintype.card_fin]; omega
     exact (Fintype.exists_ne_of_one_lt_card h2 v).elim fun u hu => ⟨⟨u, hu⟩⟩
   exact inferInstanceAs (Nonempty (∀ v : Fin n, {u : Fin n // u ≠ v}))
 

@@ -99,7 +99,7 @@ lemma avg_not_contacted (hn : 2 ≤ n) (I : Finset (Fin n)) (u : Fin n)
       rw [mem_step] at h
       rcases h with h | ⟨v, hv, hvu⟩
       · exact absurd h hu
-      · push_neg
+      · push Not
         exact ⟨v, hv, hvu⟩
     · rw [if_neg h, if_pos]
       intro v hv hvu
@@ -193,7 +193,7 @@ lemma prob_goodRound (hn : 2 ≤ n) (I : Finset (Fin n)) (hI : I.Nonempty) :
         from funext fun r => if_pos (Or.inr hbig)]
     rw [avg_const]
     norm_num
-  · push_neg at hbig
+  · push Not at hbig
     -- pointwise reverse Markov: |step I r| ≤ 9m/8 + m·1[good]
     have hpt : ∀ r : Tgt n, ((step I r).card : ℝ)
         ≤ 9 * I.card / 8 + I.card * (if goodRound I r then (1 : ℝ) else 0) := by
@@ -205,7 +205,7 @@ lemma prob_goodRound (hn : 2 ≤ n) (I : Finset (Fin n)) (hI : I.Nonempty) :
         linarith
       · rw [if_neg hg]
         have h9 : ¬ 9 * I.card ≤ 8 * (step I r).card := fun h => hg (Or.inl h)
-        push_neg at h9
+        push Not at h9
         have : (8 : ℝ) * (step I r).card < 9 * I.card := by exact_mod_cast h9
         linarith
     have havg := avg_le_avg hpt
