@@ -110,7 +110,7 @@ lemma phase1 (hn : 2 ≤ n) (v₀ : Fin n) (L T₁ : ℕ)
           _ ≤ ((9 : ℝ) / 8) ^ L := hL
       have hglt : goodCount {v₀} l < L := by
         by_contra hge
-        push_neg at hge
+        push Not at hge
         exact absurd
           (pow_le_pow_right₀ (by norm_num : (1:ℝ) ≤ 9 / 8) hge)
           (not_le.2 hgL)

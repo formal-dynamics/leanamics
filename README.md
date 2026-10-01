@@ -30,9 +30,9 @@ in every round, supplied by a self-contained Chernoff bound proved from
 
 Every project is a **separate Lake package** with its own `lakefile.toml`,
 `lake-manifest.json` and `lean-toolchain`. The `dynamics/` package is shared by
-`3-majority/`, `voter/`, `moran/` and `plurality/` (which also requires `3-majority/`), using the same
-Lean 4.32.0 toolchain and exact Mathlib revision. Rumor spreading retains its
-independent Lean 4.26.0-rc2 pin; there is no root-level Lake package. Each has the same shape:
+`3-majority/`, `voter/`, `moran/` and `plurality/` (which also requires `3-majority/`). All
+projects use the same Lean 4.32.0 toolchain and exact Mathlib revision; there is no root-level
+Lake package. Each has the same shape:
 
 ```
 <project>/
