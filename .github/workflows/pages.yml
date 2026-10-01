@@ -269,7 +269,12 @@ jobs:
         working-directory: .docbuild
         env:
           LIB: ${{ matrix.lib }}
-        run: ~/.elan/bin/lake build "$LIB:docs"
+        run: |
+          set -euo pipefail
+          # Make the bibliography pre-pass run again (see above): its restored
+          # output would mark it up to date although doc/references.bib is missing.
+          rm -f .lake/build/doc-data/references.json*
+          ~/.elan/bin/lake build "$LIB:docs"
 
       - name: Assemble the API documentation
         if: github.event_name != 'pull_request'
