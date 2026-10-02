@@ -110,6 +110,31 @@ connection probability (`Epidemics.prob_infected_eq_prob_connected`).
 * [API docs]({{ '/epidemics/docs/' | relative_url }})
 * [Source](https://github.com/formal-dynamics/leanamycs/tree/main/epidemics)
 
+## Undecided-state dynamics
+
+Each node holds opinion $a$, opinion $b$, or is undecided; every round it samples a uniformly random
+node, adopts the sampled opinion if undecided, and becomes undecided if it sees the other opinion.
+With $q$ undecided nodes, the bias between the two opinions grows in expectation by the factor
+$1 + q/n$ in one round (`Undecided.expected_bias`), and every run is eventually absorbed in a
+monochromatic configuration (`Undecided.absorbed`).
+
+* [Blueprint]({{ '/undecided/blueprint/' | relative_url }}) · [as pdf]({{ '/undecided/blueprint.pdf' | relative_url }}) ·
+  [dependency graph]({{ '/undecided/blueprint/dep_graph_document.html' | relative_url }})
+* [API docs]({{ '/undecided/docs/' | relative_url }})
+* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/undecided)
+
+## Averaging dynamics
+
+Every node replaces its value by the average of its neighbours' values. On a connected graph with
+an odd closed walk all values converge to the degree-weighted average of the initial values
+(`Averaging.tendsto_degAvg`); on a connected bipartite graph the values of a 2-colouring flip sign
+forever (`Averaging.not_tendsto_of_colorable`).
+
+* [Blueprint]({{ '/averaging/blueprint/' | relative_url }}) · [as pdf]({{ '/averaging/blueprint.pdf' | relative_url }}) ·
+  [dependency graph]({{ '/averaging/blueprint/dep_graph_document.html' | relative_url }})
+* [API docs]({{ '/averaging/docs/' | relative_url }})
+* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/averaging)
+
 ## Shared finite dynamics library
 
 `Dynamics` supplies uniform and weighted finite expectations, independent
@@ -125,6 +150,6 @@ absorption. It is shared by voter dynamics, the Moran process, 3-majority and pl
 
 Each project is a separate Lean package (its own `lakefile.toml` and
 toolchain) living in its own subdirectory of the repository, with `dynamics/`
-shared by `3-majority/`, `voter/`, `moran/`, `epidemics/` and `plurality/`; this page is the
+shared by `3-majority/`, `voter/`, `moran/`, `epidemics/`, `undecided/`, `averaging/` and `plurality/`; this page is the
 shared landing page linking to each development. See each subdirectory's own
 `README.md` for build instructions.

@@ -130,6 +130,7 @@ it under dB).
 
 | ID | Result | Source | Needs | Size | Status |
 | --- | --- | --- | --- | --- | --- |
+| UND-0 | **Basics (synchronous, binary, `K_n`):** exact one-round expectations `𝔼[a'] = a(n − b + q)/n`, `𝔼[q'] = (q² + 2ab)/n`, hence the bias grows by the factor `1 + q/n`; almost-sure absorption in a monochromatic configuration. | Survey §6; Clementi et al. 2018 | FND-2 | S | in review |
 | UND-1 | **Synchronous, binary, majority phase:** from bias `Ω(√(n log n))` (start with a constant fraction), convergence to the plurality in `O(log n)` w.h.p. The non-monotone undecided count is the new difficulty. | Survey Thm 28; Clementi et al. 2018 | FND-3 | M–L | open |
 | UND-2 | **Sequential (population protocol) version:** `O(n log n)` interactions, plurality-preserving above `ω(√(n log n))`, via the Angluin–Aspnes–Eisenstat potential function. The canonical CRN result: Cardelli–Csikász-Nagy (2012) show that the cell-cycle switch computes this approximate majority. | Survey Thm 23; AAE08 | FND-2 | L–XL | open |
 | UND-3 | **Many colours:** convergence in `O(md(c) log n)`, where `md` is the monochromatic distance. | Becchetti, Clementi, Natale, Pasquale, Silvestri, *Plurality consensus in the gossip model*, SODA 2015, [arXiv:1407.2565](https://arxiv.org/abs/1407.2565); Survey Thm 29 | UND-1 | XL | open |
@@ -152,7 +153,7 @@ are not dynamics, but their computability results still suit Lean well.
 
 | ID | Result | Source | Needs | Size | Status |
 | --- | --- | --- | --- | --- | --- |
-| AVG-1 | **Basics:** `Pᵗx → (∑ π(v)x(v))·𝟙` on connected non-bipartite graphs; the rate bound of Survey Thm 33; the expected-matrix identities (4)–(5) for the random sequential version. For regular graphs the symmetric spectral theorem suffices. | Survey §7.2 | Mathlib linear algebra | M | open |
+| AVG-1 | **Basics:** `Pᵗx → (∑ π(v)x(v))·𝟙` on connected non-bipartite graphs; the rate bound of Survey Thm 33; the expected-matrix identities (4)–(5) for the random sequential version. For regular graphs the symmetric spectral theorem suffices. | Survey §7.2 | Mathlib linear algebra | M | in review (convergence on connected non-bipartite graphs and the bipartite counterexample; rate bound and sequential version open) |
 | AVG-2 | **Strong reconstruction by averaging** on a connected `(2n,d,b)`-clustered regular graph with `1 − 2b/d > (1+δ)λ`: the sign of `x^{(t−1)}(u) − x^{(t)}(u)` recovers the two clusters for all `t ≥ C log n`. **Hint:** the argument is deterministic once `⟨x, χ⟩ ≠ 0`. That is a sum of `2n` Rademacher signs, so it is even, and when nonzero `\|α₂\| ≥ 2/√(2n)`; the eigen-decomposition then gives an explicit `t`. The only probability needed is `P(⟨x,χ⟩ = 0) = C(2n,n)/4ⁿ ≤ 1/√(πn)`, an exact count on a uniform finite type (so "w.h.p." here means `1 − O(n^{−1/2})`). | Survey Thm 36; BCN+17b | AVG-1 | M–L | open |
 
 ---
