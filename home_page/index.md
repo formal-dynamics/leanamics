@@ -96,6 +96,20 @@ $\sum_{v \in S} \deg v$ respectively (`Moran.push_fixation`, `Moran.pull_fixatio
 * [API docs]({{ '/moran/docs/' | relative_url }})
 * [Source](https://github.com/formal-dynamics/leanamycs/tree/main/moran)
 
+## Reed–Frost epidemics and bond percolation
+
+In the Reed–Frost (Independent Cascade) epidemic, each infected node infects each susceptible
+neighbour across an open edge and then recovers. With one coin per edge, the nodes infected in
+round $t$ are exactly those at distance $t$ from the initial set in the graph of open edges
+(`Epidemics.infected_iff`), so the final outbreak is the set of nodes connected to the initial set,
+and with independent Bernoulli($p$) coins the probability of eventual infection is a bond-percolation
+connection probability (`Epidemics.prob_infected_eq_prob_connected`).
+
+* [Blueprint]({{ '/epidemics/blueprint/' | relative_url }}) · [as pdf]({{ '/epidemics/blueprint.pdf' | relative_url }}) ·
+  [dependency graph]({{ '/epidemics/blueprint/dep_graph_document.html' | relative_url }})
+* [API docs]({{ '/epidemics/docs/' | relative_url }})
+* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/epidemics)
+
 ## Shared finite dynamics library
 
 `Dynamics` supplies uniform and weighted finite expectations, independent
@@ -111,6 +125,6 @@ absorption. It is shared by voter dynamics, the Moran process, 3-majority and pl
 
 Each project is a separate Lean package (its own `lakefile.toml` and
 toolchain) living in its own subdirectory of the repository, with `dynamics/`
-shared by `3-majority/`, `voter/`, `moran/` and `plurality/`; this page is the
+shared by `3-majority/`, `voter/`, `moran/`, `epidemics/` and `plurality/`; this page is the
 shared landing page linking to each development. See each subdirectory's own
 `README.md` for build instructions.

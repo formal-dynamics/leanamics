@@ -1,0 +1,64 @@
+\begin{abstract}
+We formalize the pathwise correspondence between the Reed--Frost (Independent Cascade) epidemic
+and bond percolation, after Kempe, Kleinberg and Tardos: with one coin per edge, the nodes
+infected in round $t$ are exactly those at distance $t$ from the initial set in the graph of
+open edges. Consequently the final outbreak is the set of nodes connected to the initial set by
+open edges, and with i.i.d.\ Bernoulli$(p)$ coins the probability of eventual infection is a
+bond-percolation connection probability. The development is in the finite layer of the shared
+\texttt{dynamics} package.
+\end{abstract}
+
+\section{The model}
+\begin{definition}[Percolated graph and epidemic]\label{def:reedfrost}
+\lean{Epidemics.perc,Epidemics.SIR,Epidemics.step,Epidemics.run,Epidemics.setDist}\leanok
+Every edge $e$ of a finite graph $G$ carries a coin $\omega(e)\in\{\mathrm{true},\mathrm{false}\}$;
+the percolated graph $G_\omega$ keeps the edges whose coin is true. In one round, a susceptible node
+becomes infected if it has an infected neighbour across an open edge, and every infected node
+recovers. Initially the set $I_0$ is infected and nobody is recovered. We write $d(v)\in\mathbb N\cup\{\infty\}$
+for the distance from $I_0$ to $v$ in $G_\omega$.
+\end{definition}
+
+\section{Distances from a set}
+\begin{lemma}[Distance facts]\label{lem:dist}
+\lean{Epidemics.setDist_eq_subtype,Epidemics.setDist_eq_zero_iff,Epidemics.setDist_le_add_one,Epidemics.exists_edist_eq_setDist,Epidemics.exists_adj_of_setDist_succ,Epidemics.setDist_ne_top_iff,Epidemics.setDist_lt_card}\leanok\uses{def:reedfrost}
+$d(v)=0$ iff $v\in I_0$; if $u$ and $v$ are adjacent in $G_\omega$ then $d(v)\le d(u)+1$; if
+$d(v)=t+1$ then $v$ has a neighbour $u$ in $G_\omega$ with $d(u)=t$; $d(v)<\infty$ iff $v$ is
+connected to $I_0$ in $G_\omega$, and then $d(v)<|V|$.
+\end{lemma}
+\begin{proof}\leanok
+The infimum over $I_0$ is attained; take the second-to-last vertex of a shortest walk; a shortest
+walk is a path.
+\end{proof}
+
+\section{Pathwise layers}
+\begin{theorem}[Infected and recovered sets]\label{thm:layers}
+\lean{Epidemics.infected_recovered_iff,Epidemics.infected_iff,Epidemics.recovered_iff}\leanok\uses{lem:dist}
+For every coin assignment and every $t$, the nodes infected in round $t$ are those with $d(v)=t$,
+and the nodes recovered by round $t$ are those with $d(v)<t$.
+\end{theorem}
+\begin{proof}\leanok
+Both statements together, by induction on $t$, using Lemma~\ref{lem:dist}.
+\end{proof}
+\begin{corollary}[Extinction and final size]\label{cor:final}
+\lean{Epidemics.no_infected_of_dist_lt,Epidemics.extinct_of_dist_lt,Epidemics.extinct,Epidemics.final_recovered_iff}\leanok\uses{thm:layers}
+Nobody is infected in round $t$ as soon as every finite $d(v)$ is $<t$, in particular for
+$t\ge|V|$; the nodes recovered after $|V|$ rounds are those connected to $I_0$ in $G_\omega$.
+\end{corollary}
+\begin{proof}\leanok
+Immediate from Theorem~\ref{thm:layers} and $d(v)<|V|$ when finite.
+\end{proof}
+
+\section{Random coins}
+\begin{theorem}[Reed--Frost $\Leftrightarrow$ bond percolation]\label{thm:perc}
+\lean{Epidemics.bernoulli,Epidemics.coins,Epidemics.coins_prob_open,Epidemics.prob_infected_eq_prob_connected}\leanok\uses{cor:final}
+With independent Bernoulli$(p)$ coins, each edge is open with probability $p$, and the
+probability that $v$ is eventually infected equals the probability that $v$ is connected to $I_0$
+by open edges.
+\end{theorem}
+\begin{proof}\leanok
+The two events coincide for every coin assignment (Corollary~\ref{cor:final}).
+\end{proof}
+The coupling is pathwise because every edge is used at most once: once its coin has been seen
+from an infected endpoint, that endpoint is recovered for good. This is why a single coin per edge
+gives the same process, in distribution, as fresh coins in every round (that distributional
+statement is not formalized here).
