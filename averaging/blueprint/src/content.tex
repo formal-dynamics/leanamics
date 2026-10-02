@@ -1,0 +1,47 @@
+\begin{abstract}
+We formalize the averaging dynamics on a finite graph, in which every node replaces its value by
+the average of its neighbours' values: the degree-weighted sum is conserved, the values stay in
+the initial range, and on a connected graph with an odd closed walk all values converge to the
+degree-weighted average of the initial values; on a connected bipartite graph they need not
+converge.
+\end{abstract}
+
+\section{The dynamics}
+\begin{definition}[Averaging]\label{def:avg}
+\lean{Averaging.avgStep,Averaging.avgIter,Averaging.degAvg}\leanok
+$x_{t+1}(v)=\frac1{\deg v}\sum_{u\sim v}x_t(u)$, and $\bar x=\sum_v\deg(v)\,x_0(v)/\sum_v\deg(v)$.
+\end{definition}
+\begin{lemma}[Conservation and range]\label{lem:basic}
+\lean{Averaging.degree_weighted_sum_step,Averaging.avgStep_le,Averaging.le_avgStep,Averaging.degree_weighted_sum_iter}\leanok\uses{def:avg}
+$\sum_v\deg(v)\,x_{t}(v)$ does not depend on $t$; without isolated nodes, a round never leaves an
+interval containing all current values.
+\end{lemma}
+\begin{proof}\leanok
+Double counting over ordered adjacent pairs; an average of values in an interval stays in it.
+\end{proof}
+
+\section{Convergence}
+\begin{lemma}[Walk weights]\label{lem:walks}
+\lean{Averaging.transW,Averaging.transW_nonneg,Averaging.transW_sum,Averaging.avgIter_eq_sum_transW,Averaging.transW_pos_of_walk,Averaging.exists_uniform_walk_length}\leanok\uses{def:avg}
+$x_t(v)=\sum_u W_t(v,u)\,x_0(u)$ with $W_t$ stochastic and $W_t(v,u)>0$ when a walk of length $t$
+joins $v$ and $u$. On a connected graph with an odd closed walk, some length $L$ joins every pair.
+\end{lemma}
+\begin{proof}\leanok
+Induction on $t$; for $L$, fix the parity with the odd closed walk and pad with back-and-forth steps.
+\end{proof}
+\begin{theorem}[Convergence to the degree-weighted average]\label{thm:conv}
+\lean{Averaging.fMax_antitone,Averaging.fMin_monotone,Averaging.range_avgIter_le,Averaging.gap_iter,Averaging.tendsto_degAvg}\leanok\uses{lem:basic,lem:walks}
+On a connected graph with an odd closed walk, $x_t(v)\to\bar x$ for every $v$.
+\end{theorem}
+\begin{proof}\leanok
+All entries of $W_L$ are at least some $\delta>0$, so $\max-\min$ contracts by $1-|V|\delta$ every
+$L$ rounds (Doeblin); the common limit is $\bar x$ by conservation.
+\end{proof}
+\begin{theorem}[Bipartite graphs]\label{thm:bip}
+\lean{Averaging.not_tendsto_of_colorable}\leanok\uses{def:avg}
+On a connected bipartite graph with at least two nodes, the values $\pm1$ of a proper
+2-colouring change sign at every round, so they converge nowhere.
+\end{theorem}
+\begin{proof}\leanok
+All neighbours of a node have the other colour.
+\end{proof}
