@@ -1,0 +1,59 @@
+\begin{abstract}
+We formalize the median dynamics of Doerr, Goldberg, Minder, Sauerwald and Scheideler (SPAA
+2011): every node adopts the median of its own value and the values of two random nodes. The
+median commutes with monotone maps, so thresholding the process at any value gives the binary
+median process, i.e.\ 2-Choices, driven by the same samples. For two values we prove consensus
+from a gap of order $\sqrt{n\log n}$ within $O(\log n)$ rounds with high probability.
+\end{abstract}
+
+\section{The model}
+\begin{definition}[Median dynamics]\label{def:median}
+\lean{Median.med3,Median.Config,Median.Round,Median.step,Median.run,Median.ones,Median.Consensus,Median.notConsensus,Median.kernel}\leanok
+Values lie in a linear order. In a round every node samples two nodes uniformly at random
+(independently, with replacement) and adopts the median of its own value and the two sampled
+values. With two values this is 2-Choices: a node keeps its value unless both samples hold the
+other one.
+\end{definition}
+
+\section{Structure}
+\begin{theorem}[Threshold reduction]\label{thm:threshold}
+\lean{Median.med3_monotone,Median.threshold_step,Median.threshold_run}\leanok\uses{def:median}
+The median commutes with monotone maps; hence for every threshold $\theta$ the indicator of
+$\{x_v\ge\theta\}$ evolves, round by round and for the same samples, as the binary median process.
+\end{theorem}
+\begin{proof}\leanok
+$\mathrm{med}(a,b,c)=\max(\min(a,b),\min(\max(a,b),c))$, and monotone maps commute with $\min$ and $\max$.
+\end{proof}
+\begin{theorem}[Validity, range, consensus]\label{thm:basic}
+\lean{Median.step_mem,Median.step_mem_Icc,Median.step_of_consensus,Median.absorbed}\leanok\uses{def:median}
+Every new value is a current value, values stay within any interval containing all current
+values, consensus configurations are fixed, and consensus is reached almost surely.
+\end{theorem}
+\begin{proof}\leanok
+The median is one of its arguments; the round in which every node samples node $0$ twice gives
+consensus and has positive probability; conclude with the shared absorption theorem.
+\end{proof}
+\begin{theorem}[Binary expectation]\label{thm:expect}
+\lean{Median.expected_ones}\leanok\uses{def:median}
+With two values and a fraction $p$ of \texttt{true}, the expected number of \texttt{true} after one
+round is $n(3p^2-2p^3)$, the same cubic as for 3-Majority.
+\end{theorem}
+\begin{proof}\leanok
+A \texttt{true} node stays unless both samples are \texttt{false}, a \texttt{false} node switches iff
+both samples are \texttt{true}.
+\end{proof}
+
+\section{Consensus from a vanishing bias}
+\begin{theorem}[2-Choices, w.h.p.]\label{thm:whp}
+\lean{Median.binary_consensus,Median.consensus_whp}\leanok\uses{thm:expect}
+If $\log n\ge 128$ and the \texttt{true} nodes outnumber the \texttt{false} ones by at least
+$128\sqrt{n\log n}$, all nodes hold \texttt{true} after $\lceil 128\log n\rceil$ rounds with
+probability at least $1-128/n$.
+\end{theorem}
+\begin{proof}\leanok
+Phases as in the plurality package: while it is small, the gap grows by a factor $5/4$ per phase
+except with probability $O(n^{-2})$ (Bernstein); then the minority shrinks by $7/8$ per phase down
+to $O(\log n)$; a final round reaches consensus except with probability $O(n^{-1/2})$ (Markov). The
+phases are combined with the nested-phases lemma of the shared layer. The threshold
+$\log n\ge128$, i.e.\ $n\ge e^{128}$, comes from these crude constants.
+\end{proof}
