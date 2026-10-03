@@ -19,6 +19,13 @@ for a minimal analytic toolkit.
 A self-contained paper proof, written to mirror the formalization
 lemma-for-lemma, is in [latex/three_majority.tex](latex/three_majority.tex).
 
+**Relation to `plurality/`.** This was the first, self-contained formalization of the
+two-opinion case. The [plurality package](../plurality) generalizes it to `k` colors and to a
+vanishing bias: with two opinions, `Plurality.majority3_vanishing_bias` gives consensus from a
+gap of `22√(3 n log n)` (a fraction `1/2 + O(√(log n / n))`) within `390 log n` rounds, stated
+for this package's process `ThreeMajority.run`. The plurality package reuses this development
+through the pathwise bridge `Plurality.colorSet_run`.
+
 **[Blueprint](https://formal-dynamics.github.io/leanamycs/3-majority/blueprint/)** ·
 **[Blueprint as pdf](https://formal-dynamics.github.io/leanamycs/3-majority/blueprint.pdf)** ·
 **[Dependency graph](https://formal-dynamics.github.io/leanamycs/3-majority/blueprint/dep_graph_document.html)** ·
