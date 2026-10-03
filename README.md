@@ -107,3 +107,7 @@ example `[EPI-1] Reed–Frost ⇔ bond percolation`) saying that you are working
 That is all it takes to claim it, and it keeps two people from formalizing the same
 result. Then open a (draft) pull request whenever you have something to show. To
 propose a result that is not on the roadmap, just open an issue.
+
+[PROVENANCE.md](PROVENANCE.md) records, for every result, its source paper, whether the formal
+proof follows a published proof or takes a different route, its explicit constants, and who
+produced it. Please add an entry for each result you contribute.
