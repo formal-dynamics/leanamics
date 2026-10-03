@@ -125,6 +125,20 @@ forever (`Averaging.not_tendsto_of_colorable`).
 * [API docs]({{ '/averaging/docs/' | relative_url }})
 * [Source](https://github.com/formal-dynamics/leanamycs/tree/main/averaging)
 
+## Median dynamics and 2-Choices
+
+Every node holds a value from a linearly ordered set and, every round, adopts the median of its
+own value and the values of two nodes sampled uniformly at random. Thresholding the process at any
+value gives the binary median process, i.e. 2-Choices, driven by the same samples
+(`Median.threshold_run`). With two values, a gap of $128\sqrt{n \log n}$ between them gives
+consensus on the majority within $\lceil 128 \log n \rceil$ rounds with probability $1 - 128/n$
+(`Median.consensus_whp`).
+
+* [Blueprint]({{ '/median/blueprint/' | relative_url }}) · [as pdf]({{ '/median/blueprint.pdf' | relative_url }}) ·
+  [dependency graph]({{ '/median/blueprint/dep_graph_document.html' | relative_url }})
+* [API docs]({{ '/median/docs/' | relative_url }})
+* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/median)
+
 ## Shared finite dynamics library
 
 `Dynamics` supplies uniform and weighted finite expectations, independent
@@ -140,6 +154,6 @@ absorption. It is shared by voter dynamics, the Moran process, 3-majority and pl
 
 Each project is a separate Lean package (its own `lakefile.toml` and
 toolchain) living in its own subdirectory of the repository, with `dynamics/`
-shared by `3-majority/`, `voter/`, `moran/`, `epidemics/`, `undecided/`, `averaging/` and `plurality/`; this page is the
+shared by `3-majority/`, `voter/`, `moran/`, `epidemics/`, `undecided/`, `averaging/`, `median/` and `plurality/`; this page is the
 shared landing page linking to each development. See each subdirectory's own
 `README.md` for build instructions.

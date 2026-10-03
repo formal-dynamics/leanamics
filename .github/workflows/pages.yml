@@ -79,6 +79,9 @@ jobs:
           - dir: averaging
             package: averaging
             lib: Averaging
+          - dir: median
+            package: median
+            lib: Median
           - dir: plurality
             package: plurality
             lib: Plurality
@@ -370,7 +373,7 @@ jobs:
           check() {
             if [ -e "$1" ]; then echo "ok       $1"; else echo "MISSING  $1"; status=1; fi
           }
-          for p in rumor_spread 3-majority dynamics voter moran epidemics undecided averaging plurality; do
+          for p in rumor_spread 3-majority dynamics voter moran epidemics undecided averaging median plurality; do
             check "_site/$p/blueprint/index.html"
             check "_site/$p/blueprint/dep_graph_document.html"
             check "_site/$p/blueprint.pdf"

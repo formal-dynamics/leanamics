@@ -18,6 +18,7 @@ our elementary proofs), and some are astronomically large:
 | `ThreeMajority.majority3_consensus_whp` | `30 ≤ log n` | `n ≥ e³⁰ ≈ 1.1 · 10¹³` |
 | `Plurality.theorem_3_8`, Corollaries 3.10–3.12, `majority3_vanishing_bias` | `40 ≤ log n` | `n ≥ e⁴⁰ ≈ 2.4 · 10¹⁷` |
 | `Plurality.theorem_4_8_b` | `20 ≤ log n`, `60 ∣ n` | `n ≥ e²⁰ ≈ 4.9 · 10⁸` |
+| `Median.consensus_whp` (2-Choices) | `128 ≤ log n` | `n ≥ e¹²⁸ ≈ 3.9 · 10⁵⁵` |
 
 The statements are correct as asymptotic `O(log n)` results, but they say nothing about
 realistic population sizes. Lowering these thresholds is a roadmap target (MAJ-11). Results
@@ -84,9 +85,13 @@ baseline, no placeholders, a warning-free build, and only standard axioms.
 | `Dynamics.Kernel.nested_phases` | Lemma A.4 of the SPAA 2014 plurality paper, stated there without proof (dropped in the journal version) | Phase by phase with a survival observable; the paper's hypothesis `ε ≤ ν` is not needed | Maria Sofia Bucarelli; PR #6 |
 | `Dynamics.Kernel.finite_absorption`, `exists_stationary` | Standard | Uniform absorption blocks and geometric decay; stationarity via Cesàro averages and compactness of the simplex | Niccolò D'Archivio; PR #3 |
 
+### Median dynamics and 2-Choices (`median/`)
+
+| Result | Source | Proof | Constants | Produced by |
+| --- | --- | --- | --- | --- |
+| `Median.threshold_step`, `threshold_run`, `step_mem`, `step_mem_Icc`, `step_of_consensus`, `expected_ones`, `absorbed`: threshold reduction to the binary median, validity, range, binary expectation `n(3p² − 2p³)`, almost-sure consensus | Doerr, Goldberg, Minder, Sauerwald, Scheideler, *Stabilizing consensus with the power of two choices*, SPAA 2011 (the threshold reduction is their reduction to two values) | Elementary: the median commutes with monotone maps; per-node probabilities; the shared `finite_absorption` | exact | Pinned (dbe73d6); proofs by GLM-5.3 (Mistral API, via Mistral Vibe; five sessions, ~38 min) |
+| `Median.consensus_whp`: two values, consensus from a gap `C √(n log n)` in `⌈C log n⌉` rounds w.p. `≥ 1 − C/n` | Same paper, two-value case (2-Choices) | Phases in the style of `plurality/` (`Upper.lean`): growth of the gap by `5/4` per phase (Bernstein), decay of the minority by `7/8` per phase, an endgame by Markov, combined with `nested_phases`; not the paper's proof | `C = 128`: `128 ≤ log n`, gap `128 √(n log n)`, `⌈128 log n⌉` rounds, failure `≤ 128/n` | Pinned (de93267); proofs by GLM-5.3 (three supervised sessions) |
+
 ## In progress
 
-- **Median dynamics / 2-Choices** (`median/`, roadmap MAJ-1): Doerr, Goldberg, Minder,
-  Sauerwald, Scheideler, *Stabilizing consensus with the power of two choices*, SPAA 2011.
-  Structural results proved by GLM-5.3 (Mistral API, via Mistral Vibe) on a pinned baseline;
-  consensus from a gap `C √(n log n)` in progress. The constant `C` will be recorded here.
+Nothing at the moment.
