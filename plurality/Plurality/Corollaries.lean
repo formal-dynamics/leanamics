@@ -1,4 +1,5 @@
 import Plurality.Upper
+import Plurality.Binary
 
 /-!
 # Corollaries 3.10, 3.11 and 3.12
@@ -130,5 +131,63 @@ theorem corollary_3_12 (hL : 40 ≤ Real.log n) (hk : 2 ≤ k) {β : ℝ} (hβ :
         ≤ expList (Tgt3 n) (10 * phases n β)
             (fun l => if Mono (run x l) m then (1 : ℝ) else 0) :=
   theorem_3_8_bigO hL hk hβ x hM hcm hs
+
+/-! ### Two opinions from a vanishing bias -/
+
+/-- **3-Majority with two opinions from a vanishing bias** (the `k = 2`, `λ = 3` case of
+`theorem_3_8_bigO`, transferred to the binary process `ThreeMajority.run` through
+`colorSet_run`): if the nodes of `I₀` outnumber the others by at least `22 √(3 n log n)`
+(a fraction `1/2 + O(√(log n / n))`) and `log n ≥ 40`, then after `O(log n)` rounds, at most
+`390 log n`, every node holds the opinion of `I₀` with probability at least
+`1 - 429 log n / n`. -/
+theorem majority3_vanishing_bias (hL : 40 ≤ Real.log n) (I₀ : Finset (Fin n))
+    (hs : 22 * √(3 * n * Real.log n) ≤ (I₀.card : ℝ) - (n - I₀.card)) :
+    ((10 * phases n 3 : ℕ) : ℝ) ≤ 390 * Real.log n ∧
+      1 - 429 * Real.log n / n
+        ≤ Dynamics.expList (Tgt3 n) (10 * phases n 3)
+            (fun l => if ThreeMajority.run I₀ l = univ then (1 : ℝ) else 0) := by
+  have hn : 0 < n := by
+    rcases Nat.eq_zero_or_pos n with rfl | h
+    · simp at hL; linarith
+    · exact h
+  have hnR : (0 : ℝ) < n := by exact_mod_cast hn
+  have hlog : 0 < Real.log n := by linarith
+  have hcard : I₀.card ≤ n := by simpa using card_le_univ I₀
+  have hpos : 0 < 22 * √(3 * n * Real.log n) := by positivity
+  set x := ofSet I₀ with hx
+  have h1 : count x 1 = I₀.card := count_ofSet_one I₀
+  have h0 : count x 0 = n - I₀.card := count_ofSet_zero I₀
+  have hgapR : ((n - I₀.card : ℕ) : ℝ) < I₀.card := by
+    rw [Nat.cast_sub hcard]; linarith
+  have hgap : count x 0 < count x 1 := by
+    rw [h0, h1]; exact_mod_cast hgapR
+  have hmax : maxc (count x) = count x 1 := by
+    apply le_antisymm
+    · refine Finset.sup_le fun j _ => ?_
+      fin_cases j
+      · exact hgap.le
+      · exact le_rfl
+    · exact le_maxc _ 1
+  have hM : argmaxSet (count x) = {1} := by
+    ext j
+    fin_cases j <;> (simp [mem_argmaxSet, hmax]; try omega)
+  have hsec : secondc (count x) = count x 0 := by
+    have hf : (univ.filter fun h => count x h ≠ maxc (count x)) = {0} := by
+      ext j
+      fin_cases j <;> (simp [hmax]; try omega)
+    rw [secondc, hf, sup_singleton]
+  have hbias : (bias (count x) : ℝ) = (I₀.card : ℝ) - (n - I₀.card) := by
+    rw [bias_of_singleton hM, hmax, hsec, Nat.cast_sub hgap.le, h1, h0, Nat.cast_sub hcard]
+  have hcm : (n : ℝ) / 3 ≤ count x 1 := by
+    rw [h1]; linarith [hgapR, (Nat.cast_sub hcard : ((n - I₀.card : ℕ) : ℝ) = n - I₀.card)]
+  obtain ⟨hT, hP⟩ := theorem_3_8_bigO hL le_rfl (le_refl (3 : ℝ)) x hM hcm (by rw [hbias]; exact hs)
+  refine ⟨by linarith, ?_⟩
+  have he : (fun l => if Mono (run x l) 1 then (1 : ℝ) else 0)
+      = fun l => if ThreeMajority.run I₀ l = univ then (1 : ℝ) else 0 := by
+    funext l
+    rw [show ThreeMajority.run I₀ l = colorSet (run x l) 1 by rw [colorSet_run, colorSet_ofSet]]
+    simp only [mono_one_iff_colorSet]
+  rw [← he]
+  linarith [hP]
 
 end Plurality

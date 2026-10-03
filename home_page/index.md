@@ -26,41 +26,31 @@ with high probability. The main theorem is `RumorPush.push_informs_all_whp`.
 * [API docs]({{ '/rumor_spread/docs/' | relative_url }})
 * [Source](https://github.com/formal-dynamics/leanamycs/tree/main/rumor_spread)
    
-## 3-majority dynamics
+## Majority dynamics: 3-Majority and plurality consensus
 
-In the *3-majority* model on $n$ fully-mixing agents, each agent holds one of
-two opinions and every round adopts the majority opinion among three agents
-sampled uniformly at random. Starting from an imbalance of at least $60\%$
-vs. $40\%$, after $O(\log n)$ rounds **all** agents hold the initial majority
-opinion with probability $1 - O(1/n)$. The main theorem is
-`ThreeMajority.majority3_consensus_whp`. With two colors, the plurality theorem below
-(`Plurality.theorem_3_8`) needs only a vanishing imbalance: an initial gap of
-$22\sqrt{3 n \log n}$ between the two opinions, i.e. a fraction
-$1/2 + O(\sqrt{\log n / n})$, suffices for consensus within $O(\log n)$ rounds with
-probability $1 - O(\log n / n)$.
+In the *3-majority* dynamics every node holds one of $k$ colors and, every round, adopts the
+majority color among three nodes sampled uniformly at random (the first one if all three differ).
+If the plurality color $m$ has at least $n/\lambda$ nodes and leads every other color by at least
+$22\sqrt{\lambda n \log n}$, then after $O(\lambda \log n)$ rounds **all** nodes support $m$ with
+high probability (`Plurality.theorem_3_8`), formalizing the upper bound of
+Becchetti–Clementi–Natale–Pasquale–Silvestri–Trevisan, *Simple Dynamics for Plurality Consensus*
+(SPAA 2014). With two opinions this is consensus from a vanishing imbalance: a gap of
+$22\sqrt{3 n \log n}$, i.e. a fraction $1/2 + O(\sqrt{\log n / n})$, suffices for consensus within
+$390 \log n$ rounds with probability $1 - O(\log n / n)$ (`Plurality.majority3_vanishing_bias`).
+The package also proves the paper's lower bounds: $\Omega(k \log n)$ rounds from balanced starts,
+the characterization of 3-input rules that solve plurality consensus, and $\Omega(k/h^2)$ rounds for
+$h$-plurality.
 
-* [Blueprint]({{ '/3-majority/blueprint/' | relative_url }}) · [as pdf]({{ '/3-majority/blueprint.pdf' | relative_url }}) ·
-  [dependency graph]({{ '/3-majority/blueprint/dep_graph_document.html' | relative_url }})
-* [API docs]({{ '/3-majority/docs/' | relative_url }})
-* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/3-majority)
+The two-opinion case was first formalized on its own, from a $60\%$ majority
+(`ThreeMajority.majority3_consensus_whp`); that self-contained development is kept in
+`3-majority/` and reused by the plurality package.
 
-## Plurality consensus with $k$ colors
-
-The *3-majority* dynamics with $k$ colors: every round, each node adopts the
-majority color among three nodes sampled uniformly at random (the first one if
-all three differ). If the plurality color $m$ has at least $n/\lambda$ nodes
-and leads every other color by at least $22\sqrt{\lambda n \log n}$, then after
-$O(\lambda \log n)$ rounds **all** nodes support $m$ with high probability.
-The main theorem is `Plurality.theorem_3_8`, formalizing the upper bound of
-Becchetti–Clementi–Natale–Pasquale–Silvestri–Trevisan, *Simple Dynamics for
-Plurality Consensus* (SPAA 2014), together with its lower bounds: $\Omega(k \log n)$
-rounds from balanced starts, the characterization of 3-input rules that solve
-plurality consensus, and $\Omega(k/h^2)$ rounds for $h$-plurality.
-
-* [Blueprint]({{ '/plurality/blueprint/' | relative_url }}) · [as pdf]({{ '/plurality/blueprint.pdf' | relative_url }}) ·
-  [dependency graph]({{ '/plurality/blueprint/dep_graph_document.html' | relative_url }})
-* [API docs]({{ '/plurality/docs/' | relative_url }})
-* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/plurality)
+* Plurality: [Blueprint]({{ '/plurality/blueprint/' | relative_url }}) · [as pdf]({{ '/plurality/blueprint.pdf' | relative_url }}) ·
+  [dependency graph]({{ '/plurality/blueprint/dep_graph_document.html' | relative_url }}) ·
+  [API docs]({{ '/plurality/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamycs/tree/main/plurality)
+* Two opinions from a 60% majority: [Blueprint]({{ '/3-majority/blueprint/' | relative_url }}) · [as pdf]({{ '/3-majority/blueprint.pdf' | relative_url }}) ·
+  [dependency graph]({{ '/3-majority/blueprint/dep_graph_document.html' | relative_url }}) ·
+  [API docs]({{ '/3-majority/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamycs/tree/main/3-majority)
 
 ## Weighted synchronous voter dynamics
 
@@ -110,6 +100,31 @@ connection probability (`Epidemics.prob_infected_eq_prob_connected`).
 * [API docs]({{ '/epidemics/docs/' | relative_url }})
 * [Source](https://github.com/formal-dynamics/leanamycs/tree/main/epidemics)
 
+## Undecided-state dynamics
+
+Each node holds opinion $a$, opinion $b$, or is undecided; every round it samples a uniformly random
+node, adopts the sampled opinion if undecided, and becomes undecided if it sees the other opinion.
+With $q$ undecided nodes, the bias between the two opinions grows in expectation by the factor
+$1 + q/n$ in one round (`Undecided.expected_bias`), and every run is eventually absorbed in a
+monochromatic configuration (`Undecided.absorbed`).
+
+* [Blueprint]({{ '/undecided/blueprint/' | relative_url }}) · [as pdf]({{ '/undecided/blueprint.pdf' | relative_url }}) ·
+  [dependency graph]({{ '/undecided/blueprint/dep_graph_document.html' | relative_url }})
+* [API docs]({{ '/undecided/docs/' | relative_url }})
+* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/undecided)
+
+## Averaging dynamics
+
+Every node replaces its value by the average of its neighbours' values. On a connected graph with
+an odd closed walk all values converge to the degree-weighted average of the initial values
+(`Averaging.tendsto_degAvg`); on a connected bipartite graph the values of a 2-colouring flip sign
+forever (`Averaging.not_tendsto_of_colorable`).
+
+* [Blueprint]({{ '/averaging/blueprint/' | relative_url }}) · [as pdf]({{ '/averaging/blueprint.pdf' | relative_url }}) ·
+  [dependency graph]({{ '/averaging/blueprint/dep_graph_document.html' | relative_url }})
+* [API docs]({{ '/averaging/docs/' | relative_url }})
+* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/averaging)
+
 ## Shared finite dynamics library
 
 `Dynamics` supplies uniform and weighted finite expectations, independent
@@ -125,6 +140,6 @@ absorption. It is shared by voter dynamics, the Moran process, 3-majority and pl
 
 Each project is a separate Lean package (its own `lakefile.toml` and
 toolchain) living in its own subdirectory of the repository, with `dynamics/`
-shared by `3-majority/`, `voter/`, `moran/`, `epidemics/` and `plurality/`; this page is the
+shared by `3-majority/`, `voter/`, `moran/`, `epidemics/`, `undecided/`, `averaging/` and `plurality/`; this page is the
 shared landing page linking to each development. See each subdirectory's own
 `README.md` for build instructions.

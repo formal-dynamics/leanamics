@@ -1,0 +1,45 @@
+\begin{abstract}
+We formalize the basic properties of the synchronous undecided-state dynamics with two opinions
+on the complete graph: the exact one-round expectations of the three counts, the resulting
+growth of the bias by the factor $1+q/n$ (the undecided nodes amplify the current majority), and
+almost-sure absorption in a monochromatic configuration.
+\end{abstract}
+
+\section{The model}
+\begin{definition}[Undecided-state dynamics]\label{def:usd}
+\lean{Undecided.Op,Undecided.update,Undecided.Config,Undecided.step,Undecided.count,Undecided.kernel}\leanok
+Each of $n$ nodes holds opinion $a$, opinion $b$, or is undecided. In a round every node samples a
+node uniformly at random (with replacement, possibly itself): an undecided node adopts the sampled
+opinion, and a decided node that samples the other opinion becomes undecided. We write $a$, $b$,
+$q$ for the numbers of $a$-, $b$- and undecided nodes.
+\end{definition}
+
+\section{One round in expectation}
+\begin{lemma}[Per-node probabilities]\label{lem:node}
+\lean{Undecided.count_eq_sum,Undecided.count_step_eq_sum,Undecided.avg_indicator_eq,Undecided.node_prob_a,Undecided.node_prob_b,Undecided.node_prob_u}\leanok\uses{def:usd}
+The state of a node after a round depends only on the node it samples, which is uniform; so an
+$a$-node stays $a$ with probability $1-b/n$ and an undecided node becomes $a$ with probability $a/n$.
+\end{lemma}
+\begin{proof}\leanok
+The average over all sampling functions of a function of one coordinate is the uniform average.
+\end{proof}
+\begin{theorem}[Expected counts and bias]\label{thm:expect}
+\lean{Undecided.expected_count_a,Undecided.expected_count_b,Undecided.expected_count_u,Undecided.expected_bias}\leanok\uses{lem:node}
+After one round, the expected numbers of $a$-, $b$- and undecided nodes are $a(n-b+q)/n$,
+$b(n-a+q)/n$ and $(q^2+2ab)/n$; hence the expected bias is $(a-b)(1+q/n)$.
+\end{theorem}
+\begin{proof}\leanok
+Sum Lemma~\ref{lem:node} over the nodes; $a(n-b+q)-b(n-a+q)=(a-b)(n+q)$.
+\end{proof}
+
+\section{Absorption}
+\begin{theorem}[Almost-sure absorption]\label{thm:absorbed}
+\lean{Undecided.Mono,Undecided.notMono,Undecided.step_of_mono,Undecided.notMono_step,Undecided.access_from_decided,Undecided.absorbed}\leanok\uses{def:usd}
+Monochromatic configurations are fixed points, and from every configuration the probability of
+not being monochromatic after $t$ rounds tends to $0$.
+\end{theorem}
+\begin{proof}\leanok
+If some node $w$ is decided, the round in which everybody samples $w$, repeated twice, makes the
+configuration monochromatic; it has positive probability. Conclude with the shared absorption
+theorem.
+\end{proof}
