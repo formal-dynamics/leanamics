@@ -41,14 +41,10 @@ The package also proves the paper's lower bounds: $\Omega(k \log n)$ rounds from
 the characterization of 3-input rules that solve plurality consensus, and $\Omega(k/h^2)$ rounds for
 $h$-plurality.
 
-The two-opinion case was first formalized on its own, from a $60\%$ majority
-(`ThreeMajority.majority3_consensus_whp`); that self-contained development is kept in
-`3-majority/` and reused by the plurality package.
-
 * Plurality: [Blueprint]({{ '/plurality/blueprint/' | relative_url }}) · [as pdf]({{ '/plurality/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/plurality/blueprint/dep_graph_document.html' | relative_url }}) ·
   [API docs]({{ '/plurality/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamycs/tree/main/plurality)
-* Two opinions from a 60% majority: [Blueprint]({{ '/3-majority/blueprint/' | relative_url }}) · [as pdf]({{ '/3-majority/blueprint.pdf' | relative_url }}) ·
+* Two opinions (`3-majority/`): [Blueprint]({{ '/3-majority/blueprint/' | relative_url }}) · [as pdf]({{ '/3-majority/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/3-majority/blueprint/dep_graph_document.html' | relative_url }}) ·
   [API docs]({{ '/3-majority/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamycs/tree/main/3-majority)
 
@@ -75,7 +71,7 @@ In the Birth–death Moran process, an individual chosen with probability propor
 fitness (mutants $r$, residents $1$) places a copy of itself on a uniformly random neighbour.
 On a connected regular graph, $k$ mutants take over with probability
 $(1 - r^{-k})/(1 - r^{-n})$ ($k/n$ when $r = 1$): the "if" direction of the isothermal theorem of
-Lieberman, Hauert and Nowak, whose widely quoted "if and only if" form is false. The main
+Lieberman, Hauert and Nowak. The main
 theorem is `Moran.isothermal`; `Moran.moran_formula` is Moran's 1958 formula on the complete graph.
 On an arbitrary connected graph, the neutral push (Birth–death) and pull (death–Birth) processes
 fix a mutant set $S$ with probabilities proportional to $\sum_{v \in S} 1/\deg v$ and to
