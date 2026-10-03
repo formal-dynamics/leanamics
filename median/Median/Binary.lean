@@ -1,4 +1,5 @@
 import Median.Defs
+import Median.BinaryAssembly
 
 /-! # The binary median dynamics (2-Choices) from a vanishing bias
 
@@ -16,6 +17,8 @@ theorem consensus_whp : ∃ C : ℝ, 0 < C ∧ ∀ (n : ℕ) [NeZero n], C ≤ R
     ∀ x : Config n Bool, C * √(n * Real.log n) ≤ (ones x : ℝ) - (n - ones x) →
       1 - C / n ≤ expList (Round n) ⌈C * Real.log n⌉₊
         (fun l => if run x l = (fun _ => true) then (1 : ℝ) else 0) := by
-  sorry
+  refine ⟨128, by norm_num, ?_⟩
+  intro n _ hL x hx
+  exact binary_consensus hL x hx
 
 end Median
