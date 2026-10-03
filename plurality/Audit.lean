@@ -25,3 +25,4 @@ import Plurality
 #print axioms Plurality.lemma_4_11_paper
 #print axioms Plurality.theorem_4_12
 #print axioms Plurality.theorem_4_12_log
+#print axioms Plurality.majority3_vanishing_bias

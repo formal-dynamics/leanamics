@@ -74,4 +74,22 @@ theorem binary_consensus_whp (hbig : (30 : ℝ) ≤ Real.log n) (x : Config n 2)
   · rw [if_pos hm, if_pos ((mono_one_iff_colorSet _).mp hm)]
   · rw [if_neg hm, if_neg (fun h' => hm ((mono_one_iff_colorSet _).mpr h'))]
 
+/-! ### Two colors from a vanishing bias -/
+
+/-- The two-color configuration with color `1` exactly on `I`. -/
+def ofSet (I : Finset (Fin n)) : Config n 2 := fun v => if v ∈ I then 1 else 0
+
+lemma colorSet_ofSet (I : Finset (Fin n)) : colorSet (ofSet I) 1 = I := by
+  ext v
+  by_cases h : v ∈ I <;> simp [colorSet, ofSet, h]
+
+lemma count_ofSet_one (I : Finset (Fin n)) : count (ofSet I) 1 = I.card := by
+  rw [← card_colorSet, colorSet_ofSet]
+
+lemma count_ofSet_zero (I : Finset (Fin n)) : count (ofSet I) 0 = n - I.card := by
+  have h : (univ.filter fun v => ofSet I v = 0) = Iᶜ := by
+    ext v
+    by_cases hv : v ∈ I <;> simp [ofSet, hv]
+  rw [count, h, card_compl, Fintype.card_fin]
+
 end Plurality

@@ -436,6 +436,22 @@ formalized.
   $O(\log n)$ rounds with probability at least $1 - 500/n$.
 \end{theorem}
 
+\begin{corollary}[Two opinions from a vanishing bias]\label{cor:binary_vanishing}
+  \lean{Plurality.ofSet, Plurality.colorSet_ofSet, Plurality.count_ofSet_one, Plurality.count_ofSet_zero, Plurality.majority3_vanishing_bias}
+  \leanok
+  \uses{thm:3_8, thm:binary}
+  In the binary 3-majority process, if the initial majority leads by at least
+  $22\sqrt{3n\log n}$ nodes (a fraction $\frac12 + O(\sqrt{\log n/n})$) and $\log n \ge 40$,
+  all nodes adopt it within at most $390\log n$ rounds with probability at least
+  $1 - 429\log n/n$.
+\end{corollary}
+\begin{proof}
+  \leanok
+  Theorem~\ref{thm:3_8} with $k = 2$ and $\lambda = 3$: the majority color is the unique
+  plurality, holds more than $n/2 \ge n/3$ nodes, and its bias is the gap; the conclusion
+  transfers to the binary process through Theorem~\ref{thm:binary}.
+\end{proof}
+
 \section{Lower bounds}\label{sec:lower}
 
 \subsection{Lower bound for 3-majority}
