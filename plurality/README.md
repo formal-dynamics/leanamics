@@ -37,6 +37,7 @@ this as `≤ 130 λ log n` rounds with probability `≥ 1 - 143 λ log n / n`.
 | Lemma A.4 | `Dynamics.Kernel.nested_phases` | done |
 | Theorem 3.8 | `theorem_3_8`, `theorem_3_8_bigO` | done |
 | `k = 2` | `binary_consensus_whp` (reuses `three_majority`) | done |
+| `k = 2` from a vanishing bias (gap `22√(3 n log n)`, `≤ 390 log n` rounds) | `majority3_vanishing_bias` (Theorem 3.8 with `λ = 3`, stated for `ThreeMajority.run`) | done |
 | Corollaries 3.10–3.12 | `corollary_3_10`, `corollary_3_11`, `corollary_3_12` | done |
 | Observation 3.9 (adversary) | | open |
 | Lemma 4.1, Theorem 4.2 (`Ω(k log n)`) | `lemma_4_1`, `theorem_4_2`, `theorem_4_2_log` | done, for `k ≤ n^{1/4-δ}` |
