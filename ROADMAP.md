@@ -19,6 +19,10 @@ and a status.
 
 Status values: `open` · `claimed (#issue)` · `in review (#PR)` · `done`.
 
+Done results are documented in [PROVENANCE.md](PROVENANCE.md): source paper, proof route
+(published proof followed, with deviations, or a different proof), explicit constants and
+authorship. When a target is done, add its entry there.
+
 Sizes (rough, for someone fluent in Lean + Mathlib): **S** days · **M** 1–3 weeks ·
 **L** 1–3 months · **XL** research-level.
 
@@ -125,6 +129,7 @@ it under dB).
 | MAJ-8 | **Drift hitting-time lemma, then symmetry breaking:** binary 3-Majority/2-Choices from *any* configuration in `O(log n)`. The lemma (DGM+11 Claim 2.9) is reusable across MAJ, UND and MOR-3. | Survey §4 Case 3 | MAJ-2 | L–XL | open |
 | MAJ-9 | **Classification:** majority is the only 3-input dynamics that preserves the plurality from bias `o(n)` (paper's Thm 4.8). Formalized in `plurality/`: (b) a clear-majority solver is uniform (`Plurality.theorem_4_8_b`); (a) a solver follows the clear majority on every pair, **except** rules with `Δ_r, Δ_b ≤ 1` (`Plurality.theorem_4_8_a`). The paper's supermartingale argument does not cover that case: the process is pulled to an interior point, and which color wins depends on how it escapes. Remaining: that case (metastability; the absorption probability from the interior point). | **Becchetti, Clementi, Natale, Pasquale, Silvestri, Trevisan**, *Simple dynamics for plurality consensus*, SPAA 2014, [arXiv:1310.2858](https://arxiv.org/abs/1310.2858); Survey §5.4; BCN+17a | FND-4 | L | open |
 | MAJ-10 | **Lower bounds for plurality dynamics:** from a balanced start, 3-majority needs `Ω(k log n)` rounds (Thm 4.2, `Plurality.theorem_4_2_log`) and `h`-plurality needs `Ω(k/h²)` (Thm 4.12, `Plurality.theorem_4_12_log`). The `Ω(k log n)` reading holds for `k ≤ n^{1/4-δ}`; the paper's range `k ≤ (n/log n)^{1/4}` is too wide for its proof, see `plurality/FORMALIZATION_DIFFERENCES.md`. | **Becchetti, Clementi, Natale, Pasquale, Silvestri, Trevisan**, *Simple dynamics for plurality consensus*, SPAA 2014, [arXiv:1310.2858](https://arxiv.org/abs/1310.2858) | MAJ-7 | M | done (`plurality/`) |
+| MAJ-11 | **Realistic constants.** The formal majority theorems hold only for astronomically large populations: `log n ≥ 40` (`n ≥ 2.4·10¹⁷`) for `Plurality.theorem_3_8` and `majority3_vanishing_bias`, `log n ≥ 30` (`n ≥ 10¹³`) for `ThreeMajority.majority3_consensus_whp`. The thresholds come from the constants of the published proofs, which are stated only for sufficiently large `n`, so the same is true of the literature. Improve the constants (sharper concentration, tighter phase bookkeeping) until the theorems apply to realistic `n` (say `n ≥ 10⁴`), keeping the bias `O(√(λ n log n))` and `O(λ log n)` rounds. A first step is to make every threshold a named parameter and track how it propagates. | `PROVENANCE.md` (explicit constants); BCN+14 | MAJ-7, MAJ-2 | M–L | open |
 
 ## UND: undecided-state dynamics
 
