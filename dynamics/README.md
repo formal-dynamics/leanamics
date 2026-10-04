@@ -1,6 +1,6 @@
 # Dynamics
 
-Shared finite probability and stochastic dynamics for Leanamycs. This package
+Shared finite probability and stochastic dynamics for Leanamics. This package
 uses Lean 4.32.0 and Mathlib revision
 `2d8c533bd0a0515caa32f18c0ab4485bd6229378`, exactly matching 3-majority.
 

@@ -3,7 +3,7 @@
 This document provides a detailed comparison between the paper:
 > Yehuda Hassin and David Peleg, **Distributed Probabilistic Polling and Applications to Proportionate Agreement**, *Information and Computation* 171 (2001), 248–268.
 
-and its Lean 4 formalization in the `voter` package (`leanamycs/voter`).
+and its Lean 4 formalization in the `voter` package (`leanamics/voter`).
 
 ---
 

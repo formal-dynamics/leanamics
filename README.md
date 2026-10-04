@@ -1,12 +1,15 @@
-# Leanamycs
+# Leanamics
 
 Lean 4 + Mathlib formalizations of classical results on opinion dynamics and
 related distributed processes. Each project is paired with a
 [leanblueprint](https://github.com/PatrickMassot/leanblueprint) connecting the
 paper proof to the Lean code statement-by-statement.
 
-**[https://formal-dynamics.github.io/leanamycs/](https://formal-dynamics.github.io/leanamycs/)** — landing
+**[https://formal-dynamics.github.io/leanamics/](https://formal-dynamics.github.io/leanamics/)** — landing
 page, blueprints, dependency graphs and API docs for everything below.
+
+The project was called Leanamycs until October 2026, a misspelling of Leanamics (Lean +
+dynamics); links to the old repository and site redirect here.
 
 | Project | Result | Main theorem |
 | --- | --- | --- |

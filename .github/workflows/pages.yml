@@ -4,7 +4,7 @@ name: Build and deploy the Pages site
 # doc-gen4 API docs, then assembles them under the repo-root Jekyll landing
 # page in `home_page/` and publishes the result to GitHub Pages:
 #
-#   /                              home_page/index.md (the Leanamycs landing page)
+#   /                              home_page/index.md (the Leanamics landing page)
 #   /<project>/blueprint/          leanblueprint web version
 #   /<project>/blueprint.pdf       leanblueprint pdf version
 #   /<project>/docs/               doc-gen4 API docs

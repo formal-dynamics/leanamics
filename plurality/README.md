@@ -21,10 +21,10 @@ if `log n ≥ 40` and `k ≥ 2`, then after `10 T` rounds, where
 with probability at least `1 - 11 T / n`. `Plurality.theorem_3_8_bigO` states
 this as `≤ 130 λ log n` rounds with probability `≥ 1 - 143 λ log n / n`.
 
-**[Blueprint](https://formal-dynamics.github.io/leanamycs/plurality/blueprint/)** ·
-**[Blueprint as pdf](https://formal-dynamics.github.io/leanamycs/plurality/blueprint.pdf)** ·
-**[Dependency graph](https://formal-dynamics.github.io/leanamycs/plurality/blueprint/dep_graph_document.html)** ·
-**[API docs](https://formal-dynamics.github.io/leanamycs/plurality/docs/)**
+**[Blueprint](https://formal-dynamics.github.io/leanamics/plurality/blueprint/)** ·
+**[Blueprint as pdf](https://formal-dynamics.github.io/leanamics/plurality/blueprint.pdf)** ·
+**[Dependency graph](https://formal-dynamics.github.io/leanamics/plurality/blueprint/dep_graph_document.html)** ·
+**[API docs](https://formal-dynamics.github.io/leanamics/plurality/docs/)**
 
 ## Status
 
