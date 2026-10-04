@@ -2,11 +2,13 @@
 # Unattended Grok supervisor for EPI-8: run, gate, resume with a status prompt; stop when done,
 # when the Grok pool is exhausted, after MAX_ROUNDS, or after the DEADLINE (epoch seconds).
 set -u
-RUN=$HOME/repos/epi8-run
+RUN=${RUN:-$HOME/repos/epi8-run}
 WT=${WT:?worktree}
 MAX_ROUNDS=${MAX_ROUNDS:-6}
 DEADLINE=${DEADLINE:?epoch}
-GROK=$HOME/.grok/bin/grok
+# grok's install location differs between machines (e.g. ~/.grok/bin or ~/.local/bin)
+GROK=${GROK:-$(command -v grok || ls "$HOME"/.grok/bin/grok "$HOME"/.local/bin/grok 2>/dev/null | head -1)}
+[ -x "$GROK" ] || { echo "grok binary not found" >&2; exit 1; }
 log() { echo "[$(date '+%F %T')] $*" >> "$RUN/supervise.log"; }
 
 gate() {  # writes $RUN/gate.txt, returns 0 iff accepted
