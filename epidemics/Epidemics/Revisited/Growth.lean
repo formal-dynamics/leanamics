@@ -1,4 +1,5 @@
 import Epidemics.Revisited.Defs
+import Epidemics.Revisited.GrowthUpper
 
 /-! # Exponential growth regime, upper bound (EPI-8)
 
@@ -25,7 +26,7 @@ theorem variance_card_le (P : RumorProcess n) (S : Finset (Fin n)) {c : ℝ} (hc
     (hcov : ∀ x ∉ S, ∀ y ∉ S, x ≠ y → P.cov S x y ≤ c) :
     (P.K S).expect (fun S' => ((S'.card : ℝ) - (P.K S).expect (fun S'' => (S''.card : ℝ))) ^ 2)
       ≤ (P.K S).expect (fun S' => (S'.card : ℝ)) - S.card + c * ((n : ℝ) - S.card) ^ 2 := by
-  sorry
+  exact variance_card_le_proof P S hc hcov
 
 /-- Lemma 19 (i): if, while fewer than `m` nodes are informed (and at least `ℓ`), every
 uninformed node becomes informed with probability at least `p` in each round, then
@@ -35,7 +36,7 @@ theorem connect_tail (P : RumorProcess n) {ℓ : ℕ} {m p : ℝ} (hℓm : (ℓ 
     (hp : ∀ S : Finset (Fin n), ℓ ≤ S.card → (S.card : ℝ) < m → ∀ x ∉ S, p ≤ P.informProb S x)
     (S : Finset (Fin n)) (hS : ℓ ≤ S.card) (r : ℕ) :
     P.notYet m r S ≤ ((n : ℝ) - ℓ) / ((n : ℝ) - m) * (1 - p) ^ r := by
-  sorry
+  exact connect_tail_proof P hℓm hmn hp0 hp1 hp S hS r
 
 /-- Lemma 19 (ii): under the same hypotheses with `p > 0`,
 `E[T(ℓ, m)] ≤ (n - ℓ) / (n - m) · 1 / p`. -/
@@ -44,7 +45,7 @@ theorem connect_expect (P : RumorProcess n) {ℓ : ℕ} {m p : ℝ} (hℓm : (�
     (hp : ∀ S : Finset (Fin n), ℓ ≤ S.card → (S.card : ℝ) < m → ∀ x ∉ S, p ≤ P.informProb S x)
     (S : Finset (Fin n)) (hS : ℓ ≤ S.card) (R : ℕ) :
     ∑ t ∈ range R, P.notYet m t S ≤ ((n : ℝ) - ℓ) / ((n : ℝ) - m) * (1 / p) := by
-  sorry
+  exact connect_expect_proof P hℓm hmn hp0 hp1 hp S hS R
 
 /-- Theorem 1 / Theorem 21, tail bound: under the upper exponential growth conditions, with
 `γ` between two positive constants, fewer than `f n` nodes are informed after
@@ -56,7 +57,7 @@ theorem growth_upper_tail {γlo γhi a b c f : ℝ} (hγlo : 0 < γlo) (hγ : γ
       ∀ P : RumorProcess n, P.UpperGrowth γ a b c f →
       ∀ S : Finset (Fin n), S.Nonempty → ∀ r : ℕ,
         P.notYet (f * n) (⌈Real.logb (1 + γ) n⌉₊ + r) S ≤ A * Real.exp (-α * r) := by
-  sorry
+  exact growth_upper_tail_proof hγlo hγ ha hb hc hf0 hf1 haf
 
 /-- Theorem 1 / Theorem 21, expectation: under the same conditions,
 `E[T(1, f n)] ≤ log_{1+γ} n + B`, stated for every partial sum of the tail series
@@ -67,6 +68,6 @@ theorem growth_upper_expect {γlo γhi a b c f : ℝ} (hγlo : 0 < γlo) (hγ : 
       ∀ P : RumorProcess n, P.UpperGrowth γ a b c f →
       ∀ S : Finset (Fin n), S.Nonempty → ∀ R : ℕ,
         ∑ t ∈ range R, P.notYet (f * n) t S ≤ Real.logb (1 + γ) n + B := by
-  sorry
+  exact growth_upper_expect_proof hγlo hγ ha hb hc hf0 hf1 haf
 
 end Epidemics.Revisited
