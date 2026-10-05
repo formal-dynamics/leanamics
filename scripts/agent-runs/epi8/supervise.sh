@@ -46,7 +46,8 @@ print(json.loads(l).get("sessionId","") if l else "")' 2>/dev/null)
     SID=$(ls -t "$HOME/.grok/sessions/$enc" 2>/dev/null | head -1)
   fi
   log "session $SID; end: $(grep '"type":"end"' "$out" | tail -1 | cut -c1-300)"
-  if grep -q -E '402|usage balance exhausted' "$err" "$out"; then log "Grok pool exhausted, stop"; break; fi
+  # only the error stream and the explicit message: a bare "402" also matches line numbers and base64 in $out
+  if grep -q -E '402|usage balance exhausted' "$err" || grep -q 'usage balance exhausted' "$out"; then log "Grok pool exhausted, stop"; break; fi
   if gate; then log "ACCEPTED by gate (SPEC OK, clean build)"; touch "$RUN/DONE"; break; fi
   log "gate failed: $(grep -E 'FAIL|exit' "$RUN/gate.txt" | head -5 | tr '\n' ' ')"
   { echo "Status check by the supervisor: the task is not finished yet. Continue with the same task"
