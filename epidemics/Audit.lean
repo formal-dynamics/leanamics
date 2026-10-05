@@ -6,3 +6,8 @@ import Epidemics
 #print axioms Epidemics.coins_prob_open
 #print axioms Epidemics.prob_infected_eq_prob_connected
 #print axioms Epidemics.extinct_of_dist_lt
+#print axioms Epidemics.Revisited.variance_card_le
+#print axioms Epidemics.Revisited.connect_tail
+#print axioms Epidemics.Revisited.connect_expect
+#print axioms Epidemics.Revisited.growth_upper_tail
+#print axioms Epidemics.Revisited.growth_upper_expect
