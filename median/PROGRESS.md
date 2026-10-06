@@ -1,67 +1,95 @@
-# Progress: `Median.binary_any_start`
+# Consensus from any configuration: map of the development
 
-Goal: prove the pinned `binary_any_start` in `Median/AnyStart.lean` (2-Choices from any start).
+Status: **done.** `binary_any_start`, `consensus_of_binary` and `median_consensus_any`
+(`Median/AnyStart.lean`) are proved; `lake build Median` is warning-free; `lake env lean Audit.lean`
+shows only `propext`, `Classical.choice`, `Quot.sound`. The pinned statements, imports and
+`namespace`/`open`/`variable` lines are unchanged, except for added `import Median.AnyStart...`
+lines. There are no `set_option`s, and every declaration fits in 50000 heartbeats (a quarter
+of the default budget; checked with `lake env lean -DmaxHeartbeats=50000`).
 
-## Status: DONE
+## Proof route
 
-* `binary_any_start` is proved, with `C = 2¹⁸ = 262144`.
-* `lake build` is clean. `lake env lean Median/AnyStart.lean` prints nothing (no warnings),
-  under the **default** heartbeat limit (the proof needs between 130000 and 150000 heartbeats).
-* `lake env lean Audit.lean`: `binary_any_start`, `consensus_of_binary` and
-  `median_consensus_any` depend only on `propext`, `Classical.choice`, `Quot.sound`.
-* Spec: the header (imports/namespace/open/variable) and the three pinned statements are
-  byte-identical to the baseline. The only change to `AnyStart.lean` is the proof of
-  `binary_any_start` (the diff deletes the single line `sorry`). There are no `set_option`s.
+With `L = log n` and `g = gapR y` (`#true - #false`):
 
-## Why the proof is self-contained
+1. **Reduction to two values** (`consensus_of_binary`). A run that has not reached consensus has
+   two nodes with values `a < b`; the threshold configuration `decide (b ≤ x ·)` follows the
+   same rounds (`threshold_run`) and has not reached consensus either
+   (`notConsensus_run_le_sum`). A union bound over the at most `n - 1` thresholds follows.
+2. **Amplification** (`median_consensus_any`). Three blocks of `⌈C₀ L⌉` rounds turn the binary
+   bound `C₀/n` into `(C₀/n)³` (`expList_amplify`), and `n (C₀/n)³ ≤ (3C₀ + 3)/n` because
+   `C₀³ ≤ n` (`pow_three_le_of_log`, `mul_div_pow_three_le`).
+3. **2-Choices from any start** (`binary_any_start`, `C = 2¹⁸`): two phases composed by
+   `expList_add_le`, padded by `expList_run_mono`.
+   * **Escape** (`escape_bound`, `L ≥ 8192`, `⌈2¹⁷ L⌉` rounds, failure `2/n`). The potential
+     `gapPot y = exp (-|g| / (256 √n))` satisfies the one-round drift (`avg_gapPot_step`)
+     `𝔼 gapPot' ≤ e^{-1/65536} gapPot + e^{1/131072 - √n/512}`. By the flip symmetry, take
+     `g ≥ 0`:
+     - `√n/64 ≤ g ≤ n/2` (`avg_gapPot_step_far`): Hoeffding's lemma at every node bounds the
+       exponential moment of the next gap (`avg_exp_neg_gapR_step`), and the mean gap is at
+       least `11g/8` (`meanGap_ge`);
+     - `g > n/2` (`avg_gapPot_step_huge`): the same bound gives the additive error;
+     - `g ≤ √n/64` (`avg_gapPot_step_near`): the next gap has variance at least `n/10`
+       (`one_tenth_le_variance_coord`), so Paley-Zygmund (`avg_pz_zero_one`) gives
+       `|g'| ≥ √n/4`, where the potential is at most `e^{-1/1024}`, with probability at least
+       `9/64`.
 
-A first version kept the helper lemmas in new files `AnyStartDrift/Escape/Finish.lean`,
-imported from `AnyStart.lean`. The spec gate flags any added `import` line as a header change,
-so the whole development now lives inside the proof of `binary_any_start` as local `have`s,
-using only `Median.Basic`, `Median.Binary` and `Median.AnyStartAux`. The helper files were
-deleted.
-
-Heartbeats are counted per declaration, and tactic-level `set_option maxHeartbeats` has no
-effect, because `withOptions` does not update `Core.Context.maxHeartbeats`. To stay under the
-default 200000:
-* every auxiliary lemma is nested inside the one proof that uses it, and `escape_bound`
-  `clear`s what it does not need. Per-step costs grow with the size of the local context:
-  `escape_bound` took 17 s with the flat context and 3.4 s after these changes;
-* `nlinarith` calls are replaced by `linarith` plus explicit product hints (`linarith`
-  already normalizes polynomial monomials).
-
-## Mathematical route (fixed-time drift with an exponential potential)
-
-Notation: `g = gapR y`, `L = log n`, potential `pot y = exp(-|g| / (256 √n))`, `0 < pot ≤ 1`.
-
-1. **One-round drift** (`pot_step`, needs `10 ≤ n`):
-   `avg_r pot(step y r) ≤ e^{-1/65536} pot y + e^{1/131072 - √n/512}`.
-   By the flip `y ↦ (fun v => !y v)` (commutes with `step`, negates `gapR`), assume `g ≥ 0`.
-   * `g ≥ √n/64` (`avg_pot_le_mgf`, `avg_pot_far`, `avg_pot_huge`): `|g'| ≥ g'`, the mgf of
-     `g' = 2 Σ_v coord - n` factors (`avg_exp_sum`), Hoeffding's lemma per node
-     (`one_sub_add_mul_exp_le`, any real `t`) gives
-     `avg pot' ≤ exp(-(2 Σ_v avg coord - n)/(256√n) + 1/131072)`. Then `𝔼g' ≥ (11/8) g` for
-     `g ≤ n/2` (`expones_ge`) gives contraction; for `g > n/2`, `𝔼g' ≥ g` gives the error term.
-   * `|g| ≤ √n/64` (`avg_pot_near`): centered coordinates `f v = coord - p_v`, `σ² ≥ n/10`
-     (`p_v(1-p_v) ≥ 1/10`), `𝔼S² = σ²`, `𝔼S⁴ ≤ σ² + 3σ⁴ ≤ 4σ⁴` (`avg_sum_sq`,
-     `avg_sum_fourth_le`), and two-sided Paley-Zygmund (`avg_pz`, packaged as `pz_sum`) give
-     `P(σ² ≤ 4S²) ≥ 9/64`. On that event `|g'| ≥ |2S| - (3/2)|g| ≥ √n/4`, so `pot' ≤ e^{-1/1024}`,
-     and `1 - (9/64)(1 - e^{-1/1024}) ≤ e^{-5/65536} ≤ e^{-1/65536} pot y`.
-2. **Drift iteration** (`drift`): `expList T (pot ∘ run x) ≤ e^{-T/65536} pot x + T ε`.
-3. **Escape** (`escape_bound`, `L ≥ 8192`, `T₁ = ⌈2¹⁷ L⌉₊`): `1{|g| < 128√(nL)} ≤ e^{√L/2} pot`,
-   so the failure is `≤ e^{√L/2}(e^{-2L} + T₁ε) ≤ 1/n + 1/n` (`n ≥ L⁴/24`, `√n ≥ L²/5`,
-   `T₁ ≤ n`, `ε ≤ n⁻³`).
-4. **Consensus** (`finish_bound`, `T₂ = ⌈128 L⌉₊`): `binary_consensus` on `y` (if `g ≥ G`) or on
-   the flip (if `g ≤ -G`); failure `≤ 128/n`.
-5. **Assembly**: `T₁ + T₂ ≤ ⌈2¹⁸ L⌉₊`, pad with `expList_run_anti`, total failure
-   `≤ 130/n ≤ 2¹⁸/n`.
+     The fixed-time drift lemma (`expList_le_of_drift`) iterates this over `T` rounds. Markov's
+     inequality (`gapPot ≥ e^{-√L/2}` below the threshold) and `escape_error_le` bound the
+     probability that `|g| < 128 √(nL)` by `2/n`.
+   * **Consensus** (`finish_bound`, `⌈128 L⌉` rounds, failure `128/n`): `binary_consensus` on the
+     configuration, or on its flip if `g < 0` (`expList_notConsensus_run_flip`).
 
 ## Files
 
-* `Median/AnyStart.lean`: the complete proof (inside `binary_any_start`).
-* `Median/AnyStartMoments.lean`: Grok's WIP file, rewritten so that it builds cleanly
-  (`avg_cauchy`, `avg_head_tail`, `avg_sum_sq`, `avg_sum_fourth_le`, `avg_pz`). It is **not
-  imported** anywhere: its content is duplicated inside the proof. It can be kept as a
-  reusable library or deleted.
+Import order: `Scalar`, `Moments`, `Drift` (generic), then `Aux`, `Gap`, `Potential`, `Phases`,
+`Reduction`, `AnyStart`.
 
-No open errors, no remaining work for this task.
+| File | Lines | Content |
+|---|---|---|
+| `AnyStart.lean` | 103 | the three pinned theorems, each a short outline |
+| `AnyStartScalar.lean` | 151 | real inequalities: round budgets, `c³ ≤ x`, constants, escape error |
+| `AnyStartMoments.lean` | 292 | moments of sums of independent coordinates, Paley-Zygmund, Hoeffding mgf, `{0,1}` coordinates |
+| `AnyStartDrift.lean` | 88 | fixed-time drift and two-phase composition for any finite kernel |
+| `AnyStartAux.lean` | 179 | `notConsensus` facts, values stay initial, consensus absorbs, amplification |
+| `AnyStartGap.lean` | 161 | flip symmetry, the gap after one round, `meanGap`, variance near balance |
+| `AnyStartPotential.lean` | 219 | the potential `gapPot` and its one-round drift |
+| `AnyStartPhases.lean` | 116 | `escape_bound`, `finish_bound` |
+| `AnyStartReduction.lean` | 61 | threshold witness, number of distinct values |
+
+Main lemmas by file:
+
+* `AnyStartScalar`: `ceil_add_ceil_le`, `mul_ceil_le_ceil`, `pow_three_le_of_log`,
+  `mul_div_pow_three_le`, `sq_mul_one_sub_sq_ge`, `le_abs_two_mul_add`, `near_const_le`,
+  `log_pow_four_div_le`, `escape_error_le`.
+* `AnyStartMoments`: `avg_cauchy`, `avg_head_tail`, `avg_tail`, `avg_sum_coords`, `avg_sum_sq`,
+  `avg_sum_fourth_le`, `avg_pz`, `avg_pz_sum`, `avg_pz_zero_one`, `variance_of_zero_one`,
+  `avg_exp_sum_le`.
+* `AnyStartDrift`: `iterate_le_of_drift`, `iterate_add_le`, `expList_le_of_drift`,
+  `expList_add_le`, `expList_one_sub`.
+* `AnyStartAux`: `run_mem_image`, `run_append`, `run_consensus`, `expList_run_anti`,
+  `expList_run_mono`, `expList_amplify`.
+* `AnyStartGap`: `step_flip`, `run_flip`, `gapR_flip`, `notConsensus_flip`, `gapR_step`,
+  `gapR_step_eq`, `meanGap` (with `meanGap_eq : meanGap y = g (3/2 - g²/(2n²))`),
+  `gapR_le_meanGap`, `abs_meanGap_le`, `meanGap_ge`, `one_tenth_le_variance_coord`.
+* `AnyStartPotential`: `gapPot`, `exp_neg_le_gapPot`, `gapPot_le_exp_neg`,
+  `avg_exp_neg_gapR_step`, `avg_gapPot_step_far`, `avg_gapPot_step_huge`,
+  `avg_gapPot_step_near`, `avg_gapPot_step`.
+* `AnyStartPhases`: `escape_bound`, `expList_notConsensus_le_of_gap`, `finish_bound`.
+* `AnyStartReduction`: `notConsensus_run_le_sum`, `card_image_sub_one_le`.
+
+## Candidates for `dynamics/` (not moved yet)
+
+These lemmas only use `Dynamics` notions (`avg`, `expList`, `variance`, `Kernel`) or plain reals.
+They now live in namespace `Median`.
+
+* To `Dynamics/Kernel.lean`: `iterate_le_of_drift` (fixed-time drift),
+  `iterate_add_le` (two phases).
+* To `Dynamics/Rounds.lean`: `expList_le_of_drift`, `expList_add_le`.
+* To `Dynamics/Uniform.lean`: `expList_one_sub`, `avg_cauchy`, `avg_head_tail`, `avg_tail`,
+  `sum_head_tail`, `avg_sum_coords`.
+* To `Dynamics/Concentration.lean`: `avg_exp_sum_le` (Hoeffding's mgf bound for any real `t`;
+  `Dynamics.avg_hoeffding` proves it inline and could then use it), `avg_sum_sq`,
+  `avg_sum_fourth_le`, `avg_pz`, `avg_pz_sum`, `avg_pz_zero_one`, `avg_nonneg_of_zero_one`,
+  `avg_le_one_of_zero_one`, `abs_sub_avg_le_one_of_zero_one`, `variance_of_zero_one`.
+* Plain real inequalities (a scalar-lemma file, or Mathlib-style helpers): `ceil_add_ceil_le`,
+  `mul_ceil_le_ceil`, `pow_three_le_of_log`, `log_pow_four_div_le`.

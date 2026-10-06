@@ -9,7 +9,8 @@ Auxiliary material for `Median/AnyStart.lean`:
   configurations (the corresponding lemmas of `Median/Basic.lean` are private);
 * values never leave the set of initial values (`run_mem`);
 * consensus absorbs along a list of rounds (`run_consensus`), so the probability of
-  *not* being in consensus is non-increasing in time (`expList_run_anti`) and
+  *not* being in consensus is non-increasing in time (`expList_run_anti`,
+  `expList_run_mono`) and
   submultiplicative over consecutive blocks (`notConsensus_run_append_mul`);
 * a per-binary-configuration failure bound at `T` rounds amplifies to a bound at
   `k * T` rounds (`expList_amplify`).
@@ -27,26 +28,31 @@ variable {n : ℕ} {α : Type*} [LinearOrder α]
 /-! ### The `notConsensus` indicator -/
 
 omit [LinearOrder α] in
+/-- A configuration in consensus has `notConsensus = 0`. -/
 lemma notConsensus_cons' {y : Config n α} (h : Consensus y) : notConsensus y = 0 := by
   unfold notConsensus
   rw [if_pos h]
 
 omit [LinearOrder α] in
+/-- A configuration not in consensus has `notConsensus = 1`. -/
 lemma notConsensus_noncons' {y : Config n α} (h : ¬ Consensus y) : notConsensus y = 1 := by
   unfold notConsensus
   rw [if_neg h]
 
 omit [LinearOrder α] in
+/-- `notConsensus` takes only the values `0` and `1`. -/
 lemma notConsensus_cases' (y : Config n α) : notConsensus y = 0 ∨ notConsensus y = 1 := by
   by_cases h : Consensus y
   · exact Or.inl (notConsensus_cons' h)
   · exact Or.inr (notConsensus_noncons' h)
 
 omit [LinearOrder α] in
+/-- `notConsensus` is nonnegative. -/
 lemma notConsensus_nonneg' (y : Config n α) : 0 ≤ notConsensus y := by
   rcases notConsensus_cases' y with h | h <;> simp [h]
 
 omit [LinearOrder α] in
+/-- `notConsensus` is at most `1`. -/
 lemma notConsensus_le_one' (y : Config n α) : notConsensus y ≤ 1 := by
   rcases notConsensus_cases' y with h | h <;> simp [h]
 
@@ -110,6 +116,13 @@ lemma expList_run_anti [NeZero n] (x : Config n α) (T₁ T₂ : ℕ) :
       = notConsensus (run x l₁) := expList_const _ _
   exact h1.trans (le_of_eq h2)
 
+/-- **More rounds never hurt**: the failure probability is antitone in the number of rounds. -/
+lemma expList_run_mono [NeZero n] (x : Config n α) {T₁ T₂ : ℕ} (h : T₁ ≤ T₂) :
+    expList (Round n) T₂ (fun l => notConsensus (run x l))
+      ≤ expList (Round n) T₁ (fun l => notConsensus (run x l)) := by
+  obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le h
+  exact expList_run_anti x T₁ d
+
 /-- A failure of the second block only matters if the first block has failed. -/
 lemma notConsensus_run_append_mul (y : Config n α) (l₁ l₂ : List (Round n)) :
     notConsensus (run y (l₁ ++ l₂))
@@ -139,40 +152,28 @@ lemma expList_amplify [NeZero n] {T : ℕ} {p : ℝ}
   | succ k ih =>
       have hsplit : (k + 1) * T = k * T + T := by ring
       rw [hsplit, expList_append, pow_succ]
+      -- the last block fails only if the first `k` blocks have failed, then w.p. at most `p`
       have hinner : ∀ l₁ : List (Round n),
           expList (Round n) T (fun l₂ => notConsensus (run y (l₁ ++ l₂)))
-            ≤ notConsensus (run y l₁) * p := by
+            ≤ p * notConsensus (run y l₁) := by
         intro l₁
-        have h1 : expList (Round n) T (fun l₂ => notConsensus (run y (l₁ ++ l₂)))
+        calc expList (Round n) T (fun l₂ => notConsensus (run y (l₁ ++ l₂)))
             ≤ expList (Round n) T
-              (fun l₂ => notConsensus (run y l₁) * notConsensus (run (run y l₁) l₂)) :=
-          expList_le_expList fun l₂ => notConsensus_run_append_mul y l₁ l₂
-        have h2 : expList (Round n) T
-              (fun l₂ => notConsensus (run y l₁) * notConsensus (run (run y l₁) l₂))
-            = notConsensus (run y l₁)
-              * expList (Round n) T (fun l₂ => notConsensus (run (run y l₁) l₂)) :=
-          expList_const_mul _ _ _
-        have h3 : expList (Round n) T (fun l₂ => notConsensus (run (run y l₁) l₂)) ≤ p :=
-          hbin _
-        have hmul : notConsensus (run y l₁)
-              * expList (Round n) T (fun l₂ => notConsensus (run (run y l₁) l₂))
-            ≤ notConsensus (run y l₁) * p :=
-          mul_le_mul_of_nonneg_left h3 (notConsensus_nonneg' _)
-        exact h1.trans ((le_of_eq h2).trans hmul)
-      refine le_trans (expList_le_expList hinner) ?_
-      have hswap : expList (Round n) (k * T)
-          (fun l₁ : List (Round n) => notConsensus (run y l₁) * p)
-          = expList (Round n) (k * T) (fun l : List (Round n) => notConsensus (run y l)) * p := by
-        have hcm := expList_const_mul (k * T) p (fun l : List (Round n) => notConsensus (run y l))
-        calc expList (Round n) (k * T) (fun l₁ : List (Round n) => notConsensus (run y l₁) * p)
-            = expList (Round n) (k * T)
-              (fun l₁ : List (Round n) => p * notConsensus (run y l₁)) :=
-              congrArg _ (funext fun l₁ => (mul_comm _ _).symm)
-          _ = p * expList (Round n) (k * T)
-              (fun l : List (Round n) => notConsensus (run y l)) := hcm
-          _ = expList (Round n) (k * T)
-              (fun l : List (Round n) => notConsensus (run y l)) * p := mul_comm _ _
-      rw [hswap]
-      exact mul_le_mul_of_nonneg_right ih hp
+                (fun l₂ => notConsensus (run y l₁) * notConsensus (run (run y l₁) l₂)) :=
+              expList_le_expList fun l₂ => notConsensus_run_append_mul y l₁ l₂
+          _ = notConsensus (run y l₁)
+                * expList (Round n) T (fun l₂ => notConsensus (run (run y l₁) l₂)) :=
+              expList_const_mul _ _ _
+          _ ≤ notConsensus (run y l₁) * p :=
+              mul_le_mul_of_nonneg_left (hbin _) (notConsensus_nonneg' _)
+          _ = p * notConsensus (run y l₁) := mul_comm _ _
+      calc expList (Round n) (k * T)
+            (fun l₁ => expList (Round n) T (fun l₂ => notConsensus (run y (l₁ ++ l₂))))
+          ≤ expList (Round n) (k * T) (fun l₁ => p * notConsensus (run y l₁)) :=
+            expList_le_expList hinner
+        _ = p * expList (Round n) (k * T) (fun l => notConsensus (run y l)) :=
+            expList_const_mul _ _ _
+        _ ≤ p * p ^ k := mul_le_mul_of_nonneg_left ih hp
+        _ = p ^ k * p := mul_comm _ _
 
 end Median

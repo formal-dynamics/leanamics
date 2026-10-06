@@ -1,19 +1,30 @@
-import Median.BinaryAux
+import Dynamics.Concentration
 
 /-! # Moments of sums of independent coordinates
 
-For `S = ∑ i, f i (ω i)` with independent uniform coordinates `ω i`, centered summands
-(`𝔼 f i = 0`) bounded by `1`, the second moment is the sum of the variances `σ²`
-(`avg_sum_sq`) and the fourth moment is at most `σ² + 3σ⁴` (`avg_sum_fourth_le`).
-The two-sided Paley-Zygmund inequality (`avg_pz`) turns them into a constant lower bound
-on `P(σ² ≤ 4 S²)`: this is the anti-concentration that breaks the symmetry of a balanced
-configuration of the binary median dynamics.
+For `S = ∑ i, f i (ω i)` with independent uniform coordinates `ω i` (the setting of
+`Dynamics.Concentration`):
+
+* centered summands bounded by `1`: the second moment is the sum of the variances `σ²`
+  (`avg_sum_sq`), the fourth moment is at most `σ² + 3σ⁴` (`avg_sum_fourth_le`), and the
+  two-sided Paley-Zygmund inequality (`avg_pz`) turns them into the anti-concentration bound
+  `P(σ² ≤ 4 S²) ≥ 9/64` whenever `σ² ≥ 1` (`avg_pz_sum`, and `avg_pz_zero_one` for centered
+  `{0,1}`-valued coordinates);
+* `{0,1}`-valued summands: mean in `[0, 1]`, variance `p (1 - p)` (`variance_of_zero_one`), and
+  Hoeffding's exponential-moment bound `𝔼 e^{tS} ≤ e^{t 𝔼S + n t²/8}` for every real `t`
+  (`avg_exp_sum_le`).
+
+For the binary median dynamics, anti-concentration breaks the symmetry of a balanced
+configuration and the exponential moment controls the potential away from balance
+(`Median/AnyStartPotential.lean`).
 -/
 
 namespace Median
 open Finset Real Dynamics
 
 variable {n : ℕ} {γ : Type*} [Fintype γ]
+
+/-! ### Averages on product spaces -/
 
 /-- **Cauchy-Schwarz** for uniform averages. -/
 lemma avg_cauchy (f g : γ → ℝ) :
@@ -56,6 +67,8 @@ lemma avg_sum_coords (f : Fin n → γ → ℝ) :
     avg (fun ω : Fin n → γ => ∑ i, f i (ω i)) = ∑ i, avg (f i) := by
   rw [avg_sum]
   exact Finset.sum_congr rfl fun i _ => avg_eval n i (f i)
+
+/-! ### Second and fourth moments, Paley-Zygmund -/
 
 /-- **Second moment** of a sum of independent centered coordinates. -/
 lemma avg_sum_sq (f : Fin n → γ → ℝ) (hf0 : ∀ i, avg (f i) = 0) :
@@ -192,5 +205,88 @@ lemma avg_pz (Z : γ → ℝ) {s : ℝ} (hs : 0 < s)
   have h4P : avg (fun y => Z y ^ 4) * P ≤ 4 * s ^ 2 * P := mul_le_mul_of_nonneg_right h4 hP0
   have hs2 : 0 < s ^ 2 := by positivity
   nlinarith
+
+/-- **Anti-concentration of a sum.** If independent centered coordinates are bounded by `1` and
+their variances add up to `σ² ≥ 1`, then the sum `S` satisfies `σ² ≤ 4 S²` with probability at
+least `9/64` (Paley-Zygmund, with `𝔼S² = σ²` and `𝔼S⁴ ≤ σ² + 3σ⁴ ≤ 4σ⁴`). -/
+lemma avg_pz_sum (f : Fin n → γ → ℝ) (hf0 : ∀ i, avg (f i) = 0) (hfb : ∀ i y, |f i y| ≤ 1)
+    (hσ : 1 ≤ ∑ i, avg (fun y => f i y ^ 2)) :
+    9 / 64 ≤ avg (fun ω : Fin n → γ =>
+      if ∑ i, avg (fun y => f i y ^ 2) ≤ 4 * (∑ i, f i (ω i)) ^ 2 then (1 : ℝ) else 0) := by
+  have h4 := avg_sum_fourth_le f hf0 hfb
+  have h1 := mul_le_mul_of_nonneg_left hσ (zero_le_one.trans hσ)
+  have h4' : avg (fun ω : Fin n → γ => (∑ i, f i (ω i)) ^ 4)
+      ≤ 4 * (∑ i, avg (fun y => f i y ^ 2)) ^ 2 := by linarith
+  exact avg_pz (fun ω : Fin n → γ => ∑ i, f i (ω i)) (by linarith) (avg_sum_sq f hf0) h4'
+
+/-! ### `{0,1}`-valued coordinates -/
+
+section ZeroOne
+
+variable {f : γ → ℝ}
+
+omit [Nonempty γ] in
+/-- The mean of a `{0,1}`-valued function is nonnegative. -/
+lemma avg_nonneg_of_zero_one (hf : ∀ y, f y = 0 ∨ f y = 1) : 0 ≤ avg f :=
+  avg_nonneg fun y => by rcases hf y with h | h <;> simp [h]
+
+/-- The mean of a `{0,1}`-valued function is at most `1`. -/
+lemma avg_le_one_of_zero_one (hf : ∀ y, f y = 0 ∨ f y = 1) : avg f ≤ 1 :=
+  (avg_le_avg fun y => (by rcases hf y with h | h <;> simp [h] : f y ≤ 1)).trans_eq (avg_const 1)
+
+/-- A `{0,1}`-valued function deviates from its mean by at most `1`. -/
+lemma abs_sub_avg_le_one_of_zero_one (hf : ∀ y, f y = 0 ∨ f y = 1) (y : γ) :
+    |f y - avg f| ≤ 1 := by
+  have h0 := avg_nonneg_of_zero_one hf
+  have h1 := avg_le_one_of_zero_one hf
+  rw [abs_le]
+  rcases hf y with h | h <;> rw [h] <;> constructor <;> linarith
+
+/-- The variance of a `{0,1}`-valued function with mean `p` is `p (1 - p)`. -/
+lemma variance_of_zero_one (hf : ∀ y, f y = 0 ∨ f y = 1) :
+    variance f = avg f * (1 - avg f) := by
+  have hpt : ∀ y, (f y - avg f) ^ 2 = (1 - 2 * avg f) * f y + avg f ^ 2 := by
+    intro y
+    rcases hf y with h | h <;> rw [h] <;> ring
+  unfold variance
+  simp_rw [hpt]
+  rw [avg_add, avg_const_mul, avg_const]
+  ring
+
+/-- **Anti-concentration for `{0,1}`-valued coordinates.** If the variances of independent
+`{0,1}`-valued coordinates add up to `σ² ≥ 1`, then the centered sum `S = ∑ᵢ (Yᵢ - 𝔼Yᵢ)`
+satisfies `σ² ≤ 4 S²` with probability at least `9/64`. -/
+lemma avg_pz_zero_one (Y : Fin n → γ → ℝ) (hY : ∀ i y, Y i y = 0 ∨ Y i y = 1)
+    (hσ : 1 ≤ ∑ i, variance (Y i)) :
+    9 / 64 ≤ avg (fun ω : Fin n → γ =>
+      if ∑ i, variance (Y i) ≤ 4 * (∑ i, (Y i (ω i) - avg (Y i))) ^ 2 then (1 : ℝ) else 0) :=
+  avg_pz_sum (fun i y => Y i y - avg (Y i))
+    (fun i => by rw [avg_sub, avg_const, sub_self])
+    (fun i y => abs_sub_avg_le_one_of_zero_one (hY i) y) hσ
+
+/-- **Hoeffding's exponential-moment bound** for independent `{0,1}`-valued coordinates: for
+every real `t`, `𝔼 exp (t ∑ᵢ Yᵢ) ≤ exp (t ∑ᵢ 𝔼Yᵢ + n t²/8)` (Hoeffding's lemma
+`one_sub_add_mul_exp_le` for each coordinate). -/
+lemma avg_exp_sum_le (Y : Fin n → γ → ℝ) (hY : ∀ i y, Y i y = 0 ∨ Y i y = 1) (t : ℝ) :
+    avg (fun ω : Fin n → γ => exp (t * ∑ i, Y i (ω i)))
+      ≤ exp (t * ∑ i, avg (Y i) + n * (t ^ 2 / 8)) := by
+  rw [avg_exp_sum]
+  have hone (i : Fin n) : avg (fun y => exp (t * Y i y)) ≤ exp (t * avg (Y i) + t ^ 2 / 8) := by
+    have hpt (y : γ) : exp (t * Y i y) = 1 + (exp t - 1) * Y i y := by
+      rcases hY i y with h | h <;> simp [h]
+    simp_rw [hpt]
+    rw [avg_add, avg_const, avg_const_mul]
+    have := one_sub_add_mul_exp_le (avg_nonneg_of_zero_one (hY i))
+      (avg_le_one_of_zero_one (hY i)) t
+    rw [mul_comm t (avg (Y i))]
+    linarith
+  calc ∏ i, avg (fun y => exp (t * Y i y))
+      ≤ ∏ i : Fin n, exp (t * avg (Y i) + t ^ 2 / 8) :=
+        prod_le_prod (fun i _ => avg_nonneg fun y => (exp_pos _).le) (fun i _ => hone i)
+    _ = exp (t * ∑ i, avg (Y i) + n * (t ^ 2 / 8)) := by
+        rw [← exp_sum, sum_add_distrib, ← mul_sum, sum_const, card_univ, Fintype.card_fin,
+          nsmul_eq_mul]
+
+end ZeroOne
 
 end Median
