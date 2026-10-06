@@ -26,6 +26,29 @@ formalized here.
 agent under a fixed-statement protocol and verified mechanically (statements unchanged, no
 placeholders, warning-free build, axiom audit).
 
+## COBRA ⇔ BIPS duality (EPI-4)
+
+After Cooper, Radzik and Rivera, *The coalescing-branching random walk on expanders and the dual
+epidemic process*, PODC 2016 ([arXiv:1602.05768](https://arxiv.org/abs/1602.05768)), Theorem 4.
+
+**Model.** In every round each vertex samples `k` uniform neighbours with replacement (a uniform
+element of `Choices G k`). COBRA: every vertex of the current set pushes to its sampled neighbours,
+and the next set is the set of chosen vertices. BIPS with persistent source `v`: `v` is always
+infected, and any other vertex is infected next iff one of its sampled neighbours is infected now.
+
+**Main results** (in [`Epidemics/CobraDuality.lean`](Epidemics/CobraDuality.lean)):
+
+| Result | Lean declaration |
+| --- | --- |
+| Pathwise: COBRA from `C` visits `v` within the rounds iff BIPS from `{v}` along the reversed rounds infects a vertex of `C` | `cobra_hit_iff_bips_reverse` |
+| Theorem 4: `P(Hit_C(v) > t ∣ C₀ = C) = P(C ∩ A_t = ∅ ∣ A₀ = {v})` | `cobra_bips_duality` |
+| Equation (2): `P(Hit_u(v) > t) = P(u ∉ A_t ∣ A₀ = {v})` | `cobra_bips_duality_singleton` |
+| Time reversal of i.i.d. rounds (roadmap FND-6) | `expList_reverse` |
+
+The paper assumes `G` connected and regular and `k ≥ 1`; the duality holds for every finite graph
+and every `k`. On a connected graph with at least two vertices the rounds exist
+(`choices_nonempty`), so both sides are genuine probabilities.
+
 Build and audit:
 
 ```bash
