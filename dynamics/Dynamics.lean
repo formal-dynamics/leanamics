@@ -1,4 +1,5 @@
 import Dynamics.Absorption
+import Dynamics.Bridge
 import Dynamics.Concentration
 import Dynamics.Phases
 import Dynamics.Rounds

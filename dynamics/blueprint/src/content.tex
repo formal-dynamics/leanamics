@@ -55,6 +55,19 @@ observables factor, and transporting weights along a function commutes with expe
 Distribute products over finite sums; for pushforward interchange the two sums
 and evaluate each fiber indicator.
 \end{proof}
+\begin{lemma}[Bridges between the expectation APIs]\label{lem:bridge}
+\lean{Dynamics.avg_eq_expect,Dynamics.expList_eq_expect,Dynamics.Distribution.independent_uniform_expect,Dynamics.expList_eq_independent_expect}\leanok\uses{lem:uniform-trajectory,lem:uniform-agreement,lem:weighted-product}
+The finite average is Mathlib's finite expectation, $\operatorname{avg}(f)=\E_{a\in A}f(a)$
+(\texttt{Finset.expect}); both vanish on an empty type. On a nonempty type the independent
+product of uniform distributions on $A$, indexed by a finite set $I$, is the uniform
+distribution on $A^I$. Hence $\mathrm{expList}$ over $T$ rounds is the expectation of
+$F$ over $T$ i.i.d.\ uniform draws, both as Mathlib's $\E_{\omega\colon\{0,\ldots,T-1\}\to A}$
+and under the product distribution.
+\end{lemma}
+\begin{proof}\leanok
+Mathlib's finite expectation is a sum divided by a cardinality. Every point of $A^I$ has
+product weight $|A|^{-|I|}=|A^I|^{-1}$. Combine both with Lemma~\ref{lem:uniform-trajectory}.
+\end{proof}
 \begin{definition}[Transition kernel]\label{def:kernel}
 \lean{Dynamics.Kernel,Dynamics.Kernel.iterate,Dynamics.Kernel.trajectory}\leanok\uses{def:distribution}
 A finite kernel assigns a distribution to every state. Its operator iterates

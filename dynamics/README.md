@@ -7,8 +7,9 @@ uses Lean 4.32.0 and Mathlib revision
 | Module | API |
 | --- | --- |
 | `Uniform` | Finite averages, recursive uniform trajectory expectations, independence, reindexing; extracted from 3-majority |
-| `Equivalence` | `expList_eq_avg_ofFn`, adapted from rumor spreading without modifying that independently pinned package |
+| `Equivalence` | `expList_eq_avg_ofFn`, the recursive `expList` is the uniform average over `Fin T → α` |
 | `Distribution` | Normalized nonnegative real weights, expectations, event probabilities, uniform distributions, point masses, independent products, pushforward |
+| `Bridge` | The three expectation APIs agree: `avg` is Mathlib's `𝔼 a, f a` (`avg_eq_expect`), the product of uniform laws is uniform (`Distribution.independent_uniform_expect`), and `expList` is the expectation over `T` i.i.d. draws in Mathlib's and in the distribution form (`expList_eq_expect`, `expList_eq_independent_expect`) |
 | `Kernel` | Finite stochastic kernels, finite-time expectations, events, stationarity, harmonic observables |
 | `Trajectory` | Weighted history/endpoint expectations and agreement with kernel iteration |
 | `Stationary` | Stationary-distribution existence by Cesàro averages and compactness of the finite simplex |
@@ -41,6 +42,9 @@ generates their dependency graph. Pages CI builds its HTML/PDF and doc-gen4 API
 documentation. The same workflow as the existing packages is used; doc-gen4 is
 resolved separately to preserve the main project's dependency pins.
 
-3-majority retains all original `ThreeMajority` probability declarations and
-blueprint links through compatibility declarations. The mean-scaled Chernoff bounds remain in 3-majority; `Concentration` adds
+This is the only finite-probability layer of the repository: `rumor_spread/`,
+`3-majority/` and `plurality/` use `avg` and `expList` from here (see
+[EXPECTATION_AUDIT.md](EXPECTATION_AUDIT.md) for the audit that removed the copies).
+3-majority retains its `ThreeMajority` probability names and blueprint links
+through compatibility declarations: `ThreeMajority.avg` is a reducible alias of `avg`. The mean-scaled Chernoff bounds remain in 3-majority; `Concentration` adds
 the Hoeffding and Bernstein inequalities used by `plurality/`.

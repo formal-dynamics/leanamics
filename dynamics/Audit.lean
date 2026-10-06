@@ -1,6 +1,10 @@
 import Dynamics
 #print axioms Dynamics.avg_prod_pi
 #print axioms Dynamics.expList_eq_avg_ofFn
+#print axioms Dynamics.avg_eq_expect
+#print axioms Dynamics.expList_eq_expect
+#print axioms Dynamics.Distribution.independent_uniform_expect
+#print axioms Dynamics.expList_eq_independent_expect
 #print axioms Dynamics.Distribution.independent_expect_prod
 #print axioms Dynamics.Kernel.trajectory_endpoint
 #print axioms Dynamics.Kernel.exists_stationary
