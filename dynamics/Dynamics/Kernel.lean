@@ -81,6 +81,14 @@ lemma event_le_one (K : Kernel α) (s : α → Prop) (n : ℕ) (a : α) :
     (g := fun _ => 1) (fun b => by split <;> norm_num) a
   simpa [event, iterate_const] using h
 
+/-- `event` computed with any decidability instance for the event. -/
+lemma event_eq_iterate (K : Kernel α) (s : α → Prop) [DecidablePred s] (n : ℕ) (a : α) :
+    K.event s n a = K.iterate n (fun b => if s b then 1 else 0) a := by
+  unfold event
+  congr 1
+  funext b
+  congr
+
 /-- Stationarity of a distribution for a finite transition kernel. -/
 def Stationary (K : Kernel α) (p : Distribution α) : Prop :=
   ∀ b, ∑ a, p.weight a * (K a).weight b = p.weight b
