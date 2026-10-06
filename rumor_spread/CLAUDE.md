@@ -26,6 +26,16 @@ Module structure (all under the `RumorPush` namespace, dependency order):
 - `Main.lean` — numeric lemmas (`numeric_A/B/C`) and the main theorem.
 - `Equivalence.lean` — `expList` equals the uniform average over the product space `Fin T → α` (faithfulness of the model).
 
+PULL and PUSH–PULL (roadmap EPI-5; Karp–Schindelhauer–Shenker–Vöcking, FOCS 2000), same namespace and same round model `Tgt n`:
+
+- `PullFoldl.lean` — `List.foldl` of an inflationary monotone step: persistence and pathwise domination.
+- `PullModel.lean` — `pullStep`, `pushPullStep` (= `step ∪ pullStep`, same calls), `pullRun`/`pushPullRun` (`List.foldl`), the failure probabilities, and pathwise domination of PUSH and PULL by PUSH–PULL.
+- `PullIndep.lean` — independence of the calls of a uniform round (`avg_pi_prod`, `avg_tgt_mul_prod`) and per-call probabilities.
+- `PullOneRound.lean` — exact one-round expectations (startup stall, expected growth, quadratic shrinking `u(u-1)/(n-1) ≤ u²/n`, the PUSH–PULL formula).
+- `PullPhases.lean` — the PUSH two-phase argument for an arbitrary inflationary step, given P(good round) ≥ 1/8 and a 2/3 contraction above half (`notAllOf_le_two_div`).
+- `PullGood.lean` — those two inputs for PULL (second-moment / Paley–Zygmund via pointwise bounds).
+- `PullMain.lean`, `PullPushPull.lean` — `pull_informs_all_whp`, `pushPull_informs_all_whp`: all nodes informed after `⌈160 ln n⌉` rounds with probability `≥ 1 - 2/n`.
+
 Design constraint to preserve: **no measure theory, no `PMF`/`ENNReal`, no Chernoff/martingales**; everything is finite sums plus `Real.log`/`Real.exp` only in `Main.lean` numerics.
 
 Toolchain is pinned in [lean-toolchain](lean-toolchain); the single dependency is Mathlib (see [lakefile.toml](lakefile.toml)).

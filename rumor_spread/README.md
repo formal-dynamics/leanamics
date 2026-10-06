@@ -29,6 +29,16 @@ dependency graph and a formalization-progress view; `leanblueprint
 checkdecls` (run in CI) fails the build if a tagged declaration doesn't
 exist.
 
+**PULL and PUSH–PULL** (roadmap EPI-5, after Karp, Schindelhauer, Shenker,
+Vöcking, *Randomized rumor spreading*, FOCS 2000): with the same random calls,
+`RumorPush.pull_informs_all_whp` ([PullMain.lean](RumorSpread/PullMain.lean))
+and `RumorPush.pushPull_informs_all_whp`
+([PullPushPull.lean](RumorSpread/PullPushPull.lean)) inform all nodes after
+`⌈160 ln n⌉` rounds with probability at least `1 - 2/n`;
+[PullOneRound.lean](RumorSpread/PullOneRound.lean) has the exact one-round
+picture (PULL's quadratic shrinking `𝔼u' = u(u-1)/(n-1) ≤ u²/n`). Deviations
+from the paper are listed in [PROGRESS.md](PROGRESS.md).
+
 ## Design
 
 The development avoids measure theory, `PMF`, `ENNReal`, the exponential
