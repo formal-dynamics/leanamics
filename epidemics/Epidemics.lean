@@ -5,3 +5,11 @@ import Epidemics.Revisited.GrowthConnect
 import Epidemics.Revisited.GrowthReal
 import Epidemics.Revisited.GrowthUpper
 import Epidemics.Revisited.Growth
+import Epidemics.Revisited.ShrinkingDefs
+import Epidemics.Revisited.ShrinkingAux
+import Epidemics.Revisited.ShrinkingPotential
+import Epidemics.Revisited.ShrinkingUpper
+import Epidemics.Revisited.ShrinkingTotal
+import Epidemics.Revisited.Lemma20Aux
+import Epidemics.Revisited.Lemma20
+import Epidemics.Revisited.Shrinking
