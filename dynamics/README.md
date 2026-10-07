@@ -52,8 +52,9 @@ documentation. The same workflow as the existing packages is used; doc-gen4 is
 resolved separately to preserve the main project's dependency pins.
 
 This is the only finite-probability layer of the repository: `rumor_spread/`,
-`3-majority/` and `plurality/` use `avg` and `expList` from here (see
-[EXPECTATION_AUDIT.md](EXPECTATION_AUDIT.md) for the audit that removed the copies).
+`3-majority/` and `plurality/` use `avg` and `expList` from here, and `Bridge` connects them to
+Mathlib's `Finset.expect`. Where the statements deviate from their sources, see
+[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 3-majority retains its `ThreeMajority` probability names and blueprint links
 through compatibility declarations: `ThreeMajority.avg` is a reducible alias of `avg`. The mean-scaled Chernoff bounds of 3-majority (uniform sampling) remain there; `Chernoff`
 generalizes them to independent, non-identical Bernoulli trials, and `Concentration` adds
