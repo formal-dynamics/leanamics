@@ -43,3 +43,51 @@ If some node $w$ is decided, the round in which everybody samples $w$, repeated 
 configuration monochromatic; it has positive probability. Conclude with the shared absorption
 theorem.
 \end{proof}
+
+\section{The sequential dynamics: approximate majority}
+\begin{definition}[Sequential undecided-state dynamics]\label{def:seq}
+\lean{Undecided.Sequential.Interaction,Undecided.Sequential.step,Undecided.Sequential.run}\leanok
+\uses{def:usd}
+At each step an ordered pair (initiator, responder) of distinct agents is drawn uniformly among
+the $n(n-1)$ such pairs, independently of the past; only the responder updates, by the rule of
+Definition~\ref{def:usd} applied to the initiator's state. This is the approximate-majority
+protocol of Angluin, Aspnes and Eisenstat (Distributed Computing 21, 2008), with $x$, $y$ and
+blank written $a$, $b$ and $u$.
+\end{definition}
+\begin{lemma}[One-step formula]\label{lem:seq-step}
+\lean{Undecided.Sequential.avg_transition,Undecided.Sequential.avg_step_counts}\leanok
+\uses{def:seq}
+The expectation of a function of the next configuration that depends only on the states of the
+initiator and the responder is its value on idle interactions plus the four state-changing
+transitions $xb$, $yb$, $xy$, $yx$, weighted by $aq$, $bq$, $ab$, $ab$ pairs out of $n(n-1)$
+(with $q$ the number of blank agents).
+\end{lemma}
+\begin{lemma}[Weighted supermartingales]\label{lem:seq-mart}
+\lean{Undecided.Sequential.expList_exp_pathSum_le,Undecided.Sequential.expList_ind_le_of_weight}
+\leanok
+If one step never increases $e^{\varphi}F$ in expectation, then $e^{\sum_{\text{path}}\varphi}F$
+has expectation at most $F$ at every finite time, and Markov's inequality bounds the probability
+that the path sum of $\varphi$ is large.
+\end{lemma}
+\begin{lemma}[Six potentials]\label{lem:seq-pot}
+\lean{Undecided.Sequential.stepSC,Undecided.Sequential.stepC,Undecided.Sequential.stepB,
+Undecided.Sequential.stepX,Undecided.Sequential.stepY,Undecided.Sequential.stepM}\leanok
+\uses{lem:seq-step}
+The potentials $1/((a-b)^2+4n)$ (state-changing interactions), $1$ (central region), $1/(a+b)$
+(blank corner), $3b+q+1$ and $3a+q+1$ (the two opinion corners), and $e^{-\lambda\max(a-b,0)}$
+(the gap stays positive) satisfy the hypothesis of Lemma~\ref{lem:seq-mart} with suitable
+weights.
+\end{lemma}
+\begin{theorem}[Convergence; AAE Theorem 1]\label{thm:seq-conv}
+\lean{Undecided.Sequential.prob_notCons_le,Undecided.Sequential.consensus_whp}\leanok
+\uses{lem:seq-mart,lem:seq-pot}
+For every $c$ there is $C$ such that from every non-blank configuration of $n\ge2$ agents, after
+$T\ge Cn\log n$ interactions all agents agree, with probability at least $1-C/n^c$.
+\end{theorem}
+\begin{theorem}[Correctness; AAE Theorem 2]\label{thm:seq-maj}
+\lean{Undecided.Sequential.prob_notAllX_le,Undecided.Sequential.majority_whp,
+Undecided.Sequential.approximate_majority}\leanok
+\uses{thm:seq-conv}
+For every $c$ there is $C$ such that if initially $a-b\ge C\sqrt n\log n$, then after
+$T\ge Cn\log n$ interactions all agents hold $a$, with probability at least $1-C/n^c$.
+\end{theorem}

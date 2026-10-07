@@ -79,13 +79,14 @@ lemma saturation_2b2c (hbig : (30 : ℝ) ≤ Real.log n) (I : Finset (Fin n))
           (fun l => if (1 : ℝ) ≤ (n : ℝ) - (run (step I r1) (r2 :: l)).card then (1 : ℝ) else 0))
             ≤ 1 := by
         calc avg (fun r2 : Tgt3 n => expList (Tgt3 n) 0
-              (fun l => if (1 : ℝ) ≤ (n : ℝ) - (run (step I r1) (r2 :: l)).card then (1 : ℝ) else 0))
+              (fun l => if (1 : ℝ) ≤ (n : ℝ) - (run (step I r1) (r2 :: l)).card then (1 : ℝ)
+                else 0))
             ≤ avg (fun _ : Tgt3 n => (1 : ℝ)) := avg_le_avg hpt
           _ = 1 := avg_const 1
       have hpos : (0 : ℝ) ≤ 300 / n := by positivity
       linarith
     · rw [if_neg hcase]
-      push_neg at hcase
+      push Not at hcase
       have hUI2 : (n : ℝ) - ((step I r1).card : ℝ) ≤ 10 := hcase.le
       have h2c := saturation_stage2c hn1 (step I r1) hUI2
       have heq : (fun r2 : Tgt3 n => expList (Tgt3 n) 0
@@ -135,7 +136,7 @@ lemma saturation_2a2b2c (hbig : (30 : ℝ) ≤ Real.log n) (I₀ : Finset (Fin n
       have hpos : (0 : ℝ) ≤ Real.exp (-Real.log n) + 300 / n := by positivity
       linarith
     · rw [if_neg hA]
-      push_neg at hA
+      push Not at hA
       have h2b2c := saturation_2b2c hbig (run I₀ l₁) hA
       rw [show (fun l₂ : List (Tgt3 n) =>
             if (1 : ℝ) ≤ (n : ℝ) - (run I₀ (l₁ ++ l₂)).card then (1 : ℝ) else 0)

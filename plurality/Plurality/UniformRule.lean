@@ -90,7 +90,7 @@ lemma adopt_r_le {f : Rule k} (hcm : ClearMajority f) {r g b : Fin k}
   have h3 (u v : Fin k) : f v u u = u := (hcm u v).2.2
   rcases ha with rfl | rfl | rfl <;> rcases hb' with rfl | rfl | rfl <;>
     rcases hc with rfl | rfl | rfl <;>
-    simp [e, i, d, h1, h2, h3, hrg, hgb, hrb, hrg.symm, hgb.symm, hrb.symm] <;> norm_num
+    norm_num [e, i, d, h1, h2, h3, hrg, hgb, hrb, hrg.symm, hgb.symm, hrb.symm]
 
 /-- **Adoption probability of `r`** with only `r, g, b` present:
 `p(r) ≤ 3x² - 2x³ + δ_r x_r x_g x_b`. -/
@@ -175,7 +175,7 @@ lemma poly_le (x : ℝ) (h0 : 0 ≤ x) (h1 : x ≤ 2 / 5) :
 /-- **Contraction in expectation.** With only `r, g, b` present, `δ_r ≤ 1` and
 at most `2n/5` nodes of color `r`, the expected number of `r` nodes after one
 round is at most `0.97` times the current one. -/
-theorem expected_count_le (hn : 1 ≤ n) {f : Rule k} (hf : Conservative f)
+theorem expected_count_le (hn : 1 ≤ n) {f : Rule k} (_hf : Conservative f)
     (hcm : ClearMajority f) {r g b : Fin k} (hrg : r ≠ g) (hgb : g ≠ b) (hrb : r ≠ b)
     (hδ : deltaCount f r g b r ≤ 1) {y : Config n k} (hy : Supp3 r g b y)
     (hlow : (count y r : ℝ) ≤ 2 * n / 5) :
