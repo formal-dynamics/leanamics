@@ -130,10 +130,14 @@ The proof has two phases, glued by Lemma~\ref{lem:mono}:
 \section{Finite uniform probability}\label{sec:prelim}
 
 All randomness in this development is uniform over finite types, so instead
-of measure theory or \texttt{PMF} we work with plain finite sums.
+of measure theory or \texttt{PMF} we work with plain finite sums. The
+definitions and their basic laws are those of the shared \texttt{dynamics}
+library (\texttt{Dynamics.Uniform}), which also identifies them with Mathlib's
+finite expectation \texttt{Finset.expect} and with the independent product of
+uniform distributions (\texttt{Dynamics.Bridge}).
 
 \begin{definition}[Average]\label{def:avg}
-  \lean{RumorPush.avg}
+  \lean{Dynamics.avg, Dynamics.avg_eq_expect}
   \leanok
   For a finite type $\alpha$ and $f \colon \alpha \to \R$,
   $\mathrm{avg}(f) := \bigl(\sum_{a} f(a)\bigr) / |\alpha|$ is the
@@ -141,7 +145,7 @@ of measure theory or \texttt{PMF} we work with plain finite sums.
 \end{definition}
 
 \begin{definition}[Trajectory expectation]\label{def:expList}
-  \lean{RumorPush.expList}
+  \lean{Dynamics.expList}
   \leanok
   \uses{def:avg}
   For a finite type $\alpha$, $\mathrm{expList}\ \alpha\ T\ F$ is the
@@ -156,10 +160,10 @@ of measure theory or \texttt{PMF} we work with plain finite sums.
 \end{definition}
 
 \begin{lemma}[Basic properties]\label{lem:avg-basic}
-  \lean{RumorPush.avg_le_avg, RumorPush.avg_add, RumorPush.avg_sub,
-    RumorPush.avg_const_mul, RumorPush.avg_const,
-    RumorPush.expList_le_expList, RumorPush.expList_add,
-    RumorPush.expList_const_mul, RumorPush.expList_const}
+  \lean{Dynamics.avg_le_avg, Dynamics.avg_add, Dynamics.avg_sub,
+    Dynamics.avg_const_mul, Dynamics.avg_const,
+    Dynamics.expList_le_expList, Dynamics.expList_add,
+    Dynamics.expList_const_mul, Dynamics.expList_const}
   \leanok
   \uses{def:avg, def:expList}
   $\mathrm{avg}$ and $\mathrm{expList}$ are monotone, additive, and
@@ -220,7 +224,7 @@ We write $x := \tfrac{1}{n-1}$, so $0 < x \le 1$ for $n \ge 2$.
 \end{lemma}
 
 \begin{lemma}[Markov's inequality, finite uniform version]\label{lem:markov}
-  \lean{RumorPush.avg_le_avg}
+  \lean{Dynamics.avg_le_avg}
   \leanok
   \uses{def:avg}
   Let $\Omega$ be a finite nonempty set with the uniform measure,
@@ -230,7 +234,7 @@ We write $x := \tfrac{1}{n-1}$, so $0 < x \le 1$ for $n \ge 2$.
 \end{lemma}
 
 \begin{lemma}[Reverse Markov for bounded variables]\label{lem:revmarkov}
-  \lean{RumorPush.avg_le_avg}
+  \lean{Dynamics.avg_le_avg}
   \leanok
   \uses{def:avg}
   Let $f \colon \Omega \to \R$ with $0 \le f \le b$ pointwise, $b > 0$, and
