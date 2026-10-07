@@ -21,3 +21,9 @@ import Epidemics.Revisited.ShrinkingTotal
 import Epidemics.Revisited.Lemma20Aux
 import Epidemics.Revisited.Lemma20
 import Epidemics.Revisited.Shrinking
+import Epidemics.GiantCoins
+import Epidemics.GiantDFS
+import Epidemics.GiantAnalysis
+import Epidemics.GiantProb
+import Epidemics.Giant
+import Epidemics.GiantEpidemic
