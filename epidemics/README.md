@@ -1,4 +1,4 @@
-# Epidemics: Reed–Frost and bond percolation; the giant component; the Kermack–McKendrick SIR model; Kurtz's law of large numbers; rumor spreading revisited
+# Epidemics: Reed–Frost and bond percolation; subcritical percolation; the giant component; the Kermack–McKendrick SIR model; Kurtz's law of large numbers; rumor spreading revisited
 
 A Lean formalization of the pathwise correspondence between the Reed–Frost (Independent Cascade)
 epidemic and bond percolation (after Kempe, Kleinberg and Tardos, KDD 2003; see also Becchetti et
@@ -21,6 +21,29 @@ open edge becomes infected, and every infected node recovers for good.
 The coupling holds for every coin assignment, which is stronger than the distributional
 equivalence usually stated (with fresh coins in each round); that distributional version is not
 formalized here.
+
+## Subcritical percolation and small outbreaks (EPI-2)
+
+After Becchetti et al., arXiv:2103.16398, Theorem 2.3 and its proof, Theorem E.1. Let the degrees
+of `G` be at most `d`, let `n = |V|`, and let `p (d - 1) ≤ 1 - ε` with `0 < ε < 1`
+(results in [`Epidemics/Subcritical.lean`](Epidemics/Subcritical.lean)):
+
+| Result | Lean declaration |
+| --- | --- |
+| Deferred decisions: P(component of `s` has `> t` vertices) ≤ P(`≥ t` successes in `t (d - 1) + 1` Bernoulli(`p`) trials) | `prob_cluster_gt_le_binomial` |
+| Theorem E.1: P(component of `s` has `> t` vertices) ≤ `exp (ε - ε² t / 2)` | `prob_cluster_gt_le` |
+| Theorem 2.3: with probability `≥ 1 - 1/n`, every component of `G_p` has `≤ (10 / ε²) log n` vertices | `prob_components_small` |
+| Reed–Frost with `R₀ = p (d - 1) ≤ 1 - ε`: with probability `≥ 1 - 1/n`, at most `|I₀| (10 / ε²) log n` nodes infected, none in round `⌊(10 / ε²) log n⌋` | `reedFrost_subcritical` |
+| Erdős–Rényi `G(n, c/n)`, `c ≤ 1 - ε`: with probability `≥ 1 - 1/n`, all components have `≤ (10 / ε²) log n` vertices | `erdosRenyi_subcritical` |
+
+The crux is the principle of deferred decisions. It is proved for every state of an exploration
+(discovered vertices, examined edges forced closed) by induction on a budget, conditioning on the
+coin of one frontier edge, which reproduces the recursion of the binomial tail
+([`SubcriticalExploration.lean`](Epidemics/SubcriticalExploration.lean)). The tail bound
+([`SubcriticalChernoff.lean`](Epidemics/SubcriticalChernoff.lean)) is the Chernoff bound of
+`dynamics/` (`Distribution.prob_ge_le_exp`) at the paper's tilt `ε`. Deviations from the paper
+(explicit constants, the threshold written as `p (d - 1) ≤ 1 - ε`) are listed in
+[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 
 ## The supercritical giant component (EPI-3)
 
@@ -144,7 +167,9 @@ under the same protocol and checks; the statements were reviewed by hand against
 proved under the same protocol and checks, the growth regime (Lemma 9, Lemma 19, Theorem 21) by a
 Grok agent and the rest (Lemma 20, Theorem 31, total time) by a Claude agent. Supercritical giant
 component (EPI-3): the statements were pinned and then proved by a Claude agent under the same
-protocol and checks; the statements were reviewed by hand against the source.
+protocol and checks; the statements were reviewed by hand against the source. Subcritical
+percolation (EPI-2): statements and proofs were written by a Claude agent under the same protocol
+and checks; the statements were reviewed by hand against the paper.
 
 Build and audit:
 
