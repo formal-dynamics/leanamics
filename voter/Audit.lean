@@ -27,6 +27,11 @@ import Voter
 #print axioms Voter.lazyNeighbor_consensus_probability
 #print axioms Voter.wrightFisher_fixation_of_three_le
 #print axioms Voter.wrightFisher_fixation
+#print axioms Voter.iterate_disagreement_le_pairWalk
+#print axioms Voter.iterate_disagreement_le_of_meeting
+#print axioms Voter.lazy_meeting_le_half
+#print axioms Voter.lazy_meeting_le_pow
+#print axioms Voter.lazy_voter_consensus_whp
 #print axioms Voter.potential_drift
 #print axioms Voter.potential_drift_conductance
 #print axioms Voter.lazy_consensus_of_minority

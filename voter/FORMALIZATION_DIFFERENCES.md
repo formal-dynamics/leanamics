@@ -34,15 +34,25 @@ and its Lean 4 formalization in the `voter` package (`leanamics/voter`).
 ### 1.2 Unformalized Results
 
 The following portions of the paper were not formalized:
-1. **Section 2.4: Time Bounds** (partially formalized since VOT-3: on the complete graph with
-   self-loops, the backward coalescing-walk duality [`runRounds_eq_comp`](Voter/Coalescence.lean) and
-   consensus within `2 n log n` rounds with probability `≥ 1 - 1/n`
-   [`voter_consensus_whp`](Voter/Coalescence.lean); the general-graph bounds below remain open)
-   - Dual coalescing random walks backward in time on general graphs (the complete graph with self-loops is formalized in [`Coalescence.lean`](Voter/Coalescence.lean)).
-   - Lemma 2.4: Bound on meeting time $M = O(n Z_{\max})$.
-   - Fact 2.3: Hitting time sum $Z_{i,j} + Z_{j,i} \le 1 / (\pi_H(i) h_{ij})$ for reversible Markov chains.
-   - Theorem 2.4: Expected time to monochromatic absorption $O(M \log n)$ via Chernoff bounds (Proposition 2.1).
-   - Theorem 2.5: Convergence time $O(n^3 \log n)$ in the uniform case.
+1. **Section 2.4: Time Bounds** (formalized since VOT-3 and VOT-6, with the deviations of
+   §4; only the plain walk on nonbipartite graphs remains open)
+   - Dual coalescing random walks: on the complete graph with self-loops in
+     [`Coalescence.lean`](Voter/Coalescence.lean); for every sampling kernel
+     [`iterate_disagreement_le_pairWalk`](Voter/Meeting.lean) (two coalescing tokens, union bound).
+   - Fact 2.3 (lazy uniform case): commute bound $Z_{x,y} + Z_{y,x} \le 4\,\mathrm{vol}\,(n-1)$ for
+     hitting times defined by their Laplacian system,
+     [`hitting_add_hitting_le`](Voter/MeetingHitting.lean).
+   - Lemma 2.4 (lazy walks, tail form): meeting within $51 n^3$ steps with probability
+     $\ge 1/2$, [`lazy_meeting_le_half`](Voter/MeetingTime.lean), via the comparison of
+     synchronous and sequential walks of Kanade, Mallmann-Trenn, Sauerwald instead of
+     $M = O(n Z_{\max})$.
+   - Theorem 2.4 (tail form, no Chernoff bound needed): consensus fails after $k T_0$ rounds with
+     probability $\le (n-1)2^{-k}$ if tokens meet within $T_0$ steps with probability $\ge 1/2$,
+     [`iterate_disagreement_le_of_meeting`](Voter/Meeting.lean), for every kernel.
+   - Theorem 2.5 (lazy uniform walk, high-probability form): consensus within
+     $255 n^3 \log n$ rounds with probability $\ge 1 - 1/n$ on every connected graph,
+     [`lazy_voter_consensus_whp`](Voter/MeetingConsensus.lean). The plain walk on connected
+     nonbipartite graphs (the paper's setting) is covered only conditionally on a meeting bound.
 2. **Section 3: Application to Distributed Consensus & Dynamic Networks**
    - Section 3.1: Formal specification of the consensus problem (Agreement, Validity, Stopping) and Proportionate Consensus.
    - Section 3.2: Algorithm `PropCon` (choice of degree-to-reliability factor $k = \max_i \lceil d_i / R_i \rceil$, normalized weights $\tilde{R}_i$, and weight matrix $H$ with self-loops $H_{ii} = 1 - d_i/\tilde{R}_i$).
@@ -213,6 +223,75 @@ fixation. Files: [`LazyPropagation.lean`](Voter/LazyPropagation.lean),
   for the lazy kernel.
 * `eventualColor` is, as elsewhere in the package, the supremum of the finite-time consensus
   probabilities (§2.2).
+
+---
+
+## 4. Time Bounds on Connected Graphs (Section 2.4)
+
+Files: [`MeetingRounds.lean`](Voter/MeetingRounds.lean), [`Meeting.lean`](Voter/Meeting.lean),
+[`MeetingDrift.lean`](Voter/MeetingDrift.lean), [`MeetingHitting.lean`](Voter/MeetingHitting.lean),
+[`MeetingTime.lean`](Voter/MeetingTime.lean), [`MeetingConsensus.lean`](Voter/MeetingConsensus.lean).
+Further sources: Becchetti, Clementi, Natale, *Consensus dynamics: an overview*, SIGACT News
+51(1), 2020 (the "survey"); Kanade, Mallmann-Trenn, Sauerwald, *On coalescence time in graphs*,
+SODA 2019 (arXiv:1611.02460); Cooper, Elsässer, Ono, Radzik, SIAM J. Discrete Math. 2013.
+
+### 4.1 Survey Theorem 8 is false as stated; the lazy walk is formalized
+* Theorem 8 of the survey states: "Let G be any connected undirected graph. Starting from an
+  arbitrary initial configuration c on G, the Voter dynamics reaches consensus w.h.p. in
+  O(n³ log n) rounds." For the synchronous voter with plain uniform-neighbour sampling this
+  **fails on bipartite graphs**: two tokens on opposite sides of a bipartite graph never meet,
+  and an alternating colouring never reaches consensus
+  (cf. [`twoVertex_never_consensus`](Voter/Examples.lean)). Hassin and Peleg's standing
+  hypotheses (§2.1) do require a nonbipartite graph, and their Theorem 2.5 is the uniform case
+  `H_ij = 1/d_i`.
+* We formalize the **lazy** version, which makes "every connected graph" true: every vertex
+  keeps its colour with probability `1/2` and otherwise copies a uniformly random neighbour,
+  i.e. the kernel [`lazyNeighbor`](Voter/Lazy.lean) `= (I + D⁻¹A)/2` of §3. This kernel lies
+  within Hassin and Peleg's weighted-polling framework with self-loops (the Remark on p. 254;
+  it is also their PropCon weighting `H_ii = 1 − d_i/R̃_i` with `R̃_i = 2 d_i`, taking
+  `H_ij = 1/R̃_i` on edges as the row sums require), and it is the setting of Cooper,
+  Elsässer, Ono and Radzik and of Kanade, Mallmann-Trenn and Sauerwald, whose Proposition B.9
+  (`t_meet ≤ 4 t_hit`) gives a clean meeting-time argument
+  ([`iterate_outside_succ_le`](Voter/MeetingDrift.lean)). The main theorem is
+  [`lazy_voter_consensus_whp`](Voter/MeetingConsensus.lean).
+* Hassin and Peleg's own setting (plain walk on a connected nonbipartite graph) is covered
+  only **conditionally** on a meeting bound:
+  [`iterate_disagreement_le_of_meeting`](Voter/Meeting.lean) holds for every sampling kernel.
+* The complete-graph model of [`Coalescence.lean`](Voter/Coalescence.lean) (uniform sampling
+  over all vertices, i.e. Wright–Fisher) is not a special case: `lazyNeighbor ⊤ ≠ wfKernel`.
+  The self-loop generalization (uniform over the closed neighbourhood) would contain it, but
+  its holding probability `1/(d+1)` breaks the constant-factor coupling of Proposition B.9.
+
+### 4.2 Form of the statements
+* **High-probability form instead of expected time.** Hassin and Peleg's Theorems 2.4 and 2.5
+  bound the expected consensus time (`O(M log n)`, `O(n³ log n)`). We prove
+  `P(no consensus at T) ≤ 1/n` for `T ≥ A n³ log n`, the "w.h.p." form of the survey. The
+  meeting time is likewise a tail bound (apart after `A n³` steps with probability `≤ 1/2`,
+  [`lazy_meeting_le_half`](Voter/MeetingTime.lean), and `≤ 2^{-k}` after `k A n³` steps,
+  [`lazy_meeting_le_pow`](Voter/MeetingTime.lean)) instead of an expected meeting time
+  `M = O(n³)`; the two agree up to constants (Markov's inequality and geometric trials).
+  Theorem 2.4 in tail form needs no Chernoff bound (Proposition 2.1): the diagonal of the
+  two-token walk is absorbing, so being apart is submultiplicative in blocks.
+* **Existential constants.** `O(·)` is rendered as `∃ A > 0`, uniform over all graphs, vertex
+  types of a fixed universe and palettes. The proofs give `A = 51` (meeting) and `A = 255`
+  (consensus); the literature route gives `A = 16` for the meeting bound (our commute bound
+  loses a factor `2` over darts, and the `3/4`-per-block step loses more).
+* **Two coalescing tokens driven by common rounds** ([`pairWalk`](Voter/Meeting.lean), the
+  survey's Definition 5 with two tokens) instead of two independent walks with the path event
+  "never met up to `T`". Before meeting the tokens are independent (distinct coordinates of
+  `Distribution.independent H`), and the diagonal is absorbing, so "apart at time `T`" is
+  exactly "not met within `T` steps".
+* **Hitting times** are defined as the solution of their Laplacian system (it exists by the
+  maximum principle: the system is injective, hence surjective), not as expectations of a
+  path-space stopping time. The commute bound is
+  `Z_{x,y} + Z_{y,x} ≤ 4 vol (n − 1) ≤ 4 n³`
+  ([`hitting_add_hitting_le`](Voter/MeetingHitting.lean)), the lazy uniform case of Fact 2.3.
+  Lemma 2.4 (`M = O(n Z_max)`) is replaced by the potential argument of Kanade,
+  Mallmann-Trenn and Sauerwald ([`lazy_meeting_core`](Voter/MeetingTime.lean)).
+* **Positive degrees** `hd : ∀ i, 0 < G.degree i` are assumed, as for `uniformNeighbor`; for a
+  connected graph this only excludes `n = 1`, where consensus is trivial.
+* **Arbitrary finite palette** (the survey uses `n` colours; Hassin and Peleg two colours,
+  reduced from `k`).
 
 ---
 

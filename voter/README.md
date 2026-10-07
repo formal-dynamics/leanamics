@@ -29,6 +29,9 @@ and indicator projections give the probability for every color in a finite palet
 | Remark p. 254: Theorem 2.1 on bipartite graphs given one self-loop | `propagate_kernel_region`, `consensus_tendsto_of_selfLoop`, `consensus_probability_of_selfLoop`, `color_consensus_probability_of_selfLoop` |
 | Lazy voter `(I + D⁻¹A)/2` on any connected graph (VOT-2) | `lazy`, `lazyNeighbor`, `lazy_stationary_iff`, `lazy_consensus_probability`, `lazyNeighbor_consensus_probability` |
 | Neutral Wright–Fisher: allele `a` fixes w.p. `c_a / n` (VOT-2) | `wrightFisher_fixation_of_three_le`, `wrightFisher_fixation` |
+| Section 2.4, any sampling kernel: duality with two coalescing tokens; Theorem 2.4 (tail form) | `pairWalk`, `iterate_disagreement_le_pairWalk`, `iterate_disagreement_le_of_meeting` |
+| Section 2.4, Fact 2.3 and Lemma 2.4 for lazy walks: meeting within `51 n³` steps w.p. `≥ 1/2` | `hitting_add_hitting_le`, `lazyNeighbor`, `lazy_meeting_le_half`, `lazy_meeting_le_pow` |
+| Theorem 2.5 (Survey Thm 8), lazy voter: consensus within `255 n³ log n` rounds w.p. `≥ 1 - 1/n` on every connected graph | `lazy_voter_consensus_whp` |
 | BGKM16 Section 2: volume, conductance `φ`, minority side, potential `Ψ = √vol(s_t)` (VOT-5) | `vol`, `conductance`, `discordant`, `minority`, `potential`, `dynamicLazy` |
 | BGKM16 Lemma 2.1 (corrected: sum over the minority side): `𝔼Ψ' ≤ Ψ - ∑_{u∈s_t} λ_u d_u / (32 Ψ³)` (VOT-5) | `potential_drift`, `potential_drift_conductance` |
 | BGKM16 Lemma 2.2 and Theorem 1.1 (i), two opinions: consensus within `128 m / (d_min φ)` rounds w.p. `≥ 1/2`, expected time `≤ 2·` that, dynamic graphs with fixed degrees (VOT-5) | `lazy_consensus_of_minority`, `lazy_consensus_conductance`, `lazy_expected_consensus_time`, `dynamic_consensus_conductance` |
@@ -82,5 +85,13 @@ with probability `∑_{i coloured c} dᵢ / 2m` on every connected graph, bipart
 Neutral Wright–Fisher (`WrightFisher.lean`) fixes allele `a` with probability `c_a / n` for every
 `n ≥ 1`; for `n ≥ 3` this already follows from the nonbipartite theorem on `K_n`.
 
-Future work: convergence-time bounds on general graphs, dynamic networks, and extremal
-coalition results.
+On every connected graph, `Meeting*.lean` (VOT-6) proves the duality for an arbitrary
+sampling kernel and the `O(n³ log n)` consensus time of the lazy voter dynamics (every vertex
+keeps its colour with probability `1/2`, otherwise copies a uniform neighbour). Hitting times
+are solutions of the Laplacian system (`MeetingHitting.lean`), and the meeting time follows
+Kanade, Mallmann-Trenn, Sauerwald's comparison of synchronous and sequential walks
+(`MeetingDrift.lean`). Hassin–Peleg's plain walk on nonbipartite graphs is covered only
+conditionally on a meeting bound (`iterate_disagreement_le_of_meeting`); see
+[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
+
+Future work: dynamic networks and extremal coalition results.

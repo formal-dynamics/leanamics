@@ -13,8 +13,8 @@ voter model in dynamic networks*, ICALP 2016 (BGKM16):
   side (`card_interedges_class`, `card_interedges_class_compl`);
 * the conductance is a lower bound for the cut ratios (`conductance_mul_vol_le`), nonnegative,
   at most one;
-* one lazy step: `lazyNeighbor_expect`, the probability `1/2` of moving and the probability
-  `λ_u / (2 d_u)` of adopting another opinion;
+* one lazy step (from `lazyNeighbor_expect` in `Lazy.lean`): the probability `1/2` of moving
+  and the probability `λ_u / (2 d_u)` of adopting another opinion;
 * two real inequalities: the third-order Taylor bound of `√` and a chord bound.
 -/
 
@@ -270,22 +270,6 @@ lemma conductance_le_one : conductance G ≤ 1 := by
 
 /-! ### One lazy step -/
 
-/-- Expectation under one row of the lazy voter: with probability `1/2` stay, otherwise move to
-a uniform neighbour. -/
-lemma lazyNeighbor_expect (hd : ∀ v, 0 < G.degree v) (u : V) (f : V → ℝ) :
-    (lazyNeighbor G hd u).expect f =
-      (f u + (∑ a ∈ G.neighborFinset u, f a) / G.degree u) / 2 := by
-  unfold Distribution.expect
-  have h1 : ∑ a, (if u = a then (1 : ℝ) else 0) * f a = f u := by simp
-  have h2 : ∑ a, (if G.Adj u a then ((G.degree u : ℝ))⁻¹ else 0) * f a =
-      (∑ a ∈ G.neighborFinset u, f a) / G.degree u := by
-    rw [div_eq_inv_mul, mul_sum, SimpleGraph.neighborFinset_eq_filter, sum_filter]
-    refine sum_congr rfl fun a _ => ?_
-    split_ifs <;> simp
-  simp only [lazyNeighbor_weight]
-  rw [← h1, ← h2, ← sum_add_distrib, sum_div]
-  exact sum_congr rfl fun a _ => by ring
-
 /-- The lazy voter moves with probability exactly `1/2` (a simple graph has no loops). -/
 lemma lazyNeighbor_expect_ne_self (hd : ∀ v, 0 < G.degree v) (u : V) :
     (lazyNeighbor G hd u).expect (fun a => if a ≠ u then 1 else 0) = 1 / 2 := by
@@ -293,8 +277,10 @@ lemma lazyNeighbor_expect_ne_self (hd : ∀ v, 0 < G.degree v) (u : V) :
   have h : ∑ a ∈ G.neighborFinset u, (if a ≠ u then (1 : ℝ) else 0) = G.degree u := by
     rw [sum_congr rfl fun a ha => if_pos (G.ne_of_adj ((G.mem_neighborFinset u a).mp ha)).symm]
     simp
-  rw [h, if_neg (not_not.mpr rfl), div_self (by exact_mod_cast (hd u).ne')]
-  norm_num
+  have hdu : (G.degree u : ℝ) ≠ 0 := by exact_mod_cast (hd u).ne'
+  rw [h, if_neg (not_not.mpr rfl)]
+  field_simp
+  ring
 
 /-- The lazy voter adopts another opinion with probability `λ_u / (2 d_u)`. -/
 lemma lazyNeighbor_expect_discordant [DecidableEq C] (hd : ∀ v, 0 < G.degree v)

@@ -238,6 +238,86 @@ The uniform distribution is stationary and every entry is positive. For $n\ge 3$
 complete graph is nonbipartite and Section~2.3 applies; for every $n$ the Remark applies.
 \end{proof}
 
+\section{Section 2.4 on connected graphs: meeting time and $O(n^3\log n)$ consensus}
+\begin{definition}[Two-token walk, lazy sampling]\label{def:pairwalk}
+\lean{Voter.pairWalk,Voter.leftRounds}\leanok\uses{def:backward,thm:lazy}
+For a sampling kernel $H$, two tokens move with the rounds of the voter dynamics: the
+token at $x$ moves to $r(x)$, where $r$ is drawn from the independent product of the rows
+of $H$. Off the diagonal the tokens make independent $H$-steps; on the diagonal they move
+together. The lazy kernel of a graph samples the vertex itself with probability $1/2$ and
+otherwise a uniformly random neighbour. Rounds can also be composed on the left,
+$W\mapsto r\circ W$.
+\end{definition}
+\begin{lemma}[Duality for every kernel]\label{lem:duality-general}
+\lean{Voter.independent_expect_pair,Voter.iterate_transition_eq_leftRounds,Voter.iterate_leftRounds_pair,Voter.iterate_disagreement_le_pairWalk}\leanok\uses{def:pairwalk,lem:duality}
+For every sampling kernel, the probability that no consensus is reached after $T$ rounds
+is at most the sum over $v\neq u_0$ of the probability that the tokens started at $v$ and
+$u_0$ are apart after $T$ steps.
+\end{lemma}
+\begin{proof}\leanok
+The voter dynamics on maps started from the identity composes the rounds on the right;
+composing them on the left gives the same finite-time expectations, since the rounds are
+independent and identically distributed (induction on $T$, exchanging two finite
+expectations). The left composition read at two vertices is the two-token walk. Conclude
+with the pointwise union bound of Theorem~\ref{thm:consensus-time}.
+\end{proof}
+\begin{theorem}[Hassin--Peleg Theorem 2.4, tail form]\label{thm:hp24}
+\lean{Voter.pairWalk_iterate_outside_mul_le,Voter.iterate_disagreement_le_of_meeting}\leanok\uses{lem:duality-general}
+If from every pair of vertices the tokens are apart after $T_0$ steps with probability at
+most $1/2$, then consensus fails after $kT_0$ rounds with probability at most
+$(n-1)2^{-k}$.
+\end{theorem}
+\begin{proof}\leanok
+The diagonal is absorbing, so the probabilities of being apart are submultiplicative in
+blocks of $T_0$ steps; apply Lemma~\ref{lem:duality-general}.
+\end{proof}
+\begin{lemma}[Hitting times of the lazy walk; Fact 2.3]\label{lem:hitting}
+\lean{Voter.le_zero_of_lapMatrix_le,Voter.exists_hitting,Voter.hitting,Voter.hitting_nonneg,Voter.hitting_symm,Voter.hitting_add_hitting_le}\leanok
+On a connected graph with Laplacian $L$ and $\mathrm{vol}=\sum_z d_z$, the system
+$h(y)=0$, $(Lh)(x)=2d_x$ for $x\neq y$ has a nonnegative solution $h_y$, the expected
+hitting time of $y$ for the lazy walk. It satisfies
+$\sum_z d_z h_y(z)-\mathrm{vol}\,h_y(x)=\sum_z d_z h_x(z)-\mathrm{vol}\,h_x(y)$ and
+$h_y(x)+h_x(y)\le 4\,\mathrm{vol}\,(n-1)\le 4n^3$.
+\end{lemma}
+\begin{proof}\leanok
+The maximum principle makes the linear system injective, hence surjective. The identity is
+the symmetry of $L$. For the bound, $\psi=h_y-h_x$ has energy
+$\psi^\top L\psi=2\,\mathrm{vol}\,(h_y(x)+h_x(y))$; apply Cauchy--Schwarz along a path from
+$x$ to $y$.
+\end{proof}
+\begin{lemma}[Sequential and synchronous walks]\label{lem:sequential}
+\lean{Voter.seqSurvival,Voter.seqSurvival_mul_le,Voter.iterate_outside_succ_le,Voter.iterate_outside_le_three_quarters}\leanok\uses{def:pairwalk}
+Let the two tokens move one at a time, meeting being checked after each move. If a
+nonnegative potential $F$ drops by one in expectation under a step of either token, the
+sequential walks are apart after $T$ steps with probability at most $F/T$. For a lazy
+kernel, the synchronous tokens are apart after $T+1$ steps with probability at most the
+average of the indicator of starting apart and the sequential survival; hence at most $3/4$
+once $T\ge 2\sup F$.
+\end{lemma}
+\begin{proof}\leanok
+Two inductions on $T$. When the first token lands on the old position of the second, the
+second stays put with probability at least $1/2$.
+\end{proof}
+\begin{theorem}[Meeting time of lazy walks; Lemma 2.4]\label{thm:meeting-lazy}
+\lean{Voter.meetingPotential,Voter.lazy_meeting_core,Voter.lazy_meeting_le_half,Voter.lazy_apart_le_pow,Voter.lazy_meeting_le_pow}\leanok\uses{lem:hitting,lem:sequential,thm:hp24}
+On a connected graph with $n$ vertices, two lazy walks are apart after
+$3(16n^3+1)\le 51n^3$ steps with probability at most $1/2$, and after $51kn^3$ steps with
+probability at most $2^{-k}$, from every pair of start vertices.
+\end{theorem}
+\begin{proof}\leanok
+Apply Lemma~\ref{lem:sequential} to the potential $h_y(x)-\sum_z d_z h_y(z)/\mathrm{vol}+4n^3$
+of Lemma~\ref{lem:hitting}, bounded by $8n^3$, then submultiplicativity.
+\end{proof}
+\begin{theorem}[Hassin--Peleg Theorem 2.5; Survey Theorem 8]\label{thm:hp25}
+\lean{Voter.card_sub_one_mul_half_pow_le,Voter.lazy_voter_consensus_whp}\leanok\uses{thm:meeting-lazy,lem:duality-general}
+On every connected graph with $n$ vertices and from every initial colouring, the lazy voter
+dynamics reaches consensus within $255\,n^3\log n$ rounds with probability at least $1-1/n$.
+\end{theorem}
+\begin{proof}\leanok
+With $k=\lfloor T/(51n^3)\rfloor$, Lemma~\ref{lem:duality-general} and
+Theorem~\ref{thm:meeting-lazy} bound the failure probability by $(n-1)2^{-k}\le 1/n$.
+\end{proof}
+
 \section{Consensus time via conductance (VOT-5)}
 Source: Berenbrink, Giakkoupis, Kermarrec, Mallmann-Trenn, \emph{Bounds on the voter model in
 dynamic networks}, ICALP 2016, arXiv:1603.01895 (BGKM16). The process is the lazy voter
@@ -316,6 +396,8 @@ On the two-vertex graph, every vertex must copy the other vertex.
 The alternating coloring flips each round and returns after two rounds;
 neither coloring is constant. Thus connectedness alone is insufficient.
 \end{lemma}
-Convergence-time bounds on general graphs (Hassin--Peleg Theorem~2.5), dynamic networks,
-and extremal coalition results are future work beyond this milestone. Chernoff bounds remain in the
+Hassin--Peleg Theorem~2.5 is formalized for the lazy walk; for the plain walk on
+nonbipartite graphs it holds conditionally on a meeting-time bound
+(Theorem~\ref{thm:hp24}). Dynamic networks and extremal coalition results are future work
+beyond this milestone. Chernoff bounds remain in the
 3-majority package until another theorem requires their extraction.
