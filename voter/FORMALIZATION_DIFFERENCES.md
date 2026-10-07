@@ -35,7 +35,7 @@ and its Lean 4 formalization in the `voter` package (`leanamics/voter`).
 
 The following portions of the paper were not formalized:
 1. **Section 2.4: Time Bounds** (formalized since VOT-3 and VOT-6, with the deviations of
-   [`PROGRESS-VOT6.md`](PROGRESS-VOT6.md); only the plain walk on nonbipartite graphs remains open)
+   §4; only the plain walk on nonbipartite graphs remains open)
    - Dual coalescing random walks: on the complete graph with self-loops in
      [`Coalescence.lean`](Voter/Coalescence.lean); for every sampling kernel
      [`iterate_disagreement_le_pairWalk`](Voter/Meeting.lean) (two coalescing tokens, union bound).
@@ -154,7 +154,8 @@ The following portions of the paper were not formalized:
 * **In Lean**:
   - $G$ is modeled as a Mathlib `SimpleGraph V`, which is irreflexive by definition ($\neg G.\text{Adj } i\ i$).
   - The support condition is `hsupport : ∀ i j, G.Adj i j → 0 < (H i).weight j`: every edge has positive weight, and `H` may put additional weight elsewhere, in particular on self-loops ($(H i).\text{weight } i > 0$). This covers lazy chains and Wright–Fisher sampling ([`wrightFisher_one_third`](Voter/Examples.lean)).
-  - The underlying `SimpleGraph` must still be nonbipartite, because the propagation argument starts from a monochromatic *edge* of `G`. The Remark's stronger claim (a bipartite graph with at least one self-loop suffices) is therefore not formalized.
+  - The main theorem `consensus_probability` keeps the nonbipartite hypothesis, because its propagation argument starts from a monochromatic *edge* of `G`.
+  - The Remark itself is formalized (VOT-2) as [`consensus_probability_of_selfLoop`](Voter/LazyLoop.lean) and [`color_consensus_probability_of_selfLoop`](Voter/LazyLoop.lean): on any connected `G`, bipartite or not, it suffices that `H` charges every edge and that `0 < (H v).weight v` for a single vertex `v`. The propagation ([`propagate_kernel_region`](Voter/LazyPropagation.lean)) takes rounds in the support of `H`, so the region `{v}` is monochromatic with `v` as its own internal neighbour. As in the main theorem, `H` may also charge non-edges, which is slightly more general than the Remark. Corollaries: the lazy voter `(I + D⁻¹A)/2` on any connected graph ([`lazyNeighbor_consensus_probability`](Voter/Lazy.lean)) and Wright–Fisher fixation `c_a / n` for every population size ([`wrightFisher_fixation`](Voter/WrightFisher.lean)).
 
 ---
 
@@ -170,3 +171,124 @@ The following portions of the paper were not formalized:
   - Lean additionally proves that the color probabilities form a complete distribution over colors:
     [`Voter.sum_color_consensus_probability`](Voter/Colors.lean#L61): $\sum_{c \in C} \text{eventualColor } H\ c\ s = 1$.
   - *Note*: The uniform degree-weight corollary ($\sum_{i \in A_c^s} d_i / 2m$) was formalized for Boolean colors in `uniform_consensus_probability`, but not explicitly restated as a separate lemma for the general $C$ case.
+
+---
+
+## 3. Self-loops, the Lazy Voter and Neutral Wright–Fisher
+
+This section covers the extension of Theorem 2.1 to graphs with self-loops (the Remark on
+page 254, see §2.6), the lazy voter with kernel `(I + D⁻¹A)/2` (the kernel used by
+Berenbrink, Giakkoupis, Kermarrec and Mallmann-Trenn, ICALP 2016) and neutral Wright–Fisher
+fixation. Files: [`LazyPropagation.lean`](Voter/LazyPropagation.lean),
+[`LazyLoop.lean`](Voter/LazyLoop.lean), [`Lazy.lean`](Voter/Lazy.lean),
+[`WrightFisher.lean`](Voter/WrightFisher.lean).
+
+### 3.1 Wright–Fisher with labelled individuals
+* The classical neutral Wright–Fisher model is the count chain `X_{t+1} ~ Bin(n, X_t / n)`.
+  Lean models it with labelled individuals: the synchronous voter with kernel `wfKernel V`,
+  where each offspring picks a uniformly random parent with replacement. The count chain is
+  the lumping of this chain and has the same fixation event; working with labelled
+  configurations is what makes fixation a corollary of the voter theorem.
+* The population is an arbitrary finite type `V` with `n = Fintype.card V`, rather than
+  `Fin n` (a special case).
+* Two versions are proved: [`wrightFisher_fixation_of_three_le`](Voter/WrightFisher.lean)
+  (`3 ≤ n`) follows from the original `color_consensus_probability` on the complete graph,
+  which is nonbipartite once `n ≥ 3`; [`wrightFisher_fixation`](Voter/WrightFisher.lean)
+  holds for every `n ≥ 1` and goes through the self-loop extension.
+
+### 3.2 The lazy voter on bipartite graphs needs the Remark
+* `consensus_probability` assumes `¬ G.Colorable 2`. For the lazy kernel on a bipartite `G`
+  this cannot be repaired by choosing another graph: every loopless graph `G'` whose edges are
+  charged by `(I + D⁻¹A)/2` is a subgraph of `G`, hence bipartite. The lazy results are
+  therefore proved through the self-loop extension
+  ([`consensus_probability_of_selfLoop`](Voter/LazyLoop.lean),
+  [`color_consensus_probability_of_selfLoop`](Voter/LazyLoop.lean)).
+* The extension is slightly more general than the Remark: as in the main theorem, `H` may
+  charge non-edges (only `G.Adj i j → 0 < H i j` is assumed), and one positive diagonal
+  entry suffices ("even to a single node", as the Remark says).
+* The generic step [`eventualColor_eq_whiteMass_of_tendsto`](Voter/LazyLoop.lean) is
+  Lemma 2.2 in graph-free form: if the probability of not having reached consensus vanishes,
+  the eventual white probability equals the stationary white mass.
+
+### 3.3 Lazy voter hypotheses and forms
+* [`lazyNeighbor`](Voter/Lazy.lean) needs `hd : ∀ i, 0 < G.degree i` (every vertex has a
+  neighbour to sample), as `uniformNeighbor` does. For a connected graph this only excludes
+  the one-vertex graph, where the statement is trivial. The holding probability is fixed at
+  `1/2`.
+* Only the many-colour forms are stated for the lazy voter
+  ([`lazy_consensus_probability`](Voter/Lazy.lean),
+  [`lazyNeighbor_consensus_probability`](Voter/Lazy.lean), with consensus probability
+  `∑ i with s i = c, deg i / (2 |E|)`); the Boolean form is the instance `C = Bool`,
+  `c = true`. This also supplies the many-colour degree-weight corollary missing in §2.7,
+  for the lazy kernel.
+* `eventualColor` is, as elsewhere in the package, the supremum of the finite-time consensus
+  probabilities (§2.2).
+
+---
+
+## 4. Time Bounds on Connected Graphs (Section 2.4)
+
+Files: [`MeetingRounds.lean`](Voter/MeetingRounds.lean), [`Meeting.lean`](Voter/Meeting.lean),
+[`MeetingDrift.lean`](Voter/MeetingDrift.lean), [`MeetingHitting.lean`](Voter/MeetingHitting.lean),
+[`MeetingTime.lean`](Voter/MeetingTime.lean), [`MeetingConsensus.lean`](Voter/MeetingConsensus.lean).
+Further sources: Becchetti, Clementi, Natale, *Consensus dynamics: an overview*, SIGACT News
+51(1), 2020 (the "survey"); Kanade, Mallmann-Trenn, Sauerwald, *On coalescence time in graphs*,
+SODA 2019 (arXiv:1611.02460); Cooper, Elsässer, Ono, Radzik, SIAM J. Discrete Math. 2013.
+
+### 4.1 Survey Theorem 8 is false as stated; the lazy walk is formalized
+* Theorem 8 of the survey states: "Let G be any connected undirected graph. Starting from an
+  arbitrary initial configuration c on G, the Voter dynamics reaches consensus w.h.p. in
+  O(n³ log n) rounds." For the synchronous voter with plain uniform-neighbour sampling this
+  **fails on bipartite graphs**: two tokens on opposite sides of a bipartite graph never meet,
+  and an alternating colouring never reaches consensus
+  (cf. [`twoVertex_never_consensus`](Voter/Examples.lean)). Hassin and Peleg's standing
+  hypotheses (§2.1) do require a nonbipartite graph, and their Theorem 2.5 is the uniform case
+  `H_ij = 1/d_i`.
+* We formalize the **lazy** version, which makes "every connected graph" true: every vertex
+  keeps its colour with probability `1/2` and otherwise copies a uniformly random neighbour,
+  i.e. the kernel [`lazyNeighbor`](Voter/Lazy.lean) `= (I + D⁻¹A)/2` of §3. This kernel lies
+  within Hassin and Peleg's weighted-polling framework with self-loops (the Remark on p. 254;
+  it is also their PropCon weighting `H_ii = 1 − d_i/R̃_i` with `R̃_i = 2 d_i`, taking
+  `H_ij = 1/R̃_i` on edges as the row sums require), and it is the setting of Cooper,
+  Elsässer, Ono and Radzik and of Kanade, Mallmann-Trenn and Sauerwald, whose Proposition B.9
+  (`t_meet ≤ 4 t_hit`) gives a clean meeting-time argument
+  ([`iterate_outside_succ_le`](Voter/MeetingDrift.lean)). The main theorem is
+  [`lazy_voter_consensus_whp`](Voter/MeetingConsensus.lean).
+* Hassin and Peleg's own setting (plain walk on a connected nonbipartite graph) is covered
+  only **conditionally** on a meeting bound:
+  [`iterate_disagreement_le_of_meeting`](Voter/Meeting.lean) holds for every sampling kernel.
+* The complete-graph model of [`Coalescence.lean`](Voter/Coalescence.lean) (uniform sampling
+  over all vertices, i.e. Wright–Fisher) is not a special case: `lazyNeighbor ⊤ ≠ wfKernel`.
+  The self-loop generalization (uniform over the closed neighbourhood) would contain it, but
+  its holding probability `1/(d+1)` breaks the constant-factor coupling of Proposition B.9.
+
+### 4.2 Form of the statements
+* **High-probability form instead of expected time.** Hassin and Peleg's Theorems 2.4 and 2.5
+  bound the expected consensus time (`O(M log n)`, `O(n³ log n)`). We prove
+  `P(no consensus at T) ≤ 1/n` for `T ≥ A n³ log n`, the "w.h.p." form of the survey. The
+  meeting time is likewise a tail bound (apart after `A n³` steps with probability `≤ 1/2`,
+  [`lazy_meeting_le_half`](Voter/MeetingTime.lean), and `≤ 2^{-k}` after `k A n³` steps,
+  [`lazy_meeting_le_pow`](Voter/MeetingTime.lean)) instead of an expected meeting time
+  `M = O(n³)`; the two agree up to constants (Markov's inequality and geometric trials).
+  Theorem 2.4 in tail form needs no Chernoff bound (Proposition 2.1): the diagonal of the
+  two-token walk is absorbing, so being apart is submultiplicative in blocks.
+* **Existential constants.** `O(·)` is rendered as `∃ A > 0`, uniform over all graphs, vertex
+  types of a fixed universe and palettes. The proofs give `A = 51` (meeting) and `A = 255`
+  (consensus); the literature route gives `A = 16` for the meeting bound (our commute bound
+  loses a factor `2` over darts, and the `3/4`-per-block step loses more).
+* **Two coalescing tokens driven by common rounds** ([`pairWalk`](Voter/Meeting.lean), the
+  survey's Definition 5 with two tokens) instead of two independent walks with the path event
+  "never met up to `T`". Before meeting the tokens are independent (distinct coordinates of
+  `Distribution.independent H`), and the diagonal is absorbing, so "apart at time `T`" is
+  exactly "not met within `T` steps".
+* **Hitting times** are defined as the solution of their Laplacian system (it exists by the
+  maximum principle: the system is injective, hence surjective), not as expectations of a
+  path-space stopping time. The commute bound is
+  `Z_{x,y} + Z_{y,x} ≤ 4 vol (n − 1) ≤ 4 n³`
+  ([`hitting_add_hitting_le`](Voter/MeetingHitting.lean)), the lazy uniform case of Fact 2.3.
+  Lemma 2.4 (`M = O(n Z_max)`) is replaced by the potential argument of Kanade,
+  Mallmann-Trenn and Sauerwald ([`lazy_meeting_core`](Voter/MeetingTime.lean)).
+* **Positive degrees** `hd : ∀ i, 0 < G.degree i` are assumed, as for `uniformNeighbor`; for a
+  connected graph this only excludes `n = 1`, where consensus is trivial.
+* **Arbitrary finite palette** (the survey uses `n` colours; Hassin and Peleg two colours,
+  reduced from `k`).

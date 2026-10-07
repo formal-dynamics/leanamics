@@ -1,5 +1,6 @@
 import Voter.MeetingDrift
 import Voter.MeetingHitting
+import Voter.Lazy
 
 /-! # Meeting time of two lazy random walks on a connected graph (VOT-6)
 
@@ -28,19 +29,6 @@ universe u
 
 variable {V : Type*} [Fintype V] [DecidableEq V]
 
-/-- Lazy uniform neighbour sampling: a vertex samples itself with probability `1/2` and
-otherwise a uniformly random neighbour (the lazy version of `uniformNeighbor`). In the voter
-dynamics `transition (lazyNeighbor G hd)` every vertex keeps its colour with probability `1/2`
-and otherwise copies the colour of a uniformly random neighbour. -/
-noncomputable def lazyNeighbor (G : SimpleGraph V) [DecidableRel G.Adj]
-    (hd : ∀ i, 0 < G.degree i) : Kernel V := fun i => {
-  weight := fun j => (if j = i then 1 / 2 else 0) + (uniformNeighbor G hd i).weight j / 2
-  nonneg := fun j => add_nonneg (by split <;> norm_num)
-    (div_nonneg ((uniformNeighbor G hd i).nonneg j) (by norm_num))
-  sum_one := by
-    rw [sum_add_distrib, Fintype.sum_ite_eq', ← sum_div, (uniformNeighbor G hd i).sum_one]
-    norm_num }
-
 /-! ### The lazy kernel and the meeting potential -/
 
 section Lazy
@@ -48,7 +36,7 @@ variable {G : SimpleGraph V} [DecidableRel G.Adj] (hd : ∀ i, 0 < G.degree i)
 
 /-- The lazy walk stays put with probability `1/2`. -/
 lemma lazyNeighbor_weight_self (y : V) : (lazyNeighbor G hd y).weight y = 1 / 2 := by
-  simp [lazyNeighbor, uniformNeighbor]
+  simp [lazyNeighbor_weight]
 
 /-- Expectation under the lazy kernel: half the current value plus half the neighbour
 average. -/
@@ -57,15 +45,15 @@ lemma lazyNeighbor_expect (x : V) (f : V → ℝ) :
       f x / 2 + (∑ w ∈ G.neighborFinset x, f w) / (2 * G.degree x) := by
   have hsplit (w : V) : (lazyNeighbor G hd x).weight w * f w =
       (if w = x then f x / 2 else 0) + (if G.Adj x w then f w / (2 * G.degree x) else 0) := by
-    simp only [lazyNeighbor, uniformNeighbor]
+    rw [lazyNeighbor_weight]
     by_cases hw : w = x
     · subst hw
       simp only [if_true, SimpleGraph.irrefl, if_false]
       ring
     · by_cases ha : G.Adj x w
-      · simp only [if_neg hw, if_pos ha]
+      · simp only [if_neg hw, if_neg (Ne.symm hw), if_pos ha]
         ring
-      · simp only [if_neg hw, if_neg ha]
+      · simp only [if_neg hw, if_neg (Ne.symm hw), if_neg ha]
         ring
   simp only [Distribution.expect, hsplit, Finset.sum_add_distrib, Finset.sum_ite_eq',
     Finset.mem_univ, if_true]

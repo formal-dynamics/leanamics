@@ -195,9 +195,52 @@ union bound over the other $n-1$ vertices and the meeting probability, then
 $(1-1/n)^T\le e^{-T/n}\le n^{-2}$ for $T\ge 2n\log n$.
 \end{proof}
 
+\section{Self-loops, the lazy voter and Wright--Fisher (VOT-2)}
+\begin{lemma}[Propagation through the kernel support]\label{lem:kernel-propagation}
+\lean{Voter.KernelPossible,Voter.exists_weight_pos,Voter.kernelPossible_positive,Voter.reachable_success_of_kernelPossible,Voter.propagate_kernel_region,Voter.kernelPossible_consensus_of_selfLoop,Voter.consensus_tendsto_of_selfLoop}\leanok\uses{lem:propagation,lem:21,thm:generic-absorption}
+Call a round possible for $H$ when every vertex samples a vertex of positive weight in its
+row. On a connected graph whose edges are charged by $H$, a monochromatic region in which
+every vertex charges a vertex of the region grows to consensus through possible rounds.
+If $H_{vv}>0$ for one vertex $v$, the region $\{v\}$ qualifies, so nonconsensus probability
+tends to zero, bipartite graphs included.
+\end{lemma}
+\begin{proof}\leanok
+As in Lemma~2.1: a boundary vertex copies its neighbour in the region, vertices of the region
+copy inside it, and all other vertices copy any vertex of positive weight. Possible rounds
+have positive probability, and the finite-chain absorption theorem applies.
+\end{proof}
+\begin{theorem}[Remark, p.~254]\label{thm:selfloop}
+\lean{Voter.eventualColor_eq_whiteMass_of_tendsto,Voter.consensus_probability_of_selfLoop,Voter.color_consensus_probability_of_selfLoop}\leanok\uses{lem:kernel-propagation,lem:22,thm:colors}
+On a connected graph, bipartite or not, if $H$ charges every edge and $H_{vv}>0$ for some
+vertex $v$, then consensus in colour $c$ has probability $\sum_{i:s(i)=c}\pi_i$ for every
+stationary $\pi$.
+\end{theorem}
+\begin{proof}\leanok
+Lemma~2.2 only needs nonconsensus probability to vanish; then project colours as in
+Section~2.3.
+\end{proof}
+\begin{theorem}[Lazy voter]\label{thm:lazy}
+\lean{Voter.lazy,Voter.lazyNeighbor,Voter.lazy_weight,Voter.lazyNeighbor_weight,Voter.lazy_stationary_iff,Voter.lazy_selfLoop_pos,Voter.lazy_weight_pos,Voter.lazy_consensus_probability,Voter.lazyNeighbor_consensus_probability}\leanok\uses{thm:selfloop,cor:22}
+The lazy kernel $(I+H)/2$ has the stationary distributions of $H$ and positive self-loops.
+On any connected graph the lazy voter $(I+D^{-1}A)/2$ reaches consensus in colour $c$ with
+probability $\sum_{i:s(i)=c} d_i/2m$.
+\end{theorem}
+\begin{proof}\leanok
+Apply the Remark to $(I+H)/2$; for uniform neighbour sampling use the degree distribution.
+\end{proof}
+\begin{theorem}[Neutral Wright--Fisher fixation]\label{thm:wright-fisher}
+\lean{Voter.wfKernel_pos,Voter.wfKernel_stationary,Voter.uniform_prob_eq_card,Voter.top_not_colorable_two,Voter.wrightFisher_fixation_of_three_le,Voter.wrightFisher_fixation}\leanok\uses{thm:colors,thm:selfloop,def:backward}
+If every offspring picks a uniform parent, itself included, allele $a$ fixes with probability
+$c_a/n$, where $c_a$ is its initial number of copies.
+\end{theorem}
+\begin{proof}\leanok
+The uniform distribution is stationary and every entry is positive. For $n\ge 3$ the
+complete graph is nonbipartite and Section~2.3 applies; for every $n$ the Remark applies.
+\end{proof}
+
 \section{Section 2.4 on connected graphs: meeting time and $O(n^3\log n)$ consensus}
 \begin{definition}[Two-token walk, lazy sampling]\label{def:pairwalk}
-\lean{Voter.pairWalk,Voter.lazyNeighbor,Voter.leftRounds}\leanok\uses{def:backward}
+\lean{Voter.pairWalk,Voter.leftRounds}\leanok\uses{def:backward,thm:lazy}
 For a sampling kernel $H$, two tokens move with the rounds of the voter dynamics: the
 token at $x$ moves to $r(x)$, where $r$ is drawn from the independent product of the rows
 of $H$. Off the diagonal the tokens make independent $H$-steps; on the diagonal they move
