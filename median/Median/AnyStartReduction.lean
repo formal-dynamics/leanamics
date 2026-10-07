@@ -25,9 +25,9 @@ lemma notConsensus_run_le_sum [NeZero n] (x : Config n α) {m : α} (hm : ∀ v,
     notConsensus (run x l)
       ≤ ∑ b ∈ (univ.image x).erase m, notConsensus (run (fun v => decide (b ≤ x v)) l) := by
   by_cases hc : Consensus (run x l)
-  · rw [notConsensus_cons' hc]
-    exact sum_nonneg fun b _ => notConsensus_nonneg' _
-  rw [notConsensus_noncons' hc]
+  · rw [notConsensus_cons hc]
+    exact sum_nonneg fun b _ => notConsensus_nonneg _
+  rw [notConsensus_noncons hc]
   -- two nodes `u, v` with `run x l u < run x l v`
   obtain ⟨u, v, hlt⟩ : ∃ u v, run x l u < run x l v := by
     by_contra h
@@ -47,10 +47,10 @@ lemma notConsensus_run_le_sum [NeZero n] (x : Config n α) {m : α} (hm : ∀ v,
     rw [decide_eq_true le_rfl] at hv
     exact Bool.false_ne_true (hu.trans hv.symm)
   calc (1 : ℝ) = notConsensus (run (fun w => decide (run x l v ≤ x w)) l) :=
-        (notConsensus_noncons' hnc).symm
+        (notConsensus_noncons hnc).symm
     _ ≤ ∑ b ∈ (univ.image x).erase m, notConsensus (run (fun w => decide (b ≤ x w)) l) :=
         single_le_sum (f := fun b => notConsensus (run (fun w => decide (b ≤ x w)) l))
-          (fun b _ => notConsensus_nonneg' _) hb
+          (fun b _ => notConsensus_nonneg _) hb
 
 /-- A configuration takes at most `n` distinct values. -/
 lemma card_image_sub_one_le (x : Config n α) : ((univ.image x).card : ℝ) - 1 ≤ n := by

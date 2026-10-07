@@ -24,10 +24,10 @@ variable {n : ℕ}
 lemma notConsensus_le_one_sub_ite (z : Config n Bool) :
     notConsensus z ≤ 1 - if z = (fun _ => true) then (1 : ℝ) else 0 := by
   split_ifs with h
-  · rw [notConsensus_cons' ⟨true, fun v => by rw [h]⟩]
+  · rw [notConsensus_cons ⟨true, fun v => by rw [h]⟩]
     norm_num
   · rw [sub_zero]
-    exact notConsensus_le_one' _
+    exact notConsensus_le_one _
 
 /-- The flipped configuration fails to reach consensus exactly when the configuration does. -/
 lemma expList_notConsensus_run_flip (T : ℕ) (y : Config n Bool) :
@@ -103,7 +103,7 @@ theorem finish_bound (hL : (128 : ℝ) ≤ Real.log n) (y : Config n Bool) :
       ≤ 128 / n + if |gapR y| < 128 * √((n : ℝ) * Real.log n) then (1 : ℝ) else 0 := by
   split_ifs with h
   · calc expList (Round n) ⌈128 * Real.log n⌉₊ (fun l => notConsensus (run y l)) ≤ 1 :=
-          (expList_le_expList fun l => notConsensus_le_one' _).trans_eq (expList_const _ _)
+          (expList_le_expList fun l => notConsensus_le_one _).trans_eq (expList_const _ _)
       _ ≤ 128 / n + 1 := le_add_of_nonneg_left (by positivity)
   rw [add_zero]
   push Not at h

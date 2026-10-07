@@ -58,8 +58,8 @@ lemma consensus_flip_iff {y : Config n Bool} : Consensus (fun v => !y v) ↔ Con
 /-- Flipping every opinion preserves `notConsensus`. -/
 lemma notConsensus_flip (y : Config n Bool) : notConsensus (fun v => !y v) = notConsensus y := by
   by_cases h : Consensus y
-  · rw [notConsensus_cons' h, notConsensus_cons' (consensus_flip_iff.mpr h)]
-  · rw [notConsensus_noncons' h, notConsensus_noncons' (mt consensus_flip_iff.mp h)]
+  · rw [notConsensus_cons h, notConsensus_cons (consensus_flip_iff.mpr h)]
+  · rw [notConsensus_noncons h, notConsensus_noncons (mt consensus_flip_iff.mp h)]
 
 /-! ### The gap after one round -/
 

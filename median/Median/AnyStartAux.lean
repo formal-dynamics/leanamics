@@ -5,8 +5,7 @@ import Median.Binary
 
 Auxiliary material for `Median/AnyStart.lean`:
 
-* `notConsensus` takes only the values `0` and `1`, and is `0` exactly on consensus
-  configurations (the corresponding lemmas of `Median/Basic.lean` are private);
+* `notConsensus` lies in `[0, 1]` (from `notConsensus_cases` of `Median/Basic.lean`);
 * values never leave the set of initial values (`run_mem`);
 * consensus absorbs along a list of rounds (`run_consensus`), so the probability of
   *not* being in consensus is non-increasing in time (`expList_run_anti`,
@@ -28,33 +27,14 @@ variable {n : ℕ} {α : Type*} [LinearOrder α]
 /-! ### The `notConsensus` indicator -/
 
 omit [LinearOrder α] in
-/-- A configuration in consensus has `notConsensus = 0`. -/
-lemma notConsensus_cons' {y : Config n α} (h : Consensus y) : notConsensus y = 0 := by
-  unfold notConsensus
-  rw [if_pos h]
-
-omit [LinearOrder α] in
-/-- A configuration not in consensus has `notConsensus = 1`. -/
-lemma notConsensus_noncons' {y : Config n α} (h : ¬ Consensus y) : notConsensus y = 1 := by
-  unfold notConsensus
-  rw [if_neg h]
-
-omit [LinearOrder α] in
-/-- `notConsensus` takes only the values `0` and `1`. -/
-lemma notConsensus_cases' (y : Config n α) : notConsensus y = 0 ∨ notConsensus y = 1 := by
-  by_cases h : Consensus y
-  · exact Or.inl (notConsensus_cons' h)
-  · exact Or.inr (notConsensus_noncons' h)
-
-omit [LinearOrder α] in
 /-- `notConsensus` is nonnegative. -/
-lemma notConsensus_nonneg' (y : Config n α) : 0 ≤ notConsensus y := by
-  rcases notConsensus_cases' y with h | h <;> simp [h]
+lemma notConsensus_nonneg (y : Config n α) : 0 ≤ notConsensus y := by
+  rcases notConsensus_cases y with h | h <;> simp [h]
 
 omit [LinearOrder α] in
 /-- `notConsensus` is at most `1`. -/
-lemma notConsensus_le_one' (y : Config n α) : notConsensus y ≤ 1 := by
-  rcases notConsensus_cases' y with h | h <;> simp [h]
+lemma notConsensus_le_one (y : Config n α) : notConsensus y ≤ 1 := by
+  rcases notConsensus_cases y with h | h <;> simp [h]
 
 /-! ### Values stay in the initial set -/
 
@@ -99,8 +79,8 @@ lemma notConsensus_run_append_le (x : Config n α) (l₁ l₂ : List (Round n)) 
   rw [run_append]
   by_cases h : Consensus (run x l₁)
   · rw [run_consensus _ h l₂]
-  · rw [notConsensus_noncons' h]
-    exact notConsensus_le_one' _
+  · rw [notConsensus_noncons h]
+    exact notConsensus_le_one _
 
 /-- The failure probability is non-increasing in the number of rounds. -/
 lemma expList_run_anti [NeZero n] (x : Config n α) (T₁ T₂ : ℕ) :
@@ -129,9 +109,9 @@ lemma notConsensus_run_append_mul (y : Config n α) (l₁ l₂ : List (Round n))
       ≤ notConsensus (run y l₁) * notConsensus (run (run y l₁) l₂) := by
   rw [run_append]
   by_cases h : Consensus (run y l₁)
-  · rw [run_consensus _ h l₂, notConsensus_cons' h]
+  · rw [run_consensus _ h l₂, notConsensus_cons h]
     simp
-  · rw [notConsensus_noncons' h, one_mul]
+  · rw [notConsensus_noncons h, one_mul]
 
 /-- **Amplification.** A per-configuration failure bound `p` at `T` rounds implies a
 bound `p ^ k` at `k * T` rounds: three blocks amplify a `C/n` bound to `≤ (C/n)³`,
@@ -142,13 +122,13 @@ lemma expList_amplify [NeZero n] {T : ℕ} {p : ℝ}
     expList (Round n) (k * T) (fun l => notConsensus (run y l)) ≤ p ^ k := by
   -- `hbin` forces `0 ≤ p`, since the left-hand side is nonnegative
   have hp : 0 ≤ p :=
-    le_trans (expList_nonneg fun l => notConsensus_nonneg' _) (hbin (fun _ => false))
+    le_trans (expList_nonneg fun l => notConsensus_nonneg _) (hbin (fun _ => false))
   induction k with
   | zero =>
       rw [Nat.zero_mul, expList_zero]
       show notConsensus (run y []) ≤ p ^ 0
       rw [pow_zero]
-      exact notConsensus_le_one' _
+      exact notConsensus_le_one _
   | succ k ih =>
       have hsplit : (k + 1) * T = k * T + T := by ring
       rw [hsplit, expList_append, pow_succ]
@@ -165,7 +145,7 @@ lemma expList_amplify [NeZero n] {T : ℕ} {p : ℝ}
                 * expList (Round n) T (fun l₂ => notConsensus (run (run y l₁) l₂)) :=
               expList_const_mul _ _ _
           _ ≤ notConsensus (run y l₁) * p :=
-              mul_le_mul_of_nonneg_left (hbin _) (notConsensus_nonneg' _)
+              mul_le_mul_of_nonneg_left (hbin _) (notConsensus_nonneg _)
           _ = p * notConsensus (run y l₁) := mul_comm _ _
       calc expList (Round n) (k * T)
             (fun l₁ => expList (Round n) T (fun l₂ => notConsensus (run y (l₁ ++ l₂))))
