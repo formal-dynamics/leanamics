@@ -7,3 +7,11 @@ import RumorSpread.Growth
 import RumorSpread.Saturation
 import RumorSpread.Main
 import RumorSpread.Equivalence
+import RumorSpread.PullModel
+import RumorSpread.PullOneRound
+import RumorSpread.PullMain
+import RumorSpread.PullFoldl
+import RumorSpread.PullIndep
+import RumorSpread.PullPhases
+import RumorSpread.PullGood
+import RumorSpread.PullPushPull
