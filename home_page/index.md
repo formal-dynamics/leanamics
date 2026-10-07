@@ -146,6 +146,14 @@ population protocol that draws such a pair, conditioned on the pair reacting, is
 chain, as kernels on count vectors (`Crn.jumpKernel_eq_ppKernel`). The worked
 instance is the approximate-majority network (`Crn.ApproxMajority.network_jumpKernel_eq_ppKernel`).
 
+Population protocols with input and output stably compute every threshold predicate (an
+integer linear combination of the input counts is below $c$) and every remainder predicate (it is
+congruent to $c$ modulo $m$), and the stably computable predicates are closed under Boolean operations
+(`Crn.IsSemilinearPred.stablyComputable`, the easy direction of Angluin, Aspnes, Diamadi, Fischer
+and Peralta, 2006). Since every protocol is a count-conserving bimolecular network, every Boolean
+combination of threshold and remainder predicates is stably decided by such a network
+(`Crn.IsSemilinearPred.exists_network`).
+
 * [Blueprint]({{ '/crn/blueprint/' | relative_url }}) · [as pdf]({{ '/crn/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/crn/blueprint/dep_graph_document.html' | relative_url }})
 * [API docs]({{ '/crn/docs/' | relative_url }})
