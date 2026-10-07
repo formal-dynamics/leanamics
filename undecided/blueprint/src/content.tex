@@ -107,3 +107,59 @@ exchanging the opinions. With $a\ge(1+\alpha)b$ and $q=0$ the bias is at least $
 which exceeds $C\sqrt{n\log n}$ once $\log n\ge C(1+3(2+\alpha)/\alpha)$; extra rounds do not hurt
 since the all-$a$ configuration is absorbing.
 \end{proof}
+
+\section{Many colours: plurality consensus (UND-3)}
+Becchetti, Clementi, Natale, Pasquale and Silvestri (\emph{Plurality consensus in the gossip
+model}, SODA 2015) analyse the undecided-state dynamics with $k$ colours: a state is a colour or
+the undecided state (Table~1), and with $c_i$ nodes of colour $i$ and $q$ undecided nodes one
+round gives in expectation $\mu_i=c_i(c_i+2q)/n$ nodes of colour $i$ and
+$\mu_q=(q^2+(n-q)^2-\sum_i c_i^2)/n$ undecided nodes (their (3)--(4)). The monochromatic distance
+is $\mathrm{md}(c)=\sum_i(c_i/c_1)^2\in[1,k]$, $c_1$ the plurality. For $k=2$ the dynamics is the
+binary one.
+
+\begin{theorem}[Model]\label{thm:pmodel}
+\lean{Undecided.Plurality.update,Undecided.Plurality.step,Undecided.Plurality.md,Undecided.Plurality.expected_count_some,Undecided.Plurality.expected_count_none,Undecided.Plurality.md_le_card,Undecided.Plurality.one_le_md,Undecided.Plurality.foldl_two}\leanok
+Equations (3)--(4) hold, $1\le\mathrm{md}(c)\le k$, and the two-colour dynamics is the binary
+dynamics under undecided $\mapsto u$, colour $0\mapsto a$, colour $1\mapsto b$.
+\end{theorem}
+\begin{proof}\leanok
+Linearity over the nodes, as in the binary case; the binary update is checked on the nine pairs
+of states.
+\end{proof}
+
+\begin{lemma}[Good rounds]\label{lem:pgood}
+\lean{Undecided.Plurality.tail_up,Undecided.Plurality.tail_down,Undecided.Plurality.bad_le,Undecided.Plurality.thr_step,Undecided.Plurality.inv_step,Undecided.Plurality.phi_step,Undecided.Plurality.fpsi_step,Undecided.Plurality.first_step}\leanok\uses{thm:pmodel}
+Let $\ell=3\log n$ and call a round good if every count is within
+$\sqrt{3\ell(\mu+2\ell)}$ of its mean $\mu$ (Bernstein); a round is bad with probability at most
+$(k+4)/n^3$. Let $\theta=1/(1+\alpha)$, $\kappa=1-\theta$, $B=2\,\mathrm{md}(x_0)$, $S$ the nodes
+of colours other than $m$, $c=c_m$, $\Phi=\mu_m$. If $n\ge 2\cdot10^{12}K^2k^3\log n$ with
+$K=(1+\alpha)^2/\alpha$, a good round keeps the invariant
+$c_i+12\sqrt{\ell c}\le\theta c$ ($i\ne m$), $S+12B\sqrt{\ell c}\le Bc$, multiplies $\Phi$ by
+$1+\kappa/(8000B)$ unless $4S+q\le n/10$, and keeps $\{4S+q\le n/10\}$; the first round from
+$q=0$, $(1+\alpha)c_i\le c_m$ enters the invariant with $\Phi\ge n/(2k^2)$.
+\end{lemma}
+\begin{proof}\leanok
+For the ratios: if $X\le tc/2$ one round cannot double it; if fewer than $n/20$ nodes are
+decided, $c$ grows by $16/9$, which absorbs the slack; otherwise $c\ge n/(20(1+B))$ and the
+deterministic drift $X\mu_m-\mu_Xc\ge\frac t2\kappa c^3/n$ beats the deviations, which needs
+$c^3\gtrsim n^2\log n$, i.e.\ $k\lesssim(n/\log n)^{1/3}$. For $\Phi$:
+$\mu_m+2\mu_q=n+(n-c-2q)^2/n+2W/n$ with $W=\sum_{j\ne m}c_j(c-c_j)\ge\kappa cS$ (the plurality
+drift, Lemma~1 of the paper). In the first round $q=0$, so the ratios square and
+$\mu_S=(\mathrm{md}-1)\mu_m$.
+\end{proof}
+
+\begin{theorem}[Plurality consensus]\label{thm:plurality}
+\lean{Undecided.Plurality.main_stage,Undecided.Plurality.fin_stage,Undecided.Plurality.plurality_explicit,Undecided.Plurality.plurality_whp}\leanok\uses{lem:pgood}
+Let $\alpha>0$ and $C=10^5((1+\alpha)^2/\alpha)^2$. For every $n$ with $\log n\ge C$, every $k$
+with $Ck\le(n/\log n)^{1/3}$ and every configuration without undecided nodes in which colour $m$
+has at least $1+\alpha$ times as many nodes as every other colour, all nodes hold $m$ after
+$\lceil C\,\mathrm{md}(x)\log n\rceil$ rounds with probability at least $1-6/n$ (SODA 2015,
+Theorem~11, with the range of $k$ discussed in \texttt{PROGRESS-UND3.md}).
+\end{theorem}
+\begin{proof}\leanok
+One round into the invariant, then $T_2=\lceil\log(4k^2)/\log(1+\kappa/(8000B))\rceil\le
+96000K\,\mathrm{md}\log n+1$ rounds with moving targets $\Phi\ge\frac n{2k^2}(1+\kappa/(8000B))^t$
+or $4S+q\le n/10$, which end in $\{4S+q\le n/10\}$ since $\Phi\le n$; then
+$T_3=\lceil 8\log n\rceil$ rounds in which $4S+q$ contracts by $3/4$ in expectation. The failure
+probability is at most $T(k+4)/n^3+(3/4)^{T_3}n/10\le 6/n$.
+\end{proof}

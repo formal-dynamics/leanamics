@@ -9,3 +9,10 @@ import Undecided
 #print axioms Undecided.majority_whp
 #print axioms Undecided.majority_whp_abs
 #print axioms Undecided.majority_whp_of_ratio
+#print axioms Undecided.Plurality.expected_count_some
+#print axioms Undecided.Plurality.expected_count_none
+#print axioms Undecided.Plurality.md_le_card
+#print axioms Undecided.Plurality.one_le_md
+#print axioms Undecided.Plurality.foldl_two
+#print axioms Undecided.Plurality.plurality_explicit
+#print axioms Undecided.Plurality.plurality_whp
