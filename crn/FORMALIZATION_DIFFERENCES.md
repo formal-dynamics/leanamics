@@ -48,3 +48,63 @@ majority.
 8. **Conditioning lives in `crn/`.** `Crn.normalize` and `Crn.condition` (and the lemmas of
    `Crn/DistLemmas.lean`) are general operations on `Dynamics.Distribution` and are candidates to
    move to `dynamics/`.
+
+## Semilinear predicates are stably computable (`Stable*`, CRN-3, easy direction)
+
+Sources: Angluin, Aspnes, Diamadi, Fischer and Peralta, *Computation in networks of passively
+mobile finite-state sensors*, Distributed Computing 18 (2006) [AADFP06], §3 (model) and §4
+(Lemma 3 and Corollary 2: Boolean closure; Lemma 5: threshold and remainder predicates;
+Theorem 5: Presburger-definable predicates); Angluin, Aspnes, Eisenstat and Ruppert (2007)
+[AAER07] for the reachability form of stable computation; Chen, Doty and Soloveichik,
+*Deterministic function computation with chemical reaction networks*, Natural Computing 13 (2014)
+[CDS14], §§2.1–2.2, for chemical reaction deciders, with the "every species votes" convention of
+Angluin, Aspnes and Eisenstat (PODC 2006) [AAE06].
+
+1. **Stable computation in reachability form**, not with fair executions [AADFP06, §3.2]: every
+   configuration reachable from the initial one can reach an output-stable configuration with the
+   right output (the form of [AAER07] and [CDS14, §2.2]). For finite populations the two are
+   equivalent (by AADFP06 Lemma 1, the configurations occurring infinitely often in a fair
+   execution form a final strongly connected component); this equivalence is not formalized.
+2. **Populations of every size `n ≥ 1`, and an error in AADFP06 Lemma 5 for `n = 1`.** AADFP06 do
+   not state a lower bound on the population size, but the protocols of their Lemma 5 start every
+   agent with output bit `0` (input map `σᵢ ↦ (1, 0, aᵢ)`). With a single agent no encounter ever
+   happens, so the output stays `0` even when the predicate holds (for example `a = (1)`, `c = 3`,
+   one agent: `1 < 3` holds but the output is `0`); the protocols are correct for `n ≥ 2`. The
+   theorems here are existential in the protocol, so this is harmless: the protocols used here
+   start an agent with input `i` with output bit equal to the single-agent value (`[aᵢ < c]`,
+   resp. `[aᵢ ≡ c (mod m)]`). The empty population `n = 0` is excluded, as usual (no agent, no
+   output).
+3. **Scope.** Predicates only (output alphabet `Bool`, all-agents predicate output convention),
+   standard populations (complete interaction graph on `Fin n`), symbol-count input convention.
+   Not covered: general interaction graphs, input-output relations and functions, other output
+   conventions (AADFP06 Theorem 2), the integer-based input convention (Corollary 3).
+4. **Threshold direction.** AADFP06 Lemma 5(1) is `∑ aᵢ xᵢ < c` (`stablyComputable_threshold`,
+   and the atom of `IsSemilinearPred`); the form `∑ aᵢ xᵢ ≥ c` is its negation, stated separately
+   as `stablyComputable_le_sum`.
+5. **Remainder modulus `0 < m`** instead of AADFP06's `m ≥ 2` (a slight strengthening: `m = 1`
+   gives the constant `true`), the natural hypothesis for `Int.ModEq`.
+6. **Theorem 5 for an inductive class.** AADFP06 Theorem 5 concerns Presburger-definable
+   predicates; its proof reduces them, by Presburger's quantifier elimination (their Theorem 4,
+   cited without proof), to Boolean combinations of threshold, equality and remainder predicates.
+   Here `IsSemilinearPred` is defined as the Boolean combinations of threshold and remainder
+   predicates (equalities are conjunctions of two thresholds, as in the paper's proof). That this
+   class equals the semilinear (Presburger-definable) predicates is not proved; instead,
+   `IsSemilinearPred.isSemilinearSet` proves the inclusion into Mathlib's `IsSemilinearSet`
+   (Mathlib proves `presburger.definable_iff_isSemilinearSet`), which shows that the class is
+   not too large. The converse inclusion is Presburger's quantifier elimination.
+7. **Agent-level configurations** (`Fin n → Q`, as AADFP06's `C : A → Q` and the configurations of
+   CRN-1), not multisets. Count vectors enter through `counts`, in the predicate and in the
+   transfer, where `Protocol.exists_network` shows that the induced dynamics on count vectors is
+   that of a CRN.
+8. **Transfer hypothesis.** CRN-1's networks are nonempty and have no reaction whose products
+   equal its reactants, so `Protocol.exists_network` assumes a transition that changes the
+   multiset of states of the two agents (otherwise the counts never change and there is no such
+   network). It holds for every protocol (stable computation plays no role), with the reaction set
+   characterized exactly. `StablyComputable.exists_network` provides such a transition by tagging
+   the input states, which also makes the input map injective.
+9. **Stable decision by CRNs.** `Network.StablyComputes` is the chemical reaction decider of
+   [CDS14, §2.2] with every species voting (the convention of [AAE06]), no initial context
+   (leaderless) and input species given by an injective map `X ↪ S`; the zero input is excluded
+   (with no molecule the output is undefined in [CDS14]).
+10. **Sanity check of the definition.** `Protocol.StablyComputes.unique` shows that stable
+    computation determines the predicate on nonzero inputs, so the definition is not vacuous.
