@@ -8,7 +8,7 @@ The protocol of [AADFP06, proof of Lemma 5(1)] for `∑ᵢ aᵢ xᵢ < c`, as a 
 starts with value `aᵢ`. A leader encounter gives the initiator the clamped sum
 `q(u, u') = max(-s, min(s, u + u'))` and the responder the rest `r(u, u') = u + u' - q(u, u')`,
 and the output test is `t(u) = [u < c]`. Unlike AADFP06 (output bit `0`), an input starts with
-output bit `t(aᵢ)`, which is needed for a single agent (Deviation 2 of `PROGRESS-CRN3.md`).
+output bit `t(aᵢ)`, which is needed for a single agent (see `FORMALIZATION_DIFFERENCES.md`).
 
 Correctness (`stablyComputes`): the sum of the values is `∑ᵢ aᵢ xᵢ`; merge the leaders, then let
 the leader absorb the non-leaders' values while this decreases `∑ |u|` over non-leaders. Then

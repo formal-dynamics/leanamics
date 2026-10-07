@@ -18,7 +18,7 @@ represents the count vector `counts ι` of input symbols (the symbol-count input
 initial configuration of a nonempty population, every reachable configuration can reach an
 output-stable configuration in which all agents output `φ` of the input counts. AADFP06 phrase
 this with fair executions; for finite populations both forms are equivalent, and this
-combinatorial form is the one of [AAER07] (see the Deviations in `PROGRESS-CRN3.md`).
+combinatorial form is the one of [AAER07] (see `FORMALIZATION_DIFFERENCES.md`).
 
 ## References
 

@@ -6,7 +6,7 @@ import Crn.StableLeader
 The protocol of [AADFP06, proof of Lemma 5(2)] for `∑ᵢ aᵢ xᵢ ≡ c (mod m)`, as a leader protocol
 (`Leader.protocol`) with values in `ZMod m` (AADFP06 store `(u + u') mod m` in an integer field;
 the residues are the same). Input `i` starts with value `aᵢ mod m` and output bit
-`[aᵢ ≡ c]` (needed for a single agent, Deviation 2 of `PROGRESS-CRN3.md`); a leader encounter
+`[aᵢ ≡ c]` (needed for a single agent, see `FORMALIZATION_DIFFERENCES.md`); a leader encounter
 gives the initiator the sum of the two values and the responder `0`, and the output test is
 `t(u) = [u = c]`.
 

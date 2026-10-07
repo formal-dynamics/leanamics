@@ -8,8 +8,8 @@ state is a triple (leader bit, output bit, value `u ∈ V`). An encounter in whi
 agent is a leader makes the initiator the leader with value `q(u, u')` and the responder a
 non-leader with value `r(u, u')`, and sets both output bits to `t(q(u, u'))`; an encounter of
 two non-leaders changes nothing. Inputs start as leaders with output bit `t(u)` (this
-initialisation makes the protocols correct also for a single agent, see Deviation 2 in
-`PROGRESS-CRN3.md`).
+initialisation makes the protocols correct also for a single agent, see
+`FORMALIZATION_DIFFERENCES.md`).
 
 Generic facts proved here:
 * invariants closed under steps: leaders output `t` of their value (`LeadOut`), a leader exists
