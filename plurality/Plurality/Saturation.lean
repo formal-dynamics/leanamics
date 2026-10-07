@@ -82,7 +82,8 @@ theorem lemma_3_6 (hn : 1 ≤ n) (x : Config n k) {m : Fin k} (hm : m ∈ argmax
     single_le_sum (f := fun h => (count x h : ℝ) ^ 2) (fun _ _ => sq_nonneg _) (mem_univ m)
   have hcm0 : (0 : ℝ) ≤ count x m := Nat.cast_nonneg _
   -- `n cₘ - ∑ cₕ² ≥ (n - cₘ) s`, i.e. `γ(c) ≥ 0`
-  have hkey : ((n : ℝ) - count x m) * bias (count x) ≤ n * count x m - ∑ h, (count x h : ℝ) ^ 2 := by
+  have hkey : ((n : ℝ) - count x m) * bias (count x)
+      ≤ n * count x m - ∑ h, (count x h : ℝ) ^ 2 := by
     have := mul_le_mul_of_nonneg_right (sub_nonneg.mpr hγ) (sq_nonneg (n : ℝ))
     rw [zero_mul] at this
     have e : (((n : ℝ) * count x m - ∑ h, (count x h : ℝ) ^ 2) / (n : ℝ) ^ 2
