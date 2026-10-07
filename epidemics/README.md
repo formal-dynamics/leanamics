@@ -46,16 +46,14 @@ with the Chernoff bounds of `dynamics/` ([`Epidemics/GiantProb.lean`](Epidemics/
 parametric versions of both theorems (`core_path`, `core_component`,
 [`Epidemics/Giant.lean`](Epidemics/Giant.lean)); the epidemic reading
 ([`Epidemics/GiantEpidemic.lean`](Epidemics/GiantEpidemic.lean)). Deviations from the paper are
-listed in [`PROGRESS-EPI3.md`](PROGRESS-EPI3.md).
+listed in [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 
 **Provenance (EPI-1).** The statements were written and pinned by hand; the proofs were produced by a Grok
 agent under a fixed-statement protocol and verified mechanically (statements unchanged, no
 placeholders, warning-free build, axiom audit).
 
-**Provenance (EPI-3).** The statements were pinned before any proof was written and then kept
-fixed by a mechanical gate (statement text unchanged, no placeholders, warning-free build, axiom
-audit); statements and proofs were produced by Claude (Anthropic) and verified mechanically; the
-statements were reviewed by hand against the paper.
+**Provenance (EPI-3).** The statements were pinned and then proved by a Claude agent under the
+same protocol and checks; the statements were reviewed by hand against the source.
 
 Build and audit:
 
