@@ -1,15 +1,19 @@
-<!-- The growth-regime section below is a copy of the root PROGRESS.md (left unchanged), so that this file holds the whole EPI-8 record. -->
+# PROGRESS: EPI-8, randomized rumor spreading revisited (Doerr–Kostrygin)
 
-# EPI-8 Growth.lean progress
+Source: B. Doerr, A. Kostrygin, *Randomized rumor spreading revisited*, ICALP 2017; long version arXiv:2303.11150. Two parts: the
+growth regime (Lemma 9, Lemma 19, Theorem 21), then Lemma 20, the exponential shrinking regime
+(Theorem 31) and the total spreading time.
+
+## Part 1: growth regime (Lemma 9, Lemma 19, Theorem 21)
 
 Paper: Doerr–Kostrygin, arXiv:2303.11150, Lemma 9, Lemma 19, Theorem 21 (Appendix B.2).
 
-## Status
+### Status
 
 Done. `lake build Epidemics.Revisited.Growth` succeeds with no warnings and no `sorry`.
 `#print axioms` on the five theorems shows only `propext`, `Classical.choice`, `Quot.sound`.
 
-## Theorems
+### Theorems
 
 All five statements in `epidemics/Epidemics/Revisited/Growth.lean` are unchanged. Each proof is `exact` of a helper:
 
@@ -21,7 +25,7 @@ All five statements in `epidemics/Epidemics/Revisited/Growth.lean` are unchanged
 | `growth_upper_tail` | Theorem 21, tail | `growth_upper_tail_proof` in `GrowthUpper.lean` |
 | `growth_upper_expect` | Theorem 21, expectation | `growth_upper_expect_proof` in `GrowthUpper.lean` |
 
-## Files
+### Files
 
 | File | Lines | Role |
 | --- | --- | --- |
@@ -34,7 +38,7 @@ All five statements in `epidemics/Epidemics/Revisited/Growth.lean` are unchanged
 
 `Defs.lean` is unchanged. `dynamics/` is unchanged.
 
-## Proof sketch (Theorem 21)
+### Proof sketch (Theorem 21)
 
 `f` is shrunk only inside the phase construction, to `f' = min(f/2, 1/(8(a+1)))`. On `[1, f' n]` the round target `E0(k) = E(k) - A k^{3/4}` is positive and increasing for a small explicit `A` depending on `γlo, b`. Phases are `k_0 = 1`, `k_{j+1} = k_j + E0(k_j)`, up to `J = ⌊log_{1+γ}(f' n)⌋`, so `k_J ≤ f' n` and `k_J / n` is bounded below by a positive constant depending only on `γlo, γhi, a, b, f`.
 
@@ -44,7 +48,7 @@ The remaining `r - r/2` rounds cross `[k_J, f n)` by Lemma 19, at a positive rat
 
 The expectation sums `notYet ≤ 1` over the first `⌈log_{1+γ} n⌉` terms and a geometric series after that. `N` is `growthN a b f` (large enough for the logarithm and slack inequalities). It does not depend on `γ`.
 
-## Deviations from the paper
+### Deviations from the paper
 
 - Lemma 19 does not use a dummy process. The potential is `g S = n - |S|` while `ℓ ≤ |S| < m`, and `0` once `|S| ≥ m`.
 - The phase crossing does not use stochastic domination by sums of geometric random variables (Lemmas 10, 11, 25). It is an induction on `Kernel.iterate` with the phase potential `G`.
@@ -54,27 +58,24 @@ The expectation sums `notYet ≤ 1` over the first `⌈log_{1+γ} n⌉` terms an
 - Time is split in half: `r/2` rounds for the phase potential and `r - r/2` rounds for Lemma 19. Both exponential rates are therefore halved, and the constant `A` in the tail absorbs the resulting `√x` and the Lemma 19 ratio `1/(1-f)`.
 - Constants are explicit and depend only on `γlo, γhi, a, b, c, f`. `N` may be enormous.
 
-## Current errors
+### Current errors
 
 None.
 
----
-
-# EPI-8 continued: Lemma 20, exponential shrinking regime (Theorem 31), total spreading time
+## Part 2: Lemma 20, exponential shrinking regime (Theorem 31), total spreading time
 
 Paper: Doerr–Kostrygin, arXiv:2303.11150: Lemma 20 (= Lemma 5 of the overview), Definition 11
 (= Definition 4, upper), Theorem 31 (= Theorem 2, upper bounds, Appendix B.4), and the composition
 of the regimes used for concrete protocols (Section 3.4, Appendix C, e.g. Theorem 51).
 
-## Status (2026-10-06)
+### Status (2026-10-06)
 
 Done. All six pinned theorems are proved; `lake build Epidemics` succeeds with no warnings and no
 `sorry`. `#print axioms` (also in `Audit.lean`) shows only `propext`, `Classical.choice`,
 `Quot.sound` for all six. The pinned statements (up to `:=`) and `ShrinkingDefs.lean` are
-unchanged since phase 1; only proofs and `import` lines were added. The old spec gate
-(`scripts/agent-runs/epi8/check_spec.py`) still reports `SPEC OK`.
+unchanged since they were pinned; only proofs and `import` lines were added.
 
-## Pinned
+### Pinned
 
 | Declaration | File | Paper | Content |
 | --- | --- | --- | --- |
@@ -88,14 +89,14 @@ unchanged since phase 1; only proofs and `import` lines were added. The old spec
 | `spreading_upper_tail` | `Shrinking.lean` | Thm 21 + Lemma 19 + Thm 31 | `notYet n (⌈log_{1+γ} n⌉ + ⌈ln n / ρ⌉ + r) S ≤ A e^{-α r}` |
 | `spreading_upper_expect` | `Shrinking.lean` | Thm 21 + Lemma 19 + Thm 31 | `∑_{t<R} notYet n t S ≤ log_{1+γ} n + ln n / ρ + B` |
 
-`ShrinkingDefs.lean` contains only the three definitions, so a gate may freeze the whole file
+`ShrinkingDefs.lean` contains only the three definitions, so the whole file is frozen
 (a definition's meaning is in its body, after `:=`). `Shrinking.lean` imports `Growth` (for the
 assembly); `Lemma20.lean` imports only `ShrinkingDefs`. All three files are imported by
-`Epidemics.lean`. `Defs.lean`, `Growth*.lean`, `dynamics/` and the root `PROGRESS.md` are unchanged.
-Sanity checks run in a scratch file (not in the repository) confirmed `jumpProb … 0 S = 0`,
+`Epidemics.lean`. `Defs.lean`, `Growth*.lean` and `dynamics/` are unchanged.
+Sanity checks (not kept in the repository) confirmed `jumpProb … 0 S = 0`,
 `jumpProb lo hi 1 S = P_S[|S| < lo ∧ hi ≤ |S₁|]`, and the two-round unfolding over `[S, S₁, S₂]`.
 
-## Proved
+### Proved
 
 | Theorem | Paper | Proof |
 | --- | --- | --- |
@@ -110,15 +111,15 @@ Hypotheses that are kept for fidelity but not needed (`hf0, hf1, hf'1` in `overs
 in `jumpProb_le`, `hg1 : g < 1` in the four `Shrinking.lean` theorems) are silenced by
 `have _ := h`.
 
-## Remaining
+### Remaining
 
 Nothing.
 
-## Current errors
+### Current errors
 
 None.
 
-## Files (this section)
+### Files (this section)
 
 | File | Lines | Role |
 | --- | --- | --- |
@@ -133,7 +134,7 @@ None.
 
 `Epidemics.lean` imports all of them; `Audit.lean` prints the axioms of the six theorems.
 
-## Proof of Theorem 31 (differs from the paper's route)
+### Proof of Theorem 31 (differs from the paper's route)
 
 The paper uses a target sequence `u_{j+1} = E0(u_j)`, Chebyshev per phase and domination by
 geometric variables (Lemmas 32-37). Here a single quadratic potential suffices:
@@ -157,7 +158,7 @@ The total-time theorems chain the pinned `growth_upper_tail` (its prefactor repl
 `max A 0`), the middle stage (Lemma 19, prefactor `(1-f)/g`) and Theorem 31 with two
 `tail_compose` steps.
 
-## Reusable pieces
+### Reusable pieces
 
 - `notYet_add_le`, `tail_compose`, `sum_notYet_le_of_tail` (`ShrinkingAux`): compose any
   sequence of regimes given exponential tails, and turn tails into expectation bounds.
@@ -167,7 +168,7 @@ The total-time theorems chain the pinned `growth_upper_tail` (its prefactor repl
 - `expect_deficit_le`, `expect_deficit_sq_le`: first and second moments of the number of
   uninformed nodes after one round, reusable for the double-exponential regime (Theorem 43).
 
-## Deviations from the paper
+### Deviations from the paper
 
 - **Lemma 20 is false as stated; two true versions are pinned.** The proof bounds one round:
   from `k < f n`, `P[k + X(k) ≥ f' n] = O(1/n)`. It then concludes that the whole process jumps
@@ -178,7 +179,7 @@ The total-time theorems chain the pinned `growth_upper_tail` (its prefactor repl
   the process started from one node jumps from `1` to `n` with probability 1. (The same process
   with `ε_k = c k / n²` satisfies the lower exponential growth conditions, so the last sentence of
   Theorem 1, which rests on Lemma 20, is also unproved in general. That sentence is a lower-bound
-  statement, outside this job.) Pinned instead: `overshoot_round`, the one-round estimate of the
+  statement, outside the scope of this formalization.) Pinned instead: `overshoot_round`, the one-round estimate of the
   proof, for every `f' ∈ ]f + p(1-f), 1[`; and `jumpProb_le`, the path statement with the union
   bound over rounds, `P[jump within t rounds] ≤ C/n · E[number of those rounds started below f n]`,
   that is, `O(E[T(|S|, f n)] / n)`.
