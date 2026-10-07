@@ -12,6 +12,11 @@ $s'=-\beta si$, $i'=\beta si-\gamma i$, $r'=\gamma i$ on $[0,\infty)$ with $r(0)
 theorem ($i$ initially increases iff $R_0s(0)>1$, with $R_0=\beta/\gamma$), the epidemic peak, and
 the final-size equation $s_\infty=s(0)e^{-R_0(1-s_\infty)}$, following Hethcote (SIAM Review
 2000, Theorem~2.1). This part uses Mathlib's real analysis.
+
+We also formalize the upper bounds of Doerr and Kostrygin's analysis of general rumor-spreading
+processes (\emph{Randomized rumor spreading revisited}, ICALP 2017): the exponential growth and
+shrinking regimes and the total spreading time $\log_{1+\gamma}n+\frac1\rho\ln n+O(1)$, with
+exponential tails. Lemma~20 of that paper is false as stated; we prove corrected versions.
 \end{abstract}
 
 \section{The model}
@@ -178,4 +183,101 @@ six one-sided maximal deviations stay below $\delta=\varepsilon/(2L)$, the discr
 inequality gives the bound with $L=e^{(2\beta+\gamma)T}$, once $\varepsilon N\ge2LT(2\beta+\gamma)$;
 Lemma~\ref{lem:azuma} bounds the complement by $6e^{-c\varepsilon^2N}$. Small $N$ and
 $\varepsilon\ge2$ are absorbed in $C$.
+\end{proof}
+
+\section{Randomized rumor spreading revisited}
+We follow Doerr and Kostrygin, \emph{Randomized rumor spreading revisited} (ICALP 2017; long
+version arXiv:2303.11150), with the numbering of the long version.
+
+\begin{definition}[Rumor-spreading processes]\label{def:rumor-process}
+\lean{Epidemics.Revisited.RumorProcess,Epidemics.Revisited.RumorProcess.informProb,Epidemics.Revisited.RumorProcess.cov,Epidemics.Revisited.RumorProcess.Homogeneous,Epidemics.Revisited.RumorProcess.notYet}\leanok
+A rumor-spreading process on $n$ nodes is a Markov kernel on the set $S$ of informed nodes under
+which informed nodes stay informed. For a round started from $S$, $\mathrm{informProb}(S,x)$ is
+the probability that $x$ is informed after the round and $\mathrm{cov}(S,x,y)$ the covariance of
+the events that $x$ and $y$ are. The tail of the spreading time is
+$\mathrm{notYet}(m,t,S)=\Pr[\text{fewer than }m\text{ nodes informed after }t\text{ rounds from
+}S]=\Pr[T(|S|,m)>t]$; expected times are bounded through all partial sums of
+$\sum_t\Pr[T>t]$. Homogeneity (Definition~6) is defined but not assumed.
+\end{definition}
+
+\begin{definition}[Upper growth and shrinking conditions]\label{def:rumor-conditions}
+\lean{Epidemics.Revisited.RumorProcess.UpperGrowth,Epidemics.Revisited.RumorProcess.UpperShrinking}\leanok\uses{def:rumor-process}
+Upper exponential growth (Definition~9): for $1\le|S|=k<fn$, every uninformed node is informed
+with probability at least $\gamma\frac kn(1-a\frac kn-\frac b{\ln n})$ and covariances are at
+most $ck/n^2$. Upper exponential shrinking (Definition~11): when $u=n-|S|\le gn$, every
+uninformed node stays uninformed with probability at most $e^{-\rho}+au/n$ and covariances are
+at most $c/u$.
+\end{definition}
+
+\begin{lemma}[Lemma 9]\label{lem:rumor-variance}
+\lean{Epidemics.Revisited.variance_card_le}\leanok\uses{def:rumor-process}
+If distinct uninformed nodes have covariance at most $c$, the number of informed nodes after one
+round has variance at most its expected increase plus $c(n-|S|)^2$.
+\end{lemma}
+\begin{proof}\leanok
+Expand the variance of a sum of indicators.
+\end{proof}
+
+\begin{lemma}[Lemma 19]\label{lem:rumor-connect}
+\lean{Epidemics.Revisited.connect_tail,Epidemics.Revisited.connect_expect}\leanok\uses{def:rumor-process}
+If every uninformed node is informed with probability at least $p$ in every round started with
+$\ell\le|S|<m$ informed nodes, then $\Pr[T(\ell,m)>r]\le\frac{n-\ell}{n-m}(1-p)^r$ and
+$E[T(\ell,m)]\le\frac{n-\ell}{n-m}\cdot\frac1p$.
+\end{lemma}
+\begin{proof}\leanok
+The potential $n-|S|$ (set to $0$ once $|S|\ge m$) contracts by $1-p$ in expectation.
+\end{proof}
+
+\begin{theorem}[Theorem 21: exponential growth]\label{thm:rumor-growth}
+\lean{Epidemics.Revisited.growth_upper_tail,Epidemics.Revisited.growth_upper_expect}\leanok\uses{def:rumor-conditions,lem:rumor-variance,lem:rumor-connect}
+Under the upper exponential growth conditions, with $\gamma$ between two positive constants and
+$af<1$, from any nonempty $S$: $\Pr[T(|S|,fn)>\lceil\log_{1+\gamma}n\rceil+r]\le Ae^{-\alpha r}$ and
+$E[T(|S|,fn)]\le\log_{1+\gamma}n+B$, with constants depending only on the parameters.
+\end{theorem}
+\begin{proof}\leanok
+Phases $k_{j+1}=k_j+E_0(k_j)$ with a round target $E_0(k)=E(k)-Ak^{3/4}$; Cantelli's inequality
+(Lemma~\ref{lem:rumor-variance}) bounds the probability of missing a target, and a phase potential
+on the iterated kernel replaces the paper's domination by geometric variables. Lemma~\ref{lem:rumor-connect}
+crosses the last stretch up to $fn$.
+\end{proof}
+
+\begin{lemma}[Lemma 20, corrected]\label{lem:rumor-jump}
+\lean{Epidemics.Revisited.JumpsOver,Epidemics.Revisited.RumorProcess.jumpProb,Epidemics.Revisited.overshoot_round,Epidemics.Revisited.jumpProb_le}\leanok\uses{lem:rumor-variance}
+If every round started with $1\le|S|<fn$ has $p_k\le p$ and covariances at most $c/n$, then
+(one round) for every $f'\in\,]f+p(1-f),1[$, a round from $|S|<fn$ ends with at least $f'n$
+informed nodes with probability at most $C/n$; and (path form) there is $f'\in\,]f,1[$ such that
+the probability of jumping over $[fn,f'n[$ within $t$ rounds is at most $\frac Cn$ times the
+expected number of these rounds started below $fn$, i.e.\ $O(E[T(|S|,fn)]/n)$.
+\end{lemma}
+\begin{proof}\leanok
+Chebyshev's inequality with Lemma~\ref{lem:rumor-variance} for one round, then a union bound over
+the rounds along the trajectory.
+\end{proof}
+The paper's Lemma~20 claims probability $1-O(1/n)$ of landing in $[fn,f'n]$; this is false: the
+process that from every $|S|<fn$ informs all nodes with probability $c/n$ (and otherwise none)
+satisfies the hypotheses and jumps from $1$ to $n$ with probability one. See
+\texttt{FORMALIZATION\_DIFFERENCES.md}.
+
+\begin{theorem}[Theorem 31: exponential shrinking]\label{thm:rumor-shrinking}
+\lean{Epidemics.Revisited.shrinking_upper_tail,Epidemics.Revisited.shrinking_upper_expect}\leanok\uses{def:rumor-conditions,lem:rumor-variance,lem:rumor-connect}
+Under the upper exponential shrinking conditions, with $\rho$ between two positive constants and
+$e^{-\rho_{lo}}+ag<1$, from any $S$ with $n-|S|\le gn$:
+$\Pr[T(|S|,n)>\lceil\ln n/\rho\rceil+r]\le Ae^{-\alpha r}$ and $E[T(|S|,n)]\le\ln n/\rho+B$.
+\end{theorem}
+\begin{proof}\leanok
+Lemma~\ref{lem:rumor-connect} first brings the number $u$ of uninformed nodes below $g_0n$; then
+the potential $\Phi=u+\frac\beta nu^2$ satisfies $E[\Phi']\le e^{-\rho}(1+K/n)\Phi$
+(Lemma~\ref{lem:rumor-variance} for the second moment), which replaces the paper's phase calculus.
+\end{proof}
+
+\begin{theorem}[Total spreading time]\label{thm:rumor-total}
+\lean{Epidemics.Revisited.spreading_upper_tail,Epidemics.Revisited.spreading_upper_expect}\leanok\uses{thm:rumor-growth,thm:rumor-shrinking,lem:rumor-connect}
+Under the growth conditions on $[1,fn[$, the shrinking conditions below $gn$ uninformed nodes and
+a probability at least $p>0$ of being informed in between, from any nonempty $S$:
+$\Pr[T>\lceil\log_{1+\gamma}n\rceil+\lceil\ln n/\rho\rceil+r]\le Ae^{-\alpha r}$ and
+$E[T]\le\log_{1+\gamma}n+\ln n/\rho+B$.
+\end{theorem}
+\begin{proof}\leanok
+Compose the three exponential tails (Theorem~\ref{thm:rumor-growth}, Lemma~\ref{lem:rumor-connect},
+Theorem~\ref{thm:rumor-shrinking}) by the Markov property at fixed times, and sum the tail.
 \end{proof}

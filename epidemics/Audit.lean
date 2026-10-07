@@ -32,3 +32,14 @@ import Epidemics
 #print axioms Epidemics.Kurtz.iterate_chain
 #print axioms Epidemics.Kurtz.law_of_large_numbers
 #print axioms Epidemics.Kurtz.tendsto_deviationProb
+#print axioms Epidemics.Revisited.variance_card_le
+#print axioms Epidemics.Revisited.connect_tail
+#print axioms Epidemics.Revisited.connect_expect
+#print axioms Epidemics.Revisited.growth_upper_tail
+#print axioms Epidemics.Revisited.growth_upper_expect
+#print axioms Epidemics.Revisited.overshoot_round
+#print axioms Epidemics.Revisited.jumpProb_le
+#print axioms Epidemics.Revisited.shrinking_upper_tail
+#print axioms Epidemics.Revisited.shrinking_upper_expect
+#print axioms Epidemics.Revisited.spreading_upper_tail
+#print axioms Epidemics.Revisited.spreading_upper_expect
