@@ -3,7 +3,10 @@ We formalize the averaging dynamics on a finite graph, in which every node repla
 the average of its neighbours' values: the degree-weighted sum is conserved, the values stay in
 the initial range, and on a connected graph with an odd closed walk all values converge to the
 degree-weighted average of the initial values; on a connected bipartite graph they need not
-converge.
+converge. The distance to the limit decays like $\lambda^t$, with $\lambda$ the second largest
+absolute eigenvalue of the random walk (Lovász); in the random sequential version, where one random
+edge averages its endpoints, the expected state evolves by the matrix $I-L/2m$. On a
+well-clustered regular graph started from random signs, the sign of the last change recovers the two clusters exactly (Becchetti, Clementi, Natale, Pasquale, Trevisan, SODA 2017).
 \end{abstract}
 
 \section{The dynamics}
@@ -44,4 +47,135 @@ On a connected bipartite graph with at least two nodes, the values $\pm1$ of a p
 \end{theorem}
 \begin{proof}\leanok
 All neighbours of a node have the other colour.
+\end{proof}
+
+\section{Rate of convergence}
+\begin{definition}[Random walk and its spectrum]\label{def:walk}
+\lean{Averaging.walkMatrix,Averaging.normAdjMatrix,Averaging.normAdjMatrix_isHermitian,Averaging.walkLambda,Averaging.walkStationary}\leanok\uses{def:avg}
+$P=D^{-1}A$ is the transition matrix of the random walk, $N=D^{-1/2}AD^{-1/2}$ its symmetric
+version with eigenvalues $\lambda_1\ge\lambda_2\ge\dots\ge\lambda_n$,
+$\lambda=\max\{|\lambda_2|,|\lambda_n|\}$ ($0$ if $n<2$), and $\pi(v)=\deg(v)/2m$ with $m$ the
+number of edges.
+\end{definition}
+\begin{lemma}[Matrix form of the dynamics]\label{lem:walk-bridges}
+\lean{Averaging.walkMatrix_pow_apply,Averaging.avgIter_eq_walkMatrix_pow_mulVec,Averaging.charpoly_walkMatrix}\leanok\uses{def:walk,lem:walks}
+$P^t(u,v)=W_t(u,v)$ is the probability that the walk from $u$ is at $v$ after $t$ steps, and
+$x_t=P^tx_0$. If every degree is positive, $P$ and $N$ have the same characteristic polynomial,
+so $\lambda$ is computed from the spectrum of $P$.
+\end{lemma}
+\begin{proof}\leanok
+Induction on $t$; $P=SNS^{-1}$ with $S=D^{-1/2}$.
+\end{proof}
+\begin{theorem}[Lovász's bound, Survey Theorem 33]\label{thm:lovasz}
+\lean{Averaging.abs_walkMatrix_pow_sub_walkStationary_le}\leanok\uses{def:walk,lem:walk-bridges}
+If every degree is positive, $|P^t(u,v)-\pi(v)|\le\sqrt{\deg(v)/\deg(u)}\,\lambda^t$ for all
+nodes $u,v$ and all $t$.
+\end{theorem}
+\begin{proof}\leanok
+$P^t(u,v)=\sqrt{\deg(v)/\deg(u)}\,N^t(u,v)$ and $\pi(v)=\sqrt{\deg(v)/\deg(u)}\,s(u)s(v)$ with
+$s=\sqrt\pi$ a unit eigenvector of $N$ for the eigenvalue $1$. At most one eigenvalue of $N$
+exceeds $\lambda$ in absolute value, and then it is $1$ with eigenvector $s$; so $N$ contracts
+$s^\perp$ by $\lambda$, and $N^t(u,v)-s(u)s(v)=\langle Qe_u,N^tQe_v\rangle$ with $Q=I-ss^\top$
+is at most $\lambda^t$ by Cauchy--Schwarz.
+\end{proof}
+\begin{lemma}[Non-bipartite graphs]\label{lem:lambda-lt-one}
+\lean{Averaging.walkLambda_lt_one}\leanok\uses{def:walk,lem:walk-bridges,thm:conv}
+On a connected graph with an odd closed walk, $\lambda<1$.
+\end{lemma}
+\begin{proof}\leanok
+An eigenvalue $\mu$ of $N$ with $|\mu|=1$ gives a vector $y$ with $x_t=\mu^ty$ for the
+dynamics started at $y$; by Theorem~\ref{thm:conv} $\mu=-1$ is impossible and $\mu=1$ forces $y$
+constant, so $1$ is a simple eigenvalue and all others have absolute value below $1$.
+\end{proof}
+\begin{corollary}[Rate of the averaging dynamics]\label{cor:avg-rate}
+\lean{Averaging.abs_avgIter_sub_walkStationary_le}\leanok\uses{thm:lovasz}
+If every degree is positive,
+$|x_t(u)-\sum_v\pi(v)x_0(v)|\le\lambda^t\sum_v\sqrt{\deg(v)/\deg(u)}\,|x_0(v)|$.
+\end{corollary}
+\begin{proof}\leanok
+$x_t(u)-\sum_v\pi(v)x_0(v)=\sum_v(P^t(u,v)-\pi(v))x_0(v)$ and Theorem~\ref{thm:lovasz}.
+\end{proof}
+
+\section{Sequential averaging}
+\begin{definition}[Edge step]\label{def:edge-matrix}
+\lean{Averaging.Sequential.edgeMatrix,Averaging.Sequential.kernelMatrix,Averaging.Sequential.gossipMeanMatrix,Averaging.Sequential.seqRun,Averaging.Sequential.meanMatrix}\leanok
+A step on the edge $(i,j)$ multiplies the state by $W_{ij}=I-\frac12(e_i-e_j)(e_i-e_j)^\top$;
+a run applies the steps of a list of oriented edges in order. For a stochastic matrix $P$
+(given as a kernel), $\bar W_P=I-\bar D/2n+(P+P^\top)/2n$ with
+$\bar D_{ii}=\sum_j(P_{ij}+P_{ji})$, and $\bar W=I-L/2m$ with $L$ the Laplacian.
+\end{definition}
+\begin{lemma}[Properties of an edge step]\label{lem:edge-matrix}
+\lean{Averaging.Sequential.edgeMatrix_mulVec,Averaging.Sequential.edgeMatrix_mem_doublyStochastic,Averaging.Sequential.transpose_edgeMatrix_mul_self}\leanok\uses{def:edge-matrix}
+$W_{ij}x$ replaces $x_i$ and $x_j$ by their average and keeps the other values; $W_{ij}$ is
+doubly stochastic and a symmetric projection, $W_{ij}^\top W_{ij}=W_{ij}$.
+\end{lemma}
+\begin{proof}\leanok
+Direct computation; $(e_i-e_j)^\top(e_i-e_j)=2$ for $i\ne j$.
+\end{proof}
+\begin{theorem}[Expected step, Survey equations (4) and (5)]\label{thm:mean-step}
+\lean{Averaging.Sequential.avg_expect_edgeMatrix,Averaging.Sequential.gossipMeanMatrix_of_isRegular,Averaging.Sequential.avg_edgeMatrix,Averaging.Sequential.meanMatrix_of_isRegular}\leanok\uses{lem:edge-matrix,def:walk}
+If a uniformly random node $i$ contacts $j$ with probability $P_{ij}$, then
+$\mathbb E[W_{ij}]=\bar W_P$; if a uniformly random oriented edge is selected, then
+$\mathbb E[W_{ij}]=\bar W$. On a $d$-regular graph with $d>0$ and $P=D^{-1}A$ both equal
+$(1-1/n)I+P/n$.
+\end{theorem}
+\begin{proof}\leanok
+Entrywise expansion of $W_{ij}(a,b)=\delta_{ab}-\frac12(\delta_{ia}-\delta_{ja})(\delta_{ib}-\delta_{jb})$;
+there are $\deg(a)$ darts out of $a$ and $2m=nd$ darts in all.
+\end{proof}
+\begin{theorem}[First and second moments]\label{thm:moments}
+\lean{Averaging.Sequential.avg_transpose_edgeMatrix_mul_self,Averaging.Sequential.avg_sum_sq_edgeMatrix_mulVec,Averaging.Sequential.expList_seqRun}\leanok\uses{thm:mean-step}
+For a uniformly random oriented edge, $\mathbb E[W^\top W]=\bar W$ and
+$\mathbb E\|Wx\|^2=x^\top\bar Wx$; after $t$ independent uniformly random oriented edges,
+$\mathbb E[x_t]=\bar W^tx_0$.
+\end{theorem}
+\begin{proof}\leanok
+$W^\top W=W$; for the first moment, induction on $t$ and linearity of expectation.
+\end{proof}
+
+\section{Strong reconstruction}
+\begin{definition}[Clustered regular graph]\label{def:clustered}
+\lean{Averaging.IsBalancedPartition,Averaging.IsClusteredRegular,Averaging.clusterIndicator,Averaging.transitionMatrix,Averaging.maxAbsOtherEigenvalue,Averaging.color,Averaging.IsStrongReconstruction,Averaging.reconstructionTime}\leanok\uses{def:avg}
+$G$ is $d$-regular on two clusters $V_1,V_2$ of $n$ nodes, each node having $b$ neighbours in the
+other cluster; $\chi=\mathbb 1_{V_1}-\mathbb 1_{V_2}$, $P=A/d$ with eigenvalues
+$\lambda_1\ge\lambda_2\ge\dots$, $\lambda=\max_{i\ge3}|\lambda_i|$. Node $v$ is blue at round $t$
+if $x_t(v)\ge x_{t-1}(v)$; a coloring is a strong reconstruction if no color appears in both
+clusters. $T(n,\delta)=\lceil\log(4n^3)/\log(1+\delta)\rceil+1$.
+\end{definition}
+\begin{lemma}[Lemma C.1]\label{lem:c1}
+\lean{Averaging.avgIter_eq_transitionMatrix_pow_mulVec,Averaging.transitionMatrix_mulVec_clusterIndicator,Averaging.abs_avgIter_sub_le}\leanok\uses{def:clustered}
+If $\lambda<1-2b/d$ and $x\in\{\pm1\}^{2n}$, then
+$|x_t(v)-\alpha_1-\alpha_2(1-2b/d)^t\chi(v)|\le\lambda^t\sqrt{2n}$ with
+$\alpha_1=\langle x,\mathbb 1\rangle/2n$, $\alpha_2=\langle x,\chi\rangle/2n$.
+\end{lemma}
+\begin{proof}\leanok
+$\mathbb 1$ and $\chi$ are eigenvectors with eigenvalues $1$ and $1-2b/d$, both above $\lambda$;
+at most two eigenvalues exceed $\lambda$ in absolute value, so by equality in Bessel's inequality
+their eigenvectors lie in $\operatorname{span}\{\mathbb 1,\chi\}$, and $P$ contracts the
+orthogonal complement of this plane by $\lambda$.
+\end{proof}
+\begin{theorem}[Deterministic core]\label{thm:core}
+\lean{Averaging.sign_avgIter_sub_eq,Averaging.exists_sign_avgIter_sub_clusters,Averaging.isStrongReconstruction_color,Averaging.reconstructionTime_le}\leanok\uses{lem:c1}
+On a connected clustered graph with $1-2b/d>(1+\delta)\lambda$, if $x\in\{\pm1\}^{2n}$ and
+$\langle x,\chi\rangle\ne0$, then for $t\ge T(n,\delta)=O(\log n/\delta)$,
+$\operatorname{sgn}(x_{t-1}(u)-x_t(u))=\operatorname{sgn}(\langle x,\chi\rangle\chi(u))$.
+\end{theorem}
+\begin{proof}\leanok
+$|\langle x,\chi\rangle|\ge2$ by parity, $b\ge1$ by connectivity, $d<2n$, and
+$(1+\delta)^{t-1}\ge4n^3$, so the main term of Lemma~\ref{lem:c1} dominates the errors.
+\end{proof}
+\begin{lemma}[Lemma B.1, exact form]\label{lem:b1}
+\lean{Averaging.prob_dotProduct_clusterIndicator_eq_zero,Averaging.choose_div_four_pow_le}\leanok\uses{def:clustered}
+For uniform $x\in\{\pm1\}^{2n}$, $P(\langle x,\chi\rangle=0)=\binom{2n}{n}/4^n\le1/\sqrt{\pi n}$.
+\end{lemma}
+\begin{proof}\leanok
+$x\mapsto\{v: x(v)=\chi(v)\}$ maps the zeros bijectively to the $n$-subsets; Wallis' product.
+\end{proof}
+\begin{theorem}[Strong reconstruction, Theorem 3.2]\label{thm:strong}
+\lean{Averaging.strong_reconstruction}\leanok\uses{thm:core,lem:b1}
+With probability at least $1-1/\sqrt{\pi n}$, the coloring is a strong reconstruction at every
+round $t\ge T(n,\delta)$.
+\end{theorem}
+\begin{proof}\leanok
+Theorem~\ref{thm:core} and Lemma~\ref{lem:b1}.
 \end{proof}

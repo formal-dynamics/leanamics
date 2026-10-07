@@ -1,1 +1,5 @@
 import Epidemics.ReedFrost
+import Epidemics.KermackMcKendrickDefs
+import Epidemics.KermackMcKendrick
+import Epidemics.KermackMcKendrickLimits
+import Epidemics.KermackMcKendrickPeak
