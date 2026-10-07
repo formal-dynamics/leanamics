@@ -23,6 +23,24 @@ omit [DecidableEq V] in
   exact if_pos ⟨c, rfl⟩
 
 omit [DecidableEq V] in
+/-- Nonconsensus indicates the configurations that are neither all-white nor all-black. -/
+lemma survival_eq (s : Config V Bool) :
+    survival s = if ¬ s = (fun _ => true) ∧ ¬ s = (fun _ => false) then 1 else 0 := by
+  classical
+  by_cases h : ∃ c, s = fun _ => c
+  · obtain ⟨c, rfl⟩ := h
+    rw [survival_constant]
+    cases c <;> simp
+  · rw [survival, if_neg h, if_pos ⟨fun h' => h ⟨true, h'⟩, fun h' => h ⟨false, h'⟩⟩]
+
+/-- Finite-time nonconsensus as an event. -/
+lemma iterate_survival (K : Kernel (Config V Bool)) (n : ℕ) (s : Config V Bool) :
+    K.iterate n survival s =
+      K.event (fun t => ¬ t = (fun _ => true) ∧ ¬ t = (fun _ => false)) n s := by
+  rw [K.event_eq_iterate]
+  exact congrFun (congrArg (K.iterate n) (funext survival_eq)) s
+
+omit [DecidableEq V] in
 lemma survival_nonneg (s : Config V Bool) : 0 ≤ survival s := by
   rcases survival_binary s with h | h <;> simp [h]
 

@@ -46,7 +46,8 @@ randomness is uniform over finite types. The one deliberate difference is
 that a Chernoff bound *is* needed here, and so is proved from scratch:
 
 - **Probability** ([Prob.lean](ThreeMajority/Prob.lean), aliases of the shared
-  [`Dynamics.Uniform`](../dynamics/Dynamics/Uniform.lean)): `avg` is a sum
+  [`Dynamics.Uniform`](../dynamics/Dynamics/Uniform.lean); `ThreeMajority.avg` is a
+  reducible alias of `Dynamics.avg`): `avg` is a sum
   divided by a cardinality; `expList α T F` — the expectation of a
   trajectory functional over `T` i.i.d. uniform rounds — is defined by
   recursion on `T`, which makes conditioning on a round a definitional
