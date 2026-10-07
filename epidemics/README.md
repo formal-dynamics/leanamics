@@ -1,4 +1,4 @@
-# Epidemics: Reed–Frost and bond percolation; the Kermack–McKendrick SIR model; rumor spreading revisited
+# Epidemics: Reed–Frost and bond percolation; the Kermack–McKendrick SIR model; Kurtz's law of large numbers; rumor spreading revisited
 
 A Lean formalization of the pathwise correspondence between the Reed–Frost (Independent Cascade)
 epidemic and bond percolation (after Kempe, Kleinberg and Tardos, KDD 2003; see also Becchetti et
@@ -52,6 +52,34 @@ Where the statements deviate from their sources (special constant-rate case, sol
 hypothesis, fixed initial data, the precise form of the limits and of the uniqueness statements),
 see [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 
+## Kurtz's law of large numbers for SIR, in discrete time (CRN-2)
+
+The stochastic SIR epidemic on `N` agents (`S + I → 2I` at rate `β S I / N`, `I → R` at rate
+`γ I`), uniformized at rate `(β + γ) N`: each step draws an ordered pair of agents with replacement
+and one of `β + γ` equally likely clocks (`β` infection clocks, `γ` recovery clocks, so
+`β, γ ∈ ℕ`); an infected `u` infects a susceptible `v`, or an infected `u` recovers. Step `k` is
+compared with the Kermack–McKendrick solution at time `k / ((β + γ) N)`, in the sup distance on
+`ℝ³`. Namespace `Epidemics.Kurtz`; files `Epidemics/Kurtz*.lean`.
+
+| Result | Lean declaration |
+| --- | --- |
+| Drift identity: expected one-step change of `(S, I, R)/N` is `sirField β γ / ((β + γ) N)` | `drift_susceptible`, `drift_infected`, `drift_recovered` |
+| Bounded increments: one step moves `(S, I, R)/N` by at most `1/N` | `dist_scaled_step_le` |
+| The kernel `Kernel.ofStep` iterates as `expList` over i.i.d. rounds | `iterate_chain` |
+| Maximal Azuma–Hoeffding: `P(∃ k ≤ n, M_k ≥ λ) ≤ exp(-λ²/(2 n c²))` | `expList_azuma` |
+| LLN with exponential bound: `P(∃ k ≤ T(β+γ)N, dist > L·dist(initial points) + ε) ≤ C exp(-c ε² N)` | `law_of_large_numbers` |
+| Convergence in probability, uniformly on `[0, T]`, to a fixed solution | `tendsto_deviationProb` |
+
+The constants `C, c, L` depend only on `β, γ, T` (in the proof, `L = exp((2β + γ) T)` and
+`c = 1 / (32 L² T (β + γ))`). The proof: the drift identity makes each coordinate of
+`X_k - X_0 - h ∑_{j<k} F(X_j)` a martingale with increments at most `2/N`; Ville's maximal
+inequality for the exponential supermartingale gives the maximal Azuma bound; on the good event,
+the invariance of the simplex under the ODE, the Lipschitz bound of the field, the Euler error
+`O(h²)` and Mathlib's `discrete_gronwall` keep the chain close to the solution. Deviations from
+the sources (discrete time, natural-number rates, sampling with replacement, time scale, initial
+condition, the integral-curve hypothesis) are listed in
+[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
+
 ## Randomized rumor spreading revisited (EPI-8)
 
 Doerr and Kostrygin, *Randomized rumor spreading revisited*, ICALP 2017 (long version
@@ -84,7 +112,9 @@ quadratic potential instead of the paper's phase calculus.
 produced by a Grok agent under a fixed-statement protocol and verified mechanically (statements
 unchanged, no placeholders, warning-free build, axiom audit). Kermack–McKendrick: the statements
 were pinned and then proved by a Claude agent under the same protocol and checks; the statements
-were reviewed by hand against the source. Rumor spreading revisited (EPI-8): the statements were
+were reviewed by hand against the source. Kurtz (CRN-2): the statements were pinned and then
+proved by a Claude agent under the same protocol and checks; the statements were reviewed by hand
+against the source (Wormald's Theorem 5.1). Rumor spreading revisited (EPI-8): the statements were
 pinned and then proved under the same protocol and checks, the growth regime (Lemma 9, Lemma 19,
 Theorem 21) by a Grok agent and the rest (Lemma 20, Theorem 31, total time) by a Claude agent.
 
