@@ -1,5 +1,7 @@
 import Dynamics.Absorption
 import Dynamics.Concentration
+import Dynamics.Drift
+import Dynamics.GraphRounds
 import Dynamics.Phases
 import Dynamics.Rounds
 import Dynamics.Stationary

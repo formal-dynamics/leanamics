@@ -11,3 +11,11 @@ import Dynamics
 #print axioms Dynamics.avg_bernstein
 #print axioms Dynamics.Kernel.nested_phases
 #print axioms Dynamics.expList_escape
+#print axioms Dynamics.Kernel.drift_absorption_seq
+#print axioms Dynamics.Kernel.drift_absorption
+#print axioms Dynamics.Kernel.multiplicative_drift_seq
+#print axioms Dynamics.Kernel.multiplicative_drift
+#print axioms Dynamics.avg_neighborRound_prod
+#print axioms Dynamics.avg_vertex_neighborRound
+#print axioms Dynamics.avg_edgeRound
+#print axioms Dynamics.avg_edgeRound_edge

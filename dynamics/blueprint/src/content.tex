@@ -133,3 +133,67 @@ Track the indicator of lying outside a set. In $\ell$ steps the chain leaves
 $A_i$ with probability at most $\ell\varepsilon$, and misses $A_{i+1}$ in all
 $\ell$ steps with probability at most $\nu^\ell$. Sum over the $T$ phases.
 \end{proof}
+\section{Drift and graph rounds}
+\begin{definition}[Time-dependent chain]\label{def:iterateseq}
+\lean{Dynamics.Kernel.iterateSeq,Dynamics.Kernel.iterateSeq_const}\leanok\uses{def:kernel}
+A family of kernels $(K_t)_{t\ge0}$ moves the chain from time $t$ to time
+$t+1$ with $K_t$; $\mathrm{iterateSeq}(K,n,f)(a)$ is the expectation of $f$ at
+time $n$ from $a$. A constant family gives the iterates of a single kernel.
+\end{definition}
+\begin{proof}\leanok
+Induction on $n$.
+\end{proof}
+\begin{theorem}[Drift lemma; Berenbrink et al., ICALP 2016, Lemma 2.2]\label{thm:drift}
+\lean{Dynamics.Kernel.drift_absorption_seq,Dynamics.Kernel.drift_absorption}\leanok
+\uses{def:iterateseq}
+Let $\Psi\ge0$, and for $t<T$ let $c_t\ge0$,
+$\E[\Psi(X_{t+1})\mid X_t=x]\le\Psi(x)-c_t/\Psi(x)$ when $\Psi(x)>0$, and
+$\E[\Psi(X_{t+1})\mid X_t=x]=0$ when $\Psi(x)=0$. If
+$\sum_{t<T}c_t\ge4\Psi(x_0)^2$, then $\Pr_{x_0}(\Psi(X_T)=0)\ge1/2$.
+\end{theorem}
+\begin{proof}\leanok
+Let $q=\Pr(\Psi(X_T)>0)$; survival is nonincreasing, so it is at least $q$
+before $T$. With $\lambda=q/\Psi(x_0)$, the bound $1/y\ge2\lambda-\lambda^2y$
+linearizes the drift: $\E\Psi(X_{t+1})\le(1+c_t\lambda^2)\E\Psi(X_t)
+-2c_t\lambda\Pr(\Psi(X_t)>0)\le\E\Psi(X_t)-c_t\lambda q$. (The paper uses
+Jensen's inequality here; this is its optimal-$\lambda$ form.) Summing,
+$0<m q\le\E\Psi(X_T)\le\Psi(x_0)(1-4q^2)$ if $q>0$, where $m>0$ is the least
+positive value of $\Psi$; hence $q\le1/2$.
+\end{proof}
+\begin{theorem}[Multiplicative drift; the argument of Lemma 2.4 there]\label{thm:multdrift}
+\lean{Dynamics.Kernel.multiplicative_drift_seq,Dynamics.Kernel.multiplicative_drift}\leanok
+\uses{def:iterateseq}
+Let $\Psi\ge0$ with every positive value at least $\Psi_{\min}>0$, and
+$\E[\Psi(X_{t+1})\mid X_t=x]\le(1-\delta_t)\Psi(x)$ for all $x$ and $t<T$.
+Then $\Pr_{x_0}(\Psi(X_T)>0)\le\prod_{t<T}(1-\delta_t)\,\Psi(x_0)/\Psi_{\min}$.
+\end{theorem}
+\begin{proof}\leanok
+By induction $\E\Psi(X_T)\le\prod_{t<T}(1-\delta_t)\Psi(x_0)$ (the factors are
+nonnegative unless $\Psi\equiv0$); then Markov's inequality
+$\mathbf 1_{\Psi>0}\le\Psi/\Psi_{\min}$.
+\end{proof}
+\begin{lemma}[Synchronous neighbour rounds]\label{lem:neighborround}
+\lean{Dynamics.NeighborRound,Dynamics.avg_neighborSet,Dynamics.neighborRound_nonempty,Dynamics.card_neighborRound,Dynamics.avg_neighborRound_prod,Dynamics.avg_neighborRound_eval,Dynamics.avg_neighborRound_mul,Dynamics.avg_neighborRound_sum,Dynamics.avg_vertex_neighborRound}\leanok
+\uses{def:avg}
+In a round $r\in\prod_vN(v)$ every vertex picks a neighbour. Under the uniform
+distribution the picks are independent and uniform:
+$\E\prod_vf_v(r_v)=\prod_v\E_{u\in N(v)}f_v(u)$, and, without isolated
+vertices, $\E g(r_v)=\E_{u\in N(v)}g(u)$. A uniform vertex $v$ with a uniform
+round gives the sequential step ``uniform vertex, uniform neighbour $r_v$''.
+\end{lemma}
+\begin{proof}\leanok
+$\sum_r\prod_vf_v(r_v)=\prod_v\sum_{u\in N(v)}f_v(u)$ and
+$|\prod_vN(v)|=\prod_v\deg v$; the marginals take $f_w=1$ for $w\ne v$.
+\end{proof}
+\begin{lemma}[Uniform oriented edge]\label{lem:edgeround}
+\lean{Dynamics.EdgeRound,Dynamics.edgeRound_nonempty,Dynamics.avg_edgeRound,Dynamics.avg_edgeRound_symm,Dynamics.avg_edgeRound_edge,Dynamics.avg_edgeRound_fst}\leanok
+\uses{def:avg}
+For a uniform dart $d$ of $G$,
+$\E F(d_1,d_2)=\sum_v\sum_{u\in N(v)}F(v,u)/(2|E|)$; reversing $d$ preserves
+the law, its underlying edge is a uniform edge, and its tail is $v$ with
+probability $\deg v/(2|E|)$.
+\end{lemma}
+\begin{proof}\leanok
+Group the darts by tail (the darts with tail $v$ are the neighbours of $v$)
+or by edge (each edge carries two darts).
+\end{proof}
