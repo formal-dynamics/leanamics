@@ -140,7 +140,8 @@ The following portions of the paper were not formalized:
 * **In Lean**:
   - $G$ is modeled as a Mathlib `SimpleGraph V`, which is irreflexive by definition ($\neg G.\text{Adj } i\ i$).
   - The support condition is `hsupport : ∀ i j, G.Adj i j → 0 < (H i).weight j`: every edge has positive weight, and `H` may put additional weight elsewhere, in particular on self-loops ($(H i).\text{weight } i > 0$). This covers lazy chains and Wright–Fisher sampling ([`wrightFisher_one_third`](Voter/Examples.lean)).
-  - The underlying `SimpleGraph` must still be nonbipartite, because the propagation argument starts from a monochromatic *edge* of `G`. The Remark's stronger claim (a bipartite graph with at least one self-loop suffices) is therefore not formalized.
+  - The main theorem `consensus_probability` keeps the nonbipartite hypothesis, because its propagation argument starts from a monochromatic *edge* of `G`.
+  - The Remark itself is formalized (VOT-2) as [`consensus_probability_of_selfLoop`](Voter/LazyLoop.lean) and [`color_consensus_probability_of_selfLoop`](Voter/LazyLoop.lean): on any connected `G`, bipartite or not, it suffices that `H` charges every edge and that `0 < (H v).weight v` for a single vertex `v`. The propagation ([`propagate_kernel_region`](Voter/LazyPropagation.lean)) takes rounds in the support of `H`, so the region `{v}` is monochromatic with `v` as its own internal neighbour. As in the main theorem, `H` may also charge non-edges, which is slightly more general than the Remark. Corollaries: the lazy voter `(I + D⁻¹A)/2` on any connected graph ([`lazyNeighbor_consensus_probability`](Voter/Lazy.lean)) and Wright–Fisher fixation `c_a / n` for every population size ([`wrightFisher_fixation`](Voter/WrightFisher.lean)).
 
 ---
 
