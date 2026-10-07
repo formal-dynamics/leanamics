@@ -43,3 +43,67 @@ If some node $w$ is decided, the round in which everybody samples $w$, repeated 
 configuration monochromatic; it has positive probability. Conclude with the shared absorption
 theorem.
 \end{proof}
+
+\section{The majority phase (UND-1)}
+Becchetti, Clementi, Natale, Pasquale and Silvestri (\emph{Plurality consensus in the gossip
+model}, SODA 2015, Theorem~11 with $k=2$) prove convergence to the majority in $O(\log n)$ rounds
+w.h.p.\ from configurations without undecided nodes and with a bias of order $n$. The stronger
+form below, from any configuration with bias $\Omega(\sqrt{n\log n})$, is Theorem~3.2 of Clementi,
+Ghaffari, Gual\`a, Natale, Pasquale and Scornavacca (MFCS 2018). Write $s=a-b$ for the bias,
+$\Lambda=\sqrt{n\log n}$, and call a round \emph{good} if the new counts of $a$-, $b$- and
+undecided nodes are within $\Lambda$ of their expectations (from below for $a$, from above for
+$b$, both ways for the undecided nodes).
+
+\begin{lemma}[Bad rounds]\label{lem:badround}
+\lean{Undecided.count_add,Undecided.tail_upper,Undecided.tail_lower,Undecided.bad_round,Undecided.four_exp_sqrt}\leanok\uses{thm:expect}
+A round is bad with probability at most $4e^{-2\Lambda^2/n}=4/n^2$.
+\end{lemma}
+\begin{proof}\leanok
+Each count after the round is a sum of independent indicators, one per node, depending only on
+the node it samples; apply Hoeffding's inequality to the four tails.
+\end{proof}
+
+\begin{lemma}[Good rounds]\label{lem:goodround}
+\lean{Undecided.bias_next,Undecided.undec_next,Undecided.contract,Undecided.first_det,Undecided.growth_det,Undecided.bridge_det,Undecided.fin_det}\leanok\uses{thm:expect}
+After a good round, $s'>s(1+q/n)-2\Lambda$ and $q'>n/3-s^2/(2n)-\Lambda$. If $b+2q\le 2n/3$ and
+$q\le n/3$, the potential $\Psi=12b+q$ satisfies $\mathbb E[\Psi']\le\frac56\Psi$, hence
+$\Psi'<\frac56\Psi+13\Lambda$ after a good round.
+\end{lemma}
+\begin{proof}\leanok
+$a(n-b+q)-b(n-a+q)=(a-b)(n+q)$; $(q^2+2ab)/n-n/3+s^2/(2n)=3(q-n/3)^2/(2n)$; and
+$12b(b+2q)+q^2+2ab\le 8bn+qn/3+2bn$.
+\end{proof}
+
+\begin{theorem}[Phases]\label{thm:phases}
+\lean{Undecided.missP,Undecided.missP_comp,Undecided.growth_stage,Undecided.bridge_stage,Undecided.fin_stage}\leanok\uses{lem:badround,lem:goodround}
+Let $2000\Lambda\le n$ and $p=4/n^2$.
+(Growth) From $s\ge 402\Lambda$, after $T+1$ rounds $s\ge\min(400\Lambda(201/200)^T,7n/10)$
+except with probability $(T+1)p$.
+(Bridge) From $s\ge 7n/10$, after $18$ rounds $\Psi\le n/3$ except with probability $18p$.
+(Final) From $\Psi\le n/3$, not all nodes hold $a$ after $T$ rounds with probability at most
+$(5/6)^T\Psi+Tp$.
+\end{theorem}
+\begin{proof}\leanok
+Growth: the sets $\{s\ge g,\ (q\ge n/100\text{ or }s\ge g+n/20)\}$ are entered with $g=400\Lambda$
+after one good round and $g$ grows by $201/200$ per good round (if $s\le 4n/5$ then $q'\ge n/100$);
+union bound over rounds with moving targets. Bridge: while $s\ge 2n/3$, $\Psi$ shrinks by $9/10$
+per good round and $s$ loses at most $2\Lambda$. Final: induction on $T$, splitting on whether
+the first round stays in $\{\Psi\le n/3\}$; and $\Psi\ge 1$ unless all nodes hold $a$.
+\end{proof}
+
+\begin{theorem}[Majority phase]\label{thm:majority}
+\lean{Undecided.majority_explicit,Undecided.majority_whp,Undecided.swapOp,Undecided.foldl_swap,Undecided.majority_whp_abs,Undecided.majority_whp_of_ratio}\leanok\uses{thm:phases}
+Let $C=10^4$. For every $n$ with $\log n\ge C$ and every configuration (any number of undecided
+nodes) with $|a-b|\ge C\sqrt{n\log n}$, all nodes hold the initial majority opinion after
+$\lceil C\log n\rceil$ rounds with probability at least $1-2/n$. Without undecided nodes and with
+$a\ge(1+\alpha)b$, the same holds with a constant depending on $\alpha$ (SODA 2015, Theorem~11
+for two colours).
+\end{theorem}
+\begin{proof}\leanok
+Run $T_1+1$ growth rounds with $T_1=\lceil\log n/\log(201/200)\rceil$, $18$ bridge rounds and the
+remaining $T_3\ge 12\log n$ final rounds, so that $(5/6)^{T_3}\le n^{-2}$; the failure
+probability is at most $\lceil C\log n\rceil p+n^{-2}\cdot n/3\le 2/n$. A $b$-majority follows by
+exchanging the opinions. With $a\ge(1+\alpha)b$ and $q=0$ the bias is at least $\alpha n/(2+\alpha)$,
+which exceeds $C\sqrt{n\log n}$ once $\log n\ge C(1+3(2+\alpha)/\alpha)$; extra rounds do not hurt
+since the all-$a$ configuration is absorbing.
+\end{proof}
