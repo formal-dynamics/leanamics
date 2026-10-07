@@ -21,6 +21,7 @@ dynamics); links to the old repository and site redirect here.
 | [`undecided/`](undecided) | Synchronous undecided-state dynamics with two opinions on `K_n`: exact one-round expectations of the three counts, so the bias grows in expectation by the factor `1 + q/n` (`q` undecided nodes); almost-sure absorption in a monochromatic configuration. | `Undecided.expected_bias`, `Undecided.absorbed` |
 | [`averaging/`](averaging) | Averaging dynamics on a graph (each node takes the average of its neighbours): conservation of the degree-weighted sum, maximum principle, convergence to the degree-weighted average on connected graphs with an odd closed walk, non-convergence on connected bipartite graphs. | `Averaging.tendsto_degAvg`, `Averaging.not_tendsto_of_colorable` |
 | [`median/`](median) | Median dynamics (Doerr et al., SPAA 2011): every node adopts the median of its own value and two random ones. Thresholding gives the binary median process (2-Choices); with two values, consensus from a gap of `128√(n log n)` within `⌈128 log n⌉` rounds with probability `1 − 128/n` (for `log n ≥ 128`). | `Median.threshold_run`, `Median.consensus_whp` |
+| [`crn/`](crn) | Chemical reaction networks are population protocols: for a count-conserving bimolecular CRN (`A + B → C + D`) with a common rate constant, the jump chain of stochastic mass-action kinetics equals the population protocol that draws a uniformly random ordered pair of distinct agents, conditioned on the pair reacting, as kernels on count vectors. Worked instance: the approximate-majority CRN. Stable computation (Angluin et al. 2006, easy direction): threshold and remainder predicates are stably computable by population protocols, the class is closed under Boolean operations, and protocols are CRNs, so every Boolean combination of them is stably decided by a CRN. | `Crn.jumpKernel_eq_ppKernel`, `Crn.ApproxMajority.network_jumpKernel_eq_ppKernel`, `Crn.IsSemilinearPred.stablyComputable`, `Crn.IsSemilinearPred.exists_network` |
 | [`plurality/`](plurality), [`3-majority/`](3-majority) | **Majority dynamics.** 3-Majority with `k` colors (Becchetti et al., SPAA 2014): if the plurality color has `≥ n/λ` nodes and leads every other color by `≥ 22√(λ n log n)`, all nodes adopt it within `O(λ log n)` rounds w.h.p. With two opinions: consensus from a gap of `22√(3 n log n)` (a fraction `1/2 + O(√(log n / n))`) within `390 log n` rounds. Also the `Ω(k log n)` lower bound, the characterization of good 3-input rules, and `h`-plurality. | `Plurality.theorem_3_8`, `Plurality.majority3_vanishing_bias`, `ThreeMajority.majority3_consensus_whp` |
 
 The developments are complete and `sorry`-free, and are built on a
@@ -36,7 +37,7 @@ in every round, supplied by a self-contained Chernoff bound proved from
 
 Every project is a **separate Lake package** with its own `lakefile.toml`,
 `lake-manifest.json` and `lean-toolchain`. The `dynamics/` package is shared by
-`3-majority/`, `voter/`, `moran/`, `epidemics/`, `undecided/`, `averaging/`, `median/` and `plurality/` (which also requires `3-majority/`). All
+`3-majority/`, `voter/`, `moran/`, `epidemics/`, `undecided/`, `averaging/`, `median/`, `crn/` and `plurality/` (which also requires `3-majority/`). All
 projects use the same Lean 4.32.0 toolchain and exact Mathlib revision; there is no root-level
 Lake package. Each has the same shape:
 
@@ -61,7 +62,7 @@ home_page/             the Jekyll landing page, deployed at the Pages root
 To work on one project, `cd` into it and use Lake as usual:
 
 ```bash
-cd voter               # or: dynamics, moran, epidemics, undecided, averaging, median, 3-majority, plurality, rumor_spread
+cd voter               # or: dynamics, moran, epidemics, undecided, averaging, median, crn, 3-majority, plurality, rumor_spread
 lake exe cache get     # download prebuilt Mathlib oleans (once)
 lake build             # verifies every proof in that project
 ```
@@ -74,7 +75,7 @@ lake build             # verifies every proof in that project
 - `.github/workflows/plurality-ci.yml` builds the plurality package, audits its
   main theorem axioms and rejects `sorry`; changes to `dynamics/` or `3-majority/`
   also rebuild it.
-- `.github/workflows/dynamics-ci.yml` builds the shared library and the voter, moran, epidemics, undecided, averaging and median packages
+- `.github/workflows/dynamics-ci.yml` builds the shared library and the voter, moran, epidemics, undecided, averaging, median and crn packages
   and audits the main theorem axioms.
 - `.github/workflows/pages.yml` — builds every project's blueprint (web and
   pdf) and API docs, checks that every declaration named in a blueprint
@@ -115,3 +116,8 @@ propose a result that is not on the roadmap, just open an issue.
 [PROVENANCE.md](PROVENANCE.md) records, for every result, its source paper, whether the formal
 proof follows a published proof or takes a different route, its explicit constants, and who
 produced it. Please add an entry for each result you contribute.
+
+## License
+
+Leanamics is released under the [MIT License](LICENSE). By contributing, you agree that your
+contributions are released under the same license.
