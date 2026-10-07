@@ -2,15 +2,16 @@ import Dynamics.Uniform
 
 /-!
 Compatibility declarations with the original public statements and names.
-The body of `avg` is retained so that existing `simp [avg]` proofs keep working;
-its probability laws are supplied by `Dynamics.Uniform`.
+`avg` and `expList` are reducible abbreviations of `Dynamics.avg` and `Dynamics.expList`, and
+every lemma below is the corresponding `Dynamics.Uniform` lemma: this package defines no
+expectation of its own. The names are kept for the statements and the blueprint.
 -/
 namespace ThreeMajority
 open Finset
 variable {α : Type*} [Fintype α]
 
-@[inherit_doc Dynamics.avg]
-noncomputable def avg (f : α → ℝ) : ℝ := (∑ a, f a) / (Fintype.card α : ℝ)
+/-- The uniform average `Dynamics.avg`, under this package's name (a reducible alias). -/
+noncomputable abbrev avg (f : α → ℝ) : ℝ := Dynamics.avg f
 @[inherit_doc Dynamics.expList]
 noncomputable abbrev expList (α : Type*) [Fintype α] (T : ℕ) (F : List α → ℝ) : ℝ :=
   Dynamics.expList α T F

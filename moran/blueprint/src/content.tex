@@ -58,29 +58,29 @@ absorption theorem.
 \end{proof}
 
 \section{Fixation probabilities}
-\begin{lemma}[Fixation as a limit]\label{lem:fixation-limit}
-\lean{Moran.allMutant,Moran.fixation,Moran.fixation_mono,Moran.fixation_tendsto,Moran.fixation_eq_of_invariant}\leanok\uses{thm:absorption}
-The finite-time fixation probabilities increase to the fixation probability. If an invariant
-observable agrees with the fixation indicator on constant configurations and lies between it
-and the indicator plus the unfixed indicator elsewhere, it equals the fixation probability.
+\begin{lemma}[Fixation from an invariant]\label{lem:fixation-limit}
+\lean{Moran.allMutant,Moran.fixation,Moran.iterate_allMutant,Moran.unfixed_eq,Moran.iterate_unfixed,Moran.fixation_eq_of_invariant}\leanok
+Let an observable be invariant in expectation, equal to $1$ on the all-mutant and to $0$ on the
+all-resident configuration. If the all-mutant configuration is absorbing and the probability
+that neither type has taken over tends to zero, the observable is the fixation probability.
 \end{lemma}
 \begin{proof}\leanok
-The all-mutant configuration is absorbing, so the finite-time probabilities are monotone and
-bounded. The observable differs from the fixation indicator by at most the unfixed indicator,
-whose expectation tends to zero.
+This is the finite-horizon optional stopping theorem of the shared \texttt{dynamics} package
+(\texttt{Dynamics.Kernel.iSup\_event\_of\_invariant}, roadmap FND-4) with the two constant
+configurations as targets: the fixation and unfixed indicators are the corresponding events.
 \end{proof}
 \begin{theorem}[Isothermal theorem]\label{thm:isothermal}
-\lean{Moran.moranPsi,Moran.moranPsi_invariant,Moran.moranPsi_sandwich,Moran.isothermal}\leanok\uses{thm:invariance,lem:fixation-limit}
+\lean{Moran.moranPsi,Moran.moranPsi_invariant,Moran.moranPsi_all,Moran.moranPsi_none,Moran.isothermal}\leanok\uses{thm:invariance,thm:absorption,lem:fixation-limit}
 On a connected regular graph with $r\neq1$, the fixation probability from $k$ mutants is
 $(1-r^{-k})/(1-r^{-n})$.
 \end{theorem}
 \begin{proof}\leanok
 Apply the previous lemma to $\psi=(1-(1/r)^{\#\text{mutants}})/(1-(1/r)^n)$, invariant by the
-invariance theorem, equal to $1$ and $0$ on the two constant configurations and in $[0,1]$
-otherwise.
+invariance theorem and equal to $1$ and $0$ on the two constant configurations; the
+absorption theorem gives the vanishing survival probability.
 \end{proof}
 \begin{theorem}[Neutral case]\label{thm:neutral}
-\lean{Moran.neutralPsi,Moran.neutralPsi_invariant,Moran.neutralPsi_sandwich,Moran.isothermal_neutral}\leanok\uses{thm:invariance,lem:fixation-limit}
+\lean{Moran.neutralPsi,Moran.neutralPsi_invariant,Moran.neutralPsi_all,Moran.neutralPsi_none,Moran.isothermal_neutral}\leanok\uses{thm:invariance,thm:absorption,lem:fixation-limit}
 On a connected regular graph with $r=1$, the fixation probability is $k/n$.
 \end{theorem}
 \begin{proof}\leanok
@@ -137,13 +137,13 @@ adjacent to a mutant copies it with positive probability, so the number of mutan
 with positive probability; the shared absorption theorem concludes.
 \end{proof}
 \begin{theorem}[Push and pull fixation]\label{thm:pushpull}
-\lean{Moran.pushRatio_invariant,Moran.pullRatio_invariant,Moran.pushRatio_sandwich,Moran.pullRatio_sandwich,Moran.push_fixation,Moran.pull_fixation}\leanok\uses{thm:pushpull-invariance,thm:absorption,thm:pull-absorption,lem:fixation-limit}
+\lean{Moran.pushRatio_invariant,Moran.pullRatio_invariant,Moran.pushValue_false,Moran.pullValue_false,Moran.pushValue_total_pos,Moran.pullValue_total_pos,Moran.push_fixation,Moran.pull_fixation}\leanok\uses{thm:pushpull-invariance,thm:absorption,thm:pull-absorption,lem:fixation-limit}
 On a connected graph with at least two vertices, the fixation probability of a mutant set $S$
 is $\sum_{v\in S}\frac1{\deg v}\big/\sum_{v\in V}\frac1{\deg v}$ under neutral push and
 $\sum_{v\in S}\deg v/(2|E|)$ under pull.
 \end{theorem}
 \begin{proof}\leanok
-Apply the fixation-limit lemma to the normalized reproductive values, which are invariant, equal
-to $1$ and $0$ on the two constant configurations, and in $[0,1]$ otherwise; the denominators are
-positive because every degree is at least $1$.
+Apply the fixation-limit lemma to the normalized reproductive values, which are invariant and
+equal to $1$ and $0$ on the two constant configurations; the denominators are positive because
+every degree is at least $1$.
 \end{proof}
