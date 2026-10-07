@@ -65,6 +65,14 @@ lemma prob_le_one (p : Distribution α) (s : α → Prop) : p.prob s ≤ 1 := by
   calc p.prob s ≤ p.expect (fun _ => 1) := p.expect_mono fun a => by split <;> norm_num
        _ = 1 := p.expect_const 1
 
+/-- `prob` computed with any decidability instance for the event. -/
+lemma prob_eq_expect (p : Distribution α) (s : α → Prop) [DecidablePred s] :
+    p.prob s = p.expect fun a => if s a then 1 else 0 := by
+  unfold prob
+  congr 1
+  funext a
+  congr
+
 /-- Uniform distribution, available precisely when the sample type is nonempty. -/
 noncomputable def uniform (α : Type*) [Fintype α] [Nonempty α] : Distribution α where
   weight _ := (Fintype.card α : ℝ)⁻¹

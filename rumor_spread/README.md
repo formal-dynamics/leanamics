@@ -34,13 +34,15 @@ exist.
 The development avoids measure theory, `PMF`, `ENNReal`, the exponential
 function, Chernoff bounds and martingales entirely:
 
-- **Probability** ([Prob.lean](RumorSpread/Prob.lean)): all randomness is
+- **Probability** (the shared [`Dynamics.Uniform`](../dynamics/Dynamics/Uniform.lean)
+  of the [dynamics package](../dynamics)): all randomness is
   uniform over finite types. `avg` is a sum divided by a cardinality;
   `expList α T F` — the expectation of a trajectory functional over `T`
   i.i.d. uniform rounds — is defined by recursion on `T`, which makes
   conditioning on a round a definitional unfolding.
-  [Equivalence.lean](RumorSpread/Equivalence.lean) proves this equals the
-  uniform average over the product space of all round sequences.
+  [Equivalence.lean](RumorSpread/Equivalence.lean) records that this equals the
+  uniform average over the product space of all round sequences
+  (`Dynamics.Bridge` adds Mathlib's `Finset.expect` and the product distribution).
 - **Model** ([Model.lean](RumorSpread/Model.lean)): a round is
   `Tgt n := ∀ v : Fin n, {u // u ≠ v}` (every node picks a target ≠ itself);
   `step I r = I ∪ I.image r`; trajectories are lists of rounds.

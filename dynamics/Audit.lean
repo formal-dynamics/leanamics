@@ -1,6 +1,10 @@
 import Dynamics
 #print axioms Dynamics.avg_prod_pi
 #print axioms Dynamics.expList_eq_avg_ofFn
+#print axioms Dynamics.avg_eq_expect
+#print axioms Dynamics.expList_eq_expect
+#print axioms Dynamics.Distribution.independent_uniform_expect
+#print axioms Dynamics.expList_eq_independent_expect
 #print axioms Dynamics.Distribution.independent_expect_prod
 #print axioms Dynamics.Kernel.trajectory_endpoint
 #print axioms Dynamics.Kernel.exists_stationary
@@ -23,3 +27,19 @@ import Dynamics
 #print axioms Dynamics.avg_chernoff_upper
 #print axioms Dynamics.avg_chernoff_lower_ratio
 #print axioms Dynamics.avg_chernoff_lower
+#print axioms Dynamics.Kernel.event_error_of_invariant
+#print axioms Dynamics.Kernel.tendsto_event_of_invariant
+#print axioms Dynamics.Kernel.iSup_event_of_invariant
+#print axioms Dynamics.expList_comp_reverse
+#print axioms Dynamics.Kernel.iterate_ofStep_foldr
+#print axioms Dynamics.Kernel.drift_absorption_seq
+#print axioms Dynamics.Kernel.drift_absorption
+#print axioms Dynamics.Kernel.multiplicative_drift_seq
+#print axioms Dynamics.Kernel.multiplicative_drift
+#print axioms Dynamics.avg_neighborRound_prod
+#print axioms Dynamics.avg_vertex_neighborRound
+#print axioms Dynamics.avg_edgeRound
+#print axioms Dynamics.avg_edgeRound_edge
+#print axioms Dynamics.Kernel.one_sub_hitProb_le_of_drift
+#print axioms Dynamics.Kernel.drift_hitting
+#print axioms Dynamics.Kernel.drift_hitting_log
