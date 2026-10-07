@@ -26,8 +26,9 @@ The key identity is that on a regular graph a step adds a mutant with exactly `r
 probability that it removes one, in every configuration, because the numbers of
 mutant–resident and resident–mutant edges coincide (`orientedCut_symm`, `birth_eq_r_death`).
 The fixation probability is the supremum of the increasing finite-time fixation
-probabilities, identified through an invariant potential and the shared absorption theorem of
-[`dynamics/`](../dynamics); no path-space measure is used.
+probabilities, identified through an invariant potential (`fixation_eq_of_invariant`) by the
+shared finite-horizon optional stopping theorem `Dynamics.Kernel.iSup_event_of_invariant` and
+the shared absorption theorem of [`dynamics/`](../dynamics); no path-space measure is used.
 
 Only the "if" direction is formalized: the commonly quoted "if and only if" is false
 (Galanis, Göbel, Goldberg, Lapinskas and Richerby, *Amplifiers for the Moran process*, J. ACM

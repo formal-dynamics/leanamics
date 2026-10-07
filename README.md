@@ -115,3 +115,8 @@ propose a result that is not on the roadmap, just open an issue.
 [PROVENANCE.md](PROVENANCE.md) records, for every result, its source paper, whether the formal
 proof follows a published proof or takes a different route, its explicit constants, and who
 produced it. Please add an entry for each result you contribute.
+
+## License
+
+Leanamics is released under the [MIT License](LICENSE). By contributing, you agree that your
+contributions are released under the same license.
