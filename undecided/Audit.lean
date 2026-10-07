@@ -5,3 +5,6 @@ import Undecided
 #print axioms Undecided.expected_bias
 #print axioms Undecided.step_of_mono
 #print axioms Undecided.absorbed
+#print axioms Undecided.Sequential.consensus_whp
+#print axioms Undecided.Sequential.majority_whp
+#print axioms Undecided.Sequential.approximate_majority
