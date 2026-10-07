@@ -6,6 +6,12 @@ open edges. Consequently the final outbreak is the set of nodes connected to the
 open edges, and with i.i.d.\ Bernoulli$(p)$ coins the probability of eventual infection is a
 bond-percolation connection probability. The development is in the finite layer of the shared
 \texttt{dynamics} package.
+
+We also formalize the deterministic Kermack--McKendrick SIR model: for every solution of
+$s'=-\beta si$, $i'=\beta si-\gamma i$, $r'=\gamma i$ on $[0,\infty)$ with $r(0)=0$, the threshold
+theorem ($i$ initially increases iff $R_0s(0)>1$, with $R_0=\beta/\gamma$), the epidemic peak, and
+the final-size equation $s_\infty=s(0)e^{-R_0(1-s_\infty)}$, following Hethcote (SIAM Review
+2000, Theorem~2.1). This part uses Mathlib's real analysis.
 \end{abstract}
 
 \section{The model}
@@ -62,3 +68,114 @@ The coupling is pathwise because every edge is used at most once: once its coin 
 from an infected endpoint, that endpoint is recovered for good. This is why a single coin per edge
 gives the same process, in distribution, as fresh coins in every round (that distributional
 statement is not formalized here).
+
+\section{The Kermack--McKendrick SIR model}
+\begin{definition}[Solutions]\label{def:km}
+\lean{Epidemics.KermackMcKendrick.R₀,Epidemics.KermackMcKendrick.sirField,Epidemics.KermackMcKendrick.IsSolution}\leanok
+Let $\beta,\gamma>0$ and $R_0=\beta/\gamma$. A solution is a triple $(s,i,r)$ of real functions
+such that $t\mapsto(s,i,r)(t)$ is an integral curve on $[0,\infty)$ (one-sided derivative at $0$)
+of the field $(s,i,r)\mapsto(-\beta si,\ \beta si-\gamma i,\ \gamma i)$, with $s(0),i(0)>0$,
+$r(0)=0$ and $s(0)+i(0)+r(0)=1$. Solutions are assumed, not constructed.
+\end{definition}
+
+\begin{theorem}[Invariants]\label{thm:km-basic}
+\lean{Epidemics.KermackMcKendrick.IsSolution.sum_eq_one,Epidemics.KermackMcKendrick.IsSolution.s_pos,Epidemics.KermackMcKendrick.IsSolution.i_pos,Epidemics.KermackMcKendrick.IsSolution.r_nonneg,Epidemics.KermackMcKendrick.IsSolution.strictAntiOn_s,Epidemics.KermackMcKendrick.IsSolution.strictMonoOn_r,Epidemics.KermackMcKendrick.IsSolution.s_eq_mul_exp}\leanok\uses{def:km}
+On $[0,\infty)$: $s+i+r=1$; $s,i>0$ and $r\ge0$; $s$ is strictly decreasing and $r$ strictly
+increasing; and $s(t)=s(0)e^{-R_0r(t)}$.
+\end{theorem}
+\begin{proof}\leanok
+The derivatives of $s+i+r$ and of $se^{R_0r}$ vanish ($R_0\gamma=\beta$), and a function with
+zero right derivative is constant. For $i>0$, compare $i$ with the barrier
+$b(t)=\tfrac{i(0)}2e^{-\gamma t}$: where they touch, $b'=-\gamma i<\beta si-\gamma i=i'$ since
+$s>0$, so $i\ge b$. Monotonicity follows from the signs of $s'=-\beta si$ and $r'=\gamma i$.
+\end{proof}
+
+\begin{theorem}[Threshold]\label{thm:km-threshold}
+\lean{Epidemics.KermackMcKendrick.IsSolution.strictAntiOn_i,Epidemics.KermackMcKendrick.IsSolution.initially_increasing_iff}\leanok\uses{thm:km-basic}
+If $R_0s(0)\le1$, then $i$ is strictly decreasing on $[0,\infty)$. The function $i$ is strictly
+increasing on some $[0,\varepsilon]$, $\varepsilon>0$, iff $R_0s(0)>1$.
+\end{theorem}
+\begin{proof}\leanok
+$i'=i(\beta s-\gamma)$ and $s(t)<s(0)$ for $t>0$. If $R_0s(0)>1$, then $\beta s-\gamma>0$ near $0$
+by continuity.
+\end{proof}
+
+\begin{theorem}[Limits and final size]\label{thm:km-final}
+\lean{Epidemics.KermackMcKendrick.IsSolution.tendsto_i,Epidemics.KermackMcKendrick.IsSolution.exists_tendsto_s,Epidemics.KermackMcKendrick.IsSolution.tendsto_r,Epidemics.KermackMcKendrick.IsSolution.final_size,Epidemics.KermackMcKendrick.IsSolution.limit_pos,Epidemics.KermackMcKendrick.IsSolution.R₀_mul_limit_lt_one,Epidemics.KermackMcKendrick.IsSolution.final_size_unique,Epidemics.KermackMcKendrick.IsSolution.final_size_unique_of_le_one}\leanok\uses{thm:km-threshold}
+$i(t)\to0$, $s(t)\to s_\infty$ and $r(t)\to1-s_\infty$; moreover
+$s_\infty=s(0)e^{-R_0(1-s_\infty)}$, $0<s_\infty<1/R_0$, and $s_\infty$ is the unique root of this
+equation in $(0,1/R_0]$ and in $(0,1]$.
+\end{theorem}
+\begin{proof}\leanok
+$s$ and $r$ are monotone and bounded, so $i=1-s-r$ converges; if $i\to L>0$, the mean value
+theorem makes $r$ grow by more than $1$. Pass to the limit in $s=s(0)e^{-R_0r}$. If
+$R_0s_\infty\ge1$ then $i'>0$ forever, contradicting $i\to0$. Uniqueness: $\log x-R_0x$ is strictly
+increasing on $(0,1/R_0]$ and strictly decreasing on $[1/R_0,\infty)$, and at $x=1$ it exceeds its
+value $\log s(0)-R_0$ at the roots because $s(0)<1$.
+\end{proof}
+
+\begin{theorem}[Peak]\label{thm:km-peak}
+\lean{Epidemics.KermackMcKendrick.IsSolution.exists_peak}\leanok\uses{thm:km-final}
+If $R_0s(0)>1$, there is $t_{\max}>0$ with $s(t_{\max})=1/R_0$ such that $i$ is strictly
+increasing on $[0,t_{\max}]$ and strictly decreasing on $[t_{\max},\infty)$, and
+$i(t_{\max})=i(0)+s(0)-1/R_0-\log(R_0s(0))/R_0$.
+\end{theorem}
+\begin{proof}\leanok
+Intermediate value theorem between $s(0)>1/R_0$ and $s_\infty<1/R_0$; the sign of $\beta s-\gamma$
+changes at $t_{\max}$. The value follows from $\log s=\log s(0)-R_0r$ and $r=1-s-i$.
+\end{proof}
+
+\section{Kurtz's law of large numbers for SIR, in discrete time}
+\begin{definition}[The uniformized SIR chain]\label{def:kurtz}
+\lean{Epidemics.Kurtz.Compartment,Epidemics.Kurtz.Config,Epidemics.Kurtz.count,Epidemics.Kurtz.scaled,Epidemics.Kurtz.Round,Epidemics.Kurtz.step,Epidemics.Kurtz.chain,Epidemics.Kurtz.deviationProb}\leanok\uses{def:km}
+Let $\beta,\gamma\in\mathbb N$. A configuration assigns to each of $N$ agents a compartment
+$S$, $I$ or $R$; $X=(S,I,R)/N$ are the scaled counts. One step draws $(u,v)$ uniformly in
+$[N]^2$ and one of $\beta+\gamma$ equally likely clocks: on one of the $\beta$ infection clocks an
+infected $u$ infects a susceptible $v$, on one of the $\gamma$ recovery clocks an infected $u$
+recovers. This is the continuous-time chain ($S+I\to2I$ at rate $\beta SI/N$, $I\to R$ at rate
+$\gamma I$) uniformized at rate $(\beta+\gamma)N$. The deviation probability is the probability
+that $\|X_k-x(k/((\beta+\gamma)N))\|_\infty>\theta$ for some $k\le n$.
+\end{definition}
+
+\begin{lemma}[Drift and bounded increments]\label{lem:kurtz-drift}
+\lean{Epidemics.Kurtz.drift_susceptible,Epidemics.Kurtz.drift_infected,Epidemics.Kurtz.drift_recovered,Epidemics.Kurtz.dist_scaled_step_le,Epidemics.Kurtz.iterate_chain}\leanok\uses{def:kurtz}
+$\mathbb E[X_{k+1}-X_k\mid X_k=x]=F(x)/((\beta+\gamma)N)$ with $F$ the Kermack--McKendrick field,
+and $\|X_{k+1}-X_k\|_\infty\le1/N$.
+\end{lemma}
+\begin{proof}\leanok
+Among the $N^2(\beta+\gamma)$ rounds, $\beta IS$ move an agent from $S$ to $I$ and $\gamma NI$ move
+one from $I$ to $R$; a round changes the compartment of at most one agent.
+\end{proof}
+
+\begin{lemma}[Maximal Azuma--Hoeffding]\label{lem:azuma}
+\lean{Epidemics.Kurtz.incrementSum,Epidemics.Kurtz.expList_azuma}\leanok
+If increments $D(X_j,\rho_j)$ along i.i.d.\ uniform rounds have zero conditional mean and
+$|D|\le c$, their partial sums $M_k$ satisfy
+$\mathbb P(\exists k\le n,\ M_k\ge\lambda)\le e^{-\lambda^2/(2nc^2)}$.
+\end{lemma}
+\begin{proof}\leanok
+Hoeffding's lemma ($\mathbb E e^{\theta D}\le\cosh(\theta c)\le e^{\theta^2c^2/2}$ by convexity)
+makes $e^{\theta M_k-k\theta^2c^2/2}$ a nonnegative supermartingale; Ville's maximal inequality,
+proved by induction on $n$ peeling off the first round, bounds the probability that it reaches
+$\mu$ by $1/\mu$; take $\theta=\lambda/(nc^2)$.
+\end{proof}
+
+\begin{theorem}[Law of large numbers]\label{thm:kurtz}
+\lean{Epidemics.Kurtz.law_of_large_numbers,Epidemics.Kurtz.tendsto_deviationProb}\leanok\uses{lem:kurtz-drift,lem:azuma,thm:km-basic}
+Let $\beta,\gamma,T>0$. There are $C,c>0$ and $L$ such that for every $N$, every initial
+configuration, every solution $x$ of the Kermack--McKendrick system started in the simplex and
+every $\varepsilon>0$, with probability at least $1-Ce^{-c\varepsilon^2N}$,
+$\|X_k-x(k/((\beta+\gamma)N))\|_\infty\le L\|X_0-x(0)\|_\infty+\varepsilon$ for all
+$k\le T(\beta+\gamma)N$. Hence, if $X_0\to x(0)$, the scaled chain converges to $x$ in probability,
+uniformly on $[0,T]$.
+\end{theorem}
+\begin{proof}\leanok
+The simplex is invariant under the ODE (first integral for $s$, integrating factor for $i$); there
+$F$ is $(2\beta+\gamma)$-Lipschitz and bounded by $\beta+\gamma$, so one Euler step errs by
+$O(h^2)$, $h=1/((\beta+\gamma)N)$. By Lemma~\ref{lem:kurtz-drift} each coordinate of
+$X_k-X_0-h\sum_{j<k}F(X_j)$ is a martingale with increments at most $2/N$; on the event where the
+six one-sided maximal deviations stay below $\delta=\varepsilon/(2L)$, the discrete Gr\"onwall
+inequality gives the bound with $L=e^{(2\beta+\gamma)T}$, once $\varepsilon N\ge2LT(2\beta+\gamma)$;
+Lemma~\ref{lem:azuma} bounds the complement by $6e^{-c\varepsilon^2N}$. Small $N$ and
+$\varepsilon\ge2$ are absorbed in $C$.
+\end{proof}
