@@ -5,7 +5,10 @@ Every node of a finite graph replaces its value by the average of its neighbours
 
 **Provenance.** The statements were written and pinned by hand; the proofs were produced by a Grok
 agent under a fixed-statement protocol and verified mechanically (statements unchanged, no
-placeholders, warning-free build, axiom audit).
+placeholders, warning-free build, axiom audit). AVG-1's rate bound (`Averaging/Rate*.lean`: Lovász's
+Theorem 5.1, `|Pᵗ(u,v) − π(v)| ≤ √(d(v)/d(u)) λᵗ`) and the sequential-averaging identities
+(`Averaging/Sequential*.lean`) were pinned by a Claude agent, reviewed by hand against the
+sources, and then proved by the agent under the same protocol.
 
 Build and audit:
 
