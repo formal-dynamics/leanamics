@@ -41,8 +41,11 @@ Cesàro averages and compactness; no uniqueness assumption is needed.
 
 `eventualColor` is the supremum of the increasing finite-time probabilities of
 a specified consensus color. The proof bounds the difference between invariant
-white mass and all-white probability by nonconsensus probability. The shared
-finite-chain theorem makes that bound tend to zero geometrically in blocks.
+white mass and all-white probability by nonconsensus probability; this is the
+shared finite-horizon optional stopping theorem
+`Dynamics.Kernel.event_error_of_invariant` with the two consensus configurations as
+targets. The shared finite-chain theorem makes that bound tend to zero geometrically in
+blocks.
 This formalizes the paper's transience argument through survival probabilities,
 without introducing a separate classification of recurrent states.
 

@@ -1,6 +1,6 @@
 import RumorSpread.Bounds
 import RumorSpread.Model
-import RumorSpread.Prob
+import Dynamics.Uniform
 
 /-!
 # One-round estimates
@@ -21,7 +21,7 @@ From it we derive the three estimates of Section 4 of the paper:
 
 namespace RumorPush
 
-open Finset
+open Finset Dynamics
 
 variable {n : ℕ}
 
