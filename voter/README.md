@@ -26,6 +26,9 @@ and indicator projections give the probability for every color in a finite palet
 | Section 2.3 | `iterate_project`, `color_consensus_probability` |
 | Section 2.4 on the complete graph: duality with coalescing random walks | `runRounds_eq_comp`, `disagreement_runRounds_eq_zero` |
 | Section 2.4 on the complete graph: consensus within `2 n log n` rounds w.p. `≥ 1 - 1/n` | `expList_backward_ne`, `iterate_disagreement_le`, `voter_consensus_whp` |
+| Section 2.4, any sampling kernel: duality with two coalescing tokens; Theorem 2.4 (tail form) | `pairWalk`, `iterate_disagreement_le_pairWalk`, `iterate_disagreement_le_of_meeting` |
+| Section 2.4, Fact 2.3 and Lemma 2.4 for lazy walks: meeting within `51 n³` steps w.p. `≥ 1/2` | `hitting_add_hitting_le`, `lazyNeighbor`, `lazy_meeting_le_half`, `lazy_meeting_le_pow` |
+| Theorem 2.5 (Survey Thm 8), lazy voter: consensus within `255 n³ log n` rounds w.p. `≥ 1 - 1/n` on every connected graph | `lazy_voter_consensus_whp` |
 
 All names in the table except the explicitly qualified shared declaration are
 in namespace `Voter`. The invariant-weight results have no graph assumptions.
@@ -64,5 +67,13 @@ proves the duality with coalescing random walks and the consensus-time bound; th
 backward walks from two distinct vertices fail to meet in `T` rounds with probability
 exactly `(1 - 1/n)^T`.
 
-Future work: convergence-time bounds on general graphs, dynamic networks, and extremal
-coalition results.
+On every connected graph, `Meeting*.lean` (VOT-6) proves the duality for an arbitrary
+sampling kernel and the `O(n³ log n)` consensus time of the lazy voter dynamics (every vertex
+keeps its colour with probability `1/2`, otherwise copies a uniform neighbour). Hitting times
+are solutions of the Laplacian system (`MeetingHitting.lean`), and the meeting time follows
+Kanade, Mallmann-Trenn, Sauerwald's comparison of synchronous and sequential walks
+(`MeetingDrift.lean`). Hassin–Peleg's plain walk on nonbipartite graphs is covered only
+conditionally on a meeting bound (`iterate_disagreement_le_of_meeting`); see
+`PROGRESS-VOT6.md`.
+
+Future work: dynamic networks and extremal coalition results.

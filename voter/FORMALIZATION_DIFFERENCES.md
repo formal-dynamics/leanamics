@@ -34,15 +34,25 @@ and its Lean 4 formalization in the `voter` package (`leanamics/voter`).
 ### 1.2 Unformalized Results
 
 The following portions of the paper were not formalized:
-1. **Section 2.4: Time Bounds** (partially formalized since VOT-3: on the complete graph with
-   self-loops, the backward coalescing-walk duality [`runRounds_eq_comp`](Voter/Coalescence.lean) and
-   consensus within `2 n log n` rounds with probability `≥ 1 - 1/n`
-   [`voter_consensus_whp`](Voter/Coalescence.lean); the general-graph bounds below remain open)
-   - Dual coalescing random walks backward in time on general graphs (the complete graph with self-loops is formalized in [`Coalescence.lean`](Voter/Coalescence.lean)).
-   - Lemma 2.4: Bound on meeting time $M = O(n Z_{\max})$.
-   - Fact 2.3: Hitting time sum $Z_{i,j} + Z_{j,i} \le 1 / (\pi_H(i) h_{ij})$ for reversible Markov chains.
-   - Theorem 2.4: Expected time to monochromatic absorption $O(M \log n)$ via Chernoff bounds (Proposition 2.1).
-   - Theorem 2.5: Convergence time $O(n^3 \log n)$ in the uniform case.
+1. **Section 2.4: Time Bounds** (formalized since VOT-3 and VOT-6, with the deviations of
+   [`PROGRESS-VOT6.md`](PROGRESS-VOT6.md); only the plain walk on nonbipartite graphs remains open)
+   - Dual coalescing random walks: on the complete graph with self-loops in
+     [`Coalescence.lean`](Voter/Coalescence.lean); for every sampling kernel
+     [`iterate_disagreement_le_pairWalk`](Voter/Meeting.lean) (two coalescing tokens, union bound).
+   - Fact 2.3 (lazy uniform case): commute bound $Z_{x,y} + Z_{y,x} \le 4\,\mathrm{vol}\,(n-1)$ for
+     hitting times defined by their Laplacian system,
+     [`hitting_add_hitting_le`](Voter/MeetingHitting.lean).
+   - Lemma 2.4 (lazy walks, tail form): meeting within $51 n^3$ steps with probability
+     $\ge 1/2$, [`lazy_meeting_le_half`](Voter/MeetingTime.lean), via the comparison of
+     synchronous and sequential walks of Kanade, Mallmann-Trenn, Sauerwald instead of
+     $M = O(n Z_{\max})$.
+   - Theorem 2.4 (tail form, no Chernoff bound needed): consensus fails after $k T_0$ rounds with
+     probability $\le (n-1)2^{-k}$ if tokens meet within $T_0$ steps with probability $\ge 1/2$,
+     [`iterate_disagreement_le_of_meeting`](Voter/Meeting.lean), for every kernel.
+   - Theorem 2.5 (lazy uniform walk, high-probability form): consensus within
+     $255 n^3 \log n$ rounds with probability $\ge 1 - 1/n$ on every connected graph,
+     [`lazy_voter_consensus_whp`](Voter/MeetingConsensus.lean). The plain walk on connected
+     nonbipartite graphs (the paper's setting) is covered only conditionally on a meeting bound.
 2. **Section 3: Application to Distributed Consensus & Dynamic Networks**
    - Section 3.1: Formal specification of the consensus problem (Agreement, Validity, Stopping) and Proportionate Consensus.
    - Section 3.2: Algorithm `PropCon` (choice of degree-to-reliability factor $k = \max_i \lceil d_i / R_i \rceil$, normalized weights $\tilde{R}_i$, and weight matrix $H$ with self-loops $H_{ii} = 1 - d_i/\tilde{R}_i$).

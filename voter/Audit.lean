@@ -19,3 +19,8 @@ import Voter
 #print axioms Voter.expList_backward_ne
 #print axioms Voter.iterate_disagreement_le
 #print axioms Voter.voter_consensus_whp
+#print axioms Voter.iterate_disagreement_le_pairWalk
+#print axioms Voter.iterate_disagreement_le_of_meeting
+#print axioms Voter.lazy_meeting_le_half
+#print axioms Voter.lazy_meeting_le_pow
+#print axioms Voter.lazy_voter_consensus_whp
