@@ -1,7 +1,42 @@
 # Averaging dynamics on graphs
 
-Every node of a finite graph replaces its value by the average of its neighbours' values. Main results in [`Averaging/Basic.lean`](Averaging/Basic.lean), namespace `Averaging`; see the
-[blueprint](blueprint/src/content.tex) for the statements and the map to Lean declarations.
+Every node of a finite graph replaces its value by the average of its neighbours' values. Conservation and
+convergence on connected non-bipartite graphs in [`Averaging/Basic.lean`](Averaging/Basic.lean), namespace
+`Averaging`; see the [blueprint](blueprint/src/content.tex) for the statements and the map to Lean
+declarations, and [`FORMALIZATION_DIFFERENCES.md`](FORMALIZATION_DIFFERENCES.md) for the deviations
+from the sources.
+
+## Rate of convergence and sequential averaging (roadmap AVG-1)
+
+Section 7.2 of Becchetti, Clementi, Natale, *Consensus Dynamics: An Overview* (SIGACT News
+51(1), 2020; the Survey), with Theorem 5.1 of Lovász, *Random walks on graphs: a survey* (1993)
+and equations (4)–(5) after Boyd, Ghosh, Prabhakar, Shah, *Randomized gossip algorithms* (2006).
+For the random walk `P = D⁻¹A`, its stationary distribution `π(v) = d(v)/2m` and
+`λ = max {|λ₂|, |λₙ|}`, `|Pᵗ(u,v) - π(v)| ≤ √(d(v)/d(u)) λᵗ`, and `λ < 1` on connected
+non-bipartite graphs, so the averaging dynamics converges exponentially fast. In the random
+sequential model (one uniformly random edge averages its endpoints), the expected step matrix is
+`I - L/2m` and `𝔼[x⁽ᵗ⁾] = (I - L/2m)ᵗ x⁽⁰⁾`. Statements in [`Averaging/Rate.lean`](Averaging/Rate.lean)
+and [`Averaging/Sequential.lean`](Averaging/Sequential.lean) (definitions in `RateDefs.lean`,
+`SequentialDefs.lean`), all proved:
+
+| Source | Lean |
+| --- | --- |
+| `P = D⁻¹A`, `N = D^{-1/2}AD^{-1/2}`, `λ`, `π` | `walkMatrix`, `normAdjMatrix`, `walkLambda`, `walkStationary` |
+| `Pᵗ(u,v)` is the `t`-step walk probability; `x⁽ᵗ⁾ = Pᵗ x⁽⁰⁾` | `walkMatrix_pow_apply`, `avgIter_eq_walkMatrix_pow_mulVec` |
+| `P` and `N` have the same spectrum | `charpoly_walkMatrix` |
+| Survey Theorem 33 (Lovász Theorem 5.1) | `abs_walkMatrix_pow_sub_walkStationary_le` |
+| Unless `G` is bipartite, `λ < 1` | `walkLambda_lt_one` |
+| Rate of the averaging dynamics | `abs_avgIter_sub_walkStationary_le` |
+| Edge step `W` (equation (2)), doubly stochastic, `WᵀW = W` | `Sequential.edgeMatrix`, `edgeMatrix_mulVec`, `edgeMatrix_mem_doublyStochastic`, `transpose_edgeMatrix_mul_self` |
+| Equation (4) and its regular case (5) | `Sequential.avg_expect_edgeMatrix`, `gossipMeanMatrix_of_isRegular` |
+| Uniform random edge: `𝔼[W] = I - L/2m`, regular case (5) | `Sequential.avg_edgeMatrix`, `meanMatrix_of_isRegular` |
+| Second moment `𝔼[WᵀW] = 𝔼[W]`, `𝔼‖Wx‖² = xᵀW̄x` | `Sequential.avg_transpose_edgeMatrix_mul_self`, `avg_sum_sq_edgeMatrix_mulVec` |
+| First moment `𝔼[x⁽ᵗ⁾] = W̄ᵗ x⁽⁰⁾` (Section 7.3.2) | `Sequential.expList_seqRun` |
+
+Proof files: `RateMatrix.lean`, `RateSpectral.lean`, `RateGap.lean`, `RateBound.lean`,
+`SequentialMatrix.lean`. The Survey's Theorem 33 prints `√(d(v)/d(v))`, a typo for `√(d(v)/d(u))`.
+`transitionMatrix` (AVG-2) and `walkMatrix` coincide on regular graphs and the two parts prove
+similar spectral lemmas; their unification is tracked in issue #53.
 
 ## Strong reconstruction (roadmap AVG-2)
 
@@ -32,8 +67,10 @@ Parseval, contraction off two eigenvectors), `ReconstructionMatrix.lean`,
 
 **Provenance.** The statements were written and pinned by hand; the proofs were produced by a Grok
 agent under a fixed-statement protocol and verified mechanically (statements unchanged, no
-placeholders, warning-free build, axiom audit). The AVG-2 statements were pinned by a Claude agent,
-reviewed by hand against the paper, and then proved by the agent under the same protocol.
+placeholders, warning-free build, axiom audit). The AVG-1 statements (the rate bound
+`Averaging/Rate*.lean`, Lovász's Theorem 5.1, and the sequential-averaging identities
+`Averaging/Sequential*.lean`) and the AVG-2 statements were pinned by a Claude agent, reviewed by
+hand against the sources, and then proved by the agent under the same protocol.
 
 Build and audit:
 

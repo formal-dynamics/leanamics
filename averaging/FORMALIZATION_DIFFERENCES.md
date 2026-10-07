@@ -49,3 +49,70 @@ Definition 3.1, Theorem 3.2 and its proof (inequality (3)), Observation A.3, Lem
     to `𝟙` and `χ` (distinct eigenvalues), so Parseval gives
     `∑_{j∈K} (⟨wⱼ,𝟙⟩² + ⟨wⱼ,χ⟩²) = 4n` while Bessel bounds each term by `2n`; hence each `wⱼ`,
     `j ∈ K`, lies in `span {𝟙, χ}` and is orthogonal to `x - α₁𝟙 - α₂χ`.
+
+## Rate bound and sequential averaging (`Rate`, `Sequential`, AVG-1)
+
+Sources: Becchetti, Clementi, Natale, *Consensus Dynamics: An Overview*, ACM SIGACT News 51(1),
+2020 (the Survey; open copy hal-02507613), Section 7.1 (Definitions 30, 31), Section 7.2
+(footnote 24, Theorems 32 and 33, equations (2) to (5)), Section 7.3.2 (first moment); Lovász,
+*Random walks on graphs: a survey*, 1993, Theorem 5.1 (the source of the Survey's Theorem 33);
+Boyd, Ghosh, Prabhakar, Shah, *Randomized gossip algorithms*, IEEE Trans. Inf. Theory 52(6),
+2006 (BGPS06; the source of equations (4) and (5)).
+
+1. **Simple graphs.** `G : SimpleGraph V` on a finite type (no multi-edges or self-loops, which
+   footnote 24 allows), to reuse `avgIter`/`transW` of `Averaging.Basic` and Mathlib's
+   `adjMatrix`, `degMatrix`, `lapMatrix`.
+2. **Typo in the Survey.** Its Theorem 33 prints `√(d(v)/d(v)) λᵗ`; the correct factor, as in
+   Lovász's Theorem 5.1, is `√(d(v)/d(u)) λᵗ`, which is what `abs_walkMatrix_pow_sub_walkStationary_le`
+   states. We take `λ = max {|λ₂|, |λₙ|}` as in the Survey: with `min` instead of `max` the bound
+   would fail, e.g. on a connected bipartite graph, where `λₙ = -1` and `Pᵗ(u, v)` does not converge.
+3. **Theorem 33 under a weaker hypothesis.** Every degree positive (`∀ v, 0 < G.degree v`)
+   instead of "connected" (with at least one edge, implicit for a random walk). Connected graphs
+   with at least two nodes satisfy it (`Connected.preconnected.degree_pos_of_nontrivial`), so the
+   Lean statement implies the source's; the spectral proof does not use connectivity (on a
+   disconnected graph without isolated nodes `λ = 1` and the bound is trivial). The same applies
+   to `charpoly_walkMatrix` and the averaging corollary. Positive degrees are needed: on one
+   isolated node `|P⁰ - π| = 1` but the right-hand side is `0`. (`charpoly_walkMatrix` would also
+   hold without this hypothesis, since isolated nodes give zero rows and columns in both `P` and
+   `N`; it is kept because every use has it.)
+4. **`λ` via the symmetric matrix `N = D^{-1/2} A D^{-1/2}`.** `P = D⁻¹A` is not symmetric, and
+   Mathlib's sorted real spectrum `eigenvalues₀` is for Hermitian matrices. `N` is similar to `P`
+   (`charpoly_walkMatrix`), so its sorted eigenvalues are those of `P` with multiplicity. `λ` is
+   `0` by convention when `n < 2` (there is no `λ₂`).
+5. **`m` is the number of edges.** The Survey's notation paragraph (Section 7.1) says
+   `m = ∑ᵥ d(v)`, inconsistent with `π(v) = d(v)/2m` summing to `1`; we use `m = |E|`
+   (`#G.edgeFinset`), as Lovász does.
+6. **"Unless `G` is bipartite, `λ < 1`"** (a sentence after Theorem 33) is stated for connected
+   graphs with a closed walk of odd length (that is, non-bipartite), the hypotheses of
+   `tendsto_degAvg`. Connectivity is needed: a disconnected graph without isolated nodes (e.g. two
+   disjoint triangles) has `λ₂ = 1`.
+7. **Averaging corollary.** The Survey has no displayed bound for `Pᵗx`; we state the direct
+   consequence of Theorem 33, `|x⁽ᵗ⁾(u) - ∑ᵥ π(v)x(v)| ≤ λᵗ ∑ᵥ √(d(v)/d(u)) |x(v)|`, for every real
+   initial vector (Definition 30's `±1` initialization plays no role in this deterministic
+   bound). `∑ᵥ π(v)x(v)` equals `degAvg G x` of `Averaging.Basic`.
+8. **Bridges.** `walkMatrix_pow_apply` and `avgIter_eq_walkMatrix_pow_mulVec` are the Survey's
+   sentences "`Pᵗᵤᵥ` is the probability that a random walk started at `u` is at `v` after `t`
+   steps" and "`x⁽ᵗ⁾ = Pᵗ x⁽⁰⁾`", connecting the matrix to `transW`/`avgIter`.
+9. **Two edge laws for equations (4) and (5).** The Survey's random sequential model selects one
+   oriented edge uniformly at random (Sections 2 and 6.1), for which `𝔼[W] = I - L/(2m)`. Its
+   equation (4), taken from BGPS06, is the expected matrix of a different law: a uniformly random
+   node `i` contacts `j` with probability `Pᵢⱼ`. The two coincide on regular graphs, which is
+   where (5) lives. We state (4) for BGPS06's law with an arbitrary stochastic `P`, given as a
+   `Dynamics.Kernel` (`avg_expect_edgeMatrix`; self-loops allowed, `W(i,i) = I`), (5) as its
+   specialization to `P = D⁻¹A` on a regular graph (`gossipMeanMatrix_of_isRegular`), and the
+   uniform-edge identity with its own form of (5) (`avg_edgeMatrix`, `meanMatrix_of_isRegular`).
+10. **Uniform oriented edge = uniform dart**; matrix expectations are entrywise, because
+    `Dynamics.avg` and `Distribution.expect` are real-valued. `[Nonempty G.Dart]` (at least one
+    edge) is assumed, since the average over an empty type is `0` by the `dynamics/` convention.
+    The rounds are i.i.d. via `Dynamics.expList G.Dart`, and `seqRun` applies the first step at the
+    head of the list.
+11. **Only `δ = 1/2`** (Survey footnote 28, the case of Section 7.2); `Averaging(δ)` for other `δ`
+    and the first-activation `±1` initialization of Definition 31 are not modelled: the
+    identities hold for every state `x`.
+12. **Second-moment identity** (not displayed in the Survey): `𝔼[WᵀW] = 𝔼[W]` (BGPS06, since `W`
+    is a symmetric projection), stated in matrix and vector (`𝔼‖Wx‖² = xᵀW̄x`) forms for the
+    uniform-edge law, together with the projection identity itself.
+13. **First moment for every graph.** Section 7.3.2 states `𝔼[x⁽ᵗ⁾] = W̄ᵗ x` for regular graphs
+    with `W̄` from (5); we state it for every graph with an edge, with `W̄ = I - L/(2m)`. On regular
+    graphs this is (5) by `meanMatrix_of_isRegular`, which needs `d > 0` (for `d = 0` there are no
+    edges and `meanMatrix = 1` in Lean).
