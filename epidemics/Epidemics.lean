@@ -1,4 +1,8 @@
 import Epidemics.ReedFrost
+import Epidemics.KermackMcKendrickDefs
+import Epidemics.KermackMcKendrick
+import Epidemics.KermackMcKendrickLimits
+import Epidemics.KermackMcKendrickPeak
 import Epidemics.Revisited.Defs
 import Epidemics.Revisited.GrowthAux
 import Epidemics.Revisited.GrowthConnect
