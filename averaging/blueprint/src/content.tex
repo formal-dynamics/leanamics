@@ -3,7 +3,8 @@ We formalize the averaging dynamics on a finite graph, in which every node repla
 the average of its neighbours' values: the degree-weighted sum is conserved, the values stay in
 the initial range, and on a connected graph with an odd closed walk all values converge to the
 degree-weighted average of the initial values; on a connected bipartite graph they need not
-converge.
+converge. On a well-clustered regular graph started from random signs, the sign of the last change
+recovers the two clusters exactly (Becchetti, Clementi, Natale, Pasquale, Trevisan, SODA 2017).
 \end{abstract}
 
 \section{The dynamics}
@@ -44,4 +45,51 @@ On a connected bipartite graph with at least two nodes, the values $\pm1$ of a p
 \end{theorem}
 \begin{proof}\leanok
 All neighbours of a node have the other colour.
+\end{proof}
+
+\section{Strong reconstruction}
+\begin{definition}[Clustered regular graph]\label{def:clustered}
+\lean{Averaging.IsBalancedPartition,Averaging.IsClusteredRegular,Averaging.clusterIndicator,Averaging.transitionMatrix,Averaging.maxAbsOtherEigenvalue,Averaging.color,Averaging.IsStrongReconstruction,Averaging.reconstructionTime}\leanok\uses{def:avg}
+$G$ is $d$-regular on two clusters $V_1,V_2$ of $n$ nodes, each node having $b$ neighbours in the
+other cluster; $\chi=\mathbb 1_{V_1}-\mathbb 1_{V_2}$, $P=A/d$ with eigenvalues
+$\lambda_1\ge\lambda_2\ge\dots$, $\lambda=\max_{i\ge3}|\lambda_i|$. Node $v$ is blue at round $t$
+if $x_t(v)\ge x_{t-1}(v)$; a coloring is a strong reconstruction if no color appears in both
+clusters. $T(n,\delta)=\lceil\log(4n^3)/\log(1+\delta)\rceil+1$.
+\end{definition}
+\begin{lemma}[Lemma C.1]\label{lem:c1}
+\lean{Averaging.avgIter_eq_transitionMatrix_pow_mulVec,Averaging.transitionMatrix_mulVec_clusterIndicator,Averaging.abs_avgIter_sub_le}\leanok\uses{def:clustered}
+If $\lambda<1-2b/d$ and $x\in\{\pm1\}^{2n}$, then
+$|x_t(v)-\alpha_1-\alpha_2(1-2b/d)^t\chi(v)|\le\lambda^t\sqrt{2n}$ with
+$\alpha_1=\langle x,\mathbb 1\rangle/2n$, $\alpha_2=\langle x,\chi\rangle/2n$.
+\end{lemma}
+\begin{proof}\leanok
+$\mathbb 1$ and $\chi$ are eigenvectors with eigenvalues $1$ and $1-2b/d$, both above $\lambda$;
+at most two eigenvalues exceed $\lambda$ in absolute value, so by equality in Bessel's inequality
+their eigenvectors lie in $\operatorname{span}\{\mathbb 1,\chi\}$, and $P$ contracts the
+orthogonal complement of this plane by $\lambda$.
+\end{proof}
+\begin{theorem}[Deterministic core]\label{thm:core}
+\lean{Averaging.sign_avgIter_sub_eq,Averaging.exists_sign_avgIter_sub_clusters,Averaging.isStrongReconstruction_color,Averaging.reconstructionTime_le}\leanok\uses{lem:c1}
+On a connected clustered graph with $1-2b/d>(1+\delta)\lambda$, if $x\in\{\pm1\}^{2n}$ and
+$\langle x,\chi\rangle\ne0$, then for $t\ge T(n,\delta)=O(\log n/\delta)$,
+$\operatorname{sgn}(x_{t-1}(u)-x_t(u))=\operatorname{sgn}(\langle x,\chi\rangle\chi(u))$.
+\end{theorem}
+\begin{proof}\leanok
+$|\langle x,\chi\rangle|\ge2$ by parity, $b\ge1$ by connectivity, $d<2n$, and
+$(1+\delta)^{t-1}\ge4n^3$, so the main term of Lemma~\ref{lem:c1} dominates the errors.
+\end{proof}
+\begin{lemma}[Lemma B.1, exact form]\label{lem:b1}
+\lean{Averaging.prob_dotProduct_clusterIndicator_eq_zero,Averaging.choose_div_four_pow_le}\leanok\uses{def:clustered}
+For uniform $x\in\{\pm1\}^{2n}$, $P(\langle x,\chi\rangle=0)=\binom{2n}{n}/4^n\le1/\sqrt{\pi n}$.
+\end{lemma}
+\begin{proof}\leanok
+$x\mapsto\{v: x(v)=\chi(v)\}$ maps the zeros bijectively to the $n$-subsets; Wallis' product.
+\end{proof}
+\begin{theorem}[Strong reconstruction, Theorem 3.2]\label{thm:strong}
+\lean{Averaging.strong_reconstruction}\leanok\uses{thm:core,lem:b1}
+With probability at least $1-1/\sqrt{\pi n}$, the coloring is a strong reconstruction at every
+round $t\ge T(n,\delta)$.
+\end{theorem}
+\begin{proof}\leanok
+Theorem~\ref{thm:core} and Lemma~\ref{lem:b1}.
 \end{proof}
