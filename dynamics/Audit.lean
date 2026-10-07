@@ -27,3 +27,8 @@ import Dynamics
 #print axioms Dynamics.avg_chernoff_upper
 #print axioms Dynamics.avg_chernoff_lower_ratio
 #print axioms Dynamics.avg_chernoff_lower
+#print axioms Dynamics.Kernel.event_error_of_invariant
+#print axioms Dynamics.Kernel.tendsto_event_of_invariant
+#print axioms Dynamics.Kernel.iSup_event_of_invariant
+#print axioms Dynamics.expList_comp_reverse
+#print axioms Dynamics.Kernel.iterate_ofStep_foldr

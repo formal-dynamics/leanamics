@@ -109,6 +109,23 @@ Under these hypotheses, $K^{nm}f\le q^n f$, and $K^t f(a)\to0$ for every state $
 Induct over blocks using positivity and linearity. The geometric bound tends
 to zero. For arbitrary $t$, compare with $m\lfloor t/m\rfloor$ by antitonicity.
 \end{proof}
+\begin{theorem}[Finite-horizon optional stopping]\label{thm:optional-stopping}
+\lean{Dynamics.Kernel.event_eq_iterate,Dynamics.Kernel.eq_add_target_add_survival,Dynamics.Kernel.iterate_eq_event_add,Dynamics.Kernel.event_error_of_invariant,Dynamics.Kernel.tendsto_event_of_invariant,Dynamics.Kernel.iSup_event_of_invariant}\leanok\uses{def:kernel}
+Let $\varphi$ equal $\varphi_A$ on an event $A$ and $\varphi_B$ on an event $B$, and let
+$S$ be the event of lying in neither. If $\E_{x_0}\varphi(X_T)=\varphi(x_0)$ and
+$m\le\varphi-\varphi_B\le M$ on $S$, then
+$\varphi(x_0)-\varphi_B-(\varphi_A-\varphi_B)\Pr_{x_0}(X_T\in A)$ lies between
+$m\Pr_{x_0}(X_T\in S)$ and $M\Pr_{x_0}(X_T\in S)$. Hence, if $\varphi_A\ne\varphi_B$,
+the conservation law holds for every $T$ and $\Pr_{x_0}(X_T\in S)\to0$, then
+$\Pr_{x_0}(X_T\in A)\to(\varphi(x_0)-\varphi_B)/(\varphi_A-\varphi_B)$; if moreover $A$
+is absorbing, this is the supremum of the finite-time probabilities.
+\end{theorem}
+\begin{proof}\leanok
+Pointwise, $\varphi-\varphi_B=(\varphi_A-\varphi_B)1_A+(\varphi-\varphi_B)1_S$ (on
+$A\cap B$ both sides vanish). Take expectations at time $T$ and bound the last term by
+monotonicity. For the limit, take $M=-m=\sum_a|\varphi(a)-\varphi_B|$ and squeeze. If $A$
+is absorbing, the finite-time probabilities increase, so their limit is their supremum.
+\end{proof}
 
 \section{Rounds, concentration and phases}
 \begin{definition}[Kernel of a round-based process]\label{def:ofstep}
@@ -119,6 +136,16 @@ $T$-step expectations are expectations over $T$ i.i.d.\ uniform rounds.
 \end{definition}
 \begin{proof}\leanok
 Induction on $T$, unfolding one round of $\mathrm{expList}$.
+\end{proof}
+\begin{theorem}[Time reversal of i.i.d.\ rounds]\label{thm:reverse}
+\lean{Dynamics.reverse_ofFn,Dynamics.expList_comp_reverse,Dynamics.Kernel.iterate_ofStep_foldr}\leanok\uses{lem:uniform-trajectory,def:ofstep}
+For every functional $F$ of $T$ i.i.d.\ uniform rounds,
+$\E F(r_T,\dots,r_1)=\E F(r_1,\dots,r_T)$. In particular the $T$-step expectations of a
+round-based process are also obtained by applying the rounds last to first.
+\end{theorem}
+\begin{proof}\leanok
+Write both sides as uniform averages over $\mathrm{Fin}\,T\to R$ and reindex by the
+involution $i\mapsto T-1-i$.
 \end{proof}
 \begin{theorem}[Hoeffding and Bernstein inequalities]\label{thm:concentration}
 \lean{Dynamics.avg_hoeffding,Dynamics.avg_bernstein}\leanok\uses{def:avg}
