@@ -11,6 +11,12 @@ a path of length $\varepsilon^2 n/5$ and a component of $\varepsilon n/2$ vertic
 the coupling, a Reed--Frost epidemic on $K_n$ with $R_0=pn>1$ infects $\Omega(n)$ nodes with
 probability $\Omega(1)$. The development is in the finite layer of the shared \texttt{dynamics}
 package.
+
+We also formalize the deterministic Kermack--McKendrick SIR model: for every solution of
+$s'=-\beta si$, $i'=\beta si-\gamma i$, $r'=\gamma i$ on $[0,\infty)$ with $r(0)=0$, the threshold
+theorem ($i$ initially increases iff $R_0s(0)>1$, with $R_0=\beta/\gamma$), the epidemic peak, and
+the final-size equation $s_\infty=s(0)e^{-R_0(1-s_\infty)}$, following Hethcote (SIAM Review
+2000, Theorem~2.1). This part uses Mathlib's real analysis.
 \end{abstract}
 
 \section{The model}
@@ -156,4 +162,60 @@ $\varepsilon/2-C/n$.
 The final outbreak is the component of the initial node (Corollary~\ref{cor:final}); by symmetry
 of $K_n$ this node lies in a component of size $\ge k$ with probability at least $k/n$ times the
 probability that such a component exists.
+\end{proof}
+
+\section{The Kermack--McKendrick SIR model}
+\begin{definition}[Solutions]\label{def:km}
+\lean{Epidemics.KermackMcKendrick.R₀,Epidemics.KermackMcKendrick.sirField,Epidemics.KermackMcKendrick.IsSolution}\leanok
+Let $\beta,\gamma>0$ and $R_0=\beta/\gamma$. A solution is a triple $(s,i,r)$ of real functions
+such that $t\mapsto(s,i,r)(t)$ is an integral curve on $[0,\infty)$ (one-sided derivative at $0$)
+of the field $(s,i,r)\mapsto(-\beta si,\ \beta si-\gamma i,\ \gamma i)$, with $s(0),i(0)>0$,
+$r(0)=0$ and $s(0)+i(0)+r(0)=1$. Solutions are assumed, not constructed.
+\end{definition}
+
+\begin{theorem}[Invariants]\label{thm:km-basic}
+\lean{Epidemics.KermackMcKendrick.IsSolution.sum_eq_one,Epidemics.KermackMcKendrick.IsSolution.s_pos,Epidemics.KermackMcKendrick.IsSolution.i_pos,Epidemics.KermackMcKendrick.IsSolution.r_nonneg,Epidemics.KermackMcKendrick.IsSolution.strictAntiOn_s,Epidemics.KermackMcKendrick.IsSolution.strictMonoOn_r,Epidemics.KermackMcKendrick.IsSolution.s_eq_mul_exp}\leanok\uses{def:km}
+On $[0,\infty)$: $s+i+r=1$; $s,i>0$ and $r\ge0$; $s$ is strictly decreasing and $r$ strictly
+increasing; and $s(t)=s(0)e^{-R_0r(t)}$.
+\end{theorem}
+\begin{proof}\leanok
+The derivatives of $s+i+r$ and of $se^{R_0r}$ vanish ($R_0\gamma=\beta$), and a function with
+zero right derivative is constant. For $i>0$, compare $i$ with the barrier
+$b(t)=\tfrac{i(0)}2e^{-\gamma t}$: where they touch, $b'=-\gamma i<\beta si-\gamma i=i'$ since
+$s>0$, so $i\ge b$. Monotonicity follows from the signs of $s'=-\beta si$ and $r'=\gamma i$.
+\end{proof}
+
+\begin{theorem}[Threshold]\label{thm:km-threshold}
+\lean{Epidemics.KermackMcKendrick.IsSolution.strictAntiOn_i,Epidemics.KermackMcKendrick.IsSolution.initially_increasing_iff}\leanok\uses{thm:km-basic}
+If $R_0s(0)\le1$, then $i$ is strictly decreasing on $[0,\infty)$. The function $i$ is strictly
+increasing on some $[0,\varepsilon]$, $\varepsilon>0$, iff $R_0s(0)>1$.
+\end{theorem}
+\begin{proof}\leanok
+$i'=i(\beta s-\gamma)$ and $s(t)<s(0)$ for $t>0$. If $R_0s(0)>1$, then $\beta s-\gamma>0$ near $0$
+by continuity.
+\end{proof}
+
+\begin{theorem}[Limits and final size]\label{thm:km-final}
+\lean{Epidemics.KermackMcKendrick.IsSolution.tendsto_i,Epidemics.KermackMcKendrick.IsSolution.exists_tendsto_s,Epidemics.KermackMcKendrick.IsSolution.tendsto_r,Epidemics.KermackMcKendrick.IsSolution.final_size,Epidemics.KermackMcKendrick.IsSolution.limit_pos,Epidemics.KermackMcKendrick.IsSolution.R₀_mul_limit_lt_one,Epidemics.KermackMcKendrick.IsSolution.final_size_unique,Epidemics.KermackMcKendrick.IsSolution.final_size_unique_of_le_one}\leanok\uses{thm:km-threshold}
+$i(t)\to0$, $s(t)\to s_\infty$ and $r(t)\to1-s_\infty$; moreover
+$s_\infty=s(0)e^{-R_0(1-s_\infty)}$, $0<s_\infty<1/R_0$, and $s_\infty$ is the unique root of this
+equation in $(0,1/R_0]$ and in $(0,1]$.
+\end{theorem}
+\begin{proof}\leanok
+$s$ and $r$ are monotone and bounded, so $i=1-s-r$ converges; if $i\to L>0$, the mean value
+theorem makes $r$ grow by more than $1$. Pass to the limit in $s=s(0)e^{-R_0r}$. If
+$R_0s_\infty\ge1$ then $i'>0$ forever, contradicting $i\to0$. Uniqueness: $\log x-R_0x$ is strictly
+increasing on $(0,1/R_0]$ and strictly decreasing on $[1/R_0,\infty)$, and at $x=1$ it exceeds its
+value $\log s(0)-R_0$ at the roots because $s(0)<1$.
+\end{proof}
+
+\begin{theorem}[Peak]\label{thm:km-peak}
+\lean{Epidemics.KermackMcKendrick.IsSolution.exists_peak}\leanok\uses{thm:km-final}
+If $R_0s(0)>1$, there is $t_{\max}>0$ with $s(t_{\max})=1/R_0$ such that $i$ is strictly
+increasing on $[0,t_{\max}]$ and strictly decreasing on $[t_{\max},\infty)$, and
+$i(t_{\max})=i(0)+s(0)-1/R_0-\log(R_0s(0))/R_0$.
+\end{theorem}
+\begin{proof}\leanok
+Intermediate value theorem between $s(0)>1/R_0$ and $s_\infty<1/R_0$; the sign of $\beta s-\gamma$
+changes at $t_{\max}$. The value follows from $\log s=\log s(0)-R_0r$ and $r=1-s-i$.
 \end{proof}

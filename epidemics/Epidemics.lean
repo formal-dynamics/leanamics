@@ -1,4 +1,8 @@
 import Epidemics.ReedFrost
+import Epidemics.KermackMcKendrickDefs
+import Epidemics.KermackMcKendrick
+import Epidemics.KermackMcKendrickLimits
+import Epidemics.KermackMcKendrickPeak
 import Epidemics.GiantCoins
 import Epidemics.GiantDFS
 import Epidemics.GiantAnalysis

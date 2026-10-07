@@ -10,3 +10,12 @@ import Moran
 #print axioms Moran.pull_unfixed_tendsto
 #print axioms Moran.push_fixation
 #print axioms Moran.pull_fixation
+#print axioms Moran.star_potential_invariant
+#print axioms Moran.star_fixation
+#print axioms Moran.star_fixation_leaf
+#print axioms Moran.star_fixation_centre
+#print axioms Moran.star_fixation_uniform
+#print axioms Moran.star_fixation_uniform_sum
+#print axioms Moran.star_amplifier
+#print axioms Moran.star_amplifier_deleterious
+#print axioms Moran.star_fixation_uniform_tendsto

@@ -26,6 +26,9 @@ and indicator projections give the probability for every color in a finite palet
 | Section 2.3 | `iterate_project`, `color_consensus_probability` |
 | Section 2.4 on the complete graph: duality with coalescing random walks | `runRounds_eq_comp`, `disagreement_runRounds_eq_zero` |
 | Section 2.4 on the complete graph: consensus within `2 n log n` rounds w.p. `≥ 1 - 1/n` | `expList_backward_ne`, `iterate_disagreement_le`, `voter_consensus_whp` |
+| Remark p. 254: Theorem 2.1 on bipartite graphs given one self-loop | `propagate_kernel_region`, `consensus_tendsto_of_selfLoop`, `consensus_probability_of_selfLoop`, `color_consensus_probability_of_selfLoop` |
+| Lazy voter `(I + D⁻¹A)/2` on any connected graph (VOT-2) | `lazy`, `lazyNeighbor`, `lazy_stationary_iff`, `lazy_consensus_probability`, `lazyNeighbor_consensus_probability` |
+| Neutral Wright–Fisher: allele `a` fixes w.p. `c_a / n` (VOT-2) | `wrightFisher_fixation_of_three_le`, `wrightFisher_fixation` |
 
 All names in the table except the explicitly qualified shared declaration are
 in namespace `Voter`. The invariant-weight results have no graph assumptions.
@@ -66,6 +69,14 @@ On the complete graph with self-loops (Wright–Fisher sampling), `Coalescence.l
 proves the duality with coalescing random walks and the consensus-time bound; the
 backward walks from two distinct vertices fail to meet in `T` rounds with probability
 exactly `(1 - 1/n)^T`.
+
+Hassin and Peleg remark (p. 254) that one self-loop, even at a single vertex, removes the
+nonbipartiteness hypothesis. `LazyPropagation.lean` and `LazyLoop.lean` formalize this: rounds are
+taken in the kernel support, so the self-loop vertex starts the propagation of Lemma 2.1. Two
+corollaries follow. The lazy voter `(I + D⁻¹A)/2` (`Lazy.lean`) reaches consensus in colour `c`
+with probability `∑_{i coloured c} dᵢ / 2m` on every connected graph, bipartite ones included.
+Neutral Wright–Fisher (`WrightFisher.lean`) fixes allele `a` with probability `c_a / n` for every
+`n ≥ 1`; for `n ≥ 3` this already follows from the nonbipartite theorem on `K_n`.
 
 Future work: convergence-time bounds on general graphs, dynamic networks, and extremal
 coalition results.
