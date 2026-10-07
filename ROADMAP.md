@@ -1,4 +1,4 @@
-# Leanamycs roadmap
+# Leanamics roadmap
 
 Results we would like to see formalized next, grouped into tracks. Every target has a
 stable **ID** (`VOT-3`, `MAJ-4`, …), a source, the infrastructure it needs, a size estimate
@@ -7,7 +7,7 @@ and a status.
 ## How to contribute
 
 1. **Pick a target** whose status is `open`. Check the
-   [open issues](https://github.com/formal-dynamics/leanamycs/issues) in case someone has
+   [open issues](https://github.com/formal-dynamics/leanamics/issues) in case someone has
    just claimed it.
 2. **Open an issue** titled `[ID] short name` (for example `[EPI-1] Reed–Frost ⇔ bond
    percolation`) saying that you are working on it. That's all it takes to claim a target, and
@@ -36,7 +36,7 @@ probabilities ("eventually reaches consensus") are limits of finite-time probabi
 events in a path space. Most targets below fit this layer. The few that cannot are marked.
 
 **Build on `dynamics/`.** The shared `dynamics/` package (merged in
-[#3](https://github.com/formal-dynamics/leanamycs/pull/3), together with `voter/`) provides
+[#3](https://github.com/formal-dynamics/leanamics/pull/3), together with `voter/`) provides
 weighted finite distributions, finite kernels, stationary distributions and geometric
 absorption. New targets should use `dynamics/` rather than growing another private copy of
 the probability layer.

@@ -26,3 +26,6 @@
 /home_page/averaging/
 /home_page/median/
 /home_page/plurality/
+
+# local secrets (API keys)
+.env

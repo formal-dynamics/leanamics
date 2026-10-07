@@ -79,12 +79,11 @@ the linear `5/8` estimate, as `saturation_round_closed` does). Used by
 stage 2b, where `M` is small and the *quadratic* estimate `g(M) ≤ 3M²/n`
 is the tight one — the linear `5/8·M` bound is technically still valid but
 far too crude to be useful there. -/
-lemma saturation_round_generic (hn : 1 ≤ n) (I : Finset (Fin n)) {μub k : ℝ}
+lemma saturation_round_generic (_hn : 1 ≤ n) (I : Finset (Fin n)) {μub k : ℝ}
     (hμub0 : 0 < μub) (hkμ : μub ≤ k)
     (hμ : ∑ v : Fin n, avg (Y_dis I v) ≤ μub) :
     avg (fun r : Tgt3 n => if k ≤ (n : ℝ) - ((step I r).card : ℝ) then (1 : ℝ) else 0)
       ≤ Real.exp (k - μub - k * Real.log (k / μub)) := by
-  haveI : Nonempty (Fin n) := ⟨⟨0, hn⟩⟩
   have hbound := avg_tail_ge_log_le (Y_dis I) (Y_dis_zero_one I) hμ hμub0 hkμ
   rw [show (fun x : Fin n → Fin n × Fin n × Fin n =>
         if k ≤ ∑ i, Y_dis I i (x i) then (1 : ℝ) else 0)
@@ -96,7 +95,7 @@ lemma saturation_round_generic (hn : 1 ≤ n) (I : Finset (Fin n)) {μub k : ℝ
 the true one-round mean is at most `3M²/n` — the crude, but here tight,
 bound `1-p(x) ≤ 3(1-x)²` (dropping the `5/8`-type refinement). -/
 lemma saturation_mean_quad (hn1 : 1 ≤ n) (I : Finset (Fin n)) {M : ℝ}
-    (hM0 : 0 ≤ M) (hUI : (n : ℝ) - (I.card : ℝ) ≤ M) :
+    (_hM0 : 0 ≤ M) (hUI : (n : ℝ) - (I.card : ℝ) ≤ M) :
     ∑ v : Fin n, avg (Y_dis I v) ≤ 3 * M ^ 2 / n := by
   haveI : Nonempty (Fin n) := ⟨⟨0, hn1⟩⟩
   set x : ℝ := avg (ind I) with hx
@@ -257,7 +256,7 @@ lemma saturation_fail_le (hn2 : 2 ≤ n) {M : ℝ} (hM0 : 500 * Real.log n ≤ M
         have hpos : (0:ℝ) ≤ j * Real.exp (-2 * Real.log n) := by positivity
         exact le_trans hbound1 (by linarith)
       · rw [if_neg hcase]
-        push_neg at hcase
+        push Not at hcase
         have hle : (n : ℝ) - ((step I r).card : ℝ) ≤ satAfter n M (i + 1) :=
           le_trans hcase.le (satAfter_contract_le hn1 M i)
         have hthis := ih (i + 1) (step I r) hle
@@ -345,7 +344,8 @@ lemma saturation_stage2a (hn2 : 2 ≤ n) (hfloor4 : 500 * Real.log n ≤ (n : �
   have hle := satAfter_quarter_le_floor (n := n) hn2
   have hmono : ∀ l : List (Tgt3 n),
       (if (500 * Real.log n : ℝ) < (n : ℝ) - (run I₀ l).card then (1 : ℝ) else 0)
-        ≤ (if satAfter n ((n : ℝ) / 4) (T2a n) < (n : ℝ) - (run I₀ l).card then (1 : ℝ) else 0) := by
+        ≤ (if satAfter n ((n : ℝ) / 4) (T2a n) < (n : ℝ) - (run I₀ l).card then (1 : ℝ)
+            else 0) := by
     intro l
     by_cases hc : (500 * Real.log n : ℝ) < (n : ℝ) - (run I₀ l).card
     · have hc2 : satAfter n ((n : ℝ) / 4) (T2a n) < (n : ℝ) - (run I₀ l).card :=

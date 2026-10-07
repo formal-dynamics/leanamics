@@ -3,7 +3,7 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 > **Note:** this project lives in the `rumor_spread/` subdirectory of the
-> `Leanamycs` monorepo and is an independent Lake package (its own
+> `Leanamics` monorepo and is an independent Lake package (its own
 > `lakefile.toml`, `lake-manifest.json` and toolchain, resolved separately
 > from the sibling `3-majority/`). GitHub only reads workflow files from the
 > true repo root, so CI for this directory is
@@ -19,16 +19,16 @@ A complete (`sorry`-free) Lean 4 + Mathlib formalization of the **rumor-spreadin
 Module structure (all under the `RumorPush` namespace, dependency order):
 
 - `Bounds.lean` — elementary real inequalities (Bernoulli & friends, `1 - 1/x ≤ log x`).
-- `Prob.lean` — finite uniform probability: `avg` (sum / cardinality) and `expList α T F` (expectation over `T` i.i.d. uniform draws, defined by recursion on `T`). Markov/union bounds are pointwise inequalities pushed through `expList_le_expList`.
+- Finite uniform probability is **not** defined here: `avg` (sum / cardinality) and `expList α T F` (expectation over `T` i.i.d. uniform draws, defined by recursion on `T`) and their laws come from `Dynamics.Uniform` in the sibling `../dynamics` package (a path dependency; files `open Dynamics`). Do not re-define them. Markov/union bounds are pointwise inequalities pushed through `expList_le_expList`.
 - `Model.lean` — round configurations `Tgt n`, the `step` and `run` (list-of-rounds) dynamics, good rounds, and the deterministic growth lemma.
 - `OneRound.lean` — the one *computed* probability (`avg_not_contacted`, by counting a product of subtypes) and the per-round estimates.
 - `Growth.lean` / `Saturation.lean` — the two phases; the only concentration tool is the exponential-moment induction `expList_half_pow_goodCount`.
 - `Main.lean` — numeric lemmas (`numeric_A/B/C`) and the main theorem.
-- `Equivalence.lean` — `expList` equals the uniform average over the product space `Fin T → α` (faithfulness of the model).
+- `Equivalence.lean` — `expList` equals the uniform average over the product space `Fin T → α` (faithfulness of the model; a one-line alias of `Dynamics.expList_eq_avg_ofFn`).
 
 Design constraint to preserve: **no measure theory, no `PMF`/`ENNReal`, no Chernoff/martingales**; everything is finite sums plus `Real.log`/`Real.exp` only in `Main.lean` numerics.
 
-Toolchain is pinned in [lean-toolchain](lean-toolchain); the single dependency is Mathlib (see [lakefile.toml](lakefile.toml)).
+Toolchain is pinned in [lean-toolchain](lean-toolchain); the dependencies are Mathlib and the shared `../dynamics` package (see [lakefile.toml](lakefile.toml)).
 
 ## Commands
 
