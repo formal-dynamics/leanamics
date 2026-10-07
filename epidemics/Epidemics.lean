@@ -3,3 +3,7 @@ import Epidemics.KermackMcKendrickDefs
 import Epidemics.KermackMcKendrick
 import Epidemics.KermackMcKendrickLimits
 import Epidemics.KermackMcKendrickPeak
+import Epidemics.KurtzDefs
+import Epidemics.KurtzAzuma
+import Epidemics.KurtzDrift
+import Epidemics.Kurtz

@@ -124,3 +124,58 @@ $i(t_{\max})=i(0)+s(0)-1/R_0-\log(R_0s(0))/R_0$.
 Intermediate value theorem between $s(0)>1/R_0$ and $s_\infty<1/R_0$; the sign of $\beta s-\gamma$
 changes at $t_{\max}$. The value follows from $\log s=\log s(0)-R_0r$ and $r=1-s-i$.
 \end{proof}
+
+\section{Kurtz's law of large numbers for SIR, in discrete time}
+\begin{definition}[The uniformized SIR chain]\label{def:kurtz}
+\lean{Epidemics.Kurtz.Compartment,Epidemics.Kurtz.Config,Epidemics.Kurtz.count,Epidemics.Kurtz.scaled,Epidemics.Kurtz.Round,Epidemics.Kurtz.step,Epidemics.Kurtz.chain,Epidemics.Kurtz.deviationProb}\leanok\uses{def:km}
+Let $\beta,\gamma\in\mathbb N$. A configuration assigns to each of $N$ agents a compartment
+$S$, $I$ or $R$; $X=(S,I,R)/N$ are the scaled counts. One step draws $(u,v)$ uniformly in
+$[N]^2$ and one of $\beta+\gamma$ equally likely clocks: on one of the $\beta$ infection clocks an
+infected $u$ infects a susceptible $v$, on one of the $\gamma$ recovery clocks an infected $u$
+recovers. This is the continuous-time chain ($S+I\to2I$ at rate $\beta SI/N$, $I\to R$ at rate
+$\gamma I$) uniformized at rate $(\beta+\gamma)N$. The deviation probability is the probability
+that $\|X_k-x(k/((\beta+\gamma)N))\|_\infty>\theta$ for some $k\le n$.
+\end{definition}
+
+\begin{lemma}[Drift and bounded increments]\label{lem:kurtz-drift}
+\lean{Epidemics.Kurtz.drift_susceptible,Epidemics.Kurtz.drift_infected,Epidemics.Kurtz.drift_recovered,Epidemics.Kurtz.dist_scaled_step_le,Epidemics.Kurtz.iterate_chain}\leanok\uses{def:kurtz}
+$\mathbb E[X_{k+1}-X_k\mid X_k=x]=F(x)/((\beta+\gamma)N)$ with $F$ the Kermack--McKendrick field,
+and $\|X_{k+1}-X_k\|_\infty\le1/N$.
+\end{lemma}
+\begin{proof}\leanok
+Among the $N^2(\beta+\gamma)$ rounds, $\beta IS$ move an agent from $S$ to $I$ and $\gamma NI$ move
+one from $I$ to $R$; a round changes the compartment of at most one agent.
+\end{proof}
+
+\begin{lemma}[Maximal Azuma--Hoeffding]\label{lem:azuma}
+\lean{Epidemics.Kurtz.incrementSum,Epidemics.Kurtz.expList_azuma}\leanok
+If increments $D(X_j,\rho_j)$ along i.i.d.\ uniform rounds have zero conditional mean and
+$|D|\le c$, their partial sums $M_k$ satisfy
+$\mathbb P(\exists k\le n,\ M_k\ge\lambda)\le e^{-\lambda^2/(2nc^2)}$.
+\end{lemma}
+\begin{proof}\leanok
+Hoeffding's lemma ($\mathbb E e^{\theta D}\le\cosh(\theta c)\le e^{\theta^2c^2/2}$ by convexity)
+makes $e^{\theta M_k-k\theta^2c^2/2}$ a nonnegative supermartingale; Ville's maximal inequality,
+proved by induction on $n$ peeling off the first round, bounds the probability that it reaches
+$\mu$ by $1/\mu$; take $\theta=\lambda/(nc^2)$.
+\end{proof}
+
+\begin{theorem}[Law of large numbers]\label{thm:kurtz}
+\lean{Epidemics.Kurtz.law_of_large_numbers,Epidemics.Kurtz.tendsto_deviationProb}\leanok\uses{lem:kurtz-drift,lem:azuma,thm:km-basic}
+Let $\beta,\gamma,T>0$. There are $C,c>0$ and $L$ such that for every $N$, every initial
+configuration, every solution $x$ of the Kermack--McKendrick system started in the simplex and
+every $\varepsilon>0$, with probability at least $1-Ce^{-c\varepsilon^2N}$,
+$\|X_k-x(k/((\beta+\gamma)N))\|_\infty\le L\|X_0-x(0)\|_\infty+\varepsilon$ for all
+$k\le T(\beta+\gamma)N$. Hence, if $X_0\to x(0)$, the scaled chain converges to $x$ in probability,
+uniformly on $[0,T]$.
+\end{theorem}
+\begin{proof}\leanok
+The simplex is invariant under the ODE (first integral for $s$, integrating factor for $i$); there
+$F$ is $(2\beta+\gamma)$-Lipschitz and bounded by $\beta+\gamma$, so one Euler step errs by
+$O(h^2)$, $h=1/((\beta+\gamma)N)$. By Lemma~\ref{lem:kurtz-drift} each coordinate of
+$X_k-X_0-h\sum_{j<k}F(X_j)$ is a martingale with increments at most $2/N$; on the event where the
+six one-sided maximal deviations stay below $\delta=\varepsilon/(2L)$, the discrete Gr\"onwall
+inequality gives the bound with $L=e^{(2\beta+\gamma)T}$, once $\varepsilon N\ge2LT(2\beta+\gamma)$;
+Lemma~\ref{lem:azuma} bounds the complement by $6e^{-c\varepsilon^2N}$. Small $N$ and
+$\varepsilon\ge2$ are absorbed in $C$.
+\end{proof}
