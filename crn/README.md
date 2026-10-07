@@ -39,9 +39,9 @@ remainder predicates (the semilinear predicates) is stably decided by such a CRN
   [`StableSemilinearSet`](Crn/StableSemilinearSet.lean),
   [`StableTransfer`](Crn/StableTransfer.lean) (counts of encounters, input tagging).
 
-**Status.** CRN-1: all statements proved (no `sorry`, standard axioms only); see
-[`PROGRESS.md`](PROGRESS.md). CRN-3: all statements proved as well (no `sorry`, standard
-axioms only); see [`PROGRESS-CRN3.md`](PROGRESS-CRN3.md).
+**Status.** All statements proved (no `sorry`, standard axioms only). Deviations from the
+sources (CRN-1 and CRN-3) are listed in
+[`FORMALIZATION_DIFFERENCES.md`](FORMALIZATION_DIFFERENCES.md).
 
 Build and audit:
 
