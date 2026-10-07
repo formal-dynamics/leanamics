@@ -42,3 +42,34 @@ Scheideler, *Stabilizing consensus with the power of two choices* (SPAA 2011), a
    mgf bound for any real `t`), `avg_sum_sq`, `avg_sum_fourth_le`, `avg_pz`, `avg_pz_sum`,
    `avg_pz_zero_one`, `variance_of_zero_one`; and `ceil_add_ceil_le`, `mul_ceil_le_ceil`,
    `pow_three_le_of_log`, `log_pow_four_div_le`. They are candidates for the shared core.
+
+## Many values: the middle one wins fast (`ManyValues`)
+
+1. **The deterministic core of the odd case of Theorem 21.** The paper starts from a uniformly
+   random configuration with `m` values and shows consensus in `O(log m + log log n)` rounds
+   when `m` is odd (and `Θ(log n)` rounds when `m` is even). The formal statement
+   `odd_split_consensus` assumes instead that the `2k + 1` values have exactly equal support
+   `n/(2k+1)` and that `C (2k+1) √(n log n) ≤ n`; the random start (whose supports only
+   fluctuate around `n/m`) and the even case are not formalized. The underlying statement
+   `median_consensus_fast` only needs a margin `Δ ≥ C √(n log n)` on both sides of a value `v`
+   (at least `Δ` more nodes at or above `v` than below it, and symmetrically), so it also covers
+   unequal supports.
+2. **Explicit constants and a lower bound on `n`.** "With high probability" is the explicit
+   success bound `1 - C/n` (`1 - 2C/n` for `median_consensus_fast`), under `C ≤ log n`; the
+   proofs use `C = 128` for `binary_consensus_fast` and `median_consensus_fast`, and `256` for
+   `odd_split_consensus`. Consensus on `v` is the event `run x l = fun _ => v`.
+3. **Proof route.** `binary_consensus_fast` chains one-round moves, each failing with
+   probability at most `n⁻²`, through four segments: the gap grows by a factor `5/4` per round
+   until the minority is below `n/4` (`O(log (n/Δ))` rounds); six rounds bring it to `n/8`; it
+   then shrinks quadratically (`m ↦ ≈ 3m²/n`, Bernstein) down to `512 log n`
+   (`O(log log n)` rounds); eight more rounds give consensus. For many values, the thresholds
+   `u ↦ [v ≤ x u]` and `u ↦ [x u ≤ v]` both run as 2-Choices with the same samples (the second
+   because the median is self-dual, `med3_antitone`), their gaps are the two margins, and
+   consensus of both on `true` forces consensus on `v`; a union bound gives `1 - 2C/n`.
+4. **Generic lemmas not yet in `dynamics/`.** The kernel and round lemmas
+   `kernel_event_mono_set`, `kernel_event_chain`, `kernel_event_comp`, `expList_ge_of_and` and
+   `expList_foldl_mono` (`ManyValuesKernel.lean`) do not mention the median rule, and the scalar
+   facts `exists_lt_pow_mul`, `exists_le_two_pow_two_pow`, `le_pow_ceil_real`,
+   `mul_one_div_sq_le`, `nat_ceil_mul_le_of_le`, `log_two_ge`, `log_two_le_one`
+   (`ManyValuesScalar.lean`) are plain real inequalities. They live in namespace `Median` until
+   the shared core provides them.

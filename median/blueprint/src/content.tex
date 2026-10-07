@@ -5,7 +5,9 @@ median commutes with monotone maps, so thresholding the process at any value giv
 median process, i.e.\ 2-Choices, driven by the same samples. For two values we prove consensus
 from a gap of order $\sqrt{n\log n}$ within $O(\log n)$ rounds with high probability, then
 consensus from any binary configuration and, by a union bound over the thresholds, from any
-configuration (Theorem~1 of the paper, without adversary).
+configuration (Theorem~1 of the paper, without adversary). With an odd number of equally
+supported values, the middle one wins within $O(\log m+\log\log n)$ rounds (the odd case of
+Theorem~21).
 \end{abstract}
 
 \section{The model}
@@ -101,4 +103,45 @@ Consensus is absorbing, so three blocks of $\lceil C_0\log n\rceil$ rounds turn 
 bound $C_0/n$ of Theorem~\ref{thm:binary-any} into $(C_0/n)^3$. The union bound of
 Theorem~\ref{thm:of-binary} over at most $n-1$ thresholds gives $n(C_0/n)^3\le (3C_0+3)/n$, since
 $C_0^3\le n$ when $\log n\ge 3C_0+3$.
+\end{proof}
+
+\section{Many values: the middle one wins fast}
+\begin{theorem}[Fast binary consensus from a large gap]\label{thm:binary-fast}
+\lean{Median.binary_consensus_fast}\leanok\uses{def:median}
+There is a constant $C>0$ such that, whenever $\log n\ge C$, if the \texttt{true} nodes outnumber
+the \texttt{false} ones by at least $\Delta\ge C\sqrt{n\log n}$, all nodes hold \texttt{true} after
+$\lceil C(\log(n/\Delta)+\log\log n)\rceil$ rounds with probability at least $1-C/n$.
+\end{theorem}
+\begin{proof}\leanok
+Take $C=128$ and chain one-round moves, each failing with probability at most $n^{-2}$, through
+four segments: the gap grows by a factor $5/4$ per round until the minority is below $n/4$
+($O(\log(n/\Delta))$ rounds); six rounds bring the minority below $n/8$; it then shrinks
+quadratically, $m\mapsto\approx 3m^2/n$ (Bernstein), down to $512\log n$ ($O(\log\log n)$
+rounds); eight more rounds give consensus. Consensus is absorbing, so the remaining rounds are
+harmless, and a union bound over the rounds gives the failure probability.
+\end{proof}
+\begin{theorem}[Margins around a value]\label{thm:median-fast}
+\lean{Median.median_consensus_fast}\leanok\uses{thm:threshold,thm:binary-fast}
+There is a constant $C>0$ such that, whenever $\log n\ge C$: if, for a value $v$, the nodes holding a value
+$\ge v$ outnumber those holding a value $<v$ by at least $\Delta\ge C\sqrt{n\log n}$, and
+symmetrically the nodes holding a value $\le v$ outnumber those holding a value $>v$ by at least
+$\Delta$, then all nodes hold $v$ after $\lceil C(\log(n/\Delta)+\log\log n)\rceil$ rounds with
+probability at least $1-2C/n$.
+\end{theorem}
+\begin{proof}\leanok
+The indicators of $\{x_u\ge v\}$ and of $\{x_u\le v\}$ both evolve as 2-Choices with the same
+samples (the second because the median is self-dual), with gaps the two margins. When both reach
+consensus on \texttt{true}, all nodes hold $v$; conclude with Theorem~\ref{thm:binary-fast}
+(with the same $C=128$) and a union bound.
+\end{proof}
+\begin{theorem}[An odd number of equally supported values]\label{thm:odd-split}
+\lean{Median.odd_split_consensus}\leanok\uses{thm:median-fast}
+There is a constant $C>0$ such that, whenever $\log n\ge C$: if the nodes hold $2k+1$ distinct
+values, each held by $n/(2k+1)$ nodes, and $C(2k+1)\sqrt{n\log n}\le n$, then the middle value is
+held by all nodes after $\lceil C(\log(2k+1)+\log\log n)\rceil$ rounds with probability at least
+$1-C/n$. This is the deterministic core of the odd case of Theorem~21 of Doerr et al.
+\end{theorem}
+\begin{proof}\leanok
+Both margins around the middle value equal $n/(2k+1)\ge C_0\sqrt{n\log n}$, and
+$\log(n/\Delta)=\log(2k+1)$; apply Theorem~\ref{thm:median-fast} with $C=2C_0$.
 \end{proof}
