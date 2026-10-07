@@ -12,3 +12,16 @@ import Crn
 #print axioms Crn.ApproxMajority.network_jump_expect
 #print axioms Crn.ApproxMajority.network_reactProb_eq
 #print axioms Crn.ApproxMajority.network_jumpKernel_eq_ppKernel
+#print axioms Crn.Protocol.StablyComputes.unique
+#print axioms Crn.StablyComputable.map₂
+#print axioms Crn.StablyComputable.not
+#print axioms Crn.StablyComputable.and
+#print axioms Crn.StablyComputable.or
+#print axioms Crn.stablyComputable_threshold
+#print axioms Crn.stablyComputable_le_sum
+#print axioms Crn.stablyComputable_remainder
+#print axioms Crn.IsSemilinearPred.isSemilinearSet
+#print axioms Crn.IsSemilinearPred.stablyComputable
+#print axioms Crn.Protocol.exists_network
+#print axioms Crn.StablyComputable.exists_network
+#print axioms Crn.IsSemilinearPred.exists_network
