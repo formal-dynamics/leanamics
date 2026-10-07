@@ -1,0 +1,107 @@
+\begin{abstract}
+We formalize the correspondence between chemical reaction networks and population protocols.
+For a count-conserving bimolecular network ($A + B \to C + D$) with a common rate constant, the
+jump chain of stochastic mass-action kinetics equals the population protocol that draws a
+uniformly random ordered pair of distinct agents, conditioned on the pair reacting, as kernels on
+count vectors. The worked instance is the approximate-majority network.
+\end{abstract}
+
+\section{Chemical reaction networks}
+\begin{definition}[Reactions, networks, counts]\label{def:crn}
+\lean{Crn.Reaction,Crn.Network,Crn.Counts,Crn.Reaction.consumed,Crn.Reaction.produced,Crn.Counts.react}\leanok
+A reaction $A + B \to C + D$ consumes the unordered pair $\{A, B\}$ of species and produces the
+unordered pair $\{C, D\}$; a network is a nonempty finite set of reactions whose products differ
+from their reactants. A count vector of $n$ molecules gives the number $x_a$ of molecules of each
+species $a$, with $\sum_a x_a = n$; firing an applicable reaction $r$ replaces $x_a$ by
+$x_a - \nu_a + \nu'_a$, with $\nu$, $\nu'$ the reactant and product multiplicities.
+\end{definition}
+
+\begin{definition}[Mass-action propensity]\label{def:propensity}
+\lean{Crn.Reaction.propensity,Crn.Network.totalPropensity}\leanok\uses{def:crn}
+With rate constant $k$, the propensity of $r$ at $x$ is $a_r(x) = k \prod_a \binom{x_a}{\nu_a}$
+(Gillespie's combinatorial form), and $a_0(x) = \sum_r a_r(x)$.
+\end{definition}
+
+\begin{lemma}[Propensities]\label{lem:propensity}
+\lean{Crn.Reaction.propensity_of_ne,Crn.Reaction.propensity_of_eq}\leanok\uses{def:propensity}
+For $A + B \to \cdots$ with $A \ne B$ the propensity is $k\, x_A x_B$; for $A + A \to \cdots$ it
+is $k \binom{x_A}{2}$.
+\end{lemma}
+\begin{proof}\leanok
+Only the reactant species have nonzero multiplicity in the product.
+\end{proof}
+
+\begin{definition}[Jump chain]\label{def:jump}
+\lean{Crn.Network.nextReaction,Crn.Network.jumpKernel}\leanok\uses{def:propensity}
+From $x$ with $a_0(x) > 0$ the jump chain fires $r$ with probability $a_r(x)/a_0(x)$; from a
+terminal state ($a_0(x) = 0$) it stays put.
+\end{definition}
+
+\begin{lemma}[The jump chain jumps]\label{lem:jump-self}
+\lean{Crn.Network.jumpKernel_weight_self}\leanok\uses{def:jump}
+If $a_0(x) \ne 0$, the jump chain from $x$ gives weight $0$ to $x$.
+\end{lemma}
+\begin{proof}\leanok
+A reaction with nonzero propensity is applicable, and firing an applicable reaction whose
+products differ from its reactants changes the counts.
+\end{proof}
+
+\section{Population protocols}
+\begin{definition}[The population protocol of a network]\label{def:pp}
+\lean{Crn.AgentPair,Crn.pairDist,Crn.counts,Crn.sampleDist,Crn.Reacts,Crn.outcome,Crn.ppStep,Crn.condStep,Crn.ppKernel}\leanok\uses{def:crn}
+Each of $n \ge 2$ agents holds a species. One interaction draws a uniformly random ordered pair
+$(u, v)$ of distinct agents and, independently, a uniformly random reaction $r$ of the network;
+if the species of $u$ and $v$ are the reactants of $r$ the pair reacts and $r$ fires, otherwise
+nothing changes. The protocol is observed on count vectors; conditioning on the pair reacting
+gives a kernel on count vectors.
+\end{definition}
+
+\begin{lemma}[Key identity]\label{lem:pair}
+\lean{Crn.pair_prob_of_ne,Crn.pair_prob_of_eq,Crn.pair_prob_eq_propensity}\leanok\uses{def:pp,lem:propensity}
+The drawn pair has species $\{A, B\}$ with probability $x_A x_B / \binom{n}{2}$ if $A \ne B$, and
+$\binom{x_A}{2} / \binom{n}{2}$ if $A = B$. Equivalently, it has the reactants of $r$ with
+probability $a_r(x) / (k \binom{n}{2})$.
+\end{lemma}
+\begin{proof}\leanok
+There are $n(n-1)$ ordered pairs of distinct agents, $2 x_A x_B$ of them with species $\{A, B\}$
+for $A \ne B$, and $x_A(x_A - 1)$ with species $\{A, A\}$.
+\end{proof}
+
+\begin{theorem}[One interaction]\label{thm:step}
+\lean{Crn.reactProb_eq,Crn.ppStep_expect}\leanok\uses{lem:pair,def:jump}
+The drawn pair reacts with probability $p = a_0(x) / (k\, |N| \binom{n}{2})$, and one interaction
+is a jump of the mass-action chain with probability $p$ and a no-op otherwise.
+\end{theorem}
+\begin{proof}\leanok
+Average over the uniform reaction and apply the key identity to each reaction.
+\end{proof}
+
+\begin{theorem}[CRNs are population protocols]\label{thm:crn1}
+\lean{Crn.condStep_eq_jumpKernel,Crn.jumpKernel_eq_ppKernel}\leanok\uses{thm:step,lem:jump-self}
+For every rate constant $k > 0$ and $n \ge 2$, the population protocol conditioned on the drawn
+pair reacting is the jump chain of mass-action kinetics, from every configuration and hence as
+kernels on count vectors.
+\end{theorem}
+\begin{proof}\leanok
+Conditioned on reacting, the interaction fires $r$ with probability proportional to $a_r(x)$ by
+the key identity, which is the jump chain; from a configuration where no pair can react both sides
+stay put.
+\end{proof}
+
+\section{Approximate majority}
+\begin{definition}[The approximate-majority network]\label{def:am}
+\lean{Crn.ApproxMajority.Species,Crn.ApproxMajority.network}\leanok\uses{def:crn}
+Species $X$, $Y$ (the two opinions) and $B$ (blank), and the reactions $X + Y \to X + B$,
+$X + Y \to Y + B$, $B + X \to X + X$, $B + Y \to Y + Y$ (Angluin, Aspnes and Eisenstat).
+\end{definition}
+
+\begin{theorem}[Approximate majority as a population protocol]\label{thm:am}
+\lean{Crn.ApproxMajority.network_jump_expect,Crn.ApproxMajority.network_reactProb_eq,Crn.ApproxMajority.network_jumpKernel_eq_ppKernel}\leanok\uses{def:am,thm:crn1}
+With $D = 2 x_X x_Y + x_B (x_X + x_Y) > 0$, the jump chain fires each $X + Y$ reaction with
+probability $x_X x_Y / D$, $B + X \to X + X$ with probability $x_B x_X / D$ and $B + Y \to Y + Y$
+with probability $x_B x_Y / D$; a drawn pair reacts with probability $D / (4 \binom{n}{2})$; and the
+jump chain is the population protocol conditioned on reacting.
+\end{theorem}
+\begin{proof}\leanok
+Instances of the general results, with $a_0(x) = k D$.
+\end{proof}
