@@ -139,36 +139,20 @@ lemma abs_mul_sub_mul_le {a b c d : ℝ} (ha : |a| ≤ 1) (hd : |d| ≤ 1) :
     _ ≤ 1 * |b - d| + 1 * |a - c| := by gcongr
     _ = |b - d| + |a - c| := by ring
 
-lemma abs_fst_le_norm (p : ℝ × ℝ × ℝ) : |p.1| ≤ ‖p‖ := by
-  simp only [Prod.norm_def, Real.norm_eq_abs]
-  exact le_max_left _ _
-
-lemma abs_snd_fst_le_norm (p : ℝ × ℝ × ℝ) : |p.2.1| ≤ ‖p‖ := by
-  simp only [Prod.norm_def, Real.norm_eq_abs]
-  exact (le_max_left _ _).trans (le_max_right _ _)
-
-lemma abs_snd_snd_le_norm (p : ℝ × ℝ × ℝ) : |p.2.2| ≤ ‖p‖ := by
-  simp only [Prod.norm_def, Real.norm_eq_abs]
-  exact (le_max_right _ _).trans (le_max_right _ _)
-
-/-- A point of `ℝ × ℝ × ℝ` whose three coordinates are bounded by `δ` has sup norm at most `δ`. -/
-lemma norm_le_of_abs_le {p : ℝ × ℝ × ℝ} {δ : ℝ} (h1 : |p.1| ≤ δ) (h2 : |p.2.1| ≤ δ)
-    (h3 : |p.2.2| ≤ δ) : ‖p‖ ≤ δ := by
-  simp only [Prod.norm_def, Real.norm_eq_abs]
-  exact max_le h1 (max_le h2 h3)
-
 /-- On the unit ball, the Kermack–McKendrick field is `(2β + γ)`-Lipschitz (sup norm). -/
 lemma norm_sirField_sub_le (hβ : 0 ≤ β) (hγ : 0 ≤ γ) {p q : ℝ × ℝ × ℝ} (hp : ‖p‖ ≤ 1)
     (hq : ‖q‖ ≤ 1) : ‖sirField β γ p - sirField β γ q‖ ≤ (2 * β + γ) * ‖p - q‖ := by
-  have hp1 := (abs_fst_le_norm p).trans hp
-  have hq2 := (abs_snd_fst_le_norm q).trans hq
-  have d1 := abs_fst_le_norm (p - q)
-  have d2 := abs_snd_fst_le_norm (p - q)
+  have hp1 : |p.1| ≤ 1 := (norm_fst_le p).trans hp
+  have hq2 : |q.2.1| ≤ 1 := ((norm_fst_le q.2).trans (norm_snd_le q)).trans hq
+  have d1 : |(p - q).1| ≤ ‖p - q‖ := norm_fst_le (p - q)
+  have d2 : |(p - q).2.1| ≤ ‖p - q‖ :=
+    (norm_fst_le (p - q).2).trans (norm_snd_le (p - q))
   simp only [Prod.fst_sub, Prod.snd_sub] at d1 d2
   have hm := abs_mul_sub_mul_le (b := p.2.1) (c := q.1) hp1 hq2
   have hpq : 0 ≤ ‖p - q‖ := norm_nonneg _
   have key : |p.1 * p.2.1 - q.1 * q.2.1| ≤ 2 * ‖p - q‖ := by linarith
-  refine norm_le_of_abs_le ?_ ?_ ?_ <;> simp only [sirField, Prod.fst_sub, Prod.snd_sub]
+  refine norm_prod_le_iff.2 ⟨?_, norm_prod_le_iff.2 ⟨?_, ?_⟩⟩ <;>
+    simp only [sirField, Prod.fst_sub, Prod.snd_sub, Real.norm_eq_abs]
   · calc |-(β * p.1 * p.2.1) - -(β * q.1 * q.2.1)| = β * |p.1 * p.2.1 - q.1 * q.2.1| := by
           have e : -(β * p.1 * p.2.1) - -(β * q.1 * q.2.1)
               = -(β * (p.1 * p.2.1 - q.1 * q.2.1)) := by ring
@@ -190,12 +174,13 @@ lemma norm_sirField_sub_le (hβ : 0 ≤ β) (hγ : 0 ≤ γ) {p q : ℝ × ℝ �
 /-- On the unit ball, the Kermack–McKendrick field is bounded by `β + γ` (sup norm). -/
 lemma norm_sirField_le (hβ : 0 ≤ β) (hγ : 0 ≤ γ) {p : ℝ × ℝ × ℝ} (hp : ‖p‖ ≤ 1) :
     ‖sirField β γ p‖ ≤ β + γ := by
-  have h1 := (abs_fst_le_norm p).trans hp
-  have h2 := (abs_snd_fst_le_norm p).trans hp
+  have h1 : |p.1| ≤ 1 := (norm_fst_le p).trans hp
+  have h2 : |p.2.1| ≤ 1 := ((norm_fst_le p.2).trans (norm_snd_le p)).trans hp
   have h12 : |p.1 * p.2.1| ≤ 1 := by
     rw [abs_mul]
     exact mul_le_one₀ h1 (abs_nonneg _) h2
-  refine norm_le_of_abs_le ?_ ?_ ?_ <;> simp only [sirField]
+  refine norm_prod_le_iff.2 ⟨?_, norm_prod_le_iff.2 ⟨?_, ?_⟩⟩ <;>
+    simp only [sirField, Real.norm_eq_abs]
   · rw [abs_neg, mul_assoc, abs_mul, abs_of_nonneg hβ]
     nlinarith [abs_nonneg (p.1 * p.2.1)]
   · calc |β * p.1 * p.2.1 - γ * p.2.1| ≤ |β * p.1 * p.2.1| + |γ * p.2.1| := abs_sub _ _

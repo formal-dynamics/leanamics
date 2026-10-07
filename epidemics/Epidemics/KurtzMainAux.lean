@@ -83,12 +83,12 @@ lemma coord_two (p : ℝ × ℝ × ℝ) : coord 2 p = p.2.2 := rfl
 
 lemma abs_coord_le_norm (j : Fin 3) (p : ℝ × ℝ × ℝ) : |coord j p| ≤ ‖p‖ := by
   fin_cases j
-  · exact abs_fst_le_norm p
-  · exact abs_snd_fst_le_norm p
-  · exact abs_snd_snd_le_norm p
+  · exact norm_fst_le p
+  · exact (norm_fst_le p.2).trans (norm_snd_le p)
+  · exact (norm_snd_le p.2).trans (norm_snd_le p)
 
 lemma norm_le_of_forall_coord {p : ℝ × ℝ × ℝ} {δ : ℝ} (h : ∀ j, |coord j p| ≤ δ) : ‖p‖ ≤ δ :=
-  norm_le_of_abs_le (h 0) (h 1) (h 2)
+  norm_prod_le_iff.2 ⟨h 0, norm_prod_le_iff.2 ⟨h 1, h 2⟩⟩
 
 /-! ### The martingale increments -/
 
@@ -106,7 +106,7 @@ lemma norm_scaled_le_one (x : Config N) : ‖scaled x‖ ≤ 1 := by
   have key (c : Compartment) : |(count c x : ℝ) / N| ≤ 1 := by
     rw [abs_of_nonneg (by positivity), div_le_one hN']
     exact_mod_cast count_le c x
-  exact norm_le_of_abs_le (key _) (key _) (key _)
+  exact norm_prod_le_iff.2 ⟨key _, norm_prod_le_iff.2 ⟨key _, key _⟩⟩
 
 /-- The rounds form a nonempty type when `N > 0` and `β > 0`. -/
 lemma round_nonempty (hN : 0 < N) (hβ : 0 < β) : Nonempty (Round N β γ) :=
