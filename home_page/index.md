@@ -135,6 +135,22 @@ consensus on the majority within $\lceil 128 \log n \rceil$ rounds with probabil
 * [API docs]({{ '/median/docs/' | relative_url }})
 * [Source](https://github.com/formal-dynamics/leanamics/tree/main/median)
 
+## Chemical reaction networks and population protocols
+
+In a count-conserving bimolecular chemical reaction network ($A + B \to C + D$) with a common rate
+constant, the jump chain of stochastic mass-action kinetics fires reaction $r$ with probability
+proportional to its propensity. If $a$ and $b$ agents hold species $A \ne B$, a uniformly random
+ordered pair of distinct agents holds one of each with probability $ab / \binom{n}{2}$ (and two $A$
+with probability $\binom{a}{2} / \binom{n}{2}$), which is the propensity up to a common factor. So the
+population protocol that draws such a pair, conditioned on the pair reacting, is exactly the jump
+chain, as kernels on count vectors (`Crn.jumpKernel_eq_ppKernel`). The worked
+instance is the approximate-majority network (`Crn.ApproxMajority.network_jumpKernel_eq_ppKernel`).
+
+* [Blueprint]({{ '/crn/blueprint/' | relative_url }}) · [as pdf]({{ '/crn/blueprint.pdf' | relative_url }}) ·
+  [dependency graph]({{ '/crn/blueprint/dep_graph_document.html' | relative_url }})
+* [API docs]({{ '/crn/docs/' | relative_url }})
+* [Source](https://github.com/formal-dynamics/leanamics/tree/main/crn)
+
 ## Shared finite dynamics library
 
 `Dynamics` supplies uniform and weighted finite expectations, independent
@@ -150,6 +166,6 @@ absorption. It is shared by voter dynamics, the Moran process, 3-majority and pl
 
 Each project is a separate Lean package (its own `lakefile.toml` and
 toolchain) living in its own subdirectory of the repository, with `dynamics/`
-shared by `3-majority/`, `voter/`, `moran/`, `epidemics/`, `undecided/`, `averaging/`, `median/` and `plurality/`; this page is the
+shared by `3-majority/`, `voter/`, `moran/`, `epidemics/`, `undecided/`, `averaging/`, `median/`, `crn/` and `plurality/`; this page is the
 shared landing page linking to each development. See each subdirectory's own
 `README.md` for build instructions.
