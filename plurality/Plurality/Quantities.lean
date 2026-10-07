@@ -280,8 +280,9 @@ theorem lemma_3_1_c {c : Fin k → ℕ} {n : ℕ} (hc : ∑ h, c h = n) (hn : 0 
         ≤ d * ((n : ℝ) - maxc c - d) := by
       calc ∑ h ∈ (univ.erase m).erase ℓ, (c h : ℝ) * (d - c h)
           ≤ ∑ h ∈ (univ.erase m).erase ℓ, (c h : ℝ) * d :=
-            sum_le_sum fun h _ => mul_le_mul_of_nonneg_left (by linarith [Nat.cast_nonneg (α := ℝ) (c h)])
-              (Nat.cast_nonneg _)
+            sum_le_sum fun h _ =>
+              mul_le_mul_of_nonneg_left (by linarith [Nat.cast_nonneg (α := ℝ) (c h)])
+                (Nat.cast_nonneg _)
         _ = d * ((n : ℝ) - maxc c - d) := by
             rw [← sum_mul, mul_comm, hsum, ← add_sum_erase _ _ hℓmem, hℓd]
             ring
