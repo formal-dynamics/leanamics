@@ -7,7 +7,7 @@ defaultTargets = ["Plurality"]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
 relaxedAutoImplicit = false
 weak.linter.mathlibStandardSet = true
-# the repository has no LICENSE and its files carry no copyright header
+# Mathlib's header linter only accepts its Apache 2.0 header; the repository is MIT-licensed
 weak.linter.style.header = false
 maxSynthPendingDepth = 3
 

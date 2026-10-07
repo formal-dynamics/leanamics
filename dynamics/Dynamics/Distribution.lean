@@ -65,6 +65,25 @@ lemma prob_le_one (p : Distribution α) (s : α → Prop) : p.prob s ≤ 1 := by
   calc p.prob s ≤ p.expect (fun _ => 1) := p.expect_mono fun a => by split <;> norm_num
        _ = 1 := p.expect_const 1
 
+/-- **Monotonicity of probability**: a larger event has a larger probability. A set
+inclusion `h : A ⊆ B` can be passed directly for the events `(· ∈ A)` and `(· ∈ B)`. -/
+lemma prob_mono (p : Distribution α) {s t : α → Prop} (h : ∀ ⦃a⦄, s a → t a) :
+    p.prob s ≤ p.prob t := by
+  classical
+  unfold prob
+  refine p.expect_mono fun a => ?_
+  by_cases ha : s a
+  · simp [ha, h ha]
+  · by_cases hb : t a <;> simp [ha, hb]
+
+/-- `prob` computed with any decidability instance for the event. -/
+lemma prob_eq_expect (p : Distribution α) (s : α → Prop) [DecidablePred s] :
+    p.prob s = p.expect fun a => if s a then 1 else 0 := by
+  unfold prob
+  congr 1
+  funext a
+  congr
+
 /-- Uniform distribution, available precisely when the sample type is nonempty. -/
 noncomputable def uniform (α : Type*) [Fintype α] [Nonempty α] : Distribution α where
   weight _ := (Fintype.card α : ℝ)⁻¹

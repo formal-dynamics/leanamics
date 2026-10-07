@@ -485,11 +485,11 @@ accompanying repository (library \texttt{ThreeMajority}, namespace
   how many of the three samples lie in the current opinion-$1$ set and
   compares to $2$; \texttt{run} consumes a list of rounds. The monotone
   coupling of Lemma~\ref{lem:mono} is \texttt{step\_mono}.
-\item \textbf{\texttt{Dynamics/Concentration.lean}} (the shared \texttt{dynamics}
+\item \textbf{\texttt{Dynamics/Chernoff.lean}} (the shared \texttt{dynamics}
   library, also used by the plurality and median developments; formerly
   \texttt{ThreeMajority/Chernoff.lean}): Lemma~\ref{lem:mgf} through
   Corollary~\ref{cor:chernofftail} (\texttt{avg\_chernoff\_mgf},
-  \texttt{avg\_chernoff\_upper}/\texttt{lower},
+  \texttt{avg\_chernoff\_upper\_of\_mgf}/\texttt{lower\_of\_mgf},
   \texttt{avg\_chernoff\_upper\_log}/\texttt{lower\_log}), entirely in the
   \texttt{avg} framework:
   the per-agent MGF identity uses only \texttt{Real.add\_one\_le\_exp}

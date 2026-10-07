@@ -2,12 +2,11 @@ import Dynamics.Absorption
 import Dynamics.Rounds
 
 /-!
-# Elementary tail bounds and probability monotonicity
+# Elementary tail bounds
 
-Probability facts that several model packages used to prove locally (see
-`dynamics/CONCENTRATION_AUDIT.md`), stated once for the shared finite layer.
+Probability facts that several model packages used to prove locally, stated once for the
+shared finite layer (monotonicity of probability in the event is `Distribution.prob_mono`).
 
-* `Distribution.prob_mono`: the probability of an event is monotone in the event.
 * `Distribution.expect_lt_one`, `avg_lt_one`: an observable bounded by `1` that is strictly
   below `1` at a point of positive weight has expectation strictly below `1`.
 * `avg_markov`: **Markov's inequality** `P(X ≥ c) ≤ 𝔼X / c` for uniform averages, and
@@ -34,20 +33,9 @@ open Finset
 namespace Distribution
 variable {α : Type*} [Fintype α]
 
-/-- **Monotonicity of probability**: a larger event has a larger probability. A set
-inclusion `h : A ⊆ B` can be passed directly for the events `(· ∈ A)` and `(· ∈ B)`.
-Replaces `Plurality.prob_mono_set` and `Median.prob_mono_set'`. -/
-theorem prob_mono (p : Distribution α) {s t : α → Prop} (h : ∀ ⦃a⦄, s a → t a) :
-    p.prob s ≤ p.prob t := by
-  classical
-  unfold prob
-  refine p.expect_mono fun a => ?_
-  by_cases ha : s a
-  · simp [ha, h ha]
-  · by_cases hb : t a <;> simp [ha, hb]
-
 /-- An observable bounded by `1` that is strictly below `1` at a point of positive weight has
-expectation strictly below `1`. Replaces `Moran.expect_lt_one` and `Voter.expect_lt_one`. -/
+expectation strictly below `1` (the statement of `Moran.expect_lt_one` and
+`Voter.expect_lt_one`). -/
 theorem expect_lt_one (p : Distribution α) (f : α → ℝ) (hf : ∀ a, f a ≤ 1) (b : α)
     (hb : 0 < p.weight b) (hfb : f b < 1) : p.expect f < 1 := by
   calc p.expect f < p.expect (fun _ => 1) :=
@@ -63,7 +51,7 @@ variable {α : Type*} [Fintype α]
 
 /-- The uniform case of `Distribution.expect_lt_one`: on a nonempty type, an observable
 bounded by `1` and strictly below `1` somewhere has average strictly below `1`.
-Replaces `Undecided.avg_lt_one`. -/
+(The statement of `Undecided.avg_lt_one`.) -/
 theorem avg_lt_one [Nonempty α] {f : α → ℝ} (hf : ∀ a, f a ≤ 1) {b : α} (hb : f b < 1) :
     avg f < 1 := by
   have hsum : ∑ a, f a < ∑ _a : α, (1 : ℝ) := sum_lt_sum (fun a _ => hf a) ⟨b, mem_univ b, hb⟩
@@ -130,8 +118,8 @@ theorem one_sub_avg_le_prob_ofStep {S R : Type*} [Fintype S] [Fintype R] [Nonemp
     linarith
 
 /-- An observable with `f ≤ K f` (subharmonic) has nondecreasing finite-time expectations:
-the counterpart of `iterate_antitone`. Replaces the inductions in `Moran.fixation_mono`,
-`Voter.colorProbability_mono` and `Median.event_absorb_mono`. -/
+the counterpart of `iterate_antitone`. It is the induction behind `Voter.colorProbability_mono`
+and the former `Median.event_absorb_mono`. -/
 theorem iterate_monotone (K : Dynamics.Kernel α) (f : α → ℝ)
     (h : ∀ a, f a ≤ K.apply f a) (a : α) : Monotone (fun n => K.iterate n f a) := by
   apply monotone_nat_of_le_succ

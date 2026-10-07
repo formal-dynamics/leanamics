@@ -1,7 +1,7 @@
 import Plurality.Expectation
 import Plurality.Quantities
 import Dynamics.Tail
-import Dynamics.Concentration
+import Dynamics.Chernoff
 
 /-!
 # Growth of the bias in one round (Lemmas 3.3, 3.4, 3.5)

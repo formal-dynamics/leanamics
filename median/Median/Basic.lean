@@ -85,21 +85,22 @@ private lemma ones_eq_sum (y : Config n Bool) :
 
 omit [LinearOrder α] in
 /-- Consensus configurations are mapped to zero by `notConsensus`. -/
-private lemma notConsensus_eq {y : Config n α} (h : Consensus y) : notConsensus y = 0 := by
+lemma notConsensus_cons {y : Config n α} (h : Consensus y) : notConsensus y = 0 := by
   unfold notConsensus
   rw [if_pos h]
 
 omit [LinearOrder α] in
 /-- Non-consensus configurations are mapped to one by `notConsensus`. -/
-private lemma notConsensus_eq' {y : Config n α} (h : ¬ Consensus y) : notConsensus y = 1 := by
+lemma notConsensus_noncons {y : Config n α} (h : ¬ Consensus y) : notConsensus y = 1 := by
   unfold notConsensus
   rw [if_neg h]
 
 omit [LinearOrder α] in
-private lemma notConsensus_cases (y : Config n α) : notConsensus y = 0 ∨ notConsensus y = 1 := by
+/-- `notConsensus` takes only the values `0` and `1`. -/
+lemma notConsensus_cases (y : Config n α) : notConsensus y = 0 ∨ notConsensus y = 1 := by
   by_cases h : Consensus y
-  · exact Or.inl (notConsensus_eq h)
-  · exact Or.inr (notConsensus_eq' h)
+  · exact Or.inl (notConsensus_cons h)
+  · exact Or.inr (notConsensus_noncons h)
 
 /-- Averaging the majority polynomial of two independent uniform samples: with `P` the average
 of `u` and `A` a constant, the average of `A u₁ + A u₂ + u₁u₂ − 2 A u₁u₂` over pairs is
@@ -244,7 +245,7 @@ theorem absorbed [NeZero n] [Fintype α] [Nonempty α] (x : Config n α) :
         funext r
         rw [step_of_consensus y h r]
       rw [hfun, avg_const]
-    · rw [notConsensus_eq' h]
+    · rw [notConsensus_noncons h]
       have hle : avg (fun r : Round n => notConsensus (step y r))
           ≤ avg (fun _ : Round n => (1 : ℝ)) :=
         avg_le_avg fun r => by
@@ -263,7 +264,7 @@ theorem absorbed [NeZero n] [Fintype α] [Nonempty α] (x : Config n α) :
         show med3 (y v) (y 0) (y 0) = y 0
         exact med3_right _ _
       rw [hfix]
-      exact notConsensus_eq ⟨y 0, fun v => rfl⟩
+      exact notConsensus_cons ⟨y 0, fun v => rfl⟩
     refine Dynamics.avg_lt_one (b := fun _ : Fin n => ((0 : Fin n), (0 : Fin n)))
       (fun r => ?_) (by simp only [hzero, zero_lt_one])
     rcases notConsensus_cases (step y r) with h | h <;> simp [h]

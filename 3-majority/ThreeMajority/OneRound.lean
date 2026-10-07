@@ -13,7 +13,7 @@ function, as a polynomial) plus the independence toolkit of `Prob.lean`.
 
 `Y_maj` and `card_step_eq_sum` expose the underlying `{0,1}`-valued,
 per-agent decomposition of `(step I r).card` as `∑ v, Y_maj I v (r v)`,
-which is exactly the shape the Chernoff bounds of `Dynamics.Concentration` need; `Growth.lean`
+which is exactly the shape the Chernoff bounds of `Dynamics.Chernoff` need; `Growth.lean`
 and `Saturation.lean` apply them directly to `Y_maj`.
 -/
 
@@ -86,7 +86,7 @@ lemma avg_ind_mul_triple (I : Finset (Fin n)) [Nonempty (Fin n)] :
 /-- The per-agent `{0,1}` contribution: whether a majority of the sample
 triple `s` lies in `I`. Independent of the agent index `v`; kept as a
 function `Fin n → (Fin n × Fin n × Fin n) → ℝ` to match the shape
-the Chernoff bounds of `Dynamics.Concentration` expect. -/
+the Chernoff bounds of `Dynamics.Chernoff` expect. -/
 def Y_maj (I : Finset (Fin n)) (_ : Fin n) (s : Fin n × Fin n × Fin n) : ℝ :=
   if 2 ≤ sampleCountOf I s then 1 else 0
 

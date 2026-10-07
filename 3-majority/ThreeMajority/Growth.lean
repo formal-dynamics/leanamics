@@ -1,5 +1,5 @@
 import ThreeMajority.OneRound
-import Dynamics.Concentration
+import Dynamics.Chernoff
 import ThreeMajority.Bounds
 
 /-!

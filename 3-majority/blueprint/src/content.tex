@@ -340,7 +340,7 @@ $\mathrm{avg}(\mathrm{ind}(I)) = |I|/n$.
 The only concentration tool used in the whole development, and the only
 place beyond elementary combinatorics where real exponentials appear. These
 bounds are proved once in the shared \texttt{dynamics} library
-(\texttt{Dynamics/Concentration.lean}, namespace \texttt{Dynamics}), which the
+(\texttt{Dynamics/Chernoff.lean}, namespace \texttt{Dynamics}), which the
 plurality and median developments use as well.
 
 \begin{lemma}[MGF bound]\label{lem:mgf}
@@ -361,13 +361,13 @@ plurality and median developments use as well.
 \end{lemma}
 
 \begin{lemma}[Chernoff tail bounds]\label{lem:chernoff}
-  \lean{Dynamics.avg_chernoff_upper, Dynamics.avg_chernoff_lower}
+  \lean{Dynamics.avg_chernoff_upper_of_mgf, Dynamics.avg_chernoff_lower_of_mgf}
   \leanok
   \uses{lem:mgf}
   In the setting of Lemma~\ref{lem:mgf}: for $t\ge0$ and any $k$,
-  $\Pr[X\ge k] \le \exp(\mu(e^t-1)-tk)$ (\texttt{avg\_chernoff\_upper}, Markov
+  $\Pr[X\ge k] \le \exp(\mu(e^t-1)-tk)$ (\texttt{avg\_chernoff\_upper\_of\_mgf}, Markov
   applied to $\exp(tX)$); symmetrically for $t\le0$,
-  $\Pr[X\le k] \le \exp(\mu(e^t-1)-tk)$ (\texttt{avg\_chernoff\_lower}).
+  $\Pr[X\le k] \le \exp(\mu(e^t-1)-tk)$ (\texttt{avg\_chernoff\_lower\_of\_mgf}).
 \end{lemma}
 
 \begin{lemma}[Closed-form tail bounds at the optimal $t$]\label{lem:chernofflog}
@@ -612,7 +612,7 @@ accompanying repository (library \texttt{ThreeMajority}, namespace
 library, including the independence toolkit \texttt{avg\_prod\_pi} and
 friends), \texttt{Model.lean}
 (Section~\ref{sec:model}), \texttt{Bounds.lean} (Section~\ref{sec:ineq}),
-the shared \texttt{Dynamics/Concentration.lean} (Section~\ref{sec:chernoff}),
+the shared \texttt{Dynamics/Chernoff.lean} (Section~\ref{sec:chernoff}),
 \texttt{OneRound.lean}
 (Section~\ref{sec:map}), \texttt{Growth.lean} (Section~\ref{sec:growth}),
 \texttt{Saturation.lean} (Section~\ref{sec:saturation}), \texttt{Main.lean}

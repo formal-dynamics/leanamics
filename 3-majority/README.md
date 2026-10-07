@@ -64,7 +64,7 @@ that a Chernoff bound *is* needed here; it is proved from scratch in the shared
   exact cubic majority map `p(x) = 3x² - 2x³`, via the polynomial identity
   `maj(a,b,c) = ab+bc+ac-2abc` on `{0,1}`, plus the per-agent `{0,1}`
   decomposition of `(step I r).card` that the Chernoff bounds consume.
-- **Chernoff** (shared [`Dynamics/Concentration.lean`](../dynamics/Dynamics/Concentration.lean),
+- **Chernoff** (shared [`Dynamics/Chernoff.lean`](../dynamics/Dynamics/Chernoff.lean),
   `Dynamics.avg_chernoff_*`): the only concentration tool, built from `1 + x ≤ exp x` and
   `avg_prod_pi` alone — the exponential-moment bound `𝔼[exp(tX)] ≤ exp(μ(eᵗ-1))`, Markov
   applied to `exp(tX)`, and the closed forms at the optimal `t = log(k/μ)`. These are
