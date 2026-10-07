@@ -35,6 +35,17 @@ probability decays geometrically in blocks and tends to zero.
 Take a common block length exceeding all finitely many access times, then a
 maximum survival probability strictly below one. Iterate the resulting contraction.
 \end{proof}
+\begin{theorem}[Finite-horizon optional stopping]\label{thm:optional-stopping}
+\lean{Dynamics.Kernel.event_error_of_invariant}\leanok\uses{def:weights}
+If an observable equals $\varphi_A$ on $A$, $\varphi_B$ on $B$, lies in
+$[\varphi_B+m,\varphi_B+M]$ elsewhere, and keeps its expectation up to time $T$, then
+$\varphi(x_0)-\varphi_B-(\varphi_A-\varphi_B)\Pr(X_T\in A)$ lies between $m$ and $M$
+times the probability of lying in neither event at time $T$.
+\end{theorem}
+\begin{proof}\leanok
+A shared library result (roadmap FND-4): decompose the observable pointwise into its values
+on $A$ and off $A\cup B$, take expectations, and bound the second part.
+\end{proof}
 
 \section{Section 2.1: model}
 \begin{definition}[Synchronous copying]\label{def:step}
@@ -90,7 +101,7 @@ Interchanging finite sums and using $\pi H=\pi$ proves one-step preservation;
 induction proves the iterated statement.
 \end{proof}
 \begin{lemma}[Lemma 2.2: limiting identification]\label{lem:22}
-\lean{Voter.whiteMass_bounds,Voter.whiteProbability_error,Voter.whiteProbability_tendsto}\leanok\uses{lem:21,lem:23}
+\lean{Voter.whiteMass_bounds,Voter.whiteMass_const,Voter.survival_eq,Voter.iterate_survival,Voter.colorProbability_eq_event,Voter.whiteProbability_error,Voter.whiteProbability_tendsto}\leanok\uses{lem:21,lem:23,thm:optional-stopping}
 The discrepancy between expected stationary white mass and all-white
 probability lies between zero and nonconsensus probability. Consequently
 all-white probability converges to initial stationary white mass.
@@ -99,8 +110,9 @@ invariant from Lemma 2.3 when stating the limit.
 \end{lemma}
 \begin{proof}\leanok
 Pointwise, the white mass agrees with the all-white indicator on constant
-configurations and lies in $[0,1]$ elsewhere. Take finite-time expectations
-and squeeze the discrepancy using Lemma 2.1.
+configurations and lies in $[0,1]$ elsewhere. Finite-horizon optional stopping,
+with the two consensus configurations as targets and the invariant of Lemma 2.3,
+bounds the discrepancy; squeeze it using Lemma 2.1.
 \end{proof}
 \begin{theorem}[Theorem 2.1]\label{thm:21}
 \lean{Voter.eventualColor,Voter.colorProbability_mono,Voter.consensus_probability}\leanok\uses{lem:22}

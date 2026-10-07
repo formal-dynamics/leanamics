@@ -82,7 +82,8 @@ lemma growth_round (hn : 1 ≤ n) (I : Finset (Fin n)) {β : ℝ}
     rw [sum_avg_Y_maj hn I, ← hx]
     -- Step A: the identity holds exactly at x = 1/2 + β.
     have hbase : (1 / 2 : ℝ) + (5 / 4) * β ≤ 3 * (1 / 2 + β) ^ 2 - 2 * (1 / 2 + β) ^ 3 := by
-      nlinarith [sq_nonneg β, mul_nonneg (by linarith : (0:ℝ) ≤ β) (by nlinarith : (0:ℝ) ≤ 1/4 - 2*β^2)]
+      nlinarith [sq_nonneg β,
+        mul_nonneg (by linarith : (0:ℝ) ≤ β) (by nlinarith : (0:ℝ) ≤ 1/4 - 2*β^2)]
     -- Step B: `p` is monotone on `[0,1]`, applied to `y := 1/2+β ≤ x ≤ 1`.
     have hmono : 3 * (1 / 2 + β) ^ 2 - 2 * (1 / 2 + β) ^ 3 ≤ 3 * x ^ 2 - 2 * x ^ 3 := by
       have hy0 : (0:ℝ) ≤ 1 / 2 + β := by linarith
@@ -189,7 +190,8 @@ lemma growth_fail_le (hn : 1 ≤ n) (j : ℕ) :
         linarith
       · rw [if_pos (not_le.mp hcase).le]
         have hbound1 : expList (Tgt3 n) j
-            (fun l => if (n : ℝ) * (1 / 2 + growthBias (i + (j + 1))) ≤ ((run (step I r) l).card : ℝ)
+            (fun l => if (n : ℝ) * (1 / 2 + growthBias (i + (j + 1)))
+                  ≤ ((run (step I r) l).card : ℝ)
                 then (0 : ℝ) else 1) ≤ 1 := by
           calc expList (Tgt3 n) j
                 (fun l => if (n : ℝ) * (1 / 2 + growthBias (i + (j + 1)))
@@ -242,7 +244,7 @@ lemma growth_phase1 (hn : 1 ≤ n) (I₀ : Finset (Fin n))
     · rw [if_neg hc]
       by_cases hc2 : (n : ℝ) * (1 / 2 + growthBias 10) ≤ ((run I₀ l).card : ℝ)
       · exfalso
-        push_neg at hc
+        push Not at hc
         have : (n : ℝ) * (3 / 4) < (n : ℝ) * (1 / 2 + growthBias 10) := by nlinarith
         linarith
       · rw [if_neg hc2]
