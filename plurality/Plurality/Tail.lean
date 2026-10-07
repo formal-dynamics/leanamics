@@ -16,9 +16,8 @@ a sum `X = ∑ᵢ Yᵢ(ωᵢ)` of independent `{0,1}`-valued coordinates:
 * Markov's inequality `P(X ≥ 1) ≤ 𝔼X` (Lemma 3.7).
 
 Bernstein's and Hoeffding's inequalities come from `Dynamics.Concentration`.
-The binary development states its Chernoff bounds with its own copy
-`ThreeMajority.avg` of `Dynamics.avg`; the two agree definitionally
-(`threeMajority_avg_eq`).
+The binary development states its Chernoff bounds with `ThreeMajority.avg`, a reducible
+alias of `Dynamics.avg`; `threeMajority_avg_eq` rewrites one into the other.
 -/
 
 namespace Plurality

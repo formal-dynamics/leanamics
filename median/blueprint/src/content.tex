@@ -3,7 +3,11 @@ We formalize the median dynamics of Doerr, Goldberg, Minder, Sauerwald and Schei
 2011): every node adopts the median of its own value and the values of two random nodes. The
 median commutes with monotone maps, so thresholding the process at any value gives the binary
 median process, i.e.\ 2-Choices, driven by the same samples. For two values we prove consensus
-from a gap of order $\sqrt{n\log n}$ within $O(\log n)$ rounds with high probability.
+from a gap of order $\sqrt{n\log n}$ within $O(\log n)$ rounds with high probability, then
+consensus from any binary configuration and, by a union bound over the thresholds, from any
+configuration (Theorem~1 of the paper, without adversary). With an odd number of equally
+supported values, the middle one wins within $O(\log m+\log\log n)$ rounds (the odd case of
+Theorem~21).
 \end{abstract}
 
 \section{The model}
@@ -56,4 +60,88 @@ except with probability $O(n^{-2})$ (Bernstein); then the minority shrinks by $7
 to $O(\log n)$; a final round reaches consensus except with probability $O(n^{-1/2})$ (Markov). The
 phases are combined with the nested-phases lemma of the shared layer. The threshold
 $\log n\ge128$, i.e.\ $n\ge e^{128}$, comes from these crude constants.
+\end{proof}
+
+\section{Consensus from any configuration}
+\begin{theorem}[2-Choices from any start]\label{thm:binary-any}
+\lean{Median.binary_any_start}\leanok\uses{thm:whp}
+There is a constant $C>0$ such that, whenever $\log n\ge C$, from every binary configuration
+(possibly perfectly balanced) all nodes agree after $\lceil C\log n\rceil$ rounds except with
+probability at most $C/n$.
+\end{theorem}
+\begin{proof}\leanok
+Take $C=2^{18}$ and write $g$ for the number of \texttt{true} nodes minus the number of
+\texttt{false} nodes. \emph{Escape:} the potential $e^{-|g|/(256\sqrt n)}$ contracts in
+expectation by $e^{-1/65536}$ per round, up to an additive error $e^{1/131072-\sqrt n/512}$:
+away from balance by Hoeffding's lemma applied at every node, near balance because the next gap
+has variance at least $n/10$, so by Paley--Zygmund it leaves $[-\sqrt n/4,\sqrt n/4]$ with
+probability at least $9/64$. Iterating over $\lceil 2^{17}\log n\rceil$ rounds and applying
+Markov's inequality, $|g|\ge 128\sqrt{n\log n}$ except with probability $2/n$.
+\emph{Consensus:} Theorem~\ref{thm:whp}, applied to the configuration or to its flip, finishes
+within $\lceil 128\log n\rceil$ rounds except with probability $128/n$.
+\end{proof}
+\begin{theorem}[Reduction to two values]\label{thm:of-binary}
+\lean{Median.consensus_of_binary}\leanok\uses{thm:threshold}
+If every binary configuration fails to reach consensus within $T$ rounds with probability at
+most $\varepsilon$, then a configuration with $m$ distinct values fails with probability at most
+$(m-1)\varepsilon$.
+\end{theorem}
+\begin{proof}\leanok
+If a run has not reached consensus, two nodes hold values $a<b$, and the threshold configuration
+$\{x_v\ge b\}$, which follows the same rounds by Theorem~\ref{thm:threshold}, has not reached
+consensus either. Take a union bound over the $m-1$ thresholds above the minimum value.
+\end{proof}
+\begin{theorem}[Consensus from any configuration]\label{thm:any}
+\lean{Median.median_consensus_any}\leanok\uses{thm:binary-any,thm:of-binary}
+There is a constant $C>0$ such that, whenever $\log n\ge C$, from every configuration with values
+in a linear order (any number of distinct values) all nodes agree after $\lceil C\log n\rceil$
+rounds except with probability at most $C/n$. This is Theorem~1 of Doerr et al.\ without the
+adversary.
+\end{theorem}
+\begin{proof}\leanok
+Consensus is absorbing, so three blocks of $\lceil C_0\log n\rceil$ rounds turn the binary failure
+bound $C_0/n$ of Theorem~\ref{thm:binary-any} into $(C_0/n)^3$. The union bound of
+Theorem~\ref{thm:of-binary} over at most $n-1$ thresholds gives $n(C_0/n)^3\le (3C_0+3)/n$, since
+$C_0^3\le n$ when $\log n\ge 3C_0+3$.
+\end{proof}
+
+\section{Many values: the middle one wins fast}
+\begin{theorem}[Fast binary consensus from a large gap]\label{thm:binary-fast}
+\lean{Median.binary_consensus_fast}\leanok\uses{def:median}
+There is a constant $C>0$ such that, whenever $\log n\ge C$, if the \texttt{true} nodes outnumber
+the \texttt{false} ones by at least $\Delta\ge C\sqrt{n\log n}$, all nodes hold \texttt{true} after
+$\lceil C(\log(n/\Delta)+\log\log n)\rceil$ rounds with probability at least $1-C/n$.
+\end{theorem}
+\begin{proof}\leanok
+Take $C=128$ and chain one-round moves, each failing with probability at most $n^{-2}$, through
+four segments: the gap grows by a factor $5/4$ per round until the minority is below $n/4$
+($O(\log(n/\Delta))$ rounds); six rounds bring the minority below $n/8$; it then shrinks
+quadratically, $m\mapsto\approx 3m^2/n$ (Bernstein), down to $512\log n$ ($O(\log\log n)$
+rounds); eight more rounds give consensus. Consensus is absorbing, so the remaining rounds are
+harmless, and a union bound over the rounds gives the failure probability.
+\end{proof}
+\begin{theorem}[Margins around a value]\label{thm:median-fast}
+\lean{Median.median_consensus_fast}\leanok\uses{thm:threshold,thm:binary-fast}
+There is a constant $C>0$ such that, whenever $\log n\ge C$: if, for a value $v$, the nodes holding a value
+$\ge v$ outnumber those holding a value $<v$ by at least $\Delta\ge C\sqrt{n\log n}$, and
+symmetrically the nodes holding a value $\le v$ outnumber those holding a value $>v$ by at least
+$\Delta$, then all nodes hold $v$ after $\lceil C(\log(n/\Delta)+\log\log n)\rceil$ rounds with
+probability at least $1-2C/n$.
+\end{theorem}
+\begin{proof}\leanok
+The indicators of $\{x_u\ge v\}$ and of $\{x_u\le v\}$ both evolve as 2-Choices with the same
+samples (the second because the median is self-dual), with gaps the two margins. When both reach
+consensus on \texttt{true}, all nodes hold $v$; conclude with Theorem~\ref{thm:binary-fast}
+(with the same $C=128$) and a union bound.
+\end{proof}
+\begin{theorem}[An odd number of equally supported values]\label{thm:odd-split}
+\lean{Median.odd_split_consensus}\leanok\uses{thm:median-fast}
+There is a constant $C>0$ such that, whenever $\log n\ge C$: if the nodes hold $2k+1$ distinct
+values, each held by $n/(2k+1)$ nodes, and $C(2k+1)\sqrt{n\log n}\le n$, then the middle value is
+held by all nodes after $\lceil C(\log(2k+1)+\log\log n)\rceil$ rounds with probability at least
+$1-C/n$. This is the deterministic core of the odd case of Theorem~21 of Doerr et al.
+\end{theorem}
+\begin{proof}\leanok
+Both margins around the middle value equal $n/(2k+1)\ge C_0\sqrt{n\log n}$, and
+$\log(n/\Delta)=\log(2k+1)$; apply Theorem~\ref{thm:median-fast} with $C=2C_0$.
 \end{proof}

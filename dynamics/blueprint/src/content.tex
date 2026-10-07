@@ -55,6 +55,19 @@ observables factor, and transporting weights along a function commutes with expe
 Distribute products over finite sums; for pushforward interchange the two sums
 and evaluate each fiber indicator.
 \end{proof}
+\begin{lemma}[Bridges between the expectation APIs]\label{lem:bridge}
+\lean{Dynamics.avg_eq_expect,Dynamics.expList_eq_expect,Dynamics.Distribution.independent_uniform_expect,Dynamics.expList_eq_independent_expect}\leanok\uses{lem:uniform-trajectory,lem:uniform-agreement,lem:weighted-product}
+The finite average is Mathlib's finite expectation, $\operatorname{avg}(f)=\E_{a\in A}f(a)$
+(\texttt{Finset.expect}); both vanish on an empty type. On a nonempty type the independent
+product of uniform distributions on $A$, indexed by a finite set $I$, is the uniform
+distribution on $A^I$. Hence $\mathrm{expList}$ over $T$ rounds is the expectation of
+$F$ over $T$ i.i.d.\ uniform draws, both as Mathlib's $\E_{\omega\colon\{0,\ldots,T-1\}\to A}$
+and under the product distribution.
+\end{lemma}
+\begin{proof}\leanok
+Mathlib's finite expectation is a sum divided by a cardinality. Every point of $A^I$ has
+product weight $|A|^{-|I|}=|A^I|^{-1}$. Combine both with Lemma~\ref{lem:uniform-trajectory}.
+\end{proof}
 \begin{definition}[Transition kernel]\label{def:kernel}
 \lean{Dynamics.Kernel,Dynamics.Kernel.iterate,Dynamics.Kernel.trajectory}\leanok\uses{def:distribution}
 A finite kernel assigns a distribution to every state. Its operator iterates
@@ -96,6 +109,23 @@ Under these hypotheses, $K^{nm}f\le q^n f$, and $K^t f(a)\to0$ for every state $
 Induct over blocks using positivity and linearity. The geometric bound tends
 to zero. For arbitrary $t$, compare with $m\lfloor t/m\rfloor$ by antitonicity.
 \end{proof}
+\begin{theorem}[Finite-horizon optional stopping]\label{thm:optional-stopping}
+\lean{Dynamics.Kernel.event_eq_iterate,Dynamics.Kernel.eq_add_target_add_survival,Dynamics.Kernel.iterate_eq_event_add,Dynamics.Kernel.event_error_of_invariant,Dynamics.Kernel.tendsto_event_of_invariant,Dynamics.Kernel.iSup_event_of_invariant}\leanok\uses{def:kernel}
+Let $\varphi$ equal $\varphi_A$ on an event $A$ and $\varphi_B$ on an event $B$, and let
+$S$ be the event of lying in neither. If $\E_{x_0}\varphi(X_T)=\varphi(x_0)$ and
+$m\le\varphi-\varphi_B\le M$ on $S$, then
+$\varphi(x_0)-\varphi_B-(\varphi_A-\varphi_B)\Pr_{x_0}(X_T\in A)$ lies between
+$m\Pr_{x_0}(X_T\in S)$ and $M\Pr_{x_0}(X_T\in S)$. Hence, if $\varphi_A\ne\varphi_B$,
+the conservation law holds for every $T$ and $\Pr_{x_0}(X_T\in S)\to0$, then
+$\Pr_{x_0}(X_T\in A)\to(\varphi(x_0)-\varphi_B)/(\varphi_A-\varphi_B)$; if moreover $A$
+is absorbing, this is the supremum of the finite-time probabilities.
+\end{theorem}
+\begin{proof}\leanok
+Pointwise, $\varphi-\varphi_B=(\varphi_A-\varphi_B)1_A+(\varphi-\varphi_B)1_S$ (on
+$A\cap B$ both sides vanish). Take expectations at time $T$ and bound the last term by
+monotonicity. For the limit, take $M=-m=\sum_a|\varphi(a)-\varphi_B|$ and squeeze. If $A$
+is absorbing, the finite-time probabilities increase, so their limit is their supremum.
+\end{proof}
 
 \section{Rounds, concentration and phases}
 \begin{definition}[Kernel of a round-based process]\label{def:ofstep}
@@ -106,6 +136,16 @@ $T$-step expectations are expectations over $T$ i.i.d.\ uniform rounds.
 \end{definition}
 \begin{proof}\leanok
 Induction on $T$, unfolding one round of $\mathrm{expList}$.
+\end{proof}
+\begin{theorem}[Time reversal of i.i.d.\ rounds]\label{thm:reverse}
+\lean{Dynamics.reverse_ofFn,Dynamics.expList_comp_reverse,Dynamics.Kernel.iterate_ofStep_foldr}\leanok\uses{lem:uniform-trajectory,def:ofstep}
+For every functional $F$ of $T$ i.i.d.\ uniform rounds,
+$\E F(r_T,\dots,r_1)=\E F(r_1,\dots,r_T)$. In particular the $T$-step expectations of a
+round-based process are also obtained by applying the rounds last to first.
+\end{theorem}
+\begin{proof}\leanok
+Write both sides as uniform averages over $\mathrm{Fin}\,T\to R$ and reindex by the
+involution $i\mapsto T-1-i$.
 \end{proof}
 \begin{theorem}[Hoeffding and Bernstein inequalities]\label{thm:concentration}
 \lean{Dynamics.avg_hoeffding,Dynamics.avg_bernstein}\leanok\uses{def:avg}
@@ -120,6 +160,29 @@ Hoeffding's lemma bounds each Bernoulli factor; for Bernstein,
 $e^y\le1+y+y^2/(2(1-u/3))$ for $y\le u<3$ bounds each factor, and $t$ is
 chosen as $\lambda/(\sigma^2+b\lambda/3)$.
 \end{proof}
+\begin{theorem}[Chernoff bounds for independent Bernoulli trials]\label{thm:chernoff}
+\lean{Dynamics.Distribution.bernoulli,Dynamics.Distribution.chernoff_upper_ratio,Dynamics.Distribution.chernoff_upper,Dynamics.Distribution.chernoff_lower_ratio,Dynamics.Distribution.chernoff_lower,Dynamics.Distribution.bernoulli_chernoff_upper_ratio,Dynamics.Distribution.bernoulli_chernoff_upper,Dynamics.Distribution.bernoulli_chernoff_lower_ratio,Dynamics.Distribution.bernoulli_chernoff_lower,Dynamics.avg_chernoff_upper_ratio,Dynamics.avg_chernoff_upper,Dynamics.avg_chernoff_lower_ratio,Dynamics.avg_chernoff_lower}\leanok\uses{def:distribution,def:avg}
+Let $X=\sum_iX_i$ be a sum of independent $\{0,1\}$-valued trials with
+$\Pr(X_i=1)=p_i$, and let $\mu_L\le\mu=\sum_ip_i\le\mu_H$. For $\delta>0$,
+\[\Pr(X\ge(1+\delta)\mu_H)\le\Bigl(\frac{e^{\delta}}{(1+\delta)^{1+\delta}}\Bigr)^{\mu_H}
+\le e^{-\delta^2\mu_H/(2+\delta)},\]
+and for $0<\delta<1$,
+\[\Pr(X\le(1-\delta)\mu_L)\le\Bigl(\frac{e^{-\delta}}{(1-\delta)^{1-\delta}}\Bigr)^{\mu_L}
+\le e^{-\delta^2\mu_L/2}.\]
+The trials are $\{0,1\}$-valued observables of the coordinates of an independent
+product of distributions, independent biased coins (counting the heads in any
+subset), or the coordinates of one uniform round (Mitzenmacher--Upfal,
+\emph{Probability and Computing}, Theorems 4.4 and 4.5 with Exercise 4.7).
+\end{theorem}
+\begin{proof}\leanok
+Markov's inequality applied to $e^{tX}$, which factors over the coordinates; each
+factor is $1+p_i(e^t-1)\le e^{p_i(e^t-1)}$, so $\E e^{tX}\le e^{\mu_H(e^t-1)}$ for
+$t\ge0$ and $\E e^{tX}\le e^{\mu_L(e^t-1)}$ for $t\le0$. Take $t=\log(1+\delta)$,
+respectively $t=\log(1-\delta)$. The closed forms follow from
+$\log(1+\delta)\ge2\delta/(2+\delta)$ (the first term of the series of
+$\log\frac{1+x}{1-x}$ at $x=\delta/(2+\delta)$) and
+$(1-\delta)\log(1-\delta)\ge-\delta+\delta^2/2$.
+\end{proof}
 \begin{theorem}[Nested phases]\label{thm:phases}
 \lean{Dynamics.Kernel.nested_phases}\leanok\uses{def:kernel}
 Let $A_1\supseteq\cdots\supseteq A_T$ be sets of states such that from $A_i$
@@ -132,4 +195,111 @@ $1-T(\ell\varepsilon+\nu^\ell)$.
 Track the indicator of lying outside a set. In $\ell$ steps the chain leaves
 $A_i$ with probability at most $\ell\varepsilon$, and misses $A_{i+1}$ in all
 $\ell$ steps with probability at most $\nu^\ell$. Sum over the $T$ phases.
+\end{proof}
+\section{Drift and graph rounds}
+\begin{definition}[Time-dependent chain]\label{def:iterateseq}
+\lean{Dynamics.Kernel.iterateSeq,Dynamics.Kernel.iterateSeq_const}\leanok\uses{def:kernel}
+A family of kernels $(K_t)_{t\ge0}$ moves the chain from time $t$ to time
+$t+1$ with $K_t$; $\mathrm{iterateSeq}(K,n,f)(a)$ is the expectation of $f$ at
+time $n$ from $a$. A constant family gives the iterates of a single kernel.
+\end{definition}
+\begin{proof}\leanok
+Induction on $n$.
+\end{proof}
+\begin{theorem}[Drift lemma; Berenbrink et al., ICALP 2016, Lemma 2.2]\label{thm:drift}
+\lean{Dynamics.Kernel.drift_absorption_seq,Dynamics.Kernel.drift_absorption}\leanok
+\uses{def:iterateseq}
+Let $\Psi\ge0$, and for $t<T$ let $c_t\ge0$,
+$\E[\Psi(X_{t+1})\mid X_t=x]\le\Psi(x)-c_t/\Psi(x)$ when $\Psi(x)>0$, and
+$\E[\Psi(X_{t+1})\mid X_t=x]=0$ when $\Psi(x)=0$. If
+$\sum_{t<T}c_t\ge4\Psi(x_0)^2$, then $\Pr_{x_0}(\Psi(X_T)=0)\ge1/2$.
+\end{theorem}
+\begin{proof}\leanok
+Let $q=\Pr(\Psi(X_T)>0)$; survival is nonincreasing, so it is at least $q$
+before $T$. With $\lambda=q/\Psi(x_0)$, the bound $1/y\ge2\lambda-\lambda^2y$
+linearizes the drift: $\E\Psi(X_{t+1})\le(1+c_t\lambda^2)\E\Psi(X_t)
+-2c_t\lambda\Pr(\Psi(X_t)>0)\le\E\Psi(X_t)-c_t\lambda q$. (The paper uses
+Jensen's inequality here; this is its optimal-$\lambda$ form.) Summing,
+$0<m q\le\E\Psi(X_T)\le\Psi(x_0)(1-4q^2)$ if $q>0$, where $m>0$ is the least
+positive value of $\Psi$; hence $q\le1/2$.
+\end{proof}
+\begin{theorem}[Multiplicative drift; the argument of Lemma 2.4 there]\label{thm:multdrift}
+\lean{Dynamics.Kernel.multiplicative_drift_seq,Dynamics.Kernel.multiplicative_drift}\leanok
+\uses{def:iterateseq}
+Let $\Psi\ge0$ with every positive value at least $\Psi_{\min}>0$, and
+$\E[\Psi(X_{t+1})\mid X_t=x]\le(1-\delta_t)\Psi(x)$ for all $x$ and $t<T$.
+Then $\Pr_{x_0}(\Psi(X_T)>0)\le\prod_{t<T}(1-\delta_t)\,\Psi(x_0)/\Psi_{\min}$.
+\end{theorem}
+\begin{proof}\leanok
+By induction $\E\Psi(X_T)\le\prod_{t<T}(1-\delta_t)\Psi(x_0)$ (the factors are
+nonnegative unless $\Psi\equiv0$); then Markov's inequality
+$\mathbf 1_{\Psi>0}\le\Psi/\Psi_{\min}$.
+\end{proof}
+\begin{lemma}[Synchronous neighbour rounds]\label{lem:neighborround}
+\lean{Dynamics.NeighborRound,Dynamics.avg_neighborSet,Dynamics.neighborRound_nonempty,Dynamics.card_neighborRound,Dynamics.avg_neighborRound_prod,Dynamics.avg_neighborRound_eval,Dynamics.avg_neighborRound_mul,Dynamics.avg_neighborRound_sum,Dynamics.avg_vertex_neighborRound}\leanok
+\uses{def:avg}
+In a round $r\in\prod_vN(v)$ every vertex picks a neighbour. Under the uniform
+distribution the picks are independent and uniform:
+$\E\prod_vf_v(r_v)=\prod_v\E_{u\in N(v)}f_v(u)$, and, without isolated
+vertices, $\E g(r_v)=\E_{u\in N(v)}g(u)$. A uniform vertex $v$ with a uniform
+round gives the sequential step ``uniform vertex, uniform neighbour $r_v$''.
+\end{lemma}
+\begin{proof}\leanok
+$\sum_r\prod_vf_v(r_v)=\prod_v\sum_{u\in N(v)}f_v(u)$ and
+$|\prod_vN(v)|=\prod_v\deg v$; the marginals take $f_w=1$ for $w\ne v$.
+\end{proof}
+\begin{lemma}[Uniform oriented edge]\label{lem:edgeround}
+\lean{Dynamics.EdgeRound,Dynamics.edgeRound_nonempty,Dynamics.avg_edgeRound,Dynamics.avg_edgeRound_symm,Dynamics.avg_edgeRound_edge,Dynamics.avg_edgeRound_fst}\leanok
+\uses{def:avg}
+For a uniform dart $d$ of $G$,
+$\E F(d_1,d_2)=\sum_v\sum_{u\in N(v)}F(v,u)/(2|E|)$; reversing $d$ preserves
+the law, its underlying edge is a uniform edge, and its tail is $v$ with
+probability $\deg v/(2|E|)$.
+\end{lemma}
+\begin{proof}\leanok
+Group the darts by tail (the darts with tail $v$ are the neighbours of $v$)
+or by edge (each edge carries two darts).
+\end{proof}
+\section{Hitting times}
+\begin{definition}[Hitting probability]\label{def:hitprob}
+\lean{Dynamics.Kernel.hitProb}\leanok\uses{def:kernel}
+$\mathrm{hitProb}(K,B,n)(a)=\Pr_a(\exists s\le n,\ X_s\in B)=\Pr_a(T_B\le n)$,
+the expectation over the first $n$ transitions of the indicator that one of
+the states at the times $0,\dots,n$ lies in $B$.
+\end{definition}
+\begin{lemma}[Geometric drift bound for hitting times]\label{lem:hitdrift}
+\lean{Dynamics.Kernel.stopped,Dynamics.Kernel.one_sub_hitProb_eq_event_stopped,Dynamics.Kernel.one_sub_hitProb_le_of_drift}\leanok
+\uses{def:hitprob,thm:multdrift}
+Let $V\ge0$ vanish on $B$ and be at least $V_{\min}>0$ off $B$, with
+$\E[V(X_{t+1})\mid X_t=x]\le\rho V(x)$ for $x\notin B$. Then
+$\Pr_a(T_B>t)\le\rho^tV(a)/V_{\min}$.
+\end{lemma}
+\begin{proof}\leanok
+In the chain stopped on entering $B$, being outside $B$ at time $t$ is the
+event $T_B>t$; apply Theorem~\ref{thm:multdrift} to the stopped chain with
+$\delta=1-\rho$.
+\end{proof}
+\begin{theorem}[Hitting-time bound; Doerr, Goldberg, Minder, Sauerwald, Scheideler, SPAA 2011, Claim 2.9]\label{thm:drifthitting}
+\lean{Dynamics.Kernel.drift_hitting,Dynamics.Kernel.drift_hitting_log}\leanok
+\uses{lem:hitdrift}
+Let $c_1>1$ and $c_2,c_3,c_4,c_6>0$. There is $c_5>0$ such that for every
+finite chain and observable $X\in\{0,\dots,q\}$ with $c_4\log q\le q$: if
+from every state below the target $\Pr[X_{t+1}\ge\min\{c_1X_t,q\}]\ge
+1-e^{-c_2X_t}$, and $\Pr[X_{t+1}\ge1]\ge c_3$ when $X_t=0$, then
+$X$ reaches $c_4\log q$ within $c_5\log q+\log_{c_1}(c_4\log q)$ steps with
+probability at least $1-q^{-c_6}$ (equivalently within $C\log q$ steps).
+\end{theorem}
+\begin{proof}\leanok
+The paper omits the proof. Let $p=\min\{c_3,1-e^{-c_2}\}$, $\theta=1/p$ and
+$\beta=c_2/2$. For a large threshold $x_0$ take
+$g(x)=1-\eta(\theta^x-1)$ for $x\le x_0$, with $\eta$ chosen so that
+$g(x_0)=1/2$, and $g(x)=\tfrac12e^{-\beta(x-x_0)}$ for $x\ge x_0$; let
+$V=g(X)$ below the target and $V=0$ on it. Below $x_0$ a step goes up by at
+least one with probability at least $p$, and
+$pg(x+1)+1-p\le\rho g(x)$ with $\rho=1-(1-p)\eta/2$; above $x_0$ growth by
+$c_1$ fails with probability at most $e^{-c_2x}$, and the expected potential is
+at most $\tfrac38e^{-\beta(x-x_0)}\le\rho g(x)$. Since $V\le1$ and
+$V\ge\tfrac12q^{-\beta c_4}$ below the target, Lemma~\ref{lem:hitdrift} gives
+$\Pr(T>t)\le2\rho^tq^{\beta c_4}\le q^{-c_6}$ for
+$t\ge(1+\beta c_4+c_6)\log q/\log(1/\rho)$.
 \end{proof}
