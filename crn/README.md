@@ -16,8 +16,8 @@ kernels on count vectors. Worked instance: the approximate-majority CRN
 * [`Crn/Condition.lean`](Crn/Condition.lean), [`Crn/DistLemmas.lean`](Crn/DistLemmas.lean):
   normalized weights, conditioning and expectation lemmas for `Dynamics.Distribution`.
 
-**Status.** All statements proved (no `sorry`, standard axioms only); see
-[`PROGRESS.md`](PROGRESS.md).
+**Status.** All statements proved (no `sorry`, standard axioms only). Deviations from the
+sources are listed in [`FORMALIZATION_DIFFERENCES.md`](FORMALIZATION_DIFFERENCES.md).
 
 Build and audit:
 
