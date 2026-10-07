@@ -16,7 +16,7 @@ majority*, Distributed Computing 21 (2008) [AAE08], for the protocol of `Undecid
 Consensus configurations are absorbing, so "consensus at every time `T ≥ C n log n`" is the same
 as "consensus within `C n log n` interactions". The paper's explicit constants, its "sufficiently
 large `n`" and its `ω(√n log n)` are absorbed into one existential constant `C`, which depends on
-the error exponent `c`. See `undecided/PROGRESS-UND2.md` (Deviations) for the comparison with the
+the error exponent `c`. See `undecided/FORMALIZATION_DIFFERENCES.md` for the comparison with the
 paper's statements.
 -/
 

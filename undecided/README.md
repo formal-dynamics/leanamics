@@ -9,7 +9,8 @@ Computing 2008), one uniformly random ordered pair of agents per step: from any 
 configuration consensus within `O(n log n)` interactions, and from a gap of `C √n log n` the
 initial majority wins, each with probability `1 - O(n^{-c})` for every `c` (`consensus_whp`,
 `majority_whp`, `approximate_majority`). The proof uses six weighted supermartingales along finite
-paths; see [`PROGRESS-UND2.md`](PROGRESS-UND2.md) for the route and the deviations from the paper.
+paths; see [`FORMALIZATION_DIFFERENCES.md`](FORMALIZATION_DIFFERENCES.md) for the route and the
+deviations from the paper.
 
 **Provenance.** For `Undecided/Basic.lean`, the statements were written and pinned by hand; the
 proofs were produced by a Grok agent under a fixed-statement protocol and verified mechanically
