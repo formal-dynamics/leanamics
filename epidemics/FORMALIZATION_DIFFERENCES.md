@@ -320,3 +320,44 @@ Lemma 1, Theorem 1, Theorem 2 in Discussion item 3).
     and `one_sub_le_prob` (`GiantCoins.lean`) are elementary event bounds not yet in
     `dynamics/`; their move to the core is tracked in issue #42. Monotonicity and the
     expectation form of `prob` are the core's.
+
+## COBRA ⇔ BIPS duality (`Cobra*`, EPI-4)
+
+Source: C. Cooper, T. Radzik, N. Rivera, *The coalescing-branching random walk on expanders and
+the dual epidemic process*, PODC 2016, arXiv:1602.05768: Theorem 4 (Section 2) and its case
+`C = {u}`, equation (2) (Section 1). The paper's Theorem 4: for a connected regular graph and
+`k ≥ 1`, `P̂(Hit_C(v) > t | C₀ = C) = P(C ∩ A_t = ∅ | A₀ = v)` for all `v`, `C ⊆ V`, `t ≥ 0`.
+The cover-time bounds (Theorems 1 to 3) are not formalized.
+
+1. **Hypotheses dropped (statement strengthened).** The paper assumes `G` connected and regular
+   and `k ≥ 1`. `cobra_bips_duality`, `cobra_bips_duality_singleton` and the pathwise lemma hold
+   for every finite simple graph and every `k` (including `k = 0`): the paper's proof only matches
+   each vertex's choice law in the two processes and never uses regularity (exhaustive checks on
+   small irregular graphs agree). The paper's hypotheses appear in `choices_nonempty`: on a
+   connected graph with at least two vertices the round type is nonempty, so both sides are
+   genuine probabilities. On a graph with an isolated vertex and `k ≥ 1` (where neither process
+   is defined) the round type is empty and both sides are `0` for `t ≥ 1` by the `avg`
+   convention, so the statement is vacuous there.
+2. **Conditioning on the initial state.** `P̂(· | C₀ = C)` and `P(· | A₀ = v)` are expressed by
+   starting the round-driven processes at `C` and `{v}` and averaging over `t` i.i.d. uniform
+   rounds with `Dynamics.expList` (finite probability layer, no path space). A round
+   (`Choices G k`) gives every vertex `k` neighbours sampled uniformly with replacement; both
+   processes read the same round type, a coupling of the two per-vertex sampling laws, and each
+   ignores the choices it does not use (COBRA: vertices outside `C_s`; BIPS: the source `v`), as
+   in the paper's model.
+3. **Hitting time as an event.** `Hit_C(v) = min {s ≥ 0 : v ∈ C_s}` is not defined as a random
+   variable; `Hit_C(v) > t` is written `∀ s ≤ t, v ∉ C_s` with `C_s = cobraRun C (l.take s)`,
+   time 0 included (the convention fixed by the paper's base case, "trivial if `v ∈ C`, since
+   both probabilities are 0").
+4. **Extra pathwise result and proof route.** The pathwise identity `cobra_hit_iff_bips_reverse`
+   (COBRA from `C` along the rounds `r₁, …, r_t` visits `v` iff BIPS from `{v}` along
+   `r_t, …, r₁` infects a vertex of `C`) is not stated in the paper, whose intuition paragraph
+   sketches it for `k = 1`. Theorem 4 is proved from it and the time reversal of i.i.d. rounds
+   (`Dynamics.expList_comp_reverse`), instead of the paper's induction on `t` with one-step
+   conditioning; the statement is the same.
+5. **Generalized BIPS start.** `bipsRun` takes any initial infected set `A₀`; the theorems use
+   the paper's `A₀ = {v}`.
+6. **Round type local to the package.** `Choices G k = (x : V) → Fin k → G.neighborSet x` is the
+   `k`-sample version of the core's `NeighborRound G` (`Dynamics.GraphRounds`, one uniform
+   neighbour per vertex); it is equivalent to `k` independent such rounds (`Fin k → NeighborRound
+   G`, after swapping the arguments) but is kept in `epidemics/` with the statements as written.

@@ -25,6 +25,9 @@ We also formalize the upper bounds of Doerr and Kostrygin's analysis of general 
 processes (\emph{Randomized rumor spreading revisited}, ICALP 2017): the exponential growth and
 shrinking regimes and the total spreading time $\log_{1+\gamma}n+\frac1\rho\ln n+O(1)$, with
 exponential tails. Lemma~20 of that paper is false as stated; we prove corrected versions.
+
+We also formalize the duality between the coalescing-branching random walk (COBRA) and the BIPS
+epidemic of Cooper, Radzik and Rivera (Theorem~4), pathwise and by time reversal of i.i.d.\ rounds.
 \end{abstract}
 
 \section{The model}
@@ -431,4 +434,56 @@ $E[T]\le\log_{1+\gamma}n+\ln n/\rho+B$.
 \begin{proof}\leanok
 Compose the three exponential tails (Theorem~\ref{thm:rumor-growth}, Lemma~\ref{lem:rumor-connect},
 Theorem~\ref{thm:rumor-shrinking}) by the Markov property at fixed times, and sum the tail.
+\end{proof}
+
+\section{COBRA and BIPS: the model}
+We follow Cooper, Radzik and Rivera, \emph{The coalescing-branching random walk on expanders and
+the dual epidemic process}, PODC 2016 (arXiv:1602.05768).
+\begin{definition}[Rounds of neighbour choices]\label{def:choices}
+\lean{Epidemics.Choices,Epidemics.instFintypeChoices,Epidemics.choices_nonempty}\leanok
+In a round $r$, every vertex $x$ of a finite graph $G$ samples $k$ neighbours
+$r(x,0),\dots,r(x,k-1)$. A uniform round is exactly the paper's sampling: $k$ uniform neighbours
+with replacement, independently for every vertex; $t$ i.i.d.\ uniform rounds are averaged with
+\texttt{Dynamics.expList}. If $G$ is connected and has at least two vertices, rounds exist.
+\end{definition}
+\begin{proof}\leanok
+Every vertex of a connected graph with at least two vertices has a neighbour.
+\end{proof}
+\begin{definition}[COBRA and BIPS]\label{def:cobra}
+\lean{Epidemics.cobraStep,Epidemics.cobraRun,Epidemics.bipsStep,Epidemics.bipsRun}\leanok\uses{def:choices}
+COBRA from $C_0=C$: $C_{s+1}=\{r_{s+1}(x,i) : x\in C_s,\ i<k\}$. BIPS with persistent source $v$
+from $A_0$: $A_{s+1}=\{v\}\cup\{u : \exists i,\ r_{s+1}(u,i)\in A_s\}$.
+\end{definition}
+
+\section{COBRA--BIPS duality}
+\begin{lemma}[Time reversal of i.i.d.\ rounds]\label{lem:reverse}
+\lean{Dynamics.expList_comp_reverse,Epidemics.expList_congr_length}\leanok
+For every functional $F$ of $T$ i.i.d.\ uniform rounds,
+$\mathbb E[F(r_T,\dots,r_1)]=\mathbb E[F(r_1,\dots,r_T)]$.
+\end{lemma}
+\begin{proof}\leanok
+The uniform average over $\mathrm{Fin}\,T\to\alpha$ is invariant under $\omega\mapsto\omega\circ\mathrm{rev}$
+(the time-reversal lemma of the shared \texttt{dynamics} package).
+\end{proof}
+\begin{lemma}[Pathwise duality]\label{lem:pathwise}
+\lean{Epidemics.cobra_hit_iff_bips_reverse}\leanok\uses{def:cobra}
+For all rounds $r_1,\dots,r_t$: COBRA from $C$ along $r_1,\dots,r_t$ visits $v$ at some time
+$s\le t$ (time $0$ included) iff BIPS from $\{v\}$ along $r_t,\dots,r_1$ infects a vertex of $C$.
+\end{lemma}
+\begin{proof}\leanok
+Induction on $t$, generalizing $C$. Both sides say that a chain $x_0\in C$,
+$x_j=r_j(x_{j-1},i_j)$, reaches $v$ within $t$ steps: COBRA unfolds the first round, BIPS the
+last round of the reversed sequence.
+\end{proof}
+\begin{theorem}[Theorem 4 of Cooper--Radzik--Rivera]\label{thm:duality}
+\lean{Epidemics.cobra_bips_duality,Epidemics.cobra_bips_duality_singleton}\leanok\uses{lem:reverse,lem:pathwise}
+For every finite graph, every $k$, every vertex $v$, set $C$ and time $t$:
+$\hat{\mathbb P}(\mathrm{Hit}_C(v)>t\mid C_0=C)=\mathbb P(C\cap A_t=\emptyset\mid A_0=\{v\})$. In
+particular (equation (2)), $\hat{\mathbb P}(\mathrm{Hit}_u(v)>t)=\mathbb P(u\notin A_t\mid A_0=\{v\})$.
+The paper assumes $G$ connected and regular and $k\ge1$; none of this is needed.
+\end{theorem}
+\begin{proof}\leanok
+Lemma~\ref{lem:pathwise} identifies the two events after reversing the rounds, and
+Lemma~\ref{lem:reverse} says that reversing the rounds preserves their law. The paper proves the
+theorem instead by induction on $t$ with one-step conditioning.
 \end{proof}

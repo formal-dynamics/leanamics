@@ -1,4 +1,4 @@
-# Epidemics: Reed–Frost and bond percolation; subcritical percolation; the giant component; the Kermack–McKendrick SIR model; Kurtz's law of large numbers; rumor spreading revisited
+# Epidemics: Reed–Frost and bond percolation; subcritical percolation; the giant component; the COBRA–BIPS duality; the Kermack–McKendrick SIR model; Kurtz's law of large numbers; rumor spreading revisited
 
 A Lean formalization of the pathwise correspondence between the Reed–Frost (Independent Cascade)
 epidemic and bond percolation (after Kempe, Kleinberg and Tardos, KDD 2003; see also Becchetti et
@@ -156,6 +156,32 @@ corrected path statement are formalized instead. The counterexample and the othe
 condition in Definition 11, the composed total-time theorems) are listed in
 [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md). Theorem 31 is proved with a
 quadratic potential instead of the paper's phase calculus.
+
+## COBRA ⇔ BIPS duality (EPI-4)
+
+After Cooper, Radzik and Rivera, *The coalescing-branching random walk on expanders and the dual
+epidemic process*, PODC 2016 ([arXiv:1602.05768](https://arxiv.org/abs/1602.05768)), Theorem 4.
+
+**Model.** In every round each vertex samples `k` uniform neighbours with replacement (a uniform
+element of `Choices G k`). COBRA: every vertex of the current set pushes to its sampled neighbours,
+and the next set is the set of chosen vertices. BIPS with persistent source `v`: `v` is always
+infected, and any other vertex is infected next iff one of its sampled neighbours is infected now.
+
+**Main results** (in [`Epidemics/CobraDuality.lean`](Epidemics/CobraDuality.lean)):
+
+| Result | Lean declaration |
+| --- | --- |
+| Pathwise: COBRA from `C` visits `v` within the rounds iff BIPS from `{v}` along the reversed rounds infects a vertex of `C` | `cobra_hit_iff_bips_reverse` |
+| Theorem 4: `P(Hit_C(v) > t ∣ C₀ = C) = P(C ∩ A_t = ∅ ∣ A₀ = {v})` | `cobra_bips_duality` |
+| Equation (2): `P(Hit_u(v) > t) = P(u ∉ A_t ∣ A₀ = {v})` | `cobra_bips_duality_singleton` |
+
+The paper assumes `G` connected and regular and `k ≥ 1`; the duality holds for every finite graph
+and every `k`. On a connected graph with at least two vertices the rounds exist
+(`choices_nonempty`), so both sides are genuine probabilities. The proof combines the pathwise
+identity with time reversal of i.i.d. rounds, the core's `Dynamics.expList_comp_reverse` (FND-6).
+Deviations from the paper are listed in [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
+The statements were pinned and then proved by a Claude agent under the fixed-statement protocol and
+checks of the provenance note below.
 
 **Provenance.** Reed–Frost: the statements were written and pinned by hand; the proofs were produced
 by a Grok agent under a fixed-statement protocol and verified mechanically (statements unchanged, no
