@@ -3,7 +3,12 @@ We formalize the correspondence between chemical reaction networks and populatio
 For a count-conserving bimolecular network ($A + B \to C + D$) with a common rate constant, the
 jump chain of stochastic mass-action kinetics equals the population protocol that draws a
 uniformly random ordered pair of distinct agents, conditioned on the pair reacting, as kernels on
-count vectors. The worked instance is the approximate-majority network.
+count vectors. The worked instance is the approximate-majority network. We then formalize the easy
+direction of the characterization of stably computable predicates (Angluin, Aspnes, Diamadi,
+Fischer and Peralta, 2006): threshold and remainder predicates on input counts are stably
+computable by population protocols, the class is closed under Boolean operations, and every
+protocol is a count-conserving bimolecular network, so every Boolean combination of threshold and
+remainder predicates is stably decided by such a network.
 \end{abstract}
 
 \section{Chemical reaction networks}
@@ -104,4 +109,103 @@ jump chain is the population protocol conditioned on reacting.
 \end{theorem}
 \begin{proof}\leanok
 Instances of the general results, with $a_0(x) = k D$.
+\end{proof}
+
+\section{Stable computation}
+\begin{definition}[Population protocols with input and output]\label{def:protocol}
+\lean{Crn.Protocol,Crn.Protocol.interact,Crn.Protocol.Step,Crn.Protocol.Reaches,Crn.Protocol.OutputStable}\leanok\uses{def:pp}
+A population protocol has an input function $I : X \to Q$, an output function $O : Q \to
+\{0, 1\}$ and a transition function $\delta : Q \times Q \to Q \times Q$. An encounter of an
+ordered pair $(u, v)$ of distinct agents replaces their states $p, q$ by $\delta(p, q)$;
+reachability is the reflexive-transitive closure of encounters. A configuration is
+output-stable with output $b$ if in every configuration reachable from it every agent outputs $b$.
+\end{definition}
+
+\begin{definition}[Stable computation]\label{def:stable}
+\lean{Crn.Protocol.StablyComputes,Crn.StablyComputable}\leanok\uses{def:protocol}
+A protocol stably computes a predicate $\varphi$ on input count vectors if, for every nonempty
+population and every input assignment $\iota$, every configuration reachable from $I \circ \iota$
+can reach an output-stable configuration with output $\varphi$ of the input counts. A predicate is
+stably computable if a protocol with finitely many states stably computes it.
+\end{definition}
+
+\begin{lemma}[Uniqueness]\label{lem:stable-unique}
+\lean{Crn.Protocol.StablyComputes.unique}\leanok\uses{def:stable}
+A protocol stably computes at most one predicate on nonzero count vectors.
+\end{lemma}
+\begin{proof}\leanok
+From the initial configuration of a population with the given counts, reach an output-stable
+configuration for the first predicate and then one for the second: they agree.
+\end{proof}
+
+\begin{theorem}[Boolean closure]\label{thm:boolean}
+\lean{Crn.StablyComputable.map₂,Crn.StablyComputable.not,Crn.StablyComputable.and,Crn.StablyComputable.or}\leanok\uses{def:stable}
+For every Boolean function $\xi$ of two arguments, if $\varphi$ and $\psi$ are stably computable
+then so is $\xi(\varphi, \psi)$; in particular the class is closed under negation, conjunction and
+disjunction.
+\end{theorem}
+\begin{proof}\leanok
+Parallel composition: states are pairs, both components make their own transition in every
+encounter, and the output of $(p_1, p_2)$ is $\xi(O_1 p_1, O_2 p_2)$.
+\end{proof}
+
+\section{Semilinear predicates}
+\begin{theorem}[Threshold predicates]\label{thm:threshold}
+\lean{Crn.threshold,Crn.stablyComputable_threshold,Crn.stablyComputable_le_sum}\leanok\uses{def:stable}
+For integers $a_i$ and $c$, the predicates $\sum_i a_i x_i < c$ and $\sum_i a_i x_i \ge c$ are stably
+computable.
+\end{theorem}
+\begin{proof}\leanok
+Each agent holds a leader bit, an output bit and a count in $[-s, s]$, starting from $a_i$; an
+encounter involving a leader merges the leaders into the initiator, which takes as much of the sum
+of the two counts as fits in $[-s, s]$, and both agents set their output to whether the
+initiator's count is below $c$. Unlike the original protocol, an input starts with output bit
+$[a_i < c]$, which is needed for a population of one agent. The second form is the negation.
+\end{proof}
+
+\begin{theorem}[Remainder predicates]\label{thm:remainder}
+\lean{Crn.remainder,Crn.stablyComputable_remainder}\leanok\uses{def:stable}
+For integers $a_i$, $c$ and $m > 0$, the predicate $\sum_i a_i x_i \equiv c \pmod m$ is stably
+computable.
+\end{theorem}
+\begin{proof}\leanok
+The same leader protocol with counts in $\mathbb{Z}/m$: the initiator takes the sum of the two
+counts and the responder gets $0$.
+\end{proof}
+
+\begin{definition}[Semilinear predicates]\label{def:semilinear}
+\lean{Crn.IsSemilinearPred}\leanok\uses{thm:threshold,thm:remainder}
+The Boolean combinations of threshold and remainder predicates.
+\end{definition}
+
+\begin{theorem}[Semilinear predicates are stably computable]\label{thm:semilinear}
+\lean{Crn.IsSemilinearPred.isSemilinearSet,Crn.IsSemilinearPred.stablyComputable}\leanok\uses{def:semilinear,thm:boolean}
+The truth set of every such predicate is a semilinear set of count vectors, and every such
+predicate is stably computable.
+\end{theorem}
+\begin{proof}\leanok
+Induction on the Boolean combination, with the two preceding theorems and Boolean closure; for
+the first part, semilinear sets are closed under complement, intersection and union.
+\end{proof}
+
+\section{From protocols to networks}
+\begin{definition}[Stable decision by a network]\label{def:crn-stable}
+\lean{Crn.Counts.map,Crn.Network.Step,Crn.Network.Reaches,Crn.Network.OutputStable,Crn.Network.StablyComputes}\leanok\uses{def:crn}
+A network with an injective input map $I : X \to S$ and an output map $O : S \to \{0, 1\}$
+stably decides $\varphi$ if, from the initial count vector with $x_i$ molecules of $I(i)$ and nothing
+else, every reachable count vector can reach one in which, now and in every count vector reachable
+from it, every present species votes $\varphi(x)$.
+\end{definition}
+
+\begin{theorem}[Protocols are networks]\label{thm:transfer}
+\lean{Crn.Protocol.exists_network,Crn.StablyComputable.exists_network,Crn.IsSemilinearPred.exists_network}\leanok\uses{def:crn-stable,thm:semilinear}
+The transitions $p + q \to \delta_1(p, q) + \delta_2(p, q)$ that change $\{p, q\}$ form a
+count-conserving bimolecular network whose reachable count vectors are the counts of the
+configurations reachable in the protocol. Hence every stably computable predicate, and in
+particular every Boolean combination of threshold and remainder predicates, is stably decided by
+such a network.
+\end{theorem}
+\begin{proof}\leanok
+Encounters change counts exactly by the corresponding reaction. Tagging the input states keeps
+the input map injective and provides a transition that changes the multiset of states.
 \end{proof}

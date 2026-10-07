@@ -292,3 +292,92 @@ SODA 2019 (arXiv:1611.02460); Cooper, Elsässer, Ono, Radzik, SIAM J. Discrete M
   connected graph this only excludes `n = 1`, where consensus is trivial.
 * **Arbitrary finite palette** (the survey uses `n` colours; Hassin and Peleg two colours,
   reduced from `k`).
+
+---
+
+## 5. Consensus Time via Conductance (Berenbrink–Giakkoupis–Kermarrec–Mallmann-Trenn)
+
+Source: Berenbrink, Giakkoupis, Kermarrec, Mallmann-Trenn, *Bounds on the voter model in
+dynamic networks*, ICALP 2016, arXiv:1603.01895 (BGKM16). Numbering: Theorem 1.1 (upper
+bound), Lemma 2.1 (potential drop), Lemma 2.2 (drift implies time), Lemma 2.3 (phases for
+`κ` opinions). Files: `Conductance*.lean`. The dynamics is the lazy voter
+[`lazyNeighbor`](Voter/Lazy.lean) `= (I + D⁻¹A)/2` of §3.
+
+### 5.1 Lemma 2.1 of BGKM16 is false as printed
+* The paper states
+  `𝔼[Ψ(S_{t+1}) | S_t = s_t] ≤ Ψ(s_t) - ∑_{u ∈ V} λ_{u,t} d_u / (32 Ψ(s_t)³)`,
+  with the sum over **all** vertices, where `Ψ(s) = √(vol(minority))` and `λ_u` is the
+  number of neighbours of `u` with the other opinion. This is false. Counterexample: the star
+  `K_{1,k}` with `k ≥ 15` and a single leaf in the minority (`Ψ = 1`). Only the leaf and the
+  hub can change opinion, and exactly
+  `𝔼[Ψ'] = ½ (1 - 1/(2k)) + (√(k-1) + √k)/(4k)`; for `k = 15` this is `0.6102`, while the
+  printed bound is `1 - (1 + 15)/32 = 0.5` (the hub contributes `λ d = 15`); for `k = 40` it is
+  `0.5723` against `-0.2812`.
+* The paper's proof only yields the sum over the **minority side** `v^(0)`, and Lemma 2.2 only
+  uses that sum. [`potential_drift`](Voter/ConductanceDrift.lean) formalizes this corrected
+  form, with the paper's constant `32`:
+  `𝔼 Ψ' ≤ Ψ - ∑_{u ∈ minority} λ_u d_u / (32 Ψ³)`. The conductance form
+  ([`potential_drift_conductance`](Voter/ConductanceDrift.lean), `𝔼 Ψ' ≤ Ψ - d_min φ / (32 Ψ)`)
+  is the display at the start of the proof of Lemma 2.2.
+* The definition of `λ_u` in the paper has typos ("neighbours of `u` in `V ∖ v^1(t)`" for
+  `u ∈ v^(0)`); the intended meaning, used in the proof, is the number of neighbours with the
+  other opinion ([`discordant`](Voter/Conductance.lean)).
+* In the replacement lemma (Lemma A.1) the printed proof drops a factor `1/2` that cancels;
+  the formalized version is [`independent_expect_comp_sum_le`](Voter/ConductanceIndep.lean).
+* Lemma 2.3 says "with probability 1/2 by Markov's inequality"; the reverse Markov argument
+  gives `1/3`, which is what is used ([`phase_step`](Voter/ConductanceManyAux.lean)).
+
+### 5.2 Form of the statements
+* **Constant `128` instead of `129`** (Lemma 2.2 uses
+  `τ* = min{t' : ∑ φ_i ≥ 129 vol(s_t̂)/d_min}`): the shared drift lemma
+  `Dynamics.Kernel.drift_absorption` gives `4 · 32 = 128`, which is stronger. The statements
+  read "for every `T` with `128 vol ≤ d_min φ T`, `P(no consensus at time T) ≤ 1/2`", which is
+  `P(T_cons ≤ T) ≥ 1/2` because consensus is absorbing; no stopping times or path space are
+  used. The paper's "with a probability of 1/2" is read as "at least 1/2".
+* **Theorem 1.1 (i), static graph, two opinions, explicit constant:** `128 m / (d_min φ)`
+  ([`lazy_consensus_conductance`](Voter/ConductanceTime.lean), from `vol(minority) ≤ m`). The
+  alternative bound `n log n / φ²` (part (ii), Lemma 2.4) is not formalized.
+* **Expected time** ([`lazy_expected_consensus_time`](Voter/ConductanceTime.lean)) is stated
+  as `∑_{t < N} P(T_cons > t) ≤ 2 T₀` for every horizon `N`, i.e. `𝔼[min(T_cons, N)] ≤ 2 T₀`,
+  which gives `𝔼[T_cons] ≤ 2 T₀` by monotone convergence. A `tsum` statement would be vacuous
+  for non-summable series (`∑' = 0` in Mathlib).
+* **No connectivity hypothesis; `hd : ∀ v, 0 < G.degree v` instead.** `hd` is needed to define
+  the lazy voter, as in §3. Connectivity is not needed: a disconnected graph without isolated
+  vertices has `φ = 0` (a component of volume `≤ m` has an empty cut), so the hypotheses force
+  `m = 0` and the statements are vacuous.
+* **Conductance** ([`conductance`](Voter/Conductance.lean)) is the paper's formula, with
+  `∑_{u ∈ U} λ_u` written as `#(G.interedges U Uᶜ)` (Mathlib's ordered pairs `(u, w)` with
+  `u ∈ U`, `w ∉ U` adjacent: one per cut edge). Convention `φ = 0` when no `U` has
+  `0 < vol U ≤ m` (only for graphs without edges).
+* **Two opinions** are `Bool`, `false` being the paper's opinion `0`, which wins ties in
+  [`minority`](Voter/Conductance.lean).
+
+### 5.3 Dynamic graphs
+* [`dynamic_consensus_conductance`](Voter/ConductanceTime.lean) (Lemma 2.2 on dynamic graphs)
+  is stated for two opinions (the generality of Lemma 2.2, not of Theorem 1.1's `κ`).
+* The adversary chooses the graph `G t x` from the time and the **current** configuration,
+  not from the whole history as in the paper: a history-dependent adversary is not a kernel on
+  configurations. The kernel is [`dynamicLazy`](Voter/Conductance.lean).
+* The degrees are fixed (`hdeg`, relative to the first graph `G 0 s`; the paper fixes a degree
+  sequence `d_1, …, d_n`), and `φ t` must bound the conductance of every graph the adversary
+  may use at time `t` (the paper fixes the sequence `φ_t` in advance). `vol(s_0)` and `d_min`
+  are computed in `G 0 s` (they only depend on the degrees). `φ t` may be negative, which only
+  weakens the hypothesis.
+* The start time is `t̂ = 0`; a later start is the same statement for the shifted family
+  `fun t => G (t̂ + t)`.
+
+### 5.4 Many opinions
+* [`lazy_expected_consensus_time_many`](Voter/ConductanceMany.lean) and
+  [`lazy_consensus_conductance_many`](Voter/ConductanceMany.lean) (Theorem 1.1 (i) for any
+  number of opinions) are for static graphs, with an existential constant `∃ b` (the paper:
+  "`b > 0` a suitably chosen constant"); the proofs give `b = 7000` (expectation) and
+  `b = 14000` (probability `1/2`). The expectation form corresponds to the paper's
+  `𝔼[T] ≤ b m / (4 d_min)` (in phases) in the proof of part (i).
+* `[Nonempty V]` is assumed: with `V` and the colour type both empty, the empty configuration
+  has no consensus colour in the convention of `disagreement`, while the hypothesis `b · 0 ≤ 0`
+  holds. The paper's "`κ ≤ n` opinions" is automatic (any finite colour type; only the
+  opinions present matter).
+* The phase argument of Lemma 2.3 is organized by levels `θ_j = n (5/6)^j` of the number of
+  opinions present, with an occupation-time bound per level
+  ([`sum_iterate_le_of_block`](Voter/ConductanceLevels.lean)) instead of expected numbers of
+  phases.

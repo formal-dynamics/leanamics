@@ -71,6 +71,30 @@ lemma lazy_weight_pos (K : Kernel V) {i j : V} (h : 0 < (K i).weight j) :
   have : (0 : ℝ) ≤ if i = j then 1 else 0 := by split <;> norm_num
   positivity
 
+/-- Expectation under the lazy kernel: half the current value plus half the neighbour
+average. -/
+lemma lazyNeighbor_expect {G : SimpleGraph V} [DecidableRel G.Adj] (hd : ∀ i, 0 < G.degree i)
+    (x : V) (f : V → ℝ) :
+    (lazyNeighbor G hd x).expect f =
+      f x / 2 + (∑ w ∈ G.neighborFinset x, f w) / (2 * G.degree x) := by
+  have hsplit (w : V) : (lazyNeighbor G hd x).weight w * f w =
+      (if w = x then f x / 2 else 0) + (if G.Adj x w then f w / (2 * G.degree x) else 0) := by
+    rw [lazyNeighbor_weight]
+    by_cases hw : w = x
+    · subst hw
+      simp only [if_true, SimpleGraph.irrefl, if_false]
+      ring
+    · by_cases ha : G.Adj x w
+      · simp only [if_neg hw, if_neg (Ne.symm hw), if_pos ha]
+        ring
+      · simp only [if_neg hw, if_neg (Ne.symm hw), if_neg ha]
+        ring
+  simp only [Distribution.expect, hsplit, Finset.sum_add_distrib, Finset.sum_ite_eq',
+    Finset.mem_univ, if_true]
+  rw [← Finset.sum_filter, Finset.sum_div]
+  congr 1
+  exact Finset.sum_congr (by ext w; simp) fun _ _ => rfl
+
 /-- **Lazy weighted voter (VOT-2), via Hassin–Peleg Theorem 2.1, Section 2.3 and the Remark on
 p. 254.** On any connected graph, bipartite or not, let `H` charge every edge and let `p` be
 stationary for `H`. Then the lazy voter `(I + H)/2` reaches consensus in colour `c` with

@@ -38,29 +38,6 @@ variable {G : SimpleGraph V} [DecidableRel G.Adj] (hd : ∀ i, 0 < G.degree i)
 lemma lazyNeighbor_weight_self (y : V) : (lazyNeighbor G hd y).weight y = 1 / 2 := by
   simp [lazyNeighbor_weight]
 
-/-- Expectation under the lazy kernel: half the current value plus half the neighbour
-average. -/
-lemma lazyNeighbor_expect (x : V) (f : V → ℝ) :
-    (lazyNeighbor G hd x).expect f =
-      f x / 2 + (∑ w ∈ G.neighborFinset x, f w) / (2 * G.degree x) := by
-  have hsplit (w : V) : (lazyNeighbor G hd x).weight w * f w =
-      (if w = x then f x / 2 else 0) + (if G.Adj x w then f w / (2 * G.degree x) else 0) := by
-    rw [lazyNeighbor_weight]
-    by_cases hw : w = x
-    · subst hw
-      simp only [if_true, SimpleGraph.irrefl, if_false]
-      ring
-    · by_cases ha : G.Adj x w
-      · simp only [if_neg hw, if_neg (Ne.symm hw), if_pos ha]
-        ring
-      · simp only [if_neg hw, if_neg (Ne.symm hw), if_neg ha]
-        ring
-  simp only [Distribution.expect, hsplit, Finset.sum_add_distrib, Finset.sum_ite_eq',
-    Finset.mem_univ, if_true]
-  rw [← Finset.sum_filter, Finset.sum_div]
-  congr 1
-  exact Finset.sum_congr (by ext w; simp) fun _ _ => rfl
-
 /-- Hitting times drop by one in expectation under a lazy step away from the target. -/
 lemma lazyNeighbor_expect_hitting (hc : G.Connected) {x y : V} (hxy : x ≠ y) :
     (lazyNeighbor G hd x).expect (hitting G hc y) = hitting G hc y x - 1 := by
