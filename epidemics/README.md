@@ -48,6 +48,10 @@ Positivity of `i` uses a barrier argument (`i ≥ i(0) e^{-γ t} / 2`) instead o
 Gronwall; uniqueness of the final size uses the monotonicity of `x ↦ log x - R₀ x` on either side
 of `1/R₀`.
 
+Where the statements deviate from their sources (special constant-rate case, solution taken as a
+hypothesis, fixed initial data, the precise form of the limits and of the uniqueness statements),
+see [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
+
 **Provenance.** Reed–Frost: the statements were written and pinned by hand; the proofs were
 produced by a Grok agent under a fixed-statement protocol and verified mechanically (statements
 unchanged, no placeholders, warning-free build, axiom audit). Kermack–McKendrick: the statements
