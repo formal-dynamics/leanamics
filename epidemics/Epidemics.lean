@@ -1,1 +1,7 @@
 import Epidemics.ReedFrost
+import Epidemics.SubcriticalProb
+import Epidemics.SubcriticalChernoff
+import Epidemics.SubcriticalCluster
+import Epidemics.SubcriticalExploration
+import Epidemics.SubcriticalWhp
+import Epidemics.Subcritical
