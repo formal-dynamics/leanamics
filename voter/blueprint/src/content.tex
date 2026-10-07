@@ -226,6 +226,65 @@ The uniform distribution is stationary and every entry is positive. For $n\ge 3$
 complete graph is nonbipartite and Section~2.3 applies; for every $n$ the Remark applies.
 \end{proof}
 
+\section{Consensus time via conductance (VOT-5)}
+Source: Berenbrink, Giakkoupis, Kermarrec, Mallmann-Trenn, \emph{Bounds on the voter model in
+dynamic networks}, ICALP 2016, arXiv:1603.01895 (BGKM16). The process is the lazy voter
+$(I+D^{-1}A)/2$ of Theorem~\ref{thm:lazy}.
+\begin{definition}[Volume, conductance, minority side, potential]\label{def:conductance}
+\lean{Voter.vol,Voter.conductance,Voter.discordant,Voter.minority,Voter.potential,Voter.dynamicLazy}\leanok
+$\mathrm{vol}(S)=\sum_{u\in S}d_u$; the conductance $\varphi(G)$ is the minimum of
+$|\mathrm{cut}(U,V\setminus U)|/\mathrm{vol}(U)$ over $0<\mathrm{vol}(U)\le m$; $\lambda_u$ is the
+number of neighbours of $u$ with another opinion; for two opinions $s_t$ is the side of smaller
+volume and $\Psi=\sqrt{\mathrm{vol}(s_t)}$.
+\end{definition}
+\begin{lemma}[Independent coordinates]\label{lem:indep}
+\lean{Voter.independent_expect_update,Voter.independent_expect_mul_of_update,Voter.independent_expect_sum_sq,Voter.independent_expect_sum_cube,Voter.independent_expect_comp_sum_le}\leanok
+Resampling one coordinate of an independent point does not change its law. Consequently
+centred coordinate functions have additive second and third moments, and if replacing each
+coordinate function improves $\mathbb{E}f(z+\cdot)$ for all admissible $z$, then the replacement of
+all of them improves $\mathbb{E}f(c+\sum_i g_i(x_i))$ (BGKM16 Lemma~A.1).
+\end{lemma}
+\begin{proof}\leanok
+Reindex the pairs $(x,a)$ by $(x[i\mapsto a],x_i)$; induct over the set of replaced coordinates.
+\end{proof}
+\begin{lemma}[BGKM16 Lemma~2.1, corrected]\label{lem:bgkm-21}
+\lean{Voter.potential_drift,Voter.potential_drift_conductance,Voter.expect_sqrt_le_comp,Voter.expect_compSum_sq_ge,Voter.expect_compSum_cube_le,Voter.sqrt_add_le_taylor,Voter.sqrt_chord}\leanok\uses{def:conductance,lem:indep,thm:lazy}
+If $s_t\neq\emptyset$, then
+$\mathbb{E}[\Psi_{t+1}\mid s_t]\le\Psi-\sum_{u\in s_t}\lambda_u d_u/(32\Psi^3)
+\le\Psi-d_{\min}\varphi/(32\Psi)$. The paper prints the sum over all of $V$, which fails on the
+star $K_{1,15}$; its proof gives the sum over $s_t$.
+\end{lemma}
+\begin{proof}\leanok
+$\Psi_{t+1}$ is at most the root of the new volume $P+\sum_u X_u$ of the opinion of $s_t$.
+Replace $X_u$ for $u\notin s_t$ by $Y_u=\lambda_u\mathbf{1}[\text{move}]$ (concavity of
+$\sqrt{\cdot}$), expand $\sqrt{P+x}$ to third order, and use $\mathbb{E}\Delta'=0$,
+$\mathbb{E}\Delta'^2\ge\sum_{s_t}\lambda_ud_u/4$, $\mathbb{E}\Delta'^3\le0$. The conductance gives
+$\sum_{s_t}\lambda_ud_u\ge d_{\min}\varphi\,\mathrm{vol}(s_t)$.
+\end{proof}
+\begin{theorem}[BGKM16 Lemma~2.2 and Theorem~1.1~(i), two opinions]\label{thm:bgkm-two}
+\lean{Voter.lazy_consensus_of_minority,Voter.lazy_consensus_conductance,Voter.lazy_expected_consensus_time,Voter.dynamic_consensus_conductance,Voter.sum_iterate_le_of_block}\leanok\uses{lem:bgkm-21}
+If $128\,\mathrm{vol}(s_0)\le d_{\min}\varphi T$, the opinions still disagree at time $T$ with
+probability at most $1/2$; in particular after $128m/(d_{\min}\varphi)$ rounds, and the expected
+consensus time is at most twice that. On dynamic graphs with fixed degrees the same holds once
+$128\,\mathrm{vol}(s_0)\le d_{\min}\sum_{t<T}\varphi_t$.
+\end{theorem}
+\begin{proof}\leanok
+The drift lemma of the shared library (FND-5) with drift $d_{\min}\varphi_t/32$; restarting
+bounds the expected time.
+\end{proof}
+\begin{theorem}[BGKM16 Theorem~1.1~(i), any number of opinions]\label{thm:bgkm-many}
+\lean{Voter.phase_step,Voter.level_time_le,Voter.expected_time_many_bound,Voter.lazy_expected_consensus_time_many,Voter.lazy_consensus_conductance_many}\leanok\uses{thm:bgkm-two,thm:colors}
+There is a constant $b$ such that the expected consensus time is at most $b\,m/(d_{\min}\varphi)$
+and consensus holds within $b\,m/(d_{\min}\varphi)$ rounds with probability at least $1/2$, for
+every number of opinions.
+\end{theorem}
+\begin{proof}\leanok
+Project each opinion to the two-opinion process ``$i$ against the rest''. From $\ell\le\theta$
+opinions, after $384\,\mathrm{vol}(V)/(\theta d_{\min}\varphi)$ rounds at most $5\theta/6$
+remain with probability at least $1/3$ (BGKM16 Lemma~2.3). Summing over the levels
+$\theta_j=n(5/6)^j$ gives a geometric series; Markov's inequality gives the probability form.
+\end{proof}
+
 \section{Examples and scope}
 \begin{lemma}[Triangle and a nonuniform matrix]\label{lem:examples}
 \lean{Voter.Examples.triangle_one_white,Voter.Examples.biased_stationary}\leanok\uses{cor:22,lem:23}

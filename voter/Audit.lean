@@ -27,3 +27,11 @@ import Voter
 #print axioms Voter.lazyNeighbor_consensus_probability
 #print axioms Voter.wrightFisher_fixation_of_three_le
 #print axioms Voter.wrightFisher_fixation
+#print axioms Voter.potential_drift
+#print axioms Voter.potential_drift_conductance
+#print axioms Voter.lazy_consensus_of_minority
+#print axioms Voter.lazy_consensus_conductance
+#print axioms Voter.lazy_expected_consensus_time
+#print axioms Voter.dynamic_consensus_conductance
+#print axioms Voter.lazy_expected_consensus_time_many
+#print axioms Voter.lazy_consensus_conductance_many
