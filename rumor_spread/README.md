@@ -37,7 +37,8 @@ and `RumorPush.pushPull_informs_all_whp`
 `⌈160 ln n⌉` rounds with probability at least `1 - 2/n`;
 [PullOneRound.lean](RumorSpread/PullOneRound.lean) has the exact one-round
 picture (PULL's quadratic shrinking `𝔼u' = u(u-1)/(n-1) ≤ u²/n`). Deviations
-from the paper are listed in [PROGRESS.md](PROGRESS.md).
+from the paper are listed in
+[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 
 ## Design
 

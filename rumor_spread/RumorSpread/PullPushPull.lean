@@ -14,7 +14,7 @@ PUSH–PULL dominates PUSH and PULL pathwise (`run_subset_pushPullRun`,
 
 namespace RumorPush
 
-open Finset
+open Finset Dynamics
 
 variable {n : ℕ}
 

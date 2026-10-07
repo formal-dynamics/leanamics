@@ -19,7 +19,7 @@ import RumorSpread.PullPhases
 
 namespace RumorPush
 
-open Finset
+open Finset Dynamics
 
 variable {n : ℕ}
 

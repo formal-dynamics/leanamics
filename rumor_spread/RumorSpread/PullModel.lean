@@ -1,5 +1,5 @@
 import RumorSpread.Model
-import RumorSpread.Prob
+import Dynamics.Uniform
 import RumorSpread.PullFoldl
 
 /-!
@@ -34,7 +34,7 @@ Because the three steps read the same calls, PUSH–PULL dominates PUSH and PULL
 
 namespace RumorPush
 
-open Finset
+open Finset Dynamics
 
 variable {n : ℕ}
 

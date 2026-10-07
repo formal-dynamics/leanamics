@@ -24,7 +24,7 @@ its callee lies in `I`, which has probability `m / (n - 1)`, independently over 
 
 namespace RumorPush
 
-open Finset
+open Finset Dynamics
 
 variable {n : ℕ}
 

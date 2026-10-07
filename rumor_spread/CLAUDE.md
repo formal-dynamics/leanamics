@@ -30,11 +30,13 @@ PULL and PUSH–PULL (roadmap EPI-5; Karp–Schindelhauer–Shenker–Vöcking, 
 
 - `PullFoldl.lean` — `List.foldl` of an inflationary monotone step: persistence and pathwise domination.
 - `PullModel.lean` — `pullStep`, `pushPullStep` (= `step ∪ pullStep`, same calls), `pullRun`/`pushPullRun` (`List.foldl`), the failure probabilities, and pathwise domination of PUSH and PULL by PUSH–PULL.
-- `PullIndep.lean` — independence of the calls of a uniform round (`avg_pi_prod`, `avg_tgt_mul_prod`) and per-call probabilities.
+- `PullIndep.lean` — independence of the calls of a uniform round (`avg_pi_prod`, the dependent-product form of `Dynamics.avg_prod_pi`; `avg_tgt_mul_prod`) and per-call probabilities.
 - `PullOneRound.lean` — exact one-round expectations (startup stall, expected growth, quadratic shrinking `u(u-1)/(n-1) ≤ u²/n`, the PUSH–PULL formula).
 - `PullPhases.lean` — the PUSH two-phase argument for an arbitrary inflationary step, given P(good round) ≥ 1/8 and a 2/3 contraction above half (`notAllOf_le_two_div`).
 - `PullGood.lean` — those two inputs for PULL (second-moment / Paley–Zygmund via pointwise bounds).
 - `PullMain.lean`, `PullPushPull.lean` — `pull_informs_all_whp`, `pushPull_informs_all_whp`: all nodes informed after `⌈160 ln n⌉` rounds with probability `≥ 1 - 2/n`.
+
+Deviations of the PULL / PUSH–PULL statements from [KSSV00] are listed in [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 
 Design constraint to preserve: **no measure theory, no `PMF`/`ENNReal`, no Chernoff/martingales**; everything is finite sums plus `Real.log`/`Real.exp` only in `Main.lean` numerics.
 

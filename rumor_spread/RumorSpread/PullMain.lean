@@ -13,7 +13,7 @@ generic `notAllOf_le_two_div` (`PullPhases.lean`) with the PULL inputs of `PullG
 
 namespace RumorPush
 
-open Finset
+open Finset Dynamics
 
 variable {n : ℕ}
 

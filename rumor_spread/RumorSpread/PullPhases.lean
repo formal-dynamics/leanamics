@@ -24,7 +24,7 @@ It is instantiated for PULL in `PullMain.lean`.
 
 namespace RumorPush
 
-open Finset
+open Finset Dynamics
 
 variable {n : ℕ} {α : Type*}
 

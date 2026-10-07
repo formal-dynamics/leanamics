@@ -7,7 +7,9 @@ A uniform round `r : Tgt n` is a uniform element of the product `∀ v, {u // u 
 `r v` of different nodes are independent. `avg_pi_prod` states this for any finite product
 (Fubini for products of functions of the coordinates, via `Fintype.prod_sum`), and
 `avg_tgt_mul_prod` specializes it to a function of one call `r v` times a product over calls
-`r w`, `w ∈ S`, with `v ∉ S`. This covers all the probabilities needed for PULL and PUSH–PULL:
+`r w`, `w ∈ S`, with `v ∉ S`. (`avg_pi_prod` is the dependent-product version of
+`Dynamics.avg_prod_pi`, which covers only non-dependent products `Fin n → γ` and so does not
+apply to `Tgt n`.) This covers all the probabilities needed for PULL and PUSH–PULL:
 
 * `avg_tgt_coord` — a single call is uniform among the other `n - 1` nodes;
 * `avg_call_mem`, `avg_call_not_mem` — a caller `v ∉ I` calls into `I` with probability
@@ -17,7 +19,7 @@ A uniform round `r : Tgt n` is a uniform element of the product `∀ v, {u // u 
 
 namespace RumorPush
 
-open Finset
+open Finset Dynamics
 
 variable {n : ℕ}
 
