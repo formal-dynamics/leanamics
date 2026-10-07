@@ -545,4 +545,29 @@ theorem pull_fixation [Nontrivial V] (G : SimpleGraph V) [DecidableRel G.Adj]
     (funext fun t => pullRatio_invariant G t) (div_self (pullValue_total_pos G hc).ne')
     (by rw [pullValue_false, zero_div]) (pull_allMutant_step G) s (pull_unfixed_tendsto G hc s)
 
+/-- **Neutral fixation from a uniformly random vertex.** On every connected graph with at least
+two vertices, a neutral single mutant at a uniformly random vertex fixes with probability `1/N`
+(from `push_fixation`, VOT-4). -/
+lemma neutral_uniform_fixation [Nontrivial V] (G : SimpleGraph V) [DecidableRel G.Adj]
+    (hc : G.Connected) (h1 : (0 : ℝ) < 1) :
+    (Distribution.uniform V).expect
+        (fun v => fixation (moranKernel G 1 h1) (fun w => decide (w = v))) =
+      1 / Fintype.card V := by
+  have hP := pushValue_total_pos G hc
+  have hsingle : ∀ v, pushValue G (fun w => decide (w = v)) = (G.degree v : ℝ)⁻¹ := by
+    intro v
+    unfold pushValue
+    have : univ.filter (fun w => decide (w = v) = true) = {v} := by
+      ext w
+      simp
+    rw [this, sum_singleton]
+  have hall : pushValue G (fun _ => true) = ∑ v, (G.degree v : ℝ)⁻¹ := by
+    unfold pushValue
+    congr 1
+    ext v
+    simp
+  rw [Distribution.uniform_expect, avg]
+  simp_rw [push_fixation G hc, hsingle]
+  rw [← sum_div, ← hall, div_self hP.ne']
+
 end Moran

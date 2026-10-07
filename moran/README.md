@@ -21,6 +21,12 @@ sequential PUSH voter with fitness-biased senders.
 | Neutral case `r = 1`: `P(fixation) = k/n` | `isothermal_neutral` |
 | **Moran's formula** on the complete graph | `moran_formula` |
 | **Push vs pull** (in [`Moran/PushPull.lean`](Moran/PushPull.lean)): on a connected graph, neutral push fixes a mutant set `S` with probability `∑_{v∈S} 1/deg v / ∑_v 1/deg v`, pull with probability `∑_{v∈S} deg v / 2|E|` | `push_fixation`, `pull_fixation` |
+| **Star** (in [`Moran/Star.lean`](Moran/Star.lean)), `n` leaves, `q = (n+r)/(r(nr+1))`, `κ = (nr+1)/(r(n+r))`: the potential `q^(#mutant leaves) · κ^[centre mutant]` is invariant | `star_potential_invariant` |
+| Fixation on the star from any configuration `s` (`r ≠ 1`): `(1 - Φ s)/(1 - κ q^n)` | `star_fixation` |
+| Single mutant: `(1-q)/(1-κq^n)` from a leaf, `(1-κ)/(1-κq^n)` from the centre, their average from a uniformly random vertex | `star_fixation_leaf`, `star_fixation_centre`, `star_fixation_uniform` |
+| The geometric-sum formula of Broom and Rychtář (2008), for every `r > 0` | `star_fixation_uniform_sum` |
+| **The star is an amplifier**: for every `n ≥ 2`, uniform-start fixation exceeds Moran's `(1-1/r)/(1-1/r^N)` for `r > 1` and is below it for `r < 1` | `star_amplifier`, `star_amplifier_deleterious` |
+| Large stars amplify `r` to `r²`: uniform-start fixation tends to `1 - 1/r²` (`r > 1`) | `star_fixation_uniform_tendsto` |
 
 The key identity is that on a regular graph a step adds a mutant with exactly `r` times the
 probability that it removes one, in every configuration, because the numbers of
@@ -38,7 +44,9 @@ arXiv:2403.12598).
 
 **Provenance.** The statements were written and pinned by hand; the proofs (of both files) were produced by a
 Grok agent under a fixed-statement protocol and verified mechanically (statements unchanged,
-no placeholders, warning-free build, axiom audit).
+no placeholders, warning-free build, axiom audit). The star files (`Moran/Star*.lean`, roadmap MOR-3, first item) were pinned
+and proved by a Claude agent under the same protocol; the closed forms were also checked exactly
+against the full `2^(n+1)`-state chain for small `n`.
 
 Build and audit:
 
@@ -47,6 +55,8 @@ lake exe cache get
 lake build
 python3 ../scripts/check_axioms.py
 ```
+
+Deviations from the sources are listed in [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 
 This package requires the sibling `dynamics/` package and shares its Lean 4.32.0 toolchain
 and exact Mathlib pin. The [blueprint](blueprint/src/content.tex) maps the results to
