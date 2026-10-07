@@ -201,6 +201,73 @@ A smaller slip in the same proof: it writes `E[X(k)] ≤ p n (1 - f)`; the corre
 5. `Distribution.prob` and `Kernel.event` are bridged by `prob_indicator_eq`, because `prob`
    decides propositions with `Classical.propDecidable`.
 
+## Subcritical percolation and small outbreaks (`Subcritical*`, EPI-2)
+
+Source: L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccardi,
+*Percolation and epidemic processes in one-dimensional small-world networks*, arXiv:2103.16398:
+Theorem 2.3 (bounded-degree graphs, Section 2.1) and Theorem E.1 (Appendix E, "Regular graphs
+below the threshold") with its deferred-decision proof. The Reed–Frost corollary is the one the
+paper mentions but omits after Theorem 2.5; its shape follows claim 2 of Theorems 2.4 and 2.5.
+
+1. **Threshold written multiplicatively**: `p * ((d : ℝ) - 1) ≤ 1 - ε` instead of
+   `p < (1 - ε)/(d - 1)` (Theorem 2.3) or `p = (1 - ε)/(d - 1)` (Theorem E.1). It covers both
+   (the results are monotone in `p`), is equivalent to `p ≤ (1 - ε)/(d - 1)` for `d ≥ 2`, and
+   avoids Lean's `x / 0 = 0` at `d = 1`, where the paper's threshold is `+∞`: for `d = 1` any `p`
+   is allowed and the statements stay true (components have at most 2 vertices). For `d = 0` the
+   hypothesis is automatic and components are singletons.
+2. **`ε < 1` assumed** (as in Theorem E.1; Theorem 2.3 says "ε > 0 arbitrary"). For `ε ≥ 1` and
+   `d ≥ 2` the hypothesis forces `p = 0`, and an explicit `(C/ε²) log n` bound would be false for
+   large `ε` (singletons against a bound tending to 0), so nothing is lost.
+3. **"Maximum degree `d`"** is the upper bound `∀ v, G.degree v ≤ d` (equivalent to
+   `G.maxDegree ≤ d`); the proof only uses the upper bound. Component sizes are measured as in
+   Mathlib, by `K.supp.ncard`.
+4. **Explicit tail constant**: `exp (ε - ε² t / 2) = e^ε exp (-ε² t / 2)` for Theorem E.1's
+   `exp (-Ω(ε² t))`. The paper's proof claims `exp (-ε² t / 3)` "by Chernoff bounds", but the
+   mean of its `t (d - 1) + 1` trials is `(1 - ε) t + p`, not `(1 - ε) t`: the extra trial at the
+   source (degree `d`, not `d - 1`) is what the prefactor `e^ε ≤ e` pays for. The bound is
+   Markov's inequality on `exp (ε X)`, i.e. the core's Chernoff tail before optimization
+   (`Distribution.prob_ge_le_exp`) at the paper's tilt `ε`; the optimized closed forms of the
+   core (`bernoulli_chernoff_upper`) do not give this constant directly. Numerically the paper's
+   `exp (-ε² t / 3)` also seems to hold for the binomial tail, but it is not what the standard
+   argument proves, so it is not claimed.
+5. **"W.h.p." made explicit**: probability at least `1 - 1/n` with `C_ε = 10/ε²`, for every
+   `n = |V|` (no "n large enough"; for `n ≤ 1` the statement is trivial, and for `n = 0` Lean's
+   `1/0 = 0` makes it claim probability 1, which holds since there are no components). The
+   paper's union-bound sentence ("probability … at most `1 - 1/n²`") has a typo for `1/n²`.
+6. **Deferred decisions as a probability comparison**: the paper's "we have observed at most
+   `t (d - 1) + 1` Bernoulli random variables with parameter `p` and found that at least `t` of
+   them were 1" is stated as `P(|C(s)| > t) ≤ P(≥ t successes among t (d - 1) + 1 i.i.d.
+   Bernoulli(p))`, with the product `Distribution.independent` over `Fin (t * (d - 1) + 1)`
+   (natural subtraction: one trial when `d = 0`, still true). The paper's BFS (which has a stray
+   `y` for `x`) is replaced by any one-vertex-at-a-time exploration.
+7. **Proof route** (not a statement change). There is no BFS queue: the induction is on a budget
+   `m` over exploration states `(D, X)` (discovered set, examined pairs whose coins are forced
+   closed): if `frontier G D X + (k - 1)(d - 1) ≤ m` then `P(|D| + k ≤ |reach of D|) ≤
+   binTail m k`. Conditioning on the coin of one frontier edge, a closed coin removes it from the
+   frontier and an open one adds a vertex and at most `d - 1` frontier edges, which is exactly
+   the recursion `binTail_succ_succ`. No padding of the coin sequence and no stochastic-domination
+   coupling are needed.
+8. **Percolation model**: EPI-1's `coins` put one coin on every element of `Sym2 V` (non-edges
+   and the diagonal included); only the coins of edges of `G` matter, so `perc G ω` has the law
+   of `G_p`.
+9. **Reed–Frost corollary**: the paper omits its formal statement for bounded-degree graphs. We
+   take the shape of claim 2 of Theorems 2.4 and 2.5 ("stops within `O_ε(log n)` steps,
+   `O_ε(|I₀| log n)` recovered nodes") with explicit constants, for EPI-1's pathwise process (one
+   coin per edge, equivalent in law to Reed–Frost with transmission probability `p`). The
+   reproduction number is `R₀ = p (d - 1)` (an infected non-source node has at most `d - 1`
+   susceptible neighbours), and "`R₀ < 1`" is quantified as `R₀ ≤ 1 - ε` with `0 < ε < 1`.
+   "Stops within `T` rounds" is `(run G ω I₀ T).infected = ∅`; the total number of infected
+   nodes is the final recovered set `(run G ω I₀ (Fintype.card V)).recovered`.
+10. **Erdős–Rényi corollary** (an addition): `G(n, c/n)` is `perc ⊤ ω` with `coins (c/n)`; the
+    hypotheses `0 ≤ c/n ≤ 1` are needed to form the coins.
+11. **Local lemmas.** The binomial tail `binTail` with its recursion, the scalar inequality
+    `(1 - ε) e^ε ≤ 1 - ε²/2` (`one_sub_mul_exp_le`), `prob_eq_one`, `prob_eq_zero` and the two
+    conditioning lemmas for independent products (`independent_expect_update`,
+    `independent_expect_fin_succ`, `coins_prob_split`) are not in `dynamics/` yet; their move is
+    tracked in issues #42, #44 and #46. Monotonicity, Markov's inequality on `exp (t X)` and the
+    moment-generating-function bound are the core's; congruence, complement and the union bound
+    are shared with EPI-3 (`GiantCoins.lean`).
+
 ## The supercritical giant component (`Giant*`, EPI-3)
 
 Source: M. Krivelevich, B. Sudakov, *The phase transition in random graphs: a simple proof*,

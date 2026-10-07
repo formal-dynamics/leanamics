@@ -54,3 +54,8 @@ import Epidemics
 #print axioms Epidemics.reedFrost_large_outbreak
 #print axioms Epidemics.prob_queryAnswers
 #print axioms Epidemics.DFS.fresh_nextQuery
+#print axioms Epidemics.prob_cluster_gt_le_binomial
+#print axioms Epidemics.prob_cluster_gt_le
+#print axioms Epidemics.prob_components_small
+#print axioms Epidemics.reedFrost_subcritical
+#print axioms Epidemics.erdosRenyi_subcritical
