@@ -133,6 +133,40 @@ Hoeffding's lemma bounds each Bernoulli factor; for Bernstein,
 $e^y\le1+y+y^2/(2(1-u/3))$ for $y\le u<3$ bounds each factor, and $t$ is
 chosen as $\lambda/(\sigma^2+b\lambda/3)$.
 \end{proof}
+\begin{theorem}[Lower tails and multiplicative Chernoff bounds]\label{thm:chernoff}
+\lean{Dynamics.avg_lower_tail_le_of_mgf,Dynamics.avg_hoeffding_lower,Dynamics.variance_le_avg_of_zero_one,Dynamics.avg_chernoff_mgf,Dynamics.avg_chernoff_upper,Dynamics.avg_chernoff_lower,Dynamics.avg_chernoff_upper_log,Dynamics.avg_chernoff_lower_log,Dynamics.avg_chernoff_lower_mul}\leanok\uses{thm:concentration}
+Let $X=\sum_{i<n}Y_i(\omega_i)$ with independent uniform $\{0,1\}$-valued
+coordinates and $\mu=\E X$. Then $\Pr(X\le\E X-\lambda)\le e^{-2\lambda^2/n}$, and a
+$\{0,1\}$ coordinate has variance at most its mean. For every real $t$,
+$\E e^{tX}\le\exp(\mu(e^t-1))$; hence $\Pr(X\ge k)\le\exp(\mu(e^t-1)-tk)$ for
+$t\ge0$ and $\Pr(X\le k)\le\exp(\mu(e^t-1)-tk)$ for $t\le0$. If $\E X\le\mu\le k$
+with $\mu>0$, then $\Pr(X\ge k)\le\exp(k-\mu-k\log(k/\mu))$; if $0<k\le\mu\le\E X$,
+then $\Pr(X\le k)\le\exp(k-\mu-k\log(k/\mu))$. Finally
+$\Pr(X\le(1-\delta)\E X)\le\exp(-\delta^2\E X/2)$ for $0\le\delta<1$.
+\end{theorem}
+\begin{proof}\leanok
+The lower Hoeffding tail is the upper one for $1-Y_i$. For the MGF bound,
+$e^{tY}=1+(e^t-1)Y$ on $\{0,1\}$ and $1+y\le e^y$, factor by factor; Markov's
+inequality applied to $e^{tX}$ gives the tails, and $t=\log(k/\mu)$ the closed forms
+(the exponent is monotone in $\mu$ in the right direction). The last bound is the
+closed lower form with $k=(1-\delta)\mu$ and $(1-\delta)\log(1-\delta)\ge-\delta+\delta^2/2$.
+\end{proof}
+\begin{lemma}[Elementary tail bounds and monotonicity]\label{lem:tail}
+\lean{Dynamics.Distribution.prob_mono,Dynamics.Distribution.expect_lt_one,Dynamics.avg_lt_one,Dynamics.avg_markov,Dynamics.avg_markov_one,Dynamics.Kernel.one_sub_avg_le_prob_ofStep,Dynamics.Kernel.iterate_monotone,Dynamics.Kernel.event_monotone,Dynamics.exp_neg_two_log,Dynamics.one_le_of_log_pos}\leanok\uses{def:distribution,def:ofstep}
+Probability is monotone in the event. An observable $f\le1$ with $f(b)<1$ at a
+point of positive weight has expectation $<1$. Markov's inequality
+$\Pr(X\ge c)\le\E X/c$ for $X\ge0$, $c>0$; in particular
+$\Pr(\sum_iY_i(\omega_i)\ge1)\le\sum_i\E Y_i$ for nonnegative coordinates. One
+round of $\mathrm{step}$ lands in an event with probability at least
+$1-\E[\mathrm{bad}]$ when $\mathrm{bad}\ge0$ is at least $1$ on every miss. If
+$f\le Kf$, then $n\mapsto K^nf(a)$ is nondecreasing; in particular the occupation
+probability of an absorbing event is nondecreasing in time. Finally
+$e^{-2\log n}=1/n^2$ for $n\ge1$, and $\log n>0$ forces $n\ge1$.
+\end{lemma}
+\begin{proof}\leanok
+Pointwise comparisons of indicators, integrated by monotonicity of the expectation;
+for the kernel statements, induction on time with $K^{n+1}f=K^n(Kf)$.
+\end{proof}
 \begin{theorem}[Nested phases]\label{thm:phases}
 \lean{Dynamics.Kernel.nested_phases}\leanok\uses{def:kernel}
 Let $A_1\supseteq\cdots\supseteq A_T$ be sets of states such that from $A_i$

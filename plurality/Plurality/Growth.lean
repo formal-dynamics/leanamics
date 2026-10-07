@@ -1,6 +1,7 @@
 import Plurality.Expectation
 import Plurality.Quantities
-import Plurality.Tail
+import Dynamics.Tail
+import Dynamics.Concentration
 
 /-!
 # Growth of the bias in one round (Lemmas 3.3, 3.4, 3.5)
@@ -15,7 +16,8 @@ Fix a coloring `x` with a unique plurality color `m`, and write `c = count x`,
   (`Dynamics.avg_bernstein`, with `b = 2` and variance at most `3 c_m`) bounds
   the lower deviation by `c_m α / 2`.
 * **Lemma 3.4** (`lemma_3_4`): `C_{m,t+1} > c_m (1 + γ + α/2)` except with
-  probability `exp(-c_m α²/11)`, by the multiplicative Chernoff bound.
+  probability `exp(-c_m α²/11)`, by the multiplicative Chernoff bound
+  (`Dynamics.avg_chernoff_lower_mul`).
 * **Lemma 3.5** (`lemma_3_5`): if `λ n ≤ c_m ≤ (2/3) n` and
   `s ≥ 22 √((1/λ) n log n)`, the bias grows by a factor `1 + λ/6` against each
   color, and the plurality grows, except with probability `1/n²` each.
@@ -255,7 +257,7 @@ theorem lemma_3_4 (hn : 1 ≤ n) (x : Config n k) {m : Fin k}
   set δ : ℝ := α / (2 * (1 + γ' + α)) with hδ
   have hδ0 : 0 ≤ δ := by positivity
   have hδ1 : δ < 1 := by rw [hδ, div_lt_one (by positivity)]; linarith
-  have hC := chernoff_lower (fun (_ : Fin n) t => adopt maj3 x m t)
+  have hC := avg_chernoff_lower_mul (fun (_ : Fin n) t => adopt maj3 x m t)
     (fun _ t => adopt_zero_one maj3 x m t) hδ0 hδ1
   rw [hμ] at hC
   have hk : (1 - δ) * (cm * (1 + γ' + α)) = cm * (1 + γ' + α / 2) := by
@@ -277,11 +279,6 @@ theorem lemma_3_4 (hn : 1 ≤ n) (x : Config n k) {m : Fin k}
   rw [e]
   apply div_le_div_of_nonneg_left (by positivity) (by positivity)
   linarith
-
-lemma exp_neg_two_log (hn : 1 ≤ n) : exp (-(2 * Real.log n)) = 1 / (n : ℝ) ^ 2 := by
-  have hn0 : (0 : ℝ) < n := by exact_mod_cast hn
-  rw [exp_neg, show 2 * Real.log n = Real.log ((n : ℝ) ^ 2) by
-    rw [Real.log_pow]; norm_num, exp_log (by positivity), one_div]
 
 /-- **Lemma 3.5 (large plurality and large bias).** If `M(c) = {m}`,
 `0 < λ ≤ 2/3`, `λ n ≤ c_m ≤ (2/3) n` and `s(c) ≥ 22 √((1/λ) n log n)`, then for

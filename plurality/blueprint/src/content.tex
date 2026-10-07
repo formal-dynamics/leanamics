@@ -169,7 +169,8 @@ formalized.
 \subsection{Concentration}
 
 \begin{lemma}[Concentration for sums of independent coordinates]\label{lem:tails}
-  \lean{Dynamics.avg_bernstein, Dynamics.avg_hoeffding, Plurality.chernoff_lower, Plurality.markov_one}
+  \lean{Dynamics.avg_bernstein, Dynamics.avg_hoeffding, Dynamics.avg_chernoff_lower_mul,
+    Dynamics.avg_markov_one, Dynamics.avg_chernoff_upper_log}
   \leanok
   For $X = \sum_i Y_i(\omega_i)$ with independent uniform coordinates:
   Bernstein's inequality
@@ -177,7 +178,11 @@ formalized.
   when $Y_i - \E Y_i \le b$ and $\sum_i \mathrm{Var}\,Y_i \le \sigma^2$;
   Hoeffding's inequality for $\{0,1\}$ coordinates; the multiplicative
   Chernoff lower tail $\Pr(X \le (1-\delta)\mu) \le \exp(-\delta^2\mu/2)$;
-  and Markov's inequality $\Pr(X \ge 1) \le \E X$ for $\{0,1\}$ coordinates.
+  Markov's inequality $\Pr(X \ge 1) \le \E X$ for nonnegative coordinates;
+  and the closed-form Chernoff upper tail
+  $\Pr(X \ge k) \le \exp(k - \mu - k\log(k/\mu))$ for $\E X \le \mu \le k$.
+  All are proved once in the shared \texttt{dynamics} library
+  (\texttt{Dynamics/Concentration.lean}, \texttt{Dynamics/Tail.lean}).
 \end{lemma}
 
 \subsection{Growth of the bias}

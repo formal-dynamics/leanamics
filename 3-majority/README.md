@@ -43,7 +43,8 @@ exist.
 Like the sister [rumor_spread](../rumor_spread) development, this one avoids
 measure theory, `PMF`, `ENNReal`, kernels and martingales entirely — all
 randomness is uniform over finite types. The one deliberate difference is
-that a Chernoff bound *is* needed here, and so is proved from scratch:
+that a Chernoff bound *is* needed here; it is proved from scratch in the shared
+[`dynamics`](../dynamics) library:
 
 - **Probability** ([Prob.lean](ThreeMajority/Prob.lean), aliases of the shared
   [`Dynamics.Uniform`](../dynamics/Dynamics/Uniform.lean); `ThreeMajority.avg` is a
@@ -63,12 +64,12 @@ that a Chernoff bound *is* needed here, and so is proved from scratch:
   exact cubic majority map `p(x) = 3x² - 2x³`, via the polynomial identity
   `maj(a,b,c) = ab+bc+ac-2abc` on `{0,1}`, plus the per-agent `{0,1}`
   decomposition of `(step I r).card` that the Chernoff bounds consume.
-- **Chernoff** ([Chernoff.lean](ThreeMajority/Chernoff.lean)): the only
-  concentration tool, built from `1 + x ≤ exp x` and `avg_prod_pi` alone —
-  the exponential-moment bound `𝔼[exp(tX)] ≤ exp(μ(eᵗ-1))`, Markov applied
-  to `exp(tX)`, and the closed forms at the optimal `t = log(k/μ)`. These
-  are *mean-scaled*, which is what keeps them useful once few dissenting
-  agents remain.
+- **Chernoff** (shared [`Dynamics/Concentration.lean`](../dynamics/Dynamics/Concentration.lean),
+  `Dynamics.avg_chernoff_*`): the only concentration tool, built from `1 + x ≤ exp x` and
+  `avg_prod_pi` alone — the exponential-moment bound `𝔼[exp(tX)] ≤ exp(μ(eᵗ-1))`, Markov
+  applied to `exp(tX)`, and the closed forms at the optimal `t = log(k/μ)`. These are
+  *mean-scaled*, which is what keeps them useful once few dissenting agents remain. The
+  final Markov step is `Dynamics.avg_markov_one` (`Dynamics/Tail.lean`).
 - **Growth phase** ([Growth.lean](ThreeMajority/Growth.lean)): while the
   opinion-`1` fraction is in `[3/5, 3/4]` the majority map amplifies the
   bias by `≥ 5/4` per round in expectation; `10` rounds take the fraction

@@ -101,34 +101,6 @@ private lemma notConsensus_cases (y : Config n α) : notConsensus y = 0 ∨ notC
   · exact Or.inl (notConsensus_eq h)
   · exact Or.inr (notConsensus_eq' h)
 
-/-- A `{0, 1}`-valued average that vanishes somewhere is below one. -/
-private lemma avg_lt_one {γ : Type*} [Fintype γ] [Nonempty γ] (g : γ → ℝ)
-    (hg : ∀ a, g a = 0 ∨ g a = 1) (a₀ : γ) (ha₀ : g a₀ = 0) : avg g < 1 := by
-  classical
-  have hpt : ∀ a : γ, g a ≤ (if a = a₀ then (0:ℝ) else 1) := by
-    intro a
-    by_cases h : a = a₀
-    · rw [h, if_pos rfl, ha₀]
-    · rw [if_neg h]
-      rcases hg a with h' | h' <;> simp [h']
-  have hind : avg (fun a : γ => (if a = a₀ then (1:ℝ) else 0)) = 1 / (Fintype.card γ : ℝ) := by
-    unfold avg
-    rw [Finset.sum_ite_eq' Finset.univ a₀ (fun _ => (1:ℝ))]
-    simp
-  have havg : avg (fun a : γ => (if a = a₀ then (0:ℝ) else 1))
-      = 1 - 1 / (Fintype.card γ : ℝ) := by
-    have hbody : (fun a : γ => (if a = a₀ then (0:ℝ) else 1))
-        = fun a : γ => (1:ℝ) - (if a = a₀ then (1:ℝ) else 0) := by
-      funext a
-      by_cases h : a = a₀ <;> simp [h]
-    rw [hbody, avg_sub, avg_const, hind]
-  have hcard : (0:ℝ) < (Fintype.card γ : ℝ) := by exact_mod_cast Fintype.card_pos
-  calc avg g ≤ avg (fun a : γ => (if a = a₀ then (0:ℝ) else 1)) := avg_le_avg hpt
-    _ = 1 - 1 / (Fintype.card γ : ℝ) := havg
-    _ < 1 := by
-        have hpos : (0:ℝ) < 1 / (Fintype.card γ : ℝ) := one_div_pos.mpr hcard
-        linarith
-
 /-- Averaging the majority polynomial of two independent uniform samples: with `P` the average
 of `u` and `A` a constant, the average of `A u₁ + A u₂ + u₁u₂ − 2 A u₁u₂` over pairs is
 `A (2P − 2P²) + P²`. -/
@@ -292,9 +264,9 @@ theorem absorbed [NeZero n] [Fintype α] [Nonempty α] (x : Config n α) :
         exact med3_right _ _
       rw [hfix]
       exact notConsensus_eq ⟨y 0, fun v => rfl⟩
-    exact avg_lt_one (fun r : Round n => notConsensus (step y r))
-      (fun r => notConsensus_cases (step y r))
-      (fun v : Fin n => ((0 : Fin n), (0 : Fin n))) hzero
+    refine Dynamics.avg_lt_one (b := fun _ : Fin n => ((0 : Fin n), (0 : Fin n)))
+      (fun r => ?_) (by simp only [hzero, zero_lt_one])
+    rcases notConsensus_cases (step y r) with h | h <;> simp [h]
   exact Dynamics.Kernel.finite_absorption (kernel n α) notConsensus
     (fun y => notConsensus_cases y) hstep hacc x
 

@@ -15,7 +15,8 @@ uses Lean 4.32.0 and Mathlib revision
 | `Stationary` | Stationary-distribution existence by Cesàro averages and compactness of the finite simplex |
 | `Absorption` | Uniform absorption blocks, geometric survival bounds, convergence to zero |
 | `Rounds` | The kernel `ofStep` of a process driven by i.i.d. uniform rounds, its agreement with `expList`, and `expList_escape` (union bound over rounds for a moving target) |
-| `Concentration` | Hoeffding's and Bernstein's inequalities for sums of independent coordinates |
+| `Concentration` | Hoeffding's (both tails) and Bernstein's inequalities and the multiplicative Chernoff bounds (MGF bound, parametric and closed-form tails, `P(X ≤ (1-δ)μ) ≤ exp(-δ²μ/2)`) for sums of independent coordinates |
+| `Tail` | Monotonicity of probability, Markov's inequality, the one-round bound `1 - 𝔼[bad]` for `ofStep`, monotone occupation of absorbing events, strict bounds `𝔼f < 1`, the `log n` conversions |
 | `Phases` | Progress through nested phases (`nested_phases`, Lemma A.4 of Becchetti et al., SPAA 2014) |
 
 `avg` remains zero on an empty sample type. Normalized distributions require
@@ -46,5 +47,7 @@ This is the only finite-probability layer of the repository: `rumor_spread/`,
 `3-majority/` and `plurality/` use `avg` and `expList` from here (see
 [EXPECTATION_AUDIT.md](EXPECTATION_AUDIT.md) for the audit that removed the copies).
 3-majority retains its `ThreeMajority` probability names and blueprint links
-through compatibility declarations: `ThreeMajority.avg` is a reducible alias of `avg`. The mean-scaled Chernoff bounds remain in 3-majority; `Concentration` adds
-the Hoeffding and Bernstein inequalities used by `plurality/`.
+through compatibility declarations: `ThreeMajority.avg` is a reducible alias of `avg`.
+All concentration and tail bounds of `median/`, `plurality/` and `3-majority/` live in
+`Concentration` and `Tail` (see [CONCENTRATION_AUDIT.md](CONCENTRATION_AUDIT.md) for the
+audit that removed the copies).

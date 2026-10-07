@@ -1,5 +1,5 @@
 import ThreeMajority.OneRound
-import ThreeMajority.Chernoff
+import Dynamics.Concentration
 import ThreeMajority.Bounds
 
 /-!
@@ -18,7 +18,7 @@ except with probability `≤ 10 exp(-c₁n)`.
 Unlike the push protocol's growth phase (informed sets only grow, so a
 counting argument over "good rounds" suffices), the 3-majority count is
 *not* monotone in the round index, so every round genuinely needs the
-Chernoff bound of `Chernoff.lean` — there is no way to get by with a purely
+Chernoff bound (`Dynamics.avg_chernoff_lower_log`) — there is no way to get by with a purely
 combinatorial argument here.
 -/
 
@@ -103,7 +103,7 @@ lemma growth_round (hn : 1 ≤ n) (I : Finset (Fin n)) {β : ℝ}
     exact hscaled
   have hk0 : 0 < k := by rw [hk]; nlinarith
   have hkμ : k ≤ μlb := by rw [hk, hμlb]; nlinarith
-  have hbound := avg_tail_le_log_ge (Y_maj I) (Y_maj_zero_one I) hμ hk0 hkμ
+  have hbound := Dynamics.avg_chernoff_lower_log (Y_maj I) (Y_maj_zero_one I) hμ hk0 hkμ
   rw [show (fun x : Fin n → Fin n × Fin n × Fin n =>
         if ∑ i, Y_maj I i (x i) ≤ k then (1 : ℝ) else 0)
       = fun r : Tgt3 n => if ((step I r).card : ℝ) ≤ k then (1 : ℝ) else 0
