@@ -45,6 +45,7 @@ PR or the package README records it.
 | Result | Source | Proof | Constants | Produced by |
 | --- | --- | --- | --- | --- |
 | `RumorPush.push_informs_all_whp`: push on `K_n` informs every node in `O(log n)` rounds w.h.p. | Classical; no specific paper is formalized. The blueprint cites Frieze–Grimmett (DAM 1985) and Pittel (SIAM J. Appl. Math. 1987) for the sharp bound `log₂ n + ln n`. | Own elementary proof (`latex/rumor_push.tex`): growth phase via good rounds and the moment bound `𝔼[(1/2)^good] ≤ (15/16)^T`, then contraction of the uninformed by 2/3 per round and Markov. No Chernoff bound. | `2 ≤ n`; `(⌈117 log n⌉ + 23) + ⌈6 log n⌉` rounds; failure `≤ 2/n` | Aakash Kumar, imported from a separate repository (commit 9da2dc2 records a Claude co-author); PR #1 |
+| `RumorPush.pull_informs_all_whp`, `pushPull_informs_all_whp` (roadmap EPI-5): PULL and PUSH–PULL on `K_n`, with the same random calls as PUSH, inform every node after `⌈160 ln n⌉` rounds w.p. `≥ 1 − 2/n`; exact one-round expectations (PULL's quadratic shrinking `𝔼u' = u(u−1)/(n−1) ≤ u²/n`) | Karp, Schindelhauer, Shenker, Vöcking, *Randomized rumor spreading*, FOCS 2000 | PUSH's two-phase argument, generalized to any inflationary spreading step; for PULL, good rounds with probability `≥ 1/8` by a second-moment (Paley–Zygmund) bound, then contraction by 2/3 above half; PUSH–PULL by pathwise domination. Same design constraint as PUSH: no measure theory, no Chernoff bound (`rumor_spread/FORMALIZATION_DIFFERENCES.md`) | `2 ≤ n`; `⌈160 ln n⌉` rounds; failure `≤ 2/n` | A Claude agent (Opus); PR #24 |
 
 ### Majority dynamics (`3-majority/`, `plurality/`)
 
@@ -130,5 +131,4 @@ PR or the package README records it.
 ## In progress
 
 Draft pull requests: #31 (EPI-2, subcritical percolation), #27 (EPI-4, the COBRA–BIPS
-duality), #24 (EPI-5, PULL and PUSH–PULL) and #23 (the concentration and tail lemmas moved
-into `dynamics/`).
+duality) and #23 (the concentration and tail lemmas moved into `dynamics/`).
