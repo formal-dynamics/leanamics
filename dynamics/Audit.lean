@@ -15,3 +15,15 @@ import Dynamics
 #print axioms Dynamics.avg_bernstein
 #print axioms Dynamics.Kernel.nested_phases
 #print axioms Dynamics.expList_escape
+#print axioms Dynamics.Distribution.chernoff_upper_ratio
+#print axioms Dynamics.Distribution.chernoff_upper
+#print axioms Dynamics.Distribution.chernoff_lower_ratio
+#print axioms Dynamics.Distribution.chernoff_lower
+#print axioms Dynamics.Distribution.bernoulli_chernoff_upper_ratio
+#print axioms Dynamics.Distribution.bernoulli_chernoff_upper
+#print axioms Dynamics.Distribution.bernoulli_chernoff_lower_ratio
+#print axioms Dynamics.Distribution.bernoulli_chernoff_lower
+#print axioms Dynamics.avg_chernoff_upper_ratio
+#print axioms Dynamics.avg_chernoff_upper
+#print axioms Dynamics.avg_chernoff_lower_ratio
+#print axioms Dynamics.avg_chernoff_lower

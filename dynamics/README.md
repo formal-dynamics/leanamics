@@ -16,6 +16,7 @@ uses Lean 4.32.0 and Mathlib revision
 | `Absorption` | Uniform absorption blocks, geometric survival bounds, convergence to zero |
 | `Rounds` | The kernel `ofStep` of a process driven by i.i.d. uniform rounds, its agreement with `expList`, and `expList_escape` (union bound over rounds for a moving target) |
 | `Concentration` | Hoeffding's and Bernstein's inequalities for sums of independent coordinates |
+| `Chernoff` | Multiplicative Chernoff bounds (ratio and closed forms, mean replaced by any upper/lower bound) for independent, non-identical Bernoulli trials: on `independent` products, for biased coins `Distribution.bernoulli`, and for one uniform round (roadmap FND-3) |
 | `Phases` | Progress through nested phases (`nested_phases`, Lemma A.4 of Becchetti et al., SPAA 2014) |
 
 `avg` remains zero on an empty sample type. Normalized distributions require
@@ -46,5 +47,6 @@ This is the only finite-probability layer of the repository: `rumor_spread/`,
 `3-majority/` and `plurality/` use `avg` and `expList` from here (see
 [EXPECTATION_AUDIT.md](EXPECTATION_AUDIT.md) for the audit that removed the copies).
 3-majority retains its `ThreeMajority` probability names and blueprint links
-through compatibility declarations: `ThreeMajority.avg` is a reducible alias of `avg`. The mean-scaled Chernoff bounds remain in 3-majority; `Concentration` adds
+through compatibility declarations: `ThreeMajority.avg` is a reducible alias of `avg`. The mean-scaled Chernoff bounds of 3-majority (uniform sampling) remain there; `Chernoff`
+generalizes them to independent, non-identical Bernoulli trials, and `Concentration` adds
 the Hoeffding and Bernstein inequalities used by `plurality/`.

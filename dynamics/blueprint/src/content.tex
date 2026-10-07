@@ -133,6 +133,29 @@ Hoeffding's lemma bounds each Bernoulli factor; for Bernstein,
 $e^y\le1+y+y^2/(2(1-u/3))$ for $y\le u<3$ bounds each factor, and $t$ is
 chosen as $\lambda/(\sigma^2+b\lambda/3)$.
 \end{proof}
+\begin{theorem}[Chernoff bounds for independent Bernoulli trials]\label{thm:chernoff}
+\lean{Dynamics.Distribution.bernoulli,Dynamics.Distribution.chernoff_upper_ratio,Dynamics.Distribution.chernoff_upper,Dynamics.Distribution.chernoff_lower_ratio,Dynamics.Distribution.chernoff_lower,Dynamics.Distribution.bernoulli_chernoff_upper_ratio,Dynamics.Distribution.bernoulli_chernoff_upper,Dynamics.Distribution.bernoulli_chernoff_lower_ratio,Dynamics.Distribution.bernoulli_chernoff_lower,Dynamics.avg_chernoff_upper_ratio,Dynamics.avg_chernoff_upper,Dynamics.avg_chernoff_lower_ratio,Dynamics.avg_chernoff_lower}\leanok\uses{def:distribution,def:avg}
+Let $X=\sum_iX_i$ be a sum of independent $\{0,1\}$-valued trials with
+$\Pr(X_i=1)=p_i$, and let $\mu_L\le\mu=\sum_ip_i\le\mu_H$. For $\delta>0$,
+\[\Pr(X\ge(1+\delta)\mu_H)\le\Bigl(\frac{e^{\delta}}{(1+\delta)^{1+\delta}}\Bigr)^{\mu_H}
+\le e^{-\delta^2\mu_H/(2+\delta)},\]
+and for $0<\delta<1$,
+\[\Pr(X\le(1-\delta)\mu_L)\le\Bigl(\frac{e^{-\delta}}{(1-\delta)^{1-\delta}}\Bigr)^{\mu_L}
+\le e^{-\delta^2\mu_L/2}.\]
+The trials are $\{0,1\}$-valued observables of the coordinates of an independent
+product of distributions, independent biased coins (counting the heads in any
+subset), or the coordinates of one uniform round (Mitzenmacher--Upfal,
+\emph{Probability and Computing}, Theorems 4.4 and 4.5 with Exercise 4.7).
+\end{theorem}
+\begin{proof}\leanok
+Markov's inequality applied to $e^{tX}$, which factors over the coordinates; each
+factor is $1+p_i(e^t-1)\le e^{p_i(e^t-1)}$, so $\E e^{tX}\le e^{\mu_H(e^t-1)}$ for
+$t\ge0$ and $\E e^{tX}\le e^{\mu_L(e^t-1)}$ for $t\le0$. Take $t=\log(1+\delta)$,
+respectively $t=\log(1-\delta)$. The closed forms follow from
+$\log(1+\delta)\ge2\delta/(2+\delta)$ (the first term of the series of
+$\log\frac{1+x}{1-x}$ at $x=\delta/(2+\delta)$) and
+$(1-\delta)\log(1-\delta)\ge-\delta+\delta^2/2$.
+\end{proof}
 \begin{theorem}[Nested phases]\label{thm:phases}
 \lean{Dynamics.Kernel.nested_phases}\leanok\uses{def:kernel}
 Let $A_1\supseteq\cdots\supseteq A_T$ be sets of states such that from $A_i$
