@@ -1,5 +1,6 @@
 import Epidemics.ReedFrost
 import Dynamics.Chernoff
+import Dynamics.DriftHittingAux
 
 /-! # Independent edge coins: deferred decisions and symmetry (EPI-3)
 
@@ -34,37 +35,24 @@ lemma coins_eq_independent {V : Type*} [Fintype V] [DecidableEq V] (p : ℝ) (h0
     coins (V := V) p h0 h1 = Distribution.independent fun _ => Distribution.bernoulli p h0 h1 :=
   rfl
 
-/-! ### Elementary bounds on probabilities -/
+/-! ### Elementary bounds on probabilities
+
+Monotonicity and the expectation form of `prob` are the core's `Distribution.prob_mono` and
+`Distribution.prob_eq_expect`. The bounds below are not in `dynamics/` yet (their move there is
+tracked in issue #42). -/
 
 section Prob
 
 variable {α : Type*} [Fintype α]
 
-lemma prob_eq_expect (P : Distribution α) (A : α → Prop) [DecidablePred A] :
-    P.prob A = P.expect fun a => if A a then 1 else 0 := by
-  simp only [Distribution.prob]
-  congr 1
-  funext a
-  by_cases h : A a <;> simp [h]
-
-lemma prob_mono (P : Distribution α) {A B : α → Prop} (h : ∀ a, A a → B a) :
-    P.prob A ≤ P.prob B := by
-  classical
-  rw [prob_eq_expect, prob_eq_expect]
-  refine P.expect_mono fun a => ?_
-  by_cases hA : A a
-  · simp [hA, h a hA]
-  · simp only [hA, if_false]
-    split <;> norm_num
-
 lemma prob_congr (P : Distribution α) {A B : α → Prop} (h : ∀ a, A a ↔ B a) :
     P.prob A = P.prob B :=
-  le_antisymm (prob_mono P fun a => (h a).1) (prob_mono P fun a => (h a).2)
+  le_antisymm (P.prob_mono fun a => (h a).1) (P.prob_mono fun a => (h a).2)
 
 lemma prob_not (P : Distribution α) (A : α → Prop) :
     P.prob (fun a => ¬A a) = 1 - P.prob A := by
   classical
-  rw [prob_eq_expect, prob_eq_expect, ← P.expect_const 1, ← Distribution.expect_sub]
+  rw [P.prob_eq_expect, P.prob_eq_expect, ← P.expect_const 1, ← Distribution.expect_sub]
   congr 1
   funext a
   by_cases hA : A a <;> simp [hA]
@@ -72,7 +60,7 @@ lemma prob_not (P : Distribution α) (A : α → Prop) :
 lemma prob_or_le (P : Distribution α) (A B : α → Prop) :
     P.prob (fun a => A a ∨ B a) ≤ P.prob A + P.prob B := by
   classical
-  rw [prob_eq_expect, prob_eq_expect, prob_eq_expect, ← Distribution.expect_add]
+  rw [P.prob_eq_expect, P.prob_eq_expect, P.prob_eq_expect, ← Distribution.expect_add]
   refine P.expect_mono fun a => ?_
   by_cases hA : A a <;> by_cases hB : B a <;> simp [hA, hB]
 
@@ -93,7 +81,7 @@ lemma prob_exists_le_sum {ι : Type*} (P : Distribution α) (s : Finset ι) (A :
 lemma one_sub_le_prob (P : Distribution α) {A B : α → Prop} (h : ∀ a, B a → A a) {ε : ℝ}
     (hB : P.prob (fun a => ¬B a) ≤ ε) : 1 - ε ≤ P.prob A := by
   rw [prob_not] at hB
-  linarith [prob_mono P h]
+  linarith [Distribution.prob_mono P h]
 
 end Prob
 
@@ -129,7 +117,7 @@ theorem prob_forall_eval_eq {ι α : Type*} [Fintype ι] [DecidableEq ι] [Finty
       have hki : c k = i := (mem_filter.mp hk).2
       simp only [hψ, hs, prod_singleton, Distribution.expect, mul_ite, mul_one, mul_zero,
         sum_ite_eq', mem_univ, if_true, hki]
-  rw [prob_eq_expect]
+  rw [Distribution.prob_eq_expect]
   simp_rw [hind]
   rw [Distribution.independent_expect_prod]
   simp_rw [hfib]
@@ -261,7 +249,7 @@ theorem expect_queryAnswers (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) (next : List
     · simp
   simp_rw [hdec]
   rw [Distribution.expect_sum]
-  simp only [Distribution.expect_mul, ← prob_eq_expect]
+  simp only [Distribution.expect_mul, ← Distribution.prob_eq_expect]
   simp only [prob_queryAnswers_eq p h0 h1 next hfresh]
   rw [Distribution.expect]
   refine sum_congr rfl fun x _ => ?_
@@ -276,7 +264,7 @@ theorem prob_queryAnswers (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) (next : List B
       (Distribution.independent fun _ : Fin m => Distribution.bernoulli p h0 h1).prob
         (fun x => E (List.ofFn x)) := by
   classical
-  rw [prob_eq_expect, prob_eq_expect]
+  rw [Distribution.prob_eq_expect, Distribution.prob_eq_expect]
   exact expect_queryAnswers p h0 h1 next hfresh fun L => if E L then 1 else 0
 
 end Deferred
@@ -299,7 +287,7 @@ theorem coins_prob_perm (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) (σ : Equiv.Perm
     (E : (Sym2 V → Bool) → Prop) :
     (coins p h0 h1).prob (fun ω => E (fun e => ω (e.map σ))) = (coins p h0 h1).prob E := by
   classical
-  rw [prob_eq_expect, prob_eq_expect]
+  rw [Distribution.prob_eq_expect, Distribution.prob_eq_expect]
   simp only [Distribution.expect, coins, Distribution.independent]
   refine Fintype.sum_equiv ((permSym2 σ).arrowCongr (Equiv.refl Bool)).symm _ _ fun ω => ?_
   congr 1

@@ -53,7 +53,7 @@ lemma prob_count_take_le {m t : ℕ} (ht : t ≤ m) {δ : ℝ} (hδ0 : 0 < δ) (
       Real.exp (-(δ ^ 2 * (t * p) / 2)) := by
   have h := Distribution.bernoulli_chernoff_lower (fun _ : Fin m => p) (fun _ => h0) (fun _ => h1)
     (univ.filter fun j : Fin m => j.val < t) hδ0 hδ1 (sum_filter_lt ht p).ge
-  refine (prob_mono _ fun x hx => ?_).trans h
+  refine (Distribution.prob_mono _ fun x hx => ?_).trans h
   rwa [count_take_ofFn] at hx
 
 /-- **Upper tail** for the first `t ≤ m` trials (Chernoff, FND-3):
@@ -64,7 +64,7 @@ lemma prob_count_take_ge {m t : ℕ} (ht : t ≤ m) {δ : ℝ} (hδ0 : 0 < δ) (
       Real.exp (-(δ ^ 2 * (t * p) / 3)) := by
   have h := Distribution.bernoulli_chernoff_upper (fun _ : Fin m => p) (fun _ => h0) (fun _ => h1)
     (univ.filter fun j : Fin m => j.val < t) hδ0 (sum_filter_lt ht p).le
-  refine (prob_mono _ fun x hx => ?_).trans (h.trans ?_)
+  refine (Distribution.prob_mono _ fun x hx => ?_).trans (h.trans ?_)
   · rwa [count_take_ofFn] at hx
   · rw [Real.exp_le_exp, neg_le_neg_iff]
     have : 0 ≤ δ ^ 2 * (t * p) := by positivity
@@ -85,7 +85,7 @@ theorem prob_count_take_far {m N₀ : ℕ} (hN₀ : N₀ ≤ m) {δ : ℝ} (hδ0
   calc _ ≤ (Distribution.independent fun _ : Fin m => Distribution.bernoulli p h0 h1).prob
           (fun x => (((List.ofFn x).take N₀).count true : ℝ) ≤ (1 - δ) * (N₀ * p) ∨
             (1 + δ) * (N₀ * p) ≤ (((List.ofFn x).take N₀).count true : ℝ)) := by
-        refine prob_mono _ fun x hx => ?_
+        refine Distribution.prob_mono _ fun x hx => ?_
         rcases le_abs'.mp hx with h | h
         · left; linarith
         · right; linarith
@@ -116,7 +116,7 @@ theorem prob_not_good_le {N₀ t₁ : ℕ} (ht₁ : t₁ ≤ N₀) {δ : ℝ} (h
     linarith
   have hlow {t : ℕ} (ht : t₁ ≤ t) (htN : t ≤ N₀) :
       P.prob (fun x => ¬(1 - δ) * (t * p) ≤ (((List.ofFn x).take t).count true : ℝ)) ≤ E := by
-    refine (prob_mono _ fun x hx => (not_le.mp hx).le).trans
+    refine (Distribution.prob_mono _ fun x hx => (not_le.mp hx).le).trans
       ((prob_count_take_le p h0 h1 htN hδ0 hδ1).trans ?_)
     refine le_trans ?_ (hmono ht)
     rw [Real.exp_le_exp, neg_le_neg_iff]
@@ -124,14 +124,14 @@ theorem prob_not_good_le {N₀ t₁ : ℕ} (ht₁ : t₁ ≤ N₀) {δ : ℝ} (h
     linarith
   have hhigh {t : ℕ} (ht : t₁ ≤ t) (htN : t ≤ N₀) :
       P.prob (fun x => ¬(((List.ofFn x).take t).count true : ℝ) ≤ (1 + δ) * (t * p)) ≤ E :=
-    (prob_mono _ fun x hx => (not_le.mp hx).le).trans
+    (Distribution.prob_mono _ fun x hx => (not_le.mp hx).le).trans
       ((prob_count_take_ge p h0 h1 htN hδ0 hδ1).trans (hmono ht))
   calc P.prob (fun x => ¬Good p N₀ t₁ δ (List.ofFn x))
       ≤ P.prob (fun x => ¬(((List.ofFn x).take N₀).count true : ℝ) ≤ (1 + δ) * (N₀ * p) ∨
           (¬(((List.ofFn x).take t₁).count true : ℝ) ≤ (1 + δ) * (t₁ * p) ∨
             ∃ t ∈ Icc t₁ N₀,
               ¬(1 - δ) * (t * p) ≤ (((List.ofFn x).take t).count true : ℝ))) := by
-        refine prob_mono _ fun x hx => ?_
+        refine Distribution.prob_mono _ fun x hx => ?_
         simp only [Good, not_and_or, not_forall, exists_prop] at hx
         exact hx
     _ ≤ E + (E + ∑ t ∈ Icc t₁ N₀, E) := by

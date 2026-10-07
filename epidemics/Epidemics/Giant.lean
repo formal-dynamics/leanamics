@@ -433,7 +433,7 @@ theorem core_path {lam θ δ ℓ : ℝ} (hlam : 0 < lam) (hδ0 : 0 < δ) (hδ1 :
         ((L.take N₀).count true : ℝ) ≤ (1 + δ) * (N₀ * p)))
     rw [coins_eq_independent]
     refine (le_of_eq hdd).trans ?_
-    refine (prob_mono _ fun x hx => ?_).trans
+    refine (Distribution.prob_mono _ fun x hx => ?_).trans
       ((prob_count_take_far p h0 h1 le_rfl hδ0 hδ1).trans ?_)
     · rw [not_and_or] at hx
       rcases hx with hx | hx
@@ -484,7 +484,8 @@ theorem exists_long_path :
   obtain ⟨C, hC⟩ := core_path (lam := 1 + ε) (θ := ε / 2) (δ := ε / 20) (ℓ := ε ^ 2 / 5)
     (by linarith) (by positivity) (by linarith) (by positivity) (by linarith) (by positivity)
     hC1 hC3 hC4
-  refine ⟨C, fun V _ _ p h0 h1 hp => (hC V p h0 h1 hp).trans (prob_mono _ fun ω hω => ?_)⟩
+  refine ⟨C, fun V _ _ p h0 h1 hp =>
+    (hC V p h0 h1 hp).trans (Distribution.prob_mono _ fun ω hω => ?_)⟩
   obtain ⟨u, v, q, hq, hl⟩ := hω
   refine ⟨u, v, q, hq, ?_⟩
   have e : ε ^ 2 * (Fintype.card V : ℝ) / 5 = ε ^ 2 / 5 * Fintype.card V := by ring
@@ -525,7 +526,8 @@ theorem exists_giant_component :
   obtain ⟨C, hC⟩ := core_component (lam := 1 + ε) (θ := ε / 2) (η := ε ^ 2 / 10) (δ := ε / 10)
     (c := ε / 2) (by linarith) (by positivity) (by linarith) (by positivity) (by nlinarith)
     (by linarith) hC1 hC2 hc
-  refine ⟨C, fun V _ _ p h0 h1 hp => (hC V p h0 h1 hp).trans (prob_mono _ fun ω hω => ?_)⟩
+  refine ⟨C, fun V _ _ p h0 h1 hp =>
+    (hC V p h0 h1 hp).trans (Distribution.prob_mono _ fun ω hω => ?_)⟩
   obtain ⟨K, hK⟩ := hω
   refine ⟨K, ?_⟩
   have e : ε * (Fintype.card V : ℝ) / 2 = ε / 2 * Fintype.card V := by ring

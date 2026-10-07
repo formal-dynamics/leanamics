@@ -115,8 +115,8 @@ lemma prob_component_ge (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) (v : V) (k : ℝ
       exact Finset.sum_nonneg fun _ _ => by split_ifs <;> norm_num
   have hint : k * P.prob (fun ω => ∃ K : (perc ⊤ ω).ConnectedComponent, k ≤ K.supp.ncard) ≤
       ∑ w, P.prob (fun ω => k ≤ ((perc ⊤ ω).connectedComponentMk w).supp.ncard) := by
-    rw [prob_eq_expect, ← Distribution.expect_mul]
-    simp_rw [prob_eq_expect]
+    rw [Distribution.prob_eq_expect, ← Distribution.expect_mul]
+    simp_rw [Distribution.prob_eq_expect]
     rw [← Distribution.expect_sum]
     exact P.expect_mono hpt
   rw [Finset.sum_congr rfl fun w _ => prob_component_ge_eq p h0 h1 v w k, Finset.sum_const,
