@@ -1,12 +1,15 @@
-import Epidemics.ReedFrost
+import Epidemics.GiantCoins
 
 /-! # Finite-probability helpers for EPI-2
 
-Elementary facts about `Dynamics.Distribution` used by the subcritical percolation proofs:
-monotonicity, complements and the union bound for `prob`; Markov's inequality on an exponential
-moment; and two ways of conditioning an independent product on one coordinate (an arbitrary
-coordinate, through `Function.update`, and the first coordinate of `Fin (m + 1)`, through
-`Fin.cons`). They are stated for any `Distribution` and are candidates to move to `dynamics/`.
+Monotonicity of `prob` is the core's `Distribution.prob_mono`; congruence, the complement rule
+`prob_not` and the union bound `prob_exists_le_sum` are those of `Epidemics.GiantCoins` (EPI-3);
+Markov's inequality on an exponential moment and the expectation of a coin are the core's
+`Distribution.prob_le_expect_exp` and `Distribution.bernoulli_expect` (FND-3). This file adds
+`prob_eq_one`, `prob_eq_zero` and two ways of conditioning an independent product on one
+coordinate (an arbitrary coordinate, through `Function.update`, and the first coordinate of
+`Fin (m + 1)`, through `Fin.cons`). They are stated for any `Distribution`; their move to
+`dynamics/` is tracked in issues #42 and #46.
 -/
 
 namespace Epidemics
@@ -17,17 +20,6 @@ variable {α ι β : Type*} [Fintype α] [Fintype ι] [Fintype β]
 section Prob
 variable (q : Distribution α)
 
-lemma prob_congr {s t : α → Prop} (h : ∀ a, s a ↔ t a) : q.prob s = q.prob t := by
-  rw [funext fun a => propext (h a)]
-
-lemma prob_mono {s t : α → Prop} (h : ∀ a, s a → t a) : q.prob s ≤ q.prob t := by
-  unfold Distribution.prob
-  refine q.expect_mono fun a => ?_
-  by_cases hs : s a
-  · rw [if_pos hs, if_pos (h a hs)]
-  · rw [if_neg hs]
-    split <;> norm_num
-
 lemma prob_eq_one {s : α → Prop} (h : ∀ a, s a) : q.prob s = 1 := by
   unfold Distribution.prob
   simp only [h, if_true]
@@ -37,52 +29,6 @@ lemma prob_eq_zero {s : α → Prop} (h : ∀ a, ¬s a) : q.prob s = 0 := by
   unfold Distribution.prob
   simp only [h, if_false]
   exact q.expect_const 0
-
-/-- An event and its complement have total probability one. -/
-lemma prob_add_prob_not (s : α → Prop) : q.prob s + q.prob (fun a => ¬s a) = 1 := by
-  unfold Distribution.prob
-  rw [← Distribution.expect_add, ← q.expect_const 1]
-  congr 1
-  funext a
-  by_cases hs : s a
-  · rw [if_pos hs, if_neg (not_not_intro hs)]
-    norm_num
-  · rw [if_neg hs, if_pos hs]
-    norm_num
-
-/-- **Union bound.** -/
-lemma prob_exists_le_sum (s : ι → α → Prop) :
-    q.prob (fun a => ∃ i, s i a) ≤ ∑ i, q.prob (s i) := by
-  classical
-  unfold Distribution.prob
-  rw [← Distribution.expect_sum]
-  refine q.expect_mono fun a => ?_
-  have hnn (i : ι) : (0 : ℝ) ≤ if s i a then 1 else 0 := by split <;> norm_num
-  by_cases h : ∃ i, s i a
-  · obtain ⟨i, hi⟩ := h
-    rw [if_pos ⟨i, hi⟩]
-    calc (1 : ℝ) = if s i a then 1 else 0 := by rw [if_pos hi]
-      _ ≤ ∑ j, if s j a then 1 else 0 :=
-        single_le_sum (f := fun j => if s j a then (1 : ℝ) else 0) (fun j _ => hnn j)
-          (mem_univ i)
-  · rw [if_neg h]
-    exact sum_nonneg fun i _ => hnn i
-
-/-- **Markov's inequality on an exponential moment**: for `t ≥ 0`,
-`P(k ≤ X) ≤ 𝔼[exp (t X)] · exp (-(t k))`. -/
-lemma prob_le_expect_exp (X : α → ℝ) {t : ℝ} (ht : 0 ≤ t) (k : ℝ) :
-    q.prob (fun a => k ≤ X a) ≤
-      q.expect (fun a => Real.exp (t * X a)) * Real.exp (-(t * k)) := by
-  unfold Distribution.prob
-  have hpt (a : α) :
-      (if k ≤ X a then (1 : ℝ) else 0) ≤ Real.exp (-(t * k)) * Real.exp (t * X a) := by
-    rw [← Real.exp_add]
-    split_ifs with h
-    · exact Real.one_le_exp (by nlinarith)
-    · exact (Real.exp_pos _).le
-  calc q.expect (fun a => if k ≤ X a then (1 : ℝ) else 0)
-      ≤ q.expect (fun a => Real.exp (-(t * k)) * Real.exp (t * X a)) := q.expect_mono hpt
-    _ = _ := by rw [Distribution.expect_mul, mul_comm]
 
 end Prob
 
@@ -137,11 +83,6 @@ lemma independent_expect_fin_succ {m : ℕ} (q : Distribution β) (f : (Fin (m +
   rw [← (Fin.consEquiv fun _ => β).sum_comp, Fintype.sum_prod_type]
   refine sum_congr rfl fun b _ => sum_congr rfl fun r _ => ?_
   simp [Fin.consEquiv, Fin.prod_univ_succ, mul_assoc]
-
-/-- Expectation under a Bernoulli coin. -/
-lemma bernoulli_expect (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) (f : Bool → ℝ) :
-    (bernoulli p h0 h1).expect f = p * f true + (1 - p) * f false := by
-  simp [Distribution.expect, bernoulli]
 
 /-- Conditioning the percolation coins on the coin of one pair. -/
 lemma coins_prob_split [DecidableEq α] (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) (e : α)

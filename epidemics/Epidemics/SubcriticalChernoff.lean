@@ -1,16 +1,17 @@
 import Epidemics.SubcriticalProb
-import Dynamics.Concentration
 
-/-! # Binomial tails and a Chernoff bound (EPI-2, local)
+/-! # Binomial tails and the Chernoff bound of Theorem E.1 (EPI-2)
 
-The tail `binTail p m k` of the number of successes in `m` independent Bernoulli(`p`) trials, its
-one-step recursion (condition on the first trial), and the Chernoff bound used in the proof of
-Theorem E.1 of Becchetti, Clementi, Denni, Pasquale, Trevisan, Ziccardi, *Percolation and epidemic
-processes in one-dimensional small-world networks* (arXiv:2103.16398): Markov's inequality applied
-to the exponential moment `exp (ε X)`, which factors over the independent trials.
+The tail `binTail p m k` of the number of successes in `m` independent Bernoulli(`p`) trials (the
+coin `Distribution.bernoulli` of the Chernoff bounds of `dynamics/`), its one-step recursion
+(condition on the first trial), and the Chernoff bound used in the proof of Theorem E.1 of
+Becchetti, Clementi, Denni, Pasquale, Trevisan, Ziccardi, *Percolation and epidemic processes in
+one-dimensional small-world networks* (arXiv:2103.16398).
 
-The Chernoff bound is local to `epidemics/`: the weighted Chernoff bound of FND-3, once available
-in `dynamics/`, should replace it.
+The paper tilts by `ε` rather than by the optimal `log (1 + δ)`, which gives its closed form
+`exp (ε - ε² t / 2)`. Markov's inequality on `exp (ε X)` and the bound on the moment-generating
+function are the core's `Distribution.prob_ge_le_exp` (`Dynamics.ChernoffAux`, FND-3); only the
+scalar inequality `(1 - ε) e^ε ≤ 1 - ε² / 2` and the arithmetic of the paper's constants are local.
 -/
 
 namespace Epidemics
@@ -19,7 +20,7 @@ open Finset Dynamics
 /-- The tail of a binomial distribution: the probability of at least `k` successes in `m`
 independent Bernoulli(`p`) trials. -/
 noncomputable def binTail (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) (m k : ℕ) : ℝ :=
-  (Distribution.independent fun _ : Fin m => bernoulli p h0 h1).prob
+  (Distribution.independent fun _ : Fin m => Distribution.bernoulli p h0 h1).prob
     (fun ξ => k ≤ (univ.filter fun i => ξ i = true).card)
 
 section BinTail
@@ -56,7 +57,7 @@ lemma binTail_succ_succ (m k : ℕ) :
   simp only [card_filter_cons, if_true, Bool.false_eq_true, if_false, zero_add]
   have ht : ∀ c : ℕ, k + 1 ≤ 1 + c ↔ k ≤ c := fun c => by omega
   simp only [ht]
-  simp [bernoulli]
+  simp [Distribution.bernoulli]
 
 end BinTail
 
@@ -74,28 +75,13 @@ lemma one_sub_mul_exp_le {ε : ℝ} (hε : 0 ≤ ε) (hε1 : ε < 1) :
     _ = 1 - ε ^ 2 + ε ^ 2 / (2 * (1 - ε / 3)) * (1 - ε) := by ring
     _ ≤ 1 - ε ^ 2 / 2 := by linarith
 
-/-- The exponential moment of the number of successes in `m` Bernoulli(`p`) trials. -/
-lemma expect_exp_card_filter {p : ℝ} (h0 : 0 ≤ p) (h1 : p ≤ 1) (m : ℕ) (t : ℝ) :
-    (Distribution.independent fun _ : Fin m => bernoulli p h0 h1).expect
-        (fun ξ => Real.exp (t * ((univ.filter fun i => ξ i = true).card : ℝ))) =
-      (p * Real.exp t + (1 - p)) ^ m := by
-  have h (ξ : Fin m → Bool) :
-      Real.exp (t * ((univ.filter fun i => ξ i = true).card : ℝ)) =
-        ∏ i, Real.exp (t * if ξ i = true then 1 else 0) := by
-    rw [card_filter, Nat.cast_sum, mul_sum, Real.exp_sum]
-    refine prod_congr rfl fun i _ => ?_
-    split <;> simp
-  simp_rw [h]
-  rw [Distribution.independent_expect_prod (fun _ => bernoulli p h0 h1)
-    (fun _ b => Real.exp (t * if b = true then 1 else 0))]
-  simp [bernoulli_expect, prod_const]
-
 /-- **Chernoff bound** for the proof of Theorem E.1: if `p (d - 1) ≤ 1 - ε` with `0 < ε < 1`, then
 at least `t` successes among `t (d - 1) + 1` independent Bernoulli(`p`) trials occur with
 probability at most `exp (ε - ε² t / 2)`. -/
 theorem binomial_tail_le {d : ℕ} {p ε : ℝ} (h0 : 0 ≤ p) (h1 : p ≤ 1) (hε : 0 < ε) (hε1 : ε < 1)
     (hp : p * ((d : ℝ) - 1) ≤ 1 - ε) (t : ℕ) :
-    (Distribution.independent fun _ : Fin (t * (d - 1) + 1) => bernoulli p h0 h1).prob
+    (Distribution.independent fun _ : Fin (t * (d - 1) + 1) =>
+        Distribution.bernoulli p h0 h1).prob
         (fun ξ => t ≤ (univ.filter fun i => ξ i = true).card) ≤
       Real.exp (ε - ε ^ 2 * t / 2) := by
   rcases Nat.lt_or_ge d 2 with hd | hd
@@ -115,7 +101,7 @@ theorem binomial_tail_le {d : ℕ} {p ε : ℝ} (h0 : 0 ≤ p) (h1 : p ≤ 1) (h
         rw [card_univ, Fintype.card_fin] at hle
         have h1' : (univ.filter fun i => ξ i = true).card ≤ 1 := hle.trans hm.le
         omega
-  · -- `d ≥ 2`: Markov's inequality on `exp (ε X)`
+  · -- `d ≥ 2`: Markov's inequality on `exp (ε X)` (core `prob_ge_le_exp`, tilt `ε`)
     have hd1 : (1 : ℝ) ≤ (d : ℝ) - 1 := by
       have : (2 : ℝ) ≤ d := by exact_mod_cast hd
       linarith
@@ -125,38 +111,33 @@ theorem binomial_tail_le {d : ℕ} {p ε : ℝ} (h0 : 0 ≤ p) (h1 : p ≤ 1) (h
       rw [hm]
       push_cast [Nat.cast_sub (by omega : 1 ≤ d)]
       ring
+    have ht0 : (0 : ℝ) ≤ t := t.cast_nonneg
+    -- the mean `m p` is at most `(1 - ε) (t + 1)`
+    have hmean : ∑ _i : Fin m, (Distribution.bernoulli p h0 h1).expect
+        (fun b => if b = true then (1 : ℝ) else 0) ≤ (1 - ε) * (t + 1) := by
+      simp only [Distribution.bernoulli_expect, sum_const, card_univ, Fintype.card_fin,
+        nsmul_eq_mul]
+      norm_num
+      rw [hmR]
+      nlinarith
+    have hcore := Distribution.prob_ge_le_exp (fun _ : Fin m => Distribution.bernoulli p h0 h1)
+      (fun _ b => if b = true then (1 : ℝ) else 0) (fun _ b => by cases b <;> simp) hε.le
+      hmean (t : ℝ)
+    simp only [sum_boole] at hcore
     have ha : 0 ≤ Real.exp ε - 1 := by linarith [Real.add_one_le_exp ε]
-    have hkey := one_sub_mul_exp_le hε.le hε1
-    calc (Distribution.independent fun _ : Fin m => bernoulli p h0 h1).prob
+    -- `(1 - ε) (e^ε - 1) ≤ ε - ε² / 2`
+    have hb : (1 - ε) * (Real.exp ε - 1) ≤ ε - ε ^ 2 / 2 := by
+      linarith [one_sub_mul_exp_le hε.le hε1]
+    calc (Distribution.independent fun _ : Fin m => Distribution.bernoulli p h0 h1).prob
             (fun ξ => t ≤ (univ.filter fun i => ξ i = true).card)
-        = (Distribution.independent fun _ : Fin m => bernoulli p h0 h1).prob
+        = (Distribution.independent fun _ : Fin m => Distribution.bernoulli p h0 h1).prob
             (fun ξ => (t : ℝ) ≤ ((univ.filter fun i => ξ i = true).card : ℝ)) :=
           prob_congr _ fun ξ => Nat.cast_le.symm
-      _ ≤ (Distribution.independent fun _ : Fin m => bernoulli p h0 h1).expect
-              (fun ξ => Real.exp (ε * ((univ.filter fun i => ξ i = true).card : ℝ))) *
-            Real.exp (-(ε * t)) :=
-          prob_le_expect_exp _ _ hε.le _
-      _ = (p * Real.exp ε + (1 - p)) ^ m * Real.exp (-(ε * t)) := by
-          rw [expect_exp_card_filter]
-      _ ≤ Real.exp (p * (Real.exp ε - 1)) ^ m * Real.exp (-(ε * t)) := by
-          gcongr
-          linarith [Real.add_one_le_exp (p * (Real.exp ε - 1))]
-      _ = Real.exp (m * (p * (Real.exp ε - 1)) - ε * t) := by
-          rw [← Real.exp_nat_mul, ← Real.exp_add]
-          ring_nf
+      _ ≤ Real.exp ((1 - ε) * (t + 1) * (Real.exp ε - 1) - ε * t) := hcore
       _ ≤ Real.exp (ε - ε ^ 2 * t / 2) := by
           apply Real.exp_le_exp.mpr
-          have ht0 : (0 : ℝ) ≤ t := t.cast_nonneg
-          -- `m p ≤ (1 - ε) (t + 1)`
-          have hmp : (m : ℝ) * p ≤ (1 - ε) * (t + 1) := by
-            rw [hmR]
-            nlinarith
-          -- `(1 - ε) (e^ε - 1) ≤ ε - ε² / 2`
-          have hb : (1 - ε) * (Real.exp ε - 1) ≤ ε - ε ^ 2 / 2 := by linarith
-          calc (m : ℝ) * (p * (Real.exp ε - 1)) - ε * t
-              = (m * p) * (Real.exp ε - 1) - ε * t := by ring
-            _ ≤ ((1 - ε) * (t + 1)) * (Real.exp ε - 1) - ε * t := by gcongr
-            _ = (t + 1) * ((1 - ε) * (Real.exp ε - 1)) - ε * t := by ring
+          calc (1 - ε) * (t + 1) * (Real.exp ε - 1) - ε * t
+              = (t + 1) * ((1 - ε) * (Real.exp ε - 1)) - ε * t := by ring
             _ ≤ (t + 1) * (ε - ε ^ 2 / 2) - ε * t := by gcongr
             _ ≤ ε - ε ^ 2 * t / 2 := by nlinarith [sq_nonneg ε]
 

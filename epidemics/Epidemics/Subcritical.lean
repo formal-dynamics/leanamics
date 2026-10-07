@@ -37,7 +37,8 @@ most that of at least `t` successes in `t (d - 1) + 1` independent Bernoulli(`p`
 theorem prob_cluster_gt_le_binomial (G : SimpleGraph V) [DecidableRel G.Adj] {d : ℕ}
     (hdeg : ∀ v, G.degree v ≤ d) {p : ℝ} (h0 : 0 ≤ p) (h1 : p ≤ 1) (s : V) (t : ℕ) :
     (coins p h0 h1).prob (fun ω => t < ((perc G ω).connectedComponentMk s).supp.ncard) ≤
-      (Distribution.independent fun _ : Fin (t * (d - 1) + 1) => bernoulli p h0 h1).prob
+      (Distribution.independent fun _ : Fin (t * (d - 1) + 1) =>
+          Distribution.bernoulli p h0 h1).prob
         (fun ξ => t ≤ (univ.filter fun i => ξ i = true).card) := by
   exact prob_cluster_gt_le_binTail h0 h1 hdeg s t
 
@@ -90,7 +91,7 @@ theorem reedFrost_subcritical (G : SimpleGraph V) [DecidableRel G.Adj] {d : ℕ}
             I₀.card * (10 / ε ^ 2 * Real.log (Fintype.card V)) ∧
           (run G ω I₀ ⌊10 / ε ^ 2 * Real.log (Fintype.card V)⌋₊).infected = ∅ := by
   refine (prob_components_small G hdeg h0 h1 hε hε1 hR₀).trans
-    (prob_mono _ fun ω hω => ⟨?_, ?_⟩)
+    (Distribution.prob_mono _ fun ω hω => ⟨?_, ?_⟩)
   · exact card_recovered_le G ω I₀ fun u => hω _
   · exact infected_eq_empty_of_ncard_le G ω I₀ fun u => Nat.le_floor (hω _)
 

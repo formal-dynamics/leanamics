@@ -39,11 +39,11 @@ of `G` be at most `d`, let `n = |V|`, and let `p (d - 1) ≤ 1 - ε` with `0 < �
 The crux is the principle of deferred decisions. It is proved for every state of an exploration
 (discovered vertices, examined edges forced closed) by induction on a budget, conditioning on the
 coin of one frontier edge, which reproduces the recursion of the binomial tail
-([`SubcriticalExploration.lean`](Epidemics/SubcriticalExploration.lean)). The Chernoff bound
-([`SubcriticalChernoff.lean`](Epidemics/SubcriticalChernoff.lean)) is Markov's inequality on an
-exponential moment, local to this package until FND-3 provides one in `dynamics/`. Deviations from
-the paper (explicit constants, the threshold written as `p (d - 1) ≤ 1 - ε`) are recorded in
-[`PROGRESS-EPI2.md`](PROGRESS-EPI2.md).
+([`SubcriticalExploration.lean`](Epidemics/SubcriticalExploration.lean)). The tail bound
+([`SubcriticalChernoff.lean`](Epidemics/SubcriticalChernoff.lean)) is the Chernoff bound of
+`dynamics/` (`Distribution.prob_ge_le_exp`) at the paper's tilt `ε`. Deviations from the paper
+(explicit constants, the threshold written as `p (d - 1) ≤ 1 - ε`) are listed in
+[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 
 ## The supercritical giant component (EPI-3)
 
