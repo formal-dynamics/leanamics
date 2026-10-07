@@ -90,16 +90,6 @@ lemma leafMutants_update_loss {c w : V} (hw : w ≠ c) (s : Config V) (hsw : s w
   have h := leafMutants_update_gain hw (Function.update s w false) (by simp)
   rwa [Function.update_idem, ← hsw, Function.update_eq_self] at h
 
-/-- At most `n` leaves are mutants. -/
-lemma leafMutants_le (c : V) {n : ℕ} (hn : Fintype.card V = n + 1) (s : Config V) :
-    leafMutants c s ≤ n := by
-  unfold leafMutants
-  calc (univ.filter fun v => v ≠ c ∧ s v = true).card ≤ (univ.erase c).card :=
-        card_le_card fun v hv => by
-          simp only [mem_filter] at hv
-          exact mem_erase.mpr ⟨hv.2.1, mem_univ v⟩
-    _ = n := by rw [card_erase_of_mem (mem_univ c), card_univ, hn, Nat.add_sub_cancel]
-
 /-- In the all-mutant configuration all `n` leaves are mutants. -/
 lemma leafMutants_true (c : V) {n : ℕ} (hn : Fintype.card V = n + 1) :
     leafMutants c (fun _ => true) = n := by
