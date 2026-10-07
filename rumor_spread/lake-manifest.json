@@ -3,6 +3,14 @@
   "packagesDir": ".lake/packages",
   "packages": [
     {
+      "type": "path",
+      "name": "dynamics",
+      "dir": "../dynamics",
+      "inherited": false,
+      "configFile": "lakefile.toml",
+      "manifestFile": "lake-manifest.json"
+    },
+    {
       "url": "https://github.com/PatrickMassot/checkdecls.git",
       "type": "git",
       "subDir": null,

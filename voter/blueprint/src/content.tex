@@ -35,6 +35,17 @@ probability decays geometrically in blocks and tends to zero.
 Take a common block length exceeding all finitely many access times, then a
 maximum survival probability strictly below one. Iterate the resulting contraction.
 \end{proof}
+\begin{theorem}[Finite-horizon optional stopping]\label{thm:optional-stopping}
+\lean{Dynamics.Kernel.event_error_of_invariant}\leanok\uses{def:weights}
+If an observable equals $\varphi_A$ on $A$, $\varphi_B$ on $B$, lies in
+$[\varphi_B+m,\varphi_B+M]$ elsewhere, and keeps its expectation up to time $T$, then
+$\varphi(x_0)-\varphi_B-(\varphi_A-\varphi_B)\Pr(X_T\in A)$ lies between $m$ and $M$
+times the probability of lying in neither event at time $T$.
+\end{theorem}
+\begin{proof}\leanok
+A shared library result (roadmap FND-4): decompose the observable pointwise into its values
+on $A$ and off $A\cup B$, take expectations, and bound the second part.
+\end{proof}
 
 \section{Section 2.1: model}
 \begin{definition}[Synchronous copying]\label{def:step}
@@ -90,7 +101,7 @@ Interchanging finite sums and using $\pi H=\pi$ proves one-step preservation;
 induction proves the iterated statement.
 \end{proof}
 \begin{lemma}[Lemma 2.2: limiting identification]\label{lem:22}
-\lean{Voter.whiteMass_bounds,Voter.whiteProbability_error,Voter.whiteProbability_tendsto}\leanok\uses{lem:21,lem:23}
+\lean{Voter.whiteMass_bounds,Voter.whiteMass_const,Voter.survival_eq,Voter.iterate_survival,Voter.colorProbability_eq_event,Voter.whiteProbability_error,Voter.whiteProbability_tendsto}\leanok\uses{lem:21,lem:23,thm:optional-stopping}
 The discrepancy between expected stationary white mass and all-white
 probability lies between zero and nonconsensus probability. Consequently
 all-white probability converges to initial stationary white mass.
@@ -99,8 +110,9 @@ invariant from Lemma 2.3 when stating the limit.
 \end{lemma}
 \begin{proof}\leanok
 Pointwise, the white mass agrees with the all-white indicator on constant
-configurations and lies in $[0,1]$ elsewhere. Take finite-time expectations
-and squeeze the discrepancy using Lemma 2.1.
+configurations and lies in $[0,1]$ elsewhere. Finite-horizon optional stopping,
+with the two consensus configurations as targets and the invariant of Lemma 2.3,
+bounds the discrepancy; squeeze it using Lemma 2.1.
 \end{proof}
 \begin{theorem}[Theorem 2.1]\label{thm:21}
 \lean{Voter.eventualColor,Voter.colorProbability_mono,Voter.consensus_probability}\leanok\uses{lem:22}
@@ -183,6 +195,188 @@ union bound over the other $n-1$ vertices and the meeting probability, then
 $(1-1/n)^T\le e^{-T/n}\le n^{-2}$ for $T\ge 2n\log n$.
 \end{proof}
 
+\section{Self-loops, the lazy voter and Wright--Fisher (VOT-2)}
+\begin{lemma}[Propagation through the kernel support]\label{lem:kernel-propagation}
+\lean{Voter.KernelPossible,Voter.exists_weight_pos,Voter.kernelPossible_positive,Voter.reachable_success_of_kernelPossible,Voter.propagate_kernel_region,Voter.kernelPossible_consensus_of_selfLoop,Voter.consensus_tendsto_of_selfLoop}\leanok\uses{lem:propagation,lem:21,thm:generic-absorption}
+Call a round possible for $H$ when every vertex samples a vertex of positive weight in its
+row. On a connected graph whose edges are charged by $H$, a monochromatic region in which
+every vertex charges a vertex of the region grows to consensus through possible rounds.
+If $H_{vv}>0$ for one vertex $v$, the region $\{v\}$ qualifies, so nonconsensus probability
+tends to zero, bipartite graphs included.
+\end{lemma}
+\begin{proof}\leanok
+As in Lemma~2.1: a boundary vertex copies its neighbour in the region, vertices of the region
+copy inside it, and all other vertices copy any vertex of positive weight. Possible rounds
+have positive probability, and the finite-chain absorption theorem applies.
+\end{proof}
+\begin{theorem}[Remark, p.~254]\label{thm:selfloop}
+\lean{Voter.eventualColor_eq_whiteMass_of_tendsto,Voter.consensus_probability_of_selfLoop,Voter.color_consensus_probability_of_selfLoop}\leanok\uses{lem:kernel-propagation,lem:22,thm:colors}
+On a connected graph, bipartite or not, if $H$ charges every edge and $H_{vv}>0$ for some
+vertex $v$, then consensus in colour $c$ has probability $\sum_{i:s(i)=c}\pi_i$ for every
+stationary $\pi$.
+\end{theorem}
+\begin{proof}\leanok
+Lemma~2.2 only needs nonconsensus probability to vanish; then project colours as in
+Section~2.3.
+\end{proof}
+\begin{theorem}[Lazy voter]\label{thm:lazy}
+\lean{Voter.lazy,Voter.lazyNeighbor,Voter.lazy_weight,Voter.lazyNeighbor_weight,Voter.lazy_stationary_iff,Voter.lazy_selfLoop_pos,Voter.lazy_weight_pos,Voter.lazy_consensus_probability,Voter.lazyNeighbor_consensus_probability}\leanok\uses{thm:selfloop,cor:22}
+The lazy kernel $(I+H)/2$ has the stationary distributions of $H$ and positive self-loops.
+On any connected graph the lazy voter $(I+D^{-1}A)/2$ reaches consensus in colour $c$ with
+probability $\sum_{i:s(i)=c} d_i/2m$.
+\end{theorem}
+\begin{proof}\leanok
+Apply the Remark to $(I+H)/2$; for uniform neighbour sampling use the degree distribution.
+\end{proof}
+\begin{theorem}[Neutral Wright--Fisher fixation]\label{thm:wright-fisher}
+\lean{Voter.wfKernel_pos,Voter.wfKernel_stationary,Voter.uniform_prob_eq_card,Voter.top_not_colorable_two,Voter.wrightFisher_fixation_of_three_le,Voter.wrightFisher_fixation}\leanok\uses{thm:colors,thm:selfloop,def:backward}
+If every offspring picks a uniform parent, itself included, allele $a$ fixes with probability
+$c_a/n$, where $c_a$ is its initial number of copies.
+\end{theorem}
+\begin{proof}\leanok
+The uniform distribution is stationary and every entry is positive. For $n\ge 3$ the
+complete graph is nonbipartite and Section~2.3 applies; for every $n$ the Remark applies.
+\end{proof}
+
+\section{Section 2.4 on connected graphs: meeting time and $O(n^3\log n)$ consensus}
+\begin{definition}[Two-token walk, lazy sampling]\label{def:pairwalk}
+\lean{Voter.pairWalk,Voter.leftRounds}\leanok\uses{def:backward,thm:lazy}
+For a sampling kernel $H$, two tokens move with the rounds of the voter dynamics: the
+token at $x$ moves to $r(x)$, where $r$ is drawn from the independent product of the rows
+of $H$. Off the diagonal the tokens make independent $H$-steps; on the diagonal they move
+together. The lazy kernel of a graph samples the vertex itself with probability $1/2$ and
+otherwise a uniformly random neighbour. Rounds can also be composed on the left,
+$W\mapsto r\circ W$.
+\end{definition}
+\begin{lemma}[Duality for every kernel]\label{lem:duality-general}
+\lean{Voter.independent_expect_pair,Voter.iterate_transition_eq_leftRounds,Voter.iterate_leftRounds_pair,Voter.iterate_disagreement_le_pairWalk}\leanok\uses{def:pairwalk,lem:duality}
+For every sampling kernel, the probability that no consensus is reached after $T$ rounds
+is at most the sum over $v\neq u_0$ of the probability that the tokens started at $v$ and
+$u_0$ are apart after $T$ steps.
+\end{lemma}
+\begin{proof}\leanok
+The voter dynamics on maps started from the identity composes the rounds on the right;
+composing them on the left gives the same finite-time expectations, since the rounds are
+independent and identically distributed (induction on $T$, exchanging two finite
+expectations). The left composition read at two vertices is the two-token walk. Conclude
+with the pointwise union bound of Theorem~\ref{thm:consensus-time}.
+\end{proof}
+\begin{theorem}[Hassin--Peleg Theorem 2.4, tail form]\label{thm:hp24}
+\lean{Voter.pairWalk_iterate_outside_mul_le,Voter.iterate_disagreement_le_of_meeting}\leanok\uses{lem:duality-general}
+If from every pair of vertices the tokens are apart after $T_0$ steps with probability at
+most $1/2$, then consensus fails after $kT_0$ rounds with probability at most
+$(n-1)2^{-k}$.
+\end{theorem}
+\begin{proof}\leanok
+The diagonal is absorbing, so the probabilities of being apart are submultiplicative in
+blocks of $T_0$ steps; apply Lemma~\ref{lem:duality-general}.
+\end{proof}
+\begin{lemma}[Hitting times of the lazy walk; Fact 2.3]\label{lem:hitting}
+\lean{Voter.le_zero_of_lapMatrix_le,Voter.exists_hitting,Voter.hitting,Voter.hitting_nonneg,Voter.hitting_symm,Voter.hitting_add_hitting_le}\leanok
+On a connected graph with Laplacian $L$ and $\mathrm{vol}=\sum_z d_z$, the system
+$h(y)=0$, $(Lh)(x)=2d_x$ for $x\neq y$ has a nonnegative solution $h_y$, the expected
+hitting time of $y$ for the lazy walk. It satisfies
+$\sum_z d_z h_y(z)-\mathrm{vol}\,h_y(x)=\sum_z d_z h_x(z)-\mathrm{vol}\,h_x(y)$ and
+$h_y(x)+h_x(y)\le 4\,\mathrm{vol}\,(n-1)\le 4n^3$.
+\end{lemma}
+\begin{proof}\leanok
+The maximum principle makes the linear system injective, hence surjective. The identity is
+the symmetry of $L$. For the bound, $\psi=h_y-h_x$ has energy
+$\psi^\top L\psi=2\,\mathrm{vol}\,(h_y(x)+h_x(y))$; apply Cauchy--Schwarz along a path from
+$x$ to $y$.
+\end{proof}
+\begin{lemma}[Sequential and synchronous walks]\label{lem:sequential}
+\lean{Voter.seqSurvival,Voter.seqSurvival_mul_le,Voter.iterate_outside_succ_le,Voter.iterate_outside_le_three_quarters}\leanok\uses{def:pairwalk}
+Let the two tokens move one at a time, meeting being checked after each move. If a
+nonnegative potential $F$ drops by one in expectation under a step of either token, the
+sequential walks are apart after $T$ steps with probability at most $F/T$. For a lazy
+kernel, the synchronous tokens are apart after $T+1$ steps with probability at most the
+average of the indicator of starting apart and the sequential survival; hence at most $3/4$
+once $T\ge 2\sup F$.
+\end{lemma}
+\begin{proof}\leanok
+Two inductions on $T$. When the first token lands on the old position of the second, the
+second stays put with probability at least $1/2$.
+\end{proof}
+\begin{theorem}[Meeting time of lazy walks; Lemma 2.4]\label{thm:meeting-lazy}
+\lean{Voter.meetingPotential,Voter.lazy_meeting_core,Voter.lazy_meeting_le_half,Voter.lazy_apart_le_pow,Voter.lazy_meeting_le_pow}\leanok\uses{lem:hitting,lem:sequential,thm:hp24}
+On a connected graph with $n$ vertices, two lazy walks are apart after
+$3(16n^3+1)\le 51n^3$ steps with probability at most $1/2$, and after $51kn^3$ steps with
+probability at most $2^{-k}$, from every pair of start vertices.
+\end{theorem}
+\begin{proof}\leanok
+Apply Lemma~\ref{lem:sequential} to the potential $h_y(x)-\sum_z d_z h_y(z)/\mathrm{vol}+4n^3$
+of Lemma~\ref{lem:hitting}, bounded by $8n^3$, then submultiplicativity.
+\end{proof}
+\begin{theorem}[Hassin--Peleg Theorem 2.5; Survey Theorem 8]\label{thm:hp25}
+\lean{Voter.card_sub_one_mul_half_pow_le,Voter.lazy_voter_consensus_whp}\leanok\uses{thm:meeting-lazy,lem:duality-general}
+On every connected graph with $n$ vertices and from every initial colouring, the lazy voter
+dynamics reaches consensus within $255\,n^3\log n$ rounds with probability at least $1-1/n$.
+\end{theorem}
+\begin{proof}\leanok
+With $k=\lfloor T/(51n^3)\rfloor$, Lemma~\ref{lem:duality-general} and
+Theorem~\ref{thm:meeting-lazy} bound the failure probability by $(n-1)2^{-k}\le 1/n$.
+\end{proof}
+
+\section{Consensus time via conductance (VOT-5)}
+Source: Berenbrink, Giakkoupis, Kermarrec, Mallmann-Trenn, \emph{Bounds on the voter model in
+dynamic networks}, ICALP 2016, arXiv:1603.01895 (BGKM16). The process is the lazy voter
+$(I+D^{-1}A)/2$ of Theorem~\ref{thm:lazy}.
+\begin{definition}[Volume, conductance, minority side, potential]\label{def:conductance}
+\lean{Voter.vol,Voter.conductance,Voter.discordant,Voter.minority,Voter.potential,Voter.dynamicLazy}\leanok
+$\mathrm{vol}(S)=\sum_{u\in S}d_u$; the conductance $\varphi(G)$ is the minimum of
+$|\mathrm{cut}(U,V\setminus U)|/\mathrm{vol}(U)$ over $0<\mathrm{vol}(U)\le m$; $\lambda_u$ is the
+number of neighbours of $u$ with another opinion; for two opinions $s_t$ is the side of smaller
+volume and $\Psi=\sqrt{\mathrm{vol}(s_t)}$.
+\end{definition}
+\begin{lemma}[Independent coordinates]\label{lem:indep}
+\lean{Voter.independent_expect_update,Voter.independent_expect_mul_of_update,Voter.independent_expect_sum_sq,Voter.independent_expect_sum_cube,Voter.independent_expect_comp_sum_le}\leanok
+Resampling one coordinate of an independent point does not change its law. Consequently
+centred coordinate functions have additive second and third moments, and if replacing each
+coordinate function improves $\mathbb{E}f(z+\cdot)$ for all admissible $z$, then the replacement of
+all of them improves $\mathbb{E}f(c+\sum_i g_i(x_i))$ (BGKM16 Lemma~A.1).
+\end{lemma}
+\begin{proof}\leanok
+Reindex the pairs $(x,a)$ by $(x[i\mapsto a],x_i)$; induct over the set of replaced coordinates.
+\end{proof}
+\begin{lemma}[BGKM16 Lemma~2.1, corrected]\label{lem:bgkm-21}
+\lean{Voter.potential_drift,Voter.potential_drift_conductance,Voter.expect_sqrt_le_comp,Voter.expect_compSum_sq_ge,Voter.expect_compSum_cube_le,Voter.sqrt_add_le_taylor,Voter.sqrt_chord}\leanok\uses{def:conductance,lem:indep,thm:lazy}
+If $s_t\neq\emptyset$, then
+$\mathbb{E}[\Psi_{t+1}\mid s_t]\le\Psi-\sum_{u\in s_t}\lambda_u d_u/(32\Psi^3)
+\le\Psi-d_{\min}\varphi/(32\Psi)$. The paper prints the sum over all of $V$, which fails on the
+star $K_{1,15}$; its proof gives the sum over $s_t$.
+\end{lemma}
+\begin{proof}\leanok
+$\Psi_{t+1}$ is at most the root of the new volume $P+\sum_u X_u$ of the opinion of $s_t$.
+Replace $X_u$ for $u\notin s_t$ by $Y_u=\lambda_u\mathbf{1}[\text{move}]$ (concavity of
+$\sqrt{\cdot}$), expand $\sqrt{P+x}$ to third order, and use $\mathbb{E}\Delta'=0$,
+$\mathbb{E}\Delta'^2\ge\sum_{s_t}\lambda_ud_u/4$, $\mathbb{E}\Delta'^3\le0$. The conductance gives
+$\sum_{s_t}\lambda_ud_u\ge d_{\min}\varphi\,\mathrm{vol}(s_t)$.
+\end{proof}
+\begin{theorem}[BGKM16 Lemma~2.2 and Theorem~1.1~(i), two opinions]\label{thm:bgkm-two}
+\lean{Voter.lazy_consensus_of_minority,Voter.lazy_consensus_conductance,Voter.lazy_expected_consensus_time,Voter.dynamic_consensus_conductance,Voter.sum_iterate_le_of_block}\leanok\uses{lem:bgkm-21}
+If $128\,\mathrm{vol}(s_0)\le d_{\min}\varphi T$, the opinions still disagree at time $T$ with
+probability at most $1/2$; in particular after $128m/(d_{\min}\varphi)$ rounds, and the expected
+consensus time is at most twice that. On dynamic graphs with fixed degrees the same holds once
+$128\,\mathrm{vol}(s_0)\le d_{\min}\sum_{t<T}\varphi_t$.
+\end{theorem}
+\begin{proof}\leanok
+The drift lemma of the shared library (FND-5) with drift $d_{\min}\varphi_t/32$; restarting
+bounds the expected time.
+\end{proof}
+\begin{theorem}[BGKM16 Theorem~1.1~(i), any number of opinions]\label{thm:bgkm-many}
+\lean{Voter.phase_step,Voter.level_time_le,Voter.expected_time_many_bound,Voter.lazy_expected_consensus_time_many,Voter.lazy_consensus_conductance_many}\leanok\uses{thm:bgkm-two,thm:colors}
+There is a constant $b$ such that the expected consensus time is at most $b\,m/(d_{\min}\varphi)$
+and consensus holds within $b\,m/(d_{\min}\varphi)$ rounds with probability at least $1/2$, for
+every number of opinions.
+\end{theorem}
+\begin{proof}\leanok
+Project each opinion to the two-opinion process ``$i$ against the rest''. From $\ell\le\theta$
+opinions, after $384\,\mathrm{vol}(V)/(\theta d_{\min}\varphi)$ rounds at most $5\theta/6$
+remain with probability at least $1/3$ (BGKM16 Lemma~2.3). Summing over the levels
+$\theta_j=n(5/6)^j$ gives a geometric series; Markov's inequality gives the probability form.
+\end{proof}
+
 \section{Examples and scope}
 \begin{lemma}[Triangle and a nonuniform matrix]\label{lem:examples}
 \lean{Voter.Examples.triangle_one_white,Voter.Examples.biased_stationary}\leanok\uses{cor:22,lem:23}
@@ -202,6 +396,8 @@ On the two-vertex graph, every vertex must copy the other vertex.
 The alternating coloring flips each round and returns after two rounds;
 neither coloring is constant. Thus connectedness alone is insufficient.
 \end{lemma}
-Convergence-time bounds on general graphs (Hassin--Peleg Theorem~2.5), dynamic networks,
-and extremal coalition results are future work beyond this milestone. Chernoff bounds remain in the
+Hassin--Peleg Theorem~2.5 is formalized for the lazy walk; for the plain walk on
+nonbipartite graphs it holds conditionally on a meeting-time bound
+(Theorem~\ref{thm:hp24}). Dynamic networks and extremal coalition results are future work
+beyond this milestone. Chernoff bounds remain in the
 3-majority package until another theorem requires their extraction.

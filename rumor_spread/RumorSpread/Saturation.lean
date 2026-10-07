@@ -12,7 +12,7 @@ inequality — which here is just a pointwise bound pushed through
 
 namespace RumorPush
 
-open Finset
+open Finset Dynamics
 
 variable {n : ℕ}
 

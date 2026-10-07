@@ -1,0 +1,211 @@
+\begin{abstract}
+We formalize the correspondence between chemical reaction networks and population protocols.
+For a count-conserving bimolecular network ($A + B \to C + D$) with a common rate constant, the
+jump chain of stochastic mass-action kinetics equals the population protocol that draws a
+uniformly random ordered pair of distinct agents, conditioned on the pair reacting, as kernels on
+count vectors. The worked instance is the approximate-majority network. We then formalize the easy
+direction of the characterization of stably computable predicates (Angluin, Aspnes, Diamadi,
+Fischer and Peralta, 2006): threshold and remainder predicates on input counts are stably
+computable by population protocols, the class is closed under Boolean operations, and every
+protocol is a count-conserving bimolecular network, so every Boolean combination of threshold and
+remainder predicates is stably decided by such a network.
+\end{abstract}
+
+\section{Chemical reaction networks}
+\begin{definition}[Reactions, networks, counts]\label{def:crn}
+\lean{Crn.Reaction,Crn.Network,Crn.Counts,Crn.Reaction.consumed,Crn.Reaction.produced,Crn.Counts.react}\leanok
+A reaction $A + B \to C + D$ consumes the unordered pair $\{A, B\}$ of species and produces the
+unordered pair $\{C, D\}$; a network is a nonempty finite set of reactions whose products differ
+from their reactants. A count vector of $n$ molecules gives the number $x_a$ of molecules of each
+species $a$, with $\sum_a x_a = n$; firing an applicable reaction $r$ replaces $x_a$ by
+$x_a - \nu_a + \nu'_a$, with $\nu$, $\nu'$ the reactant and product multiplicities.
+\end{definition}
+
+\begin{definition}[Mass-action propensity]\label{def:propensity}
+\lean{Crn.Reaction.propensity,Crn.Network.totalPropensity}\leanok\uses{def:crn}
+With rate constant $k$, the propensity of $r$ at $x$ is $a_r(x) = k \prod_a \binom{x_a}{\nu_a}$
+(Gillespie's combinatorial form), and $a_0(x) = \sum_r a_r(x)$.
+\end{definition}
+
+\begin{lemma}[Propensities]\label{lem:propensity}
+\lean{Crn.Reaction.propensity_of_ne,Crn.Reaction.propensity_of_eq}\leanok\uses{def:propensity}
+For $A + B \to \cdots$ with $A \ne B$ the propensity is $k\, x_A x_B$; for $A + A \to \cdots$ it
+is $k \binom{x_A}{2}$.
+\end{lemma}
+\begin{proof}\leanok
+Only the reactant species have nonzero multiplicity in the product.
+\end{proof}
+
+\begin{definition}[Jump chain]\label{def:jump}
+\lean{Crn.Network.nextReaction,Crn.Network.jumpKernel}\leanok\uses{def:propensity}
+From $x$ with $a_0(x) > 0$ the jump chain fires $r$ with probability $a_r(x)/a_0(x)$; from a
+terminal state ($a_0(x) = 0$) it stays put.
+\end{definition}
+
+\begin{lemma}[The jump chain jumps]\label{lem:jump-self}
+\lean{Crn.Network.jumpKernel_weight_self}\leanok\uses{def:jump}
+If $a_0(x) \ne 0$, the jump chain from $x$ gives weight $0$ to $x$.
+\end{lemma}
+\begin{proof}\leanok
+A reaction with nonzero propensity is applicable, and firing an applicable reaction whose
+products differ from its reactants changes the counts.
+\end{proof}
+
+\section{Population protocols}
+\begin{definition}[The population protocol of a network]\label{def:pp}
+\lean{Crn.AgentPair,Crn.pairDist,Crn.counts,Crn.sampleDist,Crn.Reacts,Crn.outcome,Crn.ppStep,Crn.condStep,Crn.ppKernel}\leanok\uses{def:crn}
+Each of $n \ge 2$ agents holds a species. One interaction draws a uniformly random ordered pair
+$(u, v)$ of distinct agents and, independently, a uniformly random reaction $r$ of the network;
+if the species of $u$ and $v$ are the reactants of $r$ the pair reacts and $r$ fires, otherwise
+nothing changes. The protocol is observed on count vectors; conditioning on the pair reacting
+gives a kernel on count vectors.
+\end{definition}
+
+\begin{lemma}[Key identity]\label{lem:pair}
+\lean{Crn.pair_prob_of_ne,Crn.pair_prob_of_eq,Crn.pair_prob_eq_propensity}\leanok\uses{def:pp,lem:propensity}
+The drawn pair has species $\{A, B\}$ with probability $x_A x_B / \binom{n}{2}$ if $A \ne B$, and
+$\binom{x_A}{2} / \binom{n}{2}$ if $A = B$. Equivalently, it has the reactants of $r$ with
+probability $a_r(x) / (k \binom{n}{2})$.
+\end{lemma}
+\begin{proof}\leanok
+There are $n(n-1)$ ordered pairs of distinct agents, $2 x_A x_B$ of them with species $\{A, B\}$
+for $A \ne B$, and $x_A(x_A - 1)$ with species $\{A, A\}$.
+\end{proof}
+
+\begin{theorem}[One interaction]\label{thm:step}
+\lean{Crn.reactProb_eq,Crn.ppStep_expect}\leanok\uses{lem:pair,def:jump}
+The drawn pair reacts with probability $p = a_0(x) / (k\, |N| \binom{n}{2})$, and one interaction
+is a jump of the mass-action chain with probability $p$ and a no-op otherwise.
+\end{theorem}
+\begin{proof}\leanok
+Average over the uniform reaction and apply the key identity to each reaction.
+\end{proof}
+
+\begin{theorem}[CRNs are population protocols]\label{thm:crn1}
+\lean{Crn.condStep_eq_jumpKernel,Crn.jumpKernel_eq_ppKernel}\leanok\uses{thm:step,lem:jump-self}
+For every rate constant $k > 0$ and $n \ge 2$, the population protocol conditioned on the drawn
+pair reacting is the jump chain of mass-action kinetics, from every configuration and hence as
+kernels on count vectors.
+\end{theorem}
+\begin{proof}\leanok
+Conditioned on reacting, the interaction fires $r$ with probability proportional to $a_r(x)$ by
+the key identity, which is the jump chain; from a configuration where no pair can react both sides
+stay put.
+\end{proof}
+
+\section{Approximate majority}
+\begin{definition}[The approximate-majority network]\label{def:am}
+\lean{Crn.ApproxMajority.Species,Crn.ApproxMajority.network}\leanok\uses{def:crn}
+Species $X$, $Y$ (the two opinions) and $B$ (blank), and the reactions $X + Y \to X + B$,
+$X + Y \to Y + B$, $B + X \to X + X$, $B + Y \to Y + Y$ (Angluin, Aspnes and Eisenstat).
+\end{definition}
+
+\begin{theorem}[Approximate majority as a population protocol]\label{thm:am}
+\lean{Crn.ApproxMajority.network_jump_expect,Crn.ApproxMajority.network_reactProb_eq,Crn.ApproxMajority.network_jumpKernel_eq_ppKernel}\leanok\uses{def:am,thm:crn1}
+With $D = 2 x_X x_Y + x_B (x_X + x_Y) > 0$, the jump chain fires each $X + Y$ reaction with
+probability $x_X x_Y / D$, $B + X \to X + X$ with probability $x_B x_X / D$ and $B + Y \to Y + Y$
+with probability $x_B x_Y / D$; a drawn pair reacts with probability $D / (4 \binom{n}{2})$; and the
+jump chain is the population protocol conditioned on reacting.
+\end{theorem}
+\begin{proof}\leanok
+Instances of the general results, with $a_0(x) = k D$.
+\end{proof}
+
+\section{Stable computation}
+\begin{definition}[Population protocols with input and output]\label{def:protocol}
+\lean{Crn.Protocol,Crn.Protocol.interact,Crn.Protocol.Step,Crn.Protocol.Reaches,Crn.Protocol.OutputStable}\leanok\uses{def:pp}
+A population protocol has an input function $I : X \to Q$, an output function $O : Q \to
+\{0, 1\}$ and a transition function $\delta : Q \times Q \to Q \times Q$. An encounter of an
+ordered pair $(u, v)$ of distinct agents replaces their states $p, q$ by $\delta(p, q)$;
+reachability is the reflexive-transitive closure of encounters. A configuration is
+output-stable with output $b$ if in every configuration reachable from it every agent outputs $b$.
+\end{definition}
+
+\begin{definition}[Stable computation]\label{def:stable}
+\lean{Crn.Protocol.StablyComputes,Crn.StablyComputable}\leanok\uses{def:protocol}
+A protocol stably computes a predicate $\varphi$ on input count vectors if, for every nonempty
+population and every input assignment $\iota$, every configuration reachable from $I \circ \iota$
+can reach an output-stable configuration with output $\varphi$ of the input counts. A predicate is
+stably computable if a protocol with finitely many states stably computes it.
+\end{definition}
+
+\begin{lemma}[Uniqueness]\label{lem:stable-unique}
+\lean{Crn.Protocol.StablyComputes.unique}\leanok\uses{def:stable}
+A protocol stably computes at most one predicate on nonzero count vectors.
+\end{lemma}
+\begin{proof}\leanok
+From the initial configuration of a population with the given counts, reach an output-stable
+configuration for the first predicate and then one for the second: they agree.
+\end{proof}
+
+\begin{theorem}[Boolean closure]\label{thm:boolean}
+\lean{Crn.StablyComputable.map₂,Crn.StablyComputable.not,Crn.StablyComputable.and,Crn.StablyComputable.or}\leanok\uses{def:stable}
+For every Boolean function $\xi$ of two arguments, if $\varphi$ and $\psi$ are stably computable
+then so is $\xi(\varphi, \psi)$; in particular the class is closed under negation, conjunction and
+disjunction.
+\end{theorem}
+\begin{proof}\leanok
+Parallel composition: states are pairs, both components make their own transition in every
+encounter, and the output of $(p_1, p_2)$ is $\xi(O_1 p_1, O_2 p_2)$.
+\end{proof}
+
+\section{Semilinear predicates}
+\begin{theorem}[Threshold predicates]\label{thm:threshold}
+\lean{Crn.threshold,Crn.stablyComputable_threshold,Crn.stablyComputable_le_sum}\leanok\uses{def:stable}
+For integers $a_i$ and $c$, the predicates $\sum_i a_i x_i < c$ and $\sum_i a_i x_i \ge c$ are stably
+computable.
+\end{theorem}
+\begin{proof}\leanok
+Each agent holds a leader bit, an output bit and a count in $[-s, s]$, starting from $a_i$; an
+encounter involving a leader merges the leaders into the initiator, which takes as much of the sum
+of the two counts as fits in $[-s, s]$, and both agents set their output to whether the
+initiator's count is below $c$. Unlike the original protocol, an input starts with output bit
+$[a_i < c]$, which is needed for a population of one agent. The second form is the negation.
+\end{proof}
+
+\begin{theorem}[Remainder predicates]\label{thm:remainder}
+\lean{Crn.remainder,Crn.stablyComputable_remainder}\leanok\uses{def:stable}
+For integers $a_i$, $c$ and $m > 0$, the predicate $\sum_i a_i x_i \equiv c \pmod m$ is stably
+computable.
+\end{theorem}
+\begin{proof}\leanok
+The same leader protocol with counts in $\mathbb{Z}/m$: the initiator takes the sum of the two
+counts and the responder gets $0$.
+\end{proof}
+
+\begin{definition}[Semilinear predicates]\label{def:semilinear}
+\lean{Crn.IsSemilinearPred}\leanok\uses{thm:threshold,thm:remainder}
+The Boolean combinations of threshold and remainder predicates.
+\end{definition}
+
+\begin{theorem}[Semilinear predicates are stably computable]\label{thm:semilinear}
+\lean{Crn.IsSemilinearPred.isSemilinearSet,Crn.IsSemilinearPred.stablyComputable}\leanok\uses{def:semilinear,thm:boolean}
+The truth set of every such predicate is a semilinear set of count vectors, and every such
+predicate is stably computable.
+\end{theorem}
+\begin{proof}\leanok
+Induction on the Boolean combination, with the two preceding theorems and Boolean closure; for
+the first part, semilinear sets are closed under complement, intersection and union.
+\end{proof}
+
+\section{From protocols to networks}
+\begin{definition}[Stable decision by a network]\label{def:crn-stable}
+\lean{Crn.Counts.map,Crn.Network.Step,Crn.Network.Reaches,Crn.Network.OutputStable,Crn.Network.StablyComputes}\leanok\uses{def:crn}
+A network with an injective input map $I : X \to S$ and an output map $O : S \to \{0, 1\}$
+stably decides $\varphi$ if, from the initial count vector with $x_i$ molecules of $I(i)$ and nothing
+else, every reachable count vector can reach one in which, now and in every count vector reachable
+from it, every present species votes $\varphi(x)$.
+\end{definition}
+
+\begin{theorem}[Protocols are networks]\label{thm:transfer}
+\lean{Crn.Protocol.exists_network,Crn.StablyComputable.exists_network,Crn.IsSemilinearPred.exists_network}\leanok\uses{def:crn-stable,thm:semilinear}
+The transitions $p + q \to \delta_1(p, q) + \delta_2(p, q)$ that change $\{p, q\}$ form a
+count-conserving bimolecular network whose reachable count vectors are the counts of the
+configurations reachable in the protocol. Hence every stably computable predicate, and in
+particular every Boolean combination of threshold and remainder predicates, is stably decided by
+such a network.
+\end{theorem}
+\begin{proof}\leanok
+Encounters change counts exactly by the corresponding reaction. Tagging the input states keeps
+the input map injective and provides a transition that changes the multiset of states.
+\end{proof}

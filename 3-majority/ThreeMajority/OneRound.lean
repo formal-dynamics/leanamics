@@ -48,7 +48,7 @@ lemma majorityIndicator_eq (I : Finset (Fin n)) (s : Fin n × Fin n × Fin n) :
           - 2 * (ind I s.1 * ind I s.2.1 * ind I s.2.2) := by
   unfold sampleCountOf ind
   by_cases h1 : s.1 ∈ I <;> by_cases h2 : s.2.1 ∈ I <;> by_cases h3 : s.2.2 ∈ I <;>
-    simp [h1, h2, h3] <;> norm_num
+    norm_num [h1, h2, h3]
 
 lemma avg_ind_mul_fst_snd1 (I : Finset (Fin n)) [Nonempty (Fin n)] :
     avg (fun s : Fin n × Fin n × Fin n => ind I s.1 * ind I s.2.1) = avg (ind I) * avg (ind I) := by
@@ -58,7 +58,8 @@ lemma avg_ind_mul_fst_snd1 (I : Finset (Fin n)) [Nonempty (Fin n)] :
     avg_mul_prod (ind I) (fun q : Fin n × Fin n => ind I q.1), avg_fst_mul (ind I)]
 
 lemma avg_ind_mul_snd1_snd2 (I : Finset (Fin n)) [Nonempty (Fin n)] :
-    avg (fun s : Fin n × Fin n × Fin n => ind I s.2.1 * ind I s.2.2) = avg (ind I) * avg (ind I) := by
+    avg (fun s : Fin n × Fin n × Fin n => ind I s.2.1 * ind I s.2.2)
+      = avg (ind I) * avg (ind I) := by
   rw [show (fun s : Fin n × Fin n × Fin n => ind I s.2.1 * ind I s.2.2)
       = fun s : Fin n × (Fin n × Fin n) =>
           (fun q : Fin n × Fin n => ind I q.1 * ind I q.2) s.2 from rfl,
@@ -127,7 +128,6 @@ lemma sum_avg_Y_maj (hn : 1 ≤ n) (I : Finset (Fin n)) :
           avg (ind I) * avg (ind I) * 3 - 2 * (avg (ind I) * avg (ind I) * avg (ind I))
       from funext (avg_Y_maj_eq I)]
   rw [Finset.sum_const, card_univ, Fintype.card_fin]
-  push_cast
   ring
 
 /-- **Exact one-round drift**: the average number of agents adopting
