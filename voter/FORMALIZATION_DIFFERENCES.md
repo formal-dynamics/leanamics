@@ -144,7 +144,8 @@ The following portions of the paper were not formalized:
 * **In Lean**:
   - $G$ is modeled as a Mathlib `SimpleGraph V`, which is irreflexive by definition ($\neg G.\text{Adj } i\ i$).
   - The support condition is `hsupport : ∀ i j, G.Adj i j → 0 < (H i).weight j`: every edge has positive weight, and `H` may put additional weight elsewhere, in particular on self-loops ($(H i).\text{weight } i > 0$). This covers lazy chains and Wright–Fisher sampling ([`wrightFisher_one_third`](Voter/Examples.lean)).
-  - The underlying `SimpleGraph` must still be nonbipartite, because the propagation argument starts from a monochromatic *edge* of `G`. The Remark's stronger claim (a bipartite graph with at least one self-loop suffices) is therefore not formalized.
+  - The main theorem `consensus_probability` keeps the nonbipartite hypothesis, because its propagation argument starts from a monochromatic *edge* of `G`.
+  - The Remark itself is formalized (VOT-2) as [`consensus_probability_of_selfLoop`](Voter/LazyLoop.lean) and [`color_consensus_probability_of_selfLoop`](Voter/LazyLoop.lean): on any connected `G`, bipartite or not, it suffices that `H` charges every edge and that `0 < (H v).weight v` for a single vertex `v`. The propagation ([`propagate_kernel_region`](Voter/LazyPropagation.lean)) takes rounds in the support of `H`, so the region `{v}` is monochromatic with `v` as its own internal neighbour. As in the main theorem, `H` may also charge non-edges, which is slightly more general than the Remark. Corollaries: the lazy voter `(I + D⁻¹A)/2` on any connected graph ([`lazyNeighbor_consensus_probability`](Voter/Lazy.lean)) and Wright–Fisher fixation `c_a / n` for every population size ([`wrightFisher_fixation`](Voter/WrightFisher.lean)).
 
 ---
 
@@ -160,3 +161,55 @@ The following portions of the paper were not formalized:
   - Lean additionally proves that the color probabilities form a complete distribution over colors:
     [`Voter.sum_color_consensus_probability`](Voter/Colors.lean#L61): $\sum_{c \in C} \text{eventualColor } H\ c\ s = 1$.
   - *Note*: The uniform degree-weight corollary ($\sum_{i \in A_c^s} d_i / 2m$) was formalized for Boolean colors in `uniform_consensus_probability`, but not explicitly restated as a separate lemma for the general $C$ case.
+
+---
+
+## 3. Self-loops, the Lazy Voter and Neutral Wright–Fisher
+
+This section covers the extension of Theorem 2.1 to graphs with self-loops (the Remark on
+page 254, see §2.6), the lazy voter with kernel `(I + D⁻¹A)/2` (the kernel used by
+Berenbrink, Giakkoupis, Kermarrec and Mallmann-Trenn, ICALP 2016) and neutral Wright–Fisher
+fixation. Files: [`LazyPropagation.lean`](Voter/LazyPropagation.lean),
+[`LazyLoop.lean`](Voter/LazyLoop.lean), [`Lazy.lean`](Voter/Lazy.lean),
+[`WrightFisher.lean`](Voter/WrightFisher.lean).
+
+### 3.1 Wright–Fisher with labelled individuals
+* The classical neutral Wright–Fisher model is the count chain `X_{t+1} ~ Bin(n, X_t / n)`.
+  Lean models it with labelled individuals: the synchronous voter with kernel `wfKernel V`,
+  where each offspring picks a uniformly random parent with replacement. The count chain is
+  the lumping of this chain and has the same fixation event; working with labelled
+  configurations is what makes fixation a corollary of the voter theorem.
+* The population is an arbitrary finite type `V` with `n = Fintype.card V`, rather than
+  `Fin n` (a special case).
+* Two versions are proved: [`wrightFisher_fixation_of_three_le`](Voter/WrightFisher.lean)
+  (`3 ≤ n`) follows from the original `color_consensus_probability` on the complete graph,
+  which is nonbipartite once `n ≥ 3`; [`wrightFisher_fixation`](Voter/WrightFisher.lean)
+  holds for every `n ≥ 1` and goes through the self-loop extension.
+
+### 3.2 The lazy voter on bipartite graphs needs the Remark
+* `consensus_probability` assumes `¬ G.Colorable 2`. For the lazy kernel on a bipartite `G`
+  this cannot be repaired by choosing another graph: every loopless graph `G'` whose edges are
+  charged by `(I + D⁻¹A)/2` is a subgraph of `G`, hence bipartite. The lazy results are
+  therefore proved through the self-loop extension
+  ([`consensus_probability_of_selfLoop`](Voter/LazyLoop.lean),
+  [`color_consensus_probability_of_selfLoop`](Voter/LazyLoop.lean)).
+* The extension is slightly more general than the Remark: as in the main theorem, `H` may
+  charge non-edges (only `G.Adj i j → 0 < H i j` is assumed), and one positive diagonal
+  entry suffices ("even to a single node", as the Remark says).
+* The generic step [`eventualColor_eq_whiteMass_of_tendsto`](Voter/LazyLoop.lean) is
+  Lemma 2.2 in graph-free form: if the probability of not having reached consensus vanishes,
+  the eventual white probability equals the stationary white mass.
+
+### 3.3 Lazy voter hypotheses and forms
+* [`lazyNeighbor`](Voter/Lazy.lean) needs `hd : ∀ i, 0 < G.degree i` (every vertex has a
+  neighbour to sample), as `uniformNeighbor` does. For a connected graph this only excludes
+  the one-vertex graph, where the statement is trivial. The holding probability is fixed at
+  `1/2`.
+* Only the many-colour forms are stated for the lazy voter
+  ([`lazy_consensus_probability`](Voter/Lazy.lean),
+  [`lazyNeighbor_consensus_probability`](Voter/Lazy.lean), with consensus probability
+  `∑ i with s i = c, deg i / (2 |E|)`); the Boolean form is the instance `C = Bool`,
+  `c = true`. This also supplies the many-colour degree-weight corollary missing in §2.7,
+  for the lazy kernel.
+* `eventualColor` is, as elsewhere in the package, the supremum of the finite-time consensus
+  probabilities (§2.2).
