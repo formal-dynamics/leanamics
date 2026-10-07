@@ -3,6 +3,8 @@ import Dynamics.Bridge
 import Dynamics.Chernoff
 import Dynamics.Concentration
 import Dynamics.OptionalStopping
+import Dynamics.Drift
+import Dynamics.GraphRounds
 import Dynamics.Phases
 import Dynamics.Reverse
 import Dynamics.Rounds

@@ -32,3 +32,11 @@ import Dynamics
 #print axioms Dynamics.Kernel.iSup_event_of_invariant
 #print axioms Dynamics.expList_comp_reverse
 #print axioms Dynamics.Kernel.iterate_ofStep_foldr
+#print axioms Dynamics.Kernel.drift_absorption_seq
+#print axioms Dynamics.Kernel.drift_absorption
+#print axioms Dynamics.Kernel.multiplicative_drift_seq
+#print axioms Dynamics.Kernel.multiplicative_drift
+#print axioms Dynamics.avg_neighborRound_prod
+#print axioms Dynamics.avg_vertex_neighborRound
+#print axioms Dynamics.avg_edgeRound
+#print axioms Dynamics.avg_edgeRound_edge
