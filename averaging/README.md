@@ -28,7 +28,7 @@ Proof files: `ReconstructionSpectral.lean` (eigenbasis of a real symmetric matri
 Parseval, contraction off two eigenvectors), `ReconstructionMatrix.lean`,
 `ReconstructionDecomp.lean` (Lemma C.1), `ReconstructionSign.lean` (deterministic core),
 `ReconstructionCount.lean` (counting and Wallis). Deviations from the paper are listed in
-[`PROGRESS-AVG2.md`](PROGRESS-AVG2.md).
+[`FORMALIZATION_DIFFERENCES.md`](FORMALIZATION_DIFFERENCES.md).
 
 **Provenance.** The statements were written and pinned by hand; the proofs were produced by a Grok
 agent under a fixed-statement protocol and verified mechanically (statements unchanged, no

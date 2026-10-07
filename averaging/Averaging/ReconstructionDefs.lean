@@ -17,7 +17,7 @@ for community detection*, SODA 2017; SIAM J. Comput. 49(4), 2020 (arXiv:1511.039
   reconstruction (Section 2);
 * `reconstructionTime`: an explicit number of rounds `T(n, δ)` for Theorem 3.2.
 
-The values after `t` rounds are `x⁽ᵗ⁾ = avgIter G t x` (AVG-1, `Averaging.Basic`).
+The values after `t` rounds are `x⁽ᵗ⁾ = avgIter G t x` (defined in `Averaging.Basic`).
 -/
 
 namespace Averaging
