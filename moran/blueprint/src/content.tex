@@ -58,29 +58,29 @@ absorption theorem.
 \end{proof}
 
 \section{Fixation probabilities}
-\begin{lemma}[Fixation as a limit]\label{lem:fixation-limit}
-\lean{Moran.allMutant,Moran.fixation,Moran.fixation_mono,Moran.fixation_tendsto,Moran.fixation_eq_of_invariant}\leanok\uses{thm:absorption}
-The finite-time fixation probabilities increase to the fixation probability. If an invariant
-observable agrees with the fixation indicator on constant configurations and lies between it
-and the indicator plus the unfixed indicator elsewhere, it equals the fixation probability.
+\begin{lemma}[Fixation from an invariant]\label{lem:fixation-limit}
+\lean{Moran.allMutant,Moran.fixation,Moran.iterate_allMutant,Moran.unfixed_eq,Moran.iterate_unfixed,Moran.fixation_eq_of_invariant}\leanok
+Let an observable be invariant in expectation, equal to $1$ on the all-mutant and to $0$ on the
+all-resident configuration. If the all-mutant configuration is absorbing and the probability
+that neither type has taken over tends to zero, the observable is the fixation probability.
 \end{lemma}
 \begin{proof}\leanok
-The all-mutant configuration is absorbing, so the finite-time probabilities are monotone and
-bounded. The observable differs from the fixation indicator by at most the unfixed indicator,
-whose expectation tends to zero.
+This is the finite-horizon optional stopping theorem of the shared \texttt{dynamics} package
+(\texttt{Dynamics.Kernel.iSup\_event\_of\_invariant}, roadmap FND-4) with the two constant
+configurations as targets: the fixation and unfixed indicators are the corresponding events.
 \end{proof}
 \begin{theorem}[Isothermal theorem]\label{thm:isothermal}
-\lean{Moran.moranPsi,Moran.moranPsi_invariant,Moran.moranPsi_sandwich,Moran.isothermal}\leanok\uses{thm:invariance,lem:fixation-limit}
+\lean{Moran.moranPsi,Moran.moranPsi_invariant,Moran.moranPsi_all,Moran.moranPsi_none,Moran.isothermal}\leanok\uses{thm:invariance,thm:absorption,lem:fixation-limit}
 On a connected regular graph with $r\neq1$, the fixation probability from $k$ mutants is
 $(1-r^{-k})/(1-r^{-n})$.
 \end{theorem}
 \begin{proof}\leanok
 Apply the previous lemma to $\psi=(1-(1/r)^{\#\text{mutants}})/(1-(1/r)^n)$, invariant by the
-invariance theorem, equal to $1$ and $0$ on the two constant configurations and in $[0,1]$
-otherwise.
+invariance theorem and equal to $1$ and $0$ on the two constant configurations; the
+absorption theorem gives the vanishing survival probability.
 \end{proof}
 \begin{theorem}[Neutral case]\label{thm:neutral}
-\lean{Moran.neutralPsi,Moran.neutralPsi_invariant,Moran.neutralPsi_sandwich,Moran.isothermal_neutral}\leanok\uses{thm:invariance,lem:fixation-limit}
+\lean{Moran.neutralPsi,Moran.neutralPsi_invariant,Moran.neutralPsi_all,Moran.neutralPsi_none,Moran.isothermal_neutral}\leanok\uses{thm:invariance,thm:absorption,lem:fixation-limit}
 On a connected regular graph with $r=1$, the fixation probability is $k/n$.
 \end{theorem}
 \begin{proof}\leanok
@@ -137,13 +137,78 @@ adjacent to a mutant copies it with positive probability, so the number of mutan
 with positive probability; the shared absorption theorem concludes.
 \end{proof}
 \begin{theorem}[Push and pull fixation]\label{thm:pushpull}
-\lean{Moran.pushRatio_invariant,Moran.pullRatio_invariant,Moran.pushRatio_sandwich,Moran.pullRatio_sandwich,Moran.push_fixation,Moran.pull_fixation}\leanok\uses{thm:pushpull-invariance,thm:absorption,thm:pull-absorption,lem:fixation-limit}
+\lean{Moran.pushRatio_invariant,Moran.pullRatio_invariant,Moran.pushValue_false,Moran.pullValue_false,Moran.pushValue_total_pos,Moran.pullValue_total_pos,Moran.push_fixation,Moran.pull_fixation}\leanok\uses{thm:pushpull-invariance,thm:absorption,thm:pull-absorption,lem:fixation-limit}
 On a connected graph with at least two vertices, the fixation probability of a mutant set $S$
 is $\sum_{v\in S}\frac1{\deg v}\big/\sum_{v\in V}\frac1{\deg v}$ under neutral push and
 $\sum_{v\in S}\deg v/(2|E|)$ under pull.
 \end{theorem}
 \begin{proof}\leanok
-Apply the fixation-limit lemma to the normalized reproductive values, which are invariant, equal
-to $1$ and $0$ on the two constant configurations, and in $[0,1]$ otherwise; the denominators are
-positive because every degree is at least $1$.
+Apply the fixation-limit lemma to the normalized reproductive values, which are invariant and
+equal to $1$ and $0$ on the two constant configurations; the denominators are positive because
+every degree is at least $1$.
+\end{proof}
+
+\section{Exact fixation on the star}
+The star with $n$ leaves is Mathlib's \texttt{starGraph} $c$ on $n+1$ vertices: the centre $c$
+is adjacent to every leaf and leaves only to $c$. It is not regular, and it amplifies selection
+(Lieberman, Hauert and Nowak 2005); its exact fixation probability is due to Broom and
+Rycht\'a\v{r} (2008, \S5). Write
+\[ q=\frac{n+r}{r(nr+1)},\qquad \kappa=\frac{nr+1}{r(n+r)}=\frac1{r^2q}. \]
+\begin{definition}[Star potential]\label{def:star-potential}
+\lean{Moran.leafMutants,Moran.starRatio,Moran.starCentreWeight,Moran.starPotential}\leanok
+For a configuration with $i$ mutant leaves, $\Phi=q^i$ if the centre is a resident and
+$\Phi=\kappa q^i$ if it is a mutant.
+\end{definition}
+\begin{theorem}[The star potential is invariant]\label{thm:star-invariance}
+\lean{Moran.star_sum_pairs,Moran.star_edge_cancel,Moran.starPotential_apply,Moran.star_potential_invariant}\leanok\uses{def:moran,def:star-potential}
+For every $r>0$, $\Phi$ is invariant in expectation under one Birth--death step on the star.
+\end{theorem}
+\begin{proof}\leanok
+Only the ordered pairs $(c,\ell)$ and $(\ell,c)$ for a leaf $\ell$ carry weight, namely
+$\mathrm{fit}(c)/(nF)$ and $\mathrm{fit}(\ell)/F$. Along each edge the two contributions cancel:
+if $\ell$ is a mutant and $c$ a resident they give $\frac{q^{i-1}}F\big(\frac{1-q}n+rq(\kappa-1)\big)=0$,
+and if $c$ is a mutant and $\ell$ a resident they give
+$\frac{q^i}F\big(1-\kappa+\frac{r\kappa(q-1)}n\big)=0$; equal types change nothing.
+\end{proof}
+\begin{theorem}[Fixation on the star]\label{thm:star}
+\lean{Moran.star_fixation_eq,Moran.star_fixation,Moran.star_fixation_leaf,Moran.star_fixation_centre,Moran.star_fixation_uniform}\leanok\uses{thm:star-invariance,thm:absorption,lem:fixation-limit}
+For $r\ne1$, the fixation probability from $s$ is $(1-\Phi(s))/(1-\kappa q^n)$. A single mutant
+fixes with probability $(1-q)/(1-\kappa q^n)$ from a leaf, $(1-\kappa)/(1-\kappa q^n)$ from the
+centre, and $(n(1-q)+(1-\kappa))/((n+1)(1-\kappa q^n))$ from a uniformly random vertex.
+\end{theorem}
+\begin{proof}\leanok
+For $r>1$ we have $q\le1$ and $\kappa<1$, so $\kappa q^n\le\Phi\le1$; for $r<1$ all inequalities
+reverse. Hence the normalized potential is $1$ at fixation, $0$ at extinction and in $[0,1]$
+otherwise, and the fixation-limit lemma applies.
+\end{proof}
+\begin{theorem}[The formula of Broom and Rycht\'a\v{r}]\label{thm:star-sum}
+\lean{Moran.star_closed_eq_sum,Moran.star_sum_neutral,Moran.neutral_uniform_fixation,Moran.star_fixation_uniform_sum}\leanok\uses{thm:star,thm:pushpull}
+For every $r>0$, a single mutant at a uniformly random vertex fixes with probability
+\[ \frac{n\cdot\frac{nr}{nr+1}+\frac r{r+n}}{(n+1)\big(1+\frac n{n+r}\sum_{j=1}^{n-1}q^j\big)}. \]
+\end{theorem}
+\begin{proof}\leanok
+For $r\ne1$ and $n\ge1$, sum the geometric series: $1+\frac n{n+r}\sum_{j=1}^{n-1}q^j=
+r^2(1-\kappa q^n)/(r^2-1)$. For $r=1$ both sides are $1/(n+1)$, by push--pull fixation; for
+$n=0$ both are $1$.
+\end{proof}
+\begin{theorem}[The star is an amplifier]\label{thm:star-amplifier}
+\lean{Moran.geom_gap_pos,Moran.star_delta_pos,Moran.star_amplifier_sign,Moran.star_amplifier,Moran.star_amplifier_deleterious}\leanok\uses{thm:star}
+For every $n\ge2$, the fixation probability from a uniformly random vertex is larger than
+Moran's $(1-1/r)/(1-r^{-(n+1)})$ for $r>1$ and smaller for $0<r<1$.
+\end{theorem}
+\begin{proof}\leanok
+Put $s=1/r$ and $t=(1+ns)/(n+s)$, so that $q=st$ and $\kappa=s/t$. The difference has the sign
+of $(1-s)\big(E(1-s^{n+1})-s^{n+1}(1-t^{n-1})\big)$ with $E=s^2(n-1)^2/((n+s)(1+ns))$. By
+Bernoulli, $1-t^{n-1}\le(n-1)(1-t)=(n-1)^2(1-s)/(n+s)$, which reduces the claim to
+$s^{n-1}(1-s)(1+ns)<1-s^{n+1}$. Its slack is $\sum_{k=0}^{n-2}(1-s)(s^k-s^n)$, a nonempty sum of
+positive terms on both sides of $s=1$.
+\end{proof}
+\begin{theorem}[Large stars amplify $r$ to $r^2$]\label{thm:star-limit}
+\lean{Moran.starRatio_le_inv,Moran.star_closed_tendsto,Moran.star_fixation_uniform_tendsto}\leanok\uses{thm:star}
+For $r>1$, the fixation probability from a uniformly random vertex of the star with $n$ leaves
+tends to $1-1/r^2$ as $n\to\infty$.
+\end{theorem}
+\begin{proof}\leanok
+$n(1-q)/(n+1)=\frac n{n+1}\cdot\frac n{n+1/r}\cdot(1-r^{-2})\to1-r^{-2}$,
+$(1-\kappa)/(n+1)\to0$, and $0\le\kappa q^n\le r^{-n}\to0$ because $q\le1/r$ for $n\ge1$.
 \end{proof}

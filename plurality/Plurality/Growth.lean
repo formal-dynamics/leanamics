@@ -164,7 +164,8 @@ theorem lemma_3_3 (hn : 1 ≤ n) (x : Config n k) {m j : Fin k}
     simp only [Y, avg_sub]
     have := avg_adopt_nonneg x j
     have := avg_adopt_le_one hn x m
-    rcases adopt_zero_one maj3 x j t with h | h <;> rcases adopt_zero_one maj3 x m t with h' | h' <;>
+    rcases adopt_zero_one maj3 x j t with h | h <;>
+      rcases adopt_zero_one maj3 x m t with h' | h' <;>
       rw [h, h'] <;> linarith
   have hYsq (v : Fin n) (t : Fin n × Fin n × Fin n) :
       Y v t ^ 2 = adopt maj3 x j t + adopt maj3 x m t := by
@@ -309,7 +310,8 @@ theorem lemma_3_5 (hn : 1 ≤ n) (x : Config n k) {m : Fin k}
   -- (5): `c_m α / (2 s) ≥ λ/6`
   have h5 : lam / 6 ≤ cm * α / (2 * s) := by
     rw [hαeq]
-    have e : cm * (((n : ℝ) - cm) * s / (n : ℝ) ^ 2) / (2 * s) = cm * ((n : ℝ) - cm) / (2 * n ^ 2) := by
+    have e : cm * (((n : ℝ) - cm) * s / (n : ℝ) ^ 2) / (2 * s)
+        = cm * ((n : ℝ) - cm) / (2 * n ^ 2) := by
       field_simp
     rw [e, le_div_iff₀ (by positivity)]
     have : (n : ℝ) / 3 ≤ n - cm := by linarith
