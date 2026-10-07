@@ -452,11 +452,6 @@ theorem pull_unfixed_tendsto [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Ad
     (pull_unfixed_access G hc) s
 
 omit [DecidableEq V] in
-lemma pushValue_nonneg (G : SimpleGraph V) [DecidableRel G.Adj] (s : Config V) :
-    0 ≤ pushValue G s :=
-  Finset.sum_nonneg fun _ _ => inv_nonneg.mpr (Nat.cast_nonneg _)
-
-omit [DecidableEq V] in
 lemma pushValue_false (G : SimpleGraph V) [DecidableRel G.Adj] :
     pushValue G (fun _ => false) = 0 := by
   unfold pushValue
@@ -464,16 +459,6 @@ lemma pushValue_false (G : SimpleGraph V) [DecidableRel G.Adj] :
     ext v
     simp
   rw [hfilter, Finset.sum_empty]
-
-omit [DecidableEq V] in
-lemma pushValue_le (G : SimpleGraph V) [DecidableRel G.Adj] (s : Config V) :
-    pushValue G s ≤ pushValue G (fun _ => true) := by
-  unfold pushValue
-  have hfilter : univ.filter (fun v => (fun _ : V => true) v = true) = univ := by
-    ext v
-    simp
-  rw [hfilter]
-  exact Finset.sum_le_univ_sum_of_nonneg fun _ => inv_nonneg.mpr (Nat.cast_nonneg _)
 
 omit [DecidableEq V] in
 lemma pushValue_total_pos [Nontrivial V] (G : SimpleGraph V) [DecidableRel G.Adj]
@@ -488,11 +473,6 @@ lemma pushValue_total_pos [Nontrivial V] (G : SimpleGraph V) [DecidableRel G.Adj
   exact inv_pos.mpr (by exact_mod_cast hc.preconnected.degree_pos_of_nontrivial v)
 
 omit [DecidableEq V] in
-lemma pullValue_nonneg (G : SimpleGraph V) [DecidableRel G.Adj] (s : Config V) :
-    0 ≤ pullValue G s :=
-  Finset.sum_nonneg fun _ _ => Nat.cast_nonneg _
-
-omit [DecidableEq V] in
 lemma pullValue_false (G : SimpleGraph V) [DecidableRel G.Adj] :
     pullValue G (fun _ => false) = 0 := by
   unfold pullValue
@@ -500,16 +480,6 @@ lemma pullValue_false (G : SimpleGraph V) [DecidableRel G.Adj] :
     ext v
     simp
   rw [hfilter, Finset.sum_empty]
-
-omit [DecidableEq V] in
-lemma pullValue_le (G : SimpleGraph V) [DecidableRel G.Adj] (s : Config V) :
-    pullValue G s ≤ pullValue G (fun _ => true) := by
-  unfold pullValue
-  have hfilter : univ.filter (fun v => (fun _ : V => true) v = true) = univ := by
-    ext v
-    simp
-  rw [hfilter]
-  exact Finset.sum_le_univ_sum_of_nonneg fun _ => Nat.cast_nonneg _
 
 omit [DecidableEq V] in
 lemma pullValue_total_pos [Nontrivial V] (G : SimpleGraph V) [DecidableRel G.Adj]
@@ -554,54 +524,6 @@ lemma pullRatio_invariant [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] 
     exact pull_value_invariant G s
   rw [hexp]
 
-omit [DecidableEq V] in
-lemma pushRatio_sandwich [Nontrivial V] (G : SimpleGraph V) [DecidableRel G.Adj]
-    (hc : G.Connected) (t : Config V) :
-    allMutant t ≤ pushValue G t / pushValue G (fun _ => true) ∧
-      pushValue G t / pushValue G (fun _ => true) ≤ allMutant t + unfixed t := by
-  have hpos : 0 < pushValue G (fun _ => true) := pushValue_total_pos G hc
-  by_cases ht : t = fun _ => true
-  · subst ht
-    rw [allMutant_true, div_self hpos.ne', unfixed_const]
-    constructor <;> norm_num
-  · by_cases hf : t = fun _ => false
-    · subst hf
-      rw [allMutant_false, pushValue_false, zero_div, unfixed_const]
-      constructor <;> norm_num
-    · have ha : allMutant t = 0 := by rw [allMutant, if_neg ht]
-      have hu : unfixed t = 1 := unfixed_of_mixed t (by
-        rintro ⟨c, hc⟩
-        cases c with
-        | false => exact hf hc
-        | true => exact ht hc)
-      rw [ha, hu, zero_add]
-      exact ⟨div_nonneg (pushValue_nonneg G t) hpos.le,
-        (div_le_one hpos).mpr (pushValue_le G t)⟩
-
-omit [DecidableEq V] in
-lemma pullRatio_sandwich [Nontrivial V] (G : SimpleGraph V) [DecidableRel G.Adj]
-    (hc : G.Connected) (t : Config V) :
-    allMutant t ≤ pullValue G t / pullValue G (fun _ => true) ∧
-      pullValue G t / pullValue G (fun _ => true) ≤ allMutant t + unfixed t := by
-  have hpos : 0 < pullValue G (fun _ => true) := pullValue_total_pos G hc
-  by_cases ht : t = fun _ => true
-  · subst ht
-    rw [allMutant_true, div_self hpos.ne', unfixed_const]
-    constructor <;> norm_num
-  · by_cases hf : t = fun _ => false
-    · subst hf
-      rw [allMutant_false, pullValue_false, zero_div, unfixed_const]
-      constructor <;> norm_num
-    · have ha : allMutant t = 0 := by rw [allMutant, if_neg ht]
-      have hu : unfixed t = 1 := unfixed_of_mixed t (by
-        rintro ⟨c, hc⟩
-        cases c with
-        | false => exact hf hc
-        | true => exact ht hc)
-      rw [ha, hu, zero_add]
-      exact ⟨div_nonneg (pullValue_nonneg G t) hpos.le,
-        (div_le_one hpos).mpr (pullValue_le G t)⟩
-
 /-- **Push fixation.** On a connected graph with at least two vertices, neutral Birth–death
 fixes with probability `∑_{v ∈ S} 1/deg v / ∑_v 1/deg v`. -/
 theorem push_fixation [Nontrivial V] (G : SimpleGraph V) [DecidableRel G.Adj]
@@ -609,11 +531,9 @@ theorem push_fixation [Nontrivial V] (G : SimpleGraph V) [DecidableRel G.Adj]
     fixation (moranKernel G 1 one_pos) s = pushValue G s / pushValue G (fun _ => true) := by
   exact fixation_eq_of_invariant (moranKernel G 1 one_pos)
     (fun t => pushValue G t / pushValue G (fun _ => true))
-    (unfixed_step G one_pos) (unfixed_access G hc one_pos)
-    (by
-      funext t
-      exact pushRatio_invariant G t)
-    (pushRatio_sandwich G hc) (allMutant_step G one_pos) s
+    (funext fun t => pushRatio_invariant G t) (div_self (pushValue_total_pos G hc).ne')
+    (by rw [pushValue_false, zero_div]) (allMutant_step G one_pos) s
+    (moran_unfixed_tendsto G hc one_pos s)
 
 /-- **Pull fixation.** On a connected graph with at least two vertices, death–Birth fixes with
 probability `∑_{v ∈ S} deg v / ∑_v deg v`. -/
@@ -622,10 +542,7 @@ theorem pull_fixation [Nontrivial V] (G : SimpleGraph V) [DecidableRel G.Adj]
     fixation (pullKernel G) s = pullValue G s / pullValue G (fun _ => true) := by
   exact fixation_eq_of_invariant (pullKernel G)
     (fun t => pullValue G t / pullValue G (fun _ => true))
-    (pull_unfixed_step G) (pull_unfixed_access G hc)
-    (by
-      funext t
-      exact pullRatio_invariant G t)
-    (pullRatio_sandwich G hc) (pull_allMutant_step G) s
+    (funext fun t => pullRatio_invariant G t) (div_self (pullValue_total_pos G hc).ne')
+    (by rw [pullValue_false, zero_div]) (pull_allMutant_step G) s (pull_unfixed_tendsto G hc s)
 
 end Moran

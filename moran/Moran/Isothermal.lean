@@ -1,4 +1,5 @@
 import Dynamics.Absorption
+import Dynamics.OptionalStopping
 
 /-! # The Moran process and the isothermal theorem (MOR-1, MOR-2)
 
@@ -469,22 +470,8 @@ lemma allMutant_nonneg (s : Config V) : 0 ≤ allMutant s := by
   split <;> norm_num
 
 omit [DecidableEq V] in
-lemma allMutant_le_one (s : Config V) : allMutant s ≤ 1 := by
-  unfold allMutant
-  split <;> norm_num
-
-omit [DecidableEq V] in
 lemma allMutant_true : allMutant (fun _ : V => true) = 1 := by
   simp [allMutant]
-
-omit [DecidableEq V] in
-lemma allMutant_false [Nonempty V] : allMutant (fun _ : V => false) = 0 := by
-  have hne : (fun _ : V => false) ≠ fun _ => true := by
-    intro h
-    obtain ⟨v⟩ := ‹Nonempty V›
-    have := congr_fun h v
-    simp at this
-  rw [allMutant, if_neg hne]
 
 lemma moran_constant [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] {r : ℝ} (hr : 0 < r)
     (c : Bool) (f : Config V → ℝ) :
@@ -620,51 +607,51 @@ lemma allMutant_step [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] {r : 
   · rw [allMutant, if_neg hs, Kernel.apply]
     exact (moranKernel G r hr s).expect_nonneg allMutant_nonneg
 
-lemma fixation_mono [Nonempty V] (K : Kernel (Config V))
-    (hstep : ∀ t, allMutant t ≤ K.apply allMutant t) (s : Config V) :
-    Monotone fun n => K.iterate n allMutant s := by
-  apply monotone_nat_of_le_succ
-  intro n
-  rw [K.iterate_add_time]
-  exact K.iterate_mono n hstep s
+/-- Finite-time fixation is the event that every vertex is a mutant. -/
+lemma iterate_allMutant (K : Kernel (Config V)) (n : ℕ) (s : Config V) :
+    K.iterate n allMutant s = K.event (· = fun _ => true) n s := by
+  rw [K.event_eq_iterate]
+  rfl
 
-lemma fixation_le_one [Nonempty V] (K : Kernel (Config V)) (n : ℕ) (s : Config V) :
-    K.iterate n allMutant s ≤ 1 := by
-  have hle := K.iterate_mono n allMutant_le_one s
-  simp [Kernel.iterate_const] at hle
-  exact hle
+omit [DecidableEq V] in
+/-- `unfixed` indicates the configurations that are neither all-mutant nor all-resident. -/
+lemma unfixed_eq (s : Config V) :
+    unfixed s = if ¬ s = (fun _ => true) ∧ ¬ s = (fun _ => false) then 1 else 0 := by
+  by_cases h : ∃ c, s = fun _ => c
+  · obtain ⟨c, rfl⟩ := h
+    rw [unfixed_const]
+    cases c <;> simp
+  · rw [unfixed_of_mixed s h, if_pos ⟨fun h' => h ⟨true, h'⟩, fun h' => h ⟨false, h'⟩⟩]
 
-lemma fixation_tendsto [Nonempty V] (K : Kernel (Config V))
-    (hstep : ∀ t, allMutant t ≤ K.apply allMutant t) (s : Config V) :
-    Tendsto (fun n => K.iterate n allMutant s) atTop (𝓝 (fixation K s)) :=
-  tendsto_atTop_ciSup (fixation_mono K hstep s)
-    ⟨1, by rintro _ ⟨n, rfl⟩; exact fixation_le_one K n s⟩
+/-- Finite-time survival (no fixation yet) as an event. -/
+lemma iterate_unfixed (K : Kernel (Config V)) (n : ℕ) (s : Config V) :
+    K.iterate n unfixed s =
+      K.event (fun t => ¬ t = (fun _ => true) ∧ ¬ t = (fun _ => false)) n s := by
+  rw [K.event_eq_iterate]
+  exact congrFun (congrArg (K.iterate n) (funext unfixed_eq)) s
 
-/-- Compare an invariant observable with fixation once it is sandwiched by `unfixed`. -/
-lemma fixation_eq_of_invariant [Nonempty V] (K : Kernel (Config V)) (ψ : Config V → ℝ)
-    (hstepU : ∀ t, K.apply unfixed t ≤ unfixed t)
-    (hacc : ∀ t, ∃ n, K.iterate n unfixed t < 1)
-    (hinv : K.apply ψ = ψ)
-    (hsand : ∀ t, allMutant t ≤ ψ t ∧ ψ t ≤ allMutant t + unfixed t)
-    (habs : ∀ t, allMutant t ≤ K.apply allMutant t) (s : Config V) :
+/-- **Fixation probability from an invariant** (finite-horizon optional stopping, roadmap
+FND-4). If `ψ` is harmonic for `K`, equals `1` on the all-mutant and `0` on the all-resident
+configuration, all-mutant is absorbing, and the probability that neither type has fixed tends
+to zero, then `ψ` is the fixation probability. This is
+`Dynamics.Kernel.iSup_event_of_invariant` for the two consensus configurations. -/
+lemma fixation_eq_of_invariant (K : Kernel (Config V)) (ψ : Config V → ℝ)
+    (hinv : K.apply ψ = ψ) (hone : ψ (fun _ => true) = 1) (hzero : ψ (fun _ => false) = 0)
+    (habs : ∀ t, allMutant t ≤ K.apply allMutant t) (s : Config V)
+    (hsurv : Tendsto (fun n => K.iterate n unfixed s) atTop (𝓝 0)) :
     fixation K s = ψ s := by
-  have htend := fixation_tendsto K habs s
-  have herr : ∀ n, 0 ≤ ψ s - K.iterate n allMutant s ∧
-      ψ s - K.iterate n allMutant s ≤ K.iterate n unfixed s := by
-    intro n
-    have hinvn := congrFun (K.iterate_invariant hinv n) s
-    have hlo := K.iterate_mono n (fun t => (hsand t).1) s
-    have hhi := K.iterate_mono n (fun t => (hsand t).2) s
-    rw [hinvn] at hlo hhi
-    rw [K.iterate_add] at hhi
-    constructor <;> linarith
-  have hz : Tendsto (fun n => ψ s - K.iterate n allMutant s) atTop (𝓝 0) :=
-    squeeze_zero (fun n => (herr n).1) (fun n => (herr n).2)
-      (K.finite_absorption unfixed unfixed_binary hstepU hacc s)
-  have hprob : Tendsto (fun n => K.iterate n allMutant s) atTop (𝓝 (ψ s)) := by
-    have hcst : Tendsto (fun _ : ℕ => ψ s) atTop (𝓝 (ψ s)) := tendsto_const_nhds
-    simpa using hcst.sub hz
-  exact tendsto_nhds_unique htend hprob
+  have habsA : ∀ t : Config V, t = (fun _ => true) → (K t).prob (· = fun _ => true) = 1 := by
+    rintro _ rfl
+    refine le_antisymm (Distribution.prob_le_one _ _) ?_
+    have h := habs fun _ => true
+    rw [allMutant_true] at h
+    rw [Distribution.prob_eq_expect]
+    exact h
+  have h := K.iSup_event_of_invariant ψ (· = fun _ => true) (· = fun _ => false) 1 0
+    (fun _ ha => ha ▸ hone) (fun _ hb => hb ▸ hzero) one_ne_zero habsA s
+    (fun T => congrFun (K.iterate_invariant hinv T) s)
+    (by simpa only [iterate_unfixed] using hsurv)
+  simpa [fixation, iterate_allMutant] using h
 
 omit [Fintype V] [DecidableEq V] in
 lemma one_div_pow_ne_one {r : ℝ} (hr : 0 < r) (hr1 : r ≠ 1) {n : ℕ} (hn : n ≠ 0) :
@@ -682,31 +669,6 @@ noncomputable def moranPsi (r : ℝ) (t : Config V) : ℝ :=
 noncomputable def neutralPsi (t : Config V) : ℝ := (mutants t : ℝ) / Fintype.card V
 
 omit [DecidableEq V] in
-lemma moranPsi_bounds [Nonempty V] {r : ℝ} (hr : 0 < r) (hr1 : r ≠ 1) (t : Config V) :
-    0 ≤ moranPsi r t ∧ moranPsi r t ≤ 1 := by
-  have hn : Fintype.card V ≠ 0 := Fintype.card_ne_zero
-  have hk : mutants t ≤ Fintype.card V := mutants_le_card t
-  have hpos : 0 < 1 / r := div_pos one_pos hr
-  unfold moranPsi
-  rcases hr1.lt_or_gt with hlt | hgt
-  · have ha : 1 < 1 / r := (one_lt_div hr).mpr hlt
-    have hpow : (1 / r) ^ mutants t ≤ (1 / r) ^ Fintype.card V :=
-      pow_le_pow_right₀ ha.le hk
-    have hnum : 1 - (1 / r) ^ mutants t ≤ 0 := sub_nonpos.mpr (one_le_pow₀ ha.le)
-    have hden : 1 - (1 / r) ^ Fintype.card V < 0 := sub_neg.mpr (one_lt_pow₀ ha hn)
-    have hle : 1 - (1 / r) ^ Fintype.card V ≤ 1 - (1 / r) ^ mutants t :=
-      sub_le_sub_left hpow 1
-    exact ⟨div_nonneg_of_nonpos hnum hden.le, (div_le_one_iff).2 (Or.inr (Or.inr ⟨hden, hle⟩))⟩
-  · have ha : 1 / r < 1 := (div_lt_one hr).mpr hgt
-    have hpow : (1 / r) ^ Fintype.card V ≤ (1 / r) ^ mutants t :=
-      pow_le_pow_of_le_one hpos.le ha.le hk
-    have hnum : 0 ≤ 1 - (1 / r) ^ mutants t := sub_nonneg.mpr (pow_le_one₀ hpos.le ha.le)
-    have hden : 0 < 1 - (1 / r) ^ Fintype.card V := sub_pos.mpr (pow_lt_one₀ hpos.le ha hn)
-    have hle : 1 - (1 / r) ^ mutants t ≤ 1 - (1 / r) ^ Fintype.card V :=
-      sub_le_sub_left hpow 1
-    exact ⟨div_nonneg hnum hden.le, (div_le_one hden).mpr hle⟩
-
-omit [DecidableEq V] in
 lemma moranPsi_all [Nonempty V] {r : ℝ} (hr : 0 < r) (hr1 : r ≠ 1) :
     moranPsi r (fun _ : V => true) = 1 := by
   unfold moranPsi
@@ -719,26 +681,6 @@ omit [DecidableEq V] in
 lemma moranPsi_none {r : ℝ} : moranPsi r (fun _ : V => false) = 0 := by
   unfold moranPsi
   rw [mutants_false rfl, pow_zero, sub_self, zero_div]
-
-omit [DecidableEq V] in
-lemma moranPsi_sandwich [Nonempty V] {r : ℝ} (hr : 0 < r) (hr1 : r ≠ 1) (t : Config V) :
-    allMutant t ≤ moranPsi r t ∧ moranPsi r t ≤ allMutant t + unfixed t := by
-  by_cases ht : t = fun _ => true
-  · subst ht
-    rw [allMutant_true, moranPsi_all hr hr1, unfixed_const]
-    constructor <;> norm_num
-  · by_cases hf : t = fun _ => false
-    · subst hf
-      rw [allMutant_false, moranPsi_none, unfixed_const]
-      constructor <;> norm_num
-    · have ha : allMutant t = 0 := by rw [allMutant, if_neg ht]
-      have hu : unfixed t = 1 := unfixed_of_mixed t (by
-        rintro ⟨c, hc⟩
-        cases c with
-        | false => exact hf hc
-        | true => exact ht hc)
-      rw [ha, hu, zero_add]
-      exact moranPsi_bounds hr hr1 t
 
 lemma moranPsi_invariant [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] (d : ℕ)
     (hreg : ∀ i, G.degree i = d) {r : ℝ} (hr : 0 < r) (s : Config V) :
@@ -759,13 +701,6 @@ lemma moranPsi_invariant [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] (
   rw [hpot, mul_comm]
 
 omit [DecidableEq V] in
-lemma neutralPsi_bounds [Nonempty V] (t : Config V) : 0 ≤ neutralPsi t ∧ neutralPsi t ≤ 1 := by
-  unfold neutralPsi
-  have hn : 0 < (Fintype.card V : ℝ) := by exact_mod_cast Fintype.card_pos
-  exact ⟨div_nonneg (Nat.cast_nonneg _) hn.le,
-    (div_le_one hn).mpr (by exact_mod_cast mutants_le_card t)⟩
-
-omit [DecidableEq V] in
 lemma neutralPsi_all [Nonempty V] : neutralPsi (fun _ : V => true) = 1 := by
   unfold neutralPsi
   rw [mutants_true rfl]
@@ -775,26 +710,6 @@ omit [DecidableEq V] in
 lemma neutralPsi_none : neutralPsi (fun _ : V => false) = 0 := by
   unfold neutralPsi
   rw [mutants_false rfl, Nat.cast_zero, zero_div]
-
-omit [DecidableEq V] in
-lemma neutralPsi_sandwich [Nonempty V] (t : Config V) :
-    allMutant t ≤ neutralPsi t ∧ neutralPsi t ≤ allMutant t + unfixed t := by
-  by_cases ht : t = fun _ => true
-  · subst ht
-    rw [allMutant_true, neutralPsi_all, unfixed_const]
-    constructor <;> norm_num
-  · by_cases hf : t = fun _ => false
-    · subst hf
-      rw [allMutant_false, neutralPsi_none, unfixed_const]
-      constructor <;> norm_num
-    · have ha : allMutant t = 0 := by rw [allMutant, if_neg ht]
-      have hu : unfixed t = 1 := unfixed_of_mixed t (by
-        rintro ⟨c, hc⟩
-        cases c with
-        | false => exact hf hc
-        | true => exact ht hc)
-      rw [ha, hu, zero_add]
-      exact neutralPsi_bounds t
 
 lemma neutralPsi_invariant [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] (d : ℕ)
     (hreg : ∀ i, G.degree i = d) (s : Config V) :
@@ -821,9 +736,8 @@ theorem isothermal [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] (hc : G
   have hinv : (moranKernel G r hr).apply (moranPsi r) = moranPsi r := by
     funext t
     exact moranPsi_invariant G d hreg hr t
-  exact fixation_eq_of_invariant (moranKernel G r hr) (moranPsi r)
-    (unfixed_step G hr) (unfixed_access G hc hr) hinv (moranPsi_sandwich hr hr1)
-    (allMutant_step G hr) s
+  exact fixation_eq_of_invariant (moranKernel G r hr) (moranPsi r) hinv (moranPsi_all hr hr1)
+    moranPsi_none (allMutant_step G hr) s (moran_unfixed_tendsto G hc hr s)
 
 /-- **Neutral case.** On a connected regular graph with `r = 1`, the fixation probability is the
 initial fraction of mutants. -/
@@ -833,9 +747,8 @@ theorem isothermal_neutral [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj]
   have hinv : (moranKernel G 1 one_pos).apply neutralPsi = neutralPsi := by
     funext t
     exact neutralPsi_invariant G d hreg t
-  exact fixation_eq_of_invariant (moranKernel G 1 one_pos) neutralPsi
-    (unfixed_step G one_pos) (unfixed_access G hc one_pos) hinv neutralPsi_sandwich
-    (allMutant_step G one_pos) s
+  exact fixation_eq_of_invariant (moranKernel G 1 one_pos) neutralPsi hinv neutralPsi_all
+    neutralPsi_none (allMutant_step G one_pos) s (moran_unfixed_tendsto G hc one_pos s)
 
 /-- **Moran's formula (1958).** On the complete graph, the fixation probability from `k`
 mutants is `(1 - r^{-k}) / (1 - r^{-n})`. -/

@@ -15,7 +15,7 @@ is still `≤ n/2` after `T₁` rounds is at most `2^L · (15/16)^T₁`.
 
 namespace RumorPush
 
-open Finset
+open Finset Dynamics
 
 variable {n : ℕ}
 
