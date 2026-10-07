@@ -23,6 +23,9 @@ uses Lean 4.32.0 and Mathlib revision
 | `DriftSeq` | Time-dependent chains (`iterateSeq`: kernel `K t` for the step `t → t + 1`), linearity and monotonicity |
 | `Drift` | Drift theorems of Berenbrink et al. (ICALP 2016): drift `c/Ψ` ⇒ absorbed with probability `≥ 1/2` once `∑ c_t ≥ 4Ψ₀²` (`drift_absorption`, Lemma 2.2); multiplicative drift ⇒ survival `≤ ∏(1 − δ_t) Ψ₀/Ψ_min` (`multiplicative_drift`, Lemma 2.4); `_seq` forms for time-dependent chains |
 | `GraphRounds` | Graph-indexed round types: `NeighborRound G` (every vertex samples a neighbour; independence and marginals) and `EdgeRound G` (one uniform oriented edge; edge, orientation and degree-bias averages) |
+| `DriftHittingDefs` | Hitting probabilities `K.hitProb B n a = P_a(T_B ≤ n)` (visit `B` at one of the times `0, …, n`), through `trajectory` |
+| `DriftHittingStop` | The stopped chain `K.stopped B`; `1 − hitProb` is its event `¬B`; geometric drift `K V ≤ ρ V` off `B` ⇒ `P(T_B > t) ≤ ρ^t V(a)/V_min` (`one_sub_hitProb_le_of_drift`, via `multiplicative_drift`) |
+| `DriftHitting` | Hitting-time bound of Doerr et al. (SPAA 2011, Claim 2.9): growth by `c₁` except with probability `e^{−c₂X}` and escape from `0` with probability `c₃` ⇒ `X ≥ c₄ log q` within `c₅ log q + log_{c₁}(c₄ log q)` steps with probability `≥ 1 − q^{−c₆}` (`drift_hitting`; `O(log q)` form `drift_hitting_log`); `DriftHittingAux` holds the potential |
 
 `avg` remains zero on an empty sample type. Normalized distributions require
 mass one and therefore cannot inhabit an empty sample space; `uniform` requires

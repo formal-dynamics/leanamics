@@ -40,3 +40,6 @@ import Dynamics
 #print axioms Dynamics.avg_vertex_neighborRound
 #print axioms Dynamics.avg_edgeRound
 #print axioms Dynamics.avg_edgeRound_edge
+#print axioms Dynamics.Kernel.one_sub_hitProb_le_of_drift
+#print axioms Dynamics.Kernel.drift_hitting
+#print axioms Dynamics.Kernel.drift_hitting_log
