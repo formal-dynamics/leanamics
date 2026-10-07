@@ -1,4 +1,5 @@
 import Voter.Absorption
+import Dynamics.OptionalStopping
 import Dynamics.Stationary
 
 /-! # Consensus probability (Theorem 2.1)
@@ -97,6 +98,21 @@ lemma whiteMass_le_one (p : Distribution V) (s : Config V Bool) : whiteMass p s 
   calc whiteMass p s ≤ p.expect (fun _ => 1) := p.expect_mono (fun i => by dsimp; split <;> norm_num)
        _ = 1 := p.expect_const 1
 
+omit [DecidableEq V] [Nonempty V] in
+/-- A constant configuration has white mass `1` if white, `0` if black. -/
+lemma whiteMass_const (p : Distribution V) (c : Bool) :
+    whiteMass p (fun _ => c) = if c then 1 else 0 :=
+  p.expect_const _
+
+omit [Nonempty V] in
+/-- Finite-time consensus on a color is an event. -/
+lemma colorProbability_eq_event [Fintype C] (H : Kernel V) (c : C) (n : ℕ) (s : Config V C) :
+    colorProbability H c n s = (transition H).event (· = fun _ => c) n s := by
+  unfold colorProbability allColor Kernel.event
+  congr 1
+  funext t
+  congr
+
 omit [DecidableEq V] in
 lemma whiteMass_bounds (p : Distribution V) (s : Config V Bool) :
     allColor true s ≤ whiteMass p s ∧ whiteMass p s ≤ allColor true s + survival s := by
@@ -118,15 +134,17 @@ lemma whiteProbability_error (H : Kernel V) (p : Distribution V) (hp : H.Station
     (n : ℕ) (s : Config V Bool) :
     0 ≤ whiteMass p s - colorProbability H true n s ∧
       whiteMass p s - colorProbability H true n s ≤ (transition H).iterate n survival s := by
-  have hinv := iterate_mass H p hp (fun b : Bool => if b then 1 else 0) n s
-  change (transition H).iterate n (whiteMass p) s = whiteMass p s at hinv
-  have hlo := (transition H).iterate_mono n (fun t => (whiteMass_bounds p t).1) s
-  have hhi := (transition H).iterate_mono n (fun t => (whiteMass_bounds p t).2) s
-  rw [hinv] at hlo hhi
-  rw [Kernel.iterate_add] at hhi
-  change colorProbability H true n s ≤ whiteMass p s at hlo
-  change whiteMass p s ≤ colorProbability H true n s + (transition H).iterate n survival s at hhi
-  constructor <;> linarith
+  have hS (t : Config V Bool) (h1 : ¬ t = fun _ => true) (h2 : ¬ t = fun _ => false) :
+      0 ≤ whiteMass p t - 0 ∧ whiteMass p t - 0 ≤ 1 := by
+    have hb := whiteMass_bounds p t
+    rw [show allColor true t = 0 by simp [allColor, h1], survival_eq, if_pos ⟨h1, h2⟩] at hb
+    constructor <;> linarith [hb.1, hb.2]
+  have h := (transition H).event_error_of_invariant (whiteMass p) (· = fun _ => true)
+    (· = fun _ => false) 1 0 0 1 (fun _ ha => by simp [ha, whiteMass_const])
+    (fun _ hb => by simp [hb, whiteMass_const]) hS s n
+    (iterate_mass H p hp (fun b : Bool => if b then 1 else 0) n s)
+  rw [← colorProbability_eq_event, ← iterate_survival] at h
+  simpa using h
 
 /-- Finite-time all-white probability converges to initial stationary white mass. -/
 theorem whiteProbability_tendsto (G : SimpleGraph V) (hc : G.Connected) (hn : ¬ G.Colorable 2)
