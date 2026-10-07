@@ -43,3 +43,10 @@ import Epidemics
 #print axioms Epidemics.Revisited.shrinking_upper_expect
 #print axioms Epidemics.Revisited.spreading_upper_tail
 #print axioms Epidemics.Revisited.spreading_upper_expect
+#print axioms Epidemics.exists_long_path
+#print axioms Epidemics.exists_giant_component
+#print axioms Epidemics.exists_linear_component
+#print axioms Epidemics.reedFrost_large_outbreak_explicit
+#print axioms Epidemics.reedFrost_large_outbreak
+#print axioms Epidemics.prob_queryAnswers
+#print axioms Epidemics.DFS.fresh_nextQuery

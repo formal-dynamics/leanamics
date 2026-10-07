@@ -1,4 +1,4 @@
-# Epidemics: Reed–Frost and bond percolation; the Kermack–McKendrick SIR model; Kurtz's law of large numbers; rumor spreading revisited
+# Epidemics: Reed–Frost and bond percolation; the giant component; the Kermack–McKendrick SIR model; Kurtz's law of large numbers; rumor spreading revisited
 
 A Lean formalization of the pathwise correspondence between the Reed–Frost (Independent Cascade)
 epidemic and bond percolation (after Kempe, Kleinberg and Tardos, KDD 2003; see also Becchetti et
@@ -21,6 +21,32 @@ open edge becomes infected, and every infected node recovers for good.
 The coupling holds for every coin assignment, which is stronger than the distributional
 equivalence usually stated (with fresh coins in each round); that distributional version is not
 formalized here.
+
+## The supercritical giant component (EPI-3)
+
+The random graph `G(n, p)` is bond percolation on the complete graph (`perc ⊤ ω`, `ω ~ coins p`).
+Following M. Krivelevich and B. Sudakov, *The phase transition in random graphs: a simple proof*
+(Random Structures & Algorithms 43, 2013, arXiv:1201.6529), a depth-first search fed with the edge
+coins gives, with `p n = 1 + ε` and "with high probability" made quantitative as "with probability
+at least `1 - C / n`":
+
+| Result | Lean declaration |
+| --- | --- |
+| Theorem 1(2): a path of length `≥ ε² n / 5`, for small `ε` | `exists_long_path` |
+| Theorem 2: a component with `≥ ε n / 2` vertices, for small `ε` | `exists_giant_component` |
+| Every `ε > 0`: a component with `≥ c n` vertices | `exists_linear_component` |
+| Reed–Frost on `K_n`, `R₀ = 1 + ε`: outbreak `≥ ε n / 2` w.p. `≥ ε/2 - C/n` | `reedFrost_large_outbreak_explicit` |
+| Reed–Frost on `K_n`, any `R₀ > 1`: outbreak `≥ c n` w.p. `≥ q > 0` | `reedFrost_large_outbreak` |
+
+Reusable pieces: the principle of deferred decisions for adaptive queries to independent coins
+(`prob_queryAnswers`, [`Epidemics/GiantCoins.lean`](Epidemics/GiantCoins.lean)); the search
+itself and its invariant ([`Epidemics/GiantDFS.lean`](Epidemics/GiantDFS.lean)); the
+deterministic analysis ([`Epidemics/GiantAnalysis.lean`](Epidemics/GiantAnalysis.lean)); Lemma 1(2)
+with the Chernoff bounds of `dynamics/` ([`Epidemics/GiantProb.lean`](Epidemics/GiantProb.lean));
+parametric versions of both theorems (`core_path`, `core_component`,
+[`Epidemics/Giant.lean`](Epidemics/Giant.lean)); the epidemic reading
+([`Epidemics/GiantEpidemic.lean`](Epidemics/GiantEpidemic.lean)). Deviations from the paper are
+listed in [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 
 ## The Kermack–McKendrick SIR model (EPI-7)
 
@@ -108,15 +134,17 @@ condition in Definition 11, the composed total-time theorems) are listed in
 [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md). Theorem 31 is proved with a
 quadratic potential instead of the paper's phase calculus.
 
-**Provenance.** Reed–Frost: the statements were written and pinned by hand; the proofs were
-produced by a Grok agent under a fixed-statement protocol and verified mechanically (statements
-unchanged, no placeholders, warning-free build, axiom audit). Kermack–McKendrick: the statements
-were pinned and then proved by a Claude agent under the same protocol and checks; the statements
-were reviewed by hand against the source. Kurtz (CRN-2): the statements were pinned and then
-proved by a Claude agent under the same protocol and checks; the statements were reviewed by hand
-against the source (Wormald's Theorem 5.1). Rumor spreading revisited (EPI-8): the statements were
-pinned and then proved under the same protocol and checks, the growth regime (Lemma 9, Lemma 19,
-Theorem 21) by a Grok agent and the rest (Lemma 20, Theorem 31, total time) by a Claude agent.
+**Provenance.** Reed–Frost: the statements were written and pinned by hand; the proofs were produced
+by a Grok agent under a fixed-statement protocol and verified mechanically (statements unchanged, no
+placeholders, warning-free build, axiom audit). Kermack–McKendrick: the statements were pinned and
+then proved by a Claude agent under the same protocol and checks; the statements were reviewed by
+hand against the source. Kurtz (CRN-2): the statements were pinned and then proved by a Claude agent
+under the same protocol and checks; the statements were reviewed by hand against the source
+(Wormald's Theorem 5.1). Rumor spreading revisited (EPI-8): the statements were pinned and then
+proved under the same protocol and checks, the growth regime (Lemma 9, Lemma 19, Theorem 21) by a
+Grok agent and the rest (Lemma 20, Theorem 31, total time) by a Claude agent. Supercritical giant
+component (EPI-3): the statements were pinned and then proved by a Claude agent under the same
+protocol and checks; the statements were reviewed by hand against the source.
 
 Build and audit:
 
