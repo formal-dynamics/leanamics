@@ -4,8 +4,13 @@ and bond percolation, after Kempe, Kleinberg and Tardos: with one coin per edge,
 infected in round $t$ are exactly those at distance $t$ from the initial set in the graph of
 open edges. Consequently the final outbreak is the set of nodes connected to the initial set by
 open edges, and with i.i.d.\ Bernoulli$(p)$ coins the probability of eventual infection is a
-bond-percolation connection probability. The development is in the finite layer of the shared
-\texttt{dynamics} package.
+bond-percolation connection probability. We then formalize the supercritical phase of the
+Erd\H{o}s--R\'enyi random graph $G(n,(1+\varepsilon)/n)$ (bond percolation on $K_n$) by the
+depth-first-search argument of Krivelevich and Sudakov: with probability at least $1-C/n$ there is
+a path of length $\varepsilon^2 n/5$ and a component of $\varepsilon n/2$ vertices; read through
+the coupling, a Reed--Frost epidemic on $K_n$ with $R_0=pn>1$ infects $\Omega(n)$ nodes with
+probability $\Omega(1)$. The development is in the finite layer of the shared \texttt{dynamics}
+package.
 \end{abstract}
 
 \section{The model}
@@ -62,3 +67,93 @@ The coupling is pathwise because every edge is used at most once: once its coin 
 from an infected endpoint, that endpoint is recovered for good. This is why a single coin per edge
 gives the same process, in distribution, as fresh coins in every round (that distributional
 statement is not formalized here).
+
+\section{The supercritical giant component (EPI-3)}
+Source: M.~Krivelevich and B.~Sudakov, \emph{The phase transition in random graphs: a simple
+proof}, Random Structures \& Algorithms 43 (2013), arXiv:1201.6529. Throughout, $G(n,p)$ is the
+percolated complete graph $(K_V)_\omega$ with i.i.d.\ Bernoulli$(p)$ coins, $n=|V|$, and
+$p=(1+\varepsilon)/n$ is written $pn=1+\varepsilon$.
+
+\begin{lemma}[Principle of deferred decisions]\label{lem:deferred}
+\lean{Epidemics.queryAnswers,Epidemics.FreshUpTo,Epidemics.prob_forall_eval_eq,Epidemics.queryAnswers_eq_iff,Epidemics.prob_queryAnswers_eq,Epidemics.expect_queryAnswers,Epidemics.prob_queryAnswers}\leanok
+If an adaptive strategy queries the coins one at a time, the next coordinate being a function of
+the answers so far, and never queries a coordinate twice among its first $m$ queries, then its
+first $m$ answers are i.i.d.\ Bernoulli$(p)$.
+\end{lemma}
+\begin{proof}\leanok
+The answers equal a list $L$ iff the coordinates queried along $L$, which are determined by $L$
+and distinct, take the values of $L$: a cylinder event of probability $\prod_k w(L_k)$.
+\end{proof}
+
+\begin{definition}[Depth-first search fed with answers]\label{def:dfs}
+\lean{Epidemics.DFS.State,Epidemics.DFS.State.pending,Epidemics.DFS.State.move,Epidemics.DFS.State.answer,Epidemics.DFS.State.settle,Epidemics.DFS.ofAnswers,Epidemics.DFS.nextQuery}\leanok
+The search of Krivelevich--Sudakov (Section~2) with the sets $S$ (done), $U$ (stack) and $T$
+(unvisited), stopped before each query; after $U=T=\emptyset$ the remaining pairs are queried.
+\end{definition}
+
+\begin{lemma}[Properties of the search]\label{lem:dfs}
+\lean{Epidemics.DFS.State.Inv,Epidemics.DFS.State.move_settle,Epidemics.DFS.fresh_nextQuery,Epidemics.DFS.card_queried_ofAnswers,Epidemics.DFS.mem_found_iff_of_queryAnswers,Epidemics.DFS.queried_of_mem_done_of_mem_unvisited,Epidemics.DFS.stack_chain_ofAnswers,Epidemics.DFS.length_stack_le,Epidemics.DFS.count_true_le_card,Epidemics.DFS.card_union_append_le,Epidemics.DFS.reachable_of_mem_comp,Epidemics.DFS.count_drop_le_card_comp,Epidemics.DFS.exists_of_epochs_lt}\leanok\uses{def:dfs,lem:deferred}
+Every pair is queried at most once; all pairs between $S$ and $T$ have been queried negatively;
+$U$ spans a path; $|U|\le 1+\sum X_i$ and, while $T\ne\emptyset$, $|S\cup U|\ge\sum X_i$; the
+vertices of one epoch are connected; when an epoch starts, the explored set $D$ has all its pairs
+with $V\setminus D$ queried.
+\end{lemma}
+\begin{proof}\leanok
+An invariant preserved by every move and answer; moves without query terminate because
+$2|S|+|U|\le 2n$ increases.
+\end{proof}
+
+\begin{lemma}[Deterministic analysis]\label{lem:analysis}
+\lean{Epidemics.DFS.three_mul_explored_lt,Epidemics.DFS.le_length_stack,Epidemics.DFS.exists_epoch_start,Epidemics.DFS.le_card_comp,Epidemics.DFS.exists_path_of_stack,Epidemics.DFS.card_comp_le_ncard}\leanok\uses{lem:dfs}
+The deterministic steps of the proofs of Theorems~1 and~2 of the paper: $|S\cup U|<n/3$ at time
+$N_0$, $|U|\ge \ell n+1$, and the current epoch started before $t_1$.
+\end{lemma}
+\begin{proof}\leanok
+In each case $|S||T|$ (or $|D|(n-|D|)$) would exceed the number of queries.
+\end{proof}
+
+\begin{lemma}[Krivelevich--Sudakov, Lemma~1(2), with Chernoff]\label{lem:ks1}
+\lean{Epidemics.prob_count_take_far,Epidemics.Good,Epidemics.prob_not_good_le}\leanok
+Among $N_0$ i.i.d.\ Bernoulli$(p)$ trials, the number of successes deviates from $N_0p$ by
+$\delta N_0p$ with probability at most $2e^{-\delta^2N_0p/3}$ (Chernoff bounds of FND-3 instead of
+Chebyshev, as in the paper's Discussion, item~1); the same holds at every time of a window.
+\end{lemma}
+\begin{proof}\leanok
+Chernoff bounds and the union bound.
+\end{proof}
+
+\begin{theorem}[Long path; Theorem~1(2)]\label{thm:path}
+\lean{Epidemics.core_path,Epidemics.exists_long_path}\leanok\uses{lem:analysis,lem:ks1}
+For every small enough $\varepsilon>0$ there is $C$ such that $G(n,(1+\varepsilon)/n)$ contains a
+path with at least $\varepsilon^2n/5$ edges with probability at least $1-C/n$.
+\end{theorem}
+\begin{proof}\leanok
+Run the search for $N_0=\lfloor\varepsilon n^2/2\rfloor$ queries; on the typical event the stack is
+a path of the required length.
+\end{proof}
+
+\begin{theorem}[Giant component; Theorem~2 and every $\varepsilon$]\label{thm:giant}
+\lean{Epidemics.core_component,Epidemics.exists_giant_component,Epidemics.exists_linear_component}\leanok\uses{lem:analysis,lem:ks1}
+For every small enough $\varepsilon>0$ there is $C$ such that $G(n,(1+\varepsilon)/n)$ has a
+component with at least $\varepsilon n/2$ vertices with probability at least $1-C/n$; for every
+$\varepsilon>0$ there are $c>0$ and $C$ such that it has a component with at least $cn$ vertices
+with probability at least $1-C/n$.
+\end{theorem}
+\begin{proof}\leanok
+No epoch starts between the times $t_1=\lfloor\eta n^2\rfloor$ and $N_0=\lfloor\theta n^2\rfloor$,
+so the positive answers in between lie in one component; $\theta=\varepsilon/2$ for the first
+statement, $\theta$ small in terms of $\varepsilon$ for the second.
+\end{proof}
+
+\begin{corollary}[Supercritical Reed--Frost epidemics]\label{cor:outbreak}
+\lean{Epidemics.card_final_recovered,Epidemics.coins_prob_perm,Epidemics.prob_component_ge,Epidemics.reedFrost_large_outbreak_explicit,Epidemics.reedFrost_large_outbreak}\leanok\uses{thm:giant,thm:perc}
+On $K_n$ with $pn=R_0>1$, the Reed--Frost epidemic started from any single node infects at least
+$cn$ nodes with probability at least $q>0$ for $n\ge n_0$; for $R_0=1+\varepsilon$ with
+$\varepsilon$ small, at least $\varepsilon n/2$ nodes with probability at least
+$\varepsilon/2-C/n$.
+\end{corollary}
+\begin{proof}\leanok
+The final outbreak is the component of the initial node (Corollary~\ref{cor:final}); by symmetry
+of $K_n$ this node lies in a component of size $\ge k$ with probability at least $k/n$ times the
+probability that such a component exists.
+\end{proof}
