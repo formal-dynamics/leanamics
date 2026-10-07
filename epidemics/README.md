@@ -48,6 +48,10 @@ Positivity of `i` uses a barrier argument (`i ≥ i(0) e^{-γ t} / 2`) instead o
 Gronwall; uniqueness of the final size uses the monotonicity of `x ↦ log x - R₀ x` on either side
 of `1/R₀`.
 
+Where the statements deviate from their sources (special constant-rate case, solution taken as a
+hypothesis, fixed initial data, the precise form of the limits and of the uniqueness statements),
+see [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
+
 ## Kurtz's law of large numbers for SIR, in discrete time (CRN-2)
 
 The stochastic SIR epidemic on `N` agents (`S + I → 2I` at rate `β S I / N`, `I → R` at rate
@@ -73,7 +77,8 @@ inequality for the exponential supermartingale gives the maximal Azuma bound; on
 the invariance of the simplex under the ODE, the Lipschitz bound of the field, the Euler error
 `O(h²)` and Mathlib's `discrete_gronwall` keep the chain close to the solution. Deviations from
 the sources (discrete time, natural-number rates, sampling with replacement, time scale, initial
-condition) are listed in [`PROGRESS-CRN2.md`](PROGRESS-CRN2.md).
+condition, the integral-curve hypothesis) are listed in
+[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 
 **Provenance.** Reed–Frost: the statements were written and pinned by hand; the proofs were
 produced by a Grok agent under a fixed-statement protocol and verified mechanically (statements
