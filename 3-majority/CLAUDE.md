@@ -3,7 +3,7 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 > **Note:** this project lives in the `3-majority/` subdirectory of the
-> `Leanamycs` monorepo and is a separate Lake package (its own
+> `Leanamics` monorepo and is a separate Lake package (its own
 > `lakefile.toml`, `lake-manifest.json` and toolchain). It requires the shared
 > sibling package `../dynamics` by path, with the same Lean toolchain and exact
 > Mathlib revision; `rumor_spread/` remains fully independent. GitHub only reads workflow files from

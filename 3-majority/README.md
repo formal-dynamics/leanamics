@@ -26,10 +26,10 @@ gap of `22√(3 n log n)` (a fraction `1/2 + O(√(log n / n))`) within `390 log
 for this package's process `ThreeMajority.run`. The plurality package reuses this development
 through the pathwise bridge `Plurality.colorSet_run`.
 
-**[Blueprint](https://formal-dynamics.github.io/leanamycs/3-majority/blueprint/)** ·
-**[Blueprint as pdf](https://formal-dynamics.github.io/leanamycs/3-majority/blueprint.pdf)** ·
-**[Dependency graph](https://formal-dynamics.github.io/leanamycs/3-majority/blueprint/dep_graph_document.html)** ·
-**[API docs](https://formal-dynamics.github.io/leanamycs/3-majority/docs/)**
+**[Blueprint](https://formal-dynamics.github.io/leanamics/3-majority/blueprint/)** ·
+**[Blueprint as pdf](https://formal-dynamics.github.io/leanamics/3-majority/blueprint.pdf)** ·
+**[Dependency graph](https://formal-dynamics.github.io/leanamics/3-majority/blueprint/dep_graph_document.html)** ·
+**[API docs](https://formal-dynamics.github.io/leanamics/3-majority/docs/)**
 
 The blueprint ([blueprint/src/content.tex](blueprint/src/content.tex)) states
 every lemma with a `\lean{}` tag pointing to its Lean declaration and a

@@ -6,7 +6,7 @@ layout: default
 usemathjax: true
 ---
 
-**Leanamycs** is a collection of Lean 4 + Mathlib formalizations of classical
+**Leanamics** is a collection of Lean 4 + Mathlib formalizations of classical
 results on opinion dynamics and related distributed processes, each paired
 with a [leanblueprint](https://github.com/PatrickMassot/leanblueprint) page
 connecting the paper proof to the Lean code statement-by-statement. The
@@ -24,7 +24,7 @@ with high probability. The main theorem is `RumorPush.push_informs_all_whp`.
 * [Blueprint]({{ '/rumor_spread/blueprint/' | relative_url }}) · [as pdf]({{ '/rumor_spread/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/rumor_spread/blueprint/dep_graph_document.html' | relative_url }})
 * [API docs]({{ '/rumor_spread/docs/' | relative_url }})
-* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/rumor_spread)
+* [Source](https://github.com/formal-dynamics/leanamics/tree/main/rumor_spread)
    
 ## Majority dynamics: 3-Majority and plurality consensus
 
@@ -43,10 +43,10 @@ $h$-plurality.
 
 * Plurality: [Blueprint]({{ '/plurality/blueprint/' | relative_url }}) · [as pdf]({{ '/plurality/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/plurality/blueprint/dep_graph_document.html' | relative_url }}) ·
-  [API docs]({{ '/plurality/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamycs/tree/main/plurality)
+  [API docs]({{ '/plurality/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/plurality)
 * Two opinions (`3-majority/`): [Blueprint]({{ '/3-majority/blueprint/' | relative_url }}) · [as pdf]({{ '/3-majority/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/3-majority/blueprint/dep_graph_document.html' | relative_url }}) ·
-  [API docs]({{ '/3-majority/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamycs/tree/main/3-majority)
+  [API docs]({{ '/3-majority/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/3-majority)
 
 ## Weighted synchronous voter dynamics
 
@@ -63,7 +63,7 @@ consensus within $2n\log n$ rounds with probability at least $1 - 1/n$
 * [Blueprint]({{ '/voter/blueprint/' | relative_url }}) · [as pdf]({{ '/voter/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/voter/blueprint/dep_graph_document.html' | relative_url }})
 * [API docs]({{ '/voter/docs/' | relative_url }})
-* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/voter)
+* [Source](https://github.com/formal-dynamics/leanamics/tree/main/voter)
 
 ## The Moran process and the isothermal theorem
 
@@ -80,7 +80,7 @@ $\sum_{v \in S} \deg v$ respectively (`Moran.push_fixation`, `Moran.pull_fixatio
 * [Blueprint]({{ '/moran/blueprint/' | relative_url }}) · [as pdf]({{ '/moran/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/moran/blueprint/dep_graph_document.html' | relative_url }})
 * [API docs]({{ '/moran/docs/' | relative_url }})
-* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/moran)
+* [Source](https://github.com/formal-dynamics/leanamics/tree/main/moran)
 
 ## Reed–Frost epidemics and bond percolation
 
@@ -94,7 +94,7 @@ connection probability (`Epidemics.prob_infected_eq_prob_connected`).
 * [Blueprint]({{ '/epidemics/blueprint/' | relative_url }}) · [as pdf]({{ '/epidemics/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/epidemics/blueprint/dep_graph_document.html' | relative_url }})
 * [API docs]({{ '/epidemics/docs/' | relative_url }})
-* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/epidemics)
+* [Source](https://github.com/formal-dynamics/leanamics/tree/main/epidemics)
 
 ## Undecided-state dynamics
 
@@ -107,7 +107,7 @@ monochromatic configuration (`Undecided.absorbed`).
 * [Blueprint]({{ '/undecided/blueprint/' | relative_url }}) · [as pdf]({{ '/undecided/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/undecided/blueprint/dep_graph_document.html' | relative_url }})
 * [API docs]({{ '/undecided/docs/' | relative_url }})
-* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/undecided)
+* [Source](https://github.com/formal-dynamics/leanamics/tree/main/undecided)
 
 ## Averaging dynamics
 
@@ -119,7 +119,7 @@ forever (`Averaging.not_tendsto_of_colorable`).
 * [Blueprint]({{ '/averaging/blueprint/' | relative_url }}) · [as pdf]({{ '/averaging/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/averaging/blueprint/dep_graph_document.html' | relative_url }})
 * [API docs]({{ '/averaging/docs/' | relative_url }})
-* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/averaging)
+* [Source](https://github.com/formal-dynamics/leanamics/tree/main/averaging)
 
 ## Median dynamics and 2-Choices
 
@@ -133,7 +133,7 @@ consensus on the majority within $\lceil 128 \log n \rceil$ rounds with probabil
 * [Blueprint]({{ '/median/blueprint/' | relative_url }}) · [as pdf]({{ '/median/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/median/blueprint/dep_graph_document.html' | relative_url }})
 * [API docs]({{ '/median/docs/' | relative_url }})
-* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/median)
+* [Source](https://github.com/formal-dynamics/leanamics/tree/main/median)
 
 ## Shared finite dynamics library
 
@@ -144,7 +144,7 @@ absorption. It is shared by voter dynamics, the Moran process, 3-majority and pl
 * [Blueprint]({{ '/dynamics/blueprint/' | relative_url }}) · [as pdf]({{ '/dynamics/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/dynamics/blueprint/dep_graph_document.html' | relative_url }})
 * [API docs]({{ '/dynamics/docs/' | relative_url }})
-* [Source](https://github.com/formal-dynamics/leanamycs/tree/main/dynamics)
+* [Source](https://github.com/formal-dynamics/leanamics/tree/main/dynamics)
 
 ---
 

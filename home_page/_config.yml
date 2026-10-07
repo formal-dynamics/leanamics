@@ -1,10 +1,10 @@
-title: Leanamycs
+title: Leanamics
 description: Lean 4 formalizations of opinion dynamics and related distributed processes
-baseurl: "/leanamycs"
+baseurl: "/leanamics"
 url: "https://formal-dynamics.github.io"
 twitter_username:
 github_username: formal-dynamics
-repository: formal-dynamics/leanamycs
+repository: formal-dynamics/leanamics
 
 authors: Aakash Kumar, Maria Sofia Bucarelli and Emanuele Natale
 

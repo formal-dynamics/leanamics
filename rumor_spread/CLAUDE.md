@@ -3,7 +3,7 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 > **Note:** this project lives in the `rumor_spread/` subdirectory of the
-> `Leanamycs` monorepo and is an independent Lake package (its own
+> `Leanamics` monorepo and is an independent Lake package (its own
 > `lakefile.toml`, `lake-manifest.json` and toolchain, resolved separately
 > from the sibling `3-majority/`). GitHub only reads workflow files from the
 > true repo root, so CI for this directory is
