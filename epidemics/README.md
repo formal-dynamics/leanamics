@@ -134,18 +134,6 @@ condition in Definition 11, the composed total-time theorems) are listed in
 [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md). Theorem 31 is proved with a
 quadratic potential instead of the paper's phase calculus.
 
-**Provenance.** Reed–Frost: the statements were written and pinned by hand; the proofs were produced
-by a Grok agent under a fixed-statement protocol and verified mechanically (statements unchanged, no
-placeholders, warning-free build, axiom audit). Kermack–McKendrick: the statements were pinned and
-then proved by a Claude agent under the same protocol and checks; the statements were reviewed by
-hand against the source. Kurtz (CRN-2): the statements were pinned and then proved by a Claude agent
-under the same protocol and checks; the statements were reviewed by hand against the source
-(Wormald's Theorem 5.1). Rumor spreading revisited (EPI-8): the statements were pinned and then
-proved under the same protocol and checks, the growth regime (Lemma 9, Lemma 19, Theorem 21) by a
-Grok agent and the rest (Lemma 20, Theorem 31, total time) by a Claude agent. Supercritical giant
-component (EPI-3): the statements were pinned and then proved by a Claude agent under the same
-protocol and checks; the statements were reviewed by hand against the source.
-
 ## COBRA ⇔ BIPS duality (EPI-4)
 
 After Cooper, Radzik and Rivera, *The coalescing-branching random walk on expanders and the dual
@@ -163,11 +151,26 @@ infected, and any other vertex is infected next iff one of its sampled neighbour
 | Pathwise: COBRA from `C` visits `v` within the rounds iff BIPS from `{v}` along the reversed rounds infects a vertex of `C` | `cobra_hit_iff_bips_reverse` |
 | Theorem 4: `P(Hit_C(v) > t ∣ C₀ = C) = P(C ∩ A_t = ∅ ∣ A₀ = {v})` | `cobra_bips_duality` |
 | Equation (2): `P(Hit_u(v) > t) = P(u ∉ A_t ∣ A₀ = {v})` | `cobra_bips_duality_singleton` |
-| Time reversal of i.i.d. rounds (roadmap FND-6) | `expList_reverse` |
 
 The paper assumes `G` connected and regular and `k ≥ 1`; the duality holds for every finite graph
 and every `k`. On a connected graph with at least two vertices the rounds exist
-(`choices_nonempty`), so both sides are genuine probabilities.
+(`choices_nonempty`), so both sides are genuine probabilities. The proof combines the pathwise
+identity with time reversal of i.i.d. rounds, the core's `Dynamics.expList_comp_reverse` (FND-6).
+Deviations from the paper are listed in [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
+The statements were pinned and then proved by a Claude agent under the fixed-statement protocol and
+checks of the provenance note below.
+
+**Provenance.** Reed–Frost: the statements were written and pinned by hand; the proofs were produced
+by a Grok agent under a fixed-statement protocol and verified mechanically (statements unchanged, no
+placeholders, warning-free build, axiom audit). Kermack–McKendrick: the statements were pinned and
+then proved by a Claude agent under the same protocol and checks; the statements were reviewed by
+hand against the source. Kurtz (CRN-2): the statements were pinned and then proved by a Claude agent
+under the same protocol and checks; the statements were reviewed by hand against the source
+(Wormald's Theorem 5.1). Rumor spreading revisited (EPI-8): the statements were pinned and then
+proved under the same protocol and checks, the growth regime (Lemma 9, Lemma 19, Theorem 21) by a
+Grok agent and the rest (Lemma 20, Theorem 31, total time) by a Claude agent. Supercritical giant
+component (EPI-3): the statements were pinned and then proved by a Claude agent under the same
+protocol and checks; the statements were reviewed by hand against the source.
 
 Build and audit:
 

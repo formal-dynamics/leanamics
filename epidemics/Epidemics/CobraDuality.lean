@@ -51,7 +51,7 @@ theorem cobra_bips_duality (v : V) (C : Finset V) (t : ℕ) :
     expList (Choices G k) t
         (fun l => if ∀ s ≤ t, v ∉ cobraRun C (l.take s) then 1 else 0) =
       expList (Choices G k) t (fun l => if C ∩ bipsRun v {v} l = ∅ then 1 else 0) := by
-  conv_rhs => rw [← expList_reverse]
+  conv_rhs => rw [← expList_comp_reverse]
   refine expList_congr_length t fun l hl => ?_
   have h : (∀ s ≤ t, v ∉ cobraRun C (l.take s)) ↔ C ∩ bipsRun v {v} l.reverse = ∅ := by
     rw [← Finset.not_nonempty_iff_eq_empty, ← cobra_hit_iff_bips_reverse, hl]
