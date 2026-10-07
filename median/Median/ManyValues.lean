@@ -46,9 +46,9 @@ theorem binary_consensus_fast : ∃ C : ℝ, 0 < C ∧ ∀ (n : ℕ) [NeZero n],
     obtain ⟨T₁, hT₁, hT₁b⟩ := exists_growth_rounds (by linarith) hΔn
     obtain ⟨T₃, hT₃, hT₃b⟩ := exists_quad_rounds hL
     -- compose the four segments (Markov property)
-    have h := (Median.kernel n Bool).event_comp (by positivity)
-      ((Median.kernel n Bool).event_comp (by positivity)
-        ((Median.kernel n Bool).event_comp (by positivity) (growth_segment hL hΔ hT₁ hgap)
+    have h := kernel_event_comp (Median.kernel n Bool) (by positivity)
+      (kernel_event_comp (Median.kernel n Bool) (by positivity)
+        (kernel_event_comp (Median.kernel n Bool) (by positivity) (growth_segment hL hΔ hT₁ hgap)
           fun _ => linear_sat_segment hL) fun _ => quad_sat_segment hL hT₃)
       fun _ => consensus_segment hL
     -- pad to `⌈128 (log (n/Δ) + log log n)⌉₊ ≥ T₁ + 6 + T₃ + 8` rounds: consensus absorbs

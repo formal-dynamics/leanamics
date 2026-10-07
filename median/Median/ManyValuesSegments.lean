@@ -7,8 +7,8 @@ import Median.ManyValuesScalar
 
 `binary_consensus_fast` (in `Median/ManyValues.lean`) runs the binary median dynamics through
 four segments. Each segment is a chain of one-round moves with failure `n⁻²` per round
-(`Dynamics.Kernel.event_chain`); the segments are composed by the Markov property
-(`Dynamics.Kernel.event_comp`). With `β = 512 log n`:
+(`kernel_event_chain`); the segments are composed by the Markov property
+(`kernel_event_comp`). With `β = 512 log n`:
 
 1. **Growth** (`growth_segment`): from a gap `Δ ≥ 128 √(n log n)`, the gap grows by `5/4` per
    round (`growth_move`); after `T₁ ≤ 5 log (n/Δ) + 2` rounds (`exists_growth_rounds`) the
@@ -107,8 +107,8 @@ lemma growth_segment (hL : (128 : ℝ) ≤ log n) {Δ : ℝ} (hΔ : 128 * √((n
   have hx0 : x ∈ growthSet n ((5 / 4 : ℝ) ^ 0 * Δ) := by
     rw [pow_zero, one_mul]
     exact mem_growthSet.mpr (Or.inr hx)
-  exact ((Median.kernel n Bool).event_chain (by positivity) T _ hmove x hx0).trans
-    ((Median.kernel n Bool).event_mono_set (growthSet_sub_satSet n hT) T x)
+  exact (kernel_event_chain (Median.kernel n Bool) (by positivity) T _ hmove x hx0).trans
+    (kernel_event_mono_set (Median.kernel n Bool) (growthSet_sub_satSet n hT) T x)
 
 /-- **Linear saturation segment.** From a minority below `n/4`, six rounds of `sat_move`
 (`m ↦ (7/8) m`, and `(7/8)^6 ≤ 1/2`) bring it below `n/8` except with probability `6 n⁻²`. -/
@@ -139,8 +139,8 @@ lemma linear_sat_segment (hL : (128 : ℝ) ≤ log n) {y : Config n Bool}
     have h1 : (7 / 8 : ℝ) ^ 6 ≤ 1 / 2 := by norm_num
     have h2 := mul_le_mul_of_nonneg_left h1 (show (0 : ℝ) ≤ (n : ℝ) / 4 by positivity)
     linarith only [h2]
-  have h := ((Median.kernel n Bool).event_chain (by positivity) 6 _ hmove y hy0).trans
-    ((Median.kernel n Bool).event_mono_set hsub 6 y)
+  have h := (kernel_event_chain (Median.kernel n Bool) (by positivity) 6 _ hmove y hy0).trans
+    (kernel_event_mono_set (Median.kernel n Bool) hsub 6 y)
   push_cast at h
   exact h
 
@@ -169,8 +169,8 @@ lemma quad_sat_segment (hL : (128 : ℝ) ≤ log n) {T : ℕ}
   have hsub : satSet n (max ((n : ℝ) / 4 * (1 / 2 : ℝ) ^ 2 ^ T) (512 * log n))
       ⊆ satSet n (512 * log n) := by
     rw [max_eq_right hT]
-  exact ((Median.kernel n Bool).event_chain (by positivity) T _ hmove y hy0).trans
-    ((Median.kernel n Bool).event_mono_set hsub T y)
+  exact (kernel_event_chain (Median.kernel n Bool) (by positivity) T _ hmove y hy0).trans
+    (kernel_event_mono_set (Median.kernel n Bool) hsub T y)
 
 /-- **Consensus segment.** From a minority below `β = 512 log n`, two nested phases of four
 rounds (`Dynamics.Kernel.nested_phases`: stay below `β` by `sat_move`, then jump to consensus by

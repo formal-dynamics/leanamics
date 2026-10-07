@@ -4,25 +4,29 @@ import Dynamics.Rounds
 
 Kernel-level facts behind the fast consensus proofs of `Median/ManyValues.lean`. None of them
 mentions the median rule: they hold for any finite Markov kernel `K`, or any process driven by
-i.i.d. uniform rounds, and are candidates for `Dynamics/`.
+i.i.d. uniform rounds, and are candidates for `Dynamics/` (they live in namespace `Median` until
+they are generalized there).
 
-* `Dynamics.Kernel.event_mono_set`: occupation probabilities are monotone in the target set;
-* `Dynamics.Kernel.event_chain`: if every state of `B i` enters `B (i+1)` in one step with
+* `kernel_event_mono_set`: occupation probabilities are monotone in the target set;
+* `kernel_event_chain`: if every state of `B i` enters `B (i+1)` in one step with
   probability `≥ 1 - ε`, then from `B 0` the chain is in `B T` after `T` steps with probability
   `≥ 1 - T ε` (union bound over the steps);
-* `Dynamics.Kernel.event_comp`: two segments compose (Markov property), adding their failures;
-* `Dynamics.expList_ge_of_and`: the union bound for two events of `T` uniform rounds;
-* `Dynamics.expList_foldl_mono`: for a round-based process, the probability of an event that is
+* `kernel_event_comp`: two segments compose (Markov property), adding their failures;
+* `expList_ge_of_and`: the union bound for two events of `T` uniform rounds;
+* `expList_foldl_mono`: for a round-based process, the probability of an event that is
   closed under the update rule is nondecreasing in the number of rounds.
 -/
 
-namespace Dynamics.Kernel
+namespace Median
+open Dynamics Dynamics.Kernel
+
+section Kernel
 
 variable {α : Type*} [Fintype α] (K : Dynamics.Kernel α)
 
 /-- **Monotonicity in the target set.** If `B ⊆ C`, being in `B` after `t` steps is at most as
 likely as being in `C`. -/
-lemma event_mono_set {B C : Set α} (h : B ⊆ C) (t : ℕ) (a : α) :
+lemma kernel_event_mono_set {B C : Set α} (h : B ⊆ C) (t : ℕ) (a : α) :
     K.event (· ∈ B) t a ≤ K.event (· ∈ C) t a := by
   classical
   unfold event
@@ -34,7 +38,7 @@ lemma event_mono_set {B C : Set α} (h : B ⊆ C) (t : ℕ) (a : α) :
 /-- **Chaining one-step moves (union bound over the steps).** If from every state of `B i` one
 step enters `B (i+1)` with probability at least `1 - ε`, then from any state of `B 0` the chain
 lies in `B T` after `T` steps with probability at least `1 - T ε`. -/
-lemma event_chain {ε : ℝ} (hε : 0 ≤ ε) (T : ℕ) (B : ℕ → Set α)
+lemma kernel_event_chain {ε : ℝ} (hε : 0 ≤ ε) (T : ℕ) (B : ℕ → Set α)
     (hB : ∀ i, ∀ a ∈ B i, 1 - ε ≤ (K a).prob (· ∈ B (i + 1))) :
     ∀ a ∈ B 0, 1 - T * ε ≤ K.event (· ∈ B T) T a := by
   classical
@@ -68,7 +72,7 @@ lemma event_chain {ε : ℝ} (hε : 0 ≤ ε) (T : ℕ) (B : ℕ → Set α)
 steps with probability at least `1 - δ₁`, and from every state of `B` it is in `C` after `t₂`
 steps with probability at least `1 - δ₂`, then from `a` it is in `C` after `t₁ + t₂` steps with
 probability at least `1 - (δ₁ + δ₂)`. -/
-lemma event_comp {B C : Set α} {t₁ t₂ : ℕ} {δ₁ δ₂ : ℝ} (hδ₂ : 0 ≤ δ₂) {a : α}
+lemma kernel_event_comp {B C : Set α} {t₁ t₂ : ℕ} {δ₁ δ₂ : ℝ} (hδ₂ : 0 ≤ δ₂) {a : α}
     (h₁ : 1 - δ₁ ≤ K.event (· ∈ B) t₁ a) (h₂ : ∀ b ∈ B, 1 - δ₂ ≤ K.event (· ∈ C) t₂ b) :
     1 - (δ₁ + δ₂) ≤ K.event (· ∈ C) (t₁ + t₂) a := by
   classical
@@ -89,9 +93,7 @@ lemma event_comp {B C : Set α} {t₁ t₂ : ℕ} {δ₁ δ₂ : ℝ} (hδ₂ : 
   rw [hsplit]
   linarith
 
-end Dynamics.Kernel
-
-namespace Dynamics
+end Kernel
 
 /-- **Union bound for two events.** If `P` and `Q` together imply `R`, then over `T` i.i.d.
 uniform rounds `ℙ[R] ≥ ℙ[P] + ℙ[Q] - 1`. -/
@@ -133,4 +135,4 @@ lemma expList_foldl_mono {S R : Type*} [Fintype R] [Nonempty R] (step : S → R 
   · rw [if_neg hl]
     exact avg_nonneg fun r => by split_ifs <;> norm_num
 
-end Dynamics
+end Median
