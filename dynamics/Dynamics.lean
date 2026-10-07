@@ -2,10 +2,10 @@ import Dynamics.Absorption
 import Dynamics.Bridge
 import Dynamics.Chernoff
 import Dynamics.Concentration
-import Dynamics.OptionalStopping
 import Dynamics.Drift
 import Dynamics.DriftHitting
 import Dynamics.GraphRounds
+import Dynamics.OptionalStopping
 import Dynamics.Phases
 import Dynamics.Reverse
 import Dynamics.Rounds
