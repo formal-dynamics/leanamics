@@ -16,15 +16,6 @@ open Finset Dynamics Real
 
 variable {n : ℕ}
 
-/-- The numbers of `a`-, `b`- and undecided nodes add up to `n`. -/
-lemma count_add (x : Config n) : (count x .a : ℝ) + count x .b + count x .u = n := by
-  rw [count_eq_sum, count_eq_sum, count_eq_sum, ← sum_add_distrib, ← sum_add_distrib]
-  have h (v : Fin n) : ((if x v = .a then (1 : ℝ) else 0) + (if x v = .b then 1 else 0)
-      + (if x v = .u then 1 else 0)) = 1 := by
-    cases x v <;> simp
-  rw [sum_congr rfl fun v _ => h v]
-  simp
-
 /-- The indicator that node `v`, sampling node `w`, is in state `o` after the round. -/
 noncomputable def ind (x : Config n) (o : Op) (v w : Fin n) : ℝ :=
   if update (x v) (x w) = o then 1 else 0
@@ -36,10 +27,6 @@ lemma ind_01 (x : Config n) (o : Op) (v w : Fin n) : ind x o v w = 0 ∨ ind x o
 lemma count_step_ind (x : Config n) (r : Fin n → Fin n) (o : Op) :
     (count (step x r) o : ℝ) = ∑ v, ind x o v (r v) :=
   count_step_eq_sum x r o
-
-/-- An indicator is nonnegative. -/
-lemma ite_one_zero_nonneg (p : Prop) [Decidable p] : (0 : ℝ) ≤ if p then 1 else 0 := by
-  split <;> norm_num
 
 variable [NeZero n]
 
@@ -101,10 +88,10 @@ lemma bad_round (x : Config n) (B : Set (Config n)) {Λ : ℝ} (hΛ : 0 ≤ Λ)
         + (if Eb + Λ ≤ (count (step x r) .b : ℝ) then 1 else 0)
         + (if (count (step x r) .u : ℝ) + Λ ≤ Eu then 1 else 0)
         + (if Eu + Λ ≤ (count (step x r) .u : ℝ) then 1 else 0) := by
-    have h1 := ite_one_zero_nonneg ((count (step x r) .a : ℝ) + Λ ≤ Ea)
-    have h2 := ite_one_zero_nonneg (Eb + Λ ≤ (count (step x r) .b : ℝ))
-    have h3 := ite_one_zero_nonneg ((count (step x r) .u : ℝ) + Λ ≤ Eu)
-    have h4 := ite_one_zero_nonneg (Eu + Λ ≤ (count (step x r) .u : ℝ))
+    have h1 := ite_nonneg (α := ℝ) zero_le_one le_rfl (p := (count (step x r) .a : ℝ) + Λ ≤ Ea)
+    have h2 := ite_nonneg (α := ℝ) zero_le_one le_rfl (p := Eb + Λ ≤ (count (step x r) .b : ℝ))
+    have h3 := ite_nonneg (α := ℝ) zero_le_one le_rfl (p := (count (step x r) .u : ℝ) + Λ ≤ Eu)
+    have h4 := ite_nonneg (α := ℝ) zero_le_one le_rfl (p := Eu + Λ ≤ (count (step x r) .u : ℝ))
     by_cases hmem : step x r ∈ B
     · rw [if_pos hmem]
       linarith

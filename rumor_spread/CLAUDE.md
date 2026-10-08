@@ -19,16 +19,28 @@ A complete (`sorry`-free) Lean 4 + Mathlib formalization of the **rumor-spreadin
 Module structure (all under the `RumorPush` namespace, dependency order):
 
 - `Bounds.lean` — elementary real inequalities (Bernoulli & friends, `1 - 1/x ≤ log x`).
-- `Prob.lean` — finite uniform probability: `avg` (sum / cardinality) and `expList α T F` (expectation over `T` i.i.d. uniform draws, defined by recursion on `T`). Markov/union bounds are pointwise inequalities pushed through `expList_le_expList`.
+- Finite uniform probability is **not** defined here: `avg` (sum / cardinality) and `expList α T F` (expectation over `T` i.i.d. uniform draws, defined by recursion on `T`) and their laws come from `Dynamics.Uniform` in the sibling `../dynamics` package (a path dependency; files `open Dynamics`). Do not re-define them. Markov/union bounds are pointwise inequalities pushed through `expList_le_expList`.
 - `Model.lean` — round configurations `Tgt n`, the `step` and `run` (list-of-rounds) dynamics, good rounds, and the deterministic growth lemma.
 - `OneRound.lean` — the one *computed* probability (`avg_not_contacted`, by counting a product of subtypes) and the per-round estimates.
 - `Growth.lean` / `Saturation.lean` — the two phases; the only concentration tool is the exponential-moment induction `expList_half_pow_goodCount`.
 - `Main.lean` — numeric lemmas (`numeric_A/B/C`) and the main theorem.
-- `Equivalence.lean` — `expList` equals the uniform average over the product space `Fin T → α` (faithfulness of the model).
+- `Equivalence.lean` — `expList` equals the uniform average over the product space `Fin T → α` (faithfulness of the model; a one-line alias of `Dynamics.expList_eq_avg_ofFn`).
+
+PULL and PUSH–PULL (roadmap EPI-5; Karp–Schindelhauer–Shenker–Vöcking, FOCS 2000), same namespace and same round model `Tgt n`:
+
+- `PullFoldl.lean` — `List.foldl` of an inflationary monotone step: persistence and pathwise domination.
+- `PullModel.lean` — `pullStep`, `pushPullStep` (= `step ∪ pullStep`, same calls), `pullRun`/`pushPullRun` (`List.foldl`), the failure probabilities, and pathwise domination of PUSH and PULL by PUSH–PULL.
+- `PullIndep.lean` — independence of the calls of a uniform round (`avg_pi_prod`, the dependent-product form of `Dynamics.avg_prod_pi`; `avg_tgt_mul_prod`) and per-call probabilities.
+- `PullOneRound.lean` — exact one-round expectations (startup stall, expected growth, quadratic shrinking `u(u-1)/(n-1) ≤ u²/n`, the PUSH–PULL formula).
+- `PullPhases.lean` — the PUSH two-phase argument for an arbitrary inflationary step, given P(good round) ≥ 1/8 and a 2/3 contraction above half (`notAllOf_le_two_div`).
+- `PullGood.lean` — those two inputs for PULL (second-moment / Paley–Zygmund via pointwise bounds).
+- `PullMain.lean`, `PullPushPull.lean` — `pull_informs_all_whp`, `pushPull_informs_all_whp`: all nodes informed after `⌈160 ln n⌉` rounds with probability `≥ 1 - 2/n`.
+
+Deviations of the PULL / PUSH–PULL statements from [KSSV00] are listed in [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 
 Design constraint to preserve: **no measure theory, no `PMF`/`ENNReal`, no Chernoff/martingales**; everything is finite sums plus `Real.log`/`Real.exp` only in `Main.lean` numerics.
 
-Toolchain is pinned in [lean-toolchain](lean-toolchain); the single dependency is Mathlib (see [lakefile.toml](lakefile.toml)).
+Toolchain is pinned in [lean-toolchain](lean-toolchain); the dependencies are Mathlib and the shared `../dynamics` package (see [lakefile.toml](lakefile.toml)).
 
 ## Commands
 

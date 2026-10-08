@@ -16,3 +16,6 @@ import Undecided
 #print axioms Undecided.Plurality.foldl_two
 #print axioms Undecided.Plurality.plurality_explicit
 #print axioms Undecided.Plurality.plurality_whp
+#print axioms Undecided.Sequential.consensus_whp
+#print axioms Undecided.Sequential.majority_whp
+#print axioms Undecided.Sequential.approximate_majority

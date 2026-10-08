@@ -56,12 +56,10 @@ noncomputable def missOne (B : Set (Config n)) (x : Config n) : ℝ :=
 
 /-! ### Elementary facts -/
 
-lemma count_nonneg (x : Config n) (o : Op) : (0 : ℝ) ≤ count x o := Nat.cast_nonneg _
-
 lemma pot_nonneg (x : Config n) : 0 ≤ pot x := by
   unfold pot
-  have := count_nonneg x .b
-  have := count_nonneg x .u
+  have : (0 : ℝ) ≤ count x .b := Nat.cast_nonneg _
+  have : (0 : ℝ) ≤ count x .u := Nat.cast_nonneg _
   linarith
 
 /-- A configuration that is not all-`a` has potential at least `1`. -/
@@ -75,8 +73,8 @@ lemma one_le_pot {x : Config n} (hx : x ∉ allA n) : 1 ≤ pot x := by
     have : 0 < count x o := Finset.card_pos.mpr ⟨v, by simp [ho]⟩
     exact_mod_cast this
   unfold pot
-  have := count_nonneg x .b
-  have := count_nonneg x .u
+  have : (0 : ℝ) ≤ count x .b := Nat.cast_nonneg _
+  have : (0 : ℝ) ≤ count x .u := Nat.cast_nonneg _
   cases h : x v with
   | a => exact absurd h hv
   | b => have := hpos .b h; linarith
@@ -191,7 +189,7 @@ lemma first_round (hn : (0 : ℝ) < n) (hΛ : 0 ≤ Λ) (hΛn : 2000 * Λ ≤ n)
     (hx : 402 * Λ ≤ bias x) :
     missOne (growthSet n (400 * Λ)) x ≤ 4 * exp (-(2 * Λ ^ 2 / n)) :=
   round_le x _ hΛ fun _ h1 h2 h3 _ =>
-    first_det hn hΛ hΛn (count_nonneg x .u) (count_add x) hx h1 h2 h3
+    first_det hn hΛ hΛn (Nat.cast_nonneg _) (count_add x) hx h1 h2 h3
 
 /-- A growth round: from `growthSet n g` into `growthSet n (min (201g/200) (7n/10))`. -/
 lemma growth_round (hn : (0 : ℝ) < n) (hΛ : 0 ≤ Λ) (hΛn : 2000 * Λ ≤ n) {g : ℝ}
@@ -199,7 +197,7 @@ lemma growth_round (hn : (0 : ℝ) < n) (hΛ : 0 ≤ Λ) (hΛn : 2000 * Λ ≤ n
     missOne (growthSet n (min (201 / 200 * g) (7 * n / 10))) x
       ≤ 4 * exp (-(2 * Λ ^ 2 / n)) :=
   round_le x _ hΛ fun _ h1 h2 h3 _ =>
-    growth_det hn hΛ hΛn hg1 hg2 (count_nonneg x .u) (count_add x) hx.1 hx.2 h1 h2 h3
+    growth_det hn hΛ hΛn hg1 hg2 (Nat.cast_nonneg _) (count_add x) hx.1 hx.2 h1 h2 h3
 
 /-- A bridge round: from `bridgeSet n s ψ` (with `s ≥ 2n/3`, `ψ ≥ 195Λ`) into
 `bridgeSet n s' ψ'` for `s' ≤ s - 2Λ` and `ψ' ≥ 9ψ/10`. -/
@@ -208,7 +206,7 @@ lemma bridge_round (hn : (0 : ℝ) < n) (hΛ : 0 ≤ Λ) {s ψ s' ψ' : ℝ} (hs
     (hx : x ∈ bridgeSet n s ψ) :
     missOne (bridgeSet n s' ψ') x ≤ 4 * exp (-(2 * Λ ^ 2 / n)) := by
   refine round_le x _ hΛ fun y h1 h2 _ h4 => ?_
-  obtain ⟨hb1, hb2⟩ := bridge_det hn (count_nonneg x .b) (count_nonneg x .u) (count_add x)
+  obtain ⟨hb1, hb2⟩ := bridge_det hn (Nat.cast_nonneg _) (Nat.cast_nonneg _) (count_add x)
     (le_trans hs hx.1) hx.2 hψ h1 h2 h4
   have hx1 : s ≤ bias x := hx.1
   refine ⟨?_, ?_⟩
@@ -223,14 +221,14 @@ lemma fin_round (hn : (0 : ℝ) < n) (hΛ : 0 ≤ Λ) (hΛn : 234 * Λ ≤ n) (x
     (hx : x ∈ finSet n) :
     missOne (finSet n) x ≤ 4 * exp (-(2 * Λ ^ 2 / n)) :=
   round_le x _ hΛ fun _ _ h2 _ h4 =>
-    fin_det hn hΛn (count_nonneg x .b) (count_nonneg x .u) (count_add x) hx h2 h4
+    fin_det hn hΛn (Nat.cast_nonneg _) (Nat.cast_nonneg _) (count_add x) hx h2 h4
 
 /-- In the final phase the potential contracts by `5/6` in expectation. -/
 lemma avg_pot_step (hn : (0 : ℝ) < n) (x : Config n) (hx : x ∈ finSet n) :
     avg (fun r : Fin n → Fin n => pot (step x r)) ≤ 5 / 6 * pot x := by
   unfold pot
   rw [avg_add, avg_const_mul, expected_count_b, expected_count_u]
-  exact fin_expect hn (count_nonneg x .b) (count_nonneg x .u) (count_add x) hx
+  exact fin_expect hn (Nat.cast_nonneg _) (Nat.cast_nonneg _) (count_add x) hx
 
 /-! ### The growth stage -/
 
@@ -305,8 +303,8 @@ theorem bridge_stage (hn : (0 : ℝ) < n) (hΛ : 0 ≤ Λ) (hΛn : 2000 * Λ ≤
   have hp : 0 ≤ 4 * exp (-(2 * Λ ^ 2 / n)) := by positivity
   have h0 : x ∈ bridgeTarget n Λ 0 := by
     have hs := count_add x
-    have hb := count_nonneg x .b
-    have hu := count_nonneg x .u
+    have hb : (0 : ℝ) ≤ count x .b := Nat.cast_nonneg _
+    have hu : (0 : ℝ) ≤ count x .u := Nat.cast_nonneg _
     unfold bias at hx
     refine ⟨?_, ?_⟩
     · show 7 * n / 10 - 2 * ((0 : ℕ) : ℝ) * Λ ≤ (count x .a : ℝ) - count x .b

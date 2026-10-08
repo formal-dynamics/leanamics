@@ -59,16 +59,14 @@ lemma avg_exp_le (Y : Fin n → γ → ℝ) (hY : ∀ i x, Y i x = 0 ∨ Y i x =
             + (fun y : γ => (Real.exp t - 1) * Y i y) y from
           funext fun y => by rw [mul_comm]]
     rcases isEmpty_or_nonempty γ with hγ | hγ
-    · simp [avg]
+    · simp [avg, Dynamics.avg]
     · rw [avg_add, avg_const, avg_const_mul, mul_comm (Real.exp t - 1) (avg (Y i))]
       linarith [Real.add_one_le_exp (avg (Y i) * (Real.exp t - 1))]
   calc ∏ i, avg (fun y : γ => Real.exp (t * Y i y))
       ≤ ∏ i, Real.exp (avg (Y i) * (Real.exp t - 1)) := by
         apply Finset.prod_le_prod
         · intro i _
-          rcases isEmpty_or_nonempty γ with hγ | hγ
-          · simp [avg]
-          · exact avg_nonneg (fun y => (Real.exp_pos _).le)
+          exact avg_nonneg (fun y => (Real.exp_pos _).le)
         · intro i _
           exact hone i
     _ = Real.exp (∑ i, avg (Y i) * (Real.exp t - 1)) := by rw [Real.exp_sum]

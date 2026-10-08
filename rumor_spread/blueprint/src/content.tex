@@ -15,6 +15,10 @@ trials. No measure theory, no PMF/\texttt{ENNReal}, no Chernoff bounds, and
 no martingales are used. This argument has been \emph{fully formalized} (no
 \texttt{sorry}) in Lean~4 + Mathlib; the main theorem is
 \texttt{RumorPush.push\_informs\_all\_whp}.
+With the same random calls, the \emph{pull} and \emph{push--pull} protocols
+of Karp, Schindelhauer, Shenker and V\"ocking also inform all nodes within
+$O(\log n)$ rounds with high probability (Section~\ref{sec:pull}); for pull,
+a second-moment bound replaces the reverse Markov inequality.
 \end{abstract}
 
 \section{The model}\label{sec:model}
@@ -130,10 +134,14 @@ The proof has two phases, glued by Lemma~\ref{lem:mono}:
 \section{Finite uniform probability}\label{sec:prelim}
 
 All randomness in this development is uniform over finite types, so instead
-of measure theory or \texttt{PMF} we work with plain finite sums.
+of measure theory or \texttt{PMF} we work with plain finite sums. The
+definitions and their basic laws are those of the shared \texttt{dynamics}
+library (\texttt{Dynamics.Uniform}), which also identifies them with Mathlib's
+finite expectation \texttt{Finset.expect} and with the independent product of
+uniform distributions (\texttt{Dynamics.Bridge}).
 
 \begin{definition}[Average]\label{def:avg}
-  \lean{RumorPush.avg}
+  \lean{Dynamics.avg, Dynamics.avg_eq_expect}
   \leanok
   For a finite type $\alpha$ and $f \colon \alpha \to \R$,
   $\mathrm{avg}(f) := \bigl(\sum_{a} f(a)\bigr) / |\alpha|$ is the
@@ -141,7 +149,7 @@ of measure theory or \texttt{PMF} we work with plain finite sums.
 \end{definition}
 
 \begin{definition}[Trajectory expectation]\label{def:expList}
-  \lean{RumorPush.expList}
+  \lean{Dynamics.expList}
   \leanok
   \uses{def:avg}
   For a finite type $\alpha$, $\mathrm{expList}\ \alpha\ T\ F$ is the
@@ -156,10 +164,10 @@ of measure theory or \texttt{PMF} we work with plain finite sums.
 \end{definition}
 
 \begin{lemma}[Basic properties]\label{lem:avg-basic}
-  \lean{RumorPush.avg_le_avg, RumorPush.avg_add, RumorPush.avg_sub,
-    RumorPush.avg_const_mul, RumorPush.avg_const,
-    RumorPush.expList_le_expList, RumorPush.expList_add,
-    RumorPush.expList_const_mul, RumorPush.expList_const}
+  \lean{Dynamics.avg_le_avg, Dynamics.avg_add, Dynamics.avg_sub,
+    Dynamics.avg_const_mul, Dynamics.avg_const,
+    Dynamics.expList_le_expList, Dynamics.expList_add,
+    Dynamics.expList_const_mul, Dynamics.expList_const}
   \leanok
   \uses{def:avg, def:expList}
   $\mathrm{avg}$ and $\mathrm{expList}$ are monotone, additive, and
@@ -220,7 +228,7 @@ We write $x := \tfrac{1}{n-1}$, so $0 < x \le 1$ for $n \ge 2$.
 \end{lemma}
 
 \begin{lemma}[Markov's inequality, finite uniform version]\label{lem:markov}
-  \lean{RumorPush.avg_le_avg}
+  \lean{Dynamics.avg_le_avg}
   \leanok
   \uses{def:avg}
   Let $\Omega$ be a finite nonempty set with the uniform measure,
@@ -230,7 +238,7 @@ We write $x := \tfrac{1}{n-1}$, so $0 < x \le 1$ for $n \ge 2$.
 \end{lemma}
 
 \begin{lemma}[Reverse Markov for bounded variables]\label{lem:revmarkov}
-  \lean{RumorPush.avg_le_avg}
+  \lean{Dynamics.avg_le_avg}
   \leanok
   \uses{def:avg}
   Let $f \colon \Omega \to \R$ with $0 \le f \le b$ pointwise, $b > 0$, and
@@ -425,6 +433,122 @@ Lemma~\ref{lem:constants} and Corollary~\ref{lem:phase2cor}:
   \;\le\; \frac1n + \frac1n \;=\; \frac2n .
 \]
 
+\section{PULL and PUSH--PULL}\label{sec:pull}
+
+We now treat the two other protocols of Karp, Schindelhauer, Shenker and
+V\"ocking \cite{KSSV00}, driven by the \emph{same} random calls: in a round
+configuration $\omega \in R_n$ every node $v$ calls $\omega(v)$. In PULL the
+caller learns the rumor from its callee; in PUSH--PULL the rumor travels in
+both directions along every call. As for PUSH, partners are chosen among the
+other $n-1$ nodes (KSSV allow self-calls; only constants change), and the
+round count is a crude $O(\log n)$ instead of the sharp
+$\log_3 n + O(\log\log n)$ of \cite[Thm.~2.1]{KSSV00}.
+
+\begin{definition}[PULL and PUSH--PULL rounds]\label{def:pull}
+  \lean{RumorPush.pullStep, RumorPush.pullRun, RumorPush.pushPullStep,
+    RumorPush.pushPullRun, RumorPush.prPullNotAllInformed,
+    RumorPush.prPushPullNotAllInformed}
+  \leanok
+  \uses{def:process}
+  $\mathrm{pullStep}(I,\omega) = I \cup \{v : \omega(v) \in I\}$ and
+  $\mathrm{pushPullStep}(I,\omega) = \mathrm{step}(I,\omega) \cup
+  \mathrm{pullStep}(I,\omega)$; trajectories fold these steps over a list of
+  i.i.d.\ uniform rounds, and the failure probabilities are the
+  probabilities that some node is still uninformed after $T$ rounds started
+  from $\{v_0\}$.
+\end{definition}
+
+\begin{lemma}[Pathwise domination]\label{lem:pull-domination}
+  \lean{RumorPush.run_subset_pushPullRun, RumorPush.pullRun_subset_pushPullRun}
+  \leanok
+  \uses{def:pull, lem:mono}
+  With the same calls, the PUSH--PULL informed set contains the PUSH and the
+  PULL informed sets after every number of rounds.
+\end{lemma}
+
+\begin{lemma}[Independent calls]\label{lem:pull-indep}
+  \lean{RumorPush.avg_pi_prod, RumorPush.avg_tgt_mul_prod,
+    RumorPush.avg_call_mem}
+  \leanok
+  \uses{def:round, def:avg}
+  The calls $\omega(v)$, $v \in V$, of a uniform round are independent, each
+  uniform among the other $n-1$ nodes; in particular a caller $v \notin I$
+  calls into $I$ with probability $|I|/(n-1)$.
+\end{lemma}
+
+\begin{lemma}[One PULL or PUSH--PULL round, exactly]\label{lem:pull-oneround}
+  \lean{RumorPush.pull_prob_stuck_singleton, RumorPush.pull_avg_card_step,
+    RumorPush.pull_avg_uninformed, RumorPush.pull_avg_uninformed_le,
+    RumorPush.pushPull_avg_uninformed}
+  \leanok
+  \uses{lem:pull-indep, lem:contact}
+  Let $m = |I|$ and $u = n - m$. From a single informed node a PULL round
+  informs nobody with probability $(1 - \frac1{n-1})^{n-1}$. After one PULL
+  round, $\E|I'| = m + u\,\frac{m}{n-1}$ and
+  $\E[n - |I'|] = \frac{u(u-1)}{n-1} \le \frac{u^2}{n}$ (quadratic
+  shrinking). After one PUSH--PULL round,
+  $\E[n - |I'|] = \frac{u(u-1)}{n-1}\bigl(1 - \frac1{n-1}\bigr)^{m}$.
+\end{lemma}
+
+\begin{lemma}[The two-phase argument for any inflationary step]
+  \label{lem:pull-phases}
+  \lean{RumorPush.goodRoundOf, RumorPush.goodCountOf,
+    RumorPush.expList_half_pow_goodCountOf, RumorPush.phase1Of,
+    RumorPush.saturationOf, RumorPush.notAllOf_le,
+    RumorPush.notAllOf_le_two_div}
+  \leanok
+  \uses{lem:adaptive, lem:phase1, lem:phase2, lem:gluing, lem:constants,
+    lem:phase2cor}
+  Let $f(I,a) \supseteq I$ be a spreading step driven by i.i.d.\ uniform
+  rounds $a$. Suppose that from every nonempty $I$ a round is good
+  ($|f(I,a)| \ge \frac98 |I|$, or $|I| > n/2$) with probability at least
+  $1/8$, and that for $|I| \ge n/2$ the expected number of uninformed nodes
+  contracts by $2/3$. Then after $\ceil{160 \log n}$ rounds from $\{v_0\}$,
+  some node is uninformed with probability at most $2/n$. The proof is the
+  PUSH proof of Sections~\ref{sec:adaptive}--\ref{sec:proof-main}, which uses
+  no other property of $\mathrm{step}$.
+\end{lemma}
+
+\begin{lemma}[The two inputs for PULL]\label{lem:pull-good}
+  \lean{RumorPush.pull_avg_new_sq_le, RumorPush.pull_prob_goodRound,
+    RumorPush.pull_avg_uninformed_contract}
+  \leanok
+  \uses{lem:pull-indep, lem:pull-oneround}
+  A PULL round is good with probability at least $1/8$, and for
+  $|I| \ge n/2$ it contracts the expected uninformed count by $2/3$.
+\end{lemma}
+
+\begin{proof}
+  The contraction follows from $\frac{u(u-1)}{n-1} \le \frac23 u$ for
+  $u \le n/2$. For good rounds, let $X$ be the number of uninformed callers
+  that call into $I$, so $|I'| = |I| + X$. By Lemma~\ref{lem:pull-indep},
+  $\mu = \E X = \frac{(n-m)m}{n-1} \ge \max(m/2, 1/2)$ for $m \le n/2$ and,
+  the calls being pairwise independent, $\E X^2 \le \mu + \mu^2$. A round
+  that is not good has $X < m/8 \le \mu/4$, so pointwise
+  $X \le \mu/4 + X^2/(2t) + (t/2)\,\mathbf 1[\text{good}]$ with
+  $t = 4(1+\mu)/3$; taking expectations gives
+  $\Pr[\text{good}] \ge \frac{3\mu}{4t} \ge 3/16$ (a Paley--Zygmund bound).
+  Unlike PUSH, the reverse Markov argument of Lemma~\ref{lem:goodround} does
+  not apply, since a PULL round can inform many more than $|I|$ new nodes.
+\end{proof}
+
+\begin{theorem}[PULL and PUSH--PULL inform $K_n$ in $O(\log n)$ rounds w.h.p.]
+  \label{thm:pull}
+  \lean{RumorPush.pull_informs_all_whp, RumorPush.pull_informs_all_whp',
+    RumorPush.pushPull_informs_all_whp, RumorPush.pushPull_informs_all_whp'}
+  \leanok
+  \uses{lem:pull-phases, lem:pull-good, lem:pull-domination}
+  Let $n \ge 2$ and $v_0 \in V$. After $\ceil{160 \log n}$ rounds of PULL,
+  or of PUSH--PULL, started from $\{v_0\}$, all nodes are informed with
+  probability at least $1 - 2/n$.
+\end{theorem}
+
+\begin{proof}
+  For PULL, apply Lemma~\ref{lem:pull-phases} with the inputs of
+  Lemma~\ref{lem:pull-good}. For PUSH--PULL, the failure event is contained
+  in the PULL failure event by Lemma~\ref{lem:pull-domination}.
+\end{proof}
+
 \section{The Lean formalization}\label{sec:lean}
 
 The argument above is fully formalized in the accompanying repository
@@ -432,13 +556,21 @@ The argument above is fully formalized in the accompanying repository
 contains no \texttt{sorry} and the main theorem depends only on the three
 standard axioms (\texttt{propext}, \texttt{Classical.choice},
 \texttt{Quot.sound}). File structure (dependency order):
-\texttt{Bounds.lean} (Section~\ref{sec:ineq}), \texttt{Prob.lean}
-(Section~\ref{sec:prelim}), \texttt{Model.lean}
+\texttt{Bounds.lean} (Section~\ref{sec:ineq}), \texttt{Dynamics.Uniform}
+of the shared \texttt{dynamics} library (Section~\ref{sec:prelim}), \texttt{Model.lean}
 (Section~\ref{sec:model}), \texttt{OneRound.lean}
 (Section~\ref{sec:oneround}), \texttt{Growth.lean}
 (Sections~\ref{sec:adaptive}--\ref{sec:growth}), \texttt{Saturation.lean}
 (Section~\ref{sec:saturation}), \texttt{Main.lean} (main theorem and
 numeric lemmas), \texttt{Equivalence.lean} (Theorem~\ref{thm:faithful}).
+PULL and PUSH--PULL (Section~\ref{sec:pull}): \texttt{PullFoldl.lean} and
+\texttt{PullModel.lean} (Definition~\ref{def:pull},
+Lemma~\ref{lem:pull-domination}), \texttt{PullIndep.lean}
+(Lemma~\ref{lem:pull-indep}), \texttt{PullOneRound.lean}
+(Lemma~\ref{lem:pull-oneround}), \texttt{PullPhases.lean}
+(Lemma~\ref{lem:pull-phases}), \texttt{PullGood.lean}
+(Lemma~\ref{lem:pull-good}), \texttt{PullMain.lean} and
+\texttt{PullPushPull.lean} (Theorem~\ref{thm:pull}).
 
 \begin{thebibliography}{9}
 \bibitem{FG85} A.~Frieze, G.~Grimmett.
