@@ -14,8 +14,8 @@ paper:
   (July 2015). Its upper-bound section is rewritten with different lemmas;
   its lower-bound section adds full proofs of Theorem 4.2 and a new Section 4.4.
 
-The formalization of Theorem 3.8 follows the SPAA proof, repaired where
-needed. The v3 proof was checked and is not used (see Section 2).
+The formalization of Theorem 3.8 follows the SPAA proof, which needs a minor
+correction (small repairs, listed below). The v3 proof was checked and is not used (see Section 2).
 
 ## 1. Theorem 3.8: how the Lean proof differs from SPAA
 
