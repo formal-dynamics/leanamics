@@ -918,6 +918,38 @@ lemma arith_T9 (hn : 0 < N) (hε0 : 0 < ε) (hε1 : ε ≤ 1) (hl3 : 0 < l3) (hl
   have : l3 * ε ^ 4 ≤ l3 * ε ^ 3 := mul_le_mul_of_nonneg_left h43 hl3.le
   linarith
 
+lemma arith_K1 {l3 : ℝ} (hε0 : 0 < ε) (hl3le : l3 ≤ 2) (hLN1 : 1 ≤ LN)
+    (hcr : r * (10 ^ 6 * LN ^ 2) ≤ l3 * ε ^ 4) :
+    20 * r / ε ^ 2 ≤ (ε / (100 * LN)) ^ 2 := by
+  have e : (ε / (100 * LN)) ^ 2 = ε ^ 2 / (10 ^ 4 * LN ^ 2) := by ring
+  have hLN : 0 < LN := by linarith
+  rw [e, div_le_div_iff₀ (by positivity) (by positivity)]
+  have h1 : r * (10 ^ 6 * LN ^ 2) ≤ 2 * ε ^ 4 := by
+    linarith [mul_le_mul_of_nonneg_right hl3le (show 0 ≤ ε ^ 4 by positivity)]
+  have e2 : 20 * r * (10 ^ 4 * LN ^ 2) = r * (10 ^ 6 * LN ^ 2) / 5 := by ring
+  have e3 : ε ^ 2 * ε ^ 2 = ε ^ 4 := by ring
+  rw [e2, e3]
+  have : 0 ≤ ε ^ 4 := by positivity
+  linarith
+
+lemma arith_K23 {Q : ℝ} (hε0 : 0 < ε) (hε1 : ε ≤ 1) (hw0 : 0 ≤ w) (hr0 : 0 ≤ r) (hQ0 : 0 ≤ Q)
+    (hQ : Q ≤ w ^ 2) :
+    4 / ε ^ 3 * (Q + 10 * r ^ 2) ≤ (2 * (w + 4 * r) / ε ^ 2) ^ 2 ∧
+      8 / ε ^ 2 * (Q + 10 * r ^ 2) ≤ (3 * (w + 4 * r) / ε) ^ 2 := by
+  have h43 : ε ^ 4 ≤ ε ^ 3 := pow_le_pow_of_le_one hε0.le hε1 (by norm_num)
+  have hwr : 0 ≤ w * r := mul_nonneg hw0 hr0
+  constructor
+  · have h1 : 4 * (Q + 10 * r ^ 2) ≤ (2 * (w + 4 * r)) ^ 2 := by nlinarith
+    have h4 : 0 ≤ 4 * (Q + 10 * r ^ 2) := by positivity
+    calc 4 / ε ^ 3 * (Q + 10 * r ^ 2) = 4 * (Q + 10 * r ^ 2) / ε ^ 3 := by ring
+      _ ≤ 4 * (Q + 10 * r ^ 2) / ε ^ 4 := div_le_div_of_nonneg_left h4 (by positivity) h43
+      _ ≤ (2 * (w + 4 * r)) ^ 2 / ε ^ 4 := div_le_div_of_nonneg_right h1 (by positivity)
+      _ = (2 * (w + 4 * r) / ε ^ 2) ^ 2 := by ring
+  · have h1 : 8 * (Q + 10 * r ^ 2) ≤ (3 * (w + 4 * r)) ^ 2 := by nlinarith
+    calc 8 / ε ^ 2 * (Q + 10 * r ^ 2) = 8 * (Q + 10 * r ^ 2) / ε ^ 2 := by ring
+      _ ≤ (3 * (w + 4 * r)) ^ 2 / ε ^ 2 := div_le_div_of_nonneg_right h1 (by positivity)
+      _ = (3 * (w + 4 * r) / ε) ^ 2 := by ring
+
 end Arith
 
 /-- The final arithmetic of Lemma 4.2 (`c = 10⁶`). -/
@@ -980,5 +1012,223 @@ lemma lemma42_arith {N LN l2 l3 ε u : ℝ} {t₁ M : ℕ} (hn : 0 < N) (hLN1 : 
       6 * LN / (l3 * ε) * (2 * u) +
       6 * LN / (l3 * ε) * (2 * (2 * (3 * (w + 4 * r) / ε) * (1 + LN))) := by rw [hX]; ring
   linarith
+
+
+/-! ### Averaging over the initial signs -/
+
+namespace IsClusteredRegular
+variable (hG : IsClusteredRegular G V₁ d b) (h3 : ThirdEigenvalueLB G V₁ d lam3)
+include hG h3
+
+omit h3 in
+lemma expList_indicator_le_one (P : List G.Dart → Prop) [DecidablePred P] (T : ℕ) :
+    expList G.Dart T (fun l => if P l then (1 : ℝ) else 0) ≤ 1 := by
+  haveI := hG.nonempty_dart
+  refine (expList_le_expList fun l => ?_).trans (expList_const T (1 : ℝ)).le
+  split_ifs <;> norm_num
+
+open scoped Classical in
+lemma avg_cutMoved_le (hl3 : 0 < lam3) (hN : (16 : ℝ) ≤ Fintype.card V) {ε : ℝ} (hε : 0 < ε)
+    (t₁ : ℕ) (hL : (t₁ : ℝ) * (2 * b / d) / Fintype.card V ≤ 1 / 8)
+    (hr : (2 * b / d) / lam3 ≤ 1 / 8) {K : ℝ} (hK : 0 ≤ K)
+    (hKsq : 20 * ((2 * b / d) / lam3) / ε ^ 2 ≤ K ^ 2) :
+    avg (fun σ : V → ℤˣ => expList G.Dart t₁ (fun l₁ =>
+        if CutMoved V₁ ε (signVec σ) (avgRun G (signVec σ) l₁) then 1 else 0)) ≤
+      8 * ((t₁ : ℝ) * (2 * b / d) / Fintype.card V) / ε ^ 2 +
+        1 / Real.sqrt (Fintype.card V + 1) + 2 * K * (1 + Real.log (Fintype.card V)) := by
+  refine hG.avg_le_of_mul_le (by positivity) hK (fun σ => hG.expList_indicator_le_one _ _)
+    fun σ => ?_
+  have hb := hG.cutMoved_bound h3 hl3 hN hε σ t₁ hL hr
+  linarith only [hb, hKsq]
+
+open scoped Classical in
+lemma avg_manyBad_le (hl3 : 0 < lam3) (hN : (16 : ℝ) ≤ Fintype.card V) {ε : ℝ} (hε : 0 < ε)
+    (t₁ : ℕ) (hL : (t₁ : ℝ) * (2 * b / d) / Fintype.card V ≤ 1 / 8)
+    (hr : (2 * b / d) / lam3 ≤ 1 / 8) {K : ℝ} (hK : 0 ≤ K)
+    (hKsq : 4 / ε ^ 3 * (Fintype.card V * (1 - lam3 / Fintype.card V) ^ t₁ +
+      10 * ((2 * b / d) / lam3) ^ 2) ≤ K ^ 2) :
+    avg (fun σ : V → ℤˣ => expList G.Dart t₁ (fun l₁ =>
+        if ε * Fintype.card V < #(badSet V₁ (thr V₁ ε (signVec σ)) (avgRun G (signVec σ) l₁)
+          (avgRun G (signVec σ) l₁)) then 1 else 0)) ≤
+      12 * ((2 * b / d) / lam3) / ε ^ 3 +
+        1 / Real.sqrt (Fintype.card V + 1) + 2 * K * (1 + Real.log (Fintype.card V)) := by
+  refine hG.avg_le_of_mul_le (by positivity) hK (fun σ => hG.expList_indicator_le_one _ _)
+    fun σ => ?_
+  have hb := hG.manyBad_bound h3 hl3 hN hε σ t₁ hL hr
+  linarith only [hb, hKsq]
+
+open scoped Classical in
+lemma avg_badRound_le (hl3 : 0 < lam3) (hN : (16 : ℝ) ≤ Fintype.card V) {ε : ℝ} (hε : 0 < ε)
+    (hε1 : ε ≤ 1) (t₁ k : ℕ) (hL : (t₁ : ℝ) * (2 * b / d) / Fintype.card V ≤ 1 / 8)
+    (hLk : (k : ℝ) * (2 * b / d) / Fintype.card V ≤ 1 / 8)
+    (hr : (2 * b / d) / lam3 ≤ 1 / 8) {K A : ℝ} (hK : 0 ≤ K)
+    (hA : 4 / ε ^ 2 * (25 / 4 * ((k : ℝ) * (2 * b / d) / Fintype.card V) +
+      11 * ((2 * b / d) / lam3)) ≤ A)
+    (hKsq : 8 / ε ^ 2 * (Fintype.card V * (1 - lam3 / Fintype.card V) ^ t₁ +
+      10 * ((2 * b / d) / lam3) ^ 2) ≤ K ^ 2) :
+    avg (fun σ : V → ℤˣ => expList G.Dart t₁ (fun l₁ =>
+        (if CutMoved V₁ ε (signVec σ) (avgRun G (signVec σ) l₁) then 0 else 1) *
+          expList G.Dart k (fun p => #(badSet V₁ (thr V₁ ε (signVec σ))
+            (avgRun G (signVec σ) l₁) (avgRun G (avgRun G (signVec σ) l₁) p)) /
+              Fintype.card V))) ≤
+      A + 1 / Real.sqrt (Fintype.card V + 1) + 2 * K * (1 + Real.log (Fintype.card V)) := by
+  haveI := hG.nonempty_dart
+  have hn := hG.card_real_pos
+  have hA0 : 0 ≤ A := le_trans (by positivity) hA
+  have hle : ∀ σ : V → ℤˣ, expList G.Dart t₁ (fun l₁ =>
+      (if CutMoved V₁ ε (signVec σ) (avgRun G (signVec σ) l₁) then 0 else 1) *
+        expList G.Dart k (fun p => #(badSet V₁ (thr V₁ ε (signVec σ))
+          (avgRun G (signVec σ) l₁) (avgRun G (avgRun G (signVec σ) l₁) p)) /
+            Fintype.card V)) ≤ 1 := fun σ => by
+    refine (expList_le_expList fun l₁ => ?_).trans (expList_const t₁ (1 : ℝ)).le
+    have h0 : 0 ≤ expList G.Dart k (fun p => #(badSet V₁ (thr V₁ ε (signVec σ))
+        (avgRun G (signVec σ) l₁) (avgRun G (avgRun G (signVec σ) l₁) p)) /
+          (Fintype.card V : ℝ)) := expList_nonneg fun p => by positivity
+    have h1 : expList G.Dart k (fun p => #(badSet V₁ (thr V₁ ε (signVec σ))
+        (avgRun G (signVec σ) l₁) (avgRun G (avgRun G (signVec σ) l₁) p)) /
+          (Fintype.card V : ℝ)) ≤ 1 := by
+      refine (expList_le_expList fun p => ?_).trans (expList_const k (1 : ℝ)).le
+      rw [div_le_one hn]; exact_mod_cast card_badSet_le _ _ _
+    split_ifs <;> linarith
+  refine hG.avg_le_of_mul_le hA0 hK hle fun σ => ?_
+  have hb := hG.badRound_bound h3 hl3 hN hε hε1 σ t₁ k hL hLk hr
+  have h2 := mul_le_mul_of_nonneg_right hA
+    (show 0 ≤ (Fintype.card V : ℝ) * cutCoef V₁ (signVec σ) ^ 2 by positivity)
+  linarith only [hb, h2, hKsq]
+
+end IsClusteredRegular
+
+
+namespace IsClusteredRegular
+variable (hG : IsClusteredRegular G V₁ d b) (h3 : ThirdEigenvalueLB G V₁ d lam3)
+include hG h3
+
+open scoped Classical in
+/-- **Lemma 4.2** with the constant `c = 10⁶`, for a phase `[t₁, t₁ + M]` with
+`6 (n/λ₃) log n ≤ t₁ ≤ 6 (n/λ₃) log n + 1` and `t₁ + M ≤ 12 (n/λ₃) log n`: with probability at
+least `1 - ε`, at least `(1 - 3ε) n` nodes are `ε`-good at every round of the phase. -/
+theorem nonEphemeral_aux {ε : ℝ} (hε0 : 0 < ε) (hε1 : ε ≤ 1) (hl3 : 0 < lam3)
+    (hc : (2 * b / d : ℝ) / lam3 ≤ lam3 * ε ^ 4 / (10 ^ 6 * Real.log (Fintype.card V) ^ 2))
+    (t₁ M : ℕ) (ht1 : 6 * Fintype.card V / lam3 * Real.log (Fintype.card V) ≤ t₁)
+    (ht1' : (t₁ : ℝ) ≤ 6 * Fintype.card V / lam3 * Real.log (Fintype.card V) + 1)
+    (hM : (t₁ : ℝ) + M ≤ 12 * Fintype.card V / lam3 * Real.log (Fintype.card V)) :
+    1 - ε ≤ avg (fun σ : V → ℤˣ => expList G.Dart (t₁ + M) (fun l =>
+        if (1 - 3 * ε) * Fintype.card V ≤ #{v | ∀ t : ℕ, t₁ ≤ t → t ≤ t₁ + M →
+          (avgRun G (signVec σ) (l.take t) v -
+            (projOne (signVec σ) v + projCut V₁ (signVec σ) v)) ^ 2 ≤
+            ε ^ 2 / Fintype.card V * ∑ w, projCut V₁ (signVec σ) w ^ 2} then 1 else 0)) := by
+  haveI := hG.nonempty_dart
+  have hn := hG.card_real_pos
+  have hl3le := hG.lam3_le_two h3
+  have hl2N := hG.two_div_card_lt
+  set N : ℝ := (Fintype.card V : ℝ) with hN_def
+  set LN := Real.log N with hLN_def
+  set l2 : ℝ := 2 * b / d with hl2_def
+  have hl2pos : 0 < l2 := lt_of_le_of_lt (by positivity) hl2N
+  have hr0 : 0 ≤ l2 / lam3 := by positivity
+  have hN4 : (4 : ℝ) ≤ N := by rw [hN_def]; exact_mod_cast hG.four_le_card
+  have hLN1 : 1 ≤ LN := by
+    have h4 : Real.log 4 = 2 * Real.log 2 := by
+      rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.log_pow]; norm_num
+    have := Real.log_le_log (by norm_num) hN4
+    have := Real.log_two_gt_d9
+    linarith
+  have hcr : l2 / lam3 * (10 ^ 6 * LN ^ 2) ≤ lam3 * ε ^ 4 := by
+    rwa [le_div_iff₀ (by positivity)] at hc
+  have hrN : 2 / (N * lam3) < l2 / lam3 := by
+    rw [div_lt_div_iff₀ (by positivity) hl3]
+    rw [div_lt_iff₀ hn] at hl2N
+    nlinarith
+  have hC : 2 * 10 ^ 6 * LN ^ 2 ≤ N * lam3 ^ 2 * ε ^ 4 := by
+    have h1 : 2 / (N * lam3) * (10 ^ 6 * LN ^ 2) ≤ lam3 * ε ^ 4 := by
+      have := mul_le_mul_of_nonneg_right hrN.le (show 0 ≤ 10 ^ 6 * LN ^ 2 by positivity)
+      linarith
+    rw [div_mul_eq_mul_div, div_le_iff₀ (by positivity)] at h1
+    nlinarith
+  have hε4 : ε ^ 4 ≤ 1 := pow_le_one₀ hε0.le hε1
+  have hLN2 : LN ≤ LN ^ 2 := by nlinarith
+  have hrLN : 10 ^ 6 * (l2 / lam3 * LN) ≤ 2 * ε ^ 4 := by
+    have h1 : l2 / lam3 * LN ≤ l2 / lam3 * LN ^ 2 := mul_le_mul_of_nonneg_left hLN2 hr0
+    have h2 : lam3 * ε ^ 4 ≤ 2 * ε ^ 4 := mul_le_mul_of_nonneg_right hl3le (by positivity)
+    linarith
+  have hNbig : 5 * 10 ^ 5 ≤ N := by
+    have h1 : lam3 ^ 2 ≤ 4 := by nlinarith
+    have h2 := mul_le_mul_of_nonneg_left h1 (show 0 ≤ N * ε ^ 4 by positivity)
+    have h3' : N * ε ^ 4 ≤ N := mul_le_of_le_one_right hn.le hε4
+    have h4 : (1 : ℝ) ≤ LN ^ 2 := by nlinarith
+    linarith
+  have hN16 : (16 : ℝ) ≤ N := by linarith
+  have hrr : l2 / lam3 ≤ l2 / lam3 * LN := le_mul_of_one_le_right hr0 hLN1
+  have hr1 : l2 / lam3 ≤ 1 / 8 := by linarith
+  have hlN : lam3 ≤ N := by linarith
+  have hL1 : (t₁ : ℝ) * l2 / N ≤ 7 * (l2 / lam3 * LN) := by
+    have h1 : (t₁ : ℝ) * l2 / N ≤ (6 * N / lam3 * LN + 1) * l2 / N :=
+      div_le_div_of_nonneg_right (mul_le_mul_of_nonneg_right ht1' hl2pos.le) hn.le
+    have h2 : (6 * N / lam3 * LN + 1) * l2 / N = 6 * (l2 / lam3 * LN) + l2 / N := by
+      field_simp
+    have h3' : l2 / N ≤ l2 / lam3 := div_le_div_of_nonneg_left hl2pos.le hl3 hlN
+    linarith
+  have hM' : (M : ℝ) ≤ 6 * N / lam3 * LN := by
+    have : 12 * N / lam3 * LN = 2 * (6 * N / lam3 * LN) := by ring
+    linarith
+  have hLk : ∀ k < M, (k : ℝ) * l2 / N ≤ 6 * (l2 / lam3 * LN) := fun k hk => by
+    have hk' : (k : ℝ) ≤ 6 * N / lam3 * LN := le_trans (by exact_mod_cast hk.le) hM'
+    calc (k : ℝ) * l2 / N ≤ (6 * N / lam3 * LN) * l2 / N :=
+          div_le_div_of_nonneg_right (mul_le_mul_of_nonneg_right hk' hl2pos.le) hn.le
+      _ = 6 * (l2 / lam3 * LN) := by field_simp
+  have hL1' : (t₁ : ℝ) * l2 / N ≤ 1 / 8 := by linarith
+  have hq0 : 0 ≤ 1 - lam3 / N := by rw [sub_nonneg, div_le_one hn]; exact hlN
+  have hNQ : N * (1 - lam3 / N) ^ t₁ ≤ 1 / N ^ 5 := card_mul_pow_le_six hn hl3 hq0 ht1
+  have hw0 : (0 : ℝ) ≤ 1 / N ^ 2 := by positivity
+  have hNQw : N * (1 - lam3 / N) ^ t₁ ≤ (1 / N ^ 2) ^ 2 := by
+    refine hNQ.trans ?_
+    rw [div_pow, one_pow, ← pow_mul]
+    exact one_div_pow_le_one_div_pow_of_le (by linarith) (by norm_num)
+  have hNQ0 : 0 ≤ N * (1 - lam3 / N) ^ t₁ := by positivity
+  -- the per-sign bound, averaged
+  have hper := fun σ : V → ℤˣ => hG.expList_good_ge (signVec σ) hε0 t₁ M
+  refine le_trans ?_ (avg_le_avg hper)
+  rw [avg_sub, avg_sub, avg_sub, avg_const, avg_const_mul, avg_sum]
+  simp_rw [avg_add, avg_const, avg_const_mul]
+  -- the three averages
+  have hε2 : 0 < ε ^ 2 := by positivity
+  have hK1sq : 20 * (l2 / lam3) / ε ^ 2 ≤ (ε / (100 * LN)) ^ 2 :=
+    arith_K1 hε0 hl3le hLN1 hcr
+  have hA1 := hG.avg_cutMoved_le h3 hl3 hN16 hε0 t₁ hL1' hr1 (K := ε / (100 * LN))
+    (by positivity) hK1sq
+  obtain ⟨hK2sq, hK3sq⟩ := arith_K23 hε0 hε1 hw0 hr0 hNQ0 hNQw
+  have hA2 := hG.avg_manyBad_le h3 hl3 hN16 hε0 t₁ hL1' hr1
+    (K := 2 * (1 / N ^ 2 + 4 * (l2 / lam3)) / ε ^ 2) (by positivity) hK2sq
+  have hA3 : ∀ k ∈ range M, avg (fun σ : V → ℤˣ => expList G.Dart t₁ (fun l₁ =>
+      (if CutMoved V₁ ε (signVec σ) (avgRun G (signVec σ) l₁) then 0 else 1) *
+        expList G.Dart k (fun p => #(badSet V₁ (thr V₁ ε (signVec σ))
+          (avgRun G (signVec σ) l₁) (avgRun G (avgRun G (signVec σ) l₁) p)) / N))) ≤
+      4 / ε ^ 2 * (25 / 4 * (6 * (l2 / lam3 * LN)) + 11 * (l2 / lam3)) +
+        1 / Real.sqrt (N + 1) + 2 * (3 * (1 / N ^ 2 + 4 * (l2 / lam3)) / ε) * (1 + LN) := by
+    intro k hk
+    have hkM := Finset.mem_range.mp hk
+    have hLk' : (k : ℝ) * l2 / N ≤ 1 / 8 := by linarith [hLk k hkM]
+    have hA : 4 / ε ^ 2 * (25 / 4 * ((k : ℝ) * l2 / N) + 11 * (l2 / lam3)) ≤
+        4 / ε ^ 2 * (25 / 4 * (6 * (l2 / lam3 * LN)) + 11 * (l2 / lam3)) := by
+      have := hLk k hkM
+      exact mul_le_mul_of_nonneg_left (by linarith) (by positivity)
+    exact hG.avg_badRound_le h3 hl3 hN16 hε0 hε1 t₁ k hL1' hLk' hr1 (by positivity) hA hK3sq
+  have hsum := Finset.sum_le_sum fun k hk => (show (b / d : ℝ) + 2 * avg (fun σ : V → ℤˣ =>
+      expList G.Dart t₁ (fun l₁ =>
+      (if CutMoved V₁ ε (signVec σ) (avgRun G (signVec σ) l₁) then 0 else 1) *
+        expList G.Dart k (fun p => #(badSet V₁ (thr V₁ ε (signVec σ))
+          (avgRun G (signVec σ) l₁) (avgRun G (avgRun G (signVec σ) l₁) p)) / N))) ≤
+      l2 / 2 + 2 * (4 / ε ^ 2 * (25 / 4 * (6 * (l2 / lam3 * LN)) + 11 * (l2 / lam3)) +
+        1 / Real.sqrt (N + 1) + 2 * (3 * (1 / N ^ 2 + 4 * (l2 / lam3)) / ε) * (1 + LN)) by
+    have e : (b / d : ℝ) = l2 / 2 := by rw [hl2_def]; ring
+    rw [e]; linarith [hA3 k hk])
+  rw [Finset.sum_const, Finset.card_range, nsmul_eq_mul] at hsum
+  have harith := lemma42_arith hn hLN1 hl3 hl3le hε0 hε1 hl2pos.le hcr hC hL1 hM'
+    (u := 1 / Real.sqrt (N + 1)) rfl
+  have hc0 : 0 ≤ 1 / (ε * N) := by positivity
+  have := mul_le_mul_of_nonneg_left hsum hc0
+  linarith
+
+end IsClusteredRegular
 
 end Averaging.Opportunistic
