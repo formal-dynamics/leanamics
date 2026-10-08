@@ -1,4 +1,5 @@
 import Undecided.MajorityStages
+import Undecided.SequentialMartingale
 
 /-! # Assembling the phases of the majority dynamics (UND-1)
 
@@ -48,17 +49,6 @@ lemma big_n {n : ℕ} (hL : (10000 : ℝ) ≤ log n) : 4000000 * log n ≤ (n : 
     mul_le_mul_of_nonneg_right h2 hL0
   nlinarith
 
-/-- `1 - G` passes through `expList`. -/
-lemma expList_one_sub {α : Type*} [Fintype α] [Nonempty α] (T : ℕ) (G : List α → ℝ) :
-    expList α T (fun l => 1 - G l) = 1 - expList α T G := by
-  have h := expList_add T (fun _ : List α => (1 : ℝ)) (fun l => -1 * G l)
-  rw [expList_const, expList_const_mul] at h
-  have e : (fun l => 1 - G l) = fun l => (fun _ : List α => (1 : ℝ)) l + -1 * G l := by
-    funext l
-    ring
-  rw [e, h]
-  ring
-
 variable {n : ℕ}
 
 /-- The probability that all nodes hold `a` is one minus the miss probability. -/
@@ -76,7 +66,7 @@ lemma prob_allA_eq [NeZero n] (T : ℕ) (x : Config n) :
     · rw [if_neg hl, if_neg (show l.foldl step x ∉ allA n from hl)]
       norm_num
   simp_rw [h]
-  rw [expList_one_sub]
+  rw [Sequential.expList_one_sub]
   rfl
 
 /-- **UND-1, explicit form.** If `log n ≥ 10⁴` and the `a`-nodes outnumber the `b`-nodes by at

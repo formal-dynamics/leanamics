@@ -91,6 +91,15 @@ lemma count_eq_sum (x : Config n) (o : Op) :
   push_cast
   rfl
 
+/-- The numbers of `a`-, `b`- and undecided nodes add up to `n`. -/
+lemma count_add (x : Config n) : (count x .a : ℝ) + count x .b + count x .u = n := by
+  rw [count_eq_sum, count_eq_sum, count_eq_sum, ← sum_add_distrib, ← sum_add_distrib]
+  have h (v : Fin n) : ((if x v = .a then (1 : ℝ) else 0) + (if x v = .b then 1 else 0)
+      + (if x v = .u then 1 else 0)) = 1 := by
+    cases x v <;> simp
+  rw [sum_congr rfl fun v _ => h v]
+  simp
+
 lemma indicator_step (x : Config n) (r : Fin n → Fin n) (v : Fin n) (o : Op) :
     (if step x r v = o then (1 : ℝ) else 0) =
       if update (x v) (x (r v)) = o then (1 : ℝ) else 0 := by
