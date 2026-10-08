@@ -68,32 +68,6 @@ variable {n k : ℕ}
 
 /-! ### Bookkeeping for one round -/
 
-lemma prob_mono_set {α : Type*} [Fintype α] (p : Distribution α) {A B : Set α} (h : A ⊆ B) :
-    p.prob (· ∈ A) ≤ p.prob (· ∈ B) := by
-  classical
-  unfold Distribution.prob
-  refine p.expect_mono fun a => ?_
-  by_cases ha : a ∈ A
-  · simp [ha, h ha]
-  · by_cases hb : a ∈ B <;> simp [ha, hb]
-
-/-- One round of 3-majority lands in `A` with probability at least
-`1 - 𝔼[bad]`, if every round that misses `A` is charged at least `1` by the
-nonnegative `bad`. -/
-lemma le_prob_step [NeZero n] (x : Config n k) (A : Set (Config n k)) (bad : Tgt3 n → ℝ)
-    (h0 : ∀ r, 0 ≤ bad r) (h1 : ∀ r, step x r ∉ A → 1 ≤ bad r) :
-    1 - avg bad ≤ ((kernel maj3) x).prob (· ∈ A) := by
-  rw [kernel, Dynamics.Kernel.prob_ofStep]
-  have e : 1 - avg bad = avg (fun r => 1 - bad r) := by rw [avg_sub, avg_const]
-  rw [e]
-  refine avg_le_avg fun r => ?_
-  by_cases hr : stepWith maj3 x r ∈ A
-  · simp only [hr, ↓reduceIte]
-    linarith [h0 r]
-  · have := h1 r hr
-    simp only [hr, ↓reduceIte]
-    linarith
-
 lemma ite_one_zero_nonneg (P : Prop) [Decidable P] : (0 : ℝ) ≤ if P then 1 else 0 := by
   split <;> norm_num
 
@@ -219,8 +193,8 @@ theorem sat_step [NeZero n] (hL : 40 ≤ Real.log n) (m : Fin k) (j : ℕ) {x : 
       rcases lt_max_iff.mp hx' with h | h
       · exact h
       · linarith
-    refine le_trans (by linarith) (le_prob_step x _ _ (fun r => ite_one_zero_nonneg _)
-      fun r hr => ?_)
+    refine le_trans (by linarith) (Kernel.one_sub_avg_le_prob_ofStep step _ x _
+      (fun r => ite_one_zero_nonneg _) fun r hr => ?_)
     split_ifs with h
     · exact le_rfl
     · exfalso
@@ -231,8 +205,8 @@ theorem sat_step [NeZero n] (hL : 40 ≤ Real.log n) (m : Fin k) (j : ℕ) {x : 
       push Not at h
       nlinarith
   · have h7 := (lemma_3_7_ii hL x hM (lt_of_not_ge hbig)).2
-    refine le_trans (by linarith) (le_prob_step x _ _ (fun r => ite_one_zero_nonneg _)
-      fun r hr => ?_)
+    refine le_trans (by linarith) (Kernel.one_sub_avg_le_prob_ofStep step _ x _
+      (fun r => ite_one_zero_nonneg _) fun r hr => ?_)
     split_ifs with h
     · exact le_rfl
     · exfalso
@@ -249,8 +223,8 @@ theorem mono_step [NeZero n] (hL : 40 ≤ Real.log n) (m : Fin k) {x : Config n 
   have hu3 : (n : ℝ) - count x m < n / 3 := lt_of_lt_of_le hx (quarter_log_le_third hL)
   obtain ⟨hM, _⟩ := of_dissent_lt x hu3
   have h7 := (lemma_3_7_ii hL x hM hx).1
-  refine le_trans (by linarith) (le_prob_step x _ _ (fun r => ite_one_zero_nonneg _)
-    fun r hr => ?_)
+  refine le_trans (by linarith) (Kernel.one_sub_avg_le_prob_ofStep step _ x _
+    (fun r => ite_one_zero_nonneg _) fun r hr => ?_)
   split_ifs with h
   · exact le_rfl
   · exfalso
@@ -265,7 +239,8 @@ theorem mono_step [NeZero n] (hL : 40 ≤ Real.log n) (m : Fin k) {x : Config n 
 
 lemma mono_stay [NeZero n] (m : Fin k) {x : Config n k} (hx : x ∈ monoSet n m) :
     1 ≤ ((kernel maj3) x).prob (· ∈ monoSet n m) := by
-  have h := le_prob_step x (monoSet n m) (fun _ => 0) (fun _ => le_rfl)
+  have h := Kernel.one_sub_avg_le_prob_ofStep step (· ∈ monoSet n m) x (fun _ => 0)
+    (fun _ => le_rfl)
     fun r hr => absurd (stepWith_mono maj3_mem hx r) hr
   rwa [avg_const, sub_zero] at h
 
@@ -333,7 +308,7 @@ theorem growth_step [NeZero n] (hL : 40 ≤ Real.log n) (hk : 2 ≤ k) (m : Fin 
     have h := sat_step hL m 0 hx0
     have hsub : satSet n m (0 + 1) ⊆ growthSet n m lam Λ (i + 1) := fun y hy =>
       satSet_zero_sub m lam Λ (i + 1) hL (satSet_succ_sub m 0 hy)
-    exact le_trans (by linarith) (h.trans (prob_mono_set _ hsub))
+    exact le_trans (by linarith) (h.trans (Distribution.prob_mono _ hsub))
   -- the growth regime of Lemma 3.5
   obtain ⟨hM, hcm, hs⟩ := hx.resolve_left hbig
   push Not at hbig
@@ -390,7 +365,7 @@ theorem growth_step [NeZero n] (hL : 40 ≤ Real.log n) (hk : 2 ≤ k) (m : Fin 
             mul_le_mul_of_nonneg_right h2 (by positivity)
         _ = 1 / n := by field_simp
     linarith [h35.2]
-  refine le_trans (by linarith) (le_prob_step x _ _
+  refine le_trans (by linarith) (Kernel.one_sub_avg_le_prob_ofStep step _ x _
     (fun r => add_nonneg (sum_nonneg fun j _ => ite_one_zero_nonneg _) (ite_one_zero_nonneg _))
     fun r hr => ?_)
   by_contra hlt
@@ -607,11 +582,11 @@ theorem theorem_3_8 (hL : 40 ≤ Real.log n) (hk : 2 ≤ k) {lam : ℝ} (hlam : 
       by_cases h1 : i ≤ T1
       · rw [hA1 _ h1] at ha ⊢
         have := growth_step hL hk m hlam hΛ (i - 1) ha
-        exact this.trans (prob_mono_set _ (growthSet_succ_sub m hlam0 (by linarith) _))
+        exact this.trans (Distribution.prob_mono _ (growthSet_succ_sub m hlam0 (by linarith) _))
       by_cases h2 : i ≤ T1 + T2
       · rw [hA2 _ (by omega) h2] at ha ⊢
         have := sat_step hL m _ ha
-        exact le_trans (by linarith) (this.trans (prob_mono_set _ (satSet_succ_sub m _)))
+        exact le_trans (by linarith) (this.trans (Distribution.prob_mono _ (satSet_succ_sub m _)))
       · rw [hA3 _ (by omega)] at ha ⊢
         have h0 : (0 : ℝ) ≤ 1 / n := by positivity
         linarith [mono_stay m ha])
@@ -627,7 +602,7 @@ theorem theorem_3_8 (hL : 40 ≤ Real.log n) (hk : 2 ≤ k) {lam : ℝ} (hlam : 
         have := growth_step hL hk m hlam hΛ (i - 1) ha
         rw [show i - 1 + 1 = T1 by omega] at this
         exact le_trans (by linarith)
-          (this.trans (prob_mono_set _ (growthSet_sub_of_lt m hgrow)))
+          (this.trans (Distribution.prob_mono _ (growthSet_sub_of_lt m hgrow)))
       by_cases h3 : i + 1 ≤ T1 + T2
       · rw [hA2 _ (by omega) h3, show i + 1 - T1 - 1 = (i - T1 - 1) + 1 by omega]
         rw [hA2 _ (by omega) (by omega)] at ha

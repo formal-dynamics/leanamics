@@ -19,16 +19,15 @@ A complete (`sorry`-free) Lean 4 + Mathlib formalization of the **3-majority opi
 
 Module structure (all under the `ThreeMajority` namespace, dependency order):
 
-- `Bounds.lean` — elementary real inequalities: a quadratically-tight lower bound on `log` near `1` (the crude `1 - 1/x ≤ log x` is *exactly* tangent at `x = 1` and so gives a useless `0` in the Chernoff exponent), `xᵏ/k! ≤ exp x`, and tangent-line bounds on `log` at an arbitrary reference point.
+- `Bounds.lean` — elementary real inequalities: a quadratically-tight lower bound on `log` near `1` (the crude `1 - 1/x ≤ log x` is *exactly* tangent at `x = 1` and so gives a useless `0` in the Chernoff exponent), `x³/6 ≤ exp x` (the general `xᵏ/k! ≤ exp x` is Mathlib's `Real.pow_div_factorial_le_exp`), and tangent-line bounds on `log` at an arbitrary reference point.
 - `Prob.lean` — compatibility layer: keeps the `ThreeMajority` names `avg` (sum / cardinality) and `expList α T F` (expectation over `T` i.i.d. uniform draws, defined by recursion on `T`) together with their laws, each stated as an alias of the corresponding declaration in the shared `Dynamics.Uniform` (package `../dynamics`), which now owns the finite uniform probability layer including `avg_prod_pi`, the independence fact for products over distinct coordinates.
 - `Model.lean` — round configurations `Tgt3 n := Fin n → Fin n × Fin n × Fin n`, the `step`/`run` dynamics, and `step_mono` (monotone in `I` for fixed `r`).
-- `Chernoff.lean` — the exponential-moment bound `𝔼[exp(tX)] ≤ exp(μ(eᵗ-1))` and the closed-form tail bounds at the optimal `t = log(k/μ)`, from `1 + x ≤ exp x` plus `avg_prod_pi`.
 - `OneRound.lean` — the exact cubic majority map `p(x) = 3x² - 2x³` (`avg_card_step`), via `maj(a,b,c) = ab+bc+ac-2abc` on `{0,1}`, plus the per-agent `{0,1}` decomposition `Y_maj` that the Chernoff bounds consume.
 - `Growth.lean` — bias amplification by `≥ 5/4` per round while the opinion-`1` fraction is in `[3/5, 3/4]`; `10` rounds get past `3/4`.
 - `Saturation.lean` — three stages taking the dissent count `U_t` from `≤ n/4` to exactly `0` (geometric descent over `T2a n = ⌈6 log n⌉` rounds to a `Θ(log n)` floor; one round to a fixed constant `10`; one Markov step to `0`).
 - `Main.lean` — glues growth to saturation via the `expList`-conditioning idiom and states the main theorem.
 
-Design constraint to preserve: **no measure theory, no `PMF`/`ENNReal`, no martingales**, and no appeal to Mathlib's `ProbabilityTheory` library — everything is finite uniform sums. Unlike the sibling `rumor_spread`, a Chernoff bound *is* required (the opinion count is not monotone in the round index, so no "good rounds" counting argument is available), but it is proved from scratch in `Chernoff.lean` rather than imported.
+Design constraint to preserve: **no measure theory, no `PMF`/`ENNReal`, no martingales**, and no appeal to Mathlib's `ProbabilityTheory` library — everything is finite uniform sums. Unlike the sibling `rumor_spread`, a Chernoff bound *is* required (the opinion count is not monotone in the round index, so no "good rounds" counting argument is available), and it comes from the shared `dynamics` package: `Dynamics/Chernoff.lean` proves the exponential-moment bound `𝔼[exp(tX)] ≤ exp(μ(eᵗ-1))` and the closed-form tails at the optimal `t = log(k/μ)` (`Dynamics.avg_chernoff_*`) from scratch, from `1 + x ≤ exp x` plus `avg_prod_pi`; `Dynamics/Tail.lean` has the Markov step `avg_markov_one`.
 
 Toolchain is pinned in [lean-toolchain](lean-toolchain); the dependencies are Mathlib, `checkdecls` and the path package `../dynamics` (see [lakefile.toml](lakefile.toml)).
 

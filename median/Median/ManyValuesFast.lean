@@ -37,7 +37,7 @@ lemma bernstein_move (hL : (128 : ℝ) ≤ log n) {τ : ℝ} (hτ : 512 * log n 
   have hs0 : 0 < s := by linarith only [hsdef, hμ0]
   have hvar : ∑ v, variance (fcoord y v) ≤ s := by
     have h1 : ∑ v, variance (fcoord y v) ≤ ∑ v, avg (fcoord y v) :=
-      Finset.sum_le_sum fun v _ => variance_fcoord_le y v
+      Finset.sum_le_sum fun v _ => variance_le_avg_of_zero_one (fcoord_zero_one y v)
     linarith only [h1, hsdef]
   have hd0 : 0 ≤ d := by linarith only [hddef, hμ, hτ0]
   have hd4 : τ / 4 ≤ d := by linarith only [hddef, hμ]
@@ -65,7 +65,10 @@ lemma bernstein_move (hL : (128 : ℝ) ≤ log n) {τ : ℝ} (hτ : 512 * log n 
     have hr' : ¬ (falsesR (step y r) < τ) := hr
     have hadd : ∑ v, avg (fcoord y v) + d = τ := by rw [hddef]; ring
     rw [hadd, if_pos (le_of_not_gt hr')]
-  have hstep := prob_step_ge y _ _ h0 h1
+  have hstep : 1 - avg (fun r : Round n =>
+      if ∑ v, avg (fcoord y v) + d ≤ falsesR (step y r) then (1 : ℝ) else 0)
+      ≤ (Median.kernel n Bool y).prob (· ∈ satSet n τ) :=
+    Kernel.one_sub_avg_le_prob_ofStep step _ y _ h0 h1
   linarith only [hstep, hbad, hexp, exp_neg_two_log hn]
 
 /-- **Quadratic saturation move.** From a minority below `t`, one round lands in

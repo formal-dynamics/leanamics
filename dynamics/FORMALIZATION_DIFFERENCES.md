@@ -31,11 +31,9 @@ Where the statements of `dynamics/` deviate from their sources, and why.
    `Environment.contains`; the reducible abbreviation keeps the name and removes the copy. The
    23 `ThreeMajority.avg_*`/`expList_*` wrappers stay (one-line proofs by the `Dynamics`
    lemmas, tagged in the blueprint, needed by `rw` on `ThreeMajority.avg` terms).
-9. **Not yet consolidated:** the concentration bounds and the generic lemmas re-proved in
-    median, moran, voter, undecided. The unification covered `dynamics/`, `rumor_spread/`,
-    `3-majority/`, `plurality/`; those packages' remaining copies (`Plurality.prob_mono_set`, `le_prob_step`, `chernoff_lower`, `markov_one`,
-    `avg_prod_iter`, `avg_eval_two`, the 3-majority Chernoff file) were left for follow-up
-    work.
+9. **Not yet consolidated:** a few generic lemmas re-proved in moran, voter and undecided
+   (see the section on tail bounds below), and the single-copy independence lemmas
+   `Plurality.avg_prod_iter`, `Plurality.avg_eval_two`.
 
 ## Chernoff bounds for independent Bernoulli trials (`Chernoff`, FND-3)
 
@@ -178,3 +176,48 @@ FND-7:
     applications; `log_{c₁}(c₄ log q) ≤ c₄ log q / log c₁` is absorbed into the constant.
 12. `hitProb` is a thin wrapper over the existing `Kernel.trajectory` (expectation of a path
     indicator); no new expectation, probability or distribution notion is introduced.
+
+## Concentration and tail bounds shared by the packages (`Concentration`, `Chernoff`, `Tail`)
+
+The tail bounds that `median/`, `plurality/` and `3-majority/` used to prove locally are stated
+once here; the packages call them directly (the old package names, e.g.
+`ThreeMajority.avg_tail_ge_log` or `Plurality.chernoff_lower`, are removed rather than kept as
+aliases, and the package blueprints tag the `Dynamics` names).
+
+1. **No paper numbering.** As for the rest of the library, the docstrings cite the textbook
+   statements (Dubhashi–Panconesi, Theorem 1.1; Mitzenmacher–Upfal, Theorems 4.4 and 4.5) and
+   the package lemmas and blueprint labels (`lem:tails`, `lem:mgf`, `lem:chernoff`,
+   `lem:chernofflog`) that a statement replaces.
+2. **`{0,1}`-valued coordinates.** The MGF bound and Hoeffding's inequality also hold for
+   `[0,1]`-valued coordinates (convexity of `exp`), but every caller has `{0,1}` coordinates
+   and `avg_hoeffding` uses the same hypothesis.
+3. **Two families of uniform-round Chernoff bounds.** `avg_chernoff_upper`/`avg_chernoff_lower`
+   (FND-3, above) are the optimized bounds at `(1 ± δ)μ`. The 3-majority proofs need the
+   bounds before `t` is optimized and at an arbitrary threshold `k`: these are
+   `avg_chernoff_upper_of_mgf`/`avg_chernoff_lower_of_mgf` (free parameter `t`) and
+   `avg_chernoff_upper_log`/`avg_chernoff_lower_log` (`P(X ≥ k)`, `P(X ≤ k)` at most
+   `exp(k - μ - k log(k/μ))`, with `μ` any upper, respectively lower, bound on the mean). They
+   are stated for `ω : Fin n → γ`, the index type of their callers. The exact-mean forms
+   (`μ = 𝔼X`) are not separate declarations.
+4. **`avg_chernoff_lower_mul`** is `avg_chernoff_lower` at the exact mean, extended to `δ = 0`
+   (where the bound is `1`), which is the form `Plurality.chernoff_lower` had.
+5. **`avg_markov_one` assumes `0 ≤ Yᵢ`, not `Yᵢ ∈ {0,1}`**: Markov's inequality needs only
+   nonnegativity.
+6. **No `[Nonempty γ]`** in `avg_chernoff_mgf`, `avg_chernoff_lower_mul` and
+   `variance_le_avg_of_zero_one`: the statements are true on an empty type (the averages
+   vanish). `avg_hoeffding_lower` keeps it, as `avg_hoeffding` does.
+7. **Predicates rather than sets** in `Distribution.prob_mono` and
+   `Kernel.one_sub_avg_le_prob_ofStep`, matching `Distribution.prob` and `Kernel.prob_ofStep`.
+   Since the hypothesis of `prob_mono` is strict-implicit, a set inclusion `A ⊆ B` is accepted
+   for the events `(· ∈ A)`, `(· ∈ B)`.
+8. **Two monotonicity statements**: `Kernel.iterate_monotone` (a subharmonic observable,
+   `f ≤ K f`, has nondecreasing iterates) and its absorbing-event form
+   `Kernel.event_monotone`. `Kernel.iSup_event_of_invariant` (`OptionalStopping`) proves the
+   same monotonicity for its own use.
+9. **Mathlib instead of new lemmas** where Mathlib states the fact: `xᵏ/k! ≤ eˣ` is
+   `Real.pow_div_factorial_le_exp` and `(q - 1)/q ≤ log q` is `Real.one_sub_inv_le_log_of_pos`.
+   The conversions `exp_neg_two_log` and `one_le_of_log_pos` (for `n : ℕ`) are new.
+10. **Copies left in other packages**: `Moran.expect_lt_one` and `Voter.expect_lt_one` have the
+    statement of `Distribution.expect_lt_one`, `Undecided.avg_lt_one` that of `avg_lt_one`, and
+    `Voter.colorProbability_mono` re-proves `Kernel.iterate_monotone` for its indicator; they
+    can be replaced by the shared versions.

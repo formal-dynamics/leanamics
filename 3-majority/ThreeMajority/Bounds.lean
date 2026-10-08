@@ -13,8 +13,8 @@ development, none requiring calculus/derivatives:
   needed is a bound strictly below `0`. This derives a genuinely
   quadratic-tight lower bound on `log` near `1`, from Mathlib's degree-`3`
   Taylor lower bound for `exp` (`Real.sum_le_exp_of_nonneg`).
-* `exp_ge_pow` (with `exp_ge_cube` as its `k = 3` special case): `xᵏ/k! ≤
-  exp x` for any degree `k`, the single-term generalization of the same
+* Mathlib's `Real.pow_div_factorial_le_exp` (with `exp_ge_cube` as its `k = 3` special
+  case): `xᵏ/k! ≤ exp x` for any degree `k`, the single-term generalization of the same
   Taylor truncation. Picking `k` large enough relative to a given lower
   bound on `log n` is what keeps that bound modest (Stage 2b,
   `saturation_stage2b`) instead of astronomically large.
@@ -22,7 +22,7 @@ development, none requiring calculus/derivatives:
   tangent-line bound on `log` at an arbitrary reference point `c` (tight at
   `L = c`, unlike a bound tangent at a single fixed point), instantiated at
   `c = exp 3 ≥ 20` to bound `log log n` far more tightly than tangenting at
-  `c = e` would — the second ingredient (besides `exp_ge_pow`) that keeps
+  `c = e` would — the second ingredient (besides `Real.pow_div_factorial_le_exp`) that keeps
   `saturation_stage2b`'s threshold on `log n` modest.
 -/
 
@@ -56,27 +56,10 @@ lemma log_ge_quadratic {x : ℝ} (hx0 : (1 : ℝ) / 2 ≤ x) (hx1 : x ≤ 1) :
   have heq : -(t + t ^ 2) = (x - 1) - (x - 1) ^ 2 := by rw [ht]; ring
   linarith [heq ▸ h5]
 
-/-- **Exponential beats any fixed power**: `xᵏ/k! ≤ exp x` for `x ≥ 0`, the
-single degree-`k` term of the Taylor series (`Real.sum_le_exp_of_nonneg`),
-extracted by dropping every other (nonnegative, since `x ≥ 0`) term of the
-sum. Lets `n` be shown astronomically larger than any fixed polynomial in
-`log n` using only a *modest* lower bound on `log n`, by picking `k` large
-enough relative to that bound (unlike a single fixed low-degree truncation
-such as the cubic case `k = 3`, which forces `log n` itself to be
-enormous). -/
-lemma exp_ge_pow {x : ℝ} (hx : 0 ≤ x) (k : ℕ) : x ^ k / k.factorial ≤ Real.exp x := by
-  have h := Real.sum_le_exp_of_nonneg hx (k + 1)
-  have hsplit : ∑ i ∈ Finset.range (k + 1), x ^ i / (i.factorial : ℝ)
-      = (∑ i ∈ Finset.range k, x ^ i / (i.factorial : ℝ)) + x ^ k / (k.factorial : ℝ) :=
-    Finset.sum_range_succ _ k
-  have hnonneg : (0 : ℝ) ≤ ∑ i ∈ Finset.range k, x ^ i / (i.factorial : ℝ) :=
-    Finset.sum_nonneg fun i _ => by positivity
-  linarith [h, hsplit, hnonneg]
-
 /-- **Exponential beats cubic**: `x³/6 ≤ exp x` for `x ≥ 0`. Special case of
-`exp_ge_pow` at `k = 3`. -/
+Mathlib's `Real.pow_div_factorial_le_exp` at `k = 3`. -/
 lemma exp_ge_cube {x : ℝ} (hx : 0 ≤ x) : x ^ 3 / 6 ≤ Real.exp x := by
-  have h := exp_ge_pow hx 3
+  have h := Real.pow_div_factorial_le_exp _ hx 3
   norm_num at h
   linarith
 
