@@ -1,5 +1,5 @@
 import ThreeMajority.OneRound
-import ThreeMajority.Chernoff
+import Dynamics.Tail
 import ThreeMajority.Growth
 
 /-!
@@ -66,7 +66,7 @@ lemma saturation_round_closed (hn : 1 ≤ n) (I : Finset (Fin n)) {M k : ℝ}
       _ = (5 / 8) * ((n:ℝ) * (1 - x)) := by ring
       _ ≤ (5 / 8) * M := by nlinarith [hnx]
       _ = μub := hμub.symm
-  have hbound := avg_tail_ge_log_le (Y_dis I) (Y_dis_zero_one I) hμ hμub0 hkM
+  have hbound := Dynamics.avg_chernoff_upper_log (Y_dis I) (Y_dis_zero_one I) hμ hμub0 hkM
   rw [show (fun x : Fin n → Fin n × Fin n × Fin n =>
         if k ≤ ∑ i, Y_dis I i (x i) then (1 : ℝ) else 0)
       = fun r : Tgt3 n => if k ≤ (n : ℝ) - ((step I r).card : ℝ) then (1 : ℝ) else 0
@@ -84,7 +84,7 @@ lemma saturation_round_generic (_hn : 1 ≤ n) (I : Finset (Fin n)) {μub k : �
     (hμ : ∑ v : Fin n, avg (Y_dis I v) ≤ μub) :
     avg (fun r : Tgt3 n => if k ≤ (n : ℝ) - ((step I r).card : ℝ) then (1 : ℝ) else 0)
       ≤ Real.exp (k - μub - k * Real.log (k / μub)) := by
-  have hbound := avg_tail_ge_log_le (Y_dis I) (Y_dis_zero_one I) hμ hμub0 hkμ
+  have hbound := Dynamics.avg_chernoff_upper_log (Y_dis I) (Y_dis_zero_one I) hμ hμub0 hkμ
   rw [show (fun x : Fin n → Fin n × Fin n × Fin n =>
         if k ≤ ∑ i, Y_dis I i (x i) then (1 : ℝ) else 0)
       = fun r : Tgt3 n => if k ≤ (n : ℝ) - ((step I r).card : ℝ) then (1 : ℝ) else 0
@@ -359,7 +359,7 @@ lemma saturation_stage2a (hn2 : 2 ≤ n) (hfloor4 : 500 * Real.log n ≤ (n : �
 the *fixed* constant `10`. Requires `log n` to be moderately large
 (`≥ 30` suffices) — not because the bound is delicate, but because `μ`
 (the true mean, `Θ((log n)²/n)`) must beat the *polynomial-in-`log n`*
-target `10`; a degree-`11` Taylor lower bound on `exp` (`exp_ge_pow`),
+target `10`; a degree-`11` Taylor lower bound on `exp` (`Real.pow_div_factorial_le_exp`),
 combined with the tangent-line log-log bound `log_log_le_of_pos` (far
 tighter, near `log n ≈ 30`, than a bound tangent at the fixed point `e`),
 already secures this once `log n ≥ 30` (a low-degree bound such as the
@@ -380,7 +380,7 @@ lemma saturation_stage2b (hbig : (30 : ℝ) ≤ Real.log n)
   have hμ := saturation_mean_quad hn1 I hM0 hUI
   set μub : ℝ := 3 * M ^ 2 / n with hμubdef
   have hn_ge_pow : L ^ 11 / (Nat.factorial 11 : ℝ) ≤ (n : ℝ) := by
-    have h := exp_ge_pow hL0.le 11; rwa [← hn_eq] at h
+    have h := Real.pow_div_factorial_le_exp _ hL0.le 11; rwa [← hn_eq] at h
   have hL9 : (30 : ℝ) ^ 9 ≤ L ^ 9 := pow_le_pow_left₀ (by norm_num) hbig 9
   have hμub_le9 : μub ≤ 9 := by
     rw [hμubdef, hMdef, div_le_iff₀ hn0]
@@ -418,24 +418,15 @@ lemma saturation_stage2c (hn1 : 1 ≤ n) (I : Finset (Fin n))
     (hUI : (n : ℝ) - I.card ≤ 10) :
     avg (fun r : Tgt3 n => if (1 : ℝ) ≤ (n : ℝ) - ((step I r).card : ℝ) then (1 : ℝ) else 0)
       ≤ 300 / n := by
-  haveI : Nonempty (Fin n) := ⟨⟨0, hn1⟩⟩
   have hmean := saturation_mean_quad hn1 I (by norm_num : (0:ℝ) ≤ 10) hUI
   have hmean_eq : (3:ℝ) * 10 ^ 2 / n = 300 / n := by ring
   rw [hmean_eq] at hmean
-  have hpt : ∀ r : Tgt3 n,
-      (if (1 : ℝ) ≤ (n : ℝ) - ((step I r).card : ℝ) then (1 : ℝ) else 0)
-        ≤ (n : ℝ) - ((step I r).card : ℝ) := by
-    intro r
-    have hcard_le : ((step I r).card : ℝ) ≤ n := by exact_mod_cast card_step_le I r
-    split_ifs with h <;> linarith
+  have hnonneg (v : Fin n) (t : Fin n × Fin n × Fin n) : 0 ≤ Y_dis I v t := by
+    rcases Y_dis_zero_one I v t with h | h <;> simp [h]
   calc avg (fun r : Tgt3 n => if (1 : ℝ) ≤ (n : ℝ) - ((step I r).card : ℝ) then (1 : ℝ) else 0)
-      ≤ avg (fun r : Tgt3 n => (n : ℝ) - ((step I r).card : ℝ)) := avg_le_avg hpt
-    _ = ∑ v : Fin n, avg (Y_dis I v) := by
-        rw [show (fun r : Tgt3 n => (n : ℝ) - ((step I r).card : ℝ))
-            = fun r : Tgt3 n => ∑ v : Fin n, Y_dis I v (r v) from funext (card_dissent_eq_sum I)]
-        rw [avg_sum]
-        refine Finset.sum_congr rfl fun v _ => ?_
-        exact avg_eval n v (Y_dis I v)
+      = avg (fun r : Tgt3 n => if (1 : ℝ) ≤ ∑ v, Y_dis I v (r v) then (1 : ℝ) else 0) := by
+        simp only [card_dissent_eq_sum I]
+    _ ≤ ∑ v : Fin n, avg (Y_dis I v) := Dynamics.avg_markov_one (Y_dis I) hnonneg
     _ ≤ 300 / n := hmean
 
 end ThreeMajority

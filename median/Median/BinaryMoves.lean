@@ -18,11 +18,10 @@ one-round phase moves, each with failure probability at most `n⁻²`
 * **Consensus** `consSet`: from `{m < β}`, one round reaches consensus except
   with probability `n^{-1/2}` (`mono_move`, Markov: `𝔼[m'] ≤ 3β²/n ≤ n^{-1/2}`).
 
-This file is a copy of `Median/BinaryPhases.lean` (whose `sat_move` exceeds the
-default elaboration budget because its `nlinarith` calls carry the full
-`∑ v, avg (fcoord x v)` terms); here the same proof goes through opaque
-abbreviations for those sums, which keeps every tactic small. Only `sat_move`
-differs from `BinaryPhases.lean`.
+`sat_move` goes through opaque abbreviations for the sums `∑ v, avg (fcoord x v)`,
+which keeps every tactic within the default elaboration budget. The generic probability
+facts (monotonicity of `prob`, the one-round bound `1 - 𝔼[bad]`, absorbing events, the
+`log n` conversions) come from `Dynamics.Tail`.
 -/
 
 namespace Median
@@ -30,34 +29,6 @@ namespace Median
 open Finset Real Dynamics
 
 /-! ### Scalar numerics -/
-
-/-- **The exponential beats any fixed power**: `xᵏ/k! ≤ exp x` for `x ≥ 0`, the
-single degree-`k` term of the Taylor series. -/
-lemma exp_ge_pow' {x : ℝ} (hx : 0 ≤ x) (k : ℕ) : x ^ k / k.factorial ≤ exp x := by
-  have h := Real.sum_le_exp_of_nonneg hx (k + 1)
-  have hsplit : ∑ i ∈ Finset.range (k + 1), x ^ i / (i.factorial : ℝ)
-      = (∑ i ∈ Finset.range k, x ^ i / (i.factorial : ℝ)) + x ^ k / (k.factorial : ℝ) :=
-    Finset.sum_range_succ _ k
-  have hnonneg : (0 : ℝ) ≤ ∑ i ∈ Finset.range k, x ^ i / (i.factorial : ℝ) :=
-    Finset.sum_nonneg fun i _ => by positivity
-  linarith [h, hsplit, hnonneg]
-
-/-- `(q - 1)/q ≤ log q` for `0 < q` (tangent at `1`). -/
-lemma sub_one_div_le_log' {q : ℝ} (hq : 0 < q) : (q - 1) / q ≤ log q := by
-  have h := log_le_sub_one_of_pos (inv_pos.mpr hq)
-  rw [log_inv] at h
-  have e : (q - 1) / q = 1 - q⁻¹ := by field_simp
-  linarith
-
-lemma exp_neg_two_log {n : ℕ} (hn : 1 ≤ n) : exp (-(2 * log n)) = 1 / (n : ℝ) ^ 2 := by
-  have hn0 : (0 : ℝ) < n := by exact_mod_cast hn
-  rw [exp_neg, show 2 * log n = log ((n : ℝ) ^ 2) by
-    rw [log_pow]; norm_num, exp_log (by positivity), one_div]
-
-lemma one_le_of_log_pos {n : ℕ} (h : 0 < log n) : 1 ≤ n := by
-  rcases n with _ | n
-  · simp at h
-  · omega
 
 /-- `log n ≥ 128` already forces `n ≥ 2`. -/
 lemma two_le_of_log {n : ℕ} (hL : (128 : ℝ) ≤ log n) : 2 ≤ n := by
@@ -76,7 +47,8 @@ lemma big_log_le {n : ℕ} (hL : (128 : ℝ) ≤ log n) : 2 ^ 20 * log n ≤ (n 
   have hn0 : (0 : ℝ) < n := by exact_mod_cast hn
   have hL0 : 0 ≤ log n := hL.trans' (by norm_num)
   have h8 : (log n) ^ 8 / 40320 ≤ (n : ℝ) := by
-    have h := exp_ge_pow' (Real.log_nonneg (show (1 : ℝ) ≤ n by exact_mod_cast hn)) 8
+    have h := Real.pow_div_factorial_le_exp _
+      (Real.log_nonneg (show (1 : ℝ) ≤ n by exact_mod_cast hn)) 8
     have h8 : ((8 : ℕ).factorial : ℝ) = 40320 := by rfl
     rw [h8] at h
     rwa [exp_log hn0] at h
@@ -94,21 +66,19 @@ lemma big_log_le {n : ℕ} (hL : (128 : ℝ) ≤ log n) : 2 ^ 20 * log n ≤ (n 
 
 /-- `log (5/4) ≥ 1/5`. -/
 lemma log_five_fourth_ge : 1 / 5 ≤ log ((5 : ℝ) / 4) := by
-  have h := sub_one_div_le_log' (show (0 : ℝ) < 5 / 4 by norm_num)
-  norm_num at h
-  exact h
+  calc (1 : ℝ) / 5 = 1 - (((5 : ℝ) / 4))⁻¹ := by norm_num
+    _ ≤ log ((5 : ℝ) / 4) := Real.one_sub_inv_le_log_of_pos (by norm_num)
 
 /-- `log (8/7) ≥ 1/8`. -/
 lemma log_eight_seventh_ge : 1 / 8 ≤ log ((8 : ℝ) / 7) := by
-  have h := sub_one_div_le_log' (show (0 : ℝ) < 8 / 7 by norm_num)
-  norm_num at h
-  exact h
+  calc (1 : ℝ) / 8 = 1 - (((8 : ℝ) / 7))⁻¹ := by norm_num
+    _ ≤ log ((8 : ℝ) / 7) := Real.one_sub_inv_le_log_of_pos (by norm_num)
 
 /-- With `log n ≥ 128`, `3 (512 log n)² ≤ exp (log n / 2)`. -/
 lemma markov_exp {n : ℕ} (hL : (128 : ℝ) ≤ log n) :
     3 * (512 * log n) ^ 2 ≤ exp (log n / 2) := by
   have hL0 : 0 ≤ log n := hL.trans' (by norm_num)
-  have h := exp_ge_pow' (show 0 ≤ log n / 2 by linarith) 12
+  have h := Real.pow_div_factorial_le_exp _ (show 0 ≤ log n / 2 by linarith) 12
   have h12 : ((12 : ℕ).factorial : ℝ) = 479001600 := by rfl
   rw [h12] at h
   have hL12 : (log n / 2) ^ 12 = (log n) ^ 12 / 4096 := by
@@ -172,35 +142,8 @@ lemma falsesR_pos {x : Config n Bool} (h : x ≠ (fun _ => true)) : 1 ≤ falses
     rw [← cast_nat_sub x]
     exact_mod_cast h3
 
-/-- Monotonicity of the probability in the event. -/
-lemma prob_mono_set' {α : Type*} [Fintype α] (p : Distribution α) {A B : Set α}
-    (h : A ⊆ B) : p.prob (· ∈ A) ≤ p.prob (· ∈ B) := by
-  classical
-  unfold Distribution.prob
-  refine p.expect_mono fun a => ?_
-  by_cases ha : a ∈ A
-  · simp [ha, h ha]
-  · by_cases hb : a ∈ B <;> simp [ha, hb]
-
 lemma kernel_eq : Median.kernel n Bool
     = Dynamics.Kernel.ofStep (Median.step (n := n) (α := Bool)) := rfl
-
-/-- One round lands in `A` with probability at least `1 - 𝔼[bad]`, where the
-nonnegative `bad` charges every round that misses `A` by at least `1`. -/
-lemma prob_step_ge (x : Config n Bool) (A : Set (Config n Bool)) (bad : Round n → ℝ)
-    (h0 : ∀ r, 0 ≤ bad r) (h1 : ∀ r, step x r ∉ A → 1 ≤ bad r) :
-    1 - avg bad ≤ (Median.kernel n Bool x).prob (· ∈ A) := by
-  rw [kernel_eq, Dynamics.Kernel.prob_ofStep]
-  have e : (1 : ℝ) - avg bad = avg (fun r : Round n => 1 - bad r) := by
-    rw [avg_sub, avg_const]
-  rw [e]
-  refine avg_le_avg fun r => ?_
-  by_cases hr : step x r ∈ A
-  · simp only [hr, ↓reduceIte]
-    linarith [h0 r]
-  · have hb := h1 r hr
-    simp only [hr, ↓reduceIte]
-    linarith
 
 /-- Consensus: every node holds `true`. -/
 def consSet : Set (Config n Bool) := {x | x = (fun _ => true)}
@@ -226,72 +169,6 @@ lemma cons_absorb {y : Config n Bool} (hy : y ∈ consSet) :
     funext r
     exact if_pos (mem_consSet.mpr (step_cons (mem_consSet.mp hy) r))
   rw [hfun, avg_const]
-
-/-- The occupation probability of an absorbing event is nondecreasing in time. -/
-lemma event_absorb_mono {α : Type*} [Fintype α] {K : Dynamics.Kernel α} {P : α → Prop}
-    (habs : ∀ a, P a → (K a).prob P = 1) :
-    ∀ (T₁ T₂ : ℕ) (a : α), T₁ ≤ T₂ → K.event P T₁ a ≤ K.event P T₂ a := by
-  classical
-  have hnonneg : ∀ (T : ℕ) (b : α), 0 ≤ K.event P T b := by
-    intro T b
-    simp only [Dynamics.Kernel.event]
-    exact Dynamics.Kernel.iterate_nonneg _ T (fun c => by split <;> norm_num) b
-  have hone : ∀ (T : ℕ) (b : α), P b → K.event P T b = 1 := by
-    intro T
-    induction T with
-    | zero =>
-      intro b hb
-      simp only [Dynamics.Kernel.event, Dynamics.Kernel.iterate_zero]
-      simp [hb]
-    | succ T ih =>
-      intro b hb
-      have hrw : K.event P (T + 1) b = (K b).expect (K.event P T) := rfl
-      rw [hrw]
-      have hlow : (K b).expect (fun c => if P c then (1 : ℝ) else 0)
-          ≤ (K b).expect (K.event P T) := by
-        refine (K b).expect_mono fun c => ?_
-        by_cases hc : P c
-        · rw [ih c hc]
-          simp [hc]
-        · simp only [hc, ↓reduceIte]
-          exact hnonneg T c
-      have hhigh : (K b).expect (K.event P T) ≤ (K b).expect (fun _ : α => (1 : ℝ)) := by
-        refine (K b).expect_mono fun c => ?_
-        have h1 : K.event P T c ≤ 1 := by
-          simp only [Dynamics.Kernel.event]
-          exact Dynamics.Kernel.iterate_le_one _ T (fun c => by split <;> norm_num) c
-        exact h1
-      have hconst : (K b).expect (fun _ : α => (1 : ℝ)) = 1 := (K b).expect_const 1
-      rw [hconst] at hhigh
-      have hprob : (K b).expect (fun c => if P c then (1 : ℝ) else 0) = (K b).prob P := rfl
-      rw [hprob, habs b hb] at hlow
-      linarith
-  have hmono : ∀ (T : ℕ) (a : α), K.event P T a ≤ K.event P (T + 1) a := by
-    intro T
-    induction T with
-    | zero =>
-      intro a
-      by_cases ha : P a
-      · rw [hone 0 a ha, hone 1 a ha]
-      · have hz : K.event P 0 a = 0 := by
-          simp only [Dynamics.Kernel.event, Dynamics.Kernel.iterate_zero]
-          simp [ha]
-        rw [hz]
-        exact hnonneg 1 a
-    | succ T ih =>
-      intro a
-      have hrw : K.event P (T + 1 + 1) a = (K a).expect (K.event P (T + 1)) := rfl
-      rw [hrw]
-      exact (K a).expect_mono ih
-  intro T₁ T₂ a hle
-  obtain ⟨d, rfl⟩ : ∃ d, T₂ = T₁ + d := ⟨T₂ - T₁, by omega⟩
-  clear hle
-  induction d with
-  | zero => simp
-  | succ d ih =>
-    have hstep : K.event P (T₁ + d + 1) a = K.event P (T₁ + (d + 1)) a := by
-      rw [Nat.add_assoc]
-    exact le_trans (le_trans ih (hmono (T₁ + d) a)) hstep.le
 
 /-- Kernel occupation probabilities of the all-`true` event are expectations
 over lists of rounds. -/
@@ -451,7 +328,7 @@ lemma growth_move_small (hL : (128 : ℝ) ≤ log n) {x : Config n Bool}
       if ∑ v, avg (fcoord x v) + ((n : ℝ) / 4 - ∑ v, avg (fcoord x v))
           ≤ falsesR (step x r) then (1 : ℝ) else 0)
       ≤ (Median.kernel n Bool x).prob (· ∈ satSet n ((n : ℝ) / 4)) :=
-    prob_step_ge x _ _ h0 h1
+    Kernel.one_sub_avg_le_prob_ofStep step _ x _ h0 h1
   have hfin := exp_le_inv_sq hn hkey
   linarith
 
@@ -511,7 +388,7 @@ lemma growth_move_big (hL : (128 : ℝ) ≤ log n) {G : ℝ} (hG0 : 0 ≤ G)
   have hstep : 1 - avg (fun r : Round n =>
       if (ones (step x r) : ℝ) + G / 16 ≤ ∑ v, avg (coord x v) then (1 : ℝ) else 0)
       ≤ (Median.kernel n Bool x).prob (· ∈ growthSet n ((5 / 4) * G)) :=
-    prob_step_ge x _ _ h0 h1
+    Kernel.one_sub_avg_le_prob_ofStep step _ x _ h0 h1
   have hfin := exp_le_inv_sq hn hkey
   linarith
 
@@ -527,11 +404,11 @@ lemma growth_move (hL : (128 : ℝ) ≤ log n) {G : ℝ} (hG0 : 0 ≤ G)
   have hsub : satSet n ((n : ℝ) / 4) ⊆ growthSet n ((5 / 4) * G) :=
     fun y hy => mem_growthSet.mpr (Or.inl (mem_satSet.mp hy))
   rcases mem_growthSet.mp hx with hm | hg
-  · exact le_trans (growth_move_small hL hm) (prob_mono_set' _ hsub)
+  · exact le_trans (growth_move_small hL hm) (Distribution.prob_mono _ hsub)
   · by_cases hm4 : (n : ℝ) / 4 ≤ falsesR x
     · exact growth_move_big hL hG0 hG2 hm4 hg
     · push Not at hm4
-      exact le_trans (growth_move_small hL hm4) (prob_mono_set' _ hsub)
+      exact le_trans (growth_move_small hL hm4) (Distribution.prob_mono _ hsub)
 
 /-- One round of the saturation phase: from a minority below `t ≤ n/4` the
 minority drops below `max ((7/8) t) β` except with probability `1/n²`, where
@@ -559,7 +436,7 @@ lemma sat_move (hL : (128 : ℝ) ≤ log n) {t : ℝ} (_ht0 : 0 ≤ t) (htn : t 
   have hvar : ∑ v, variance (fcoord x v) ≤ s := by
     rw [hsdef]
     have h1 : ∑ v, variance (fcoord x v) ≤ ∑ v, avg (fcoord x v) :=
-      Finset.sum_le_sum fun v _ => variance_fcoord_le x v
+      Finset.sum_le_sum fun v _ => variance_le_avg_of_zero_one (fcoord_zero_one x v)
     linarith
   have hden_eq : ∀ d : ℝ, 0 ≤ d → 2 * s * (1 + d / (3 * s)) = 2 * s + 2 * d / 3 := by
     intro d _hd0
@@ -624,7 +501,7 @@ lemma sat_move (hL : (128 : ℝ) ≤ log n) {t : ℝ} (_ht0 : 0 ≤ t) (htn : t 
         if ∑ v, avg (fcoord x v) + d ≤ falsesR (step x r) then (1 : ℝ) else 0)
         ≤ (Median.kernel n Bool x).prob
           (· ∈ satSet n (max ((7 / 8) * t) (512 * log n))) :=
-      prob_step_ge x _ _ h0 h1
+      Kernel.one_sub_avg_le_prob_ofStep step _ x _ h0 h1
     have hexp := bernstein_exp_le hσ0 hd0 hD hden hcD
     have hfin : exp (-(2 * log n)) = 1 / (n : ℝ) ^ 2 := exp_neg_two_log hn
     linarith
@@ -685,7 +562,7 @@ lemma sat_move (hL : (128 : ℝ) ≤ log n) {t : ℝ} (_ht0 : 0 ≤ t) (htn : t 
         if ∑ v, avg (fcoord x v) + d ≤ falsesR (step x r) then (1 : ℝ) else 0)
         ≤ (Median.kernel n Bool x).prob
           (· ∈ satSet n (max ((7 / 8) * t) (512 * log n))) :=
-      prob_step_ge x _ _ h0 h1
+      Kernel.one_sub_avg_le_prob_ofStep step _ x _ h0 h1
     have hexp := bernstein_exp_le hσ0 hd0 hD hden hcD
     have hfin : exp (-(2 * log n)) = 1 / (n : ℝ) ^ 2 := exp_neg_two_log hn
     linarith
@@ -727,7 +604,8 @@ lemma mono_move (hL : (128 : ℝ) ≤ log n) {x : Config n Bool}
     rw [if_pos hone]
   have hstep : 1 - avg (fun r : Round n =>
       if 1 ≤ falsesR (step x r) then (1 : ℝ) else 0)
-      ≤ (Median.kernel n Bool x).prob (· ∈ consSet) := prob_step_ge x _ _ h0 h1
+      ≤ (Median.kernel n Bool x).prob (· ∈ consSet) :=
+    Kernel.one_sub_avg_le_prob_ofStep step _ x _ h0 h1
   linarith
 
 end Median

@@ -27,6 +27,11 @@ three settings, all on the finite product space `ι → α` (no measure theory):
 * **uniform rounds**: `ω : ι → γ` is uniform (one independent uniform draw per agent, as in
   `Dynamics.Concentration`), probabilities are `avg` of indicators and `pᵢ = avg (Y i)`.
   This is the form produced by `Kernel.prob_ofStep` for one round of a dynamics.
+
+For uniform rounds over `Fin n` the file also gives the MGF bound `avg_chernoff_mgf`, the
+tails for a free parameter `t` (`avg_chernoff_upper_of_mgf`, `avg_chernoff_lower_of_mgf`),
+the closed forms `exp(k - μ - k log(k/μ))` at an arbitrary threshold `k`
+(`avg_chernoff_upper_log`, `avg_chernoff_lower_log`) and `avg_chernoff_lower_mul`.
 -/
 
 namespace Dynamics
@@ -247,5 +252,122 @@ theorem avg_chernoff_lower {ι γ : Type*} [Fintype ι] [DecidableEq ι] [Fintyp
       ≤ exp (-(δ ^ 2 * μL / 2)) := by
   exact avg_indicator_le_of_independent _ (exp_pos _).le fun P hP =>
     Distribution.chernoff_lower P Y hY hδ0 hδ1 (by simpa only [hP] using hμL)
+
+/-! ### Uniform rounds: MGF, free parameter and logarithmic forms
+
+For `X = ∑ᵢ Yᵢ(ωᵢ)` with `ω : Fin n → γ` uniform and `{0,1}`-valued coordinates
+(Dubhashi–Panconesi, *Concentration of Measure for the Analysis of Randomized Algorithms*,
+Theorem 1.1 and its proof; Mitzenmacher–Upfal, Theorem 4.5): the tails before the parameter
+`t` is optimized, the closed forms for an arbitrary threshold `k`, and the lower tail at the
+exact mean. These replace the bounds of the former `3-majority/ThreeMajority/Chernoff.lean`
+(3-majority blueprint `lem:mgf`, `lem:chernoff`, `lem:chernofflog`) and
+`Plurality.chernoff_lower`. -/
+
+section UniformFin
+
+variable {n : ℕ} {γ : Type*} [Fintype γ]
+
+/-- **The Chernoff MGF bound** for one uniform round: for every real `t`,
+`𝔼[exp(tX)] ≤ exp(μ(eᵗ - 1))` (the uniform-round form of
+`Distribution.independent_expect_exp_sum_le`, also on an empty type `γ`).
+Replaces `ThreeMajority.avg_exp_le`. -/
+theorem avg_chernoff_mgf (Y : Fin n → γ → ℝ) (hY : ∀ i x, Y i x = 0 ∨ Y i x = 1) (t : ℝ) :
+    avg (fun ω : Fin n → γ => exp (t * ∑ i, Y i (ω i)))
+      ≤ exp ((∑ i, avg (Y i)) * (exp t - 1)) := by
+  rw [avg_exp_sum]
+  have hone (i : Fin n) :
+      avg (fun y => exp (t * Y i y)) ≤ exp (avg (Y i) * (exp t - 1)) := by
+    have hpt (y : γ) : exp (t * Y i y) = 1 + (exp t - 1) * Y i y := by
+      rcases hY i y with h | h <;> simp [h]
+    simp_rw [hpt]
+    rcases isEmpty_or_nonempty γ with hγ | hγ
+    · simp [avg]
+    · rw [avg_add, avg_const, avg_const_mul, mul_comm (exp t - 1)]
+      linarith [add_one_le_exp (avg (Y i) * (exp t - 1))]
+  calc ∏ i, avg (fun y => exp (t * Y i y))
+      ≤ ∏ i : Fin n, exp (avg (Y i) * (exp t - 1)) :=
+        prod_le_prod (fun i _ => avg_nonneg fun y => (exp_pos _).le) (fun i _ => hone i)
+    _ = exp ((∑ i, avg (Y i)) * (exp t - 1)) := by rw [← exp_sum, sum_mul]
+
+/-- **Chernoff upper tail for a free parameter** `t ≥ 0`:
+`P(X ≥ k) ≤ exp(μ(eᵗ - 1) - t k)` (before optimizing `t`; `avg_chernoff_upper` is the
+optimized form). Replaces `ThreeMajority.avg_tail_ge`. -/
+theorem avg_chernoff_upper_of_mgf (Y : Fin n → γ → ℝ) (hY : ∀ i x, Y i x = 0 ∨ Y i x = 1)
+    {t : ℝ} (ht : 0 ≤ t) (k : ℝ) :
+    avg (fun ω : Fin n → γ => if k ≤ ∑ i, Y i (ω i) then (1 : ℝ) else 0)
+      ≤ exp ((∑ i, avg (Y i)) * (exp t - 1) - t * k) := by
+  calc _ ≤ avg (fun ω : Fin n → γ => exp (t * ∑ i, Y i (ω i))) * exp (-(t * k)) :=
+        avg_tail_le_of_mgf (fun ω => ∑ i, Y i (ω i)) ht k
+    _ ≤ exp ((∑ i, avg (Y i)) * (exp t - 1)) * exp (-(t * k)) :=
+        mul_le_mul_of_nonneg_right (avg_chernoff_mgf Y hY t) (exp_pos _).le
+    _ = _ := by rw [← exp_add, ← sub_eq_add_neg]
+
+/-- **Chernoff lower tail for a free parameter** `t ≤ 0`:
+`P(X ≤ k) ≤ exp(μ(eᵗ - 1) - t k)` (before optimizing `t`; `avg_chernoff_lower` is the
+optimized form). Replaces `ThreeMajority.avg_tail_le`. -/
+theorem avg_chernoff_lower_of_mgf (Y : Fin n → γ → ℝ) (hY : ∀ i x, Y i x = 0 ∨ Y i x = 1)
+    {t : ℝ} (ht : t ≤ 0) (k : ℝ) :
+    avg (fun ω : Fin n → γ => if ∑ i, Y i (ω i) ≤ k then (1 : ℝ) else 0)
+      ≤ exp ((∑ i, avg (Y i)) * (exp t - 1) - t * k) := by
+  calc _ ≤ avg (fun ω : Fin n → γ => exp (t * ∑ i, Y i (ω i))) * exp (-(t * k)) :=
+        avg_lower_tail_le_of_mgf (fun ω => ∑ i, Y i (ω i)) ht k
+    _ ≤ exp ((∑ i, avg (Y i)) * (exp t - 1)) * exp (-(t * k)) :=
+        mul_le_mul_of_nonneg_right (avg_chernoff_mgf Y hY t) (exp_pos _).le
+    _ = _ := by rw [← exp_add, ← sub_eq_add_neg]
+
+/-- **Chernoff upper tail**, closed form at a threshold `k` (`t = log (k/μ)`): if `μ > 0`
+bounds the mean from above and `μ ≤ k`, then `P(X ≥ k) ≤ exp(k - μ - k log(k/μ))`. With
+`μ = 𝔼X` this is `ThreeMajority.avg_tail_ge_log`; it replaces that lemma and
+`ThreeMajority.avg_tail_ge_log_le`. -/
+theorem avg_chernoff_upper_log (Y : Fin n → γ → ℝ) (hY : ∀ i x, Y i x = 0 ∨ Y i x = 1)
+    {k μ : ℝ} (hμ : ∑ i, avg (Y i) ≤ μ) (hμ0 : 0 < μ) (hk : μ ≤ k) :
+    avg (fun ω : Fin n → γ => if k ≤ ∑ i, Y i (ω i) then (1 : ℝ) else 0)
+      ≤ exp (k - μ - k * Real.log (k / μ)) := by
+  have hk0 : 0 < k := hμ0.trans_le hk
+  have ht : 0 ≤ Real.log (k / μ) := Real.log_nonneg (by rw [le_div_iff₀ hμ0]; linarith)
+  refine (avg_chernoff_upper_of_mgf Y hY ht k).trans (exp_le_exp.mpr ?_)
+  rw [exp_log (by positivity)]
+  have hslope : 0 ≤ k / μ - 1 := by rw [sub_nonneg, le_div_iff₀ hμ0]; linarith
+  have h1 := mul_le_mul_of_nonneg_right hμ hslope
+  have h2 : μ * (k / μ - 1) = k - μ := by field_simp
+  have h3 : Real.log (k / μ) * k = k * Real.log (k / μ) := mul_comm _ _
+  linarith
+
+/-- **Chernoff lower tail**, closed form at a threshold `k` (`t = log (k/μ)`): if `μ` bounds
+the mean from below and `0 < k ≤ μ`, then `P(X ≤ k) ≤ exp(k - μ - k log(k/μ))`. With
+`μ = 𝔼X` this is `ThreeMajority.avg_tail_le_log`; it replaces that lemma and
+`ThreeMajority.avg_tail_le_log_ge`. -/
+theorem avg_chernoff_lower_log (Y : Fin n → γ → ℝ) (hY : ∀ i x, Y i x = 0 ∨ Y i x = 1)
+    {k μ : ℝ} (hμ : μ ≤ ∑ i, avg (Y i)) (hk0 : 0 < k) (hkμ : k ≤ μ) :
+    avg (fun ω : Fin n → γ => if ∑ i, Y i (ω i) ≤ k then (1 : ℝ) else 0)
+      ≤ exp (k - μ - k * Real.log (k / μ)) := by
+  have hμ0 : 0 < μ := hk0.trans_le hkμ
+  have ht : Real.log (k / μ) ≤ 0 :=
+    Real.log_nonpos (by positivity) (by rw [div_le_one hμ0]; exact hkμ)
+  refine (avg_chernoff_lower_of_mgf Y hY ht k).trans (exp_le_exp.mpr ?_)
+  rw [exp_log (by positivity)]
+  have hslope : k / μ - 1 ≤ 0 := by rw [sub_nonpos, div_le_one hμ0]; exact hkμ
+  have h1 := mul_le_mul_of_nonpos_right hμ hslope
+  have h2 : μ * (k / μ - 1) = k - μ := by field_simp
+  have h3 : Real.log (k / μ) * k = k * Real.log (k / μ) := mul_comm _ _
+  linarith
+
+/-- **Multiplicative Chernoff lower tail at the mean**: `P(X ≤ (1 - δ)μ) ≤ exp(-δ²μ/2)` for
+`0 ≤ δ < 1` and `μ = 𝔼X` (`avg_chernoff_lower` with `μL = 𝔼X`, extended to `δ = 0`).
+Replaces `Plurality.chernoff_lower` (plurality blueprint `lem:tails`). -/
+theorem avg_chernoff_lower_mul (Y : Fin n → γ → ℝ) (hY : ∀ i x, Y i x = 0 ∨ Y i x = 1)
+    {δ : ℝ} (hδ0 : 0 ≤ δ) (hδ1 : δ < 1) :
+    avg (fun ω : Fin n → γ =>
+        if ∑ i, Y i (ω i) ≤ (1 - δ) * ∑ i, avg (Y i) then (1 : ℝ) else 0)
+      ≤ exp (-(δ ^ 2 * (∑ i, avg (Y i)) / 2)) := by
+  rcases hδ0.lt_or_eq with hδpos | hδzero
+  · exact avg_chernoff_lower Y hY hδpos hδ1 le_rfl
+  · subst hδzero
+    have h1 : exp (-((0 : ℝ) ^ 2 * (∑ i, avg (Y i)) / 2)) = 1 := by simp
+    rw [h1]
+    exact avg_ite_le_one _
+
+end UniformFin
+
 
 end Dynamics

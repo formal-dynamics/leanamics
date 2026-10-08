@@ -294,7 +294,7 @@ $\mathrm{avg}(\mathrm{ind}(I)) = |I|/n$.
 \end{lemma}
 
 \begin{lemma}[Exponential beats any fixed power]\label{lem:exppow}
-  \lean{ThreeMajority.exp_ge_pow, ThreeMajority.exp_ge_cube}
+  \lean{Real.pow_div_factorial_le_exp, ThreeMajority.exp_ge_cube}
   \leanok
   For $x\ge0$ and any $k\in\N$: $x^k/k! \le \exp(x)$ --- the single
   degree-$k$ term of the Taylor truncation, extracted by dropping every
@@ -338,10 +338,13 @@ $\mathrm{avg}(\mathrm{ind}(I)) = |I|/n$.
 \section{An elementary Chernoff bound}\label{sec:chernoff}
 
 The only concentration tool used in the whole development, and the only
-place beyond elementary combinatorics where real exponentials appear.
+place beyond elementary combinatorics where real exponentials appear. These
+bounds are proved once in the shared \texttt{dynamics} library
+(\texttt{Dynamics/Chernoff.lean}, namespace \texttt{Dynamics}), which the
+plurality and median developments use as well.
 
 \begin{lemma}[MGF bound]\label{lem:mgf}
-  \lean{ThreeMajority.avg_exp_le}
+  \lean{Dynamics.avg_chernoff_mgf}
   \leanok
   \uses{lem:indep}
   Let $Y_1,\dots,Y_n \colon \gamma \to \{0,1\}$ be the per-agent
@@ -358,35 +361,34 @@ place beyond elementary combinatorics where real exponentials appear.
 \end{lemma}
 
 \begin{lemma}[Chernoff tail bounds]\label{lem:chernoff}
-  \lean{ThreeMajority.avg_tail_ge, ThreeMajority.avg_tail_le}
+  \lean{Dynamics.avg_chernoff_upper_of_mgf, Dynamics.avg_chernoff_lower_of_mgf}
   \leanok
   \uses{lem:mgf}
   In the setting of Lemma~\ref{lem:mgf}: for $t\ge0$ and any $k$,
-  $\Pr[X\ge k] \le \exp(\mu(e^t-1)-tk)$ (\texttt{avg\_tail\_ge}, Markov
+  $\Pr[X\ge k] \le \exp(\mu(e^t-1)-tk)$ (\texttt{avg\_chernoff\_upper\_of\_mgf}, Markov
   applied to $\exp(tX)$); symmetrically for $t\le0$,
-  $\Pr[X\le k] \le \exp(\mu(e^t-1)-tk)$ (\texttt{avg\_tail\_le}).
+  $\Pr[X\le k] \le \exp(\mu(e^t-1)-tk)$ (\texttt{avg\_chernoff\_lower\_of\_mgf}).
 \end{lemma}
 
 \begin{lemma}[Closed-form tail bounds at the optimal $t$]\label{lem:chernofflog}
-  \lean{ThreeMajority.avg_tail_ge_log, ThreeMajority.avg_tail_le_log,
-    ThreeMajority.avg_tail_ge_log_le, ThreeMajority.avg_tail_le_log_ge}
+  \lean{Dynamics.avg_chernoff_upper_log, Dynamics.avg_chernoff_lower_log}
   \leanok
   \uses{lem:chernoff}
   Plugging $t=\log(k/\mu)$ into Lemma~\ref{lem:chernoff}: for $k\ge\mu>0$,
   \[
     \Pr[X\ge k] \;\le\; \exp\bigl(k-\mu-k\log(k/\mu)\bigr)
-    \qquad(\texttt{avg\_tail\_ge\_log}),
+    \qquad(\mu=\E X),
   \]
   and symmetrically for $0<k\le\mu$,
-  $\Pr[X\le k] \le \exp(k-\mu-k\log(k/\mu))$ (\texttt{avg\_tail\_le\_log}).
+  $\Pr[X\le k] \le \exp(k-\mu-k\log(k/\mu))$.
   Both closed forms are \emph{mean-scaled}: the exponent depends on the true
   $\mu$ directly, not on a crude worst-case range/variance proxy, which
   matters late in the saturation phase once few at-risk agents remain
-  (Lemma~\ref{lem:stage2b}). Two generalized variants take only an
-  \emph{upper} bound $\mu_{\mathrm{ub}}\ge\mu$ (\texttt{avg\_tail\_ge\_log\_le},
-  used by the saturation phase) or a \emph{lower} bound $\mu_{\mathrm{lb}}
-  \le\mu$ (\texttt{avg\_tail\_le\_log\_ge}, used by the growth phase) on the
-  true mean --- monotonicity of the exponent in $\mu$ at the optimal $t$
+  (Lemma~\ref{lem:stage2b}). The Lean statements are the generalized
+  variants, which take only an \emph{upper} bound $\mu_{\mathrm{ub}}\ge\mu$
+  (\texttt{avg\_chernoff\_upper\_log}, used by the saturation phase) or a
+  \emph{lower} bound $\mu_{\mathrm{lb}}\le\mu$ (\texttt{avg\_chernoff\_lower\_log}, used by
+  the growth phase) on the true mean (the exact forms are the case of equality) --- monotonicity of the exponent in $\mu$ at the optimal $t$
   makes both directions sound, and this is the form each phase actually
   needs, since the exact mean depends on $x=|I|/n$ while the phases only
   assume an inequality on $|I|$.
@@ -605,13 +607,13 @@ $\Pr[I_T=V] = 1-\Pr[I_T\ne V] \ge 1-500/n$.
 The argument above is fully formalized (no \texttt{sorry}) in the
 accompanying repository (library \texttt{ThreeMajority}, namespace
 \texttt{ThreeMajority}). File structure (dependency order):
-\texttt{Prob.lean} (Section~\ref{sec:prelim}: the same finite-uniform
-\texttt{avg}/\texttt{expList} machinery as
-\texttt{rumor\_spread/RumorSpread/Prob.lean}, copied since the two Lean
-projects are independent packages, plus the new independence toolkit
-\texttt{avg\_prod\_pi} and friends), \texttt{Model.lean}
+\texttt{Prob.lean} (Section~\ref{sec:prelim}: aliases of the finite-uniform
+\texttt{avg}/\texttt{expList} machinery of the shared \texttt{dynamics}
+library, including the independence toolkit \texttt{avg\_prod\_pi} and
+friends), \texttt{Model.lean}
 (Section~\ref{sec:model}), \texttt{Bounds.lean} (Section~\ref{sec:ineq}),
-\texttt{Chernoff.lean} (Section~\ref{sec:chernoff}), \texttt{OneRound.lean}
+the shared \texttt{Dynamics/Chernoff.lean} (Section~\ref{sec:chernoff}),
+\texttt{OneRound.lean}
 (Section~\ref{sec:map}), \texttt{Growth.lean} (Section~\ref{sec:growth}),
 \texttt{Saturation.lean} (Section~\ref{sec:saturation}), \texttt{Main.lean}
 (Section~\ref{sec:proof-main} and the main theorem). Design constraint
