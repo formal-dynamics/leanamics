@@ -34,7 +34,9 @@ with two exceptions where the paper's argument does not go through: the
 $\Omega(k\log n)$ bound is proved for $k \le n^{1/4-\delta}$ rather than up to
 $(n/\log n)^{1/4}$, and part~(a) of Theorem~4.8 (Theorem~\ref{thm:4_8_a}) leaves open rules
 with $\Delta_r, \Delta_b \le 1$. Observation~3.9 (an adversary) is not
-formalized.
+formalized. Beyond the paper, Section~\ref{sec:any_start} proves that with two opinions
+3-majority reaches consensus from any configuration, including a perfectly balanced one, within
+$O(\log n)$ rounds w.h.p.
 \end{abstract}
 
 \section{The model}\label{sec:model}
@@ -456,6 +458,100 @@ formalized.
   Theorem~\ref{thm:3_8} with $k = 2$ and $\lambda = 3$: the majority color is the unique
   plurality, holds more than $n/2 \ge n/3$ nodes, and its bias is the gap; the conclusion
   transfers to the binary process through Theorem~\ref{thm:binary}.
+\end{proof}
+
+\subsection{Two colors from any configuration}\label{sec:any_start}
+
+This part goes beyond the paper: it follows the symmetry-breaking argument for the binary
+median dynamics of Doerr, Goldberg, Minder, Sauerwald and Scheideler (SPAA 2011), as described in
+Becchetti, Clementi, Natale, \emph{Consensus dynamics: an overview} (SIGACT News 2020, \S4,
+Case~3), here for binary 3-majority. Let $I$ be the set of nodes with opinion $1$ and
+$s = |I| - (n - |I|)$ the gap. After one round, $s' = 2\sum_v Y_v - n$ for independent
+$\{0,1\}$-valued $Y_v$ with mean $p = 3x^2 - 2x^3$, $x = |I|/n$, so
+$\mathbb{E}s' = s\,(3/2 - s^2/(2n^2))$.
+
+\begin{lemma}[Jump near balance]\label{lem:jump_near_balance}
+  \lean{Plurality.gap, Plurality.binKernel, Plurality.avg_pz_zero_one, Plurality.jump_near_balance}
+  \leanok
+  \uses{thm:binary}
+  If $n \ge 5$ and $|s| \le 4\sqrt n/25$, then $|s'| \ge \sqrt n/5$ with probability at
+  least $9/64$.
+\end{lemma}
+\begin{proof}
+  \leanok
+  The centered sum $S = \sum_v (Y_v - p)$ has variance $\sigma^2 = np(1-p) \ge n/5$ and fourth
+  moment at most $\sigma^2 + 3\sigma^4$, so by Paley--Zygmund $4S^2 \ge \sigma^2$ with
+  probability at least $9/64$. Then $|s'| = |2S + \mathbb{E}s'| \ge \sqrt{n/5} - \frac32|s|
+  \ge \sqrt n/5$.
+\end{proof}
+
+\begin{lemma}[Growth away from balance]\label{lem:growth_far}
+  \lean{Plurality.mean_ge, Plurality.growth_far}
+  \leanok
+  \uses{thm:binary}
+  If $0 \le s \le n/2$ and $\lambda \ge 0$, then $s' > \frac{11}{8}s - 2\lambda$ with
+  probability at least $1 - e^{-2\lambda^2/n}$.
+\end{lemma}
+\begin{proof}
+  \leanok
+  $\mathbb{E}s' \ge \frac{11}{8}s$ for $0 \le s \le n/2$, and Hoeffding's inequality bounds the
+  lower tail of $\sum_v Y_v$.
+\end{proof}
+
+\begin{theorem}[Symmetry breaking]\label{thm:symmetry_breaking}
+  \lean{Plurality.gapUnits, Plurality.units_near, Plurality.units_far, Plurality.units_grow, Plurality.hitProb_mono, Plurality.majority3_symmetry_breaking}
+  \leanok
+  \uses{lem:jump_near_balance, lem:growth_far}
+  There is $C > 0$ such that, for $\log n \ge 40$, from any configuration the gap reaches
+  $22\sqrt{3n\log n}$ in absolute value within any $t \ge C\log n$ rounds with probability at
+  least $1 - 1/n$.
+\end{theorem}
+\begin{proof}
+  \leanok
+  Apply the hitting-time bound of Doerr et al.\ (their Claim~2.9,
+  \texttt{Dynamics.Kernel.drift\_hitting\_log}) to $X = \lfloor |s|/(\sqrt n/100)\rfloor$ with
+  $q = n$, $c_1 = 5/4$, $c_2 = 1/320000$, $c_3 = 9/64$, $c_4 = 1000$, $c_6 = 1$; by the
+  symmetry between the opinions assume $s \ge 0$. If $X = 0$, Lemma~\ref{lem:jump_near_balance}
+  gives $X' \ge 20 \ge 1$ with probability $9/64$. If $1 \le X < 16$, the same lemma gives
+  $X' \ge 20 \ge \frac54 X$ with probability $9/64 \ge 1 - e^{-X/320000}$. If
+  $16 \le X < 1000\log n$, then $s \le n/2$, and Lemma~\ref{lem:growth_far} with
+  $\lambda = X\sqrt n/3200$ gives $s' > \frac{21}{16}X\sqrt n/100$, hence $X' \ge \frac54 X$,
+  except with probability $e^{-X^2/5120000} \le e^{-X/320000}$. Reaching $X \ge 1000\log n$
+  means $|s| \ge 10\sqrt n\log n \ge 22\sqrt{3n\log n}$.
+\end{proof}
+
+\begin{lemma}[Hit, then absorb]\label{lem:hit_absorb}
+  \lean{Plurality.hitProb_le_one, Plurality.hitProb_nonneg, Plurality.hitProb_sub_le_event, Plurality.event_amplify}
+  \leanok
+  Let $P$ be an absorbing event of a finite Markov chain. If from every state of $B$ the chain is
+  in $P$ after $T$ steps with probability at least $1 - \varepsilon$, then from any state it is in
+  $P$ at time $t + T$ with probability at least $\Pr(T_B \le t) - \varepsilon$. If moreover from
+  every state the chain is in $P$ after $T_1$ steps with probability at least $1 - \varepsilon$,
+  and from $a$ after $T_0$ steps with probability at least $1 - \delta$, then from $a$ it is in
+  $P$ after $T_0 + T_1$ steps with probability at least $1 - \delta\varepsilon$.
+\end{lemma}
+\begin{proof}
+  \leanok
+  The first claim by induction on $t$, through the recursion of $\Pr(T_B \le t)$ and the
+  monotonicity in time of an absorbing event; the second by the Markov property at time $T_0$.
+\end{proof}
+
+\begin{theorem}[Two opinions from any configuration]\label{thm:any_start}
+  \lean{Plurality.step_compl, Plurality.consensus_absorbing, Plurality.event_consensus_of_gap, Plurality.majority3_any_start, Plurality.majority3_any_start_whp}
+  \leanok
+  \uses{thm:symmetry_breaking, cor:binary_vanishing, lem:hit_absorb}
+  There is $C > 0$ such that, for $\log n \ge 40$, from any configuration (in particular from a
+  perfectly balanced one) all nodes hold the same opinion after any $T \ge C\log n$ rounds with
+  probability at least $1 - C\log n/n$; and, for $\log n \ge C$, with probability at least
+  $1 - 1/n$.
+\end{theorem}
+\begin{proof}
+  \leanok
+  Theorem~\ref{thm:symmetry_breaking}, then Corollary~\ref{cor:binary_vanishing} applied to the
+  set of nodes of opinion $1$ or to its complement, composed by Lemma~\ref{lem:hit_absorb};
+  consensus on either opinion is absorbing, so further rounds keep it. For the second bound, two
+  consecutive blocks each fail with probability at most $\varepsilon = C_0\log n/n$, and
+  $\varepsilon^2 \le 1/n$.
 \end{proof}
 
 \section{Lower bounds}\label{sec:lower}

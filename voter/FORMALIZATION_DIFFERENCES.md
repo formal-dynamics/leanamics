@@ -71,17 +71,20 @@ The following portions of the paper were not formalized:
 
 ## 2. Key Differences, Adaptations, and Mathematical Nuances
 
-### 2.1 Correction of the "W.L.O.G. White" Handwave in Lemma 2.1 Proof
+### 2.1 The "w.l.o.g. white" step in the proof of Lemma 2.1
 * **Paper text (page 252)**:
   > *"Under this state, there must be two neighbors with the same color. This must happen because $G$ is nonbipartite, so it must contain an odd cycle, and any 2-coloring on this cycle must assign the same color to two neighbors. Let $i$ and $j$ be two such neighboring nodes, and **w.l.o.g assume that they are colored white**. We prove by induction that there is a positive probability that at time $k$ all nodes of distance $k$ from $i$ or $j$ are colored white. Hence at time step $\text{Diam}(V)$, $s$ can be absorbed to the all-white state..."*
-* **The issue**:
-  Assuming "without loss of generality" that the monochromatic edge is white is invalid when analyzing an arbitrary non-monochromatic state $s$. An initial state $s$ could contain monochromatic *black* edges but *no* monochromatic white edges (e.g. if the white vertices form an independent set). From such an edge, the region propagation argument can only guarantee reaching the *all-black* state in $\text{Diam}(V)$ steps, not necessarily the all-white state directly.
-* **Lean's rigorous treatment**:
-  [`Voter.possible_consensus`](Voter/Graph.lean#L90) explicitly proves:
+* **Reading of the step**:
+  The lemma only claims that non-consensus states are transient, so it suffices that *some* consensus
+  state is reachable from every state. Swapping the two colours justifies the "w.l.o.g.": from a
+  monochromatic black edge the same propagation argument reaches the all-black state. The formal
+  statement makes the colour explicit.
+* **Formal statement**:
+  [`Voter.possible_consensus`](Voter/Graph.lean#L90) proves
   ```lean
   ∃ c, Relation.ReflTransGen (Possible G) s (fun _ => c)
   ```
-  That is, consensus is reachable in **some** color $c \in \{\text{true}, \text{false}\}$ (the color of the monochromatic edge found by [`Nonemonochromatic_edge`](Voter/Graph.lean#L18)). This suffices to prove that the probability of staying in non-consensus states decays to 0 ([`Noneconsensus_tendsto`](Voter/Absorption.lean#L109)), fixing the paper's informal leap.
+  that is, consensus is reachable in **some** color $c \in \{\text{true}, \text{false}\}$ (the color of the monochromatic edge found by [`Nonemonochromatic_edge`](Voter/Graph.lean#L18)). This is what the proof that the probability of staying in non-consensus states decays to 0 ([`Noneconsensus_tendsto`](Voter/Absorption.lean#L109)) uses.
 
 ---
 
@@ -235,11 +238,11 @@ Further sources: Becchetti, Clementi, Natale, *Consensus dynamics: an overview*,
 51(1), 2020 (the "survey"); Kanade, Mallmann-Trenn, Sauerwald, *On coalescence time in graphs*,
 SODA 2019 (arXiv:1611.02460); Cooper, Elsässer, Ono, Radzik, SIAM J. Discrete Math. 2013.
 
-### 4.1 Survey Theorem 8 is false as stated; the lazy walk is formalized
+### 4.1 Survey Theorem 8 needs a minor correction; the lazy walk is formalized
 * Theorem 8 of the survey states: "Let G be any connected undirected graph. Starting from an
   arbitrary initial configuration c on G, the Voter dynamics reaches consensus w.h.p. in
-  O(n³ log n) rounds." For the synchronous voter with plain uniform-neighbour sampling this
-  **fails on bipartite graphs**: two tokens on opposite sides of a bipartite graph never meet,
+  O(n³ log n) rounds." For the synchronous voter with plain uniform-neighbour sampling the statement needs a
+  **nonbipartiteness hypothesis** (or a lazy walk): two tokens on opposite sides of a bipartite graph never meet,
   and an alternating colouring never reaches consensus
   (cf. [`twoVertex_never_consensus`](Voter/Examples.lean)). Hassin and Peleg's standing
   hypotheses (§2.1) do require a nonbipartite graph, and their Theorem 2.5 is the uniform case
@@ -300,15 +303,16 @@ SODA 2019 (arXiv:1611.02460); Cooper, Elsässer, Ono, Radzik, SIAM J. Discrete M
 Source: Berenbrink, Giakkoupis, Kermarrec, Mallmann-Trenn, *Bounds on the voter model in
 dynamic networks*, ICALP 2016, arXiv:1603.01895 (BGKM16). Numbering: Theorem 1.1 (upper
 bound), Lemma 2.1 (potential drop), Lemma 2.2 (drift implies time), Lemma 2.3 (phases for
-`κ` opinions). Files: `Conductance*.lean`. The dynamics is the lazy voter
-[`lazyNeighbor`](Voter/Lazy.lean) `= (I + D⁻¹A)/2` of §3.
+`κ` opinions), Lemma 2.4 (the bound `n log n / φ²`). Files: `Conductance*.lean`. The
+dynamics is the lazy voter [`lazyNeighbor`](Voter/Lazy.lean) `= (I + D⁻¹A)/2` of §3.
 
-### 5.1 Lemma 2.1 of BGKM16 is false as printed
+### 5.1 Lemma 2.1 of BGKM16 needs a minor correction
 * The paper states
   `𝔼[Ψ(S_{t+1}) | S_t = s_t] ≤ Ψ(s_t) - ∑_{u ∈ V} λ_{u,t} d_u / (32 Ψ(s_t)³)`,
   with the sum over **all** vertices, where `Ψ(s) = √(vol(minority))` and `λ_u` is the
-  number of neighbours of `u` with the other opinion. This is false. Counterexample: the star
-  `K_{1,k}` with `k ≥ 15` and a single leaf in the minority (`Ψ = 1`). Only the leaf and the
+  number of neighbours of `u` with the other opinion. With the sum over all vertices the inequality
+  does not hold. Example: the star
+  `K_{1,k}` with `k ≥ 12` and a single leaf in the minority (`Ψ = 1`). Only the leaf and the
   hub can change opinion, and exactly
   `𝔼[Ψ'] = ½ (1 - 1/(2k)) + (√(k-1) + √k)/(4k)`; for `k = 15` this is `0.6102`, while the
   printed bound is `1 - (1 + 15)/32 = 0.5` (the hub contributes `λ d = 15`); for `k = 40` it is
@@ -336,7 +340,7 @@ bound), Lemma 2.1 (potential drop), Lemma 2.2 (drift implies time), Lemma 2.3 (p
   used. The paper's "with a probability of 1/2" is read as "at least 1/2".
 * **Theorem 1.1 (i), static graph, two opinions, explicit constant:** `128 m / (d_min φ)`
   ([`lazy_consensus_conductance`](Voter/ConductanceTime.lean), from `vol(minority) ≤ m`). The
-  alternative bound `n log n / φ²` (part (ii), Lemma 2.4) is not formalized.
+  alternative bound `n log n / φ²` (part (ii), Lemma 2.4) is in §5.5.
 * **Expected time** ([`lazy_expected_consensus_time`](Voter/ConductanceTime.lean)) is stated
   as `∑_{t < N} P(T_cons > t) ≤ 2 T₀` for every horizon `N`, i.e. `𝔼[min(T_cons, N)] ≤ 2 T₀`,
   which gives `𝔼[T_cons] ≤ 2 T₀` by monotone convergence. A `tsum` statement would be vacuous
@@ -361,8 +365,9 @@ bound), Lemma 2.1 (potential drop), Lemma 2.2 (drift implies time), Lemma 2.3 (p
 * The degrees are fixed (`hdeg`, relative to the first graph `G 0 s`; the paper fixes a degree
   sequence `d_1, …, d_n`), and `φ t` must bound the conductance of every graph the adversary
   may use at time `t` (the paper fixes the sequence `φ_t` in advance). `vol(s_0)` and `d_min`
-  are computed in `G 0 s` (they only depend on the degrees). `φ t` may be negative, which only
-  weakens the hypothesis.
+  are computed in `G 0 s` (they only depend on the degrees). In
+  `dynamic_consensus_conductance`, `φ t` may be negative, which only weakens the hypothesis; the
+  statements of §5.5 square `φ t` and require `0 ≤ φ t` (the paper's `φ_t` is a conductance).
 * The start time is `t̂ = 0`; a later start is the same statement for the shifted family
   `fun t => G (t̂ + t)`.
 
@@ -381,3 +386,52 @@ bound), Lemma 2.1 (potential drop), Lemma 2.2 (drift implies time), Lemma 2.3 (p
   opinions present, with an occupation-time bound per level
   ([`sum_iterate_le_of_block`](Voter/ConductanceLevels.lean)) instead of expected numbers of
   phases.
+
+### 5.5 The bound `n log n / φ²` (Theorem 1.1 (ii), Lemma 2.4)
+Files: [`ConductanceSq.lean`](Voter/ConductanceSq.lean),
+[`ConductanceSqAux.lean`](Voter/ConductanceSqAux.lean).
+* **The multiplicative drift** ([`potential_drift_mul`](Voter/ConductanceSq.lean),
+  `𝔼 Ψ' ≤ (1 - φ²/(32n)) Ψ` from every two-opinion configuration) is derived from the corrected
+  Lemma 2.1 of §5.1 (sum over the minority side). The proof of Lemma 2.4 starts from the printed
+  form of Lemma 2.1 (sum over all of `V`) but immediately restricts the sum to the minority side
+  `v^(0)`, so the corrected form is exactly what it needs. Cauchy–Schwarz is applied over the
+  minority side, which has at most `n` vertices, as in the paper.
+* **Lemma 2.4 needs a minor correction to its statement:** it prints
+  `Pr(T ≤ τ') ≥ 1/n²`, while its proof and its own static special case give
+  `Pr(T ≤ τ') ≥ 1 - 1/n²`. The formalized statements
+  ([`lazy_consensus_conductance_sq`](Voter/ConductanceSq.lean),
+  [`dynamic_consensus_conductance_sq`](Voter/ConductanceSq.lean)) read: for every `T` with
+  `96 n ln n ≤ φ² T` (static) or `96 n ln n ≤ ∑_{t < T} φ_t²` (dynamic), the opinions still
+  disagree at time `T` with probability at most `1/n²`.
+* **A minor correction to the proof of Lemma 2.4:** the recursion display ends with
+  `Ψ_0 exp(+∑ φ_i² / (32n))`; the sign of the exponent must be negative. The formal proof uses
+  `1 - x ≤ e^{-x}` factor by factor ([`prod_one_sub_le`](Voter/ConductanceSqAux.lean)) instead of
+  the arithmetic–geometric mean step, and the multiplicative drift lemma of the shared library
+  (`Dynamics.Kernel.multiplicative_drift_seq`) for `P(Ψ_T > 0) ≤ 𝔼 Ψ_T` (using `Ψ ≥ 1` before
+  consensus, [`one_le_potential`](Voter/ConductanceSqAux.lean)).
+* **Constants:** `b = 96` and the natural logarithm, as in the static statement of Lemma 2.4
+  ("`96 n log n / φ²`"); the computation `Ψ_0 e^{-3 ln n} ≤ n · n^{-3}` uses the natural
+  logarithm (`Ψ_0 ≤ √m ≤ n`, [`potential_le_card`](Voter/ConductanceSqAux.lean)). Rounds are
+  `t < T`, as in §5.2.
+* **Any number of opinions** ([`lazy_consensus_conductance_sq_many`](Voter/ConductanceSq.lean),
+  [`dynamic_consensus_conductance_sq_many`](Voter/ConductanceSq.lean)): probability at most `1/n`
+  of disagreement, the paper's `Pr(T(κ) ≤ τ') ≥ 1 - 1/n`, by the paper's union bound over the
+  projections "`i` against the rest". Unlike part (i) (§5.4), this covers dynamic graphs too. There
+  the adversary sees the whole configuration, so the projected process is not itself a dynamic
+  two-opinion voter of §5.3; the proof therefore runs the multiplicative drift on the full process
+  with the observable `Ψ(projection)`, using that one round commutes with the projection on
+  whatever graph the adversary chooses. The union bound is over all colours, those absent at time
+  `0` contributing nothing, so at most `n` terms count. `[Nonempty V]` is assumed for the reason
+  of §5.4.
+* **Expected time** ([`lazy_expected_consensus_time_sq`](Voter/ConductanceSq.lean), static
+  graphs, any number of opinions): `∑_{t < N} P(T_cons > t) ≤ 2 T₀` when
+  `96 n ln n ≤ φ² T₀`, by restarting, as in §5.2.
+* **Theorem 1.1 with both parts** ("`T ≤ min{τ, τ'}` with probability `1/2`") is stated as: if
+  `T` satisfies the threshold of part (i) or that of part (ii), the opinions disagree at time `T`
+  with probability at most `1/2`; since both sums are nondecreasing in `T`, this is the paper's
+  `min`. On static graphs, for any number of opinions and with an existential constant `b`
+  ([`lazy_consensus_conductance_min`](Voter/ConductanceSq.lean); the proof gives
+  `b = max(b₁, 96)` with `b₁` the constant of part (i)). On dynamic graphs only for two opinions
+  ([`dynamic_consensus_conductance_min`](Voter/ConductanceSq.lean), constants `128` and `96`),
+  since part (i) with many opinions is formalized for static graphs only (§5.4); its hypothesis
+  `0 ≤ φ t` is needed by part (ii) and also restricts the part (i) branch.

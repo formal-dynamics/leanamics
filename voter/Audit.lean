@@ -40,3 +40,11 @@ import Voter
 #print axioms Voter.dynamic_consensus_conductance
 #print axioms Voter.lazy_expected_consensus_time_many
 #print axioms Voter.lazy_consensus_conductance_many
+#print axioms Voter.potential_drift_mul
+#print axioms Voter.lazy_consensus_conductance_sq
+#print axioms Voter.lazy_consensus_conductance_sq_many
+#print axioms Voter.lazy_expected_consensus_time_sq
+#print axioms Voter.dynamic_consensus_conductance_sq
+#print axioms Voter.dynamic_consensus_conductance_sq_many
+#print axioms Voter.dynamic_consensus_conductance_min
+#print axioms Voter.lazy_consensus_conductance_min
