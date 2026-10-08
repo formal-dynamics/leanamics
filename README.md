@@ -5,39 +5,31 @@ related distributed processes. Each project is paired with a
 [leanblueprint](https://github.com/PatrickMassot/leanblueprint) connecting the
 paper proof to the Lean code statement-by-statement.
 
-**[https://formal-dynamics.github.io/leanamics/](https://formal-dynamics.github.io/leanamics/)** — landing
-page, blueprints, dependency graphs and API docs for everything below.
+**[https://formal-dynamics.github.io/leanamics/](https://formal-dynamics.github.io/leanamics/)** (landing
+page, blueprints, dependency graphs and API docs for everything below).
 
-The project was called Leanamycs until October 2026, a misspelling of Leanamics (Lean +
-dynamics); links to the old repository and site redirect here.
+## Results
 
-| Project | Result | Main theorem |
-| --- | --- | --- |
-| [`rumor_spread/`](rumor_spread) | In the uniform *push* model on the complete graph `K_n`, one initially informed node informs all `n` nodes within `O(log n)` rounds w.h.p. | `RumorPush.push_informs_all_whp` |
-| [`dynamics/`](dynamics) | Shared finite weighted distributions, trajectory expectations, stationary distributions, and geometric absorption | `Dynamics.Kernel.finite_absorption` |
-| [`voter/`](voter) | Hassin–Peleg Sections 2.1–2.3: weighted synchronous consensus probabilities, uniform-neighbor and multiple-color corollaries. On the complete graph, a duality with coalescing random walks gives consensus within `2 n log n` rounds with probability `≥ 1 - 1/n`. | `Voter.consensus_probability`, `Voter.voter_consensus_whp` |
-| [`moran/`](moran) | Birth–death Moran process with mutant fitness `r`: on a connected regular graph the fixation probability from `k` mutants is `(1 - r^-k)/(1 - r^-n)` (`k/n` if `r = 1`), the "if" direction of the isothermal theorem; Moran's formula on the complete graph; neutral push vs pull fixation on arbitrary connected graphs (weights `1/deg` vs `deg`). | `Moran.isothermal`, `Moran.moran_formula`, `Moran.push_fixation`, `Moran.pull_fixation` |
-| [`epidemics/`](epidemics) | Reed–Frost (Independent Cascade) epidemic with one coin per edge: pathwise, the nodes infected in round `t` are those at distance `t` from the initial set in the graph of open edges; final outbreak = nodes connected to the initial set, so with i.i.d. Bernoulli(`p`) coins P(infected) = P(connected) in bond percolation. | `Epidemics.infected_iff`, `Epidemics.prob_infected_eq_prob_connected` |
-| [`undecided/`](undecided) | Synchronous undecided-state dynamics with two opinions on `K_n`: exact one-round expectations of the three counts, so the bias grows in expectation by the factor `1 + q/n` (`q` undecided nodes); almost-sure absorption in a monochromatic configuration. | `Undecided.expected_bias`, `Undecided.absorbed` |
-| [`averaging/`](averaging) | Averaging dynamics on a graph (each node takes the average of its neighbours): conservation of the degree-weighted sum, maximum principle, convergence to the degree-weighted average on connected graphs with an odd closed walk, non-convergence on connected bipartite graphs. | `Averaging.tendsto_degAvg`, `Averaging.not_tendsto_of_colorable` |
-| [`median/`](median) | Median dynamics (Doerr et al., SPAA 2011): every node adopts the median of its own value and two random ones. Thresholding gives the binary median process (2-Choices); with two values, consensus from a gap of `128√(n log n)` within `⌈128 log n⌉` rounds with probability `1 − 128/n` (for `log n ≥ 128`). | `Median.threshold_run`, `Median.consensus_whp` |
-| [`crn/`](crn) | Chemical reaction networks are population protocols: for a count-conserving bimolecular CRN (`A + B → C + D`) with a common rate constant, the jump chain of stochastic mass-action kinetics equals the population protocol that draws a uniformly random ordered pair of distinct agents, conditioned on the pair reacting, as kernels on count vectors. Worked instance: the approximate-majority CRN. Stable computation (Angluin et al. 2006, easy direction): threshold and remainder predicates are stably computable by population protocols, the class is closed under Boolean operations, and protocols are CRNs, so every Boolean combination of them is stably decided by a CRN. | `Crn.jumpKernel_eq_ppKernel`, `Crn.ApproxMajority.network_jumpKernel_eq_ppKernel`, `Crn.IsSemilinearPred.stablyComputable`, `Crn.IsSemilinearPred.exists_network` |
-| [`plurality/`](plurality), [`3-majority/`](3-majority) | **Majority dynamics.** 3-Majority with `k` colors (Becchetti et al., SPAA 2014): if the plurality color has `≥ n/λ` nodes and leads every other color by `≥ 22√(λ n log n)`, all nodes adopt it within `O(λ log n)` rounds w.h.p. With two opinions: consensus from a gap of `22√(3 n log n)` (a fraction `1/2 + O(√(log n / n))`) within `390 log n` rounds. Also the `Ω(k log n)` lower bound, the characterization of good 3-input rules, and `h`-plurality. | `Plurality.theorem_3_8`, `Plurality.majority3_vanishing_bias`, `ThreeMajority.majority3_consensus_whp` |
+[RESULTS.md](RESULTS.md) lists everything formalized so far, area by area (voter, Moran,
+majority and plurality, median and 2-Choices, undecided-state, epidemics and rumor spreading,
+chemical reaction networks, averaging), with its source, the main Lean theorems and the roadmap
+ID. [ROADMAP.md](ROADMAP.md) lists the results we would like to formalize next, and
+[PROVENANCE.md](PROVENANCE.md) records, for each result, the proof route, the explicit constants
+and who produced it.
 
-The developments are complete and `sorry`-free, and are built on a
-minimal finite-probability layer: no measure theory, no `PMF`/`ENNReal`, no
-martingales, no appeal to Mathlib's `ProbabilityTheory` library. Push and
-3-majority sit in different regimes — the push protocol's informed set only grows, so a
-counting argument over "good rounds" suffices, whereas the 3-majority opinion
-count is not monotone in the round index and so needs genuine concentration
-in every round, supplied by a self-contained Chernoff bound proved from
-`1 + x ≤ exp x`.
+The developments are `sorry`-free. Probability is finite: randomness lives on finite types and
+expectations are finite sums, in the shared `dynamics/` package (whose expectations agree with
+Mathlib's `Finset.expect`); no measure theory, `PMF`/`ENNReal` or Mathlib `ProbabilityTheory`
+is used. Concentration bounds (Chernoff, Hoeffding, Bernstein, a maximal Azuma–Hoeffding
+inequality) and (super)martingale arguments are proved within this layer, and the deterministic
+parts use Mathlib's analysis and linear algebra (integral curves and the discrete Gronwall
+inequality for the SIR model, the spectrum of symmetric matrices for averaging).
 
 ## Layout
 
 Every project is a **separate Lake package** with its own `lakefile.toml`,
 `lake-manifest.json` and `lean-toolchain`. The `dynamics/` package is shared by
-`3-majority/`, `voter/`, `moran/`, `epidemics/`, `undecided/`, `averaging/`, `median/`, `crn/` and `plurality/` (which also requires `3-majority/`). All
+`rumor_spread/`, `3-majority/`, `voter/`, `moran/`, `epidemics/`, `undecided/`, `averaging/`, `median/`, `crn/` and `plurality/` (which also requires `3-majority/`). All
 projects use the same Lean 4.32.0 toolchain and exact Mathlib revision; there is no root-level
 Lake package. Each has the same shape:
 
@@ -97,7 +89,8 @@ Copy the layout above into a new top-level directory, then add a
 `pages.yml` (its directory, its Lake package name, and the `lean_lib` whose
 docs to build). Set `\home{../..}` and `\dochome{../docs}` in the project's
 `blueprint/src/web.tex`, since blueprints are served one level below the
-landing page, and add a section for it to `home_page/index.md`.
+landing page, add a section for it to `home_page/index.md`, and list its results in
+[RESULTS.md](RESULTS.md).
 
 ## Contributing
 
@@ -115,7 +108,8 @@ propose a result that is not on the roadmap, just open an issue.
 
 [PROVENANCE.md](PROVENANCE.md) records, for every result, its source paper, whether the formal
 proof follows a published proof or takes a different route, its explicit constants, and who
-produced it. Please add an entry for each result you contribute.
+produced it. Please add an entry there, and a row to [RESULTS.md](RESULTS.md), for each result
+you contribute.
 
 ## License
 

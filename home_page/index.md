@@ -11,8 +11,9 @@ results on opinion dynamics and related distributed processes, each paired
 with a [leanblueprint](https://github.com/PatrickMassot/leanblueprint) page
 connecting the paper proof to the Lean code statement-by-statement. The
 developments below are complete and `sorry`-free, and are built on a
-minimal finite-probability layer — no measure theory, no `PMF`/`ENNReal`, no
-martingales. More protocols are expected to join over time.
+minimal finite-probability layer (no measure theory, no `PMF`/`ENNReal`). More protocols
+are expected to join over time; the complete list of formalized results, with their main
+theorems, is in [RESULTS.md](https://github.com/formal-dynamics/leanamics/blob/main/RESULTS.md).
 
 ## Rumor spreading (uniform push)
 

@@ -21,7 +21,8 @@ Status values: `open` · `claimed (#issue)` · `in review (#PR)` · `done`.
 
 Done results are documented in [PROVENANCE.md](PROVENANCE.md): source paper, proof route
 (published proof followed, with deviations, or a different proof), explicit constants and
-authorship. When a target is done, add its entry there.
+authorship, and [RESULTS.md](RESULTS.md) lists them by area. When a target is done, add its entry
+to PROVENANCE.md and a row to RESULTS.md.
 
 Sizes (rough, for someone fluent in Lean + Mathlib): **S** days · **M** 1–3 weeks ·
 **L** 1–3 months · **XL** research-level.
