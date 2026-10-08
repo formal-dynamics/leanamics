@@ -103,15 +103,17 @@ follow the paper's strategy but not its bookkeeping; see
 [`FORMALIZATION_DIFFERENCES.md`](FORMALIZATION_DIFFERENCES.md). The step matrix of this part and
 `Sequential.edgeMatrix` (AVG-1) describe the same uniform-edge step.
 
+Provenance of AVG-3: the statements were fixed by a Claude agent before the proofs and reviewed
+by a second Claude agent against the paper (the review led to `±1` labels in Definition 2.3); the
+proofs are by Claude agents under the fixed-statement protocol, verified mechanically (no
+placeholders, warning-free build, axiom audit).
+
 **Provenance.** The statements were written and pinned by hand; the proofs were produced by a Grok
 agent under a fixed-statement protocol and verified mechanically (statements unchanged, no
 placeholders, warning-free build, axiom audit). The AVG-1 statements (the rate bound
 `Averaging/Rate*.lean`, Lovász's Theorem 5.1, and the sequential-averaging identities
 `Averaging/Sequential*.lean`) and the AVG-2 statements were pinned by a Claude agent, reviewed by
-hand against the sources, and then proved by the agent under the same protocol. The AVG-3
-statements were pinned by a Claude agent and reviewed by a second Claude agent against the paper
-(the review led to `±1` labels in Definition 2.3); the proofs are by Claude agents under the
-fixed-statement protocol.
+hand against the sources, and then proved by the agent under the same protocol.
 
 Build and audit:
 
