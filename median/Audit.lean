@@ -14,3 +14,10 @@ import Median
 #print axioms Median.binary_consensus_fast
 #print axioms Median.median_consensus_fast
 #print axioms Median.odd_split_consensus
+#print axioms Median.expander_mixing
+#print axioms Median.sparse_of_lambdaG
+#print axioms Median.expected_minority_step
+#print axioms Median.phaseII_step
+#print axioms Median.two_choices_expander_explicit
+#print axioms Median.two_choices_expander
+#print axioms Median.two_choices_failure_tendsto
