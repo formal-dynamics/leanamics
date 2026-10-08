@@ -7,12 +7,13 @@ choices* (2009 version: Theorems 2, 3 and 10; SPAA 2011: Theorem 1.1). Against a
 knows the history and recolours at most `F ≤ √n / C` nodes per round, the median rule reaches
 almost stable consensus within `O(log n)` rounds with high probability: from round
 `T₀ = ⌈C log n⌉` on, all but `C (F + log n)` nodes hold the same value, and keep holding it for
-`H` more rounds, except with probability at most `(C log n + H)/n²` per pair of values.
+`H` more rounds, except with probability at most `(C log n + H)/n²` per threshold (pair of
+consecutive legal values).
 
 * `binary_almost_stable_of_isAdvRun`, `binary_almost_stable`: two values (2-Choices), from any
   configuration;
-* `median_almost_stable`: any number `m` of values, the adversary writing initial values only;
-  the failure probability is at most `(m - 1)` times the binary one.
+* `median_almost_stable`: any number `m` of legal values, the adversary writing legal values
+  only; the failure probability is at most `(m - 1)` times the binary one.
 -/
 
 namespace Median
@@ -51,17 +52,18 @@ theorem binary_almost_stable : ∃ C : ℝ, 0 < C ∧ ∀ (n : ℕ) [NeZero n], 
   sorry
 
 /-- **Almost stable consensus against an adaptive adversary** (the paper's main theorem with
-adversary: Theorem 1.1 of SPAA 2011, Theorems 2, 3 and 20 of the 2009 version). From any
-configuration with `m` distinct values, against any adversary that knows the history, recolours
-at most `F ≤ √n / C` nodes per round and only writes initial values, all but at most
-`C (F + log n)` nodes hold a common value at every time from `⌈C log n⌉` to `⌈C log n⌉ + H`,
-except with probability at most `(m - 1) (C log n + H)/n²`. -/
+adversary: Theorem 1.1 of SPAA 2011, Theorems 2, 3 and 20 of the 2009 version). Let `S` be a set
+of `m` legal values containing the values of the configuration `x` (in the paper, the initial
+values; a larger `S` also covers a corruption before the first round). Against any adversary
+that knows the history, recolours at most `F ≤ √n / C` nodes per round and only writes values
+of `S`, all but at most `C (F + log n)` nodes hold a common value at every time from
+`⌈C log n⌉` to `⌈C log n⌉ + H`, except with probability at most `(m - 1) (C log n + H)/n²`. -/
 theorem median_almost_stable : ∃ C : ℝ, 0 < C ∧ ∀ (n : ℕ) [NeZero n], C ≤ Real.log n →
-    ∀ F : ℕ, C * F ≤ √(n : ℝ) → ∀ (x : Config n α) (A : Adversary n α), A.Bounded F →
-    A.UsesValues (Set.range x) → ∀ H : ℕ,
+    ∀ F : ℕ, C * F ≤ √(n : ℝ) → ∀ (S : Finset α) (x : Config n α), (∀ v, x v ∈ S) →
+    ∀ A : Adversary n α, A.Bounded F → A.UsesValues (S : Set α) → ∀ H : ℕ,
       expList (Round n) (⌈C * Real.log n⌉₊ + H)
           (notAlmostStable (C * (F + Real.log n)) ⌈C * Real.log n⌉₊ H (runAdv A x))
-        ≤ (((univ.image x).card : ℝ) - 1) * ((C * Real.log n + H) / (n : ℝ) ^ 2) := by
+        ≤ ((S.card : ℝ) - 1) * ((C * Real.log n + H) / (n : ℝ) ^ 2) := by
   sorry
 
 end Median

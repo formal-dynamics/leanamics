@@ -290,4 +290,91 @@ theorem adv_phase2 (hL : (128 : ℝ) ≤ log n) {F : ℕ} (hF : 1024 * (F : ℝ)
   rw [card_ne_true]
   exact hmem.le
 
+/-! ### Both phases -/
+
+omit [NeZero n] in
+/-- Allowing more exceptions makes almost stable consensus easier. -/
+lemma notAlmostStable_mono {α : Type*} [LinearOrder α] {K K' : ℝ} (hK : K ≤ K') (T₀ H : ℕ)
+    (P : List (Round n) → Config n α) (l : List (Round n)) :
+    notAlmostStable K' T₀ H P l ≤ notAlmostStable K T₀ H P l := by
+  rw [notAlmostStable_eq, notAlmostStable_eq]
+  exact failInd_mono fun ⟨b, hb⟩ => ⟨b, fun t h1 h2 => le_trans (hb t h1 h2) hK⟩
+
+omit [NeZero n] in
+lemma notAlmostStable_le_one {α : Type*} [LinearOrder α] (K : ℝ) (T₀ H : ℕ)
+    (P : List (Round n) → Config n α) (l : List (Round n)) : notAlmostStable K T₀ H P l ≤ 1 := by
+  rw [notAlmostStable_eq]
+  exact failInd_le_one _
+
+/-- **Almost stable consensus for a perturbed run of 2-Choices.** For `log n ≥ 2²⁰` and
+`F ≤ √n/1024`, all but at most `max (16 F) (1024 log n)` nodes hold a common value at every time
+from `T₀ = ⌈2²⁰ log n⌉` to `T₀ + H`, except with probability at most `(2²⁰ log n + H)/n²`:
+escape in `⌈2¹⁹ log n⌉` rounds (`adv_escape`), then growth and saturation (`adv_phase2`, on the
+run or on its flip). -/
+theorem adv_binary_window (hL : (2 ^ 20 : ℝ) ≤ log n) {F : ℕ} (hF : 1024 * (F : ℝ) ≤ √(n : ℝ))
+    {x : Config n Bool} {P : List (Round n) → Config n Bool} (hP : IsAdvRun F x P) (H : ℕ) :
+    expList (Round n) (⌈2 ^ 20 * log n⌉₊ + H)
+        (notAlmostStable (max (16 * (F : ℝ)) (1024 * log n)) ⌈2 ^ 20 * log n⌉₊ H P)
+      ≤ (2 ^ 20 * log n + H) / (n : ℝ) ^ 2 := by
+  have hn0 : (0 : ℝ) < n := Nat.cast_pos.mpr (NeZero.pos n)
+  have hL0 : 0 ≤ log n := by linarith
+  obtain ⟨K, hK⟩ : ∃ K, K = max (16 * (F : ℝ)) (1024 * log n) := ⟨_, rfl⟩
+  obtain ⟨G₀, hG₀⟩ : ∃ G₀, G₀ = 128 * √((n : ℝ) * log n) := ⟨_, rfl⟩
+  obtain ⟨T₀, hT₀⟩ : ∃ T₀, T₀ = ⌈2 ^ 20 * log n⌉₊ := ⟨_, rfl⟩
+  obtain ⟨Te, hTe⟩ : ∃ Te, Te = ⌈524288 * log n⌉₊ := ⟨_, rfl⟩
+  rw [← hK, ← hT₀]
+  -- the round counts
+  have hT₀1 : 2 ^ 20 * log n ≤ (T₀ : ℝ) := hT₀ ▸ Nat.le_ceil _
+  have hT₀2 : (T₀ : ℝ) ≤ 2 ^ 20 * log n + 1 := hT₀ ▸ (Nat.ceil_lt_add_one (by positivity)).le
+  have hTe1 : 524288 * log n ≤ (Te : ℝ) := hTe ▸ Nat.le_ceil _
+  have hTe2 : (Te : ℝ) ≤ 524288 * log n + 1 := hTe ▸ (Nat.ceil_lt_add_one (by positivity)).le
+  have hg1 : (⌈9 * log n⌉₊ : ℝ) ≤ 9 * log n + 1 := (Nat.ceil_lt_add_one (by positivity)).le
+  have hs1 : (⌈16 * log n⌉₊ : ℝ) ≤ 16 * log n + 1 := (Nat.ceil_lt_add_one (by positivity)).le
+  have hsum : Te + (⌈9 * log n⌉₊ + ⌈16 * log n⌉₊) ≤ T₀ := by
+    have : (Te : ℝ) + (⌈9 * log n⌉₊ + ⌈16 * log n⌉₊) ≤ T₀ := by linarith
+    exact_mod_cast this
+  obtain ⟨T₁, hT₁⟩ : ∃ T₁, T₁ = T₀ - Te := ⟨_, rfl⟩
+  have hT₁g : ⌈9 * log n⌉₊ + ⌈16 * log n⌉₊ ≤ T₁ := by omega
+  have hT₁R : (T₁ : ℝ) = T₀ - Te := by rw [hT₁, Nat.cast_sub (by omega)]
+  rw [show T₀ + H = Te + (T₁ + H) by omega]
+  refine le_trans (expList_le_of_split (Ψ := fun l => failInd (G₀ ≤ |gapR (P l)|))
+    (a := ((T₁ + H : ℕ) : ℝ) / (n : ℝ) ^ 2) ?_) ?_
+  · intro l₁ hl₁
+    by_cases hG : G₀ ≤ |gapR (P l₁)|
+    · rw [failInd_of hG, add_zero]
+      have hQ : IsAdvRun F (P l₁) (fun l => P (l₁ ++ l)) := hP.perturbed.shift l₁
+      have hpt : ∀ l₂, notAlmostStable K T₀ H P (l₁ ++ l₂)
+          ≤ notAlmostStable K T₁ H (fun l => P (l₁ ++ l)) l₂ := by
+        intro l₂
+        rw [notAlmostStable_eq, notAlmostStable_eq]
+        refine failInd_mono fun ⟨b, hb⟩ => ⟨b, fun t h1 h2 => ?_⟩
+        have hb' := hb (t - Te) (by omega) (by omega)
+        rwa [List.take_append, List.take_of_length_le (by omega), hl₁]
+      refine le_trans (expList_le_expList hpt) ?_
+      rcases le_or_gt 0 (gapR (P l₁)) with hpos | hneg
+      · rw [abs_of_nonneg hpos] at hG
+        rw [hK]
+        exact adv_phase2 (by linarith) hF (hG₀ ▸ hG) hQ H hT₁g
+      · rw [abs_of_neg hneg] at hG
+        rw [show notAlmostStable K T₁ H (fun l => P (l₁ ++ l))
+            = notAlmostStable K T₁ H (fun l v => !P (l₁ ++ l) v) from
+          funext fun l => (notAlmostStable_flip _ _ _ _ l).symm, hK]
+        exact adv_phase2 (by linarith) hF (by rw [gapR_flip]; linarith) (isAdvRun_flip hQ) H
+          hT₁g
+    · rw [failInd_of_not hG]
+      calc expList (Round n) (T₁ + H) (fun l₂ => notAlmostStable K T₀ H P (l₁ ++ l₂))
+          ≤ expList (Round n) (T₁ + H) (fun _ => (1 : ℝ)) :=
+            expList_le_expList fun l => notAlmostStable_le_one _ _ _ _ _
+        _ = 1 := expList_const _ _
+        _ ≤ ((T₁ + H : ℕ) : ℝ) / (n : ℝ) ^ 2 + 1 := le_add_of_nonneg_left (by positivity)
+  · have hesc := adv_escape (by linarith) hF hP
+    rw [← hTe, ← hG₀] at hesc
+    calc ((T₁ + H : ℕ) : ℝ) / (n : ℝ) ^ 2
+          + expList (Round n) Te (fun l => failInd (G₀ ≤ |gapR (P l)|))
+        ≤ ((T₁ + H : ℕ) : ℝ) / (n : ℝ) ^ 2 + 2 / (n : ℝ) ^ 2 := by gcongr
+      _ = ((T₁ : ℝ) + 2 + H) / (n : ℝ) ^ 2 := by push_cast; ring
+      _ ≤ (2 ^ 20 * log n + H) / (n : ℝ) ^ 2 := by
+          gcongr
+          linarith
+
 end Median
