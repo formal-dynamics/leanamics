@@ -117,17 +117,18 @@ Lemma numbers follow the arXiv version.
    uniform draws from `Fin d × Fin d` through an enumeration of each neighbourhood
    (`roundEquiv`).
 6. **Proof route of Theorem 4.** The paper combines its Lemma 6 and Corollary 4 (Phase II: the
-   minority falls from `(3/13) c n` to a slowly growing `ω` in `O(log n)` rounds) with its
-   Lemma 9 and Corollary 5 (Phase III: from `ω` to `0`), for `ω = log n / log log n`. The
+   minority falls from `(3/13)(3/5 − λ_G) n` to a slowly growing `ω` in `O(log n)` rounds)
+   with its Lemma 9 and Corollary 5 (Phase III: from `ω` to `0`), for `ω = log n / log log n`. The
    formalization uses instead one supermartingale argument (`expList_le_of_contract`). In the
    region `|B| ≤ (ε/5) n`, every superset of `B` of size at most `(13/3) |B| ≤ εn` is sparse by
    the mixing lemma (`sparse_of_lambdaG`: `E(S, S) ≤ d |S|² / n + λ_G d |S|`), so the expected
    minority contracts by `24/25` per round, and by the Chernoff bound one round leaves the
    region with probability at most `e^{−εn/24250}`. This gives the explicit bound of item 4
-   directly, with a failure probability polynomially small in `n` (the paper's phases give
-   `e^{−Θ(ω)}`). The sparsity threshold `εn` replaces the paper's `c n` with
-   `c = 1 − (2/5)(1 − λ)^{−1} ≥ ε`, and the mixing lemma replaces the conductance bound of
-   Jerrum and Sinclair used in the proof of Lemma 6.
+   directly; for fixed `ε` (more generally, when `εn` is large compared with `log n`) the
+   failure probability is polynomially small in `n`, while the paper's phases give `e^{−Θ(ω)}`,
+   which for `ω = log n / log log n` is `n^{−Θ(1/log log n)}`. The sparsity threshold `εn`
+   replaces the paper's `c n` with `c = 1 − (2/5)(1 − λ)^{−1} ≥ ε`, and the mixing lemma
+   replaces the conductance bound of Jerrum and Sinclair used in the proof of Lemma 6.
 7. **No adversary.** The paper notes that its theorems hold against an adversary that
    redistributes the opinions before every round (keeping their numbers). The formal statements
    cover the process without an adversary. The one-round bounds hold for every configuration in
