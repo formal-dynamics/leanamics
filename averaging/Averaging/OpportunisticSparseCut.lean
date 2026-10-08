@@ -1,4 +1,4 @@
-import Averaging.OpportunisticNonEphemeral
+import Averaging.OpportunisticSignEvents
 
 /-! # Averaging whenever you meet: community recovery on clustered graphs with a sparse cut
 
@@ -98,6 +98,178 @@ theorem IsClusteredRegular.prob_good_window (hG : IsClusteredRegular G V₁ d b)
     simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hv ⊢
     intro t hta htb
     exact hv t (Nat.ceil_le.mpr hta) (Nat.le_floor htb)
+
+/-- The hypothesis of Lemma 4.2 forces `n ε⁴ ≥ 5·10⁵`. -/
+lemma IsClusteredRegular.card_mul_pow_four_ge (hG : IsClusteredRegular G V₁ d b)
+    (h3 : ThirdEigenvalueLB G V₁ d lam3) {ε : ℝ} (hε0 : 0 < ε) (hl3 : 0 < lam3)
+    (hc : (2 * b / d : ℝ) / lam3 ≤ lam3 * ε ^ 4 / (10 ^ 6 * Real.log (Fintype.card V) ^ 2)) :
+    5 * 10 ^ 5 ≤ (Fintype.card V : ℝ) * ε ^ 4 := by
+  have hn := hG.card_real_pos
+  have hl3le := hG.lam3_le_two h3
+  have hl2N := hG.two_div_card_lt
+  set N : ℝ := (Fintype.card V : ℝ) with hN_def
+  set LN := Real.log N
+  set l2 : ℝ := 2 * b / d
+  have hN4 : (4 : ℝ) ≤ N := by rw [hN_def]; exact_mod_cast hG.four_le_card
+  have hLN1 : 1 ≤ LN := by
+    have h4 : Real.log 4 = 2 * Real.log 2 := by
+      rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.log_pow]; norm_num
+    have := Real.log_le_log (by norm_num) hN4
+    have := Real.log_two_gt_d9
+    linarith
+  have hcr : l2 / lam3 * (10 ^ 6 * LN ^ 2) ≤ lam3 * ε ^ 4 := by
+    rwa [le_div_iff₀ (by positivity)] at hc
+  have hrN : 2 / (N * lam3) < l2 / lam3 := by
+    rw [div_lt_div_iff₀ (by positivity) hl3]
+    rw [div_lt_iff₀ hn] at hl2N
+    nlinarith
+  have hC : 2 * 10 ^ 6 * LN ^ 2 ≤ N * lam3 ^ 2 * ε ^ 4 := by
+    have h1 : 2 / (N * lam3) * (10 ^ 6 * LN ^ 2) ≤ lam3 * ε ^ 4 := by
+      have := mul_le_mul_of_nonneg_right hrN.le (show 0 ≤ 10 ^ 6 * LN ^ 2 by positivity)
+      linarith
+    rw [div_mul_eq_mul_div, div_le_iff₀ (by positivity)] at h1
+    nlinarith
+  have h1 : lam3 ^ 2 ≤ 4 := by nlinarith
+  have h2 := mul_le_mul_of_nonneg_left h1 (show 0 ≤ N * ε ^ 4 by positivity)
+  have h4 : (1 : ℝ) ≤ LN ^ 2 := by nlinarith
+  nlinarith
+
+lemma inv_sqrt_half_le {N ε : ℝ} (hN : 0 ≤ N) (hε0 : 0 < ε) (hε1 : ε ≤ 1)
+    (h : 5 * 10 ^ 5 ≤ N * ε ^ 4) : 1 / Real.sqrt (N / 2 + 1) ≤ ε / 10 := by
+  refine one_div_sqrt_le (by positivity) (by positivity) ?_
+  have h42 : ε ^ 4 ≤ ε ^ 2 := pow_le_pow_of_le_one hε0.le hε1 (by norm_num)
+  have h1 : N * ε ^ 4 ≤ N * ε ^ 2 := mul_le_mul_of_nonneg_left h42 hN
+  have e : (ε / 10) ^ 2 * (N / 2 + 1) = N * ε ^ 2 / 200 + ε ^ 2 / 100 := by ring
+  rw [e]
+  have : 0 ≤ ε ^ 2 / 100 := by positivity
+  linarith
+
+/-- A small initial community average forces one block sum to be small. -/
+lemma IsClusteredRegular.blockSum_small (hG : IsClusteredRegular G V₁ d b) {ε : ℝ}
+    (hε0 : 0 ≤ ε) (hε1 : ε ≤ 1) (σ : V → ℤˣ) (v : V)
+    (h : (projOne (signVec σ) v + projCut V₁ (signVec σ) v) ^ 2 ≤
+      ε ^ 2 / Fintype.card V * ∑ w, projCut V₁ (signVec σ) w ^ 2) :
+    |blockSum V₁ σ| ≤ ε * |blockSum V₁ᶜ σ| ∨ |blockSum V₁ᶜ σ| ≤ ε * |blockSum V₁ σ| := by
+  have hn := hG.card_real_pos
+  rw [hG.projOne_add_projCut_signVec, hG.sum_sq_projCut_signVec] at h
+  set S₁ := blockSum V₁ σ
+  set S₂ := blockSum V₁ᶜ σ
+  have key : ∀ A B : ℝ, (2 * A / Fintype.card V) ^ 2 ≤
+      ε ^ 2 / Fintype.card V * ((A - B) ^ 2 / Fintype.card V) → |A| ≤ ε * |B| := by
+    intro A B hAB
+    have h1 : (2 * A) ^ 2 ≤ (ε * (A - B)) ^ 2 := by
+      have e1 : (2 * A / Fintype.card V) ^ 2 = (2 * A) ^ 2 / (Fintype.card V : ℝ) ^ 2 := by ring
+      have e2 : ε ^ 2 / Fintype.card V * ((A - B) ^ 2 / Fintype.card V) =
+          (ε * (A - B)) ^ 2 / (Fintype.card V : ℝ) ^ 2 := by ring
+      rw [e1, e2] at hAB
+      exact (div_le_div_iff_of_pos_right (by positivity)).mp hAB
+    have h2 := sq_le_sq.mp h1
+    rw [abs_mul, abs_mul, abs_of_nonneg hε0, abs_two] at h2
+    have h3 : |A - B| ≤ |A| + |B| := abs_sub _ _
+    have h4 : 2 * |A| ≤ ε * |A| + ε * |B| := by nlinarith [abs_nonneg A, abs_nonneg B]
+    nlinarith [abs_nonneg A]
+  split_ifs at h with hv
+  · exact Or.inl (key S₁ S₂ h)
+  · exact Or.inr (key S₂ S₁ (by rwa [show (S₂ - S₁) ^ 2 = (S₁ - S₂) ^ 2 by ring]))
+
+lemma pos_iff_of_sq_lt {x μ : ℝ} (h : (x - μ) ^ 2 < μ ^ 2) : 0 < x ↔ 0 < μ := by
+  constructor
+  · intro hx; nlinarith
+  · intro hμ; nlinarith
+
+/-- Good nodes, when the community averages are not too small, have the right sign. -/
+lemma sq_sub_lt_of_good {ε : ℝ} {x₀ x : V → ℝ} {v : V} (hgood : IsGood V₁ ε x₀ x v)
+    (hs : ε ^ 2 / Fintype.card V * ∑ w, projCut V₁ x₀ w ^ 2 <
+      (projOne x₀ v + projCut V₁ x₀ v) ^ 2) :
+    (x v - (projOne x₀ v + projCut V₁ x₀ v)) ^ 2 < (projOne x₀ v + projCut V₁ x₀ v) ^ 2 :=
+  lt_of_le_of_lt hgood hs
+
+/-- **Sign recovery over the phase** (`c = 10⁶`, `C = 4`) on a general vertex type. -/
+theorem IsClusteredRegular.prob_sign_window (hG : IsClusteredRegular G V₁ d b)
+    (h3 : ThirdEigenvalueLB G V₁ d lam3) {ε : ℝ} (hε0 : 0 < ε) (hε1 : ε ≤ 1) (hl3 : 0 < lam3)
+    (hc : (2 * b / d : ℝ) / lam3 ≤ lam3 * ε ^ 4 / (10 ^ 6 * Real.log (Fintype.card V) ^ 2)) :
+    1 - 4 * ε ≤ avg fun σ : V → ℤˣ =>
+      expList G.Dart ⌊12 * Fintype.card V / lam3 * Real.log (Fintype.card V)⌋₊ fun l =>
+        if (1 - 4 * ε) * Fintype.card V ≤ #{v | ∀ t : ℕ,
+            6 * Fintype.card V / lam3 * Real.log (Fintype.card V) ≤ t →
+            (t : ℝ) ≤ 12 * Fintype.card V / lam3 * Real.log (Fintype.card V) →
+            SignType.sign (avgRun G (signVec σ) (l.take t) v) =
+              SignType.sign (projOne (signVec σ) v + projCut V₁ (signVec σ) v)}
+        then 1 else 0 := by
+  haveI := hG.nonempty_dart
+  have hn := hG.card_real_pos
+  have hgood := hG.prob_good_window h3 hε0 hε1 hl3 hc
+  have hA := hG.avg_abs_blockSum_le_mul (V₁ := V₁) hε0.le
+  have hB := hG.avg_abs_blockSum_compl_le_mul (V₁ := V₁) hε0.le
+  have hsq := inv_sqrt_half_le hn.le hε0 hε1 (hG.card_mul_pow_four_ge h3 hε0 hl3 hc)
+  set T := ⌊12 * (Fintype.card V : ℝ) / lam3 * Real.log (Fintype.card V)⌋₊
+  set a := 6 * (Fintype.card V : ℝ) / lam3 * Real.log (Fintype.card V)
+  set a2 := 12 * (Fintype.card V : ℝ) / lam3 * Real.log (Fintype.card V)
+  have hpt : ∀ σ : V → ℤˣ,
+      expList G.Dart T (fun l => if (1 - 3 * ε) * Fintype.card V ≤ #{v | ∀ t : ℕ, a ≤ t →
+          (t : ℝ) ≤ a2 → IsGood V₁ ε (signVec σ) (avgRun G (signVec σ) (l.take t)) v}
+        then 1 else 0) -
+        ((if |blockSum V₁ σ| ≤ ε * |blockSum V₁ᶜ σ| then (1 : ℝ) else 0) +
+          (if |blockSum V₁ᶜ σ| ≤ ε * |blockSum V₁ σ| then (1 : ℝ) else 0)) ≤
+      expList G.Dart T (fun l => if (1 - 4 * ε) * Fintype.card V ≤ #{v | ∀ t : ℕ, a ≤ t →
+          (t : ℝ) ≤ a2 → SignType.sign (avgRun G (signVec σ) (l.take t) v) =
+            SignType.sign (projOne (signVec σ) v + projCut V₁ (signVec σ) v)} then 1 else 0) := by
+    intro σ
+    have hI0 : ∀ (P : Prop) [Decidable P], (0 : ℝ) ≤ if P then 1 else 0 := fun P _ => by
+      split_ifs <;> norm_num
+    have hle1 : expList G.Dart T (fun l => if (1 - 3 * ε) * Fintype.card V ≤ #{v | ∀ t : ℕ,
+        a ≤ t → (t : ℝ) ≤ a2 → IsGood V₁ ε (signVec σ) (avgRun G (signVec σ) (l.take t)) v}
+          then (1 : ℝ) else 0) ≤ 1 :=
+      (expList_le_expList fun l => by split_ifs <;> norm_num).trans (expList_const T 1).le
+    have hR0 : 0 ≤ expList G.Dart T (fun l => if (1 - 4 * ε) * Fintype.card V ≤ #{v | ∀ t : ℕ,
+        a ≤ t → (t : ℝ) ≤ a2 → SignType.sign (avgRun G (signVec σ) (l.take t) v) =
+          SignType.sign (projOne (signVec σ) v + projCut V₁ (signVec σ) v)} then (1 : ℝ)
+            else 0) := expList_nonneg fun l => by split_ifs <;> norm_num
+    by_cases hs : ∀ v, ε ^ 2 / Fintype.card V * ∑ w, projCut V₁ (signVec σ) w ^ 2 <
+        (projOne (signVec σ) v + projCut V₁ (signVec σ) v) ^ 2
+    · have hmono : expList G.Dart T (fun l => if (1 - 3 * ε) * Fintype.card V ≤ #{v | ∀ t : ℕ,
+          a ≤ t → (t : ℝ) ≤ a2 → IsGood V₁ ε (signVec σ) (avgRun G (signVec σ) (l.take t)) v}
+            then (1 : ℝ) else 0) ≤
+          expList G.Dart T (fun l => if (1 - 4 * ε) * Fintype.card V ≤ #{v | ∀ t : ℕ, a ≤ t →
+            (t : ℝ) ≤ a2 → SignType.sign (avgRun G (signVec σ) (l.take t) v) =
+              SignType.sign (projOne (signVec σ) v + projCut V₁ (signVec σ) v)}
+                then 1 else 0) := by
+        refine expList_le_expList fun l => ?_
+        split_ifs with h1 h2 <;> try norm_num
+        refine absurd ?_ h2
+        have hsub : #{v | ∀ t : ℕ, a ≤ t → (t : ℝ) ≤ a2 →
+            IsGood V₁ ε (signVec σ) (avgRun G (signVec σ) (l.take t)) v} ≤
+            #{v | ∀ t : ℕ, a ≤ t → (t : ℝ) ≤ a2 →
+              SignType.sign (avgRun G (signVec σ) (l.take t) v) =
+                SignType.sign (projOne (signVec σ) v + projCut V₁ (signVec σ) v)} := by
+          refine Finset.card_le_card fun v hv => ?_
+          simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hv ⊢
+          intro t ht1 ht2
+          have h := sq_sub_lt_of_good (hv t ht1 ht2) (hs v)
+          have := sign_add_of_sq_lt h
+          rwa [add_sub_cancel] at this
+        have : (#{v | ∀ t : ℕ, a ≤ t → (t : ℝ) ≤ a2 →
+            IsGood V₁ ε (signVec σ) (avgRun G (signVec σ) (l.take t)) v} : ℝ) ≤
+            #{v | ∀ t : ℕ, a ≤ t → (t : ℝ) ≤ a2 →
+              SignType.sign (avgRun G (signVec σ) (l.take t) v) =
+                SignType.sign (projOne (signVec σ) v + projCut V₁ (signVec σ) v)} := by
+          exact_mod_cast hsub
+        nlinarith
+      have := hI0 (|blockSum V₁ σ| ≤ ε * |blockSum V₁ᶜ σ|)
+      have := hI0 (|blockSum V₁ᶜ σ| ≤ ε * |blockSum V₁ σ|)
+      linarith
+    · simp only [not_forall, not_lt] at hs
+      obtain ⟨v, hv⟩ := hs
+      rcases hG.blockSum_small hε0.le hε1 σ v hv with h | h
+      · rw [if_pos h]
+        have := hI0 (|blockSum V₁ᶜ σ| ≤ ε * |blockSum V₁ σ|)
+        linarith
+      · rw [if_pos h]
+        have := hI0 (|blockSum V₁ σ| ≤ ε * |blockSum V₁ᶜ σ|)
+        linarith
+  refine le_trans ?_ (avg_le_avg hpt)
+  rw [avg_sub, avg_add]
+  linarith
 
 end General
 
