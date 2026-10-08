@@ -58,8 +58,8 @@ theorem binary_consensus_fast : ∃ C : ℝ, 0 < C ∧ ∀ (n : ℕ) [NeZero n],
     have hR : ((T₁ + 6 + T₃ + 8 : ℕ) : ℝ) ≤ 128 * (log (n / Δ) + log (log n)) := by
       push_cast
       linarith
-    have hpad := event_absorb_mono (K := Median.kernel n Bool) (P := (· ∈ consSet))
-      (fun _ ha => cons_absorb ha) _ _ x (Nat.cast_le.mp (hR.trans (Nat.le_ceil _)))
+    have hpad := Kernel.event_monotone (Median.kernel n Bool) (P := (· ∈ consSet))
+      (fun _ ha => cons_absorb ha) x (Nat.cast_le.mp (hR.trans (Nat.le_ceil _)))
     -- the failure budget: `(T₁ + 6 + T₃ + 10) n⁻² ≤ 128/n`
     have hwn : log (n / Δ) ≤ log n := log_le_log (by positivity) (div_le_self hn0.le hΔ1)
     have hbud := mul_one_div_sq_le (S := T₁ + 6 + T₃ + 10) (C := 128) hn0

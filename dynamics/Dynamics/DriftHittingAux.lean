@@ -24,16 +24,6 @@ namespace Dynamics
 namespace Distribution
 variable {α : Type*} [Fintype α]
 
-/-- Probabilities are monotone in the event. -/
-lemma prob_mono (μ : Distribution α) {E F : α → Prop} (h : ∀ b, E b → F b) :
-    μ.prob E ≤ μ.prob F := by
-  classical
-  unfold prob
-  refine μ.expect_mono fun b => ?_
-  by_cases hE : E b
-  · simp [hE, h b hE]
-  · by_cases hF : F b <;> simp [hE, hF]
-
 /-- If `f ≤ M` everywhere and `f ≤ m ≤ M` on an event of probability at least `s`, then
 `𝔼 f ≤ M - (M - m) s`. -/
 lemma expect_le_of_prob (μ : Distribution α) {f : α → ℝ} {E : α → Prop} {m M s : ℝ}

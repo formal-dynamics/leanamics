@@ -19,6 +19,10 @@ probability of an event is the average of its indicator, and independence is
 * `avg_bernstein`: **Bernstein's inequality**, `P(X ≥ 𝔼X + λ) ≤
   exp(-λ² / (2σ²(1 + bλ/(3σ²))))` whenever every coordinate satisfies
   `Yᵢ - 𝔼Yᵢ ≤ b` and `σ²` bounds the variance of `X`.
+* `avg_hoeffding_lower`: Hoeffding's lower tail, and `variance_le_avg_of_zero_one`:
+  the variance of a `{0,1}` coordinate is at most its mean.
+
+The multiplicative Chernoff bounds are in `Dynamics.Chernoff`.
 -/
 
 namespace Dynamics
@@ -180,6 +184,14 @@ lemma one_sub_add_mul_exp_le {p : ℝ} (hp0 : 0 ≤ p) (hp1 : p ≤ 1) (t : ℝ)
 /-! ### Tail bounds for sums of independent coordinates -/
 
 variable {n : ℕ} {γ : Type*} [Fintype γ]
+
+/-- The average of an indicator is at most `1`, also on an empty type. -/
+lemma avg_ite_le_one {α : Type*} [Fintype α] (P : α → Prop) [DecidablePred P] :
+    avg (fun a => if P a then (1 : ℝ) else 0) ≤ 1 := by
+  rcases isEmpty_or_nonempty α with hα | hα
+  · simp [avg]
+  · calc _ ≤ avg (fun _ : α => (1 : ℝ)) := avg_le_avg fun a => by split <;> norm_num
+      _ = 1 := avg_const 1
 
 /-- Markov's inequality applied to `exp (t (X - k))`: an exponential-moment
 bound turns into a tail bound. -/
@@ -356,5 +368,56 @@ theorem avg_bernstein [Nonempty γ] (Y : Fin n → γ → ℝ) {b σ2 lam : ℝ}
         rw [h1]
         field_simp
         ring
+
+/-! ### Lower tails and the variance of a `{0,1}` coordinate -/
+
+/-- Markov's inequality applied to `exp (t (X - k))` with `t ≤ 0`: the lower-tail companion
+of `avg_tail_le_of_mgf`. -/
+theorem avg_lower_tail_le_of_mgf (X : (Fin n → γ) → ℝ) {t : ℝ} (ht : t ≤ 0) (k : ℝ) :
+    avg (fun ω => if X ω ≤ k then (1 : ℝ) else 0)
+      ≤ avg (fun ω => exp (t * X ω)) * exp (-(t * k)) := by
+  have hpt (ω : Fin n → γ) :
+      (if X ω ≤ k then (1 : ℝ) else 0) ≤ exp (-(t * k)) * exp (t * X ω) := by
+    rw [← exp_add]
+    split_ifs with h
+    · have h0 : (0 : ℝ) ≤ -(t * k) + t * X ω := by nlinarith
+      calc (1 : ℝ) = exp 0 := by simp
+        _ ≤ _ := exp_le_exp.mpr h0
+    · exact (exp_pos _).le
+  calc avg (fun ω => if X ω ≤ k then (1 : ℝ) else 0)
+      ≤ avg (fun ω => exp (-(t * k)) * exp (t * X ω)) := avg_le_avg hpt
+    _ = _ := by rw [avg_const_mul, mul_comm]
+
+/-- **Hoeffding's inequality, lower tail**, for independent `{0,1}`-valued coordinates:
+`P(X ≤ 𝔼X - λ) ≤ exp(-2λ²/n)`. Replaces `Median.avg_hoeffding_lower`. -/
+theorem avg_hoeffding_lower [Nonempty γ] (Y : Fin n → γ → ℝ)
+    (hY : ∀ i x, Y i x = 0 ∨ Y i x = 1) {lam : ℝ} (hlam : 0 ≤ lam) :
+    avg (fun ω : Fin n → γ =>
+        if ∑ i, Y i (ω i) + lam ≤ ∑ i, avg (Y i) then (1 : ℝ) else 0)
+      ≤ exp (-(2 * lam ^ 2 / n)) := by
+  have hYc (i : Fin n) (y : γ) : 1 - Y i y = 0 ∨ 1 - Y i y = 1 := by
+    rcases hY i y with h | h <;> simp [h]
+  have hB := avg_hoeffding (fun i y => 1 - Y i y) hYc hlam
+  have hsumavg : ∑ i, avg (fun y => 1 - Y i y) = (n : ℝ) - ∑ i, avg (Y i) := by
+    simp only [avg_sub, avg_const, sum_sub_distrib, sum_const, card_univ, Fintype.card_fin,
+      nsmul_eq_mul, mul_one]
+  have hcond (ω : Fin n → γ) :
+      ((∑ i, avg (fun y => 1 - Y i y)) + lam ≤ ∑ i, (1 - Y i (ω i)))
+        ↔ (∑ i, Y i (ω i) + lam ≤ ∑ i, avg (Y i)) := by
+    rw [hsumavg, sum_sub_distrib]
+    simp only [sum_const, card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one]
+    constructor <;> intro h <;> linarith
+  simp only [hcond] at hB
+  exact hB
+
+/-- The variance of a `{0,1}`-valued coordinate is at most its mean (`p (1 - p) ≤ p`).
+Generalizes `Median.variance_fcoord_le`. -/
+theorem variance_le_avg_of_zero_one {f : γ → ℝ} (hf : ∀ y, f y = 0 ∨ f y = 1) :
+    variance f ≤ avg f := by
+  rcases isEmpty_or_nonempty γ with hγ | hγ
+  · simp [variance, avg]
+  · have hsq : (fun y => f y ^ 2) = f := funext fun y => by rcases hf y with h | h <;> simp [h]
+    have h := variance_le_avg_sq f
+    rwa [hsq] at h
 
 end Dynamics

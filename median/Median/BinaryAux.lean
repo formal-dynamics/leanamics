@@ -16,7 +16,7 @@ corresponding bookkeeping:
   gap `g = a - m`, `𝔼[ones'] = a + a m g / n²` and `𝔼[m'] = m - a m g / n²`
   (the `p ↦ 3p² - 2p³` map, with `p = a/n`);
 * Hoeffding and Bernstein tails for the two counts (`Dynamics.Concentration`),
-  and Markov's inequality `P[m' ≥ 1] ≤ 𝔼[m']`.
+  and Markov's inequality `P[m' ≥ 1] ≤ 𝔼[m']` (`Dynamics.avg_markov_one`).
 -/
 
 namespace Median
@@ -396,42 +396,6 @@ lemma expones_ge (x : Config n Bool) [NeZero n]
 
 /-! ### Concentration for one round -/
 
-/-- **Hoeffding's inequality, lower tail**: for independent `{0,1}` coordinates,
-`P(X + λ ≤ 𝔼X) ≤ exp(-2λ²/n)`. -/
-lemma avg_hoeffding_lower {n : ℕ} {γ : Type*} [Fintype γ] [Nonempty γ]
-    (Y : Fin n → γ → ℝ) (hY : ∀ i x, Y i x = 0 ∨ Y i x = 1) {lam : ℝ} (hlam : 0 ≤ lam) :
-    avg (fun ω : Fin n → γ =>
-        if ∑ i, Y i (ω i) + lam ≤ ∑ i, avg (Y i) then (1 : ℝ) else 0)
-      ≤ exp (-(2 * lam ^ 2 / n)) := by
-  have hYc : ∀ i x, (1 - Y i x) = 0 ∨ (1 - Y i x) = 1 := by
-    intro i y
-    rcases hY i y with h | h <;> simp [h]
-  have hB := avg_hoeffding (Y := fun i y => 1 - Y i y) hYc hlam
-  have hsum : ∀ ω : Fin n → γ, ∑ i, (1 - Y i (ω i)) = (n : ℝ) - ∑ i, Y i (ω i) := by
-    intro ω
-    rw [sum_sub_distrib]
-    simp
-  have hsumavg : ∑ i, avg (fun y => 1 - Y i y) = (n : ℝ) - ∑ i, avg (Y i) := by
-    have havg1 : ∀ i, avg (fun y => 1 - Y i y) = 1 - avg (Y i) := by
-      intro i
-      rw [avg_sub, avg_const]
-    simp only [havg1]
-    rw [sum_sub_distrib]
-    simp
-  have hcond : ∀ ω : Fin n → γ,
-      ((∑ i, avg (fun y => 1 - Y i y)) + lam ≤ ∑ i, (1 - Y i (ω i)))
-        ↔ (∑ i, Y i (ω i) + lam ≤ ∑ i, avg (Y i)) := by
-    intro ω
-    rw [hsumavg, hsum ω]
-    constructor <;> intro h <;> linarith
-  have heq : (fun ω : Fin n → γ =>
-        if (∑ i, avg (fun y => 1 - Y i y)) + lam ≤ ∑ i, (1 - Y i (ω i)) then (1 : ℝ) else 0)
-      = fun ω : Fin n → γ =>
-        if ∑ i, Y i (ω i) + lam ≤ ∑ i, avg (Y i) then (1 : ℝ) else 0 := by
-    funext ω
-    simp only [hcond ω]
-  rwa [heq] at hB
-
 /-- Probability that one round produces at most `𝔼 - lam` `true` nodes. -/
 lemma ones_tail_lower (x : Config n Bool) [NeZero n] {lam : ℝ} (hlam : 0 ≤ lam) :
     avg (fun r : Round n =>
@@ -460,19 +424,6 @@ lemma falses_tail_upper (x : Config n Bool) [NeZero n] {lam : ℝ} (hlam : 0 ≤
   rw [hev]
   exact avg_hoeffding (fcoord x) (fcoord_zero_one x) hlam
 
-/-- The variance of a `{0,1}`-valued coordinate is at most its mean. -/
-lemma variance_fcoord_le (x : Config n Bool) [NeZero n] (v : Fin n) :
-    variance (fcoord x v) ≤ avg (fcoord x v) := by
-  have h1 : variance (fcoord x v) ≤ avg (fun p => fcoord x v p ^ 2) :=
-    variance_le_avg_sq _
-  have h2 : avg (fun p : Fin n × Fin n => fcoord x v p ^ 2) = avg (fcoord x v) := by
-    have hfun : (fun p : Fin n × Fin n => fcoord x v p ^ 2) = fcoord x v := by
-      funext p
-      rcases fcoord_zero_one x v p with h | h <;> simp [h]
-    rw [hfun]
-  rw [h2] at h1
-  exact h1
-
 /-- Bernstein's bound for the number of `false` nodes after one round. -/
 lemma falses_tail_bernstein (x : Config n Bool) [NeZero n] {lam σ2 : ℝ}
     (hlam : 0 ≤ lam) (hσ0 : 0 < σ2) (hvar : ∑ v, variance (fcoord x v) ≤ σ2) :
@@ -496,23 +447,11 @@ lemma falses_tail_bernstein (x : Config n Bool) [NeZero n] {lam σ2 : ℝ}
   exact hB
 
 /-- **Markov's inequality**: the probability of a `false` node after one round is
-at most the expected number of `false` nodes. -/
+at most the expected number of `false` nodes (`Dynamics.avg_markov_one`). -/
 lemma falses_tail_markov (x : Config n Bool) [NeZero n] :
     avg (fun r : Round n => if 1 ≤ falsesR (step x r) then (1 : ℝ) else 0)
       ≤ ∑ v, avg (fcoord x v) := by
-  have hle : ∀ r : Round n,
-      (if 1 ≤ falsesR (step x r) then (1 : ℝ) else 0) ≤ ∑ v, fcoord x v (r v) := by
-    intro r
-    by_cases h : 1 ≤ falsesR (step x r)
-    · rw [if_pos h]
-      rw [falses_step_sum] at h
-      exact h
-    · rw [if_neg h]
-      exact sum_nonneg fun v _ => fcoord_nonneg x v (r v)
-  calc avg (fun r : Round n => if 1 ≤ falsesR (step x r) then (1 : ℝ) else 0)
-      ≤ avg (fun r : Round n => ∑ v, fcoord x v (r v)) := avg_le_avg hle
-    _ = ∑ v : Fin n, avg (fun r : Round n => fcoord x v (r v)) := avg_sum univ _
-    _ = ∑ v : Fin n, avg (fcoord x v) := by
-        refine Finset.sum_congr rfl fun v _ => avg_eval n v _
+  simp only [falses_step_sum]
+  exact avg_markov_one (fcoord x) (fcoord_nonneg x)
 
 end Median

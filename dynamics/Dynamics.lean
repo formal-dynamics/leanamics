@@ -10,4 +10,5 @@ import Dynamics.Phases
 import Dynamics.Reverse
 import Dynamics.Rounds
 import Dynamics.Stationary
+import Dynamics.Tail
 import Dynamics.Trajectory
