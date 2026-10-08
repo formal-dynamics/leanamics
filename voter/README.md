@@ -101,8 +101,8 @@ conditionally on a meeting bound (`iterate_disagreement_le_of_meeting`); see
 `O(n log n / φ²)`: the corrected Lemma 2.1 and Cauchy–Schwarz give a multiplicative drift of the
 potential, and the multiplicative drift lemma of the shared library turns it into consensus with
 probability at least `1 - 1/n²`; a union bound over the projections "`i` against the rest" covers
-any number of opinions, on dynamic graphs too. The statements were pinned by a Claude agent and
-reviewed against the paper by a second agent; the proofs are by a Claude agent under the
-fixed-statement protocol, with the axiom audit in `Audit.lean`.
+any number of opinions, on dynamic graphs too. The statements were written by a Claude agent and
+reviewed against the paper by a second agent before any proof; the proofs are by a Claude agent
+under the fixed-statement protocol, with the axiom audit in `Audit.lean`.
 
 Future work: dynamic networks and extremal coalition results.
