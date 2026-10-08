@@ -210,12 +210,78 @@ theorem two_choices_expander : ∃ C : ℝ, 0 < C ∧
               + (C * log (Fintype.card V) + 1) * exp (-(ε * Fintype.card V / C)))
           ≤ expList (GraphRound G) ⌈C * log (Fintype.card V)⌉₊
               (fun l => if graphRun G x l = fun _ => a then (1 : ℝ) else 0) := by
-  sorry
+  refine ⟨25000, by norm_num, ?_⟩
+  intro V _ _ G _ d hd hreg ε hε hlam a x hx
+  set n : ℝ := (Fintype.card V : ℝ) with hn
+  set T := ⌈25000 * log n⌉₊ with hT
+  have h := two_choices_expander_explicit G hd hreg hε hlam a x hx T
+  have hn0 : 0 ≤ n := Nat.cast_nonneg _
+  have hlog : 0 ≤ log n := Real.log_natCast_nonneg _
+  have hb0 : (0 : ℝ) ≤ minority a x := Nat.cast_nonneg _
+  have hbn : (minority a x : ℝ) ≤ n := by
+    rw [hn]
+    exact_mod_cast Finset.card_le_univ _
+  -- the decay term
+  have hA : (T : ℝ) * exp (-(ε * n / 24250)) ≤ (25000 * log n + 1) * exp (-(ε * n / 25000)) := by
+    have hT1 : (T : ℝ) ≤ 25000 * log n + 1 := (Nat.ceil_lt_add_one (by positivity)).le
+    have he : exp (-(ε * n / 24250)) ≤ exp (-(ε * n / 25000)) := by
+      rw [exp_le_exp]
+      have : 0 ≤ ε * n := by positivity
+      linarith
+    exact mul_le_mul hT1 he (exp_pos _).le (by positivity)
+  -- the contraction term
+  have hB : (24 / 25 : ℝ) ^ T * minority a x ≤ 1 / n := by
+    rcases hn0.eq_or_lt with hn' | hnpos
+    · have : (minority a x : ℝ) = 0 := le_antisymm (hn' ▸ hbn) hb0
+      rw [this, ← hn', mul_zero, div_zero]
+    · have h1 : (24 / 25 : ℝ) ^ T ≤ exp (-(T / 25)) := by
+        have : (24 / 25 : ℝ) ≤ exp (-(1 / 25)) := by
+          have := add_one_le_exp (-(1 / 25 : ℝ))
+          linarith
+        calc (24 / 25 : ℝ) ^ T ≤ exp (-(1 / 25)) ^ T := pow_le_pow_left₀ (by norm_num) this T
+          _ = exp (-(T / 25)) := by rw [← Real.exp_nat_mul]; ring_nf
+      have h2 : exp (-(T / 25)) ≤ exp (-(2 * log n)) := by
+        rw [exp_le_exp]
+        have : 25000 * log n ≤ T := Nat.le_ceil _
+        linarith
+      have h3 : exp (-(2 * log n)) = 1 / (n * n) := by
+        rw [exp_neg, two_mul, exp_add, exp_log hnpos, one_div]
+      calc (24 / 25 : ℝ) ^ T * minority a x ≤ 1 / (n * n) * n :=
+            mul_le_mul (h1.trans (h2.trans h3.le)) hbn hb0 (by positivity)
+        _ = 1 / n := by field_simp
+  linarith
 
 /-- The failure probability of `two_choices_expander` is `o(1)`: for fixed `C > 0` and `ε > 0`,
 `1/n + (C log n + 1) e^{−ε n / C} → 0`. -/
 theorem two_choices_failure_tendsto {C ε : ℝ} (hC : 0 < C) (hε : 0 < ε) :
     Tendsto (fun n : ℕ => 1 / (n : ℝ) + (C * log n + 1) * exp (-(ε * n / C))) atTop (𝓝 0) := by
-  sorry
+  set c := ε / C with hc
+  have hc0 : 0 < c := div_pos hε hC
+  -- `(C x + 1) e^{−c x} → 0` along the reals
+  have hreal : Tendsto (fun y : ℝ => (C * y + 1) * exp (-(c * y))) atTop (𝓝 0) := by
+    have h1 : Tendsto (fun y : ℝ => c * y) atTop atTop := tendsto_id.const_mul_atTop hc0
+    have h2 : Tendsto (fun z : ℝ => z ^ 1 * exp (-z)) atTop (𝓝 0) :=
+      Real.tendsto_pow_mul_exp_neg_atTop_nhds_zero 1
+    have h3 := (h2.comp h1).const_mul (C / c)
+    have h4 := tendsto_exp_neg_atTop_nhds_zero.comp h1
+    have h5 := h3.add h4
+    rw [mul_zero, zero_add] at h5
+    refine h5.congr fun y => ?_
+    simp only [Function.comp_apply, pow_one]
+    field_simp
+  have hnat := hreal.comp tendsto_natCast_atTop_atTop
+  have hupper : Tendsto (fun n : ℕ => (C * (n : ℝ) + 1) * exp (-(c * n))) atTop (𝓝 0) := hnat
+  have hlog : Tendsto (fun n : ℕ => (C * log n + 1) * exp (-(ε * n / C))) atTop (𝓝 0) := by
+    refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds hupper (fun n => ?_)
+      (fun n => ?_)
+    · have := Real.log_natCast_nonneg n
+      positivity
+    · have hl : log (n : ℝ) ≤ n := Real.log_le_self (Nat.cast_nonneg n)
+      have he : exp (-(ε * n / C)) = exp (-(c * n)) := by rw [hc]; ring_nf
+      rw [he]
+      exact mul_le_mul_of_nonneg_right (by nlinarith) (exp_pos _).le
+  have hinv : Tendsto (fun n : ℕ => 1 / (n : ℝ)) atTop (𝓝 0) :=
+    tendsto_one_div_atTop_nhds_zero_nat
+  simpa using hinv.add hlog
 
 end Median
