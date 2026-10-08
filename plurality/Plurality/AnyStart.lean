@@ -248,6 +248,156 @@ theorem growth_far [NeZero n] (I : Finset (Fin n)) (h0 : 0 ≤ gap I) (h1 : gap 
     rw [gap_step] at hle
     rw [if_pos (by linarith)]
 
+/-! ### Symmetry breaking: the hypotheses of the hitting-time bound -/
+
+/-- The absolute gap in units of `√n / 100`, rounded down: the observable `X` to which the
+hitting-time bound is applied. -/
+noncomputable def gapUnits (I : Finset (Fin n)) : ℕ := ⌊|gap I| / (√(n : ℝ) / 100)⌋₊
+
+lemma gapUnits_compl (I : Finset (Fin n)) : gapUnits Iᶜ = gapUnits I := by
+  simp only [gapUnits, gap_compl, abs_neg]
+
+lemma unit_pos [NeZero n] : 0 < √(n : ℝ) / 100 := by
+  have : (0 : ℝ) < n := Nat.cast_pos.mpr (NeZero.pos n)
+  positivity
+
+lemma gapUnits_mul_le [NeZero n] (I : Finset (Fin n)) :
+    (gapUnits I : ℝ) * (√(n : ℝ) / 100) ≤ |gap I| := by
+  have := Nat.floor_le (div_nonneg (abs_nonneg (gap I)) (unit_pos (n := n)).le)
+  rwa [le_div_iff₀ unit_pos] at this
+
+lemma lt_gapUnits_add_one [NeZero n] (I : Finset (Fin n)) :
+    |gap I| < ((gapUnits I : ℝ) + 1) * (√(n : ℝ) / 100) := by
+  have := Nat.lt_floor_add_one (|gap I| / (√(n : ℝ) / 100))
+  rwa [div_lt_iff₀ unit_pos] at this
+
+lemma le_gapUnits [NeZero n] {k : ℕ} {I : Finset (Fin n)}
+    (h : (k : ℝ) * (√(n : ℝ) / 100) ≤ |gap I|) : k ≤ gapUnits I :=
+  Nat.le_floor (by rwa [le_div_iff₀ unit_pos])
+
+/-- For `log n ≥ 40`: `n > 0` and `√n ≥ 20 log n + 1`, from `√n = e^{(log n)/2} ≥ (log n)⁴/384`. -/
+lemma sqrt_ge_of_log (hL : 40 ≤ Real.log n) :
+    (0 : ℝ) < n ∧ 20 * Real.log n + 1 ≤ √(n : ℝ) := by
+  have hn : (0 : ℝ) < n := by
+    by_contra h
+    push Not at h
+    have h0 : (n : ℝ) = 0 := le_antisymm h (Nat.cast_nonneg _)
+    rw [h0, Real.log_zero] at hL
+    linarith
+  refine ⟨hn, ?_⟩
+  have hw0 : 0 < √(n : ℝ) := Real.sqrt_pos.mpr hn
+  have h := Real.pow_div_factorial_le_exp (x := Real.log n / 2) (by linarith) 4
+  rw [← Real.log_sqrt hn.le, Real.exp_log hw0, Real.log_sqrt hn.le] at h
+  norm_num [Nat.factorial] at h
+  obtain ⟨L, hLdef⟩ : ∃ L, L = Real.log n := ⟨_, rfl⟩
+  rw [← hLdef] at h hL ⊢
+  have hL3 : 64000 ≤ L ^ 3 := by
+    have := pow_le_pow_left₀ (by norm_num) hL 3
+    norm_num at this
+    linarith
+  nlinarith
+
+/-- Near balance (`1 ≤ X < 16`, where the gap is below `4√n/25`): with probability at least
+`9/64` the next gap is at least `√n/5`, so `X` jumps to at least `20 ≥ 5X/4`. -/
+lemma units_near [NeZero n] (hL : 40 ≤ Real.log n) (I : Finset (Fin n))
+    (hI : gapUnits I < 16) :
+    9 / 64 ≤ (binKernel n I).prob (fun J => 20 ≤ gapUnits J) := by
+  obtain ⟨hn0, hw⟩ := sqrt_ge_of_log hL
+  have hn5 : 5 ≤ n := by
+    have h1 : (1 : ℝ) ≤ √(n : ℝ) := by linarith
+    have h2 : (5 : ℝ) ≤ n := by
+      have := Real.sq_sqrt hn0.le
+      nlinarith
+    exact_mod_cast h2
+  have hhi := lt_gapUnits_add_one I
+  have h16 : (gapUnits I : ℝ) + 1 ≤ 16 := by
+    have : gapUnits I + 1 ≤ 16 := hI
+    exact_mod_cast this
+  have hw0 : 0 < √(n : ℝ) / 100 := unit_pos
+  have hnear : |gap I| ≤ 4 * √(n : ℝ) / 25 := by nlinarith
+  refine (jump_near_balance hn5 I hnear).trans (Distribution.prob_mono _ fun J hJ => ?_)
+  exact le_gapUnits (by push_cast; linarith)
+
+/-- Above `√n` (`16 ≤ X < 1000 log n`, gap `≥ 0`): by `growth_far` with `λ = X √n / 3200`,
+`X` grows to at least `5X/4` except with probability `exp (-X²/5120000) ≤ exp (-X/320000)`. -/
+lemma units_far [NeZero n] (hL : 40 ≤ Real.log n) (I : Finset (Fin n)) (hg : 0 ≤ gap I)
+    (h16 : 16 ≤ gapUnits I) (hI : (gapUnits I : ℝ) < 1000 * Real.log n) :
+    1 - Real.exp (-(1 / 320000 * (gapUnits I : ℝ)))
+      ≤ (binKernel n I).prob (fun J => 5 / 4 * (gapUnits I : ℝ) ≤ gapUnits J) := by
+  obtain ⟨hn0, hw⟩ := sqrt_ge_of_log hL
+  have hlo := gapUnits_mul_le I
+  have hhi := lt_gapUnits_add_one I
+  obtain ⟨w, hw_def⟩ : ∃ w, w = √(n : ℝ) := ⟨_, rfl⟩
+  obtain ⟨X, hX⟩ : ∃ X : ℝ, X = gapUnits I := ⟨_, rfl⟩
+  obtain ⟨L, hLdef⟩ : ∃ L, L = Real.log n := ⟨_, rfl⟩
+  have hww : w ^ 2 = n := by rw [hw_def, Real.sq_sqrt hn0.le]
+  rw [← hw_def, ← hLdef] at hw
+  rw [← hw_def, ← hX] at hlo hhi
+  rw [← hX] at hI ⊢
+  rw [← hLdef] at hI hL
+  have hX16 : (16 : ℝ) ≤ X := by rw [hX]; exact_mod_cast h16
+  have hw0 : 0 < w := by linarith
+  rw [abs_of_nonneg hg] at hlo hhi
+  -- `s < (X + 1) √n/100 ≤ (1000 log n + 1) √n/100 ≤ n/2`
+  have hhalf : gap I ≤ n / 2 := by
+    have h1 : (X + 1) * (w / 100) ≤ (1000 * L + 1) * (w / 100) :=
+      mul_le_mul_of_nonneg_right (by linarith) (by positivity)
+    have h2 : (1000 * L + 1) * (w / 100) ≤ w ^ 2 / 2 := by nlinarith
+    rw [← hww]
+    linarith
+  have hlam : 0 ≤ X * (w / 100) / 32 := by positivity
+  have hgf := growth_far I hg hhalf hlam
+  have hexp : Real.exp (-(2 * (X * (w / 100) / 32) ^ 2 / n)) ≤ Real.exp (-(1 / 320000 * X)) := by
+    apply Real.exp_le_exp.mpr
+    rw [← hww]
+    have e : 2 * (X * (w / 100) / 32) ^ 2 / w ^ 2 = X ^ 2 / 5120000 := by
+      field_simp
+      ring
+    rw [e]
+    nlinarith
+  refine le_trans ?_ (hgf.trans (Distribution.prob_mono _ fun J hJ => ?_))
+  · linarith
+  · -- `|gap J| > 21 X/16 · √n/100`, so `X J + 1 > 21 X/16 ≥ 5X/4 + 1`
+    have hJ' : 21 / 16 * X * (w / 100) < |gap J| := by
+      have := le_abs_self (gap J)
+      nlinarith
+    have hJhi := lt_gapUnits_add_one J
+    rw [← hw_def] at hJhi
+    have hlt : 21 / 16 * X < (gapUnits J : ℝ) + 1 := by
+      have h : (21 / 16 * X) * (w / 100) < ((gapUnits J : ℝ) + 1) * (w / 100) := by
+        linarith [hJ'.trans hJhi]
+      exact lt_of_mul_lt_mul_right h (by positivity)
+    linarith
+
+/-- The growth hypothesis of the hitting-time bound: below the target, `X` grows to at least
+`min (5X/4) n` with probability at least `1 - exp (-X/320000)`. -/
+lemma units_grow [NeZero n] (hL : 40 ≤ Real.log n) (I : Finset (Fin n))
+    (hI : (gapUnits I : ℝ) < 1000 * Real.log n) :
+    1 - Real.exp (-(1 / 320000 * (gapUnits I : ℝ)))
+      ≤ (binKernel n I).prob (fun J => min (5 / 4 * (gapUnits I : ℝ)) n ≤ gapUnits J) := by
+  refine le_trans ?_ (Distribution.prob_mono _ fun J (h : 5 / 4 * (gapUnits I : ℝ) ≤ gapUnits J) =>
+    (min_le_left _ _).trans h)
+  rcases Nat.lt_or_ge (gapUnits I) 1 with h0 | h1
+  · rw [Nat.lt_one_iff.mp h0]
+    simp only [Nat.cast_zero, mul_zero, neg_zero, Real.exp_zero, sub_self]
+    exact Distribution.prob_nonneg _ _
+  rcases Nat.lt_or_ge (gapUnits I) 16 with hs | hs
+  · -- near balance
+    have hX15 : (gapUnits I : ℝ) ≤ 15 := by exact_mod_cast Nat.lt_succ_iff.mp hs
+    have hexp : 1 - Real.exp (-(1 / 320000 * (gapUnits I : ℝ))) ≤ 9 / 64 := by
+      have := Real.add_one_le_exp (-(1 / 320000 * (gapUnits I : ℝ)))
+      linarith
+    refine hexp.trans ((units_near hL I hs).trans (Distribution.prob_mono _ fun J hJ => ?_))
+    have : (20 : ℝ) ≤ gapUnits J := by exact_mod_cast hJ
+    linarith
+  · -- above `√n`: reduce to a nonnegative gap by exchanging the opinions
+    rcases le_total 0 (gap I) with hg | hg
+    · exact units_far hL I hg hs hI
+    · have hc := units_far hL Iᶜ (by rw [gap_compl]; linarith) (by rwa [gapUnits_compl])
+        (by rwa [gapUnits_compl])
+      rw [prob_binKernel_compl] at hc
+      simpa only [compl_compl, gapUnits_compl] using hc
+
 /-- **Symmetry breaking.** There is `C > 0` such that, for `log n ≥ 40`, from any configuration
 `I₀` the gap reaches `22 √(3 n log n)` in absolute value within any `t ≥ C log n` rounds with
 probability at least `1 - 1/n`. -/
