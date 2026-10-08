@@ -16,8 +16,8 @@ not support the plurality color `m` decreases geometrically.
 
 The paper omits the proof of Lemma 3.7; the one here uses Lemma 3.6 with the
 bounds `s cₘ ≥ n²/9` (first regime) and `s ≥ n - 2(n - cₘ)` (second regime),
-the closed-form Chernoff upper tail `ThreeMajority.avg_tail_ge_log_le`, and
-Markov's inequality. "Sufficiently large `n`" is made explicit as `log n ≥ 40`.
+the closed-form Chernoff upper tail `Dynamics.avg_chernoff_upper_log`, and Markov's
+inequality `Dynamics.avg_markov_one`. "Sufficiently large `n`" is made explicit as `log n ≥ 40`.
 -/
 
 namespace Plurality
@@ -26,11 +26,6 @@ open Finset Real Dynamics
 open ThreeMajority (Tgt3 tgt3_nonempty)
 
 variable {n k : ℕ}
-
-lemma one_le_of_log_pos (hL : 0 < Real.log n) : 1 ≤ n := by
-  rcases n with _ | n
-  · simp at hL
-  · omega
 
 /-- The per-node indicator of not adopting `m`. -/
 def notAdopt (x : Config n k) (m : Fin k) (_ : Fin n) (t : Fin n × Fin n × Fin n) : ℝ :=
@@ -164,9 +159,8 @@ theorem lemma_3_7_i (hL : 40 ≤ Real.log n) (x : Config n k) {m : Fin k}
     calc (n : ℝ) - mu n (count x) m ≤ u * (1 - (bias (count x) : ℝ) * count x m / (n : ℝ) ^ 2) :=
           h36
       _ ≤ 8 / 9 * u := by nlinarith
-  have hC := ThreeMajority.avg_tail_ge_log_le (notAdopt x m) (notAdopt_zero_one x m) hμ
+  have hC := Dynamics.avg_chernoff_upper_log (notAdopt x m) (notAdopt_zero_one x m) hμ
     (by positivity) (by linarith : 8 / 9 * u ≤ 17 / 18 * u)
-  simp only [threeMajority_avg_eq] at hC
   have hevent : (fun r : Tgt3 n =>
         if 17 / 18 * u ≤ (n : ℝ) - count (step x r) m then (1 : ℝ) else 0)
       = fun r : Tgt3 n => if 17 / 18 * u ≤ ∑ v, notAdopt x m v (r v) then (1 : ℝ) else 0 := by
@@ -237,7 +231,8 @@ theorem lemma_3_7_ii (hL : 40 ≤ Real.log n) (x : Config n k) {m : Fin k}
     linarith
   constructor
   · -- Markov: `P(C̄' ≥ 1) ≤ 𝔼[C̄'] ≤ 3 L² e^{-L/2} ≤ e^{-L/5}`
-    have hM1 := markov_one (notAdopt x m) (notAdopt_zero_one x m)
+    have hM1 := avg_markov_one (notAdopt x m) fun v t => by
+      rcases notAdopt_zero_one x m v t with h | h <;> simp [h]
     have hevent : ∀ r : Tgt3 n,
         (if 0 < (n : ℝ) - count (step x r) m then (1 : ℝ) else 0)
           = if 1 ≤ ∑ v, notAdopt x m v (r v) then (1 : ℝ) else 0 := by
@@ -284,9 +279,8 @@ theorem lemma_3_7_ii (hL : 40 ≤ Real.log n) (x : Config n k) {m : Fin k}
         rw [hratio, le_div_iff₀ (by positivity), one_mul]
         exact hexp34
       exact (one_le_div hμub0).mp h1
-    have hC := ThreeMajority.avg_tail_ge_log_le (notAdopt x m) (notAdopt_zero_one x m)
+    have hC := Dynamics.avg_chernoff_upper_log (notAdopt x m) (notAdopt_zero_one x m)
       (hμ1.trans hμ2) hμub0 hμk
-    simp only [threeMajority_avg_eq] at hC
     have hevent : (fun r : Tgt3 n =>
           if kk ≤ (n : ℝ) - count (step x r) m then (1 : ℝ) else 0)
         = fun r : Tgt3 n => if kk ≤ ∑ v, notAdopt x m v (r v) then (1 : ℝ) else 0 := by

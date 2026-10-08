@@ -3,7 +3,6 @@
 import ThreeMajority.Prob
 import ThreeMajority.Model
 import ThreeMajority.Bounds
-import ThreeMajority.Chernoff
 import ThreeMajority.OneRound
 import ThreeMajority.Growth
 import ThreeMajority.Saturation

@@ -42,7 +42,7 @@ lemma hfloor4_of_hbig (hbig : (30 : ℝ) ≤ Real.log n) :
   have hL0 : 0 < L := by rw [hLdef]; linarith
   have hn_eq : (n : ℝ) = Real.exp L := (Real.exp_log hn0).symm
   have hn_ge_pow : L ^ 11 / (Nat.factorial 11 : ℝ) ≤ (n : ℝ) := by
-    have h := exp_ge_pow hL0.le 11; rwa [← hn_eq] at h
+    have h := Real.pow_div_factorial_le_exp _ hL0.le 11; rwa [← hn_eq] at h
   have hfact : (Nat.factorial 11 : ℝ) = 39916800 := by norm_num [Nat.factorial]
   rw [hfact] at hn_ge_pow
   have hL10 : (30 : ℝ) ^ 10 ≤ L ^ 10 := pow_le_pow_left₀ (by norm_num) hbig 10
@@ -229,7 +229,7 @@ theorem majority3_consensus_fail_le_clean (hbig : (30 : ℝ) ≤ Real.log n)
   refine hmain.trans ?_
   have hL0 : 0 < Real.log n := by linarith
   have hn_ge_pow : (Real.log n) ^ 11 / (Nat.factorial 11 : ℝ) ≤ (n : ℝ) := by
-    have h := exp_ge_pow hL0.le 11
+    have h := Real.pow_div_factorial_le_exp _ hL0.le 11
     rwa [Real.exp_log hn0] at h
   have hfact11 : (Nat.factorial 11 : ℝ) = 39916800 := by norm_num [Nat.factorial]
   rw [hfact11] at hn_ge_pow
@@ -240,7 +240,7 @@ theorem majority3_consensus_fail_le_clean (hbig : (30 : ℝ) ≤ Real.log n)
     have hx_ge : (40:ℝ) ≤ (1/10^7:ℝ) * n := by nlinarith [hbig_n]
     have hx_pos : (0:ℝ) < (1/10^7:ℝ) * n := by nlinarith [hx_ge]
     have hexp_ge : ((1/10^7:ℝ) * n)^11 / (Nat.factorial 11 : ℝ) ≤ Real.exp ((1/10^7:ℝ) * n) :=
-      exp_ge_pow hx_pos.le 11
+      Real.pow_div_factorial_le_exp _ hx_pos.le 11
     rw [hfact11] at hexp_ge
     have hy10 : (40:ℝ)^10 ≤ ((1/10^7:ℝ) * n)^10 := pow_le_pow_left₀ (by norm_num) hx_ge 10
     have hkey : 10 * n ≤ Real.exp ((1/10^7:ℝ) * n) := by
