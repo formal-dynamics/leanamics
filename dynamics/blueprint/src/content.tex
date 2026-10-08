@@ -294,7 +294,13 @@ probability $\deg v/(2|E|)$.
 Group the darts by tail (the darts with tail $v$ are the neighbours of $v$)
 or by edge (each edge carries two darts).
 \end{proof}
-\section{Hitting times}
+\section{Hitting times}\label{sec:dgmss-hitting}
+This section formalizes Claim~2.9 of Doerr, Goldberg, Minder, Sauerwald and Scheideler,
+\emph{Stabilizing consensus with the power of two choices} (SPAA 2011), as
+Theorem~\ref{thm:drifthitting}. Compared with the claim, the hypothesis $c_4\log q\le q$ is added
+(the target is a possible value, which a non-asymptotic statement needs), and $c_5$ also depends
+on $c_1,c_2,c_3$
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/dynamics/FORMALIZATION_DIFFERENCES.md#hitting-time-lemma-drifthitting-maj-8-doerr-et-al-spaa-2011-claim-29}{details}).
 \begin{definition}[Hitting probability]\label{def:hitprob}
 \lean{Dynamics.Kernel.hitProb}\leanok\uses{def:kernel}
 $\mathrm{hitProb}(K,B,n)(a)=\Pr_a(\exists s\le n,\ X_s\in B)=\Pr_a(T_B\le n)$,

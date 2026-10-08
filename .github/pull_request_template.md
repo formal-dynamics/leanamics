@@ -9,6 +9,7 @@ you did; if an item does not apply, say why.
 
 - [ ] The package `README.md` and blueprint (`blueprint/src/content.tex`, with `\lean{}` tags) are updated
 - [ ] `FORMALIZATION_DIFFERENCES.md` lists every deviation from the source
+- [ ] Each formalized paper has a blueprint section with a stable `\label{sec:...}` (used for links to the website); existing labels are not renamed
 - [ ] `RESULTS.md` has a row for each new or changed result
 - [ ] `PROVENANCE.md` has an entry for each new or changed result
 - [ ] The status in `ROADMAP.md` is updated

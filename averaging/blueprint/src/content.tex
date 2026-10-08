@@ -49,7 +49,14 @@ On a connected bipartite graph with at least two nodes, the values $\pm1$ of a p
 All neighbours of a node have the other colour.
 \end{proof}
 
-\section{Rate of convergence}
+\section{Rate of convergence}\label{sec:lovasz}
+Theorem~5.1 of Lovász, \emph{Random walks on graphs: a survey} (1993), in the form of
+Theorem~33 of the survey of Becchetti, Clementi and Natale, \emph{Consensus dynamics: an
+overview} (SIGACT News 2020). Two printed details need a minor correction: Lovász's text defines
+$\lambda$ as $\min\{|\lambda_2|,|\lambda_n|\}$, a slip for $\max$ (with $\min$ the bound would
+fail, e.g.\ on a connected bipartite graph), and Theorem~33 of the survey prints
+$\sqrt{d(v)/d(v)}$ for $\sqrt{d(v)/d(u)}$; the corrected form is formalized
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/averaging/FORMALIZATION_DIFFERENCES.md#rate-bound-and-sequential-averaging-rate-sequential-avg-1}{details}).
 \begin{definition}[Random walk and its spectrum]\label{def:walk}
 \lean{Averaging.walkMatrix,Averaging.normAdjMatrix,Averaging.normAdjMatrix_isHermitian,Averaging.walkLambda,Averaging.walkStationary}\leanok\uses{def:avg}
 $P=D^{-1}A$ is the transition matrix of the random walk, $N=D^{-1/2}AD^{-1/2}$ its symmetric
@@ -96,7 +103,10 @@ $|x_t(u)-\sum_v\pi(v)x_0(v)|\le\lambda^t\sum_v\sqrt{\deg(v)/\deg(u)}\,|x_0(v)|$.
 $x_t(u)-\sum_v\pi(v)x_0(v)=\sum_v(P^t(u,v)-\pi(v))x_0(v)$ and Theorem~\ref{thm:lovasz}.
 \end{proof}
 
-\section{Sequential averaging}
+\section{Sequential averaging}\label{sec:bgps-gossip}
+The random sequential (gossip) averaging of Boyd, Ghosh, Prabhakar and Shah, \emph{Randomized
+gossip algorithms} (IEEE Trans.\ Inf.\ Theory 52, 2006), the source of equations (4) and (5) of
+the survey of Becchetti, Clementi and Natale.
 \begin{definition}[Edge step]\label{def:edge-matrix}
 \lean{Averaging.Sequential.edgeMatrix,Averaging.Sequential.kernelMatrix,Averaging.Sequential.gossipMeanMatrix,Averaging.Sequential.seqRun,Averaging.Sequential.meanMatrix}\leanok
 A step on the edge $(i,j)$ multiplies the state by $W_{ij}=I-\frac12(e_i-e_j)(e_i-e_j)^\top$;
@@ -133,7 +143,9 @@ $\mathbb E[x_t]=\bar W^tx_0$.
 $W^\top W=W$; for the first moment, induction on $t$ and linearity of expectation.
 \end{proof}
 
-\section{Strong reconstruction}
+\section{Strong reconstruction}\label{sec:bcnpt-reconstruction}
+Becchetti, Clementi, Natale, Pasquale and Trevisan, \emph{Find your place: simple distributed
+algorithms for community detection} (SODA 2017; SIAM J. Comput.\ 2020), Theorem~3.2.
 \begin{definition}[Clustered regular graph]\label{def:clustered}
 \lean{Averaging.IsBalancedPartition,Averaging.IsClusteredRegular,Averaging.clusterIndicator,Averaging.transitionMatrix,Averaging.maxAbsOtherEigenvalue,Averaging.color,Averaging.IsStrongReconstruction,Averaging.reconstructionTime}\leanok\uses{def:avg}
 $G$ is $d$-regular on two clusters $V_1,V_2$ of $n$ nodes, each node having $b$ neighbours in the
@@ -180,9 +192,13 @@ round $t\ge T(n,\delta)$.
 Theorem~\ref{thm:core} and Lemma~\ref{lem:b1}.
 \end{proof}
 
-\section{Averaging whenever you meet}
+\section{Averaging whenever you meet}\label{sec:bcmnprt-opportunistic}
 Becchetti, Clementi, Manurangsi, Natale, Pasquale, Raghavendra, Trevisan, \emph{Average whenever
 you meet: opportunistic protocols for community detection} (ESA 2018, arXiv:1703.05045).
+The proof of Theorem~4.1 needs a minor correction: its last step uses
+$\mathbb E\|z^{(0)}\|^2\le 1/n$, while for uniform signs $\mathbb E\|z^{(0)}\|^2=n-2$. The
+conclusion still holds, and the formal proof uses its own bookkeeping
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/averaging/FORMALIZATION_DIFFERENCES.md#averaging-whenever-you-meet-opportunistic-avg-3}{details}).
 \begin{definition}[Opportunistic averaging, Algorithm 1]\label{def:opp}
 \lean{Averaging.Opportunistic.signVec,Averaging.Opportunistic.edgeAvg,Averaging.Opportunistic.avgRun,Averaging.Opportunistic.oppStep,Averaging.Opportunistic.oppRun}\leanok
 One uniformly random edge is activated per round; a node activated for the first time draws a
