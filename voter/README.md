@@ -36,6 +36,9 @@ and indicator projections give the probability for every color in a finite palet
 | BGKM16 Lemma 2.1 (corrected: sum over the minority side): `𝔼Ψ' ≤ Ψ - ∑_{u∈s_t} λ_u d_u / (32 Ψ³)` (VOT-5) | `potential_drift`, `potential_drift_conductance` |
 | BGKM16 Lemma 2.2 and Theorem 1.1 (i), two opinions: consensus within `128 m / (d_min φ)` rounds w.p. `≥ 1/2`, expected time `≤ 2·` that, dynamic graphs with fixed degrees (VOT-5) | `lazy_consensus_of_minority`, `lazy_consensus_conductance`, `lazy_expected_consensus_time`, `dynamic_consensus_conductance` |
 | BGKM16 Theorem 1.1 (i) via Lemma 2.3, any number of opinions: `O(m / (d_min φ))` w.p. `≥ 1/2` and in expectation (VOT-5) | `lazy_expected_consensus_time_many`, `lazy_consensus_conductance_many` |
+| BGKM16 Lemma 2.4 (multiplicative drift): `𝔼Ψ' ≤ (1 - φ²/(32n)) Ψ` (VOT-5) | `potential_drift_mul` |
+| BGKM16 Lemma 2.4 and Theorem 1.1 (ii): consensus within `96 n ln n / φ²` rounds w.p. `≥ 1 - 1/n²` (two opinions) and `≥ 1 - 1/n` (any number of opinions), static and dynamic graphs with fixed degrees; expected time `≤ 2·` that (VOT-5) | `lazy_consensus_conductance_sq`, `dynamic_consensus_conductance_sq`, `lazy_consensus_conductance_sq_many`, `dynamic_consensus_conductance_sq_many`, `lazy_expected_consensus_time_sq` |
+| BGKM16 Theorem 1.1: consensus within `min{τ, τ'}` rounds w.p. `≥ 1/2` (static graphs with any number of opinions; dynamic graphs with two opinions) (VOT-5) | `lazy_consensus_conductance_min`, `dynamic_consensus_conductance_min` |
 
 All names in the table except the explicitly qualified shared declaration are
 in namespace `Voter`. The invariant-weight results have no graph assumptions.
@@ -93,5 +96,13 @@ Kanade, Mallmann-Trenn, Sauerwald's comparison of synchronous and sequential wal
 (`MeetingDrift.lean`). Hassin–Peleg's plain walk on nonbipartite graphs is covered only
 conditionally on a meeting bound (`iterate_disagreement_le_of_meeting`); see
 [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
+
+`ConductanceSq*.lean` (VOT-5, BGKM16 Theorem 1.1 (ii)) proves the alternative bound
+`O(n log n / φ²)`: the corrected Lemma 2.1 and Cauchy–Schwarz give a multiplicative drift of the
+potential, and the multiplicative drift lemma of the shared library turns it into consensus with
+probability at least `1 - 1/n²`; a union bound over the projections "`i` against the rest" covers
+any number of opinions, on dynamic graphs too. The statements were written by a Claude agent and
+reviewed against the paper by a second agent before any proof; the proofs are by a Claude agent
+under the fixed-statement protocol, with the axiom audit in `Audit.lean`.
 
 Future work: dynamic networks and extremal coalition results.

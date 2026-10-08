@@ -7,3 +7,4 @@ import Voter.Conductance
 import Voter.ConductanceDrift
 import Voter.ConductanceTime
 import Voter.ConductanceMany
+import Voter.ConductanceSq
