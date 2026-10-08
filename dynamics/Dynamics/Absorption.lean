@@ -79,6 +79,7 @@ theorem finite_absorption [Nonempty α] (K : Dynamics.Kernel α) (f : α → ℝ
   apply squeeze_zero (fun n => K.iterate_nonneg n hnonneg a)
     (fun n => K.iterate_antitone f hstep a (Nat.div_mul_le_self n m))
   apply hb.comp
-  exact tendsto_atTop.mpr (fun b => eventually_atTop.mpr ⟨b * m, fun n hn => (Nat.le_div_iff_mul_le hm).mpr hn⟩)
+  exact tendsto_atTop.mpr fun b =>
+    eventually_atTop.mpr ⟨b * m, fun n hn => (Nat.le_div_iff_mul_le hm).mpr hn⟩
 
 end Dynamics.Kernel

@@ -31,11 +31,8 @@ lemma le_pow_ceil {n : ℕ} (hn : 1 ≤ n) {q : ℝ} (hq : 1 < q) :
   rwa [div_le_iff₀ hlq] at this
 
 /-- `log n ≥ 10⁴` forces `n ≥ 1`. -/
-lemma one_le_of_log {n : ℕ} (hL : (10000 : ℝ) ≤ log n) : 1 ≤ n := by
-  rcases Nat.eq_zero_or_pos n with rfl | h
-  · simp at hL
-    linarith
-  · exact h
+lemma one_le_of_log {n : ℕ} (hL : (10000 : ℝ) ≤ log n) : 1 ≤ n :=
+  one_le_of_log_pos (by linarith)
 
 /-- With `log n ≥ 10⁴`, `n ≥ 4·10⁶ log n` (from `exp x ≥ x³/6`). -/
 lemma big_n {n : ℕ} (hL : (10000 : ℝ) ≤ log n) : 4000000 * log n ≤ (n : ℝ) := by

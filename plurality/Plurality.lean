@@ -1,7 +1,6 @@
 import Plurality.Model
 import Plurality.Quantities
 import Plurality.Expectation
-import Plurality.Tail
 import Plurality.Numerics
 import Plurality.Growth
 import Plurality.Saturation

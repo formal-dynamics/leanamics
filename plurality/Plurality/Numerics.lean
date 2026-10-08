@@ -7,8 +7,8 @@ The paper's statements hold "for sufficiently large `n`". The formal versions
 make this explicit through a lower bound on `L = log n`, and express the powers
 `n^{1/4}`, `n^{3/10}`, `n^{-1/5}` of the paper as real powers
 `(n : ℝ) ^ (a : ℝ) = exp (a L)`. The bounds below are all derived from
-the single-term Taylor bound `ThreeMajority.exp_ge_pow` and the series for
-`log (1 - x)` in Mathlib.
+Mathlib's single-term Taylor bound `Real.pow_div_factorial_le_exp` and the series for
+`log (1 - x)`.
 -/
 
 namespace Plurality
@@ -23,7 +23,7 @@ lemma natCast_eq_exp {n : ℕ} (hn : 1 ≤ n) : (n : ℝ) = exp (Real.log n) :=
 
 /-- `exp y ≥ y⁷ / 5040`. -/
 lemma exp_ge_pow_seven {y : ℝ} (hy : 0 ≤ y) : y ^ 7 / 5040 ≤ exp y := by
-  have h := ThreeMajority.exp_ge_pow hy 7
+  have h := Real.pow_div_factorial_le_exp _ hy 7
   norm_num [Nat.factorial] at h
   linarith
 

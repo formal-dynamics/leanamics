@@ -53,7 +53,7 @@ lemma two_mul_div_two_add_le_log_one_add {δ : ℝ} (hδ : 0 ≤ δ) :
         ring
     _ ≤ log (1 + δ) := h0
 
-/-- `log x ≥ (x - 1/x)/2` for `0 < x ≤ 1` (as `Plurality.half_sub_inv_le_log`). -/
+/-- `log x ≥ (x - 1/x)/2` for `0 < x ≤ 1`. -/
 lemma half_sub_inv_le_log_of_le_one {x : ℝ} (hx0 : 0 < x) (hx1 : x ≤ 1) :
     (x - x⁻¹) / 2 ≤ log x := by
   -- `ψ x = log x - (x - 1/x)/2` has `ψ' = -(x-1)²/(2x²) ≤ 0` and `ψ 1 = 0`
@@ -79,8 +79,7 @@ lemma half_sub_inv_le_log_of_le_one {x : ℝ} (hx0 : 0 < x) (hx1 : x ≤ 1) :
   simp only [log_one, inv_one, sub_self, zero_div] at h
   linarith
 
-/-- `-δ + δ²/2 ≤ (1 - δ) log (1 - δ)` for `0 ≤ δ < 1` (as
-`Plurality.one_sub_mul_log_one_sub_ge`). -/
+/-- `-δ + δ²/2 ≤ (1 - δ) log (1 - δ)` for `0 ≤ δ < 1`. -/
 lemma neg_add_sq_div_two_le_one_sub_mul_log {δ : ℝ} (hδ0 : 0 ≤ δ) (hδ1 : δ < 1) :
     -δ + δ ^ 2 / 2 ≤ (1 - δ) * log (1 - δ) := by
   have hx0 : 0 < 1 - δ := by linarith
