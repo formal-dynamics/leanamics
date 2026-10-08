@@ -1,4 +1,5 @@
 import Epidemics.Revisited.DoubleShrinkingDefs
+import Epidemics.Revisited.DoubleShrinkingTotal
 import Epidemics.Revisited.Shrinking
 
 /-! # Double exponential shrinking regime, upper bound, and the total spreading time (EPI-8)
@@ -35,7 +36,10 @@ theorem double_shrinking_upper_tail {ℓ a c g α τ : ℝ} (hℓ : 1 < ℓ) (ha
       P.UpperDoubleShrinking ℓ a c g α → P.FastFinishing α τ →
       ∀ S : Finset (Fin n), (n : ℝ) - S.card ≤ g * n → ∀ r : ℕ,
         P.notYet n (⌈Real.logb ℓ (Real.log n)⌉₊ + r) S ≤ C * (n : ℝ) ^ (A' - α' * r) := by
-  sorry
+  have _ := hg1
+  have _ := hα1
+  obtain ⟨C, A', α', -, -, hα', N, h⟩ := double_shrinking_upper_tail_proof hℓ ha hc hg0 hα0 hag hτ
+  exact ⟨C, A', α', hα', N, h⟩
 
 /-- Theorem 43, expectation: under the same conditions, `E[T(⌈(1 - g) n⌉, n)] ≤ log_ℓ ln n + B`,
 stated for every partial sum of the tail series `E[T] = ∑_t P[T > t]`. -/
@@ -46,7 +50,9 @@ theorem double_shrinking_upper_expect {ℓ a c g α τ : ℝ} (hℓ : 1 < ℓ) (
       P.UpperDoubleShrinking ℓ a c g α → P.FastFinishing α τ →
       ∀ S : Finset (Fin n), (n : ℝ) - S.card ≤ g * n → ∀ R : ℕ,
         ∑ t ∈ range R, P.notYet n t S ≤ Real.logb ℓ (Real.log n) + B := by
-  sorry
+  have _ := hg1
+  have _ := hα1
+  exact double_shrinking_upper_expect_proof hℓ ha hc hg0 hα0 hag hτ
 
 /-- Total spreading time with a double exponential shrinking regime, tail bound (Theorems 21
 and 43 composed through Lemma 19): under the upper exponential growth conditions in `[1, f n[`
@@ -68,7 +74,11 @@ theorem spreading_upper_tail_double {γlo γhi a b c f ℓ a' c' g α τ p : ℝ
       ∀ S : Finset (Fin n), S.Nonempty → ∀ r : ℕ,
         P.notYet n (⌈Real.logb (1 + γ) n⌉₊ + ⌈Real.logb ℓ (Real.log n)⌉₊ + r) S
           ≤ A * Real.exp (-κ * r) := by
-  sorry
+  have _ := hg1
+  have _ := hα1
+  obtain ⟨A, κ, -, hκ, N, h⟩ := spreading_upper_tail_double_proof hγlo hγ ha hb hc hf0 hf1 haf
+    hℓ ha' hc' hg0 hα0 hag hτ hp0 hp1
+  exact ⟨A, κ, hκ, N, h⟩
 
 /-- Total spreading time with a double exponential shrinking regime, expectation: under the
 same conditions, `E[T(1, n)] ≤ log_{1+γ} n + log_ℓ ln n + B`, stated for every partial sum of
@@ -86,6 +96,9 @@ theorem spreading_upper_expect_double {γlo γhi a b c f ℓ a' c' g α τ p : �
       ∀ S : Finset (Fin n), S.Nonempty → ∀ R : ℕ,
         ∑ t ∈ range R, P.notYet n t S ≤
           Real.logb (1 + γ) n + Real.logb ℓ (Real.log n) + B := by
-  sorry
+  have _ := hg1
+  have _ := hα1
+  exact spreading_upper_expect_double_proof hγlo hγ ha hb hc hf0 hf1 haf hℓ ha' hc' hg0 hα0 hag
+    hτ hp0 hp1
 
 end Epidemics.Revisited
