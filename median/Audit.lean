@@ -21,3 +21,7 @@ import Median
 #print axioms Median.two_choices_expander_explicit
 #print axioms Median.two_choices_expander
 #print axioms Median.two_choices_failure_tendsto
+#print axioms Median.runAdv_isAdvRun
+#print axioms Median.binary_almost_stable_of_isAdvRun
+#print axioms Median.binary_almost_stable
+#print axioms Median.median_almost_stable

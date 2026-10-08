@@ -53,7 +53,8 @@ majority.
 
 Sources: Angluin, Aspnes, Diamadi, Fischer and Peralta, *Computation in networks of passively
 mobile finite-state sensors*, Distributed Computing 18 (2006) [AADFP06], §3 (model) and §4
-(Lemma 3 and Corollary 2: Boolean closure; Lemma 5: threshold and remainder predicates;
+(Lemma 3 and Corollary 2: Boolean closure; Lemma 5: threshold and remainder predicates, Lemma 11
+in the authors' 2005 journal manuscript;
 Theorem 5: Presburger-definable predicates); Angluin, Aspnes, Eisenstat and Ruppert (2007)
 [AAER07] for the reachability form of stable computation; Chen, Doty and Soloveichik,
 *Deterministic function computation with chemical reaction networks*, Natural Computing 13 (2014)
@@ -65,10 +66,12 @@ Angluin, Aspnes and Eisenstat (PODC 2006) [AAE06].
    right output (the form of [AAER07] and [CDS14, §2.2]). For finite populations the two are
    equivalent (by AADFP06 Lemma 1, the configurations occurring infinitely often in a fair
    execution form a final strongly connected component); this equivalence is not formalized.
-2. **Populations of every size `n ≥ 1`, and an error in AADFP06 Lemma 5 for `n = 1`.** AADFP06 do
+2. **Populations of every size `n ≥ 1`, and a minor correction to AADFP06 Lemma 5 for `n = 1`.** AADFP06 do
    not state a lower bound on the population size, but the protocols of their Lemma 5 start every
    agent with output bit `0` (input map `σᵢ ↦ (1, 0, aᵢ)`). With a single agent no encounter ever
-   happens, so the output stays `0` even when the predicate holds (for example `a = (1)`, `c = 3`,
+   happens: under AADFP06's definitions this case is degenerate (no interaction, hence no
+   computation), and under the natural convention that a lone agent keeps its state, the output
+   stays `0` even when the predicate holds (for example `a = (1)`, `c = 3`,
    one agent: `1 < 3` holds but the output is `0`); the protocols are correct for `n ≥ 2`. The
    theorems here are existential in the protocol, so this is harmless: the protocols used here
    start an agent with input `i` with output bit equal to the single-agent value (`[aᵢ < c]`,

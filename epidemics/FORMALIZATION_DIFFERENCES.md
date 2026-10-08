@@ -113,7 +113,7 @@ Source: B. Doerr, A. Kostrygin, *Randomized rumor spreading revisited*, ICALP 20
 arXiv:2303.11150 (numbering of the long version: Lemma 9, Lemma 19, Lemma 20, Definition 11,
 Theorem 21, Theorem 31).
 
-### Lemma 20 of the paper is false as stated
+### Lemma 20 of the paper needs a major correction
 
 Lemma 20 (Lemma 5 of the overview) claims: if `p_k ≤ p` and `c_k ≤ c/n` for every `k < f n`,
 then there is `f' ∈ ]f, 1[` such that, with probability `1 - O(1/n)`, the number of informed
@@ -122,14 +122,15 @@ nodes lies in `[f n, f' n]` at the end of some round. The proof bounds one round
 `[f n, f' n]` with probability `O(1/n)`, but the process may spend many rounds below `f n`, with
 a chance to jump in each.
 
-**Counterexample.** From every `S` with `|S| < f n`, inform all nodes with probability
+**Example.** The printed statement does not hold for the following process. From every `S` with `|S| < f n`, inform all nodes with probability
 `ε = c/n` and otherwise none. For `n ≥ c/p`, `p_k = ε ≤ p` and `c_k = ε(1 - ε) ≤ c/n`, but the
 process started from one node jumps from `1` to `n` with probability 1. (The same process with
 `ε_k = c k / n²` satisfies the lower exponential growth conditions, so the last sentence of
-Theorem 1, which rests on Lemma 20, is also unproved in general. That sentence is a lower-bound
-statement, outside the scope of this formalization.)
+Theorem 1, which rests on Lemma 20 (through Theorem 27), needs another argument in general. That
+sentence is a lower-bound statement, outside the scope of this formalization. The long version
+also uses Lemma 20 in the proofs of Theorems 57 and 58.)
 
-Two true versions are formalized instead:
+Two corrected versions are formalized instead:
 
 * `overshoot_round`, the one-round estimate of the proof, for every `f' ∈ ]f + p(1-f), 1[`;
 * `jumpProb_le`, the path statement with the union bound over rounds:
@@ -200,6 +201,66 @@ A smaller slip in the same proof: it writes `E[X(k)] ≤ p n (1 - f)`; the corre
 4. **Lemma 20, path form,** is proved by a union bound along `Kernel.trajectory`.
 5. `Distribution.prob` and `Kernel.event` are bridged by `prob_indicator_eq`, because `prob`
    decides propositions with `Classical.propDecidable`.
+
+### Theorem 43 and the push, pull and push–pull protocols
+
+Source: the same paper, Definition 13, Theorem 43 (Appendix B.6) and Theorems 51, 52 and 53
+(Appendix C).
+
+1. **Definition 13 and fast finishing, one `n` at a time.** `UpperDoubleShrinking ℓ a c g α`
+   asks, for every `S` with `n^{1-α} ≤ u = n - |S| ≤ g n`, that every uninformed node stays
+   uninformed with probability at most `a (u/n)^{ℓ-1}` and that covariances are at most
+   `c n / u²`. `FastFinishing α τ` is the second hypothesis of Theorem 43: for `u ≤ n^{1-α}`,
+   the stay probability is at most `n^{-τ}`. The exponent `ℓ > 1` is real (real powers). The
+   parameter ranges are the paper's (`g, α ∈ [0, 1]`, `a, c ≥ 0`, `a g^{ℓ-1} < 1`, `τ > 0`);
+   no parameter depends on `n`, so the per-`n` reading loses nothing. The overview's Theorem 3
+   uses Definition 5 (conditions for all `u ∈ [1, g n]`), which implies Definition 13 together
+   with fast finishing for large `n`.
+2. **Tail form.** The paper's `P[T ≥ log_ℓ ln n + r] ≤ O(n^{-α' r + A'})` is stated as
+   `P[T > ⌈log_ℓ ln n⌉ + r] ≤ C n^{A' - α' r}`. The formal event is contained in the paper's, so
+   the paper's bound implies the formal one; conversely the formal bound gives the paper's up to
+   one round, absorbed in `A'`. The expectation is bounded through every partial sum of the tail
+   series, as in Theorems 21 and 31.
+3. **Starting sets.** Theorem 43 starts from exactly `⌈(1 - g) n⌉` informed nodes; here from any
+   `S` with `n - |S| ≤ g n`. The total-time theorems and the instances start from any nonempty
+   set (the paper: one informed node).
+4. **The proof of Theorem 43 needs a minor correction.** The paper first reduces to a small `g`
+   by Lemma 19. This gives `O(1)` expected rounds for that stage, but Lemma 19's tail
+   `(g/g') (1 - p)^r` has a rate that does not depend on `n`, so the stated tail
+   `O(n^{-α' r + A'})` does not follow for the whole process. The statement holds: the formal
+   proof replaces Lemma 19 by geometric phase targets `g μ^j n`, `μ = (1 + a g^{ℓ-1}) / 2`, whose
+   failure probability per round is `O(1/n)` by Chebyshev's inequality with the variance bound of
+   Lemma 9 (or `O(n^{-τ})` by Markov's inequality below `n^{1-α}` uninformed nodes). In the
+   paper's tail bound (11), `J q^{-r}` has a typo in the sign of the exponent.
+5. **Proof route** (not a statement change). The double exponential targets are written in
+   closed form, `ε_j = exp (-(κ + ℓ^j D₀))` with `κ (ℓ - 1) = ln (2 a₁)` and `a₁ = max a 1`, and
+   the number of phases is `J = ⌊log_ℓ (β ln n / (2 D₀))⌋ ≤ log_ℓ ln n` with `β = min α (1/4)`,
+   so that `n^{-β} ≤ ε_J ≤ n^{-β/(2ℓ)}`. Instead of the domination by geometric variables
+   (Lemma 47), the phase potential `λ^{J - j}` with `λ = n^δ` contracts by `n^{-2δ} + n^{-δ}`
+   per round (`notYet_phase_le`); its factor `2^J` is a power of `n`. The last stage uses that
+   every uninformed node stays uninformed with probability at most `n^{-τ₃}` below `ε_J n`
+   uninformed nodes, and Markov's inequality. The degenerate cases `g = 0` (nothing to do) and
+   `α = 0` (fast finishing everywhere) are treated separately.
+6. **Total time with double exponential shrinking.** `spreading_upper_tail_double` and
+   `spreading_upper_expect_double` compose Theorem 21, Lemma 19 and Theorem 43 as in the proofs
+   of Theorems 52 and 53, like `spreading_upper_tail` for Theorem 31. They require `g > 0` (for
+   Lemma 19's prefactor `(1 - f)/g`); the unused hypotheses `g ≤ 1` and `α ≤ 1` are kept.
+7. **The protocols.** Every node calls a uniformly random node, itself included (the paper's
+   convention for complete graphs); the calls of a round form a uniform function
+   `Fin n → Fin n`. The package `rumor_spread/` models PUSH, PULL and PUSH–PULL without
+   self-calls; the two developments are independent.
+8. **The parameters of the instances need a minor correction.** Definition 9 requires
+   `0 < f < 1` and `a f < 1`, and Definition 13 requires `a g^{ℓ-1} < 1`. The paper takes
+   `f = 1` and `a = 1` for push, `f = 1` for pull, and `g = 1`, `a = 1`, `α = 0` for the double
+   exponential shrinking of pull; with `α = 0`, Theorem 43's fast finishing would also be
+   required for all `u ≤ n`, which fails at `u = n/2` (the stay probability of pull is `u/n`).
+   The formal instances take `f = g = 1/2` (so the middle range of Lemma 19 is empty),
+   `a = 1/2` for push (the paper's own estimate `p_k ≥ k/n - k²/(2n²)`), `a = 3/4` and
+   `γ = 2` for push–pull (from `p_k ≥ 2k/n - 3k²/(2n²)`), `ℓ = 2`, `a = 1`, `c = 0`,
+   `α = τ = 1/2` for the double exponential shrinking of pull and push–pull, and `ρ = 1`,
+   `a = 2/e`, `c = 0`, `g = 1/2` for the exponential shrinking of push, as in the paper.
+9. **Statements of Theorems 51 to 53.** The paper states the expected times `± O(1)`; only the
+   upper bounds are formalized, with exponential tails added. Lower bounds are out of scope.
 
 ## Subcritical percolation and small outbreaks (`Subcritical*`, EPI-2)
 

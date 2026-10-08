@@ -14,8 +14,8 @@ paper:
   (July 2015). Its upper-bound section is rewritten with different lemmas;
   its lower-bound section adds full proofs of Theorem 4.2 and a new Section 4.4.
 
-The formalization of Theorem 3.8 follows the SPAA proof, repaired where
-needed. The v3 proof was checked and is not used (see Section 2).
+The formalization of Theorem 3.8 follows the SPAA proof, which needs a minor
+correction (small repairs, listed below). The v3 proof was checked and is not used (see Section 2).
 
 ## 1. Theorem 3.8: how the Lean proof differs from SPAA
 
@@ -62,7 +62,7 @@ in spirit (its phases switch on `c_1 ≥ 2n/3`, and its per-color failure
 probability is `1/n³`), but it has its own problems, so the formalization
 keeps the SPAA proof:
 
-* **A false intermediate inequality.** The proof of "from plurality to
+* **An intermediate inequality that needs a minor correction.** The proof of "from plurality to
   majority" uses `μ_1 - μ_j ≥ (c_1 - c_j)(1 + c_1/(3n))` for every `j ≠ 1`.
   This fails for colors with few nodes: for `c = (n/3 + s, n/3, n/3 - s, 0)`
   and `j = 4`, `μ_1 - μ_4 = c_1(1 + s/n - 2s²/n²)`, which is below
@@ -132,7 +132,46 @@ otherwise:
   appear equally often, so each is chosen with the same probability, as the
   paper specifies.
 
-## 4. Not formalized
+## 4. Two opinions from any configuration (beyond the paper)
+
+`Plurality/AnyStart.lean` proves that binary 3-majority reaches consensus from any configuration
+within `O(log n)` rounds with high probability. The source of the argument is Becchetti,
+Clementi, Natale, *Consensus dynamics: an overview* (SIGACT News 2020, §4, Case 3), which
+describes the symmetry breaking of Doerr, Goldberg, Minder, Sauerwald and Scheideler (SPAA 2011)
+for the binary median dynamics. The formal version differs as follows.
+
+* **The dynamics.** The survey's argument is for the binary median dynamics (equivalently
+  2-Choices: a node's own opinion and two samples). Here it is carried out for 3-majority (three
+  samples, with replacement, possibly the node itself). Both have the same expected next fraction
+  `3x² - 2x³`, so the drift computations carry over; the `√n` jump near balance is proved directly
+  for 3-majority, from the variance `n p (1 - p)` of one round.
+* **Explicit constants, except one.** The survey's `γ√n` jump and constant-factor growth are
+  `jump_near_balance` (gap at most `4√n/25` becomes at least `√n/5` with probability `9/64`) and
+  `growth_far` (for `0 ≤ s ≤ n/2`, the next gap exceeds `11s/8 - 2λ` except with probability
+  `exp(-2λ²/n)`). The final round count `C log n` has a constant `C` that is only shown to exist,
+  since the hitting-time bound `Dynamics.Kernel.drift_hitting_log` gives none.
+* **The observable.** The survey uses `Z = ⌊s/(γ√n)⌋` on `{0, …, q}` with `q = ⌊(n/2)/(γ√n)⌋`
+  and the target `α log q`, giving a gap `Ω(√(n log n))`. The proof uses
+  `X = ⌊|s|/(√n/100)⌋`, which is at most `n`, with `q = n`, constants `c₁ = 5/4`,
+  `c₂ = 1/320000`, `c₃ = 9/64`, `c₄ = 1000`, `c₆ = 1`, and the target `1000 log n`, that is
+  `|s| ≥ 10 √n log n`. This is more than the `22 √(3 n log n)` needed by
+  `majority3_vanishing_bias`, which is the threshold stated in `majority3_symmetry_breaking`.
+  The absolute value and the symmetry between the two opinions (`step_compl`) replace the
+  survey's tacit choice of the majority opinion.
+* **"W.h.p." made explicit.** `majority3_any_start` holds for `log n ≥ 40` with failure
+  probability `C log n / n`, inherited from the `429 log n / n` of `majority3_vanishing_bias`.
+  `majority3_any_start_whp` runs it twice: from every configuration each block fails with
+  probability at most `ε = C₀ log n / n`, consensus absorbs, so both fail with probability at
+  most `ε² ≤ 1/n`. This needs `log n ≥ C` for the same unspecified `C`.
+* **Large `n`.** As for the other theorems of this package, the statements apply only to
+  astronomically large `n` (`log n ≥ 40`, or `log n ≥ C`).
+* **The two stages.** The survey passes from the hitting time back to its Case 2 informally.
+  Here the composition is `hitProb_sub_le_event`: if from every state with a large gap consensus
+  holds after `T` more rounds with probability `1 - ε`, then consensus holds at time `t + T` with
+  probability at least `P(gap is large by time t) - ε`. It is proved by induction on `t` from the
+  recursion of the hitting probability, and uses that consensus on either opinion is absorbing.
+
+## 5. Not formalized
 
 * **Observation 3.9 (adversary).** As stated ("Theorem 3.8 still holds")
   it cannot hold literally: an adversary that recolors even one node per round

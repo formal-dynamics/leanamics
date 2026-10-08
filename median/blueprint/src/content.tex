@@ -224,4 +224,58 @@ $e^{-\varepsilon n/24250}$ (take $m=(\varepsilon/5)n$). By induction on $T$, a $
 observable bounded by the potential $|B|$ in the region has expectation at most
 $(24/25)^T|B_0|+Te^{-\varepsilon n/24250}$; apply it to the indicator of not being in consensus.
 For the $O(\log n)$ form, $(24/25)^T\le e^{-T/25}\le n^{-2}$ and $|B_0|\le n$.
+
+\section{Almost stable consensus against an adaptive adversary}
+\begin{definition}[Adaptive adversary]\label{def:adversary}
+\lean{Median.Adversary,Median.Adversary.Bounded,Median.Adversary.UsesValues,Median.runAdv,Median.IsAdvRun,Median.AlmostConsensus,Median.notAlmostStable}\leanok\uses{def:median}
+An adversary maps the list of rounds played so far (the current one last) and the output of the
+median rule in the current round to a new configuration; it is $F$-bounded if it recolours at
+most $F$ nodes, and it uses values of $S$ if every value it writes lies in $S$. The run against
+the adversary applies, in every round, the median rule and then the adversary. More generally, a
+perturbed run is any function of the rounds played so far that starts at $x$ and, after every
+round, differs from the output of the median rule in at most $F$ nodes. A configuration is in
+almost consensus on $b$ with $K$ exceptions if at most $K$ nodes hold a value other than $b$;
+almost stable consensus during the times $T_0,\dots,T_0+H$ means almost consensus on the same
+value $b$ at all these times.
+\end{definition}
+\begin{theorem}[2-Choices against an adaptive adversary]\label{thm:binary-adv}
+\lean{Median.runAdv_isAdvRun,Median.binary_almost_stable_of_isAdvRun,Median.binary_almost_stable}\leanok\uses{def:adversary,thm:binary-any}
+There is a constant $C>0$ such that, whenever $\log n\ge C$ and $CF\le\sqrt n$, for every binary
+configuration, every perturbed run with budget $F$ (in particular, the run against every
+$F$-bounded adversary) and every $H\ge0$, almost stable consensus with $C(F+\log n)$ exceptions
+holds during the times $\lceil C\log n\rceil,\dots,\lceil C\log n\rceil+H$, except with
+probability at most $(C\log n+H)/n^2$. This is the two-value case (Theorem~10 of the 2009
+version) of the main theorem of Doerr et al.
+\end{theorem}
+\begin{proof}\leanok
+Take $C=2^{20}$, so $F\le\sqrt n/1024$, and let $g$ be the gap and $K=\max(16F,1024\log n)$.
+Recolouring $F$ nodes moves $g$ by at most $2F$ and the minority by at most $F$.
+\emph{Escape:} the potential $e^{-|g|/(256\sqrt n)}$ of Theorem~\ref{thm:binary-any} grows by at
+most $e^{1/131072}$ under the recolourings, so it still contracts by $e^{-1/131072}$ per round up
+to an additive $e^{1/65536-\sqrt n/512}$; after $\lceil 2^{19}\log n\rceil$ rounds Markov's
+inequality gives $|g|\ge 128\sqrt{n\log n}$ except with probability $2/n^2$. \emph{Growth and
+saturation} (for $g>0$; otherwise flip): a chain of one-round moves, each failing with
+probability at most $n^{-2}$ for every recolouring, along sets indexed by time: the gap grows from
+$G$ to $\min(9G/8,17n/32)$ (Hoeffding: $5G/4$ before the recolouring), then the minority shrinks
+from $t$ to $\max(15t/16,K)$ (Bernstein: $\max(7t/8,512\log n)$ before the recolouring) and stays
+below $K$. A union bound over the rounds of the chain and of the window gives the bound.
+\end{proof}
+\begin{theorem}[Almost stable consensus against an adaptive adversary]\label{thm:median-adv}
+\lean{Median.median_almost_stable}\leanok\uses{thm:binary-adv,thm:threshold}
+There is a constant $C>0$ such that, whenever $\log n\ge C$ and $CF\le\sqrt n$: let $S$ be a set
+of $m$ legal values containing the values of a configuration $x$. Against every $F$-bounded
+adversary that only writes values of $S$, and for every $H\ge0$, almost stable consensus with
+$C(F+\log n)$ exceptions holds during the times $\lceil C\log n\rceil,\dots,\lceil C\log n\rceil+H$,
+except with probability at most $(m-1)(C\log n+H)/n^2$.
+\end{theorem}
+\begin{proof}\leanok
+Take $C=2^{20}$. All values of the run lie in $S$. For every legal value $b$, the threshold
+$u\mapsto[b\le x_u]$ of the run is a perturbed run of 2-Choices with the same budget, because the
+median commutes with monotone maps and thresholding does not increase the Hamming distance. If,
+for every legal $b$ above the minimum $m_0$, the threshold run stays in almost consensus on some
+$c_b$ with $K$ exceptions, let $w$ be the largest legal value with $w=m_0$ or $c_w=\texttt{true}$:
+the nodes below $w$ are exceptions of the threshold at $w$, and the nodes above $w$ are exceptions
+of the threshold at the next legal value, so the run is in almost consensus on $w$ with $2K$
+exceptions. Conclude with the internal bound of Theorem~\ref{thm:binary-adv} and a union bound
+over the $m-1$ thresholds.
 \end{proof}
