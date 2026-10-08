@@ -81,3 +81,46 @@ python3 ../scripts/check_axioms.py
 ```
 
 This package uses the sibling `dynamics/` package's Lean 4.32.0 toolchain and exact Mathlib pin.
+
+## Averaging whenever you meet (roadmap AVG-3)
+
+Becchetti, Clementi, Manurangsi, Natale, Pasquale, Raghavendra, Trevisan, *Average whenever you
+meet: opportunistic protocols for community detection* (ESA 2018,
+[arXiv:1703.05045](https://arxiv.org/abs/1703.05045)). One uniformly random edge is activated per
+round; a node activated for the first time draws a uniform sign `±1`, and the two endpoints
+replace their values by their average (`Averaging(1/2)`, Algorithm 1). On an `(n, d, b)`-clustered
+regular graph whose cut is sparse with respect to the inner expansion (`λ₂ = 2b/d ≪ λ₃`), the
+values stay close to the initial average of each community over the phase
+`6 (n/λ₃) log n ≤ t ≤ 12 (n/λ₃) log n`, so their signs recover the communities. Namespace
+`Averaging.Opportunistic`, files `Averaging/Opportunistic*.lean`, all proved:
+
+| Paper | Lean |
+| --- | --- |
+| Algorithm 1, first activations by deferred decisions | `oppStep`, `oppRun`, `oppRun_getD`, `oppRun_isSome_iff` |
+| Uniform edge as uniform dart; conservation | `avg_dart_edge`, `sum_avgRun` |
+| Equations (1), (2), Observation A.2, equation (15) | `stepMatrix`, `meanStepMatrix`, `stepMatrix_mulVec`, `stepMatrix_isSymm`, `stepMatrix_mul_self`, `avg_stepMatrix`, `meanStepMatrix_isSymm`, `meanStepMatrix_mem_doublyStochastic`, `avg_edgeAvg`, `expList_avgRun`, `avg_sum_sq_edgeAvg` |
+| Definition 2.2, `χ`, `Q₁`, `Q₂`, `Q₃⋯ₙ` (equation (7)), `λ₃` | `IsClusteredRegular`, `cutVec`, `projOne`, `projCut`, `projRest`, `ThirdEigenvalueLB` |
+| Theorem 3.1 on clustered regular graphs (Lemmas B.1, B.3, B.4) | `meanStepMatrix_mulVec_cutVec`, `expList_projCut`, `expList_avgRun_decomp`, `sum_sq_meanStepMatrix_pow_le`, `monotone_criterion`, `sign_criterion` |
+| Lemmas C.2, C.3 (one round) | `IsClusteredRegular.avg_cutDev_edgeAvg_le`, `IsClusteredRegular.avg_restSq_edgeAvg_le` |
+| Lemma C.4 (unrolled recursions) | `IsClusteredRegular.expList_secondMoment_le` |
+| Theorem 4.1 (second moment analysis) | `secondMoment_bound` (`c = 100`) |
+| Definitions 4.1, 2.3 | `IsGood`, `IsWeakReconstruction` |
+| Lemma 4.2 (non-ephemeral good nodes) | `nonEphemeral_good` (`c = 10⁶`) |
+| Sign of the values over the phase (Section 4.2, Lemma A.1) | `sign_phase` (`c = 10⁶`, `C = 4`) |
+| Weak reconstruction over the phase | `weakReconstruction_phase` (`c = 10⁶`, `C = 6`) |
+
+Proof files: `OpportunisticOneStep.lean` (one round: Lemmas C.2, C.3),
+`OpportunisticSecondMoment.lean` (Lemma C.4, Theorem 4.1), `OpportunisticGood.lean` (good nodes
+stay good: the deterministic part of Lemma 4.2), `OpportunisticNonEphemeral.lean` (expectation
+bounds, anti-concentration of `‖y⁽⁰⁾‖²`, Lemma 4.2), `OpportunisticSigns.lean` and
+`OpportunisticSignEvents.lean` (sums of independent signs, Lemma A.1). The general-graph theorems
+`IsClusteredRegular.prob_good_window`, `prob_sign_window` and `prob_weakReconstruction_window`
+state the last three results on any finite vertex type. The proofs of Theorem 4.1 and Lemma 4.2
+follow the paper's strategy but not its bookkeeping; see
+[`FORMALIZATION_DIFFERENCES.md`](FORMALIZATION_DIFFERENCES.md). The step matrix of this part and
+`Sequential.edgeMatrix` (AVG-1) describe the same uniform-edge step.
+
+Provenance of AVG-3: the statements were fixed by a Claude agent before the proofs and reviewed
+by a second Claude agent against the paper (the review led to `±1` labels in Definition 2.3); the
+proofs are by Claude agents under the fixed-statement protocol, verified mechanically (no
+placeholders, warning-free build, axiom audit).
