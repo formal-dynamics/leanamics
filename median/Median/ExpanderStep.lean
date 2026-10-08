@@ -257,4 +257,70 @@ theorem sum_minorityProb_le {d : ℕ} (hd : 0 < d) (hreg : G.IsRegularOfDegree d
     linarith
   · nlinarith [sq_nonneg (y - 2 / 5 * B.card)]
 
+/-- The expected minority after one round is at most `(24/25) |B|`. -/
+theorem avg_minority_step_le {d : ℕ} (hd : 0 < d) (hreg : G.IsRegularOfDegree d) (a : Bool)
+    (x : V → Bool)
+    (hsp : ∀ S : Finset V, univ.filter (fun v => x v ≠ a) ⊆ S →
+      (S.card : ℝ) ≤ 13 / 3 * minority a x → (edgeCount G S S : ℝ) ≤ 3 / 5 * d * S.card) :
+    avg (fun r : GraphRound G => (minority a (graphStep G x r) : ℝ)) ≤ 24 / 25 * minority a x := by
+  rw [avg_minority_step hd hreg]
+  exact sum_minorityProb_le hd hreg a x hsp
+
+/-! ### Concentration: one round as independent trials on a common sample space -/
+
+/-- An enumeration of the neighbours of `v` in a `d`-regular graph. -/
+noncomputable def nbrEquiv {d : ℕ} (hreg : G.IsRegularOfDegree d) (v : V) :
+    Fin d ≃ G.neighborSet v :=
+  (Fintype.equivFinOfCardEq (by rw [G.card_neighborSet_eq_degree, hreg v])).symm
+
+/-- On a `d`-regular graph a round is the same as `2|V|` labels in `Fin d`, so uniform rounds
+are independent uniform draws from the common space `Fin d × Fin d`, one per vertex. -/
+noncomputable def roundEquiv {d : ℕ} (hreg : G.IsRegularOfDegree d) :
+    (V → Fin d × Fin d) ≃ GraphRound G where
+  toFun ω := (fun v => nbrEquiv hreg v (ω v).1, fun v => nbrEquiv hreg v (ω v).2)
+  invFun r := fun v => ((nbrEquiv hreg v).symm (r.1 v), (nbrEquiv hreg v).symm (r.2 v))
+  left_inv ω := by
+    funext v
+    simp
+  right_inv r := Prod.ext (funext fun v => by simp) (funext fun v => by simp)
+
+/-- **Tail of the minority after one round**: under the sparsity hypothesis, for every
+`m ≥ |B|`, `P(|B'| ≥ (49/50) m) ≤ e^{−m/4850}` (Chernoff's bound with mean bound `(24/25) m` and
+`δ = 1/48`). -/
+theorem tail_minority_step {d : ℕ} (hd : 0 < d) (hreg : G.IsRegularOfDegree d) (a : Bool)
+    (x : V → Bool)
+    (hsp : ∀ S : Finset V, univ.filter (fun v => x v ≠ a) ⊆ S →
+      (S.card : ℝ) ≤ 13 / 3 * minority a x → (edgeCount G S S : ℝ) ≤ 3 / 5 * d * S.card)
+    {m : ℝ} (hm : (minority a x : ℝ) ≤ m) :
+    avg (fun r : GraphRound G =>
+        if 49 / 50 * m ≤ (minority a (graphStep G x r) : ℝ) then (1 : ℝ) else 0)
+      ≤ exp (-(m / 4850)) := by
+  have : Nonempty (Fin d) := ⟨⟨0, hd⟩⟩
+  rw [← avg_equiv (roundEquiv hreg)]
+  set Y : V → Fin d × Fin d → ℝ := fun v q =>
+    neInd a (med3 (x v) (x (nbrEquiv hreg v q.1)) (x (nbrEquiv hreg v q.2))) with hYdef
+  have hY : ∀ v q, Y v q = 0 ∨ Y v q = 1 := fun v q => by
+    simp only [hYdef, neInd]
+    split_ifs <;> simp
+  have hsum (ω : V → Fin d × Fin d) :
+      (minority a (graphStep G x (roundEquiv hreg ω)) : ℝ) = ∑ v, Y v (ω v) := by
+    rw [minority_eq_sum]
+    rfl
+  have hμ : ∑ v, avg (Y v) ≤ 24 / 25 * m := by
+    have hv (v : V) : avg (Y v) = minorityProb G d a x v := by
+      have hp : avg (fun i : Fin d => neInd a (x (nbrEquiv hreg v i)))
+          = (nbCount G a x v : ℝ) / d := by
+        rw [avg_equiv (nbrEquiv hreg v) (fun u : G.neighborSet v => neInd a (x u)),
+          avg_neighbor_neInd hreg]
+      exact avg_pair a (x v) (fun i : Fin d => x (nbrEquiv hreg v i)) hp
+    simp_rw [hv]
+    have := sum_minorityProb_le hd hreg a x hsp
+    linarith
+  have key := avg_chernoff_upper Y hY (δ := 1 / 48) (by norm_num) hμ
+  have hc : (1 + 1 / 48 : ℝ) * (24 / 25 * m) = 49 / 50 * m := by ring
+  have he : -((1 / 48 : ℝ) ^ 2 * (24 / 25 * m) / (2 + 1 / 48)) = -(m / 4850) := by ring
+  rw [hc, he] at key
+  simp_rw [hsum]
+  exact key
+
 end Median
