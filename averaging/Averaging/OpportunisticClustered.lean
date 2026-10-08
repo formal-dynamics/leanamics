@@ -500,7 +500,8 @@ lemma two_le_abs_sum_cutVec (hG : IsClusteredRegular G V₁ d b) (σ : V → ℤ
     rw [← Int.cast_abs]; exact_mod_cast Int.one_le_abs hne
   rw [abs_mul, abs_two]; linarith
 
-lemma sign_add_of_sq_lt {m e : ℝ} (h : e ^ 2 < m ^ 2) : SignType.sign (m + e) = SignType.sign m := by
+lemma sign_add_of_sq_lt {m e : ℝ} (h : e ^ 2 < m ^ 2) :
+    SignType.sign (m + e) = SignType.sign m := by
   have h' := sq_lt_sq.mp h
   rcases lt_trichotomy m 0 with hm | hm | hm
   · rw [abs_of_neg hm] at h'

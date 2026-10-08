@@ -96,8 +96,8 @@ theorem sign_phase :
 /-- **Main theorem** (averaging whenever you meet recovers the communities): on an
 `(n, d, b)`-clustered regular graph with `λ₂/λ₃ ≤ λ₃ ε⁴/(c log² n)` for a large enough constant `c`
 (`λ₂ = 2b/d`), with probability at least `1/2 - C ε` over the initial coins and the edges, the sign
-of the values (`+1` for a positive value, `-1` otherwise) is a `C ε`-weak reconstruction of the two communities at every round of the phase
-`6 (n/λ₃) log n ≤ t ≤ 12 (n/λ₃) log n`. -/
+of the values (`+1` for a positive value, `-1` otherwise) is a `C ε`-weak reconstruction of the two
+communities at every round of the phase `6 (n/λ₃) log n ≤ t ≤ 12 (n/λ₃) log n`. -/
 theorem weakReconstruction_phase :
     ∃ c C : ℝ, 0 < c ∧ 0 < C ∧ ∀ (n : ℕ) (G : SimpleGraph (Fin n)) [DecidableRel G.Adj]
       (V₁ : Finset (Fin n)) (d b : ℕ) (lam3 ε : ℝ), IsClusteredRegular G V₁ d b →
