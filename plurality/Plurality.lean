@@ -13,3 +13,4 @@ import Plurality.HPlurality
 import Plurality.Rules
 import Plurality.ClearMajority
 import Plurality.UniformRule
+import Plurality.AnyStart
