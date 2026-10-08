@@ -148,6 +148,8 @@ the probability that fewer than `m` nodes are informed after `t` rounds from `S`
 | Jumping over `[f n, f' n[` has probability `O(E[T(|S|, f n)] / n)` (corrected Lemma 20) | Lemma 20 | `jumpProb_le` |
 | Exponential shrinking regime: from `≤ g n` uninformed nodes, all informed after `(1/ρ) ln n + O(1)` rounds, exponential tail | Theorem 31 (Theorem 2, upper bounds) | `shrinking_upper_tail`, `shrinking_upper_expect` |
 | Total spreading time `log_{1+γ} n + (1/ρ) ln n + O(1)`, exponential tail | Theorems 21 and 31 with Lemma 19 | `spreading_upper_tail`, `spreading_upper_expect` |
+| Double exponential shrinking regime: from `≤ g n` uninformed nodes, all informed after `log_ℓ ln n + O(1)` rounds, tail `O(n^{A' - α' r})` | Theorem 43 (Theorem 3, upper bounds) | `double_shrinking_upper_tail`, `double_shrinking_upper_expect` |
+| Total spreading time `log_{1+γ} n + log_ℓ ln n + O(1)`, exponential tail | Theorems 21 and 43 with Lemma 19 | `spreading_upper_tail_double`, `spreading_upper_expect_double` |
 
 **Lemma 20 of the paper is false as stated** (a process can stay below `f n` for many rounds,
 with a chance to jump over `[f n, f' n]` in each); the one-round estimate of its proof and a
@@ -156,6 +158,30 @@ corrected path statement are formalized instead. The counterexample and the othe
 condition in Definition 11, the composed total-time theorems) are listed in
 [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md). Theorem 31 is proved with a
 quadratic potential instead of the paper's phase calculus.
+
+### Push, pull and push–pull on the complete graph
+
+The classical protocols on `K_n` with self-calls (the paper's convention; every node calls a
+uniformly random node in each round), as rumor-spreading processes (`push`, `pull`, `pushPull`,
+in [`Epidemics/Revisited/Protocols.lean`](Epidemics/Revisited/Protocols.lean) and
+[`Instances.lean`](Epidemics/Revisited/Instances.lean)), starting from any nonempty set of
+informed nodes:
+
+| Result | Paper | Lean declaration |
+| --- | --- | --- |
+| Exact `p_k`: `1 - (1 - 1/n)^k` (push), `k/n` (pull), `1 - (1 - 1/n)^k (1 - k/n)` (push–pull); homogeneity | Appendix C (proofs of Theorems 51–53) | `push_informProb`, `pull_informProb`, `pushPull_informProb`, `push_homogeneous`, `pull_homogeneous`, `pushPull_homogeneous` |
+| Nonpositive covariances (independence for pull) | Appendix C | `push_cov_nonpos`, `pull_cov_eq_zero`, `pushPull_cov_nonpos` |
+| The growth, shrinking and double shrinking conditions with explicit constants | Theorems 51–53 (proofs) | `push_upperGrowth`, `push_upperShrinking`, `pull_upperGrowth`, `pull_upperDoubleShrinking`, `pull_fastFinishing`, `pushPull_upperGrowth`, `pushPull_upperDoubleShrinking`, `pushPull_fastFinishing` |
+| Push: all informed within `log₂ n + ln n + O(1)` rounds, exponential tail and expectation | Theorem 51 (upper bound) | `push_spreading_tail`, `push_spreading_expect` |
+| Pull: `log₂ n + log₂ ln n + O(1)` | Theorem 52 (upper bound) | `pull_spreading_tail`, `pull_spreading_expect` |
+| Push–pull: `log₃ n + log₂ ln n + O(1)` | Theorem 53 (upper bound) | `pushPull_spreading_tail`, `pushPull_spreading_expect` |
+
+For push this is the sharp upper bound of Frieze and Grimmett and of Pittel (all nodes informed
+after `log₂ n + ln n + O(1)` rounds), with an exponential tail. The package `rumor_spread/` has
+its own PUSH, PULL and PUSH–PULL models (without self-calls) and proves `O(log n)` bounds with
+large constants; the two developments are independent. Lower bounds are not formalized.
+Deviations (Theorem 43's proof, the parameters of the instances) are listed in
+[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 
 ## COBRA ⇔ BIPS duality (EPI-4)
 
@@ -191,7 +217,10 @@ hand against the source. Kurtz (CRN-2): the statements were pinned and then prov
 under the same protocol and checks; the statements were reviewed by hand against the source
 (Wormald's Theorem 5.1). Rumor spreading revisited (EPI-8): the statements were pinned and then
 proved under the same protocol and checks, the growth regime (Lemma 9, Lemma 19, Theorem 21) by a
-Grok agent and the rest (Lemma 20, Theorem 31, total time) by a Claude agent. Supercritical giant
+Grok agent and the rest (Lemma 20, Theorem 31, total time) by a Claude agent. The double
+exponential shrinking regime (Theorem 43) and the push, pull and push–pull instances (EPI-8 (c)):
+the statements were pinned by a Claude agent and reviewed by a second agent against the paper;
+the proofs are by a Claude agent under the fixed-statement protocol and the same checks. Supercritical giant
 component (EPI-3): the statements were pinned and then proved by a Claude agent under the same
 protocol and checks; the statements were reviewed by hand against the source. Subcritical
 percolation (EPI-2): statements and proofs were written by a Claude agent under the same protocol
