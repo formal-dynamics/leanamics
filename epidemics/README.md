@@ -1,4 +1,4 @@
-# Epidemics: Reed–Frost and bond percolation; the giant component; the Kermack–McKendrick SIR model; Kurtz's law of large numbers; rumor spreading revisited
+# Epidemics: Reed–Frost and bond percolation; subcritical percolation; the giant component; the COBRA–BIPS duality; the Kermack–McKendrick SIR model; Kurtz's law of large numbers; rumor spreading revisited
 
 A Lean formalization of the pathwise correspondence between the Reed–Frost (Independent Cascade)
 epidemic and bond percolation (after Kempe, Kleinberg and Tardos, KDD 2003; see also Becchetti et
@@ -21,6 +21,29 @@ open edge becomes infected, and every infected node recovers for good.
 The coupling holds for every coin assignment, which is stronger than the distributional
 equivalence usually stated (with fresh coins in each round); that distributional version is not
 formalized here.
+
+## Subcritical percolation and small outbreaks (EPI-2)
+
+After Becchetti et al., arXiv:2103.16398, Theorem 2.3 and its proof, Theorem E.1. Let the degrees
+of `G` be at most `d`, let `n = |V|`, and let `p (d - 1) ≤ 1 - ε` with `0 < ε < 1`
+(results in [`Epidemics/Subcritical.lean`](Epidemics/Subcritical.lean)):
+
+| Result | Lean declaration |
+| --- | --- |
+| Deferred decisions: P(component of `s` has `> t` vertices) ≤ P(`≥ t` successes in `t (d - 1) + 1` Bernoulli(`p`) trials) | `prob_cluster_gt_le_binomial` |
+| Theorem E.1: P(component of `s` has `> t` vertices) ≤ `exp (ε - ε² t / 2)` | `prob_cluster_gt_le` |
+| Theorem 2.3: with probability `≥ 1 - 1/n`, every component of `G_p` has `≤ (10 / ε²) log n` vertices | `prob_components_small` |
+| Reed–Frost with `R₀ = p (d - 1) ≤ 1 - ε`: with probability `≥ 1 - 1/n`, at most `|I₀| (10 / ε²) log n` nodes infected, none in round `⌊(10 / ε²) log n⌋` | `reedFrost_subcritical` |
+| Erdős–Rényi `G(n, c/n)`, `c ≤ 1 - ε`: with probability `≥ 1 - 1/n`, all components have `≤ (10 / ε²) log n` vertices | `erdosRenyi_subcritical` |
+
+The crux is the principle of deferred decisions. It is proved for every state of an exploration
+(discovered vertices, examined edges forced closed) by induction on a budget, conditioning on the
+coin of one frontier edge, which reproduces the recursion of the binomial tail
+([`SubcriticalExploration.lean`](Epidemics/SubcriticalExploration.lean)). The tail bound
+([`SubcriticalChernoff.lean`](Epidemics/SubcriticalChernoff.lean)) is the Chernoff bound of
+`dynamics/` (`Distribution.prob_ge_le_exp`) at the paper's tilt `ε`. Deviations from the paper
+(explicit constants, the threshold written as `p (d - 1) ≤ 1 - ε`) are listed in
+[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 
 ## The supercritical giant component (EPI-3)
 
@@ -134,6 +157,32 @@ condition in Definition 11, the composed total-time theorems) are listed in
 [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md). Theorem 31 is proved with a
 quadratic potential instead of the paper's phase calculus.
 
+## COBRA ⇔ BIPS duality (EPI-4)
+
+After Cooper, Radzik and Rivera, *The coalescing-branching random walk on expanders and the dual
+epidemic process*, PODC 2016 ([arXiv:1602.05768](https://arxiv.org/abs/1602.05768)), Theorem 4.
+
+**Model.** In every round each vertex samples `k` uniform neighbours with replacement (a uniform
+element of `Choices G k`). COBRA: every vertex of the current set pushes to its sampled neighbours,
+and the next set is the set of chosen vertices. BIPS with persistent source `v`: `v` is always
+infected, and any other vertex is infected next iff one of its sampled neighbours is infected now.
+
+**Main results** (in [`Epidemics/CobraDuality.lean`](Epidemics/CobraDuality.lean)):
+
+| Result | Lean declaration |
+| --- | --- |
+| Pathwise: COBRA from `C` visits `v` within the rounds iff BIPS from `{v}` along the reversed rounds infects a vertex of `C` | `cobra_hit_iff_bips_reverse` |
+| Theorem 4: `P(Hit_C(v) > t ∣ C₀ = C) = P(C ∩ A_t = ∅ ∣ A₀ = {v})` | `cobra_bips_duality` |
+| Equation (2): `P(Hit_u(v) > t) = P(u ∉ A_t ∣ A₀ = {v})` | `cobra_bips_duality_singleton` |
+
+The paper assumes `G` connected and regular and `k ≥ 1`; the duality holds for every finite graph
+and every `k`. On a connected graph with at least two vertices the rounds exist
+(`choices_nonempty`), so both sides are genuine probabilities. The proof combines the pathwise
+identity with time reversal of i.i.d. rounds, the core's `Dynamics.expList_comp_reverse` (FND-6).
+Deviations from the paper are listed in [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
+The statements were pinned and then proved by a Claude agent under the fixed-statement protocol and
+checks of the provenance note below.
+
 **Provenance.** Reed–Frost: the statements were written and pinned by hand; the proofs were produced
 by a Grok agent under a fixed-statement protocol and verified mechanically (statements unchanged, no
 placeholders, warning-free build, axiom audit). Kermack–McKendrick: the statements were pinned and
@@ -144,7 +193,9 @@ under the same protocol and checks; the statements were reviewed by hand against
 proved under the same protocol and checks, the growth regime (Lemma 9, Lemma 19, Theorem 21) by a
 Grok agent and the rest (Lemma 20, Theorem 31, total time) by a Claude agent. Supercritical giant
 component (EPI-3): the statements were pinned and then proved by a Claude agent under the same
-protocol and checks; the statements were reviewed by hand against the source.
+protocol and checks; the statements were reviewed by hand against the source. Subcritical
+percolation (EPI-2): statements and proofs were written by a Claude agent under the same protocol
+and checks; the statements were reviewed by hand against the paper.
 
 Build and audit:
 

@@ -4,7 +4,10 @@ and bond percolation, after Kempe, Kleinberg and Tardos: with one coin per edge,
 infected in round $t$ are exactly those at distance $t$ from the initial set in the graph of
 open edges. Consequently the final outbreak is the set of nodes connected to the initial set by
 open edges, and with i.i.d.\ Bernoulli$(p)$ coins the probability of eventual infection is a
-bond-percolation connection probability. We then formalize the supercritical phase of the
+bond-percolation connection probability. Below the threshold, on graphs of maximum degree $d$ with
+$p(d-1)\le1-\varepsilon$, every cluster has at most $(10/\varepsilon^2)\log n$ vertices with
+probability at least $1-1/n$ (Becchetti et al.), so a subcritical Reed--Frost epidemic stays
+small and dies out within $O(\log n)$ rounds. We then formalize the supercritical phase of the
 Erd\H{o}s--R\'enyi random graph $G(n,(1+\varepsilon)/n)$ (bond percolation on $K_n$) by the
 depth-first-search argument of Krivelevich and Sudakov: with probability at least $1-C/n$ there is
 a path of length $\varepsilon^2 n/5$ and a component of $\varepsilon n/2$ vertices; read through
@@ -22,6 +25,9 @@ We also formalize the upper bounds of Doerr and Kostrygin's analysis of general 
 processes (\emph{Randomized rumor spreading revisited}, ICALP 2017): the exponential growth and
 shrinking regimes and the total spreading time $\log_{1+\gamma}n+\frac1\rho\ln n+O(1)$, with
 exponential tails. Lemma~20 of that paper is false as stated; we prove corrected versions.
+
+We also formalize the duality between the coalescing-branching random walk (COBRA) and the BIPS
+epidemic of Cooper, Radzik and Rivera (Theorem~4), pathwise and by time reversal of i.i.d.\ rounds.
 \end{abstract}
 
 \section{The model}
@@ -78,6 +84,59 @@ The coupling is pathwise because every edge is used at most once: once its coin 
 from an infected endpoint, that endpoint is recovered for good. This is why a single coin per edge
 gives the same process, in distribution, as fresh coins in every round (that distributional
 statement is not formalized here).
+
+\section{Subcritical percolation and small outbreaks (EPI-2)}
+After Becchetti, Clementi, Denni, Pasquale, Trevisan, Ziccardi (arXiv:2103.16398), Theorem 2.3
+and its proof, Theorem E.1. Throughout, the degrees of $G$ are at most $d$, $n = |V|$, and
+$p(d-1) \le 1 - \varepsilon$ with $0 < \varepsilon < 1$.
+
+\begin{lemma}[Binomial tail and Chernoff bound]\label{lem:chernoff}
+\lean{Epidemics.binTail,Epidemics.binTail_succ_succ,Epidemics.one_sub_mul_exp_le,Epidemics.binomial_tail_le}\leanok\uses{thm:perc}
+At least $t$ successes among $t(d-1)+1$ independent Bernoulli$(p)$ trials occur with probability
+at most $\exp(\varepsilon - \varepsilon^2 t/2)$.
+\end{lemma}
+\begin{proof}\leanok
+Markov's inequality on $e^{\varepsilon X}$ and the bound $\mathbb E[e^{\varepsilon X}] \le
+\exp(\mu(e^{\varepsilon}-1))$ for a sum of independent trials with mean $\mu \le
+(1-\varepsilon)(t+1)$ (the Chernoff layer of the shared \texttt{dynamics} package, before
+optimizing the tilt: \texttt{Distribution.prob\_ge\_le\_exp}), then $(1-\varepsilon)e^{\varepsilon} \le 1 - \varepsilon^2/2$.
+\end{proof}
+
+\begin{theorem}[Deferred decisions]\label{thm:deferred}
+\lean{Epidemics.reachSet,Epidemics.closeOff,Epidemics.frontier,Epidemics.prob_reachSet_le_binTail,Epidemics.prob_cluster_gt_le_binTail,Epidemics.prob_cluster_gt_le_binomial}\leanok\uses{lem:chernoff}
+The component of $s$ in $G_p$ has more than $t$ vertices with probability at most that of at
+least $t$ successes in $t(d-1)+1$ independent Bernoulli$(p)$ trials.
+\end{theorem}
+\begin{proof}\leanok
+For an exploration state (discovered set $D$, examined pairs $X$, forced closed), induction on a
+budget $m \ge \mathrm{frontier}(D, X) + (k-1)(d-1)$: conditioning on the coin of one frontier edge,
+a closed coin removes that edge from the frontier, and an open one adds a vertex and at most $d-1$
+new frontier edges at it while removing the examined one. This is the recursion of the binomial
+tail. The initial frontier of $\{s\}$ has at most $d$ edges.
+\end{proof}
+
+\begin{theorem}[Theorems E.1 and 2.3]\label{thm:subcritical}
+\lean{Epidemics.prob_cluster_gt_le,Epidemics.prob_components_le_of_tail,Epidemics.card_mul_exp_le,Epidemics.prob_components_small}\leanok\uses{thm:deferred}
+The component of any vertex has more than $t$ vertices with probability at most
+$\exp(\varepsilon - \varepsilon^2 t/2)$, and with probability at least $1 - 1/n$ every component of
+$G_p$ has at most $(10/\varepsilon^2)\log n$ vertices.
+\end{theorem}
+\begin{proof}\leanok
+Theorem~\ref{thm:deferred} and Lemma~\ref{lem:chernoff}, then a union bound over the vertices.
+\end{proof}
+
+\begin{corollary}[Subcritical Reed--Frost and Erd\H{o}s--R\'enyi]\label{cor:subcritical}
+\lean{Epidemics.card_recovered_le,Epidemics.infected_eq_empty_of_ncard_le,Epidemics.reedFrost_subcritical,Epidemics.erdosRenyi_subcritical}\leanok\uses{thm:subcritical,cor:final}
+With probability at least $1 - 1/n$, the Reed--Frost epidemic with $R_0 = p(d-1) \le 1 -
+\varepsilon$ infects at most $|I_0| (10/\varepsilon^2)\log n$ nodes and nobody is infected in round
+$\lfloor (10/\varepsilon^2)\log n \rfloor$; and every component of $G(n, c/n)$ with
+$c \le 1 - \varepsilon$ has at most $(10/\varepsilon^2)\log n$ vertices.
+\end{corollary}
+\begin{proof}\leanok
+The final outbreak is the union of the components of $I_0$, and distances inside a component are
+smaller than its size (Corollary~\ref{cor:final}). $G(n, c/n)$ is bond percolation on $K_n$, with
+$d = n - 1$ and $p(d-1) \le c$.
+\end{proof}
 
 \section{The supercritical giant component}
 Source: M.~Krivelevich and B.~Sudakov, \emph{The phase transition in random graphs: a simple
@@ -375,4 +434,56 @@ $E[T]\le\log_{1+\gamma}n+\ln n/\rho+B$.
 \begin{proof}\leanok
 Compose the three exponential tails (Theorem~\ref{thm:rumor-growth}, Lemma~\ref{lem:rumor-connect},
 Theorem~\ref{thm:rumor-shrinking}) by the Markov property at fixed times, and sum the tail.
+\end{proof}
+
+\section{COBRA and BIPS: the model}
+We follow Cooper, Radzik and Rivera, \emph{The coalescing-branching random walk on expanders and
+the dual epidemic process}, PODC 2016 (arXiv:1602.05768).
+\begin{definition}[Rounds of neighbour choices]\label{def:choices}
+\lean{Epidemics.Choices,Epidemics.instFintypeChoices,Epidemics.choices_nonempty}\leanok
+In a round $r$, every vertex $x$ of a finite graph $G$ samples $k$ neighbours
+$r(x,0),\dots,r(x,k-1)$. A uniform round is exactly the paper's sampling: $k$ uniform neighbours
+with replacement, independently for every vertex; $t$ i.i.d.\ uniform rounds are averaged with
+\texttt{Dynamics.expList}. If $G$ is connected and has at least two vertices, rounds exist.
+\end{definition}
+\begin{proof}\leanok
+Every vertex of a connected graph with at least two vertices has a neighbour.
+\end{proof}
+\begin{definition}[COBRA and BIPS]\label{def:cobra}
+\lean{Epidemics.cobraStep,Epidemics.cobraRun,Epidemics.bipsStep,Epidemics.bipsRun}\leanok\uses{def:choices}
+COBRA from $C_0=C$: $C_{s+1}=\{r_{s+1}(x,i) : x\in C_s,\ i<k\}$. BIPS with persistent source $v$
+from $A_0$: $A_{s+1}=\{v\}\cup\{u : \exists i,\ r_{s+1}(u,i)\in A_s\}$.
+\end{definition}
+
+\section{COBRA--BIPS duality}
+\begin{lemma}[Time reversal of i.i.d.\ rounds]\label{lem:reverse}
+\lean{Dynamics.expList_comp_reverse,Epidemics.expList_congr_length}\leanok
+For every functional $F$ of $T$ i.i.d.\ uniform rounds,
+$\mathbb E[F(r_T,\dots,r_1)]=\mathbb E[F(r_1,\dots,r_T)]$.
+\end{lemma}
+\begin{proof}\leanok
+The uniform average over $\mathrm{Fin}\,T\to\alpha$ is invariant under $\omega\mapsto\omega\circ\mathrm{rev}$
+(the time-reversal lemma of the shared \texttt{dynamics} package).
+\end{proof}
+\begin{lemma}[Pathwise duality]\label{lem:pathwise}
+\lean{Epidemics.cobra_hit_iff_bips_reverse}\leanok\uses{def:cobra}
+For all rounds $r_1,\dots,r_t$: COBRA from $C$ along $r_1,\dots,r_t$ visits $v$ at some time
+$s\le t$ (time $0$ included) iff BIPS from $\{v\}$ along $r_t,\dots,r_1$ infects a vertex of $C$.
+\end{lemma}
+\begin{proof}\leanok
+Induction on $t$, generalizing $C$. Both sides say that a chain $x_0\in C$,
+$x_j=r_j(x_{j-1},i_j)$, reaches $v$ within $t$ steps: COBRA unfolds the first round, BIPS the
+last round of the reversed sequence.
+\end{proof}
+\begin{theorem}[Theorem 4 of Cooper--Radzik--Rivera]\label{thm:duality}
+\lean{Epidemics.cobra_bips_duality,Epidemics.cobra_bips_duality_singleton}\leanok\uses{lem:reverse,lem:pathwise}
+For every finite graph, every $k$, every vertex $v$, set $C$ and time $t$:
+$\hat{\mathbb P}(\mathrm{Hit}_C(v)>t\mid C_0=C)=\mathbb P(C\cap A_t=\emptyset\mid A_0=\{v\})$. In
+particular (equation (2)), $\hat{\mathbb P}(\mathrm{Hit}_u(v)>t)=\mathbb P(u\notin A_t\mid A_0=\{v\})$.
+The paper assumes $G$ connected and regular and $k\ge1$; none of this is needed.
+\end{theorem}
+\begin{proof}\leanok
+Lemma~\ref{lem:pathwise} identifies the two events after reversing the rounds, and
+Lemma~\ref{lem:reverse} says that reversing the rounds preserves their law. The paper proves the
+theorem instead by induction on $t$ with one-step conditioning.
 \end{proof}
