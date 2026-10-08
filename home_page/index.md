@@ -38,6 +38,11 @@ Consensus* (SPAA 2014), whose proof needs a minor correction (small repairs), to
 Corollaries 3.10 to 3.12. With two opinions this is consensus from a vanishing imbalance: a gap of
 $22\sqrt{3 n \log n}$, i.e. a fraction $1/2 + O(\sqrt{\log n / n})$, suffices for consensus within
 $390 \log n$ rounds with probability $1 - O(\log n / n)$ (`Plurality.majority3_vanishing_bias`).
+From **any** configuration, even a perfectly balanced one, binary 3-majority reaches consensus
+within $O(\log n)$ rounds with probability $1 - 1/n$ (`Plurality.majority3_any_start_whp`): near
+balance one round creates a gap of order $\sqrt{n}$ with constant probability, and the
+hitting-time lemma of Doerr et al. (SPAA 2011) shows that the gap then grows to the size the
+vanishing-bias theorem needs.
 The package also proves the paper's lower bounds ($\Omega(k \log n)$ rounds from balanced starts,
 and $\Omega(k/h^2)$ rounds for $h$-plurality) and its characterization of the 3-input rules that
 solve plurality consensus, except for one family of rules that remains open.
@@ -60,9 +65,16 @@ consensus on the majority within $\lceil 128 \log n \rceil$ rounds with probabil
 (`Median.consensus_whp`), and a gap $\Delta$ of at least that size gives consensus within
 $O(\log(n/\Delta) + \log \log n)$ rounds (`Median.binary_consensus_fast`). From any
 configuration, with any number of values and even from a perfectly balanced start, consensus
-follows within $O(\log n)$ rounds with probability $1 - O(1/n)$ (`Median.median_consensus_any`,
-the paper's Theorem 1 without its adversary). The odd case of the paper's Theorem 21 is
-formalized for exactly equal supports (`Median.odd_split_consensus`).
+follows within $O(\log n)$ rounds with probability $1 - O(1/n)$ (`Median.median_consensus_any`).
+The paper's Theorem 1 is also formalized with its adaptive adversary: against an adversary that
+knows the history and changes the values of up to $F \le \sqrt{n}/2^{20}$ nodes per round, after
+$O(\log n)$ rounds all but $O(F + \log n)$ nodes agree on one value over any finite window
+(`Median.median_almost_stable`). The odd case of the paper's Theorem 21 is formalized for exactly
+equal supports (`Median.odd_split_consensus`). On graphs, in two-sample voting every vertex
+samples two neighbours and adopts their opinion if they agree; on a $d$-regular expander whose
+second largest eigenvalue in absolute value is at most $3/5 - \varepsilon$, a minority of at most
+$\varepsilon n/5$ vertices disappears within $O(\log n)$ rounds (`Median.two_choices_expander`,
+Theorem 4 of Cooper, Elsässer and Radzik, ICALP 2014).
 
 * [Blueprint]({{ '/median/blueprint/' | relative_url }}) · [as pdf]({{ '/median/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/median/blueprint/dep_graph_document.html' | relative_url }})
@@ -75,7 +87,15 @@ Each node holds opinion $a$, opinion $b$, or is undecided; every round it sample
 node, adopts the sampled opinion if undecided, and becomes undecided if it sees the other opinion.
 With $q$ undecided nodes, the bias between the two opinions grows in expectation by the factor
 $1 + q/n$ in one round (`Undecided.expected_bias`), and every run is eventually absorbed in a
-monochromatic configuration (`Undecided.absorbed`). In the sequential version, the
+monochromatic configuration (`Undecided.absorbed`). A bias of order $\sqrt{n \log n}$ suffices,
+from any configuration and with any number of undecided nodes, for all nodes to adopt the majority
+opinion within $O(\log n)$ rounds with probability $1 - O(1/n)$ (`Undecided.majority_whp`, after
+Clementi, Ghaffari, Gualà, Natale, Pasquale and Scornavacca, MFCS 2018). With $k$ colours and no
+undecided nodes, if the plurality color leads every other color by a constant factor, all nodes
+adopt it within $O(\mathrm{md}(c) \log n)$ rounds, where $\mathrm{md}(c)$ is the monochromatic
+distance of the initial configuration (`Undecided.Plurality.plurality_whp`, Theorem 11 of
+Becchetti, Clementi, Natale, Pasquale and Silvestri, SODA 2015, whose range of $k$ needs a minor
+correction). In the sequential version, the
 approximate-majority population protocol of Angluin, Aspnes and Eisenstat (Distributed Computing,
 2008), one random pair of agents interacts per step: from any configuration with a decided agent,
 consensus is reached within $O(n \log n)$ interactions, and from a gap of order
@@ -104,7 +124,9 @@ $O(n^3 \log n)$ rounds with probability at least $1 - 1/n$ (`Voter.lazy_voter_co
 Hassin and Peleg's Theorem 2.5), and within $O(m/(d\varphi))$ rounds with probability at least
 $1/2$, where $m$ is the number of edges, $d$ the minimum degree and $\varphi$ the conductance,
 also on dynamic graphs and with any number of opinions (`Voter.lazy_consensus_conductance`,
-after Berenbrink, Giakkoupis, Kermarrec and Mallmann-Trenn, ICALP 2016).
+after Berenbrink, Giakkoupis, Kermarrec and Mallmann-Trenn, ICALP 2016), as well as within
+$O(n \log n/\varphi^2)$ rounds with probability at least $1 - 1/n$, the second bound of the same
+paper (`Voter.lazy_consensus_conductance_sq_many`).
 
 * [Blueprint]({{ '/voter/blueprint/' | relative_url }}) · [as pdf]({{ '/voter/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/voter/blueprint/dep_graph_document.html' | relative_url }})
@@ -143,8 +165,11 @@ nodes within $\lceil 160 \ln n \rceil$ rounds with probability at least $1 - 2/n
 rumor-spreading processes, the upper bounds of Doerr and Kostrygin, *Randomized rumor spreading
 revisited* (ICALP 2017), are formalized: exponential growth, exponential shrinking and the total
 spreading time, with exponential tails (`Epidemics.Revisited.spreading_upper_tail`). Lemma 20 of
-the paper needs a major correction, and the lower bounds and the concrete protocols are not
-formalized.
+the paper needs a major correction. As instances, on $K_n$ (with self-calls) push informs all
+nodes within $\log_2 n + \ln n + O(1)$ rounds, the sharp upper bound of Frieze and Grimmett and
+of Pittel, pull within $\log_2 n + \log_2 \ln n + O(1)$ and push–pull within
+$\log_3 n + \log_2 \ln n + O(1)$, with exponential tails
+(`Epidemics.Revisited.push_spreading_tail`); the lower bounds are not formalized.
 
 **Reed–Frost and percolation.** In the Reed–Frost (Independent Cascade) epidemic, each infected
 node infects each susceptible neighbour across an open edge and then recovers. With one coin per
@@ -155,9 +180,12 @@ is a bond-percolation connection probability (`Epidemics.prob_infected_eq_prob_c
 the threshold (maximum degree $d$ and $p(d-1) \le 1 - \varepsilon$), every component of the
 percolated graph has $O(\log n / \varepsilon^2)$ vertices with probability at least $1 - 1/n$, so
 outbreaks are small and short (`Epidemics.reedFrost_subcritical`, after Becchetti, Clementi,
-Denni, Pasquale, Trevisan and Ziccardi). Above it, $G(n, (1+\varepsilon)/n)$ has a linear-size
-component, and Reed–Frost on $K_n$ with basic reproduction number above $1$ infects a linear number
-of nodes with constant probability (`Epidemics.exists_giant_component`,
+Denni, Pasquale, Trevisan and Ziccardi). The same holds on their one-dimensional small-world
+networks, a cycle plus random shortcuts (the edges of $G(n, c/n)$, or a random perfect matching),
+below the thresholds $(\sqrt{c^2 + 6c + 1} - c - 1)/(2c)$ and $1/2$
+(`Epidemics.swg_reedFrost_subcritical`; the supercritical half is not formalized). Above the
+threshold, $G(n, (1+\varepsilon)/n)$ has a linear-size component, and Reed–Frost on $K_n$ with
+basic reproduction number above $1$ infects a linear number of nodes with constant probability (`Epidemics.exists_giant_component`,
 `Epidemics.reedFrost_large_outbreak`, after Krivelevich and Sudakov, 2013).
 
 **COBRA and BIPS.** The coalescing-branching random walk and the BIPS epidemic are dual: on every
@@ -219,7 +247,12 @@ On a regular graph made of two clusters with a spectral gap, starting from unifo
 $\pm 1$ values, the sign of the change of a node's value in one round recovers the two clusters
 after $O(\log n / \delta)$ rounds with probability at least $1 - 1/\sqrt{\pi n}$
 (`Averaging.strong_reconstruction`, after Becchetti, Clementi, Natale, Pasquale and Trevisan,
-*Find your place*, SODA 2017).
+*Find your place*, SODA 2017). In the asynchronous protocol *averaging whenever you meet*, one
+uniformly random edge averages its endpoints per round and a node draws a random $\pm 1$ value at
+its first activation; on the same kind of graph with a sparse cut, the signs of the values recover
+the two communities over a phase of $\Theta(n \log n / \lambda_3)$ rounds, with probability at
+least $1/2 - O(\varepsilon)$ (`Averaging.Opportunistic.weakReconstruction_phase`, after Becchetti,
+Clementi, Manurangsi, Natale, Pasquale, Raghavendra and Trevisan, ESA 2018).
 
 * [Blueprint]({{ '/averaging/blueprint/' | relative_url }}) · [as pdf]({{ '/averaging/blueprint.pdf' | relative_url }}) ·
   [dependency graph]({{ '/averaging/blueprint/dep_graph_document.html' | relative_url }})
