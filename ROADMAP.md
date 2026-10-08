@@ -15,13 +15,19 @@ and a status.
 3. **Open a pull request** when you have something to show. Drafts are welcome. Follow the
    project layout described in the [README](README.md): a separate Lake package (or an
    extension of an existing one), a blueprint with `\lean{}` tags, and a `sorry`-free build.
+   The pull request must also keep the documentation up to date: the package's `README.md` and
+   blueprint, its `FORMALIZATION_DIFFERENCES.md`, [RESULTS.md](RESULTS.md),
+   [PROVENANCE.md](PROVENANCE.md), the status here, and the landing page `home_page/index.md`
+   (or an issue opened to update it). The
+   [pull request template](.github/pull_request_template.md) lists these items.
 4. Want to propose a result that is not listed? Open an issue; the roadmap is meant to grow.
 
 Status values: `open` · `claimed (#issue)` · `in review (#PR)` · `done`.
 
 Done results are documented in [PROVENANCE.md](PROVENANCE.md): source paper, proof route
 (published proof followed, with deviations, or a different proof), explicit constants and
-authorship. When a target is done, add its entry there.
+authorship, and [RESULTS.md](RESULTS.md) lists them by area. When a target is done, add its entry
+to PROVENANCE.md and a row to RESULTS.md.
 
 Sizes (rough, for someone fluent in Lean + Mathlib): **S** days · **M** 1–3 weeks ·
 **L** 1–3 months · **XL** research-level.
