@@ -4,7 +4,8 @@ import Epidemics.Revisited.Shrinking
 /-! # Double exponential shrinking regime, upper bound, and the total spreading time (EPI-8)
 
 Doerr and Kostrygin, *Randomized rumor spreading revisited* (ICALP 2017; long version
-arXiv:2303.11150), Theorem 43 (Theorem 3 of the overview, upper bounds): under the upper double
+arXiv:2303.11150), Theorem 43 (upper bounds; Theorem 3 of the overview, whose conditions,
+Definition 5, imply Definition 13 together with fast finishing): under the upper double
 exponential shrinking conditions (Definition 13) and fast finishing below `n^{1-α}` uninformed
 nodes, once at most `g n` nodes are uninformed, all nodes are informed within
 `log_ℓ ln n + O(1)` rounds in expectation, and overshooting this by `r` rounds has probability

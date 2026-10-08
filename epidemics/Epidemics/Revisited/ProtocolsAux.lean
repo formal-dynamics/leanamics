@@ -1,6 +1,18 @@
-import Epidemics.Revisited.Protocols
+import Epidemics.Revisited.ProtocolsDefs
+import Epidemics.Revisited.DoubleShrinkingDefs
+import Epidemics.Revisited.ShrinkingDefs
 import Epidemics.GiantCoins
 import Epidemics.Revisited.GrowthAux
+
+/-! # The push, pull and push–pull protocols: computations (EPI-8, instances)
+
+* The uniform calls are independent and uniform coordinates (`prob_calls_forall`), so the events
+  "`x` stays uninformed" and "`x` and `y` stay uninformed" are products of one-coordinate events
+  and their probabilities are explicit.
+* `cov` is rewritten through the "uninformed" events by inclusion–exclusion (`cov_eq`).
+* Elementary inequalities: the second-order Bonferroni bound
+  `(1 - x)^k ≤ 1 - k x + (k x)² / 2` and `e^t ≤ 1 + 2t` on `[0, 1]`.
+-/
 
 namespace Epidemics.Revisited
 open Finset Dynamics
