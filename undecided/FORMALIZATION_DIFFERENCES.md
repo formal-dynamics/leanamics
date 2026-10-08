@@ -2,6 +2,88 @@
 
 Where the statements of `undecided/` deviate from their sources, and why.
 
+## Majority phase of the binary dynamics (`Majority*`, roadmap UND-1)
+
+Sources: L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri, *Plurality consensus in
+the gossip model*, SODA 2015, arXiv:1407.2565 [BCNPS15]; A. Clementi, M. Ghaffari, L. Gualà,
+E. Natale, F. Pasquale, G. Scornavacca, *A tight analysis of the parallel undecided-state
+dynamics with two colors*, MFCS 2018, arXiv:1707.05135 [CGGNPS18].
+
+### The statements
+
+`Undecided/Majority.lean` (namespace `Undecided`) reuses `Config`, `Op`, `count` and `step` from
+`Undecided/Basic.lean`; probabilities are `Dynamics.expList (Fin n → Fin n) T` expectations of
+the indicator that `l.foldl step x` is the all-`a` (or all-`b`) configuration.
+
+* `majority_whp`: there is `C > 0` such that for every `n` with `log n ≥ C` and every
+  configuration with `count a - count b ≥ C √(n log n)` (any number of undecided nodes), all
+  nodes hold `a` after `⌈C log n⌉` rounds with probability at least `1 - C/n`. Proved with
+  `C = 10⁴`; the explicit form is `majority_explicit` (failure probability at most `2/n`).
+* `majority_whp_abs`: the same with `|count a - count b|`, the target being the initial majority
+  opinion.
+* `majority_whp_of_ratio (hα : 0 < α)`: [BCNPS15, Theorem 11] for two colours. Without undecided
+  nodes and with `count a ≥ (1 + α) count b`, the same conclusion with
+  `C = 10⁴ + 3·10⁴ (2 + α)/α`.
+
+### Differences in the statements
+
+1. **Additive bias, undecided nodes allowed.** [BCNPS15] proves the binary case only as
+   Theorem 11 with `k = 2`, from configurations without undecided nodes (`q⁽⁰⁾ = 0`, Section 2.1)
+   and with a multiplicative bias `c₁ ≥ (1 + α) c₂`, that is a bias of order `n`. The main
+   statement `majority_whp` is the stronger form of [CGGNPS18, Theorem 3.2]: any configuration
+   with bias at least `C √(n log n)`. The form of [BCNPS15] is stated separately
+   (`majority_whp_of_ratio`), with `q⁽⁰⁾ = 0` as in the paper. The hypothesis `q⁽⁰⁾ = 0` cannot
+   be dropped there: with undecided nodes allowed, a ratio hypothesis alone does not give a
+   high-probability statement (from `a = 2`, `b = 1` and all other nodes undecided, simulations
+   show that the majority wins only in about 80% of the runs).
+2. **Explicit "with high probability".** `1 - n^{-Θ(1)}` and `O(log n)` become one existential
+   constant `C`: `log n ≥ C`, bias at least `C √(n log n)`, `⌈C log n⌉` rounds, probability at
+   least `1 - C/n`. [CGGNPS18] allows any constant `γ > 0` in the bias `γ √(n log n)` (with a
+   `γ`-dependent exponent); only the existence of a suitable (large) constant is stated here.
+3. **"Within `T` rounds" is stated as "at round `T`"**, which is equivalent because the
+   monochromatic configurations are absorbing (`step_of_mono`).
+4. **The majority is named `a`** in `majority_whp`, following the paper's convention `c₁ ≥ c₂`;
+   `majority_whp_abs` covers either opinion.
+5. **Sampling model.** Every node samples one node uniformly with replacement, possibly itself
+   (as in `Undecided/Basic.lean`). This is the model behind the expectations (3) and (4) of
+   [BCNPS15] (`µᵢ = cᵢ (cᵢ + 2q)/n`) and (1) to (3) of [CGGNPS18].
+6. **Finite probability.** Probabilities are `expList` expectations over `T` i.i.d. uniform
+   rounds (equivalently `(kernel n).event`, by `Dynamics.Kernel.event_ofStep`), not events on a
+   path space.
+7. **`majority_whp_of_ratio`:** the constant depends on `α`, as the `O(·)` of [BCNPS15] does. The
+   paper's condition `k = O((n / log n)^{1/3})` is vacuous for `k = 2`, and the monochromatic
+   distance is at most `2`, so `O(md(c) log n) = O(log n)`.
+
+### Differences in the proofs
+
+The proof does not follow [BCNPS15] (Lemmas 1, 2, 5, 9 and 10, built on the monochromatic distance
+and a multiplicative bias), which does not reach an additive `√(n log n)` bias. It follows the
+phase structure of [CGGNPS18] (phases `H4`, `H5`, `H7`, then `H6`, then consensus), simplified with
+large explicit constants. Only Hoeffding's inequality is used (`Dynamics.avg_hoeffding`), at
+deviation `Λ = √(n log n)`: a round is *bad* if one of the counts of `a`, `b` or undecided nodes
+deviates from its expectation by `Λ` in the relevant direction, which has probability at most
+`4/n²` (`bad_round`, `four_exp_sqrt`). With `s = count a - count b`, `q = count u` and the
+potential `Ψ = 12 count b + q` (`MajorityStages.lean`):
+
+1. **Growth** (`growth_stage`, `T₁ + 1` rounds with `T₁ = ⌈log n / log(201/200)⌉`): from
+   `s ≥ 402Λ`, one good round reaches the set where `s ≥ 400Λ` and either `q ≥ n/100` or
+   `s ≥ 400Λ + n/20`; the threshold `400Λ` then grows by the factor `201/200` per good round up to
+   `7n/10` (if `s ≤ 4n/5`, a good round leaves at least `n/100` undecided nodes, as in
+   [CGGNPS18, (4)]; with that many undecided nodes the bias grows by the factor `1.01`).
+2. **Bridge** (`bridge_stage`, `18` rounds): while `s ≥ 2n/3`, `Ψ` shrinks by `9/10` per good
+   round, from `Ψ ≤ 2n` to `Ψ ≤ n/3`, and `s` loses at most `2Λ` per round.
+3. **Final phase** (`fin_stage`, `T₃ ≥ 12 log n` rounds): on `{Ψ ≤ n/3}` the expectation of `Ψ`
+   contracts by `5/6` per round and the set is kept after a good round, so the probability of
+   not being all-`a` is at most `(5/6)^{T₃} n/3 + T₃ · 4/n²`; here `Ψ < 1` if and only if all nodes
+   hold `a`. This linear potential replaces the analysis of [CGGNPS18] in the last phase.
+
+The stages are composed by the Markov property (`missP_comp`, through `Dynamics.expList_append`),
+the moving targets of the growth phase by `Dynamics.expList_escape`, and the total failure
+probability is at most `⌈10⁴ log n⌉ · 4/n² + 1/(3n) ≤ 2/n`. The `b`-majority case follows by
+exchanging the two opinions (`swapOp`, `MajoritySymm.lean`). Simulations (`n = 10⁵`, bias
+`√(n log n)` and `2 √(n log n)`, various numbers of undecided nodes) reached consensus on the
+majority within about `2 log n` rounds, far below the proved `10⁴ log n`.
+
 ## Sequential approximate majority (`Sequential*`, roadmap UND-2)
 
 Source: D. Angluin, J. Aspnes, D. Eisenstat, *A simple population protocol for fast robust

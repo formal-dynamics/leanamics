@@ -32,14 +32,6 @@ lemma sum_comp_eq (s : Config n) (f : Op → ℝ) :
     sum_const, nsmul_eq_mul]
   rfl
 
-/-- The counts add up to the population size. -/
-lemma count_add (s : Config n) :
-    (count s .a : ℝ) + count s .b + count s .u = n := by
-  have h := sum_comp_eq s (fun _ => (1 : ℝ))
-  simp only [mul_one, sum_const, card_univ, Fintype.card_fin, nsmul_eq_mul] at h
-  rw [sum_op] at h
-  linarith
-
 lemma count_add_nat (s : Config n) : count s .a + count s .b + count s .u = n := by
   have h := count_add s
   exact_mod_cast h

@@ -1,4 +1,5 @@
 import Undecided.Basic
+import Undecided.Majority
 import Undecided.Sequential
 import Undecided.SequentialMartingale
 import Undecided.SequentialCounts

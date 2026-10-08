@@ -1,5 +1,6 @@
 import Dynamics.Rounds
 import Dynamics.Absorption
+import Dynamics.Tail
 import Mathlib
 
 /-! # The undecided-state dynamics (synchronous, binary, complete graph)
@@ -91,6 +92,15 @@ lemma count_eq_sum (x : Config n) (o : Op) :
   push_cast
   rfl
 
+/-- The numbers of `a`-, `b`- and undecided nodes add up to `n`. -/
+lemma count_add (x : Config n) : (count x .a : ℝ) + count x .b + count x .u = n := by
+  rw [count_eq_sum, count_eq_sum, count_eq_sum, ← sum_add_distrib, ← sum_add_distrib]
+  have h (v : Fin n) : ((if x v = .a then (1 : ℝ) else 0) + (if x v = .b then 1 else 0)
+      + (if x v = .u then 1 else 0)) = 1 := by
+    cases x v <;> simp
+  rw [sum_congr rfl fun v _ => h v]
+  simp
+
 lemma indicator_step (x : Config n) (r : Fin n → Fin n) (v : Fin n) (o : Op) :
     (if step x r v = o then (1 : ℝ) else 0) =
       if update (x v) (x (r v)) = o then (1 : ℝ) else 0 := by
@@ -171,17 +181,6 @@ monochromatic at `x w`. -/
 lemma two_const_mono (x : Config n) {w : Fin n} (hw : x w = .a ∨ x w = .b) :
     step (step x (fun _ => w)) (fun _ => w) = fun _ => x w := by
   exact step_clear (step x (fun _ => w)) hw (fun v => step_towards x hw v) (step_towards_at x hw)
-
-/-- On a nonempty finite type, an observable bounded by `1` and strictly below `1`
-somewhere has average strictly below `1`. -/
-lemma avg_lt_one {α : Type*} [Fintype α] [Nonempty α] {f : α → ℝ}
-    (hf : ∀ a, f a ≤ 1) {b : α} (hb : f b < 1) : avg f < 1 := by
-  have hsum : ∑ a, f a < ∑ a : α, (1 : ℝ) :=
-    sum_lt_sum (fun a _ => hf a) ⟨b, mem_univ b, hb⟩
-  have hlt : avg f < avg (fun _ : α => (1 : ℝ)) := by
-    unfold avg
-    exact div_lt_div_of_pos_right hsum card_cast_pos
-  simpa [avg_const] using hlt
 
 variable [NeZero n]
 
