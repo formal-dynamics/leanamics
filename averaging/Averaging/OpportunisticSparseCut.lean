@@ -271,6 +271,135 @@ theorem IsClusteredRegular.prob_sign_window (hG : IsClusteredRegular G V₁ d b)
   rw [avg_sub, avg_add]
   linarith
 
+/-- On the good event with opposite community averages that are not too small, the sign of the
+values is a `6ε`-weak reconstruction. -/
+lemma IsClusteredRegular.isWeakReconstruction_of_good (hG : IsClusteredRegular G V₁ d b)
+    {ε : ℝ} (σ : V → ℤˣ) (x : V → ℝ) (Good : Finset V)
+    (hcount : (1 - 3 * ε) * Fintype.card V ≤ #Good)
+    (hgood : ∀ v ∈ Good, IsGood V₁ ε (signVec σ) x v)
+    (hs : ∀ v, ε ^ 2 / Fintype.card V * ∑ w, projCut V₁ (signVec σ) w ^ 2 <
+      (projOne (signVec σ) v + projCut V₁ (signVec σ) v) ^ 2)
+    (hopp : blockSum V₁ σ * blockSum V₁ᶜ σ < 0) :
+    IsWeakReconstruction V₁ (6 * ε) fun v => if 0 < x v then 1 else -1 := by
+  have hn := hG.card_real_pos
+  have hV₁ : (#V₁ : ℝ) = Fintype.card V / 2 := by
+    have := hG.card_eq
+    have : (2 * #V₁ : ℝ) = Fintype.card V := by exact_mod_cast this
+    linarith
+  have hV₂ : (#V₁ᶜ : ℝ) = Fintype.card V / 2 := by
+    rw [Finset.card_compl, Nat.cast_sub (Finset.card_le_univ _), hV₁]; ring
+  have hinter : ∀ U : Finset V, (#U : ℝ) + #Good - Fintype.card V ≤ #(U ∩ Good) := fun U => by
+    have h1 := Finset.card_union_add_card_inter U Good
+    have h2 : #(U ∪ Good) ≤ Fintype.card V := Finset.card_le_univ _
+    have h1' : (#(U ∪ Good) : ℝ) + #(U ∩ Good) = #U + #Good := by exact_mod_cast h1
+    have h2' : (#(U ∪ Good) : ℝ) ≤ Fintype.card V := by exact_mod_cast h2
+    linarith
+  -- the sign of a good node is that of its community's average
+  have hsign : ∀ v ∈ Good, (0 < x v ↔ 0 < (if v ∈ V₁ then blockSum V₁ σ else blockSum V₁ᶜ σ)) :=
+    fun v hv => by
+      have h := pos_iff_of_sq_lt (sq_sub_lt_of_good (hgood v hv) (hs v))
+      rw [h, hG.projOne_add_projCut_signVec]
+      split_ifs <;> rw [div_pos_iff_of_pos_right hn, mul_pos_iff_of_pos_left two_pos]
+  have hiff : 0 < blockSum V₁ σ ↔ ¬ 0 < blockSum V₁ᶜ σ := by
+    constructor
+    · intro h1 h2; nlinarith [mul_pos h1 h2]
+    · intro h2
+      by_contra h1
+      have h1' := le_of_not_gt h1
+      have h2' := le_of_not_gt h2
+      nlinarith [mul_nonneg_of_nonpos_of_nonpos h1' h2']
+  have hlab : ∀ p q : Prop, [Decidable p] → [Decidable q] →
+      ((if p then (1 : ℤˣ) else -1) = if q then 1 else -1) → (p ↔ q) := by
+    intro p q _ _ h
+    by_cases hp : p <;> by_cases hq : q <;> simp_all
+  refine ⟨V₁ ∩ Good, Finset.inter_subset_left, V₁ᶜ ∩ Good, Finset.inter_subset_left, ?_, ?_, ?_⟩
+  · have := hinter V₁; linarith
+  · have := hinter V₁ᶜ; linarith
+  · rw [Set.disjoint_left]
+    rintro a ⟨v, hv, rfl⟩ ⟨w, hw, hwa⟩
+    simp only [Finset.coe_inter, Set.mem_inter_iff, Finset.mem_coe, Finset.mem_compl] at hv hw
+    have h1 := hsign v hv.2
+    have h2 := hsign w hw.2
+    rw [if_pos hv.1] at h1
+    rw [if_neg hw.1] at h2
+    have := hlab _ _ hwa
+    rw [h2, h1] at this
+    tauto
+
+/-- **Weak reconstruction over the phase** (`c = 10⁶`, `C = 6`) on a general vertex type. -/
+theorem IsClusteredRegular.prob_weakReconstruction_window (hG : IsClusteredRegular G V₁ d b)
+    (h3 : ThirdEigenvalueLB G V₁ d lam3) {ε : ℝ} (hε0 : 0 < ε) (hε1 : ε ≤ 1) (hl3 : 0 < lam3)
+    (hc : (2 * b / d : ℝ) / lam3 ≤ lam3 * ε ^ 4 / (10 ^ 6 * Real.log (Fintype.card V) ^ 2)) :
+    1 / 2 - 6 * ε ≤ avg fun σ : V → ℤˣ =>
+      expList G.Dart ⌊12 * Fintype.card V / lam3 * Real.log (Fintype.card V)⌋₊ fun l =>
+        if ∀ t : ℕ, 6 * Fintype.card V / lam3 * Real.log (Fintype.card V) ≤ t →
+            (t : ℝ) ≤ 12 * Fintype.card V / lam3 * Real.log (Fintype.card V) →
+            IsWeakReconstruction V₁ (6 * ε)
+              fun v => if 0 < avgRun G (signVec σ) (l.take t) v then 1 else -1
+        then 1 else 0 := by
+  haveI := hG.nonempty_dart
+  have hn := hG.card_real_pos
+  have hgood := hG.prob_good_window h3 hε0 hε1 hl3 hc
+  have hA := hG.avg_abs_blockSum_le_mul (V₁ := V₁) hε0.le
+  have hB := hG.avg_abs_blockSum_compl_le_mul (V₁ := V₁) hε0.le
+  have hO := hG.avg_blockSum_mul_neg (V₁ := V₁)
+  have hsq := inv_sqrt_half_le hn.le hε0 hε1 (hG.card_mul_pow_four_ge h3 hε0 hl3 hc)
+  set T := ⌊12 * (Fintype.card V : ℝ) / lam3 * Real.log (Fintype.card V)⌋₊
+  set a := 6 * (Fintype.card V : ℝ) / lam3 * Real.log (Fintype.card V)
+  set a2 := 12 * (Fintype.card V : ℝ) / lam3 * Real.log (Fintype.card V)
+  have hpt : ∀ σ : V → ℤˣ,
+      expList G.Dart T (fun l => if (1 - 3 * ε) * Fintype.card V ≤ #{v | ∀ t : ℕ, a ≤ t →
+          (t : ℝ) ≤ a2 → IsGood V₁ ε (signVec σ) (avgRun G (signVec σ) (l.take t)) v}
+        then 1 else 0) +
+        (if blockSum V₁ σ * blockSum V₁ᶜ σ < 0 then (1 : ℝ) else 0) - 1 -
+        ((if |blockSum V₁ σ| ≤ ε * |blockSum V₁ᶜ σ| then (1 : ℝ) else 0) +
+          (if |blockSum V₁ᶜ σ| ≤ ε * |blockSum V₁ σ| then (1 : ℝ) else 0)) ≤
+      expList G.Dart T (fun l => if ∀ t : ℕ, a ≤ t → (t : ℝ) ≤ a2 →
+          IsWeakReconstruction V₁ (6 * ε)
+            (fun v => if 0 < avgRun G (signVec σ) (l.take t) v then 1 else -1)
+        then 1 else 0) := by
+    intro σ
+    have hI0 : ∀ (P : Prop) [Decidable P], (0 : ℝ) ≤ if P then 1 else 0 := fun P _ => by
+      split_ifs <;> norm_num
+    have hle1 : expList G.Dart T (fun l => if (1 - 3 * ε) * Fintype.card V ≤ #{v | ∀ t : ℕ,
+        a ≤ t → (t : ℝ) ≤ a2 → IsGood V₁ ε (signVec σ) (avgRun G (signVec σ) (l.take t)) v}
+          then (1 : ℝ) else 0) ≤ 1 :=
+      (expList_le_expList fun l => by split_ifs <;> norm_num).trans (expList_const T 1).le
+    have hR0 : 0 ≤ expList G.Dart T (fun l => if ∀ t : ℕ, a ≤ t → (t : ℝ) ≤ a2 →
+          IsWeakReconstruction V₁ (6 * ε)
+            (fun v => if 0 < avgRun G (signVec σ) (l.take t) v then (1 : ℤˣ) else -1)
+        then (1 : ℝ) else 0) := expList_nonneg fun l => by split_ifs <;> norm_num
+    have hA0 := hI0 (|blockSum V₁ σ| ≤ ε * |blockSum V₁ᶜ σ|)
+    have hB0 := hI0 (|blockSum V₁ᶜ σ| ≤ ε * |blockSum V₁ σ|)
+    by_cases hopp : blockSum V₁ σ * blockSum V₁ᶜ σ < 0
+    · rw [if_pos hopp]
+      by_cases hs : ∀ v, ε ^ 2 / Fintype.card V * ∑ w, projCut V₁ (signVec σ) w ^ 2 <
+          (projOne (signVec σ) v + projCut V₁ (signVec σ) v) ^ 2
+      · have hmono : expList G.Dart T (fun l => if (1 - 3 * ε) * Fintype.card V ≤
+            #{v | ∀ t : ℕ, a ≤ t → (t : ℝ) ≤ a2 →
+              IsGood V₁ ε (signVec σ) (avgRun G (signVec σ) (l.take t)) v} then (1 : ℝ) else 0) ≤
+            expList G.Dart T (fun l => if ∀ t : ℕ, a ≤ t → (t : ℝ) ≤ a2 →
+              IsWeakReconstruction V₁ (6 * ε)
+                (fun v => if 0 < avgRun G (signVec σ) (l.take t) v then (1 : ℤˣ) else -1)
+            then 1 else 0) := by
+          refine expList_le_expList fun l => ?_
+          split_ifs with h1 h2 <;> try norm_num
+          refine absurd ?_ h2
+          intro t ht1 ht2
+          refine hG.isWeakReconstruction_of_good σ _ _ h1 (fun v hv => ?_) hs hopp
+          simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hv
+          exact hv t ht1 ht2
+        linarith
+      · simp only [not_forall, not_lt] at hs
+        obtain ⟨v, hv⟩ := hs
+        rcases hG.blockSum_small hε0.le hε1 σ v hv with h | h
+        · rw [if_pos h]; linarith
+        · rw [if_pos h]; linarith
+    · rw [if_neg hopp]; linarith
+  refine le_trans ?_ (avg_le_avg hpt)
+  rw [avg_sub, avg_sub, avg_add, avg_add, avg_const]
+  linarith
+
 end General
 
 /-- Theorem 4.1 (second moment analysis): on an `(n, d, b)`-clustered regular graph with
@@ -327,7 +456,12 @@ theorem sign_phase :
               SignType.sign (avgRun G (signVec σ) (l.take t) v) =
                 SignType.sign (projOne (signVec σ) v + projCut V₁ (signVec σ) v)}
           then 1 else 0 := by
-  sorry
+  refine ⟨10 ^ 6, 4, by norm_num, by norm_num, fun n G _ V₁ d b lam3 ε hG h3 hl3 hε hc => ?_⟩
+  rcases le_or_gt ε 1 with hε1 | hε1
+  · have := hG.prob_sign_window h3 hε hε1 hl3 (by simpa using hc)
+    simpa using this
+  · refine le_trans (by linarith) (avg_nonneg fun σ => expList_nonneg fun l => ?_)
+    split_ifs <;> norm_num
 
 /-- **Main theorem** (averaging whenever you meet recovers the communities): on an
 `(n, d, b)`-clustered regular graph with `λ₂/λ₃ ≤ λ₃ ε⁴/(c log² n)` for a large enough constant `c`
@@ -345,6 +479,11 @@ theorem weakReconstruction_phase :
               IsWeakReconstruction V₁ (C * ε)
                 fun v => if 0 < avgRun G (signVec σ) (l.take t) v then 1 else -1
           then 1 else 0 := by
-  sorry
+  refine ⟨10 ^ 6, 6, by norm_num, by norm_num, fun n G _ V₁ d b lam3 ε hG h3 hl3 hε hc => ?_⟩
+  rcases le_or_gt ε 1 with hε1 | hε1
+  · have := hG.prob_weakReconstruction_window h3 hε hε1 hl3 (by simpa using hc)
+    simpa using this
+  · refine le_trans (by linarith) (avg_nonneg fun σ => expList_nonneg fun l => ?_)
+    split_ifs <;> norm_num
 
 end Averaging.Opportunistic
