@@ -20,13 +20,13 @@ configuration after the rounds `l` is `l.foldl step x`. The monochromatic config
 absorbing (`step_const`), so holding consensus after `T` rounds is the same as reaching it
 within `T` rounds.
 
-**Range of `k`.** The pinned range is the paper's exponent `1/3` with a sufficiently small
+**Range of `k`.** The stated range is the paper's exponent `1/3` with a sufficiently small
 constant (`k ≤ (n / log n)^{1/3} / C`, `C` depending on `α`), not an arbitrary constant: see
-"Deviations" in `PROGRESS-UND3.md`. In short, the proof of Theorem 11 invokes Lemma 10, which
-assumes `k = O((n / log n)^{1/4})`; and the per-round high-probability bounds on the ratios
+the UND-3 section of `FORMALIZATION_DIFFERENCES.md`. In short, the proof of Theorem 11 invokes
+Lemma 10, which assumes `k = O((n / log n)^{1/4})`; and the per-round high-probability bounds on the ratios
 `Cᵢ / C₁` (Lemma 2) only close at `k ≍ (n / log n)^{1/3}` when the drift
 `(c₁ + 2q) / (cᵢ + 2q)` of the ratio beats its one-round fluctuation, which holds for
-`k ≤ ε(α) (n / log n)^{1/3}`. The pinned range contains `k = O((n / log n)^{1/4})` with any
+`k ≤ ε(α) (n / log n)^{1/3}`. The stated range contains `k = O((n / log n)^{1/4})` with any
 constant for large `n`.
 
 **Proof** (`plurality_explicit`, with `C = 10⁵ ((1 + α)²/α)²` and failure probability at most
