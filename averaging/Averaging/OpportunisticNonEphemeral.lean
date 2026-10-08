@@ -568,4 +568,163 @@ theorem IsClusteredRegular.expList_good_ge (hG : IsClusteredRegular G V₁ d b) 
   simp_rw [expList_add, expList_const, expList_const_mul]
   exact le_rfl
 
+
+/-! ### Bounds for one choice of the initial signs, in the form used by anti-concentration -/
+
+namespace IsClusteredRegular
+variable (hG : IsClusteredRegular G V₁ d b) (h3 : ThirdEigenvalueLB G V₁ d lam3)
+include hG h3
+
+open scoped Classical in
+/-- The cut coefficient moves by the start of the phase with probability `g₁` satisfying
+`g₁ ‖y⁽⁰⁾‖² ≤ (8 L₁/ε²) ‖y⁽⁰⁾‖² + 20 r/ε²`. -/
+lemma cutMoved_bound (hl3 : 0 < lam3) (hN : (16 : ℝ) ≤ Fintype.card V) {ε : ℝ} (hε : 0 < ε)
+    (σ : V → ℤˣ) (t₁ : ℕ) (hL : (t₁ : ℝ) * (2 * b / d) / Fintype.card V ≤ 1 / 8)
+    (hr : (2 * b / d) / lam3 ≤ 1 / 8) :
+    expList G.Dart t₁ (fun l₁ => if CutMoved V₁ ε (signVec σ) (avgRun G (signVec σ) l₁) then 1
+        else 0) * (Fintype.card V * cutCoef V₁ (signVec σ) ^ 2) ≤
+      8 * (t₁ * (2 * b / d) / Fintype.card V) / ε ^ 2 *
+          (Fintype.card V * cutCoef V₁ (signVec σ) ^ 2) + 20 * ((2 * b / d) / lam3) / ε ^ 2 := by
+  have hb := hG.expList_cutDev_signVec_le h3 hl3 hN σ t₁ hL hr
+  set N : ℝ := (Fintype.card V : ℝ)
+  set s₀ := N * cutCoef V₁ (signVec σ) ^ 2
+  rw [mul_comm, ← expList_const_mul]
+  have hpt : ∀ l₁ : List G.Dart, s₀ * (if CutMoved V₁ ε (signVec σ) (avgRun G (signVec σ) l₁)
+      then 1 else 0) ≤ 4 / ε ^ 2 * (N * (cutCoef V₁ (avgRun G (signVec σ) l₁) -
+        cutCoef V₁ (signVec σ)) ^ 2) := fun l₁ => by
+    split_ifs with h
+    · unfold CutMoved at h
+      rw [mul_one, div_mul_eq_mul_div, le_div_iff₀ (by positivity)]
+      nlinarith
+    · rw [mul_zero]; positivity
+  refine (expList_le_expList hpt).trans ?_
+  rw [expList_const_mul]
+  have : 0 ≤ 4 / ε ^ 2 := by positivity
+  have := mul_le_mul_of_nonneg_left hb this
+  refine this.trans (le_of_eq ?_)
+  field_simp
+  ring
+
+open scoped Classical in
+/-- Many bad nodes at the start: probability `g₂` with
+`g₂ ‖y⁽⁰⁾‖² ≤ (12 r/ε³) ‖y⁽⁰⁾‖² + (4/ε³)(n (1 - λ₃/n)^{t₁} + 10 r²)`. -/
+lemma manyBad_bound (hl3 : 0 < lam3) (hN : (16 : ℝ) ≤ Fintype.card V) {ε : ℝ} (hε : 0 < ε)
+    (σ : V → ℤˣ) (t₁ : ℕ) (hL : (t₁ : ℝ) * (2 * b / d) / Fintype.card V ≤ 1 / 8)
+    (hr : (2 * b / d) / lam3 ≤ 1 / 8) :
+    expList G.Dart t₁ (fun l₁ => if ε * Fintype.card V < #(badSet V₁ (thr V₁ ε (signVec σ))
+        (avgRun G (signVec σ) l₁) (avgRun G (signVec σ) l₁)) then 1 else 0) *
+        (Fintype.card V * cutCoef V₁ (signVec σ) ^ 2) ≤
+      12 * ((2 * b / d) / lam3) / ε ^ 3 * (Fintype.card V * cutCoef V₁ (signVec σ) ^ 2) +
+        4 / ε ^ 3 * (Fintype.card V * (1 - lam3 / Fintype.card V) ^ t₁ +
+          10 * ((2 * b / d) / lam3) ^ 2) := by
+  have hb := hG.expList_restSq_signVec_le h3 hl3 hN σ t₁ hL hr
+  have hn := hG.card_real_pos
+  set N : ℝ := (Fintype.card V : ℝ)
+  set s₀ := N * cutCoef V₁ (signVec σ) ^ 2
+  rw [mul_comm, ← expList_const_mul]
+  have hpt : ∀ l₁ : List G.Dart, s₀ * (if ε * N < #(badSet V₁ (thr V₁ ε (signVec σ))
+      (avgRun G (signVec σ) l₁) (avgRun G (signVec σ) l₁)) then 1 else 0) ≤
+      4 / ε ^ 3 * restSq V₁ (avgRun G (signVec σ) l₁) := fun l₁ => by
+    split_ifs with h
+    · have hθ : 0 ≤ thr V₁ ε (signVec σ) := by unfold thr; positivity
+      have := restSq_gt_of_card_badSet_gt hθ hε.le _ h
+      unfold thr at this
+      rw [mul_one, div_mul_eq_mul_div, le_div_iff₀ (by positivity)]
+      have e : ε * N * (ε ^ 2 * s₀ / (4 * N)) = ε ^ 3 * s₀ / 4 := by field_simp
+      rw [e] at this
+      nlinarith
+    · rw [mul_zero]; exact mul_nonneg (by positivity) (restSq_nonneg _)
+  refine (expList_le_expList hpt).trans ?_
+  rw [expList_const_mul]
+  have : 0 ≤ 4 / ε ^ 3 := by positivity
+  have := mul_le_mul_of_nonneg_left hb this
+  refine this.trans (le_of_eq ?_)
+  ring
+
+open scoped Classical in
+/-- Bad rounds in the phase: `g₃ ‖y⁽⁰⁾‖² ≤ (4/ε²)(6.25 L_k + 11 r) ‖y⁽⁰⁾‖² +
+(8/ε²)(n (1 - λ₃/n)^{t₁} + 10 r²)`, where `g₃` is the expected fraction of bad nodes after
+`t₁ + k` rounds, on the event that the cut coefficient has not moved. -/
+lemma badRound_bound (hl3 : 0 < lam3) (hN : (16 : ℝ) ≤ Fintype.card V) {ε : ℝ} (hε : 0 < ε)
+    (hε1 : ε ≤ 1) (σ : V → ℤˣ) (t₁ k : ℕ)
+    (hL : (t₁ : ℝ) * (2 * b / d) / Fintype.card V ≤ 1 / 8)
+    (hLk : (k : ℝ) * (2 * b / d) / Fintype.card V ≤ 1 / 8)
+    (hr : (2 * b / d) / lam3 ≤ 1 / 8) :
+    expList G.Dart t₁ (fun l₁ =>
+        (if CutMoved V₁ ε (signVec σ) (avgRun G (signVec σ) l₁) then 0 else 1) *
+          expList G.Dart k (fun p => #(badSet V₁ (thr V₁ ε (signVec σ)) (avgRun G (signVec σ) l₁)
+            (avgRun G (avgRun G (signVec σ) l₁) p)) / Fintype.card V)) *
+        (Fintype.card V * cutCoef V₁ (signVec σ) ^ 2) ≤
+      4 / ε ^ 2 * (25 / 4 * (k * (2 * b / d) / Fintype.card V) + 11 * ((2 * b / d) / lam3)) *
+          (Fintype.card V * cutCoef V₁ (signVec σ) ^ 2) +
+        8 / ε ^ 2 * (Fintype.card V * (1 - lam3 / Fintype.card V) ^ t₁ +
+          10 * ((2 * b / d) / lam3) ^ 2) := by
+  haveI := hG.nonempty_dart
+  have hz1 := hG.expList_restSq_signVec_le h3 hl3 hN σ t₁ hL hr
+  have hn := hG.card_real_pos
+  set N : ℝ := (Fintype.card V : ℝ)
+  set x₀ := signVec σ
+  set s₀ := N * cutCoef V₁ x₀ ^ 2
+  set r := (2 * b / d : ℝ) / lam3
+  set Lk := (k : ℝ) * (2 * b / d) / N
+  have hr0 : 0 ≤ r := by positivity
+  have hLk0 : 0 ≤ Lk := by positivity
+  have hs0 : 0 ≤ s₀ := by positivity
+  rw [mul_comm, ← expList_const_mul]
+  have hpt : ∀ l₁ : List G.Dart,
+      s₀ * ((if CutMoved V₁ ε x₀ (avgRun G x₀ l₁) then 0 else 1) *
+        expList G.Dart k (fun p => #(badSet V₁ (thr V₁ ε x₀) (avgRun G x₀ l₁)
+          (avgRun G (avgRun G x₀ l₁) p)) / N)) ≤
+      4 / ε ^ 2 * ((5 / 2 * Lk + 2 * r) * (5 / 2 * s₀)) +
+        4 / ε ^ 2 * (2 * restSq V₁ (avgRun G x₀ l₁)) := fun l₁ => by
+    set x₁ := avgRun G x₀ l₁
+    have hz : 0 ≤ restSq V₁ x₁ := restSq_nonneg _
+    have hc : 0 ≤ 4 / ε ^ 2 := by positivity
+    split_ifs with h
+    · rw [zero_mul, mul_zero]; positivity
+    · rw [one_mul]
+      -- the fraction of bad nodes against the deviation
+      have hcard : ∀ p : List G.Dart, s₀ * (#(badSet V₁ (thr V₁ ε x₀) x₁ (avgRun G x₁ p)) / N) ≤
+          4 / ε ^ 2 * ∑ v, devVec V₁ x₁ (avgRun G x₁ p) v ^ 2 := fun p => by
+        have := card_badSet_mul_le (thr V₁ ε x₀) x₁ (avgRun G x₁ p) (V₁ := V₁)
+        have ht : thr V₁ ε x₀ = ε ^ 2 * s₀ / (4 * N) := rfl
+        generalize (#(badSet V₁ (thr V₁ ε x₀) x₁ (avgRun G x₁ p)) : ℝ) = B at this ⊢
+        have e : s₀ * (B / N) = 4 / ε ^ 2 * (B * thr V₁ ε x₀) := by
+          rw [ht]; field_simp
+        rw [e]; exact mul_le_mul_of_nonneg_left this hc
+      rw [← expList_const_mul]
+      refine (expList_le_expList hcard).trans ?_
+      rw [expList_const_mul]
+      have hdev := hG.expList_devVec_le h3 hl3 hN x₁ k hLk hr
+      have hs1 : N * cutCoef V₁ x₁ ^ 2 ≤ 5 / 2 * s₀ := by
+        unfold CutMoved at h
+        push_neg at h
+        have hε2 : ε ^ 2 ≤ 1 := by nlinarith
+        nlinarith [sq_nonneg (cutCoef V₁ x₁ - 2 * cutCoef V₁ x₀), hn]
+      have h1 : (5 / 2 * Lk + 2 * r) * (N * cutCoef V₁ x₁ ^ 2) ≤
+          (5 / 2 * Lk + 2 * r) * (5 / 2 * s₀) :=
+        mul_le_mul_of_nonneg_left hs1 (by positivity)
+      have := mul_le_mul_of_nonneg_left hdev hc
+      nlinarith
+  refine (expList_le_expList hpt).trans ?_
+  rw [expList_add, expList_const, expList_const_mul]
+  have hc : 0 ≤ 4 / ε ^ 2 := by positivity
+  have := mul_le_mul_of_nonneg_left hz1 (show 0 ≤ 4 / ε ^ 2 * 2 by positivity)
+  have e1 : 4 / ε ^ 2 * (25 / 4 * Lk + 11 * r) * s₀ =
+      4 / ε ^ 2 * ((5 / 2 * Lk + 2 * r) * (5 / 2 * s₀)) + 4 / ε ^ 2 * 2 * (3 * r * s₀) := by ring
+  rw [e1]
+  have e2 : 8 / ε ^ 2 * (N * (1 - lam3 / N) ^ t₁ + 10 * r ^ 2) =
+      4 / ε ^ 2 * 2 * (N * (1 - lam3 / N) ^ t₁ + 10 * r ^ 2) := by ring
+  rw [e2]
+  have e3 : 4 / ε ^ 2 * 2 * (N * (1 - lam3 / N) ^ t₁ + 3 * r * s₀ + 10 * r ^ 2) =
+      4 / ε ^ 2 * 2 * (3 * r * s₀) + 4 / ε ^ 2 * 2 * (N * (1 - lam3 / N) ^ t₁ + 10 * r ^ 2) := by
+    ring
+  rw [e3] at this
+  have e4 : (4 / ε ^ 2 * expList G.Dart t₁ fun l => 2 * restSq V₁ (avgRun G x₀ l)) =
+      4 / ε ^ 2 * 2 * expList G.Dart t₁ fun l => restSq V₁ (avgRun G x₀ l) := by
+    rw [expList_const_mul]; ring
+  linarith
+
+end IsClusteredRegular
+
 end Averaging.Opportunistic
