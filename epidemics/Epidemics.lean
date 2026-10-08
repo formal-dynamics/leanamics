@@ -48,3 +48,10 @@ import Epidemics.SubcriticalCluster
 import Epidemics.SubcriticalExploration
 import Epidemics.SubcriticalWhp
 import Epidemics.Subcritical
+import Epidemics.SmallWorldDefs
+import Epidemics.SmallWorldMart
+import Epidemics.SmallWorldExplore
+import Epidemics.SmallWorldCollapse
+import Epidemics.SmallWorldSubcritical
+import Epidemics.SmallWorld
+import Epidemics.SmallWorldEpidemic

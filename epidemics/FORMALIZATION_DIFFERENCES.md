@@ -329,6 +329,79 @@ paper mentions but omits after Theorem 2.5; its shape follows claim 2 of Theorem
     moment-generating-function bound are the core's; congruence, complement and the union bound
     are shared with EPI-3 (`GiantCoins.lean`).
 
+## Small-world networks below the percolation threshold (`SmallWorld*`, EPI-6)
+
+Source: L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccardi,
+*Percolation and epidemic processes in one-dimensional small-world networks*, arXiv:2103.16398
+(v3): Definitions 1.1 (`SWG(n, q)`) and 1.2 (`3-SWG(n)`), claim 2 of Theorems 2.1, 2.2, 2.4 and
+2.5, and Appendix C (Lemma C.1 and its proof).
+
+1. **"W.h.p." made explicit.** The paper's "with high probability" is `≥ 1 - n^{-Ω(1)}`; the
+   statements say "with probability at least `1 - C / n`" with `∃ C`, the rate the proofs give
+   (Lemma C.1 states `1 - 1/n` for `n` large). The constants are explicit in the proofs:
+   `β = 64 / δ²` and `C = 2` for `SWG(n, c/n)` (`swg_components_small`, valid for every `n ≥ 2`),
+   where `p₀ = p* - ε` and `δ = 1 - p₀ - c p₀ (1 + p₀) > 0`; `β = 10 / (2ε)²` and `C = 1` for
+   `3-SWG(n)`.
+2. **Constants uniform in `p`.** The constants depend only on `c` and `ε` (resp. `ε`) and the
+   statements quantify over every `p` below `p* - ε` (resp. `1/2 - ε`) afterwards, as in the
+   appendix lemmas (Lemma C.1 is stated for `0 ≤ p ≤ p* - ε`). The inequalities on `p` are strict,
+   as in Section 2. `0 ≤ p ≤ 1` replaces the paper's `p > 0` (the case `p = 0` is included).
+3. **Bridge probability.** `q = c / n` is written `q * n = c` with `0 ≤ q ≤ 1` (needed to form the
+   coins, so `n ≥ c`), as `p * n = 1 + ε` in EPI-3. `n ≥ 3` for `SWG(n, q)` (Definition 1.1) and
+   `n ≥ 4` even for `3-SWG(n)` (Definition 1.2).
+4. **Models.** The vertex set is `Fin n` with Mathlib's `cycleGraph n`. The bridges of
+   `SWG(n, q)` are the open pairs of EPI-1's i.i.d. coins `b ~ coins q` (`perc ⊤ b`, EPI-3's
+   `G(n, q)`), so `swg n b = cycleGraph n ⊔ perc ⊤ b`: a bridge on a cycle edge is the same edge,
+   as in the paper's `E₁ ∪ E₂`. The coins are indexed by all of `Sym2 (Fin n)`; diagonal coins are
+   unused. The matching of `3-SWG(n)` is a uniformly random element of Mathlib's perfect matchings
+   of the complete graph (`Subgraph.IsPerfectMatching`), rather than a sequential sampling
+   procedure; perfect matchings exist for even `n` (`PerfectMatching.nonempty`).
+5. **Joint law.** "Probabilities over the randomness of `G` and of the percolation" is the iterated
+   expectation `(coins q).expect fun b => (coins p).prob fun ω => …` (resp. over
+   `uniformMatching n`), which is the probability under the product of the two independent laws.
+6. **`O(log n)`** is `β * Real.log n` (natural logarithm). Component sizes are measured as in
+   Mathlib, by `K.supp.ncard`.
+7. **Reed–Frost.** EPI-1's pathwise process `run` with one coin per edge (equal in law to the
+   paper's process, each edge being tried at most once; Theorem A.3). "The process stops within
+   `T` steps" is `∃ t ≤ T` with no infectious node; "recovered nodes at the end" is
+   `(run … n).recovered` (the epidemic is over after `n` rounds); the bounds `O(log n)` and
+   `O(|I₀| log n)` share one constant `β`.
+8. **Theorem 2.5, claim 2 needs a minor correction.** In v3 its hypothesis repeats the `SWG(n, c/n)`
+   threshold `p < (√(c² + 6c + 1) - c - 1)/(2c) - ε`, but `3-SWG(n)` has no parameter `c`. The
+   formal statement uses `p < 1/2 - ε`, the threshold of Theorem 2.2, claim 2, from which the
+   paper derives it.
+9. **Theorem 2.2, claim 2** is derived, as in the paper, from Theorem 2.3: EPI-2's
+   `prob_components_small` with `d = 3` (`swg3_degree_le`) and `2ε` in place of `ε`
+   (`2 p ≤ 1 - 2ε`). Theorem 2.3 itself is EPI-2's and is not restated.
+10. **Proof route for Lemma C.1** (not a statement change). The paper dominates the size of a
+    breadth-first search by a single-type Galton–Watson process with offspring
+    `W = Y + ∑_{j ≤ 2Y} L_j` (`Y ~ Bin(n, pc/n)`, `L_j` geometric) and bounds `∑ W_i` by Chernoff
+    bounds on `Y` and on the negative binomial. Here the two coin families are first collapsed
+    into one percolation of the complete graph with independent coins (`expect_prob_swg_eq`):
+    probability `p` on cycle edges, `p q` on the other pairs. The exploration then processes one
+    node at a time and tracks two types of nodes: discovered through a cycle edge (weight `1`, at
+    most one undiscovered cycle neighbour) or not (weight `1 + p₀`, at most two). These weights
+    are a left eigenvector of the mean matrix at `p₀`. Below the threshold the expected weight
+    discovered from a node of weight `w` is at most `(1 - δ/2) w`. An exponential of the weight
+    balance is then a supermartingale, by deferred decisions on fresh coins, which gives
+    `P(|C(s)| > t) ≤ exp (δ/4 - δ² t / 32)`. In the paper's Algorithm 3 the queue starts as `{s}`
+    and only local clusters of bridge neighbours are enqueued, so the cycle neighbours of `s` (its
+    local cluster) are never visited unless reached through a bridge: the claim that the
+    algorithm visits the component of `s` needs a minor correction (start from the local cluster
+    of `s`, which adds one more local cluster to the domination). The exploration here processes
+    every discovered node, the root included, whose two cycle neighbours are covered by its
+    weight `1 + p₀`.
+11. **Not formalized (yet).** Claim 1 (the supercritical regime) of Theorems 2.1, 2.2, 2.4 and 2.5
+    (Appendices B and D), and the extensions of Appendix F.
+12. **Local lemmas.** The supermartingale lemma for adaptive observations
+    (`expect_prod_hist_le_one`) and its deferred-decisions form for fresh coordinates
+    (`expect_prod_hist_le_one_of_fresh`), the coordinatewise combination of independent families
+    (`expect_expect_coord`, `expect_mul_of_dep`), Markov's inequality `prob_le_expect_div`, the
+    moment-generating function of a weighted block of coins (`expect_exp_sum_open`) and the union
+    bound over components for an arbitrary random graph (`prob_components_le_of_tail'`, the
+    form of EPI-2's `prob_components_le_of_tail` for any distribution) are not in `dynamics/`
+    yet; their move is tracked in issues #42, #46 and #49.
+
 ## The supercritical giant component (`Giant*`, EPI-3)
 
 Source: M. Krivelevich, B. Sudakov, *The phase transition in random graphs: a simple proof*,

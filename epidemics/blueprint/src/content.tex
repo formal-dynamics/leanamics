@@ -138,6 +138,92 @@ smaller than its size (Corollary~\ref{cor:final}). $G(n, c/n)$ is bond percolati
 $d = n - 1$ and $p(d-1) \le c$.
 \end{proof}
 
+\section{Small-world networks below the threshold (EPI-6)}
+After Becchetti, Clementi, Denni, Pasquale, Trevisan, Ziccardi (arXiv:2103.16398), Definitions
+1.1 and 1.2, claim 2 of Theorems 2.1, 2.2, 2.4, 2.5, and Lemma C.1. $\mathrm{SWG}(n, q)$ is the
+cycle $C_n$ together with the edges of $G(n, q)$; $3\text{-}\mathrm{SWG}(n)$ is the cycle together
+with a uniformly random perfect matching. Probabilities are over the graph and the percolation.
+
+\begin{definition}[Small-world graphs and the threshold]\label{def:swg}
+\lean{Epidemics.swg,Epidemics.PerfectMatching,Epidemics.uniformMatching,Epidemics.swg3,Epidemics.swgThreshold,Epidemics.swgThreshold_spec,Epidemics.lt_swgThreshold_iff,Epidemics.swgThreshold_one,Epidemics.swg3_degree_le}\leanok\uses{thm:perc}
+$\mathrm{SWG}(n, q)$ is $C_n \cup \mathrm{perc}(K_n, b)$ with $b$ i.i.d.\ Bernoulli$(q)$, and
+$3\text{-}\mathrm{SWG}(n)$ is $C_n \cup M$ with $M$ uniform among the perfect matchings of $K_n$ ($n$
+even). The critical value $p^* = (\sqrt{c^2+6c+1} - c - 1)/(2c)$ is the root of $c p (1 + p) =
+1 - p$, so that $p < p^*$ if and only if $c p(1+p) < 1-p$; for $c = 1$, $p^* = \sqrt 2 - 1$. The
+graph $3\text{-}\mathrm{SWG}(n)$ has maximum degree $3$.
+\end{definition}
+
+\begin{lemma}[Collapsing the two coin families]\label{lem:swg-collapse}
+\lean{Epidemics.swgRate,Epidemics.perc_swg_eq,Epidemics.expect_expect_coord,Epidemics.expect_prob_swg_eq}\leanok\uses{def:swg}
+The percolation graph of $\mathrm{SWG}(n, q)$ with parameter $p$ has the law of the percolation of
+$K_n$ with independent coins, of probability $p$ on the cycle edges and $pq$ on the other pairs.
+\end{lemma}
+\begin{proof}\leanok
+A pair is an open edge if and only if its percolation coin is open and it is a cycle edge or an
+open bridge; these combined coins are independent across pairs, with the stated probabilities.
+\end{proof}
+
+\begin{lemma}[Supermartingale for adaptive observations]\label{lem:swg-mart}
+\lean{Epidemics.hist,Epidemics.histProd,Epidemics.expect_prod_hist_le_one,Epidemics.expect_prod_hist_le_one_of_fresh,Epidemics.prob_le_expect_div}\leanok
+If an adaptive process reads, at each step, coordinates of an independent family not read before,
+and every factor $f_h \ge 0$ satisfies $\mathbb E[f_h(\mathrm{obs}_h)] \le 1$ for every history $h$,
+then the product of the factors along the process has expectation at most $1$.
+\end{lemma}
+\begin{proof}\leanok
+Condition on the history: the event that the history is $h$ depends only on the coordinates read
+along $h$, which are independent of the fresh ones (principle of deferred decisions); induction on
+the number of steps.
+\end{proof}
+
+\begin{theorem}[Weighted exploration]\label{thm:swg-explore}
+\lean{Epidemics.Explore.state,Epidemics.Explore.Inv,Epidemics.Explore.pot,Epidemics.Explore.prob_cluster_gt_le}\leanok\uses{lem:swg-mart}
+Explore the cluster of $s$ one node at a time, with independent Bernoulli$(r_e)$ coins, giving
+each discovered node the weight $h_e \in [w_{\min}, w_{\max}]$ of the pair through which it was
+discovered. If the expected weight discovered from every node of weight $w$ is at most $\lambda w$,
+then for $\theta \ge 0$ and $\kappa \le 2$ with $\theta w_{\max} \le \kappa - 1$ and $\kappa\lambda
+\le 1$, the cluster of $s$ has more than $t$ nodes with probability at most
+$\exp(-\theta((1-\kappa\lambda) t w_{\min} - w_{\max}))$.
+\end{theorem}
+\begin{proof}\leanok
+The exponential of $\theta$ times (discovered weight $-\ \kappa\lambda\,\cdot$ processed weight) is
+a supermartingale, by $1 - r + r e^x \le e^{\kappa r x}$ for $0 \le x \le \kappa - 1 \le 1$ and
+Lemma~\ref{lem:swg-mart}. A cluster with more than $t$ nodes leaves $t$ processed and $t + 1$
+discovered nodes after $t$ steps; Markov's inequality concludes.
+\end{proof}
+
+\begin{theorem}[Lemma C.1 and Theorem 2.1, claim 2]\label{thm:swg-sub}
+\lean{Epidemics.swgWeight,Epidemics.swg_step,Epidemics.prob_components_le_of_tail',Epidemics.swg_components_small,Epidemics.swg_subcritical}\leanok\uses{lem:swg-collapse,thm:swg-explore}
+Let $c > 0$, $p_0 = p^* - \varepsilon > 0$ and $\delta = 1 - p_0 - c p_0 (1 + p_0)$. For $n \ge 2$, $q =
+c/n$ and $p \le p_0$, with probability at least $1 - 2/n$ every component of the percolated
+$\mathrm{SWG}(n, q)$ has at most $(64/\delta^2) \log n$ nodes.
+\end{theorem}
+\begin{proof}\leanok
+Weights $1$ (discovered through a cycle edge: at most one undiscovered cycle neighbour) and $1 +
+p_0$ (otherwise: at most two), and at most $n$ further pairs each open with probability $pc/n$:
+the expected discovered weight is at most $(1 - \delta/2)$ times the weight. Apply
+Theorem~\ref{thm:swg-explore} with $\theta = \delta/8$, $\kappa = 1 + \delta/4$ and a union bound
+over the nodes.
+\end{proof}
+
+\begin{corollary}[Theorem 2.2, claim 2]\label{cor:swg3-sub}
+\lean{Epidemics.swg3_subcritical}\leanok\uses{def:swg,thm:subcritical}
+For $p < 1/2 - \varepsilon$, with probability at least $1 - 1/n$ every component of the percolated
+$3\text{-}\mathrm{SWG}(n)$ has at most $(10/(2\varepsilon)^2) \log n$ nodes.
+\end{corollary}
+\begin{proof}\leanok
+Theorem~\ref{thm:subcritical} with $d = 3$ and $2\varepsilon$ in place of $\varepsilon$.
+\end{proof}
+
+\begin{corollary}[Theorems 2.4 and 2.5, claim 2]\label{cor:swg-rf}
+\lean{Epidemics.reedFrost_of_components_le,Epidemics.swg_reedFrost_subcritical,Epidemics.swg3_reedFrost_subcritical}\leanok\uses{thm:swg-sub,cor:swg3-sub,cor:subcritical}
+Below the threshold ($p < p^* - \varepsilon$ on $\mathrm{SWG}(n, c/n)$, $p < 1/2 - \varepsilon$ on
+$3\text{-}\mathrm{SWG}(n)$), with probability at least $1 - C/n$ the Reed--Frost epidemic from $I_0$
+is over within $\beta \log n$ rounds and at most $\beta |I_0| \log n$ nodes are recovered at the end.
+\end{corollary}
+\begin{proof}\leanok
+Deterministic consequences of the component bounds (Corollary~\ref{cor:subcritical}).
+\end{proof}
+
 \section{The supercritical giant component}
 Source: M.~Krivelevich and B.~Sudakov, \emph{The phase transition in random graphs: a simple
 proof}, Random Structures \& Algorithms 43 (2013), arXiv:1201.6529. Throughout, $G(n,p)$ is the
