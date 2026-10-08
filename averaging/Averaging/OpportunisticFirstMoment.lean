@@ -141,7 +141,7 @@ lemma avg_edgeAvg_aux [Nonempty G.Dart] (x : V → ℝ) (v : V) :
   rw [avg_dart, sum_dart_edgeAvg, meanStepMatrix_mulVec]
   field_simp
 
-/-! ### The pinned statements -/
+/-! ### Main statements -/
 
 section NoDec
 omit [DecidableRel G.Adj]

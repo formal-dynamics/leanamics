@@ -702,7 +702,7 @@ lemma monotone_criterion_aux (h3 : ThirdEigenvalueLB G V₁ d lam3) (σ : V → 
 
 end IsClusteredRegular
 
-/-! ### The pinned statements -/
+/-! ### Main statements -/
 
 /-- Section 4.1: on an `(n, d, b)`-clustered regular graph, `W̄ χ = (1 - λ₂/n) χ` with
 `λ₂ = 2b/d`. -/
