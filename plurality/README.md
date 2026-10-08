@@ -38,12 +38,29 @@ this as `≤ 130 λ log n` rounds with probability `≥ 1 - 143 λ log n / n`.
 | Theorem 3.8 | `theorem_3_8`, `theorem_3_8_bigO` | done |
 | `k = 2` | `binary_consensus_whp` (reuses `three_majority`) | done |
 | `k = 2` from a vanishing bias (gap `22√(3 n log n)`, `≤ 390 log n` rounds) | `majority3_vanishing_bias` (Theorem 3.8 with `λ = 3`, stated for `ThreeMajority.run`) | done |
+| `k = 2` from **any** configuration (symmetry breaking, beyond the paper) | `majority3_symmetry_breaking`, `majority3_any_start`, `majority3_any_start_whp` | done |
 | Corollaries 3.10–3.12 | `corollary_3_10`, `corollary_3_11`, `corollary_3_12` | done |
 | Observation 3.9 (adversary) | | open |
 | Lemma 4.1, Theorem 4.2 (`Ω(k log n)`) | `lemma_4_1`, `theorem_4_2`, `theorem_4_2_log` | done, for `k ≤ n^{1/4-δ}` |
 | Theorem 4.8 (a), Lemma 4.9 | `theorem_4_8_a`, `not_solver_of_drift` | done except rules with `Δ_r, Δ_b ≤ 1` |
 | Theorem 4.8 (b), Lemma 4.10 | `theorem_4_8_b`, `not_solver_of_nonuniform` | done |
 | Lemma 4.11, Theorem 4.12 (`h`-plurality) | `lemma_4_11`, `theorem_4_12`, `theorem_4_12_log` | done |
+
+**Two opinions from any configuration** (`Plurality.majority3_any_start_whp` in
+[Plurality/AnyStart.lean](Plurality/AnyStart.lean), roadmap MAJ-8): there is `C > 0` such that,
+for `log n ≥ C`, binary 3-majority started from **any** configuration, including a perfectly
+balanced one, has all nodes holding the same opinion after any `T ≥ C log n` rounds with
+probability at least `1 - 1/n` (`majority3_any_start`: the same for `log n ≥ 40` with probability
+`1 - C log n / n`). The proof follows the symmetry-breaking argument of Doerr, Goldberg, Minder,
+Sauerwald and Scheideler (SPAA 2011) for the binary median dynamics, as described in Becchetti,
+Clementi, Natale, *Consensus dynamics: an overview* (SIGACT News 2020, §4, Case 3). Near balance
+one round moves the gap to order `√n` with probability `9/64` (Paley-Zygmund,
+`jump_near_balance`), and above `√n` it grows by a constant factor except with exponentially small
+probability (Hoeffding, `growth_far`). The hitting-time bound of Doerr et al. (Claim 2.9, the core
+`Dynamics.Kernel.drift_hitting_log`) then shows that the gap reaches `22 √(3 n log n)` within
+`O(log n)` rounds with probability `1 - 1/n` (`majority3_symmetry_breaking`), after which
+`majority3_vanishing_bias` finishes. The constant `C` is not explicit, because the hitting-time
+bound gives none.
 
 The proof of Theorem 3.8 departs from the paper in a few places, and some
 proofs in both versions of the paper have gaps. Both are recorded in
@@ -62,6 +79,9 @@ proofs in both versions of the paper have gaps. Both are recorded in
 | `Upper` | The phases, one round of each phase, Theorem 3.8 |
 | `Corollaries` | Corollaries 3.10, 3.11, 3.12 |
 | `Binary` | The `k = 2` case via the `three_majority` package |
+| `AnyStartMoments` | Second and fourth moments of independent sums, Paley-Zygmund |
+| `AnyStartKernel` | Hitting a set then reaching an absorbing event; amplification |
+| `AnyStart` | `k = 2` from any configuration: symmetry breaking, then the vanishing bias |
 | `Lower` | Lemma 4.1 and Theorem 4.2 |
 | `Rules` | 3-input rules, `Δ`, `δ`, solvers, consensus needs survival |
 | `ClearMajority` | Theorem 4.8 (a) |
@@ -72,6 +92,15 @@ The package depends on `../dynamics` (finite distributions, kernels,
 Bernstein, Hoeffding and multiplicative Chernoff bounds, Markov's inequality, the
 nested-phase lemma) and `../3-majority` (the binary theorem). Like the rest of
 the repository it uses no measure theory, `PMF`/`ENNReal` or martingales.
+
+**Provenance.** For `Plurality/AnyStart*.lean` (binary 3-majority from any configuration), the
+statements were pinned by a Claude agent and reviewed by a second Claude agent, which checked them
+against the source and numerically and found no problems; the proofs are by a Claude agent under
+the fixed-statement protocol (statements unchanged, no placeholders, warning-free build, axiom
+audit). The amplified statement `majority3_any_start_whp` was added after the first review, on the
+reviewer's suggestion, and reviewed the same way. The moment lemmas of `AnyStartMoments.lean` are
+those of `median/Median/AnyStartMoments.lean`. See [PROVENANCE.md](../PROVENANCE.md) for the other
+results.
 
 ## Building
 

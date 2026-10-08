@@ -536,7 +536,9 @@ theorem majority3_any_start : ∃ C : ℝ, 0 < C ∧ ∀ (n : ℕ), 40 ≤ Real.
 
 /-- **Binary 3-Majority from any configuration, with high probability.** There is `C > 0` such
 that, for `log n ≥ C`, from any configuration `I₀` all nodes hold the same opinion after any
-`T ≥ C log n` rounds with probability at least `1 - 1/n`. -/
+`T ≥ C log n` rounds with probability at least `1 - 1/n`. It runs `majority3_any_start` twice:
+each block fails with probability at most `ε = C₀ log n / n` from every configuration, and
+consensus absorbs, so both fail with probability at most `ε² ≤ 1/n`. -/
 theorem majority3_any_start_whp : ∃ C : ℝ, 0 < C ∧ ∀ (n : ℕ), C ≤ Real.log n →
     ∀ (I₀ : Finset (Fin n)) (T : ℕ), C * Real.log n ≤ T →
       1 - 1 / (n : ℝ)
