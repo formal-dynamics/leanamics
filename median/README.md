@@ -54,12 +54,12 @@ ordered adjacent pairs (`edgeCount`). In [`Median/Expander.lean`](Median/Expande
 The proof replaces the paper's Phases II and III by a single supermartingale argument
 (`expList_le_of_contract`); see [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 
-**Provenance (Theorem 4).** The statements were pinned by a Claude agent and reviewed against the
-paper by a second agent, which found no problem with them (it corrected the paper's lemma numbers
-cited in the docstrings and suggested stating the one-round expectation bound separately, which
-was added as `expected_minority_step`); the proofs are by a Claude agent under the
-fixed-statement protocol, and verified mechanically (statements unchanged, no placeholders,
-warning-free build, axiom audit).
+**Provenance (Theorem 4).** The statements were written and fixed in advance by a Claude
+agent and reviewed against the paper by a second agent, which found no problem with them (it
+corrected the paper's lemma numbers cited in the docstrings and suggested stating the one-round
+expectation bound separately, which was added as `expected_minority_step`); the proofs are by a
+Claude agent under the fixed-statement protocol, and verified mechanically (statements
+unchanged, no placeholders, warning-free build, axiom audit).
 
 Build and audit:
 
