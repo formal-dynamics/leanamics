@@ -57,8 +57,8 @@ theorem lazy_consensus_conductance_sq (hd : ∀ v, 0 < G.degree v) (s : Config V
 a graph with `n` vertices and conductance `φ`, from a configuration with any number of opinions:
 for every `T` with `96 n ln n ≤ φ² T`, the opinions still disagree at time `T` with probability
 at most `1/n`. -/
-theorem lazy_consensus_conductance_sq_many {C : Type*} [Fintype C] (hd : ∀ v, 0 < G.degree v)
-    (s : Config V C) (T : ℕ)
+theorem lazy_consensus_conductance_sq_many [Nonempty V] {C : Type*} [Fintype C]
+    (hd : ∀ v, 0 < G.degree v) (s : Config V C) (T : ℕ)
     (hT : 96 * (Fintype.card V : ℝ) * Real.log (Fintype.card V) ≤ conductance G ^ 2 * T) :
     (transition (lazyNeighbor G hd)).iterate T disagreement s ≤ 1 / (Fintype.card V : ℝ) := by
   sorry
@@ -66,8 +66,8 @@ theorem lazy_consensus_conductance_sq_many {C : Type*} [Fintype C] (hd : ∀ v, 
 /-- **Expected consensus time by restarting** (BGKM16, Theorem 1.1 (ii), static graph, any
 number of opinions). If `96 n ln n ≤ φ² T₀`, then for every horizon `N`,
 `𝔼[min(T_cons, N)] = ∑_{t < N} P(T_cons > t) ≤ 2 T₀`; letting `N → ∞`, `𝔼[T_cons] ≤ 2 T₀`. -/
-theorem lazy_expected_consensus_time_sq {C : Type*} [Fintype C] (hd : ∀ v, 0 < G.degree v)
-    (s : Config V C) (T₀ : ℕ)
+theorem lazy_expected_consensus_time_sq [Nonempty V] {C : Type*} [Fintype C]
+    (hd : ∀ v, 0 < G.degree v) (s : Config V C) (T₀ : ℕ)
     (hT₀ : 96 * (Fintype.card V : ℝ) * Real.log (Fintype.card V) ≤ conductance G ^ 2 * T₀)
     (N : ℕ) :
     ∑ t ∈ range N, (transition (lazyNeighbor G hd)).iterate t disagreement s ≤ 2 * T₀ := by
@@ -93,7 +93,7 @@ theorem dynamic_consensus_conductance_sq (G : ℕ → Config V Bool → SimpleGr
 on a dynamic graph as in `dynamic_consensus_conductance_sq`, from a configuration `s` with any
 number of opinions. If `96 n ln n ≤ ∑_{t < T} φ_t²`, the opinions still disagree at time `T`
 with probability at most `1/n`. -/
-theorem dynamic_consensus_conductance_sq_many {C : Type*} [Fintype C]
+theorem dynamic_consensus_conductance_sq_many [Nonempty V] {C : Type*} [Fintype C]
     (G : ℕ → Config V C → SimpleGraph V)
     [∀ t x, DecidableRel (G t x).Adj] (hd : ∀ t x v, 0 < (G t x).degree v) (s : Config V C)
     (hdeg : ∀ t x v, (G t x).degree v = (G 0 s).degree v)
