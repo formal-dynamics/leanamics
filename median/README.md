@@ -33,7 +33,7 @@ hand; the proofs were produced by
 GLM-5.3 (on the Mistral API, driven by Mistral Vibe) under the fixed-statement protocol and
 verified mechanically (statements unchanged, no placeholders, warning-free build, axiom audit).
 For the results against an adaptive adversary (`Median/Adversary*.lean`), the statements were
-pinned by a Claude agent and reviewed by a second agent (the review led to the set `S` of legal
+fixed by a Claude agent and reviewed by a second agent before the proofs (the review led to the set `S` of legal
 values in `median_almost_stable`, which also covers a corruption before the first round); the
 proofs are by a Claude agent (Opus) under the fixed-statement protocol. See
 [PROVENANCE.md](../PROVENANCE.md) for the other results.
