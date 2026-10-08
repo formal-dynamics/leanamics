@@ -46,26 +46,14 @@ lemma tail_upper (x : Config n) (o : Op) {lam : ℝ} (hlam : 0 ≤ lam) :
   simp_rw [count_step_ind]
   exact avg_hoeffding (ind x o) (ind_01 x o) hlam
 
-/-- **Lower tail** of a count after one round (Hoeffding applied to the complements). -/
+/-- **Lower tail** of a count after one round (Hoeffding, `Dynamics.avg_hoeffding_lower`). -/
 lemma tail_lower (x : Config n) (o : Op) {lam : ℝ} (hlam : 0 ≤ lam) :
     avg (fun r : Fin n → Fin n =>
       if (count (step x r) o : ℝ) + lam ≤ avg (fun r' : Fin n → Fin n => (count (step x r') o : ℝ))
       then (1 : ℝ) else 0) ≤ exp (-(2 * lam ^ 2 / n)) := by
-  have h01 : ∀ v w, (fun v w => 1 - ind x o v w) v w = 0 ∨ (fun v w => 1 - ind x o v w) v w = 1 :=
-    fun v w => by rcases ind_01 x o v w with h | h <;> simp [h]
-  have key := avg_hoeffding (fun v w => 1 - ind x o v w) h01 hlam
-  have hmean : ∑ v, avg (fun w => 1 - ind x o v w)
-      = n - avg (fun r' : Fin n → Fin n => (count (step x r') o : ℝ)) := by
-    rw [avg_count_step]
-    simp_rw [avg_sub, avg_const]
-    rw [sum_sub_distrib]
-    simp
-  refine le_trans (avg_le_avg fun r => ?_) key
-  have hsum : ∑ v, (fun v w => 1 - ind x o v w) v (r v) = n - count (step x r) o := by
-    rw [count_step_ind]
-    simp only [sum_sub_distrib, sum_const, card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one]
-  rw [hmean, hsum]
-  split_ifs with h1 h2 <;> first | (exfalso; apply h2; linarith) | norm_num
+  rw [avg_count_step]
+  simp_rw [count_step_ind]
+  exact avg_hoeffding_lower (ind x o) (ind_01 x o) hlam
 
 /-- **Bad rounds.** If every configuration whose counts are within `Λ` of the expected counts
 (from below for `a`, from above for `b`, both ways for the undecided nodes) lies in `B`, then one
@@ -112,13 +100,6 @@ lemma bad_round (x : Config n) (B : Set (Config n)) {Λ : ℝ} (hΛ : 0 ≤ Λ)
   have t3 := tail_lower x .u hΛ
   have t4 := tail_upper x .u hΛ
   linarith
-
-omit [NeZero n] in
-/-- `exp (-2 log n) = 1/n²`. -/
-lemma exp_neg_two_log {n : ℕ} (hn : 1 ≤ n) : exp (-(2 * log n)) = 1 / (n : ℝ) ^ 2 := by
-  have hn0 : (0 : ℝ) < n := by exact_mod_cast hn
-  rw [exp_neg, show 2 * log n = log ((n : ℝ) ^ 2) by
-    rw [log_pow]; norm_num, exp_log (by positivity), one_div]
 
 omit [NeZero n] in
 /-- With `Λ = √(n log n)` the bad-round bound is `4/n²`. -/

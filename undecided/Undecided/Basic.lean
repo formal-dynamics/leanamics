@@ -1,5 +1,6 @@
 import Dynamics.Rounds
 import Dynamics.Absorption
+import Dynamics.Tail
 import Mathlib
 
 /-! # The undecided-state dynamics (synchronous, binary, complete graph)
@@ -180,17 +181,6 @@ monochromatic at `x w`. -/
 lemma two_const_mono (x : Config n) {w : Fin n} (hw : x w = .a ∨ x w = .b) :
     step (step x (fun _ => w)) (fun _ => w) = fun _ => x w := by
   exact step_clear (step x (fun _ => w)) hw (fun v => step_towards x hw v) (step_towards_at x hw)
-
-/-- On a nonempty finite type, an observable bounded by `1` and strictly below `1`
-somewhere has average strictly below `1`. -/
-lemma avg_lt_one {α : Type*} [Fintype α] [Nonempty α] {f : α → ℝ}
-    (hf : ∀ a, f a ≤ 1) {b : α} (hb : f b < 1) : avg f < 1 := by
-  have hsum : ∑ a, f a < ∑ a : α, (1 : ℝ) :=
-    sum_lt_sum (fun a _ => hf a) ⟨b, mem_univ b, hb⟩
-  have hlt : avg f < avg (fun _ : α => (1 : ℝ)) := by
-    unfold avg
-    exact div_lt_div_of_pos_right hsum card_cast_pos
-  simpa [avg_const] using hlt
 
 variable [NeZero n]
 
