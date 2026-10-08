@@ -534,4 +534,56 @@ theorem majority3_any_start : ∃ C : ℝ, 0 < C ∧ ∀ (n : ℕ), 40 ≤ Real.
   simp only at hmono
   linarith
 
+/-- **Binary 3-Majority from any configuration, with high probability.** There is `C > 0` such
+that, for `log n ≥ C`, from any configuration `I₀` all nodes hold the same opinion after any
+`T ≥ C log n` rounds with probability at least `1 - 1/n`. -/
+theorem majority3_any_start_whp : ∃ C : ℝ, 0 < C ∧ ∀ (n : ℕ), C ≤ Real.log n →
+    ∀ (I₀ : Finset (Fin n)) (T : ℕ), C * Real.log n ≤ T →
+      1 - 1 / (n : ℝ)
+        ≤ expList (Tgt3 n) T (fun l =>
+            if ThreeMajority.run I₀ l = univ ∨ ThreeMajority.run I₀ l = ∅ then (1 : ℝ) else 0) := by
+  /- Two blocks of `majority3_any_start`, each failing with probability at most
+  `ε = C₀ log n / n` from any configuration; consensus absorbs, so both fail with probability at
+  most `ε² ≤ 1/n` (`event_amplify`). -/
+  obtain ⟨C₀, hC₀, h⟩ := majority3_any_start
+  refine ⟨7 * C₀ + 40, by positivity, fun n hL I₀ T hT => ?_⟩
+  have hL40 : 40 ≤ Real.log n := by linarith
+  obtain ⟨hn0, -⟩ := sqrt_ge_of_log hL40
+  haveI : NeZero n := ⟨by exact_mod_cast hn0.ne'⟩
+  obtain ⟨L, hLdef⟩ : ∃ L, L = Real.log n := ⟨_, rfl⟩
+  rw [← hLdef] at hL hL40 hT
+  have hL0 : 0 ≤ C₀ * L := by positivity
+  -- the two blocks: `T₀ = ⌈C₀ log n⌉` and `T₁ = T - T₀ ≥ C₀ log n`
+  obtain ⟨T₀, hT₀⟩ : ∃ T₀ : ℕ, T₀ = ⌈C₀ * L⌉₊ := ⟨_, rfl⟩
+  have hT₀le : C₀ * L ≤ T₀ := hT₀ ▸ Nat.le_ceil _
+  have hT₀lt : (T₀ : ℝ) < C₀ * L + 1 := hT₀ ▸ Nat.ceil_lt_add_one hL0
+  have hT₀T : T₀ ≤ T := by
+    have : (T₀ : ℝ) ≤ T := by nlinarith
+    exact_mod_cast this
+  have hT₁ : C₀ * L ≤ ((T - T₀ : ℕ) : ℝ) := by
+    rw [Nat.cast_sub hT₀T]
+    nlinarith
+  have hblock (b : Finset (Fin n)) (t : ℕ) (ht : C₀ * L ≤ t) :
+      1 - C₀ * L / n ≤ (binKernel n).event (fun J => J = univ ∨ J = ∅) t b := by
+    rw [event_consensus]
+    have := h n (hLdef ▸ hL40) b t (hLdef ▸ ht)
+    rwa [← hLdef] at this
+  have hamp := event_amplify (binKernel n) consensus_absorbing (by positivity)
+    (fun b => hblock b (T - T₀) hT₁) I₀ (hblock I₀ T₀ hT₀le)
+  rw [Nat.add_sub_cancel' hT₀T, event_consensus] at hamp
+  refine le_trans ?_ hamp
+  -- `(C₀ log n / n)² ≤ 1/n`, as `n = e^{log n} ≥ (log n)⁴/24 ≥ C₀² (log n)²` for `log n ≥ 7 C₀`
+  have hexp := Real.pow_div_factorial_le_exp (x := L) (by linarith) 4
+  rw [hLdef, Real.exp_log hn0, ← hLdef] at hexp
+  norm_num [Nat.factorial] at hexp
+  have hC : C₀ ≤ L / 7 := by linarith
+  have hC2 : (C₀ * L) ^ 2 ≤ n := by
+    have h1 : C₀ * L ≤ L / 7 * L := mul_le_mul_of_nonneg_right hC (by linarith)
+    have h2 : (C₀ * L) ^ 2 ≤ (L / 7 * L) ^ 2 := pow_le_pow_left₀ hL0 h1 2
+    nlinarith
+  have : C₀ * L / n * (C₀ * L / n) ≤ 1 / n := by
+    rw [div_mul_div_comm, div_le_div_iff₀ (by positivity) hn0]
+    nlinarith
+  linarith
+
 end Plurality

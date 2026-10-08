@@ -1,5 +1,6 @@
 import Dynamics.DriftHitting
 import Dynamics.Tail
+import Dynamics.Phases
 
 /-!
 # Hitting a set, then reaching an absorbing event
@@ -13,7 +14,11 @@ Facts about an arbitrary finite Markov kernel `K`, used to compose the two stage
   absorbing event `P` after `T` steps with probability at least `1 - ε`, and `B` is hit within `t`
   steps with probability `h`, then the chain is in `P` at time `t + T` with probability at least
   `h - ε`. This is the strong Markov property at the hitting time of `B`, proved by induction on
-  `t` through the recursion of `hitProb`, without stopping times.
+  `t` through the recursion of `hitProb`, without stopping times;
+* `event_amplify` (**amplification**): if an absorbing event is reached within `T₁` steps with
+  probability at least `1 - ε` from every state, then a first block of `T₀` steps that fails with
+  probability at most `δ` is followed by a block that fails with probability at most `ε`, so both
+  fail with probability at most `δ ε`.
 -/
 
 namespace Plurality
@@ -94,5 +99,41 @@ theorem hitProb_sub_le_event (K : Kernel α) {B P : α → Prop}
           = (K a).expect (fun b => K.hitProb B t b - ε) := by
             rw [Distribution.expect_sub, Distribution.expect_const]
         _ ≤ (K a).expect (fun b => K.event P (t + T) b) := (K a).expect_mono ih
+
+/-- **Amplification.** Let `P` be absorbing for `K`, and suppose that from every state the chain
+is in `P` after `T₁` steps with probability at least `1 - ε` (`ε ≥ 0`). If from `a` it is in `P`
+after `T₀` steps with probability at least `1 - δ`, then it is in `P` after `T₀ + T₁` steps with
+probability at least `1 - δ ε`. -/
+theorem event_amplify (K : Kernel α) {P : α → Prop} (habs : ∀ a, P a → (K a).prob P = 1)
+    {T₀ T₁ : ℕ} {ε δ : ℝ} (hε : 0 ≤ ε) (h₁ : ∀ b, 1 - ε ≤ K.event P T₁ b) (a : α)
+    (h₀ : 1 - δ ≤ K.event P T₀ a) : 1 - δ * ε ≤ K.event P (T₀ + T₁) a := by
+  classical
+  have e (m : ℕ) (b : α) : K.event P m b = 1 - K.iterate m (outside {b | P b}) b :=
+    event_eq_one_sub K {b | P b} m b
+  rw [e] at h₀ ⊢
+  -- after `T₁` steps, the probability of being outside `P` is at most `ε` times the indicator
+  -- of being outside `P` now
+  have hpt (b : α) : K.iterate T₁ (outside {b | P b}) b ≤ ε * outside {b | P b} b := by
+    by_cases hb : P b
+    · rw [outside_of_mem (B := {b | P b}) hb, mul_zero]
+      have h0 : K.event P 0 b = 1 := by
+        rw [event_eq_iterate, iterate_zero, if_pos hb]
+      have hm := K.event_monotone habs b (Nat.zero_le T₁)
+      have h1 := K.event_le_one P T₁ b
+      simp only at hm
+      simp only [e] at h0 hm h1
+      linarith
+    · rw [outside_of_not_mem (B := {b | P b}) hb, mul_one]
+      have := h₁ b
+      rw [e] at this
+      linarith
+  have hδ : K.iterate T₀ (outside {b | P b}) a ≤ δ := by linarith
+  have hnn : 0 ≤ K.iterate T₀ (outside {b | P b}) a :=
+    K.iterate_nonneg T₀ (outside_nonneg _) a
+  calc 1 - δ * ε ≤ 1 - ε * K.iterate T₀ (outside {b | P b}) a := by nlinarith
+    _ = 1 - K.iterate T₀ (fun b => ε * outside {b | P b} b) a := by rw [iterate_mul]
+    _ ≤ 1 - K.iterate T₀ (K.iterate T₁ (outside {b | P b})) a := by
+        linarith [K.iterate_mono T₀ hpt a]
+    _ = 1 - K.iterate (T₀ + T₁) (outside {b | P b}) a := by rw [iterate_add_time]
 
 end Plurality
