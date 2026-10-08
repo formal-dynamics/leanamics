@@ -73,3 +73,82 @@ Scheideler, *Stabilizing consensus with the power of two choices* (SPAA 2011), a
    `mul_one_div_sq_le`, `nat_ceil_mul_le_of_le`, `log_two_ge`, `log_two_le_one`
    (`ManyValuesScalar.lean`) are plain real inequalities. They live in namespace `Median` until
    the shared core provides them.
+
+## Against an adaptive adversary (`Adversary`)
+
+Theorem and lemma numbers below follow the 2009 version of the paper; the main theorem with
+adversary is Theorem 1.1 of the SPAA 2011 proceedings.
+
+1. **The adversary is a function of the rounds played so far, inside `expList`.** The paper's
+   `T`-bounded adversary knows the entire history and changes the values of up to `T` nodes in
+   every round. Such an adversary is not a Markov kernel on configurations (it depends on the
+   history), and putting the history into the state would make it unbounded. Instead the
+   randomness stays the list of independent uniform rounds averaged by `expList`, and the
+   adversary is a function `A h z` of the list `h` of rounds played so far and of the output `z`
+   of the median rule in the current round (`Adversary`, `runAdv`). Since the initial
+   configuration is fixed, `h` determines the whole history, so this is the most general
+   deterministic adaptive adversary; a randomized adversary (independent of the rounds) is a
+   mixture of deterministic ones, so worst-case bounds over deterministic adversaries cover it.
+   The theorems are also stated for any *perturbed run* `P` (`IsAdvRun`): a function of the
+   rounds played so far that starts at the initial configuration and, after every round, differs
+   from the output of the median rule in at most `F` nodes; `runAdv_isAdvRun` shows that runs
+   against `F`-bounded adversaries are of this kind.
+2. **When the adversary acts.** The adversary acts after the median step of each round, seeing
+   that round's samples (as in Section 3 of the paper, where it changes the choices of balls
+   after they are drawn; in Section 1.1 it acts at the beginning of each round). A corruption
+   before the first round is covered because the initial configuration is arbitrary and, for
+   many values, the legal values form a set `S` that only has to contain the values of the
+   configuration (item 6). The configuration at time `t` is observed after round `t`'s
+   adversary; in the paper's description it is observed before the next corruption, which
+   differs in at most `F` nodes.
+3. **Budget `F ≤ √n / C` with `C = 2²⁰`.** The paper allows `T ≤ √n` (Theorems 2 and 3) or
+   `O(√n)` (Theorem 10). The symmetry breaking reuses the one-round contraction of the
+   potential `exp (-|g| / (256 √n))` of the adversary-free proof; it survives recolourings that
+   move the gap by at most `√n/512` per round, which is where the budget `√n/1024` comes from. A
+   budget of order `√n` with a large constant would need a symmetry-breaking argument over
+   several rounds.
+4. **Almost stable consensus over a finite window.** The paper asks for a round `r` and a value
+   `v` such that at every later round all but `O(T)` nodes agree on `v`. Formally
+   (`notAlmostStable`), the window is the times `⌈C log n⌉, …, ⌈C log n⌉ + H` for any `H`, with a
+   single value `b` for the whole window, at most `C (F + log n)` other nodes at every time, and
+   a failure probability that grows linearly in `H` (each round of the window fails with
+   probability at most `n⁻²`). The `log n` term is the Chernoff slack of the stable phase: with
+   few corrupted nodes, `O(T)` exceptions for `T` below `log n` are not claimed. The value `b`
+   is not required to be a legal value; for `K < n/2` exceptions it is the majority value.
+5. **Two values: no restriction on the values written.** In `binary_almost_stable` the
+   adversary may write either Boolean. This is not only more general: the reduction of item 6
+   needs it, because the threshold of a run against a many-valued adversary is a binary run
+   against an adversary that may write either value.
+6. **Many values: `O(log n)` rounds via thresholds, at a factor `m - 1` in the failure.** The
+   paper's bound with adversary and `m` values is `O(log m log log n + log n)` rounds
+   (Theorems 3 and 20, through phases on groups of bins). `median_almost_stable` reaches almost
+   stable consensus in `O(log n)` rounds for every `m`, a stronger time bound, through the
+   threshold reduction that the paper uses only without adversary (Lemma 17): for every legal
+   value `b`, the threshold `u ↦ [b ≤ x u]` of the run is a binary run against an adversary with
+   the same budget (thresholding commutes with the median rule and does not increase the
+   Hamming distance). If all thresholds above the minimum stay in almost consensus with `K`
+   exceptions, the run stays in almost consensus with `2K` exceptions on the largest legal value
+   whose threshold is in majority `true` (`notAlmostStable_le_sum`). The union bound over the
+   `m - 1` thresholds makes the failure probability `(m - 1)(C log n + H)/n²`. For a constant
+   number of values (Theorem 2) this is `O(log n / n²)` when `H = O(log n)`; for `m` of order
+   `n` it is `O(log n / n)`, which is weaker than the paper's "with high probability" (`1 - n⁻ᶜ`
+   for some `c > 1`). The adversary writes values of a set `S` of `m` legal values containing
+   the values of the start (the paper: the initial values).
+7. **Explicit constants and a lower bound on `n`.** As for the adversary-free theorems, "with
+   high probability" is made explicit, and the theorems assume `C ≤ log n` with `C = 2²⁰`, so
+   they apply only to astronomically large populations (roadmap MAJ-11).
+8. **Proof route.** Two values (`Median/AdversaryBinary.lean`): escape from balance by the drift
+   of the potential under recolourings (`avg_gapPot_perturbed`) and Markov's inequality, in
+   `⌈2¹⁹ log n⌉` rounds with failure `2/n²`; then a chain of one-round moves, each failing with
+   probability `n⁻²` for every recolouring: the gap grows from `G` to `min (9G/8) (17n/32)`
+   (`adv_growth_move`; Hoeffding gives `5G/4` before the recolouring), and the minority shrinks
+   from `t` to `max (15t/16) K`, `K = max (16F) (1024 log n)` (`adv_sat_move`; Bernstein gives
+   `max (7t/8) (512 log n)` before the recolouring), then stays below `K`. A negative gap is
+   handled by the flip symmetry.
+9. **Generic lemmas not yet in `dynamics/`.** `Median/AdversaryPerturbed.lean` does not mention
+   the median rule: perturbed runs of a round-based process (`Perturbed`), fixed-time drift for
+   them (`expList_le_of_drift_perturbed`), chains of moves along a path
+   (`expList_path_perturbed`, a perturbed path form of `Dynamics.expList_escape`), and the
+   `expList` facts `expList_le_of_length`, `expList_le_of_split`. They are candidates for the
+   shared core, where they would give adversarial versions of the drift and phase lemmas of
+   other packages.
