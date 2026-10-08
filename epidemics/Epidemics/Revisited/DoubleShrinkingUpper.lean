@@ -444,7 +444,8 @@ theorem double_shrinking_tail_main {ℓ a c g α τ : ℝ} (hℓ : 1 < ℓ) (ha 
     have hexp : 0 ≤ max A₂ 1 + 2 * ω / 3 + ω / 3 * K - ω / 3 * r := by
       have h1 : (r : ℝ) < K := by exact_mod_cast hrK
       have h2 := le_max_right A₂ 1
-      have h3 : ω / 3 * (r : ℝ) ≤ ω / 3 * K := mul_le_mul_of_nonneg_left h1.le (by linarith only [hω0])
+      have h3 : ω / 3 * (r : ℝ) ≤ ω / 3 * K :=
+        mul_le_mul_of_nonneg_left h1.le (by linarith only [hω0])
       linarith only [h2, h3, hω0]
     have hone : (1 : ℝ) ≤ (n : ℝ) ^ (max A₂ 1 + 2 * ω / 3 + ω / 3 * K - ω / 3 * r) :=
       Real.one_le_rpow (by exact_mod_cast hn1) hexp

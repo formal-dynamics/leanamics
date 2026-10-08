@@ -60,7 +60,8 @@ theorem double_shrinking_upper_tail_proof {ℓ a c g α τ : ℝ} (hℓ : 1 < �
 
 /-- A polynomial tail `C n^{A' - α' r}` is an exponential tail `C e^{A'} e^{-α' r}` once
 `ln n ≥ 1`. -/
-lemma exp_tail_of_poly (P : RumorProcess n) {m C A' α' : ℝ} (hC : 1 ≤ C) (hn : 3 ≤ n) (T₀ : ℕ) (S : Finset (Fin n))
+lemma exp_tail_of_poly (P : RumorProcess n) {m C A' α' : ℝ} (hC : 1 ≤ C) (hn : 3 ≤ n) (T₀ : ℕ)
+    (S : Finset (Fin n))
     (h : ∀ r : ℕ, P.notYet m (T₀ + r) S ≤ C * (n : ℝ) ^ (A' - α' * r)) (r : ℕ) :
     P.notYet m (T₀ + r) S ≤ C * Real.exp A' * Real.exp (-α' * r) := by
   have hn1 : 1 ≤ n := by omega
