@@ -17,8 +17,9 @@ uses Lean 4.32.0 and Mathlib revision
 | `OptionalStopping` | Finite-horizon optional stopping (roadmap FND-4): a conserved observable, constant on two target events, gives the finite-time error bound `event_error_of_invariant`, the limit `tendsto_event_of_invariant` and the absorption probability `iSup_event_of_invariant` = `(φ(x₀) − φB)/(φA − φB)` |
 | `Rounds` | The kernel `ofStep` of a process driven by i.i.d. uniform rounds, its agreement with `expList`, and `expList_escape` (union bound over rounds for a moving target) |
 | `Reverse` | Time reversal of i.i.d. rounds (roadmap FND-6): `expList_comp_reverse`, and `iterate_ofStep_foldr` (round-based kernels applied last round first) |
-| `Concentration` | Hoeffding's and Bernstein's inequalities for sums of independent coordinates |
-| `Chernoff` | Multiplicative Chernoff bounds (ratio and closed forms, mean replaced by any upper/lower bound) for independent, non-identical Bernoulli trials: on `independent` products, for biased coins `Distribution.bernoulli`, and for one uniform round (roadmap FND-3) |
+| `Concentration` | Hoeffding's (both tails) and Bernstein's inequalities for sums of independent coordinates, and the variance bound `p(1 - p) ≤ p` of a `{0,1}` coordinate |
+| `Chernoff` | Multiplicative Chernoff bounds (ratio and closed forms, mean replaced by any upper/lower bound) for independent, non-identical Bernoulli trials: on `independent` products, for biased coins `Distribution.bernoulli`, and for one uniform round (roadmap FND-3); for uniform rounds also the MGF bound, the tails for a free parameter `t` (`avg_chernoff_upper_of_mgf`, `avg_chernoff_lower_of_mgf`) and the forms `exp(k - μ - k log(k/μ))` |
+| `Tail` | Markov's inequality, the one-round bound `1 - 𝔼[bad]` for `ofStep`, monotone occupation of absorbing events, strict bounds `𝔼f < 1`, the `log n` conversions |
 | `Phases` | Progress through nested phases (`nested_phases`, Lemma A.4 of Becchetti et al., SPAA 2014) |
 | `DriftSeq` | Time-dependent chains (`iterateSeq`: kernel `K t` for the step `t → t + 1`), linearity and monotonicity |
 | `Drift` | Drift theorems of Berenbrink et al. (ICALP 2016): drift `c/Ψ` ⇒ absorbed with probability `≥ 1/2` once `∑ c_t ≥ 4Ψ₀²` (`drift_absorption`, Lemma 2.2); multiplicative drift ⇒ survival `≤ ∏(1 − δ_t) Ψ₀/Ψ_min` (`multiplicative_drift`, Lemma 2.4); `_seq` forms for time-dependent chains |
@@ -56,6 +57,6 @@ This is the only finite-probability layer of the repository: `rumor_spread/`,
 Mathlib's `Finset.expect`. Where the statements deviate from their sources, see
 [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 3-majority retains its `ThreeMajority` probability names and blueprint links
-through compatibility declarations: `ThreeMajority.avg` is a reducible alias of `avg`. The mean-scaled Chernoff bounds of 3-majority (uniform sampling) remain there; `Chernoff`
-generalizes them to independent, non-identical Bernoulli trials, and `Concentration` adds
-the Hoeffding and Bernstein inequalities used by `plurality/`.
+through compatibility declarations: `ThreeMajority.avg` is a reducible alias of `avg`.
+All concentration and tail bounds of `median/`, `plurality/` and `3-majority/` live in
+`Concentration`, `Chernoff` and `Tail`; the packages no longer keep local copies.

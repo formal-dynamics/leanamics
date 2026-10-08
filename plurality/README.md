@@ -56,7 +56,6 @@ proofs in both versions of the paper have gaps. Both are recorded in
 | `Model` | Colorings, 3-input rules, `maj3`, rounds, the Markov kernel |
 | `Expectation` | Adoption probabilities and Lemma 2.1 |
 | `Quantities` | `m(c)`, `M(c)`, `s(c)`, `α(c)`, `γ(c)`, `μ_j(c)`; Lemmas 3.1, 3.2 |
-| `Tail` | Chernoff lower tail and Markov's inequality |
 | `Numerics` | Explicit "sufficiently large `n`" bounds |
 | `Growth` | Lemmas 3.3, 3.4, 3.5 |
 | `Saturation` | Lemmas 3.6, 3.7 |
@@ -70,8 +69,8 @@ proofs in both versions of the paper have gaps. Both are recorded in
 | `HPlurality` | The `h`-plurality model, Lemma 4.11, Theorem 4.12 |
 
 The package depends on `../dynamics` (finite distributions, kernels,
-Bernstein and Hoeffding inequalities, the nested-phase lemma) and
-`../3-majority` (its Chernoff bounds and the binary theorem). Like the rest of
+Bernstein, Hoeffding and multiplicative Chernoff bounds, Markov's inequality, the
+nested-phase lemma) and `../3-majority` (the binary theorem). Like the rest of
 the repository it uses no measure theory, `PMF`/`ENNReal` or martingales.
 
 ## Building
