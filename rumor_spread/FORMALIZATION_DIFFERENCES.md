@@ -51,8 +51,11 @@ Appl. Math. 10 (1985) (PUSH, partner chosen among the other nodes).
    the PUSH and the PULL informed sets pathwise (`run_subset_pushPullRun`,
    `pullRun_subset_pushPullRun`), so `pushPull_informs_all_whp` follows from
    `pull_informs_all_whp` at the same round count.
-8. **Not formalized:** the sharp PUSH bound `log₂ n + ln n` ([FG85], B. Pittel, SIAM J. Appl.
-   Math. 47 (1987)).
+8. **The sharp PUSH bound** `log₂ n + ln n + O(1)` ([FG85], B. Pittel, SIAM J. Appl. Math. 47
+   (1987)) is not formalized in this package. Its upper bound, with exponential tails, is
+   formalized in `epidemics/` as an instance of Doerr and Kostrygin's general analysis
+   (`Epidemics.Revisited.push_spreading_tail`), in a model where a node may call itself; the
+   lower bound is not formalized.
 9. **Start and size.** `n ≥ 2` throughout (for `n = 1` there is no round configuration: `Tgt 1`
    is empty); the process starts from a single, arbitrary informed node `v₀`, as in the
    sources.
