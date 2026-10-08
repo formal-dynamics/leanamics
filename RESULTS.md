@@ -54,7 +54,7 @@ READMEs.
 
 [README](median/README.md) · [differences from the sources](median/FORMALIZATION_DIFFERENCES.md)
 
-Theorem numbers follow the 2009 version of Doerr et al. 2011.
+Theorem numbers of Doerr et al. 2011 follow its 2009 version (Dagstuhl Seminar Proceedings 09371); other rows use their own paper's numbering.
 
 | Result | Source | Main theorems | Roadmap |
 | --- | --- | --- | --- |
