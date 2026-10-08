@@ -16,7 +16,7 @@ deviations from the paper.
 proofs were produced by a Grok agent under a fixed-statement protocol and verified mechanically
 (statements unchanged, no placeholders, warning-free build, axiom audit). The sequential
 statements and their proofs were written by a Claude agent under the same protocol; the statements
-were reviewed by hand against the paper.
+were reviewed by a second agent against the paper.
 
 Build and audit:
 

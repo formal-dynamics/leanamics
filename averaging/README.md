@@ -69,8 +69,8 @@ Parseval, contraction off two eigenvectors), `ReconstructionMatrix.lean`,
 agent under a fixed-statement protocol and verified mechanically (statements unchanged, no
 placeholders, warning-free build, axiom audit). The AVG-1 statements (the rate bound
 `Averaging/Rate*.lean`, Lovász's Theorem 5.1, and the sequential-averaging identities
-`Averaging/Sequential*.lean`) and the AVG-2 statements were pinned by a Claude agent, reviewed by
-hand against the sources, and then proved by the agent under the same protocol.
+`Averaging/Sequential*.lean`) and the AVG-2 statements were pinned by a Claude agent, reviewed by a second
+agent against the sources, and then proved by the agent under the same protocol.
 
 Build and audit:
 

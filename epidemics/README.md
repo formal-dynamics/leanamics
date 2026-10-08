@@ -186,16 +186,16 @@ checks of the provenance note below.
 **Provenance.** Reed–Frost: the statements were written and pinned by hand; the proofs were produced
 by a Grok agent under a fixed-statement protocol and verified mechanically (statements unchanged, no
 placeholders, warning-free build, axiom audit). Kermack–McKendrick: the statements were pinned and
-then proved by a Claude agent under the same protocol and checks; the statements were reviewed by
-hand against the source. Kurtz (CRN-2): the statements were pinned and then proved by a Claude agent
-under the same protocol and checks; the statements were reviewed by hand against the source
+then proved by a Claude agent under the same protocol and checks; the statements were reviewed by a second
+agent against the source. Kurtz (CRN-2): the statements were pinned and then proved by a Claude agent
+under the same protocol and checks; the statements were reviewed by a second agent against the source
 (Wormald's Theorem 5.1). Rumor spreading revisited (EPI-8): the statements were pinned and then
 proved under the same protocol and checks, the growth regime (Lemma 9, Lemma 19, Theorem 21) by a
 Grok agent and the rest (Lemma 20, Theorem 31, total time) by a Claude agent. Supercritical giant
 component (EPI-3): the statements were pinned and then proved by a Claude agent under the same
-protocol and checks; the statements were reviewed by hand against the source. Subcritical
+protocol and checks; the statements were reviewed by a second agent against the source. Subcritical
 percolation (EPI-2): statements and proofs were written by a Claude agent under the same protocol
-and checks; the statements were reviewed by hand against the paper.
+and checks; the statements were reviewed by a second agent against the paper.
 
 Build and audit:
 
