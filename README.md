@@ -49,6 +49,7 @@ Shared at the repository root:
 ```
 home_page/             the Jekyll landing page, deployed at the Pages root
 .github/workflows/     per-project build CI, plus the shared Pages deployment
+.github/pull_request_template.md   the documentation checklist of every pull request
 ```
 
 To work on one project, `cd` into it and use Lake as usual:
@@ -90,7 +91,7 @@ Copy the layout above into a new top-level directory, then add a
 docs to build). Set `\home{../..}` and `\dochome{../docs}` in the project's
 `blueprint/src/web.tex`, since blueprints are served one level below the
 landing page, add a section for it to `home_page/index.md`, and list its results in
-[RESULTS.md](RESULTS.md).
+[RESULTS.md](RESULTS.md). The documentation rule below applies to the pull request that adds it.
 
 ## Contributing
 
@@ -108,8 +109,15 @@ propose a result that is not on the roadmap, just open an issue.
 
 [PROVENANCE.md](PROVENANCE.md) records, for every result, its source paper, whether the formal
 proof follows a published proof or takes a different route, its explicit constants, and who
-produced it. Please add an entry there, and a row to [RESULTS.md](RESULTS.md), for each result
-you contribute.
+produced it.
+
+**Every pull request that adds or changes a result must keep the documentation up to date:** the
+package's `README.md` and blueprint, its `FORMALIZATION_DIFFERENCES.md`, a row in
+[RESULTS.md](RESULTS.md), an entry in [PROVENANCE.md](PROVENANCE.md), the status in
+[ROADMAP.md](ROADMAP.md), and the landing page `home_page/index.md`. If the landing page is not
+updated in the pull request itself, open an issue to update it. The
+[pull request template](.github/pull_request_template.md) lists these items, together with the
+axiom audit.
 
 ## License
 
