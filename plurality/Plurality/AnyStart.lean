@@ -439,6 +439,61 @@ theorem majority3_symmetry_breaking : ∃ C : ℝ, 0 < C ∧ ∀ (n : ℕ) [NeZe
     nlinarith [mul_le_mul_of_nonneg_left hL hnL]
   · positivity
 
+/-! ### Consensus absorbs; the vanishing-bias stage as a kernel event -/
+
+lemma step_univ (r : Tgt3 n) : ThreeMajority.step univ r = univ := by
+  ext v
+  simp [ThreeMajority.mem_step, ThreeMajority.sampleCount, sampleCountOf]
+
+lemma step_empty (r : Tgt3 n) : ThreeMajority.step ∅ r = ∅ := by
+  rw [← compl_univ, step_compl, step_univ]
+
+/-- Consensus on either opinion is absorbing. -/
+lemma consensus_absorbing [NeZero n] (I : Finset (Fin n)) (hI : I = univ ∨ I = ∅) :
+    (binKernel n I).prob (fun J => J = univ ∨ J = ∅) = 1 := by
+  classical
+  have h (r : Tgt3 n) : ThreeMajority.step I r = univ ∨ ThreeMajority.step I r = ∅ := by
+    rcases hI with rfl | rfl
+    · exact Or.inl (step_univ r)
+    · exact Or.inr (step_empty r)
+  rw [binKernel, Kernel.prob_ofStep]
+  simp only [h, if_true]
+  exact Dynamics.avg_const 1
+
+/-- The occupation probability of consensus, as an expectation over rounds. -/
+lemma event_consensus [NeZero n] (T : ℕ) (I : Finset (Fin n)) :
+    (binKernel n).event (fun J => J = univ ∨ J = ∅) T I
+      = expList (Tgt3 n) T (fun l =>
+          if ThreeMajority.run I l = univ ∨ ThreeMajority.run I l = ∅ then (1 : ℝ) else 0) := by
+  classical
+  rw [binKernel, Kernel.event_ofStep]
+  congr 1
+  funext l
+  rw [run_eq_foldl]
+  congr
+
+/-- **The vanishing-bias stage** (`majority3_vanishing_bias`, applied to `I` or to its
+complement): from a gap at least `22 √(3 n log n)` in absolute value, consensus holds after
+`10 · phases n 3 ≤ 390 log n` rounds with probability at least `1 - 429 log n / n`. -/
+lemma event_consensus_of_gap [NeZero n] (hL : 40 ≤ Real.log n) (I : Finset (Fin n))
+    (hI : 22 * √(3 * n * Real.log n) ≤ |gap I|) :
+    1 - 429 * Real.log n / n
+      ≤ (binKernel n).event (fun J => J = univ ∨ J = ∅) (10 * phases n 3) I := by
+  classical
+  rw [event_consensus]
+  rcases le_total 0 (gap I) with hg | hg
+  · rw [abs_of_nonneg hg] at hI
+    refine (majority3_vanishing_bias hL I hI).2.trans (expList_le_expList fun l => ?_)
+    split_ifs <;> simp_all
+  · have hc : 22 * √(3 * n * Real.log n) ≤ (Iᶜ.card : ℝ) - (n - Iᶜ.card) := by
+      change _ ≤ gap Iᶜ
+      rw [gap_compl]
+      rw [abs_of_nonpos hg] at hI
+      exact hI
+    refine (majority3_vanishing_bias hL Iᶜ hc).2.trans (expList_le_expList fun l => ?_)
+    rw [run_compl]
+    split_ifs with h1 h2 <;> simp_all [compl_eq_univ_iff]
+
 /-- **Binary 3-Majority from any configuration.** There is `C > 0` such that, for `log n ≥ 40`,
 from any configuration `I₀` (in particular from a perfectly balanced one), all nodes hold the same
 opinion after any `T ≥ C log n` rounds with probability at least `1 - C log n / n`. -/
@@ -447,6 +502,36 @@ theorem majority3_any_start : ∃ C : ℝ, 0 < C ∧ ∀ (n : ℕ), 40 ≤ Real.
       1 - C * Real.log n / n
         ≤ expList (Tgt3 n) T (fun l =>
             if ThreeMajority.run I₀ l = univ ∨ ThreeMajority.run I₀ l = ∅ then (1 : ℝ) else 0) := by
-  sorry
+  /- Symmetry breaking within `t₁ = ⌈C₀ log n⌉` rounds w.p. `1 - 1/n`, then the vanishing-bias
+  stage within `390 log n` rounds w.p. `1 - 429 log n / n`; consensus absorbs, so the remaining
+  rounds keep it. -/
+  obtain ⟨C₀, hC₀, hsb⟩ := majority3_symmetry_breaking
+  refine ⟨C₀ + 430, by positivity, fun n hL I₀ T hT => ?_⟩
+  obtain ⟨hn0, -⟩ := sqrt_ge_of_log hL
+  haveI : NeZero n := ⟨by exact_mod_cast hn0.ne'⟩
+  have hT₂ : ((10 * phases n 3 : ℕ) : ℝ) ≤ 390 * Real.log n := by
+    have := phases_le hL (le_refl (3 : ℝ))
+    push_cast
+    linarith
+  obtain ⟨t₁, ht₁⟩ : ∃ t₁ : ℕ, t₁ = ⌈C₀ * Real.log n⌉₊ := ⟨_, rfl⟩
+  have ht₁le : C₀ * Real.log n ≤ t₁ := ht₁ ▸ Nat.le_ceil _
+  have ht₁lt : (t₁ : ℝ) < C₀ * Real.log n + 1 := ht₁ ▸ Nat.ceil_lt_add_one (by positivity)
+  -- hit the large-gap set, then absorb
+  have hcomp := hitProb_sub_le_event (binKernel n) (consensus_absorbing)
+    (by positivity : (0 : ℝ) ≤ 429 * Real.log n / n) (event_consensus_of_gap hL) t₁ I₀
+  have hsb' := hsb n hL I₀ t₁ ht₁le
+  -- more rounds keep consensus
+  have hle : t₁ + 10 * phases n 3 ≤ T := by
+    have : ((t₁ + 10 * phases n 3 : ℕ) : ℝ) ≤ T := by
+      push_cast at hT₂ ⊢
+      nlinarith
+    exact_mod_cast this
+  have hmono := Kernel.event_monotone (binKernel n) consensus_absorbing I₀ hle
+  rw [← event_consensus]
+  have hfin : 1 - (C₀ + 430) * Real.log n / n ≤ 1 - 1 / n - 429 * Real.log n / n := by
+    rw [sub_sub, ← add_div, sub_le_sub_iff_left, div_le_div_iff_of_pos_right hn0]
+    nlinarith
+  simp only at hmono
+  linarith
 
 end Plurality
