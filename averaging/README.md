@@ -65,6 +65,23 @@ Parseval, contraction off two eigenvectors), `ReconstructionMatrix.lean`,
 `ReconstructionCount.lean` (counting and Wallis). Deviations from the paper are listed in
 [`FORMALIZATION_DIFFERENCES.md`](FORMALIZATION_DIFFERENCES.md).
 
+**Provenance.** The statements were written and pinned by hand; the proofs were produced by a Grok
+agent under a fixed-statement protocol and verified mechanically (statements unchanged, no
+placeholders, warning-free build, axiom audit). The AVG-1 statements (the rate bound
+`Averaging/Rate*.lean`, Lovász's Theorem 5.1, and the sequential-averaging identities
+`Averaging/Sequential*.lean`) and the AVG-2 statements were pinned by a Claude agent, reviewed by
+hand against the sources, and then proved by the agent under the same protocol.
+
+Build and audit:
+
+```bash
+lake exe cache get
+lake build
+python3 ../scripts/check_axioms.py
+```
+
+This package uses the sibling `dynamics/` package's Lean 4.32.0 toolchain and exact Mathlib pin.
+
 ## Averaging whenever you meet (roadmap AVG-3)
 
 Becchetti, Clementi, Manurangsi, Natale, Pasquale, Raghavendra, Trevisan, *Average whenever you
@@ -107,20 +124,3 @@ Provenance of AVG-3: the statements were fixed by a Claude agent before the proo
 by a second Claude agent against the paper (the review led to `±1` labels in Definition 2.3); the
 proofs are by Claude agents under the fixed-statement protocol, verified mechanically (no
 placeholders, warning-free build, axiom audit).
-
-**Provenance.** The statements were written and pinned by hand; the proofs were produced by a Grok
-agent under a fixed-statement protocol and verified mechanically (statements unchanged, no
-placeholders, warning-free build, axiom audit). The AVG-1 statements (the rate bound
-`Averaging/Rate*.lean`, Lovász's Theorem 5.1, and the sequential-averaging identities
-`Averaging/Sequential*.lean`) and the AVG-2 statements were pinned by a Claude agent, reviewed by
-hand against the sources, and then proved by the agent under the same protocol.
-
-Build and audit:
-
-```bash
-lake exe cache get
-lake build
-python3 ../scripts/check_axioms.py
-```
-
-This package uses the sibling `dynamics/` package's Lean 4.32.0 toolchain and exact Mathlib pin.
