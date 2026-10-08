@@ -183,7 +183,7 @@ Deviations from the paper are listed in [FORMALIZATION_DIFFERENCES.md](FORMALIZA
 The statements were pinned and then proved by a Claude agent under the fixed-statement protocol and
 checks of the provenance note below.
 
-**Provenance.** Reed–Frost: the statements were written and pinned by hand; the proofs were produced
+**Provenance.** Reed–Frost: the statements were written and pinned by a second agent; the proofs were produced
 by a Grok agent under a fixed-statement protocol and verified mechanically (statements unchanged, no
 placeholders, warning-free build, axiom audit). Kermack–McKendrick: the statements were pinned and
 then proved by a Claude agent under the same protocol and checks; the statements were reviewed by a second

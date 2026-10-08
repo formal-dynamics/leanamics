@@ -27,7 +27,7 @@ statements and proofs deviate from the paper is listed in
 [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 
 **Provenance.** For the results up to `consensus_whp`, the statements were written and pinned by
-hand; the proofs were produced by
+a second agent; the proofs were produced by
 GLM-5.3 (on the Mistral API, driven by Mistral Vibe) under the fixed-statement protocol and
 verified mechanically (statements unchanged, no placeholders, warning-free build, axiom audit).
 See [PROVENANCE.md](../PROVENANCE.md) for the other results.

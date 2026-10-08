@@ -65,7 +65,7 @@ Parseval, contraction off two eigenvectors), `ReconstructionMatrix.lean`,
 `ReconstructionCount.lean` (counting and Wallis). Deviations from the paper are listed in
 [`FORMALIZATION_DIFFERENCES.md`](FORMALIZATION_DIFFERENCES.md).
 
-**Provenance.** The statements were written and pinned by hand; the proofs were produced by a Grok
+**Provenance.** The statements were written and pinned by a second agent; the proofs were produced by a Grok
 agent under a fixed-statement protocol and verified mechanically (statements unchanged, no
 placeholders, warning-free build, axiom audit). The AVG-1 statements (the rate bound
 `Averaging/Rate*.lean`, Lovász's Theorem 5.1, and the sequential-averaging identities

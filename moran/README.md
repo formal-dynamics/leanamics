@@ -42,7 +42,7 @@ Only the "if" direction is formalized: the commonly quoted "if and only if" does
 needs care because that projection is not Markov in general (Keller and Uğurlu,
 arXiv:2403.12598).
 
-**Provenance.** The statements were written and pinned by hand; the proofs (of both files) were produced by a
+**Provenance.** The statements were written and pinned by a second agent; the proofs (of both files) were produced by a
 Grok agent under a fixed-statement protocol and verified mechanically (statements unchanged,
 no placeholders, warning-free build, axiom audit). The star files (`Moran/Star*.lean`, roadmap MOR-3, first item) were pinned
 and proved by a Claude agent under the same protocol; the closed forms were also checked exactly

@@ -190,7 +190,7 @@ abstract only: VOT-6, MOR-3, EPI-3, MAJ-2–MAJ-4, MAJ-6–MAJ-9, UND-1–UND-3,
 marked "classical" rest on textbook results. Formulas derived for this roadmap were checked
 independently: the Moran formula (MOR-1), the isothermal property on a regular graph (MOR-2)
 and both push/pull fixation formulas (VOT-4) against exact absorbing-chain solutions over all
-mutant sets on small graphs; the 2-Choices cubic (MAJ-1) and the bias-growth identity (MAJ-2a) symbolically; the pair-sampling identity behind CRN-1 by hand; the Daley–Kendall rates against their restatement by Lebensztayn–Rodriguez (2025); and the explicit
+mutant sets on small graphs; the 2-Choices cubic (MAJ-1) and the bias-growth identity (MAJ-2a) symbolically; the pair-sampling identity behind CRN-1 by a second agent; the Daley–Kendall rates against their restatement by Lebensztayn–Rodriguez (2025); and the explicit
 recovery time in the AVG-2 hint by simulation on random clustered expanders. Claimers
 should still read the source before formalizing.
 

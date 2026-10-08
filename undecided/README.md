@@ -12,7 +12,7 @@ initial majority wins, each with probability `1 - O(n^{-c})` for every `c` (`con
 paths; see [`FORMALIZATION_DIFFERENCES.md`](FORMALIZATION_DIFFERENCES.md) for the route and the
 deviations from the paper.
 
-**Provenance.** For `Undecided/Basic.lean`, the statements were written and pinned by hand; the
+**Provenance.** For `Undecided/Basic.lean`, the statements were written and pinned by a second agent; the
 proofs were produced by a Grok agent under a fixed-statement protocol and verified mechanically
 (statements unchanged, no placeholders, warning-free build, axiom audit). The sequential
 statements and their proofs were written by a Claude agent under the same protocol; the statements
