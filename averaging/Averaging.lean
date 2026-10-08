@@ -8,4 +8,6 @@ import Averaging.OpportunisticClustered
 import Averaging.OpportunisticSigns
 import Averaging.OpportunisticOneStep
 import Averaging.OpportunisticSecondMoment
+import Averaging.OpportunisticGood
+import Averaging.OpportunisticNonEphemeral
 import Averaging.OpportunisticSparseCut
