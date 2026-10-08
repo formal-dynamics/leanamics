@@ -65,7 +65,7 @@ Angluin, Aspnes and Eisenstat (PODC 2006) [AAE06].
    right output (the form of [AAER07] and [CDS14, §2.2]). For finite populations the two are
    equivalent (by AADFP06 Lemma 1, the configurations occurring infinitely often in a fair
    execution form a final strongly connected component); this equivalence is not formalized.
-2. **Populations of every size `n ≥ 1`, and an error in AADFP06 Lemma 5 for `n = 1`.** AADFP06 do
+2. **Populations of every size `n ≥ 1`, and a minor correction to AADFP06 Lemma 5 for `n = 1`.** AADFP06 do
    not state a lower bound on the population size, but the protocols of their Lemma 5 start every
    agent with output bit `0` (input map `σᵢ ↦ (1, 0, aᵢ)`). With a single agent no encounter ever
    happens, so the output stays `0` even when the predicate holds (for example `a = (1)`, `c = 3`,

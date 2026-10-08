@@ -24,7 +24,7 @@ the final-size equation $s_\infty=s(0)e^{-R_0(1-s_\infty)}$, following Hethcote 
 We also formalize the upper bounds of Doerr and Kostrygin's analysis of general rumor-spreading
 processes (\emph{Randomized rumor spreading revisited}, ICALP 2017): the exponential growth and
 shrinking regimes and the total spreading time $\log_{1+\gamma}n+\frac1\rho\ln n+O(1)$, with
-exponential tails. Lemma~20 of that paper is false as stated; we prove corrected versions.
+exponential tails. Lemma~20 of that paper needs a major correction; we prove corrected versions.
 
 We also formalize the duality between the coalescing-branching random walk (COBRA) and the BIPS
 epidemic of Cooper, Radzik and Rivera (Theorem~4), pathwise and by time reversal of i.i.d.\ rounds.
@@ -407,8 +407,8 @@ expected number of these rounds started below $fn$, i.e.\ $O(E[T(|S|,fn)]/n)$.
 Chebyshev's inequality with Lemma~\ref{lem:rumor-variance} for one round, then a union bound over
 the rounds along the trajectory.
 \end{proof}
-The paper's Lemma~20 claims probability $1-O(1/n)$ of landing in $[fn,f'n]$; this is false: the
-process that from every $|S|<fn$ informs all nodes with probability $c/n$ (and otherwise none)
+The paper's Lemma~20 claims probability $1-O(1/n)$ of landing in $[fn,f'n]$; this needs a
+correction, as the process that from every $|S|<fn$ informs all nodes with probability $c/n$ (and otherwise none)
 satisfies the hypotheses and jumps from $1$ to $n$ with probability one. See
 \texttt{FORMALIZATION\_DIFFERENCES.md}.
 

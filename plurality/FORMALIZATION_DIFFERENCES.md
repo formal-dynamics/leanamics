@@ -62,7 +62,7 @@ in spirit (its phases switch on `c_1 ≥ 2n/3`, and its per-color failure
 probability is `1/n³`), but it has its own problems, so the formalization
 keeps the SPAA proof:
 
-* **A false intermediate inequality.** The proof of "from plurality to
+* **An intermediate inequality that needs a minor correction.** The proof of "from plurality to
   majority" uses `μ_1 - μ_j ≥ (c_1 - c_j)(1 + c_1/(3n))` for every `j ≠ 1`.
   This fails for colors with few nodes: for `c = (n/3 + s, n/3, n/3 - s, 0)`
   and `j = 4`, `μ_1 - μ_4 = c_1(1 + s/n - 2s²/n²)`, which is below

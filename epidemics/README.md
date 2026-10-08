@@ -149,9 +149,9 @@ the probability that fewer than `m` nodes are informed after `t` rounds from `S`
 | Exponential shrinking regime: from `≤ g n` uninformed nodes, all informed after `(1/ρ) ln n + O(1)` rounds, exponential tail | Theorem 31 (Theorem 2, upper bounds) | `shrinking_upper_tail`, `shrinking_upper_expect` |
 | Total spreading time `log_{1+γ} n + (1/ρ) ln n + O(1)`, exponential tail | Theorems 21 and 31 with Lemma 19 | `spreading_upper_tail`, `spreading_upper_expect` |
 
-**Lemma 20 of the paper is false as stated** (a process can stay below `f n` for many rounds,
+**Lemma 20 of the paper needs a major correction** (a process can stay below `f n` for many rounds,
 with a chance to jump over `[f n, f' n]` in each); the one-round estimate of its proof and a
-corrected path statement are formalized instead. The counterexample and the other deviations
+corrected path statement are formalized instead. The example and the other deviations
 (conditions for every state instead of homogeneity, arbitrary starting sets, a uniform side
 condition in Definition 11, the composed total-time theorems) are listed in
 [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md). Theorem 31 is proved with a

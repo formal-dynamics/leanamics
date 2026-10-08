@@ -343,8 +343,8 @@ Reindex the pairs $(x,a)$ by $(x[i\mapsto a],x_i)$; induct over the set of repla
 \lean{Voter.potential_drift,Voter.potential_drift_conductance,Voter.expect_sqrt_le_comp,Voter.expect_compSum_sq_ge,Voter.expect_compSum_cube_le,Voter.sqrt_add_le_taylor,Voter.sqrt_chord}\leanok\uses{def:conductance,lem:indep,thm:lazy}
 If $s_t\neq\emptyset$, then
 $\mathbb{E}[\Psi_{t+1}\mid s_t]\le\Psi-\sum_{u\in s_t}\lambda_u d_u/(32\Psi^3)
-\le\Psi-d_{\min}\varphi/(32\Psi)$. The paper prints the sum over all of $V$, which fails on the
-star $K_{1,15}$; its proof gives the sum over $s_t$.
+\le\Psi-d_{\min}\varphi/(32\Psi)$. The paper prints the sum over all of $V$; this needs a minor correction (the
+inequality does not hold on the star $K_{1,15}$), and its proof gives the sum over $s_t$.
 \end{lemma}
 \begin{proof}\leanok
 $\Psi_{t+1}$ is at most the root of the new volume $P+\sum_u X_u$ of the opinion of $s_t$.

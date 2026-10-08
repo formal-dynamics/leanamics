@@ -36,7 +36,7 @@ probabilities, identified through an invariant potential (`fixation_eq_of_invari
 shared finite-horizon optional stopping theorem `Dynamics.Kernel.iSup_event_of_invariant` and
 the shared absorption theorem of [`dynamics/`](../dynamics); no path-space measure is used.
 
-Only the "if" direction is formalized: the commonly quoted "if and only if" is false
+Only the "if" direction is formalized: the commonly quoted "if and only if" does not hold in general
 (Galanis, Göbel, Goldberg, Lapinskas and Richerby, *Amplifiers for the Moran process*, J. ACM
 2017, Proposition 12), and the classical proof, which projects onto the number of mutants,
 needs care because that projection is not Markov in general (Keller and Uğurlu,

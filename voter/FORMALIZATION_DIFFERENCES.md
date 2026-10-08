@@ -235,11 +235,11 @@ Further sources: Becchetti, Clementi, Natale, *Consensus dynamics: an overview*,
 51(1), 2020 (the "survey"); Kanade, Mallmann-Trenn, Sauerwald, *On coalescence time in graphs*,
 SODA 2019 (arXiv:1611.02460); Cooper, Elsässer, Ono, Radzik, SIAM J. Discrete Math. 2013.
 
-### 4.1 Survey Theorem 8 is false as stated; the lazy walk is formalized
+### 4.1 Survey Theorem 8 needs a minor correction; the lazy walk is formalized
 * Theorem 8 of the survey states: "Let G be any connected undirected graph. Starting from an
   arbitrary initial configuration c on G, the Voter dynamics reaches consensus w.h.p. in
-  O(n³ log n) rounds." For the synchronous voter with plain uniform-neighbour sampling this
-  **fails on bipartite graphs**: two tokens on opposite sides of a bipartite graph never meet,
+  O(n³ log n) rounds." For the synchronous voter with plain uniform-neighbour sampling the statement needs a
+  **nonbipartiteness hypothesis** (or a lazy walk): two tokens on opposite sides of a bipartite graph never meet,
   and an alternating colouring never reaches consensus
   (cf. [`twoVertex_never_consensus`](Voter/Examples.lean)). Hassin and Peleg's standing
   hypotheses (§2.1) do require a nonbipartite graph, and their Theorem 2.5 is the uniform case
@@ -303,11 +303,12 @@ bound), Lemma 2.1 (potential drop), Lemma 2.2 (drift implies time), Lemma 2.3 (p
 `κ` opinions). Files: `Conductance*.lean`. The dynamics is the lazy voter
 [`lazyNeighbor`](Voter/Lazy.lean) `= (I + D⁻¹A)/2` of §3.
 
-### 5.1 Lemma 2.1 of BGKM16 is false as printed
+### 5.1 Lemma 2.1 of BGKM16 needs a minor correction
 * The paper states
   `𝔼[Ψ(S_{t+1}) | S_t = s_t] ≤ Ψ(s_t) - ∑_{u ∈ V} λ_{u,t} d_u / (32 Ψ(s_t)³)`,
   with the sum over **all** vertices, where `Ψ(s) = √(vol(minority))` and `λ_u` is the
-  number of neighbours of `u` with the other opinion. This is false. Counterexample: the star
+  number of neighbours of `u` with the other opinion. With the sum over all vertices the inequality
+  does not hold. Example: the star
   `K_{1,k}` with `k ≥ 15` and a single leaf in the minority (`Ψ = 1`). Only the leaf and the
   hub can change opinion, and exactly
   `𝔼[Ψ'] = ½ (1 - 1/(2k)) + (√(k-1) + √k)/(4k)`; for `k = 15` this is `0.6102`, while the
