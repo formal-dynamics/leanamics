@@ -248,7 +248,7 @@ lemma expList_devVec_le (hl3 : 0 < lam3) (hN : (16 : ℝ) ≤ Fintype.card V)
     rw [← sum_sq_dev_eq hG]
     have havg : avg (avgRun G x₁ p) = avg x₁ := by simp only [avg, sum_avgRun]
     refine Finset.sum_congr rfl fun v _ => ?_
-    simp only [devVec, projCut_eq, projRest, projOne, projCut, havg, cutCoef]
+    simp only [devVec, projRest, projOne, projCut, havg, cutCoef]
     ring
   simp_rw [hdev]
   rw [expList_add]
@@ -276,5 +276,296 @@ lemma expList_devVec_le (hl3 : 0 < lam3) (hN : (16 : ℝ) ≤ Fintype.card V)
   nlinarith [mul_nonneg hr0 hz]
 
 end IsClusteredRegular
+
+
+/-! ### The good event -/
+
+omit [DecidableRel G.Adj] in
+lemma card_badSet_mul_le (θ : ℝ) (x₁ x : V → ℝ) :
+    #(badSet V₁ θ x₁ x) * θ ≤ ∑ v, devVec V₁ x₁ x v ^ 2 := by
+  calc #(badSet V₁ θ x₁ x) * θ = ∑ _v ∈ badSet V₁ θ x₁ x, θ := by
+        rw [sum_const, nsmul_eq_mul]
+    _ ≤ ∑ v ∈ badSet V₁ θ x₁ x, devVec V₁ x₁ x v ^ 2 := Finset.sum_le_sum fun v hv => by
+        simp only [badSet, Finset.mem_filter, Finset.mem_univ, true_and] at hv; exact hv.le
+    _ ≤ ∑ v, devVec V₁ x₁ x v ^ 2 :=
+        Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_univ _) fun _ _ _ => sq_nonneg _
+
+omit [DecidableRel G.Adj] in
+lemma card_badSet_le (θ : ℝ) (x₁ x : V → ℝ) : #(badSet V₁ θ x₁ x) ≤ Fintype.card V :=
+  Finset.card_le_univ _
+
+omit [DecidableRel G.Adj] in
+/-- At the reference state itself the deviation is the rest component. -/
+lemma devVec_self (x₁ : V → ℝ) (v : V) : devVec V₁ x₁ x₁ v = projRest V₁ x₁ v := by
+  simp only [devVec, projRest, projOne, projCut, cutCoef]
+
+omit [DecidableRel G.Adj] in
+/-- Many bad nodes at the start force a large rest component: `|B| > ε n` gives
+`‖z₁‖² > ε n θ`. -/
+lemma restSq_gt_of_card_badSet_gt {θ ε : ℝ} (hθ : 0 ≤ θ) (hε : 0 ≤ ε) (x₁ : V → ℝ)
+    (h : ε * Fintype.card V < #(badSet V₁ θ x₁ x₁)) :
+    ε * Fintype.card V * θ < restSq V₁ x₁ := by
+  have hne : (badSet V₁ θ x₁ x₁).Nonempty := by
+    rw [← Finset.card_pos]
+    have : (0 : ℝ) < #(badSet V₁ θ x₁ x₁) := lt_of_le_of_lt (by positivity) h
+    exact_mod_cast this
+  have h1 : #(badSet V₁ θ x₁ x₁) * θ < ∑ v ∈ badSet V₁ θ x₁ x₁, devVec V₁ x₁ x₁ v ^ 2 := by
+    rw [← nsmul_eq_mul, ← sum_const]
+    exact Finset.sum_lt_sum_of_nonempty hne fun v hv => by
+      simp only [badSet, Finset.mem_filter, Finset.mem_univ, true_and] at hv; exact hv
+  have h2 : ∑ v ∈ badSet V₁ θ x₁ x₁, devVec V₁ x₁ x₁ v ^ 2 ≤ restSq V₁ x₁ := by
+    simp_rw [devVec_self]
+    exact Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_univ _) fun _ _ _ => sq_nonneg _
+  have h3 : ε * Fintype.card V * θ ≤ #(badSet V₁ θ x₁ x₁) * θ :=
+    mul_le_mul_of_nonneg_right h.le hθ
+  linarith
+
+omit [Fintype V] [DecidableRel G.Adj] in
+lemma avgRun_take_append (x : V → ℝ) (l₁ l₂ : List G.Dart) {t : ℕ} (ht : l₁.length ≤ t) :
+    avgRun G x ((l₁ ++ l₂).take t) = avgRun G (avgRun G x l₁) (l₂.take (t - l₁.length)) := by
+  rw [List.take_append, List.take_of_length_le ht, avgRun_append]
+
+/-- The threshold `θ = ε² ‖y⁽⁰⁾‖²/(4n)` for the deviation. -/
+noncomputable def thr (V₁ : Finset V) (ε : ℝ) (x₀ : V → ℝ) : ℝ :=
+  ε ^ 2 * (Fintype.card V * cutCoef V₁ x₀ ^ 2) / (4 * Fintype.card V)
+
+/-- The cut coefficient has moved by the start of the phase: `4 n (β₁ - β₀)² > ε² ‖y⁽⁰⁾‖²`. -/
+def CutMoved (V₁ : Finset V) (ε : ℝ) (x₀ x₁ : V → ℝ) : Prop :=
+  ε ^ 2 * (Fintype.card V * cutCoef V₁ x₀ ^ 2) <
+    4 * Fintype.card V * (cutCoef V₁ x₁ - cutCoef V₁ x₀) ^ 2
+
+open scoped Classical in
+/-- **Deterministic core of Lemma 4.2**: if the cut coefficient has not moved much by the start
+of the phase (`4 n (β₁ - β₀)² ≤ ε² ‖y⁽⁰⁾‖²`), at most `ε n` nodes are bad at the start and at most
+`ε n` rounds of the phase are bad, then at least `(1 - 3ε) n` nodes are `ε`-good at every round of
+the phase. -/
+theorem card_good_ge (hG : IsClusteredRegular G V₁ d b) (x₀ : V → ℝ) {ε : ℝ}
+    (l₁ l₂ : List G.Dart)
+    (hF : 4 * Fintype.card V * (cutCoef V₁ (avgRun G x₀ l₁) - cutCoef V₁ x₀) ^ 2 ≤
+      ε ^ 2 * (Fintype.card V * cutCoef V₁ x₀ ^ 2))
+    (hB : (#(badSet V₁ (thr V₁ ε x₀) (avgRun G x₀ l₁) (avgRun G x₀ l₁)) : ℝ) ≤
+      ε * Fintype.card V)
+    (hZ : (#{k ∈ range l₂.length | IsBadRound V₁ (thr V₁ ε x₀) (avgRun G x₀ l₁) l₂ k} : ℝ) ≤
+      ε * Fintype.card V) :
+    (1 - 3 * ε) * Fintype.card V ≤ #{v | ∀ t : ℕ, l₁.length ≤ t → t ≤ l₁.length + l₂.length →
+      (avgRun G x₀ ((l₁ ++ l₂).take t) v - (projOne x₀ v + projCut V₁ x₀ v)) ^ 2 ≤
+        ε ^ 2 / Fintype.card V * ∑ w, projCut V₁ x₀ w ^ 2} := by
+  have hn := hG.card_real_pos
+  set N : ℝ := (Fintype.card V : ℝ)
+  set s₀ := N * cutCoef V₁ x₀ ^ 2
+  set θ := thr V₁ ε x₀
+  set x₁ := avgRun G x₀ l₁
+  set Tch := (univ.filter fun v => v ∈ badSet V₁ θ x₁ x₁ ∨ ∃ k < l₂.length, ∃ e : G.Dart,
+    l₂[k]? = some e ∧ (v = e.fst ∨ v = e.snd) ∧ IsBadStep V₁ θ x₁ (avgRun G x₁ (l₂.take k)) e)
+  have hT := card_touched_le θ x₁ l₂ (V₁ := V₁)
+  have hsub : univ \ Tch ⊆ (univ.filter fun v => ∀ t : ℕ, l₁.length ≤ t →
+      t ≤ l₁.length + l₂.length →
+      (avgRun G x₀ ((l₁ ++ l₂).take t) v - (projOne x₀ v + projCut V₁ x₀ v)) ^ 2 ≤
+        ε ^ 2 / N * ∑ w, projCut V₁ x₀ w ^ 2) := by
+    intro v hv
+    simp only [Finset.mem_sdiff, Finset.mem_univ, true_and, Tch, Finset.mem_filter, not_or,
+      not_exists, not_and] at hv
+    obtain ⟨h0, hstep⟩ := hv
+    have hgood := not_mem_badSet_avgRun θ x₁ v l₂ h0 fun k hk e he hve hbad =>
+      hstep k hk e he hve hbad
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+    intro t ht1 ht2
+    rw [avgRun_take_append x₀ l₁ l₂ ht1]
+    have hk := hgood (t - l₁.length) (by omega)
+    simp only [badSet, Finset.mem_filter, Finset.mem_univ, true_and, not_lt] at hk
+    set y := avgRun G x₁ (l₂.take (t - l₁.length))
+    have havg : avg x₁ = avg x₀ := by simp only [x₁, avg, sum_avgRun]
+    have e1 : y v - (projOne x₀ v + projCut V₁ x₀ v) =
+        devVec V₁ x₁ y v + (cutCoef V₁ x₁ - cutCoef V₁ x₀) * cutVec V₁ v := by
+      simp only [devVec, projOne, projCut_eq, havg]; ring
+    rw [e1, IsClusteredRegular.sum_sq_projCut]
+    have hχ := cutVec_sq (V₁ := V₁) v
+    have hF' : (cutCoef V₁ x₁ - cutCoef V₁ x₀) ^ 2 ≤ ε ^ 2 * s₀ / (4 * N) := by
+      rw [le_div_iff₀ (by positivity)]; linarith
+    have hθ : θ = ε ^ 2 * s₀ / (4 * N) := rfl
+    have key : (devVec V₁ x₁ y v + (cutCoef V₁ x₁ - cutCoef V₁ x₀) * cutVec V₁ v) ^ 2 ≤
+        2 * devVec V₁ x₁ y v ^ 2 + 2 * (cutCoef V₁ x₁ - cutCoef V₁ x₀) ^ 2 := by
+      nlinarith [sq_nonneg (devVec V₁ x₁ y v - (cutCoef V₁ x₁ - cutCoef V₁ x₀) * cutVec V₁ v)]
+    have e2 : ε ^ 2 / N * s₀ = 2 * (ε ^ 2 * s₀ / (4 * N)) + 2 * (ε ^ 2 * s₀ / (4 * N)) := by
+      field_simp; ring
+    rw [show N * cutCoef V₁ x₀ ^ 2 = s₀ from rfl, e2]
+    linarith
+  have hcard : (N - #Tch : ℝ) ≤ #(univ.filter fun v => ∀ t : ℕ, l₁.length ≤ t →
+      t ≤ l₁.length + l₂.length →
+      (avgRun G x₀ ((l₁ ++ l₂).take t) v - (projOne x₀ v + projCut V₁ x₀ v)) ^ 2 ≤
+        ε ^ 2 / N * ∑ w, projCut V₁ x₀ w ^ 2) := by
+    have h1 := Finset.card_le_card hsub
+    rw [Finset.card_sdiff_of_subset (Finset.subset_univ _), Finset.card_univ] at h1
+    have h2 : #Tch ≤ Fintype.card V := Finset.card_le_univ _
+    have : ((Fintype.card V - #Tch : ℕ) : ℝ) = N - #Tch := by rw [Nat.cast_sub h2]
+    rw [← this]; exact_mod_cast h1
+  have hT' : (#Tch : ℝ) ≤ #(badSet V₁ θ x₁ x₁) +
+      2 * #{k ∈ range l₂.length | IsBadRound V₁ θ x₁ l₂ k} := by exact_mod_cast hT
+  linarith
+
+
+omit [Fintype V] [DecidableEq V] [DecidableRel G.Adj] in
+lemma ite_exists_some {α : Type*} (o : Option α) (P : α → Prop) [DecidablePred P]
+    [Decidable (∃ e, o = some e ∧ P e)] :
+    (if ∃ e, o = some e ∧ P e then (1 : ℝ) else 0) =
+      match o with
+      | some e => if P e then 1 else 0
+      | none => 0 := by
+  cases o <;> simp
+
+/-- One bad round: `P(bad) ≤ b/d + 2 |B|/n`. -/
+lemma IsClusteredRegular.avg_isBadStep_le (hG : IsClusteredRegular G V₁ d b) (θ : ℝ)
+    (x₁ y : V → ℝ) :
+    avg (fun e : G.Dart => if IsBadStep V₁ θ x₁ y e then (1 : ℝ) else 0) ≤
+      b / d + 2 * (#(badSet V₁ θ x₁ y) / Fintype.card V) := by
+  have h : ∀ e : G.Dart, (if IsBadStep V₁ θ x₁ y e then (1 : ℝ) else 0) ≤
+      (if IsCrossDart V₁ e then 1 else 0) + (if e.fst ∈ badSet V₁ θ x₁ y then 1 else 0) +
+        (if e.snd ∈ badSet V₁ θ x₁ y then 1 else 0) := fun e => by
+    unfold IsBadStep
+    by_cases h1 : IsCrossDart V₁ e <;> by_cases h2 : e.fst ∈ badSet V₁ θ x₁ y <;>
+      by_cases h3 : e.snd ∈ badSet V₁ θ x₁ y <;> simp [h1, h2, h3]
+  refine (avg_le_avg h).trans (le_of_eq ?_)
+  rw [avg_add, avg_add, hG.avg_cross, hG.avg_fst_mem, hG.avg_snd_mem]
+  ring
+
+open scoped Classical in
+/-- **The good event, for fixed initial signs** (proof of Lemma 4.2): the probability that at
+least `(1 - 3ε) n` nodes are `ε`-good throughout the phase `[t₁, t₁ + M]` is at least
+`1 - P(cut moved) - P(|B| > ε n) - (1/(ε n)) ∑_{k < M} (b/d + 2 E[1 - 1_moved; |B_k|/n])`. -/
+theorem IsClusteredRegular.expList_good_ge (hG : IsClusteredRegular G V₁ d b) (x₀ : V → ℝ)
+    {ε : ℝ} (hε : 0 < ε) (t₁ M : ℕ) :
+    1 - expList G.Dart t₁ (fun l₁ => if CutMoved V₁ ε x₀ (avgRun G x₀ l₁) then 1 else 0) -
+        expList G.Dart t₁ (fun l₁ =>
+          if ε * Fintype.card V < #(badSet V₁ (thr V₁ ε x₀) (avgRun G x₀ l₁) (avgRun G x₀ l₁))
+          then 1 else 0) -
+        1 / (ε * Fintype.card V) * ∑ k ∈ range M, (b / d + 2 * expList G.Dart t₁ (fun l₁ =>
+          (if CutMoved V₁ ε x₀ (avgRun G x₀ l₁) then 0 else 1) * expList G.Dart k (fun p =>
+            #(badSet V₁ (thr V₁ ε x₀) (avgRun G x₀ l₁) (avgRun G (avgRun G x₀ l₁) p)) /
+              Fintype.card V))) ≤
+      expList G.Dart (t₁ + M) (fun l =>
+        if (1 - 3 * ε) * Fintype.card V ≤ #{v | ∀ t : ℕ, t₁ ≤ t → t ≤ t₁ + M →
+          (avgRun G x₀ (l.take t) v - (projOne x₀ v + projCut V₁ x₀ v)) ^ 2 ≤
+            ε ^ 2 / Fintype.card V * ∑ w, projCut V₁ x₀ w ^ 2} then 1 else 0) := by
+  haveI := hG.nonempty_dart
+  have hn := hG.card_real_pos
+  set N : ℝ := (Fintype.card V : ℝ)
+  have hεN : 0 < ε * N := by positivity
+  set θ := thr V₁ ε x₀
+  -- the inner bound, for a fixed start `l₁` of length `t₁`
+  set F1 : List G.Dart → ℝ := fun l₁ => if CutMoved V₁ ε x₀ (avgRun G x₀ l₁) then 1 else 0
+  set D1 : List G.Dart → ℝ := fun l₁ =>
+    if ε * N < #(badSet V₁ θ (avgRun G x₀ l₁) (avgRun G x₀ l₁)) then 1 else 0
+  set g3 : ℕ → List G.Dart → ℝ := fun k l₁ =>
+    (if CutMoved V₁ ε x₀ (avgRun G x₀ l₁) then 0 else 1) * expList G.Dart k (fun p =>
+      #(badSet V₁ θ (avgRun G x₀ l₁) (avgRun G (avgRun G x₀ l₁) p)) / N)
+  have hinner : ∀ l₁ : List G.Dart, l₁.length = t₁ →
+      1 - F1 l₁ - D1 l₁ - 1 / (ε * N) * ∑ k ∈ range M, (b / d + 2 * g3 k l₁) ≤
+      expList G.Dart M (fun l₂ =>
+        if (1 - 3 * ε) * N ≤ #{v | ∀ t : ℕ, t₁ ≤ t → t ≤ t₁ + M →
+          (avgRun G x₀ ((l₁ ++ l₂).take t) v - (projOne x₀ v + projCut V₁ x₀ v)) ^ 2 ≤
+            ε ^ 2 / N * ∑ w, projCut V₁ x₀ w ^ 2} then 1 else 0) := by
+    intro l₁ hl₁
+    set x₁ := avgRun G x₀ l₁
+    let F : List G.Dart → Option G.Dart → ℝ := fun p o => match o with
+      | some e => if IsBadStep V₁ θ x₁ (avgRun G x₁ p) e then 1 else 0
+      | none => 0
+    have hF0 : ∀ p o, 0 ≤ F p o := by
+      intro p o
+      cases o with
+      | none => exact le_rfl
+      | some e => simp only [F]; split_ifs <;> norm_num
+    set Zc : List G.Dart → ℝ := fun l₂ => ∑ k ∈ range M, F (l₂.take k) l₂[k]?
+    have hZc_ge : ∀ l₂, (#{k ∈ range M | IsBadRound V₁ θ x₁ l₂ k} : ℝ) ≤ Zc l₂ := by
+      intro l₂
+      rw [Finset.card_filter]
+      push_cast
+      refine Finset.sum_le_sum fun k _ => ?_
+      by_cases h : IsBadRound V₁ θ x₁ l₂ k
+      · obtain ⟨e, he, hb⟩ := h
+        rw [if_pos ⟨e, he, hb⟩, he]
+        simp [F, hb]
+      · rw [if_neg h]; exact hF0 _ _
+    have hZ0 : ∀ l₂, 0 ≤ Zc l₂ := fun l₂ => Finset.sum_nonneg fun k _ => hF0 _ _
+    have hc01 : (if CutMoved V₁ ε x₀ x₁ then (0 : ℝ) else 1) = 1 - F1 l₁ := by
+      simp only [F1, x₁]; split_ifs <;> norm_num
+    -- pointwise in `l₂`
+    have hpt : ∀ l₂ : List G.Dart, l₂.length = M →
+        1 - F1 l₁ - D1 l₁ - (1 - F1 l₁) * (1 / (ε * N) * Zc l₂) ≤
+        (if (1 - 3 * ε) * N ≤ #{v | ∀ t : ℕ, t₁ ≤ t → t ≤ t₁ + M →
+          (avgRun G x₀ ((l₁ ++ l₂).take t) v - (projOne x₀ v + projCut V₁ x₀ v)) ^ 2 ≤
+            ε ^ 2 / N * ∑ w, projCut V₁ x₀ w ^ 2} then 1 else 0) := by
+      intro l₂ hl₂
+      have hD0 : 0 ≤ D1 l₁ := by simp only [D1]; split_ifs <;> norm_num
+      have hR0 : (0 : ℝ) ≤ if (1 - 3 * ε) * N ≤ #{v | ∀ t : ℕ, t₁ ≤ t → t ≤ t₁ + M →
+          (avgRun G x₀ ((l₁ ++ l₂).take t) v - (projOne x₀ v + projCut V₁ x₀ v)) ^ 2 ≤
+            ε ^ 2 / N * ∑ w, projCut V₁ x₀ w ^ 2} then 1 else 0 := by split_ifs <;> norm_num
+      have hcZ : 0 ≤ 1 / (ε * N) * Zc l₂ := mul_nonneg (by positivity) (hZ0 l₂)
+      by_cases hF : CutMoved V₁ ε x₀ x₁
+      · have : F1 l₁ = 1 := by simp only [F1, x₁] at hF ⊢; simp [hF]
+        rw [this]; nlinarith
+      have hF1 : F1 l₁ = 0 := by simp only [F1, x₁] at hF ⊢; simp [hF]
+      rw [hF1]
+      by_cases hD : ε * N < #(badSet V₁ θ x₁ x₁)
+      · have : D1 l₁ = 1 := by simp only [D1, x₁] at hD ⊢; simp [hD]
+        rw [this]; nlinarith
+      have hD1 : D1 l₁ = 0 := by simp only [D1, x₁] at hD ⊢; simp [hD]
+      rw [hD1]
+      by_cases hZ : ε * N < Zc l₂
+      · have : 1 < 1 / (ε * N) * Zc l₂ := by
+          rw [one_div, ← div_eq_inv_mul, lt_div_iff₀ hεN]; linarith
+        linarith
+      have hD' := le_of_not_gt hD
+      have hZ' : (#{k ∈ range l₂.length | IsBadRound V₁ θ x₁ l₂ k} : ℝ) ≤ ε * N := by
+        rw [hl₂]; exact (hZc_ge l₂).trans (le_of_not_gt hZ)
+      have hgood := card_good_ge hG x₀ l₁ l₂ (le_of_not_gt hF) hD' hZ'
+      rw [hl₁, hl₂] at hgood
+      rw [if_pos hgood]
+      linarith
+    -- the expectation of `Zc`
+    have hZc : expList G.Dart M Zc ≤ ∑ k ∈ range M, (b / d + 2 * expList G.Dart k (fun p =>
+        #(badSet V₁ θ x₁ (avgRun G x₁ p)) / N)) := by
+      rw [expList_sum]
+      refine Finset.sum_le_sum fun k hk => ?_
+      have hkM : k < M := Finset.mem_range.mp hk
+      rw [expList_take_getElem? hkM]
+      rw [← expList_const_mul, ← expList_const (α := G.Dart) k (b / d : ℝ), ← expList_add]
+      exact expList_le_expList fun p => hG.avg_isBadStep_le θ x₁ _
+    refine le_trans ?_ (expList_le_of_length hpt)
+    have e1 : expList G.Dart M (fun l₂ => 1 - F1 l₁ - D1 l₁ - (1 - F1 l₁) * (1 / (ε * N) * Zc l₂)) =
+        1 - F1 l₁ - D1 l₁ - (1 - F1 l₁) * (1 / (ε * N) * expList G.Dart M Zc) := by
+      rw [← expList_const_mul, ← expList_const_mul]
+      rw [show (fun l₂ => 1 - F1 l₁ - D1 l₁ - (1 - F1 l₁) * (1 / (ε * N) * Zc l₂)) =
+          fun l₂ => (1 - F1 l₁ - D1 l₁) + (-1) * ((1 - F1 l₁) * (1 / (ε * N) * Zc l₂)) from
+        funext fun l₂ => by ring]
+      rw [expList_add, expList_const, expList_const_mul]
+      ring
+    rw [e1]
+    have hF01 : 0 ≤ 1 - F1 l₁ := by simp only [F1]; split_ifs <;> norm_num
+    have hF11 : 1 - F1 l₁ ≤ 1 := by simp only [F1]; split_ifs <;> norm_num
+    have hc : 0 ≤ 1 / (ε * N) := by positivity
+    have h1 : (1 - F1 l₁) * (1 / (ε * N) * expList G.Dart M Zc) ≤
+        1 / (ε * N) * ∑ k ∈ range M, (b / d + 2 * g3 k l₁) := by
+      have hsum : (1 - F1 l₁) * expList G.Dart M Zc ≤ ∑ k ∈ range M, (b / d + 2 * g3 k l₁) := by
+        refine (mul_le_mul_of_nonneg_left hZc hF01).trans ?_
+        rw [Finset.mul_sum]
+        refine Finset.sum_le_sum fun k _ => ?_
+        have hbd : 0 ≤ (b / d : ℝ) := by positivity
+        have : (1 - F1 l₁) * (2 * expList G.Dart k (fun p =>
+            #(badSet V₁ θ x₁ (avgRun G x₁ p)) / N)) = 2 * g3 k l₁ := by
+          simp only [g3, x₁, F1]; split_ifs <;> ring
+        nlinarith [mul_le_mul_of_nonneg_right hF11 hbd]
+      calc (1 - F1 l₁) * (1 / (ε * N) * expList G.Dart M Zc)
+          = 1 / (ε * N) * ((1 - F1 l₁) * expList G.Dart M Zc) := by ring
+        _ ≤ _ := mul_le_mul_of_nonneg_left hsum hc
+    linarith
+  rw [expList_append]
+  refine le_trans ?_ (expList_le_of_length hinner)
+  have hsub : ∀ (F G' : List G.Dart → ℝ), expList G.Dart t₁ (fun l => F l - G' l) =
+      expList G.Dart t₁ F - expList G.Dart t₁ G' := fun F G' => by
+    rw [show (fun l => F l - G' l) = fun l => F l + (-1) * G' l from funext fun l => by ring,
+      expList_add, expList_const_mul]; ring
+  rw [hsub, hsub, hsub, expList_const, expList_const_mul, expList_sum]
+  simp_rw [expList_add, expList_const, expList_const_mul]
+  exact le_rfl
 
 end Averaging.Opportunistic
