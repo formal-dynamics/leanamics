@@ -97,9 +97,9 @@ $p(d-1) \le 1 - \varepsilon$ with $0 < \varepsilon < 1$. The small-world part of
 formalized in the next section (EPI-6).
 
 A few points of the paper need a minor correction, and the corrected versions are what is
-formalized: the tail $\exp(-\varepsilon^2 t/3)$ claimed in the proof of Theorem~E.1 (the formal
-bound is $e^{\varepsilon}\exp(-\varepsilon^2 t/2)$, which pays for the extra trial at the source)
-and a typo in its union bound
+formalized: the Chernoff step in the proof of Theorem~E.1, which does not account for the extra
+trial at the source (the formal bound is $e^{\varepsilon}\exp(-\varepsilon^2 t/2)$, still of the
+form $\exp(-\Omega(\varepsilon^2 t))$ that the theorem states), and a typo in its union bound
 (\href{https://github.com/formal-dynamics/leanamics/blob/main/epidemics/FORMALIZATION_DIFFERENCES.md#subcritical-percolation-and-small-outbreaks-subcritical-epi-2}{details}),
 and, in the small-world part, the hypothesis of claim~2 of Theorem~2.5 and the starting set of
 the exploration in Algorithm~3
