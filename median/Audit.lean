@@ -14,3 +14,7 @@ import Median
 #print axioms Median.binary_consensus_fast
 #print axioms Median.median_consensus_fast
 #print axioms Median.odd_split_consensus
+#print axioms Median.runAdv_isAdvRun
+#print axioms Median.binary_almost_stable_of_isAdvRun
+#print axioms Median.binary_almost_stable
+#print axioms Median.median_almost_stable

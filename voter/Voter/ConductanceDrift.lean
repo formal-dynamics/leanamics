@@ -20,8 +20,8 @@ variable {V : Type*} [Fintype V] [DecidableEq V] (G : SimpleGraph V) [DecidableR
 side `s_t` of the configuration `s` is nonempty, then
 `𝔼[Ψ(S_{t+1}) | S_t = s_t] ≤ Ψ(s_t) - ∑_{u ∈ s_t} λ_u d_u / (32 Ψ(s_t)³)`.
 The paper prints the sum over all vertices `u ∈ V`; its proof bounds the sum over `s_t`, which is
-what the proof of Lemma 2.2 uses. The printed form is false (star `K_{1,15}`, see
-`FORMALIZATION_DIFFERENCES.md`, §5.1). -/
+what the proof of Lemma 2.2 uses. The printed form needs this minor correction (it does not hold
+on the star `K_{1,15}`, see `FORMALIZATION_DIFFERENCES.md`, §5.1). -/
 theorem potential_drift (hd : ∀ v, 0 < G.degree v) (s : Config V Bool)
     (hs : (minority G s).Nonempty) :
     (transition (lazyNeighbor G hd)).apply (potential G) s ≤

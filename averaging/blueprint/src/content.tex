@@ -179,3 +179,89 @@ round $t\ge T(n,\delta)$.
 \begin{proof}\leanok
 Theorem~\ref{thm:core} and Lemma~\ref{lem:b1}.
 \end{proof}
+
+\section{Averaging whenever you meet}
+Becchetti, Clementi, Manurangsi, Natale, Pasquale, Raghavendra, Trevisan, \emph{Average whenever
+you meet: opportunistic protocols for community detection} (ESA 2018, arXiv:1703.05045).
+\begin{definition}[Opportunistic averaging, Algorithm 1]\label{def:opp}
+\lean{Averaging.Opportunistic.signVec,Averaging.Opportunistic.edgeAvg,Averaging.Opportunistic.avgRun,Averaging.Opportunistic.oppStep,Averaging.Opportunistic.oppRun}\leanok
+One uniformly random edge is activated per round; a node activated for the first time draws a
+uniform sign, and both endpoints take the average of their two values. The rounds are i.i.d.
+uniform darts of $G$.
+\end{definition}
+\begin{lemma}[Deferred decisions]\label{lem:opp-model}
+\lean{Averaging.Opportunistic.avg_dart_edge,Averaging.Opportunistic.oppRun_isSome_iff,Averaging.Opportunistic.oppRun_getD,Averaging.Opportunistic.sum_avgRun}\leanok\uses{def:opp}
+A uniform dart is a uniform edge; a node holds a value exactly when it has been activated, and
+the protocol's values are those of the averaging process started from the coins $\sigma$; the sum
+of the values is conserved.
+\end{lemma}
+\begin{proof}\leanok
+Induction on the list of rounds; every edge carries two darts.
+\end{proof}
+\begin{theorem}[Expected step, equations (1), (2), (15)]\label{thm:opp-first}
+\lean{Averaging.Opportunistic.stepMatrix,Averaging.Opportunistic.meanStepMatrix,Averaging.Opportunistic.stepMatrix_mulVec,Averaging.Opportunistic.stepMatrix_isSymm,Averaging.Opportunistic.stepMatrix_mul_self,Averaging.Opportunistic.avg_stepMatrix,Averaging.Opportunistic.meanStepMatrix_isSymm,Averaging.Opportunistic.meanStepMatrix_mem_doublyStochastic,Averaging.Opportunistic.avg_edgeAvg,Averaging.Opportunistic.expList_avgRun,Averaging.Opportunistic.avg_sum_sq_edgeAvg}\leanok\uses{def:opp}
+$W_t$ is a symmetric projection, $\mathbb E[W]=\bar W=I-L/2m$ is symmetric and doubly stochastic,
+$\mathbb E[x^{(t)}]=\bar W^tx^{(0)}$ and $\mathbb E\|Wx\|^2=x^\top\bar Wx$.
+\end{theorem}
+\begin{proof}\leanok
+Entrywise computation over the darts; induction on $t$.
+\end{proof}
+\begin{definition}[Clustered regular graphs, Definition 2.2]\label{def:opp-clustered}
+\lean{Averaging.Opportunistic.IsClusteredRegular,Averaging.Opportunistic.cutVec,Averaging.Opportunistic.projOne,Averaging.Opportunistic.projCut,Averaging.Opportunistic.projRest,Averaging.Opportunistic.ThirdEigenvalueLB}\leanok
+$G$ is $d$-regular with communities $V_1$ and $V_2=V_1^c$ of size $n/2$, each node having $b$
+neighbours in the other community, $0<b$, $2b<d<n$. The state splits as $x=x_\parallel+y+z$ along
+$\mathbb 1$, $\chi=\mathbb 1_{V_1}-\mathbb 1_{V_2}$ and their orthogonal complement;
+$\lambda_2=2b/d$, and $\lambda_3$ enters as a lower bound on the Rayleigh quotient of $L/d$ on
+the complement.
+\end{definition}
+\begin{theorem}[Theorem 3.1 on clustered regular graphs]\label{thm:opp-31}
+\lean{Averaging.Opportunistic.meanStepMatrix_mulVec_cutVec,Averaging.Opportunistic.expList_projCut,Averaging.Opportunistic.expList_avgRun_decomp,Averaging.Opportunistic.sum_sq_meanStepMatrix_pow_le,Averaging.Opportunistic.monotone_criterion,Averaging.Opportunistic.sign_criterion}\leanok\uses{thm:opp-first,def:opp-clustered}
+$\bar W\chi=(1-\lambda_2/n)\chi$, the expected state decomposes exactly as in Lemma B.1, and the
+monotonicity and sign criteria of Lemmas B.3 and B.4 hold at every node.
+\end{theorem}
+\begin{proof}\leanok
+$\bar W$ contracts the complement of $\operatorname{span}\{\mathbb 1,\chi\}$ by
+$1-\lambda_3/n$.
+\end{proof}
+\begin{lemma}[One round, Lemmas C.2 and C.3]\label{lem:opp-onestep}
+\lean{Averaging.Opportunistic.IsClusteredRegular.avg_restSq_edgeAvg_le,Averaging.Opportunistic.IsClusteredRegular.avg_cutDev_edgeAvg_le}\leanok\uses{thm:opp-first,def:opp-clustered}
+With $\beta=\langle x,\chi\rangle/n$: $\mathbb E\|z'\|^2\le(1-\lambda_3/n)\|z\|^2+\lambda_2\beta^2$ and,
+for every $\gamma$, $\mathbb E\,n(\beta'-\gamma)^2\le(1-\lambda_2/n)\,n(\beta-\gamma)^2+\lambda_2\gamma^2
++(4\lambda_2/n^2)(n\beta^2+\|z\|^2)$.
+\end{lemma}
+\begin{proof}\leanok
+$\mathbb E\|Wx\|^2=x^\top\bar Wx$ and Jensen for $\beta'$; the variance of $\beta'$ comes from the
+$nb$ darts across the cut.
+\end{proof}
+\begin{theorem}[Second moment analysis, Lemma C.4 and Theorem 4.1]\label{thm:opp-41}
+\lean{Averaging.Opportunistic.IsClusteredRegular.expList_secondMoment_le,Averaging.Opportunistic.IsClusteredRegular.secondMoment_bound_aux,Averaging.Opportunistic.secondMoment_bound}\leanok\uses{lem:opp-onestep}
+If $100\lambda_2\log n\le\lambda_3$ and $3(n/\lambda_3)\log n\le t\le n/(4\lambda_2)$, then
+$\mathbb E\|y^{(t)}+z^{(t)}-y^{(0)}\|^2\le3\lambda_2t/n$.
+\end{theorem}
+\begin{proof}\leanok
+Unroll the two recursions from any state; average over the signs ($\mathbb E\|y^{(0)}\|^2=1$,
+$\|z^{(0)}\|^2\le n$).
+\end{proof}
+\begin{theorem}[Non-ephemeral good nodes, Lemma 4.2]\label{thm:opp-42}
+\lean{Averaging.Opportunistic.IsGood,Averaging.Opportunistic.card_good_ge,Averaging.Opportunistic.IsClusteredRegular.nonEphemeral_aux,Averaging.Opportunistic.IsClusteredRegular.prob_good_window,Averaging.Opportunistic.nonEphemeral_good}\leanok\uses{thm:opp-41}
+If $\lambda_2/\lambda_3\le\lambda_3\varepsilon^4/(c\log^2n)$, then with probability at least
+$1-\varepsilon$ at least $(1-3\varepsilon)n$ nodes are $\varepsilon$-good at every round of the
+phase $6(n/\lambda_3)\log n\le t\le12(n/\lambda_3)\log n$.
+\end{theorem}
+\begin{proof}\leanok
+Good nodes averaged only with good nodes of their community stay good; the bad rounds of the
+phase are counted in expectation from the second-moment bounds restarted at the start of the
+phase, and small initial cut components are handled by anti-concentration of $\langle\sigma,\chi\rangle$.
+\end{proof}
+\begin{theorem}[Sign recovery and weak reconstruction]\label{thm:opp-main}
+\lean{Averaging.Opportunistic.IsWeakReconstruction,Averaging.Opportunistic.IsClusteredRegular.avg_abs_blockSum_le_mul,Averaging.Opportunistic.IsClusteredRegular.avg_blockSum_mul_neg,Averaging.Opportunistic.IsClusteredRegular.prob_sign_window,Averaging.Opportunistic.IsClusteredRegular.prob_weakReconstruction_window,Averaging.Opportunistic.sign_phase,Averaging.Opportunistic.weakReconstruction_phase}\leanok\uses{thm:opp-42}
+Under the hypothesis of Lemma 4.2, with probability at least $1-4\varepsilon$ at least
+$(1-4\varepsilon)n$ nodes have the sign of their community's initial average throughout the
+phase, and with probability at least $1/2-6\varepsilon$ the signs of the values are a
+$6\varepsilon$-weak reconstruction at every round of the phase.
+\end{theorem}
+\begin{proof}\leanok
+A good node has the sign of $2S_h/n$ unless $|S_1|\le\varepsilon|S_2|$ or $|S_2|\le\varepsilon|S_1|$
+(each of probability at most $\varepsilon+1/\sqrt{n/2+1}$); $S_1S_2<0$ with probability at least
+$1/2-1/\sqrt{n/2+1}$.
+\end{proof}

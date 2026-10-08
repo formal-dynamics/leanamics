@@ -1,4 +1,4 @@
-# Epidemics: Reed–Frost and bond percolation; subcritical percolation; the giant component; the COBRA–BIPS duality; the Kermack–McKendrick SIR model; Kurtz's law of large numbers; rumor spreading revisited
+# Epidemics: Reed–Frost and bond percolation; subcritical percolation; small-world networks below the threshold; the giant component; the COBRA–BIPS duality; the Kermack–McKendrick SIR model; Kurtz's law of large numbers; rumor spreading revisited
 
 A Lean formalization of the pathwise correspondence between the Reed–Frost (Independent Cascade)
 epidemic and bond percolation (after Kempe, Kleinberg and Tardos, KDD 2003; see also Becchetti et
@@ -70,6 +70,45 @@ parametric versions of both theorems (`core_path`, `core_component`,
 [`Epidemics/Giant.lean`](Epidemics/Giant.lean)); the epidemic reading
 ([`Epidemics/GiantEpidemic.lean`](Epidemics/GiantEpidemic.lean)). Deviations from the paper are
 listed in [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
+
+## Small-world networks below the percolation threshold (EPI-6)
+
+After L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccardi, *Percolation and
+epidemic processes in one-dimensional small-world networks* (arXiv:2103.16398).
+`SWG(n, q)` is the cycle `C_n` plus the edges of an Erdős–Rényi graph `G(n, q)` (`swg n b`,
+`b ~ coins q`); `3-SWG(n)` is the cycle plus a uniformly random perfect matching (`swg3 n M`,
+`M ~ uniformMatching n`). Probabilities are over the graph and the bond percolation `ω ~ coins p`
+(equivalently, the Reed–Frost epidemic with transmission probability `p`). The critical value for
+`SWG(n, c/n)` is `p* = (√(c² + 6c + 1) - c - 1) / (2c)` (`swgThreshold c`), the root of
+`c p (1 + p) = 1 - p`; for `3-SWG(n)` it is `1/2`. "W.h.p." is made explicit as "with probability
+at least `1 - C/n`" (results in [`Epidemics/SmallWorld.lean`](Epidemics/SmallWorld.lean) and
+[`Epidemics/SmallWorldEpidemic.lean`](Epidemics/SmallWorldEpidemic.lean)):
+
+| Result | Lean declaration |
+| --- | --- |
+| Theorem 2.1, claim 2: `SWG(n, c/n)`, `p < p* - ε`: all components have `O(log n)` nodes w.h.p. | `swg_subcritical` |
+| Lemma C.1 with explicit constants: `≤ (64/δ²) log n` nodes with probability `≥ 1 - 2/n`, `δ = 1 - p₀ - c p₀ (1 + p₀)` | `swg_components_small` |
+| Theorem 2.2, claim 2: `3-SWG(n)`, `p < 1/2 - ε`: all components have `O(log n)` nodes w.h.p. | `swg3_subcritical` |
+| Theorem 2.4, claim 2: Reed–Frost on `SWG(n, c/n)` below `p*` stops within `O(log n)` rounds with `O(|I₀| log n)` recovered nodes w.h.p. | `swg_reedFrost_subcritical` |
+| Theorem 2.5, claim 2 (threshold `1/2`): the same on `3-SWG(n)` | `swg3_reedFrost_subcritical` |
+| The threshold: `c p* (1 + p*) = 1 - p*`, `p < p* ↔ c p (1 + p) < 1 - p`, `p* = √2 - 1` for `c = 1` | `swgThreshold_spec`, `lt_swgThreshold_iff`, `swgThreshold_one` |
+
+The proof of Lemma C.1 first collapses the two independent coin families into one percolation of
+the complete graph with independent coins, of probability `p` on cycle edges and `p c / n` on
+the other pairs ([`SmallWorldCollapse.lean`](Epidemics/SmallWorldCollapse.lean)). A
+breadth-first exploration of a cluster gives each node the weight `1` if it was discovered through
+a cycle edge and `1 + p₀` otherwise, a left eigenvector of the two-type mean matrix behind the
+paper's Galton–Watson comparison; below the threshold the expected discovered weight shrinks by a
+factor `1 - δ/2` per processed node, so an exponential of the weight balance is a supermartingale
+([`SmallWorldMart.lean`](Epidemics/SmallWorldMart.lean): products of factors along adaptive
+observations of fresh independent coordinates, the principle of deferred decisions;
+[`SmallWorldExplore.lean`](Epidemics/SmallWorldExplore.lean): the exploration and the tail bound
+`Explore.prob_cluster_gt_le`). Markov's inequality and a union bound over the nodes conclude
+([`SmallWorldSubcritical.lean`](Epidemics/SmallWorldSubcritical.lean)). Theorem 2.2, claim 2 is
+EPI-2's Theorem 2.3 (`prob_components_small`) applied to the maximum degree `3` of `3-SWG(n)`,
+and the Reed–Frost claims follow from the component bounds by EPI-2's deterministic lemmas.
+The supercritical claims (claim 1 of Theorems 2.1, 2.2, 2.4 and 2.5) are not formalized yet.
+Deviations from the paper are listed in [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 
 ## The Kermack–McKendrick SIR model (EPI-7)
 
@@ -148,14 +187,40 @@ the probability that fewer than `m` nodes are informed after `t` rounds from `S`
 | Jumping over `[f n, f' n[` has probability `O(E[T(|S|, f n)] / n)` (corrected Lemma 20) | Lemma 20 | `jumpProb_le` |
 | Exponential shrinking regime: from `≤ g n` uninformed nodes, all informed after `(1/ρ) ln n + O(1)` rounds, exponential tail | Theorem 31 (Theorem 2, upper bounds) | `shrinking_upper_tail`, `shrinking_upper_expect` |
 | Total spreading time `log_{1+γ} n + (1/ρ) ln n + O(1)`, exponential tail | Theorems 21 and 31 with Lemma 19 | `spreading_upper_tail`, `spreading_upper_expect` |
+| Double exponential shrinking regime: from `≤ g n` uninformed nodes, all informed after `log_ℓ ln n + O(1)` rounds, tail `O(n^{A' - α' r})` | Theorem 43 (Theorem 3, upper bounds) | `double_shrinking_upper_tail`, `double_shrinking_upper_expect` |
+| Total spreading time `log_{1+γ} n + log_ℓ ln n + O(1)`, exponential tail | Theorems 21 and 43 with Lemma 19 | `spreading_upper_tail_double`, `spreading_upper_expect_double` |
 
-**Lemma 20 of the paper is false as stated** (a process can stay below `f n` for many rounds,
+**Lemma 20 of the paper needs a major correction** (a process can stay below `f n` for many rounds,
 with a chance to jump over `[f n, f' n]` in each); the one-round estimate of its proof and a
-corrected path statement are formalized instead. The counterexample and the other deviations
+corrected path statement are formalized instead. The example and the other deviations
 (conditions for every state instead of homogeneity, arbitrary starting sets, a uniform side
 condition in Definition 11, the composed total-time theorems) are listed in
 [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md). Theorem 31 is proved with a
 quadratic potential instead of the paper's phase calculus.
+
+### Push, pull and push–pull on the complete graph
+
+The classical protocols on `K_n` with self-calls (the paper's convention; every node calls a
+uniformly random node in each round), as rumor-spreading processes (`push`, `pull`, `pushPull`,
+in [`Epidemics/Revisited/Protocols.lean`](Epidemics/Revisited/Protocols.lean) and
+[`Instances.lean`](Epidemics/Revisited/Instances.lean)), starting from any nonempty set of
+informed nodes:
+
+| Result | Paper | Lean declaration |
+| --- | --- | --- |
+| Exact `p_k`: `1 - (1 - 1/n)^k` (push), `k/n` (pull), `1 - (1 - 1/n)^k (1 - k/n)` (push–pull); homogeneity | Appendix C (proofs of Theorems 51–53) | `push_informProb`, `pull_informProb`, `pushPull_informProb`, `push_homogeneous`, `pull_homogeneous`, `pushPull_homogeneous` |
+| Nonpositive covariances (independence for pull) | Appendix C | `push_cov_nonpos`, `pull_cov_eq_zero`, `pushPull_cov_nonpos` |
+| The growth, shrinking and double shrinking conditions with explicit constants | Theorems 51–53 (proofs) | `push_upperGrowth`, `push_upperShrinking`, `pull_upperGrowth`, `pull_upperDoubleShrinking`, `pull_fastFinishing`, `pushPull_upperGrowth`, `pushPull_upperDoubleShrinking`, `pushPull_fastFinishing` |
+| Push: all informed within `log₂ n + ln n + O(1)` rounds, exponential tail and expectation | Theorem 51 (upper bound) | `push_spreading_tail`, `push_spreading_expect` |
+| Pull: `log₂ n + log₂ ln n + O(1)` | Theorem 52 (upper bound) | `pull_spreading_tail`, `pull_spreading_expect` |
+| Push–pull: `log₃ n + log₂ ln n + O(1)` | Theorem 53 (upper bound) | `pushPull_spreading_tail`, `pushPull_spreading_expect` |
+
+For push this is the sharp upper bound of Frieze and Grimmett and of Pittel (all nodes informed
+after `log₂ n + ln n + O(1)` rounds), with an exponential tail. The package `rumor_spread/` has
+its own PUSH, PULL and PUSH–PULL models (without self-calls) and proves `O(log n)` bounds with
+large constants; the two developments are independent. Lower bounds are not formalized.
+Deviations (Theorem 43's proof, the parameters of the instances) are listed in
+[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 
 ## COBRA ⇔ BIPS duality (EPI-4)
 
@@ -183,19 +248,26 @@ Deviations from the paper are listed in [FORMALIZATION_DIFFERENCES.md](FORMALIZA
 The statements were pinned and then proved by a Claude agent under the fixed-statement protocol and
 checks of the provenance note below.
 
-**Provenance.** Reed–Frost: the statements were written and pinned by hand; the proofs were produced
+**Provenance.** Reed–Frost: the statements were written and pinned by a second agent; the proofs were produced
 by a Grok agent under a fixed-statement protocol and verified mechanically (statements unchanged, no
 placeholders, warning-free build, axiom audit). Kermack–McKendrick: the statements were pinned and
-then proved by a Claude agent under the same protocol and checks; the statements were reviewed by
-hand against the source. Kurtz (CRN-2): the statements were pinned and then proved by a Claude agent
-under the same protocol and checks; the statements were reviewed by hand against the source
+then proved by a Claude agent under the same protocol and checks; the statements were reviewed by a second
+agent against the source. Kurtz (CRN-2): the statements were pinned and then proved by a Claude agent
+under the same protocol and checks; the statements were reviewed by a second agent against the source
 (Wormald's Theorem 5.1). Rumor spreading revisited (EPI-8): the statements were pinned and then
 proved under the same protocol and checks, the growth regime (Lemma 9, Lemma 19, Theorem 21) by a
-Grok agent and the rest (Lemma 20, Theorem 31, total time) by a Claude agent. Supercritical giant
+Grok agent and the rest (Lemma 20, Theorem 31, total time) by a Claude agent. The double
+exponential shrinking regime (Theorem 43) and the push, pull and push–pull instances (EPI-8 (c)):
+the statements were written by a Claude agent and reviewed by a second agent against the paper
+before the proofs, which are by a Claude agent under the fixed-statement protocol and the same
+checks. Supercritical giant
 component (EPI-3): the statements were pinned and then proved by a Claude agent under the same
-protocol and checks; the statements were reviewed by hand against the source. Subcritical
+protocol and checks; the statements were reviewed by a second agent against the source. Subcritical
 percolation (EPI-2): statements and proofs were written by a Claude agent under the same protocol
-and checks; the statements were reviewed by hand against the paper.
+and checks; the statements were reviewed by a second agent against the paper. Small-world networks below
+the threshold (EPI-6): the statements were pinned by a Claude agent and reviewed by a second
+agent against the paper; the proofs are by a Claude agent under the fixed-statement protocol and
+the same checks.
 
 Build and audit:
 

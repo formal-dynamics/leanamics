@@ -113,7 +113,7 @@ Source: B. Doerr, A. Kostrygin, *Randomized rumor spreading revisited*, ICALP 20
 arXiv:2303.11150 (numbering of the long version: Lemma 9, Lemma 19, Lemma 20, Definition 11,
 Theorem 21, Theorem 31).
 
-### Lemma 20 of the paper is false as stated
+### Lemma 20 of the paper needs a major correction
 
 Lemma 20 (Lemma 5 of the overview) claims: if `p_k ≤ p` and `c_k ≤ c/n` for every `k < f n`,
 then there is `f' ∈ ]f, 1[` such that, with probability `1 - O(1/n)`, the number of informed
@@ -122,14 +122,15 @@ nodes lies in `[f n, f' n]` at the end of some round. The proof bounds one round
 `[f n, f' n]` with probability `O(1/n)`, but the process may spend many rounds below `f n`, with
 a chance to jump in each.
 
-**Counterexample.** From every `S` with `|S| < f n`, inform all nodes with probability
+**Example.** The printed statement does not hold for the following process. From every `S` with `|S| < f n`, inform all nodes with probability
 `ε = c/n` and otherwise none. For `n ≥ c/p`, `p_k = ε ≤ p` and `c_k = ε(1 - ε) ≤ c/n`, but the
 process started from one node jumps from `1` to `n` with probability 1. (The same process with
 `ε_k = c k / n²` satisfies the lower exponential growth conditions, so the last sentence of
-Theorem 1, which rests on Lemma 20, is also unproved in general. That sentence is a lower-bound
-statement, outside the scope of this formalization.)
+Theorem 1, which rests on Lemma 20 (through Theorem 27), needs another argument in general. That
+sentence is a lower-bound statement, outside the scope of this formalization. The long version
+also uses Lemma 20 in the proofs of Theorems 57 and 58.)
 
-Two true versions are formalized instead:
+Two corrected versions are formalized instead:
 
 * `overshoot_round`, the one-round estimate of the proof, for every `f' ∈ ]f + p(1-f), 1[`;
 * `jumpProb_le`, the path statement with the union bound over rounds:
@@ -201,6 +202,66 @@ A smaller slip in the same proof: it writes `E[X(k)] ≤ p n (1 - f)`; the corre
 5. `Distribution.prob` and `Kernel.event` are bridged by `prob_indicator_eq`, because `prob`
    decides propositions with `Classical.propDecidable`.
 
+### Theorem 43 and the push, pull and push–pull protocols
+
+Source: the same paper, Definition 13, Theorem 43 (Appendix B.6) and Theorems 51, 52 and 53
+(Appendix C).
+
+1. **Definition 13 and fast finishing, one `n` at a time.** `UpperDoubleShrinking ℓ a c g α`
+   asks, for every `S` with `n^{1-α} ≤ u = n - |S| ≤ g n`, that every uninformed node stays
+   uninformed with probability at most `a (u/n)^{ℓ-1}` and that covariances are at most
+   `c n / u²`. `FastFinishing α τ` is the second hypothesis of Theorem 43: for `u ≤ n^{1-α}`,
+   the stay probability is at most `n^{-τ}`. The exponent `ℓ > 1` is real (real powers). The
+   parameter ranges are the paper's (`g, α ∈ [0, 1]`, `a, c ≥ 0`, `a g^{ℓ-1} < 1`, `τ > 0`);
+   no parameter depends on `n`, so the per-`n` reading loses nothing. The overview's Theorem 3
+   uses Definition 5 (conditions for all `u ∈ [1, g n]`), which implies Definition 13 together
+   with fast finishing for large `n`.
+2. **Tail form.** The paper's `P[T ≥ log_ℓ ln n + r] ≤ O(n^{-α' r + A'})` is stated as
+   `P[T > ⌈log_ℓ ln n⌉ + r] ≤ C n^{A' - α' r}`. The formal event is contained in the paper's, so
+   the paper's bound implies the formal one; conversely the formal bound gives the paper's up to
+   one round, absorbed in `A'`. The expectation is bounded through every partial sum of the tail
+   series, as in Theorems 21 and 31.
+3. **Starting sets.** Theorem 43 starts from exactly `⌈(1 - g) n⌉` informed nodes; here from any
+   `S` with `n - |S| ≤ g n`. The total-time theorems and the instances start from any nonempty
+   set (the paper: one informed node).
+4. **The proof of Theorem 43 needs a minor correction.** The paper first reduces to a small `g`
+   by Lemma 19. This gives `O(1)` expected rounds for that stage, but Lemma 19's tail
+   `(g/g') (1 - p)^r` has a rate that does not depend on `n`, so the stated tail
+   `O(n^{-α' r + A'})` does not follow for the whole process. The statement holds: the formal
+   proof replaces Lemma 19 by geometric phase targets `g μ^j n`, `μ = (1 + a g^{ℓ-1}) / 2`, whose
+   failure probability per round is `O(1/n)` by Chebyshev's inequality with the variance bound of
+   Lemma 9 (or `O(n^{-τ})` by Markov's inequality below `n^{1-α}` uninformed nodes). In the
+   paper's tail bound (11), `J q^{-r}` has a typo in the sign of the exponent.
+5. **Proof route** (not a statement change). The double exponential targets are written in
+   closed form, `ε_j = exp (-(κ + ℓ^j D₀))` with `κ (ℓ - 1) = ln (2 a₁)` and `a₁ = max a 1`, and
+   the number of phases is `J = ⌊log_ℓ (β ln n / (2 D₀))⌋ ≤ log_ℓ ln n` with `β = min α (1/4)`,
+   so that `n^{-β} ≤ ε_J ≤ n^{-β/(2ℓ)}`. Instead of the domination by geometric variables
+   (Lemma 47), the phase potential `λ^{J - j}` with `λ = n^δ` contracts by `n^{-2δ} + n^{-δ}`
+   per round (`notYet_phase_le`); its factor `2^J` is a power of `n`. The last stage uses that
+   every uninformed node stays uninformed with probability at most `n^{-τ₃}` below `ε_J n`
+   uninformed nodes, and Markov's inequality. The degenerate cases `g = 0` (nothing to do) and
+   `α = 0` (fast finishing everywhere) are treated separately.
+6. **Total time with double exponential shrinking.** `spreading_upper_tail_double` and
+   `spreading_upper_expect_double` compose Theorem 21, Lemma 19 and Theorem 43 as in the proofs
+   of Theorems 52 and 53, like `spreading_upper_tail` for Theorem 31. They require `g > 0` (for
+   Lemma 19's prefactor `(1 - f)/g`); the unused hypotheses `g ≤ 1` and `α ≤ 1` are kept.
+7. **The protocols.** Every node calls a uniformly random node, itself included (the paper's
+   convention for complete graphs); the calls of a round form a uniform function
+   `Fin n → Fin n`. The package `rumor_spread/` models PUSH, PULL and PUSH–PULL without
+   self-calls; the two developments are independent.
+8. **The parameters of the instances need a minor correction.** Definition 9 requires
+   `0 < f < 1` and `a f < 1`, and Definition 13 requires `a g^{ℓ-1} < 1`. The paper takes
+   `f = 1` and `a = 1` for push, `f = 1` for pull, and `g = 1`, `a = 1`, `α = 0` for the double
+   exponential shrinking of pull; with `α = 0`, Theorem 43's fast finishing would also be
+   required for all `u ≤ n`, which fails at `u = n/2` (the stay probability of pull is `u/n`).
+   The formal instances take `f = g = 1/2` (so the middle range of Lemma 19 is empty),
+   `a = 1/2` for push (the paper's own estimate `p_k ≥ k/n - k²/(2n²)`), `a = 3/4` and
+   `γ = 2` for push–pull (from `p_k ≥ 2k/n - 3k²/(2n²)`), `ℓ = 2`, `a = 1`, `c = 0`,
+   `α = τ = 1/2` for the double exponential shrinking of pull and push–pull, and `ρ = 1`,
+   `a = 2/e`, `c = 0`, `g = 1/2` for the exponential shrinking of push, as in the paper.
+9. **Statements of Theorems 51 to 53.** The paper states the expected times `± O(1)`; only the
+   upper bounds are formalized, with exponential tails added. Lower bounds are out of scope.
+
 ## Subcritical percolation and small outbreaks (`Subcritical*`, EPI-2)
 
 Source: L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccardi,
@@ -267,6 +328,79 @@ paper mentions but omits after Theorem 2.5; its shape follows claim 2 of Theorem
     tracked in issues #42, #44 and #46. Monotonicity, Markov's inequality on `exp (t X)` and the
     moment-generating-function bound are the core's; congruence, complement and the union bound
     are shared with EPI-3 (`GiantCoins.lean`).
+
+## Small-world networks below the percolation threshold (`SmallWorld*`, EPI-6)
+
+Source: L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccardi,
+*Percolation and epidemic processes in one-dimensional small-world networks*, arXiv:2103.16398
+(v3): Definitions 1.1 (`SWG(n, q)`) and 1.2 (`3-SWG(n)`), claim 2 of Theorems 2.1, 2.2, 2.4 and
+2.5, and Appendix C (Lemma C.1 and its proof).
+
+1. **"W.h.p." made explicit.** The paper's "with high probability" is `≥ 1 - n^{-Ω(1)}`; the
+   statements say "with probability at least `1 - C / n`" with `∃ C`, the rate the proofs give
+   (Lemma C.1 states `1 - 1/n` for `n` large). The constants are explicit in the proofs:
+   `β = 64 / δ²` and `C = 2` for `SWG(n, c/n)` (`swg_components_small`, valid for every `n ≥ 2`),
+   where `p₀ = p* - ε` and `δ = 1 - p₀ - c p₀ (1 + p₀) > 0`; `β = 10 / (2ε)²` and `C = 1` for
+   `3-SWG(n)`.
+2. **Constants uniform in `p`.** The constants depend only on `c` and `ε` (resp. `ε`) and the
+   statements quantify over every `p` below `p* - ε` (resp. `1/2 - ε`) afterwards, as in the
+   appendix lemmas (Lemma C.1 is stated for `0 ≤ p ≤ p* - ε`). The inequalities on `p` are strict,
+   as in Section 2. `0 ≤ p ≤ 1` replaces the paper's `p > 0` (the case `p = 0` is included).
+3. **Bridge probability.** `q = c / n` is written `q * n = c` with `0 ≤ q ≤ 1` (needed to form the
+   coins, so `n ≥ c`), as `p * n = 1 + ε` in EPI-3. `n ≥ 3` for `SWG(n, q)` (Definition 1.1) and
+   `n ≥ 4` even for `3-SWG(n)` (Definition 1.2).
+4. **Models.** The vertex set is `Fin n` with Mathlib's `cycleGraph n`. The bridges of
+   `SWG(n, q)` are the open pairs of EPI-1's i.i.d. coins `b ~ coins q` (`perc ⊤ b`, EPI-3's
+   `G(n, q)`), so `swg n b = cycleGraph n ⊔ perc ⊤ b`: a bridge on a cycle edge is the same edge,
+   as in the paper's `E₁ ∪ E₂`. The coins are indexed by all of `Sym2 (Fin n)`; diagonal coins are
+   unused. The matching of `3-SWG(n)` is a uniformly random element of Mathlib's perfect matchings
+   of the complete graph (`Subgraph.IsPerfectMatching`), rather than a sequential sampling
+   procedure; perfect matchings exist for even `n` (`PerfectMatching.nonempty`).
+5. **Joint law.** "Probabilities over the randomness of `G` and of the percolation" is the iterated
+   expectation `(coins q).expect fun b => (coins p).prob fun ω => …` (resp. over
+   `uniformMatching n`), which is the probability under the product of the two independent laws.
+6. **`O(log n)`** is `β * Real.log n` (natural logarithm). Component sizes are measured as in
+   Mathlib, by `K.supp.ncard`.
+7. **Reed–Frost.** EPI-1's pathwise process `run` with one coin per edge (equal in law to the
+   paper's process, each edge being tried at most once; Theorem A.3). "The process stops within
+   `T` steps" is `∃ t ≤ T` with no infectious node; "recovered nodes at the end" is
+   `(run … n).recovered` (the epidemic is over after `n` rounds); the bounds `O(log n)` and
+   `O(|I₀| log n)` share one constant `β`.
+8. **Theorem 2.5, claim 2 needs a minor correction.** In v3 its hypothesis repeats the `SWG(n, c/n)`
+   threshold `p < (√(c² + 6c + 1) - c - 1)/(2c) - ε`, but `3-SWG(n)` has no parameter `c`. The
+   formal statement uses `p < 1/2 - ε`, the threshold of Theorem 2.2, claim 2, from which the
+   paper derives it.
+9. **Theorem 2.2, claim 2** is derived, as in the paper, from Theorem 2.3: EPI-2's
+   `prob_components_small` with `d = 3` (`swg3_degree_le`) and `2ε` in place of `ε`
+   (`2 p ≤ 1 - 2ε`). Theorem 2.3 itself is EPI-2's and is not restated.
+10. **Proof route for Lemma C.1** (not a statement change). The paper dominates the size of a
+    breadth-first search by a single-type Galton–Watson process with offspring
+    `W = Y + ∑_{j ≤ 2Y} L_j` (`Y ~ Bin(n, pc/n)`, `L_j` geometric) and bounds `∑ W_i` by Chernoff
+    bounds on `Y` and on the negative binomial. Here the two coin families are first collapsed
+    into one percolation of the complete graph with independent coins (`expect_prob_swg_eq`):
+    probability `p` on cycle edges, `p q` on the other pairs. The exploration then processes one
+    node at a time and tracks two types of nodes: discovered through a cycle edge (weight `1`, at
+    most one undiscovered cycle neighbour) or not (weight `1 + p₀`, at most two). These weights
+    are a left eigenvector of the mean matrix at `p₀`. Below the threshold the expected weight
+    discovered from a node of weight `w` is at most `(1 - δ/2) w`. An exponential of the weight
+    balance is then a supermartingale, by deferred decisions on fresh coins, which gives
+    `P(|C(s)| > t) ≤ exp (δ/4 - δ² t / 32)`. In the paper's Algorithm 3 the queue starts as `{s}`
+    and only local clusters of bridge neighbours are enqueued, so the cycle neighbours of `s` (its
+    local cluster) are never visited unless reached through a bridge: the claim that the
+    algorithm visits the component of `s` needs a minor correction (start from the local cluster
+    of `s`, which adds one more local cluster to the domination). The exploration here processes
+    every discovered node, the root included, whose two cycle neighbours are covered by its
+    weight `1 + p₀`.
+11. **Not formalized (yet).** Claim 1 (the supercritical regime) of Theorems 2.1, 2.2, 2.4 and 2.5
+    (Appendices B and D), and the extensions of Appendix F.
+12. **Local lemmas.** The supermartingale lemma for adaptive observations
+    (`expect_prod_hist_le_one`) and its deferred-decisions form for fresh coordinates
+    (`expect_prod_hist_le_one_of_fresh`), the coordinatewise combination of independent families
+    (`expect_expect_coord`, `expect_mul_of_dep`), Markov's inequality `prob_le_expect_div`, the
+    moment-generating function of a weighted block of coins (`expect_exp_sum_open`) and the union
+    bound over components for an arbitrary random graph (`prob_components_le_of_tail'`, the
+    form of EPI-2's `prob_components_le_of_tail` for any distribution) are not in `dynamics/`
+    yet; their move is tracked in issues #42, #46 and #49.
 
 ## The supercritical giant component (`Giant*`, EPI-3)
 
