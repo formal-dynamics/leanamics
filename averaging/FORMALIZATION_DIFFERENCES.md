@@ -66,6 +66,8 @@ Boyd, Ghosh, Prabhakar, Shah, *Randomized gossip algorithms*, IEEE Trans. Inf. T
    Lovász's Theorem 5.1, is `√(d(v)/d(u)) λᵗ`, which is what `abs_walkMatrix_pow_sub_walkStationary_le`
    states. We take `λ = max {|λ₂|, |λₙ|}` as in the Survey: with `min` instead of `max` the bound
    would fail, e.g. on a connected bipartite graph, where `λₙ = -1` and `Pᵗ(u, v)` does not converge.
+   Lovász's text itself defines `λ = min {|λ₂|, |λₙ|}`, a slip for `max` that needs a minor
+   correction; the Survey correctly uses `max`.
 3. **Theorem 33 under a weaker hypothesis.** Every degree positive (`∀ v, 0 < G.degree v`)
    instead of "connected" (with at least one edge, implicit for a random walk). Connected graphs
    with at least two nodes satisfy it (`Connected.preconnected.degree_pos_of_nontrivial`), so the

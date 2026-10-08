@@ -25,6 +25,7 @@ package's `FORMALIZATION_DIFFERENCES.md` lists the deviations. Many statements m
 sufficiently large $n$" explicit, with thresholds that can be astronomically large.
 
 ## Majority dynamics: 3-Majority and plurality consensus
+{: #majority}
 
 In the *3-majority* dynamics every node holds one of $k$ colors and, every round, adopts the
 majority color among three nodes sampled uniformly at random (the first one if all three differ).
@@ -55,6 +56,7 @@ solve plurality consensus, except for one family of rules that remains open.
   [API docs]({{ '/3-majority/docs/' | relative_url }}) · [Source and README](https://github.com/formal-dynamics/leanamics/tree/main/3-majority)
 
 ## Median dynamics and 2-Choices
+{: #median}
 
 Every node holds a value from a linearly ordered set and, every round, adopts the median of its
 own value and the values of two nodes sampled uniformly at random (Doerr, Goldberg, Minder,
@@ -82,6 +84,7 @@ Theorem 4 of Cooper, Elsässer and Radzik, ICALP 2014).
 * [Source and README](https://github.com/formal-dynamics/leanamics/tree/main/median)
 
 ## Undecided-state dynamics
+{: #undecided}
 
 Each node holds opinion $a$, opinion $b$, or is undecided; every round it samples a uniformly random
 node, adopts the sampled opinion if undecided, and becomes undecided if it sees the other opinion.
@@ -108,6 +111,7 @@ $\sqrt{n} \log n$ the initial majority wins, each with probability $1 - O(n^{-c}
 * [Source and README](https://github.com/formal-dynamics/leanamics/tree/main/undecided)
 
 ## Voter model
+{: #voter}
 
 For a finite connected nonbipartite undirected graph, each vertex independently
 samples a neighbor according to a stochastic matrix (self-loops allowed) and
@@ -134,6 +138,7 @@ paper (`Voter.lazy_consensus_conductance_sq_many`).
 * [Source and README](https://github.com/formal-dynamics/leanamics/tree/main/voter)
 
 ## The Moran process and the isothermal theorem
+{: #moran}
 
 In the Birth–death Moran process, an individual chosen with probability proportional to its
 fitness (mutants $r$, residents $1$) places a copy of itself on a uniformly random neighbour.
@@ -155,6 +160,7 @@ the fixation probability tends to $1 - 1/r^2$ (`Moran.star_fixation`, `Moran.sta
 * [Source and README](https://github.com/formal-dynamics/leanamics/tree/main/moran)
 
 ## Epidemics and rumor spreading
+{: #epidemics}
 
 **Rumor spreading.** In the uniform *push* model on the complete graph $K_n$, every informed node
 sends the rumor to a uniformly random other node each round; starting from a single informed node,
@@ -210,6 +216,7 @@ any fixed time, except with probability exponentially small in the population si
   [API docs]({{ '/epidemics/docs/' | relative_url }}) · [Source and README](https://github.com/formal-dynamics/leanamics/tree/main/epidemics)
 
 ## Chemical reaction networks and population protocols
+{: #crn}
 
 In a count-conserving bimolecular chemical reaction network ($A + B \to C + D$) with a common rate
 constant, the jump chain of stochastic mass-action kinetics fires reaction $r$ with probability
@@ -234,6 +241,7 @@ combination of threshold and remainder predicates is stably decided by such a ne
 * [Source and README](https://github.com/formal-dynamics/leanamics/tree/main/crn)
 
 ## Averaging dynamics
+{: #averaging}
 
 Every node replaces its value by the average of its neighbours' values. On a connected graph with
 an odd closed walk all values converge to the degree-weighted average of the initial values
@@ -260,6 +268,7 @@ Clementi, Manurangsi, Natale, Pasquale, Raghavendra and Trevisan, ESA 2018).
 * [Source and README](https://github.com/formal-dynamics/leanamics/tree/main/averaging)
 
 ## Shared finite dynamics library
+{: #dynamics}
 
 `Dynamics` supplies uniform and weighted finite expectations (which agree with Mathlib's
 `Finset.expect`), independent products, pushforward, kernels, stationary distributions and

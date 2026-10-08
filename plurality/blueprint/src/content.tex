@@ -119,6 +119,13 @@ $O(\log n)$ rounds w.h.p.
 
 \section{The upper bound}\label{sec:upper}
 
+This section formalizes Theorem~3.8 of Becchetti, Clementi, Natale, Pasquale, Silvestri and
+Trevisan, \emph{Simple Dynamics for Plurality Consensus} (SPAA 2014), and its Corollaries 3.10
+to~3.12. The SPAA proof of Theorem~3.8 needs a minor correction (small repairs: the saturation
+phases as defined are not shown to be preserved, and a union bound over the competing colors is
+missing), and the repaired proof is what is formalized
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/plurality/FORMALIZATION_DIFFERENCES.md#1-theorem-38-how-the-lean-proof-differs-from-spaa}{details}).
+
 \subsection{Plurality, bias, \texorpdfstring{$\alpha$}{alpha} and \texorpdfstring{$\gamma$}{gamma}}
 
 \begin{definition}[Section 3 quantities]\label{def:quantities}

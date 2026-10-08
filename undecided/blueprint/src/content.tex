@@ -44,7 +44,7 @@ configuration monochromatic; it has positive probability. Conclude with the shar
 theorem.
 \end{proof}
 
-\section{The majority phase (UND-1)}
+\section{The majority phase (UND-1)}\label{sec:cggnps-majority}
 Becchetti, Clementi, Natale, Pasquale and Silvestri (\emph{Plurality consensus in the gossip
 model}, SODA 2015, Theorem~11 with $k=2$) prove convergence to the majority in $O(\log n)$ rounds
 w.h.p.\ from configurations without undecided nodes and with a bias of order $n$. The stronger
@@ -108,7 +108,7 @@ which exceeds $C\sqrt{n\log n}$ once $\log n\ge C(1+3(2+\alpha)/\alpha)$; extra 
 since the all-$a$ configuration is absorbing.
 \end{proof}
 
-\section{Many colours: plurality consensus (UND-3)}
+\section{Many colours: plurality consensus (UND-3)}\label{sec:bcnps-plurality}
 Becchetti, Clementi, Natale, Pasquale and Silvestri (\emph{Plurality consensus in the gossip
 model}, SODA 2015) analyse the undecided-state dynamics with $k$ colours: a state is a colour or
 the undecided state (Table~1), and with $c_i$ nodes of colour $i$ and $q$ undecided nodes one
@@ -116,6 +116,12 @@ round gives in expectation $\mu_i=c_i(c_i+2q)/n$ nodes of colour $i$ and
 $\mu_q=(q^2+(n-q)^2-\sum_i c_i^2)/n$ undecided nodes (their (3)--(4)). The monochromatic distance
 is $\mathrm{md}(c)=\sum_i(c_i/c_1)^2\in[1,k]$, $c_1$ the plurality. For $k=2$ the dynamics is the
 binary one.
+
+The range of $k$ in Theorem~11 of the paper needs a minor correction: its proof invokes Lemma~10,
+which assumes $k=O((n/\log n)^{1/4})$, and the round-by-round argument closes for
+$k\le\varepsilon(\alpha)(n/\log n)^{1/3}$. The formalized statement takes
+$Ck\le(n/\log n)^{1/3}$ with $C=C(\alpha)$
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/undecided/FORMALIZATION_DIFFERENCES.md#the-dynamics-with-k-colours-plurality-roadmap-und-3}{details}).
 
 \begin{theorem}[Model]\label{thm:pmodel}
 \lean{Undecided.Plurality.update,Undecided.Plurality.step,Undecided.Plurality.md,Undecided.Plurality.expected_count_some,Undecided.Plurality.expected_count_none,Undecided.Plurality.md_le_card,Undecided.Plurality.one_le_md,Undecided.Plurality.foldl_two}\leanok
@@ -163,7 +169,7 @@ or $4S+q\le n/10$, which end in $\{4S+q\le n/10\}$ since $\Phi\le n$; then
 $T_3=\lceil 8\log n\rceil$ rounds in which $4S+q$ contracts by $3/4$ in expectation. The failure
 probability is at most $T(k+4)/n^3+(3/4)^{T_3}n/10\le 6/n$.
 \end{proof}
-\section{The sequential dynamics: approximate majority}
+\section{The sequential dynamics: approximate majority}\label{sec:aae-approx-majority}
 \begin{definition}[Sequential undecided-state dynamics]\label{def:seq}
 \lean{Undecided.Sequential.Interaction,Undecided.Sequential.step,Undecided.Sequential.run}\leanok
 \uses{def:usd}

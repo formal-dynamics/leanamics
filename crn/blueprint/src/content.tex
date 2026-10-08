@@ -111,7 +111,15 @@ jump chain is the population protocol conditioned on reacting.
 Instances of the general results, with $a_0(x) = k D$.
 \end{proof}
 
-\section{Stable computation}
+\section{Stable computation}\label{sec:aadfp-stable}
+This section and the two following ones formalize the easy direction of the characterization of
+stably computable predicates of Angluin, Aspnes, Diamadi, Fischer and Peralta,
+\emph{Computation in networks of passively mobile finite-state sensors} (Distributed Computing
+18, 2006). Their Lemma~5 needs a minor correction for a population of a single agent: no
+encounter happens, and if a lone agent keeps its state, its output stays $0$ even when the
+predicate holds. The protocols
+formalized here start each agent with its single-agent output and are correct for every $n\ge1$
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/crn/FORMALIZATION_DIFFERENCES.md#semilinear-predicates-are-stably-computable-stable-crn-3-easy-direction}{details}).
 \begin{definition}[Population protocols with input and output]\label{def:protocol}
 \lean{Crn.Protocol,Crn.Protocol.interact,Crn.Protocol.Step,Crn.Protocol.Reaches,Crn.Protocol.OutputStable}\leanok\uses{def:pp}
 A population protocol has an input function $I : X \to Q$, an output function $O : Q \to

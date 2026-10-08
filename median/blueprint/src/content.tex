@@ -12,7 +12,13 @@ eliminates a minority of size at most $(\varepsilon/5)n$ within $O(\log n)$ roun
 probability (Theorem~4 of Cooper, Elsässer and Radzik, ICALP 2014).
 \end{abstract}
 
-\section{The model}
+\section{The model}\label{sec:dgmss-median}
+This section, the four following ones and the last one (against an adaptive adversary) formalize
+Doerr, Goldberg, Minder, Sauerwald and Scheideler, \emph{Stabilizing consensus with the power of
+two choices} (SPAA 2011). Claim~2.9 of the paper, a hitting-time lemma, is formalized in the
+shared \texttt{dynamics} package, with two points made explicit there: the target $c_4\log q$ is
+at most $q$, and $c_5$ also depends on $c_1,c_2,c_3$
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/dynamics/FORMALIZATION_DIFFERENCES.md#hitting-time-lemma-drifthitting-maj-8-doerr-et-al-spaa-2011-claim-29}{details}).
 \begin{definition}[Median dynamics]\label{def:median}
 \lean{Median.med3,Median.Config,Median.Round,Median.step,Median.run,Median.ones,Median.Consensus,Median.notConsensus,Median.kernel}\leanok
 Values lie in a linear order. In a round every node samples two nodes uniformly at random
@@ -148,7 +154,7 @@ Both margins around the middle value equal $n/(2k+1)\ge C_0\sqrt{n\log n}$, and
 $\log(n/\Delta)=\log(2k+1)$; apply Theorem~\ref{thm:median-fast} with $C=2C_0$.
 \end{proof}
 
-\section{Two-sample voting on expanders}
+\section{Two-sample voting on expanders}\label{sec:cer-two-choices}
 This section formalizes Theorem~4 of Cooper, Elsässer and Radzik, \emph{The power of two choices
 in distributed voting} (ICALP 2014, arXiv:1404.7479); lemma numbers follow the arXiv version.
 

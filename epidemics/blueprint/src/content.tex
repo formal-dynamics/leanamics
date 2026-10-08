@@ -30,7 +30,12 @@ We also formalize the duality between the coalescing-branching random walk (COBR
 epidemic of Cooper, Radzik and Rivera (Theorem~4), pathwise and by time reversal of i.i.d.\ rounds.
 \end{abstract}
 
-\section{The model}
+\section{The model}\label{sec:kkt-live-edge}
+This section and the three following ones (distances, pathwise layers, random coins) formalize
+the live-edge coupling of Kempe, Kleinberg and Tardos (KDD 2003) for the Independent Cascade
+model, also Theorem~A.3 of Becchetti, Clementi, Denni, Pasquale, Trevisan and Ziccardi
+(arXiv:2103.16398).
+
 \begin{definition}[Percolated graph and epidemic]\label{def:reedfrost}
 \lean{Epidemics.perc,Epidemics.SIR,Epidemics.step,Epidemics.run,Epidemics.setDist}\leanok
 Every edge $e$ of a finite graph $G$ carries a coin $\omega(e)\in\{\mathrm{true},\mathrm{false}\}$;
@@ -85,10 +90,20 @@ from an infected endpoint, that endpoint is recovered for good. This is why a si
 gives the same process, in distribution, as fresh coins in every round (that distributional
 statement is not formalized here).
 
-\section{Subcritical percolation and small outbreaks (EPI-2)}
+\section{Subcritical percolation and small outbreaks (EPI-2)}\label{sec:bcdptz-small-world}
 After Becchetti, Clementi, Denni, Pasquale, Trevisan, Ziccardi (arXiv:2103.16398), Theorem 2.3
 and its proof, Theorem E.1. Throughout, the degrees of $G$ are at most $d$, $n = |V|$, and
-$p(d-1) \le 1 - \varepsilon$ with $0 < \varepsilon < 1$.
+$p(d-1) \le 1 - \varepsilon$ with $0 < \varepsilon < 1$. The small-world part of the paper is
+formalized in the next section (EPI-6).
+
+A few points of the paper need a minor correction, and the corrected versions are what is
+formalized: the Chernoff step in the proof of Theorem~E.1, which does not account for the extra
+trial at the source (the formal bound is $e^{\varepsilon}\exp(-\varepsilon^2 t/2)$, still of the
+form $\exp(-\Omega(\varepsilon^2 t))$ that the theorem states), and a typo in its union bound
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/epidemics/FORMALIZATION_DIFFERENCES.md#subcritical-percolation-and-small-outbreaks-subcritical-epi-2}{details}),
+and, in the small-world part, the hypothesis of claim~2 of Theorem~2.5 and the starting set of
+the exploration in Algorithm~3
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/epidemics/FORMALIZATION_DIFFERENCES.md#small-world-networks-below-the-percolation-threshold-smallworld-epi-6}{details}).
 
 \begin{lemma}[Binomial tail and Chernoff bound]\label{lem:chernoff}
 \lean{Epidemics.binTail,Epidemics.binTail_succ_succ,Epidemics.one_sub_mul_exp_le,Epidemics.binomial_tail_le}\leanok\uses{thm:perc}
@@ -139,6 +154,7 @@ $d = n - 1$ and $p(d-1) \le c$.
 \end{proof}
 
 \section{Small-world networks below the threshold (EPI-6)}
+This section continues Section~\ref{sec:bcdptz-small-world}.
 After Becchetti, Clementi, Denni, Pasquale, Trevisan, Ziccardi (arXiv:2103.16398), Definitions
 1.1 and 1.2, claim 2 of Theorems 2.1, 2.2, 2.4, 2.5, and Lemma C.1. $\mathrm{SWG}(n, q)$ is the
 cycle $C_n$ together with the edges of $G(n, q)$; $3\text{-}\mathrm{SWG}(n)$ is the cycle together
@@ -224,7 +240,7 @@ is over within $\beta \log n$ rounds and at most $\beta |I_0| \log n$ nodes are 
 Deterministic consequences of the component bounds (Corollary~\ref{cor:subcritical}).
 \end{proof}
 
-\section{The supercritical giant component}
+\section{The supercritical giant component}\label{sec:krivelevich-sudakov}
 Source: M.~Krivelevich and B.~Sudakov, \emph{The phase transition in random graphs: a simple
 proof}, Random Structures \& Algorithms 43 (2013), arXiv:1201.6529. Throughout, $G(n,p)$ is the
 percolated complete graph $(K_V)_\omega$ with i.i.d.\ Bernoulli$(p)$ coins, $n=|V|$, and
@@ -314,7 +330,9 @@ of $K_n$ this node lies in a component of size $\ge k$ with probability at least
 probability that such a component exists.
 \end{proof}
 
-\section{The Kermack--McKendrick SIR model}
+\section{The Kermack--McKendrick SIR model}\label{sec:kermack-mckendrick}
+The SIR model of Kermack and McKendrick (1927), following Hethcote, \emph{The mathematics of
+infectious diseases} (SIAM Review 2000), system (2.2) and Theorem~2.1.
 \begin{definition}[Solutions]\label{def:km}
 \lean{Epidemics.KermackMcKendrick.R₀,Epidemics.KermackMcKendrick.sirField,Epidemics.KermackMcKendrick.IsSolution}\leanok
 Let $\beta,\gamma>0$ and $R_0=\beta/\gamma$. A solution is a triple $(s,i,r)$ of real functions
@@ -370,7 +388,9 @@ Intermediate value theorem between $s(0)>1/R_0$ and $s_\infty<1/R_0$; the sign o
 changes at $t_{\max}$. The value follows from $\log s=\log s(0)-R_0r$ and $r=1-s-i$.
 \end{proof}
 
-\section{Kurtz's law of large numbers for SIR, in discrete time}
+\section{Kurtz's law of large numbers for SIR, in discrete time}\label{sec:kurtz}
+After Kurtz (J. Appl. Probab.~7, 1970) and Wormald (1999, Theorem~5.1), for the SIR model of
+Section~\ref{sec:kermack-mckendrick}.
 \begin{definition}[The uniformized SIR chain]\label{def:kurtz}
 \lean{Epidemics.Kurtz.Compartment,Epidemics.Kurtz.Config,Epidemics.Kurtz.count,Epidemics.Kurtz.scaled,Epidemics.Kurtz.Round,Epidemics.Kurtz.step,Epidemics.Kurtz.chain,Epidemics.Kurtz.deviationProb}\leanok\uses{def:km}
 Let $\beta,\gamma\in\mathbb N$. A configuration assigns to each of $N$ agents a compartment
@@ -425,9 +445,16 @@ Lemma~\ref{lem:azuma} bounds the complement by $6e^{-c\varepsilon^2N}$. Small $N
 $\varepsilon\ge2$ are absorbed in $C$.
 \end{proof}
 
-\section{Randomized rumor spreading revisited}
+\section{Randomized rumor spreading revisited}\label{sec:doerr-kostrygin}
 We follow Doerr and Kostrygin, \emph{Randomized rumor spreading revisited} (ICALP 2017; long
 version arXiv:2303.11150), with the numbering of the long version.
+
+Lemma~20 of the paper needs a major correction; corrected versions are formalized
+(Lemma~\ref{lem:rumor-jump},
+\href{https://github.com/formal-dynamics/leanamics/blob/main/epidemics/FORMALIZATION_DIFFERENCES.md#lemma-20-of-the-paper-needs-a-major-correction}{details}).
+The proof of Theorem~43 and the parameters of the push, pull and push--pull instances need a
+minor correction, and the corrected versions are formalized
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/epidemics/FORMALIZATION_DIFFERENCES.md#theorem-43-and-the-push-pull-and-pushpull-protocols}{details}).
 
 \begin{definition}[Rumor-spreading processes]\label{def:rumor-process}
 \lean{Epidemics.Revisited.RumorProcess,Epidemics.Revisited.RumorProcess.informProb,Epidemics.Revisited.RumorProcess.cov,Epidemics.Revisited.RumorProcess.Homogeneous,Epidemics.Revisited.RumorProcess.notYet}\leanok
@@ -494,9 +521,9 @@ Chebyshev's inequality with Lemma~\ref{lem:rumor-variance} for one round, then a
 the rounds along the trajectory.
 \end{proof}
 The paper's Lemma~20 claims probability $1-O(1/n)$ of landing in $[fn,f'n]$; this needs a
-correction, as the process that from every $|S|<fn$ informs all nodes with probability $c/n$ (and otherwise none)
-satisfies the hypotheses and jumps from $1$ to $n$ with probability one. See
-\texttt{FORMALIZATION\_DIFFERENCES.md}.
+major correction, as the process that from every $|S|<fn$ informs all nodes with probability $c/n$ (and otherwise none)
+satisfies the hypotheses and jumps from $1$ to $n$ with probability one
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/epidemics/FORMALIZATION_DIFFERENCES.md#lemma-20-of-the-paper-needs-a-major-correction}{details}).
 
 \begin{theorem}[Theorem 31: exponential shrinking]\label{thm:rumor-shrinking}
 \lean{Epidemics.Revisited.shrinking_upper_tail,Epidemics.Revisited.shrinking_upper_expect}\leanok\uses{def:rumor-conditions,lem:rumor-variance,lem:rumor-connect}
@@ -601,9 +628,10 @@ Instantiate Theorem~\ref{thm:rumor-total} (push) and Theorem~\ref{thm:rumor-tota
 $f=g=\frac12$.
 \end{proof}
 
-\section{COBRA and BIPS: the model}
+\section{COBRA and BIPS: the model}\label{sec:crr-cobra-bips}
 We follow Cooper, Radzik and Rivera, \emph{The coalescing-branching random walk on expanders and
-the dual epidemic process}, PODC 2016 (arXiv:1602.05768).
+the dual epidemic process}, PODC 2016 (arXiv:1602.05768). The duality itself (their Theorem~4)
+is in the next section.
 \begin{definition}[Rounds of neighbour choices]\label{def:choices}
 \lean{Epidemics.Choices,Epidemics.instFintypeChoices,Epidemics.choices_nonempty}\leanok
 In a round $r$, every vertex $x$ of a finite graph $G$ samples $k$ neighbours

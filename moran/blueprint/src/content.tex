@@ -7,7 +7,11 @@ gives Moran's formula (1958). As in the voter project, eventual probabilities ar
 increasing finite-time probabilities; no path-space measure is used.
 \end{abstract}
 
-\section{The model}
+\section{The model}\label{sec:lhn-isothermal}
+This section and the three following ones formalize the ``if'' direction of the isothermal
+theorem of Lieberman, Hauert and Nowak, \emph{Evolutionary dynamics on graphs} (Nature 2005),
+with Moran's formula (1958) on the complete graph; the main theorem is in the section on fixation
+probabilities.
 \begin{definition}[Birth--death Moran kernel]\label{def:moran}
 \lean{Moran.Config,Moran.mutants,Moran.fitness,Moran.totalFitness,Moran.target,Moran.pairDist,Moran.moranKernel}\leanok
 Mutants have fitness $r>0$ and residents fitness $1$. A step chooses a parent $u$ with
@@ -96,11 +100,13 @@ The complete graph is connected and $(n-1)$-regular.
 The converse of the isothermal theorem does not hold in general (Galanis, Göbel, Goldberg, Lapinskas and
 Richerby, Proposition~12), so only this direction is formalized.
 
-\section{Push versus pull on arbitrary graphs}
+\section{Push versus pull on arbitrary graphs}\label{sec:ars-push-pull}
 On the complete graph the neutral push and pull voter processes coincide; on an irregular graph
 they fix a mutant set with different probabilities, weighted by $1/\deg$ and by $\deg$
 respectively. In population genetics this is the difference between Birth--death and
-death--Birth updating.
+death--Birth updating. Antal, Redner and Sood, \emph{Evolutionary dynamics on
+degree-heterogeneous graphs} (Phys.\ Rev.\ Lett.\ 96, 2006), derive these weights by a
+mean-field approximation; here they are proved exactly, on every connected graph.
 \begin{definition}[Death--Birth kernel]\label{def:pull}
 \lean{Moran.pullWeight,Moran.pullDist,Moran.pullKernel,Moran.pull_weight_nonneg,Moran.pull_weight_sum_one}\leanok\uses{def:moran}
 In one pull (death--Birth) step, a uniformly random vertex $u$ adopts the type of a uniformly
@@ -148,7 +154,7 @@ equal to $1$ and $0$ on the two constant configurations; the denominators are po
 every degree is at least $1$.
 \end{proof}
 
-\section{Exact fixation on the star}
+\section{Exact fixation on the star}\label{sec:broom-rychtar}
 The star with $n$ leaves is Mathlib's \texttt{starGraph} $c$ on $n+1$ vertices: the centre $c$
 is adjacent to every leaf and leaves only to $c$. It is not regular, and it amplifies selection
 (Lieberman, Hauert and Nowak 2005); its exact fixation probability is due to Broom and

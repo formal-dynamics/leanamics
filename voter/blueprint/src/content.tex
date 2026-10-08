@@ -47,7 +47,12 @@ A shared library result (roadmap FND-4): decompose the observable pointwise into
 on $A$ and off $A\cup B$, take expectations, and bound the second part.
 \end{proof}
 
-\section{Section 2.1: model}
+\section{Section 2.1: model}\label{sec:hassin-peleg}
+This section and the following ones formalize Sections 2.1 to 2.4 of Hassin and Peleg,
+\emph{Distributed Probabilistic Polling and Applications to Proportionate Agreement}
+(Information and Computation 171, 2001): absorption and the consensus probability (Section 2.2),
+multiple colors (Section 2.3), the self-loop Remark of p.~254 (lazy voter and Wright--Fisher),
+and the consensus time on the complete graph and on connected graphs (Section 2.4).
 \begin{definition}[Synchronous copying]\label{def:step}
 \lean{Voter.step,Voter.round,Voter.transition}\leanok\uses{def:weights}
 A configuration is $s:V\to C$. Independently sample $r(i)$ according to row
@@ -238,7 +243,15 @@ The uniform distribution is stationary and every entry is positive. For $n\ge 3$
 complete graph is nonbipartite and Section~2.3 applies; for every $n$ the Remark applies.
 \end{proof}
 
-\section{Section 2.4 on connected graphs: meeting time and $O(n^3\log n)$ consensus}
+\section{Section 2.4 on connected graphs: meeting time and $O(n^3\log n)$ consensus}\label{sec:kms-meeting-time}
+Theorem~2.5 of Hassin and Peleg (Theorem~8 of the survey of Becchetti, Clementi and Natale,
+\emph{Consensus dynamics: an overview}, SIGACT News 2020) is formalized for the lazy voter, with
+the meeting-time argument of Kanade, Mallmann-Trenn and Sauerwald, \emph{On coalescence time in
+graphs} (SODA 2019), Proposition~B.9 ($t_{\mathrm{meet}}\le 4t_{\mathrm{hit}}$). For the
+synchronous voter with plain uniform-neighbour sampling, Theorem~8 of the survey needs a minor
+correction (a nonbipartiteness hypothesis, or a lazy walk), and the lazy version is what is
+formalized
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/voter/FORMALIZATION_DIFFERENCES.md#41-survey-theorem-8-needs-a-minor-correction-the-lazy-walk-is-formalized}{details}).
 \begin{definition}[Two-token walk, lazy sampling]\label{def:pairwalk}
 \lean{Voter.pairWalk,Voter.leftRounds}\leanok\uses{def:backward,thm:lazy}
 For a sampling kernel $H$, two tokens move with the rounds of the voter dynamics: the
@@ -318,10 +331,18 @@ With $k=\lfloor T/(51n^3)\rfloor$, Lemma~\ref{lem:duality-general} and
 Theorem~\ref{thm:meeting-lazy} bound the failure probability by $(n-1)2^{-k}\le 1/n$.
 \end{proof}
 
-\section{Consensus time via conductance (VOT-5)}
+\section{Consensus time via conductance (VOT-5)}\label{sec:bgkm-conductance}
 Source: Berenbrink, Giakkoupis, Kermarrec, Mallmann-Trenn, \emph{Bounds on the voter model in
 dynamic networks}, ICALP 2016, arXiv:1603.01895 (BGKM16). The process is the lazy voter
 $(I+D^{-1}A)/2$ of Theorem~\ref{thm:lazy}.
+
+Lemma~2.1 of BGKM16 needs a minor correction (its sum should run over the minority side, which is
+what its proof gives), and so do the statement of Lemma~2.4 (it prints $1/n^2$ for $1-1/n^2$)
+and the sign of an exponent in its proof; the corrected versions are formalized
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/voter/FORMALIZATION_DIFFERENCES.md#51-lemma-21-of-bgkm16-needs-a-minor-correction}{details
+on Lemma~2.1},
+\href{https://github.com/formal-dynamics/leanamics/blob/main/voter/FORMALIZATION_DIFFERENCES.md#5-consensus-time-via-conductance-berenbrinkgiakkoupiskermarrecmallmann-trenn}{details
+on Lemma~2.4} in Section~5.5 there).
 \begin{definition}[Volume, conductance, minority side, potential]\label{def:conductance}
 \lean{Voter.vol,Voter.conductance,Voter.discordant,Voter.minority,Voter.potential,Voter.dynamicLazy}\leanok
 $\mathrm{vol}(S)=\sum_{u\in S}d_u$; the conductance $\varphi(G)$ is the minimum of
@@ -344,7 +365,8 @@ Reindex the pairs $(x,a)$ by $(x[i\mapsto a],x_i)$; induct over the set of repla
 If $s_t\neq\emptyset$, then
 $\mathbb{E}[\Psi_{t+1}\mid s_t]\le\Psi-\sum_{u\in s_t}\lambda_u d_u/(32\Psi^3)
 \le\Psi-d_{\min}\varphi/(32\Psi)$. The paper prints the sum over all of $V$; this needs a minor correction (the
-inequality does not hold on the star $K_{1,15}$), and its proof gives the sum over $s_t$.
+inequality does not hold on the star $K_{1,15}$), and its proof gives the sum over $s_t$
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/voter/FORMALIZATION_DIFFERENCES.md#51-lemma-21-of-bgkm16-needs-a-minor-correction}{details}).
 \end{lemma}
 \begin{proof}\leanok
 $\Psi_{t+1}$ is at most the root of the new volume $P+\sum_u X_u$ of the opinion of $s_t$.
