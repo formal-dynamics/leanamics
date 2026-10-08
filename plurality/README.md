@@ -94,7 +94,7 @@ nested-phase lemma) and `../3-majority` (the binary theorem). Like the rest of
 the repository it uses no measure theory, `PMF`/`ENNReal` or martingales.
 
 **Provenance.** For `Plurality/AnyStart*.lean` (binary 3-majority from any configuration), the
-statements were pinned by a Claude agent and reviewed by a second Claude agent, which checked them
+statements were fixed in advance by a Claude agent and reviewed by a second Claude agent, which checked them
 against the source and numerically and found no problems; the proofs are by a Claude agent under
 the fixed-statement protocol (statements unchanged, no placeholders, warning-free build, axiom
 audit). The amplified statement `majority3_any_start_whp` was added after the first review, on the
