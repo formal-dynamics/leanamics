@@ -41,6 +41,35 @@ values in `median_almost_stable`, which also covers a corruption before the firs
 proofs are by a Claude agent (Opus) under the fixed-statement protocol. See
 [PROVENANCE.md](../PROVENANCE.md) for the other results.
 
+## Two-sample voting on expanders
+
+Cooper, Elsässer and Radzik, *The power of two choices in distributed voting* (ICALP 2014,
+[arXiv:1404.7479](https://arxiv.org/abs/1404.7479)): on a graph, every vertex samples two
+neighbours independently and uniformly at random (with replacement) and adopts their opinion if
+the two samples agree. With two opinions this is the median rule with the samples restricted to
+the neighbourhood (`graphStep`, `graphStep_bool`); rounds are pairs of the core's
+`Dynamics.NeighborRound`. On a `d`-regular graph, `λ_G = max {λ₂, |λₙ|}` is computed from
+Mathlib's sorted eigenvalues of the transition matrix `P = A/d` (`lambdaG`), and `E(S, T)` counts
+ordered adjacent pairs (`edgeCount`). In [`Median/Expander.lean`](Median/Expander.lean):
+
+| Result | Lean declaration |
+| --- | --- |
+| Expander mixing lemma (the paper's Lemma 3): `\|E(S, T) − d\|S\|\|T\|/n\| ≤ λ_G d √(\|S\|\|T\|)` on every `d`-regular graph | `expander_mixing` |
+| Sets of at most `εn` vertices span at most `(3/10) d \|S\|` edges when `λ_G ≤ 3/5 − ε` | `sparse_of_lambdaG` |
+| One round with a sparse minority `B` (the paper's Lemma 5 at `α = 3/10`): `𝔼\|B'\| ≤ (24/25)\|B\|`, and `\|B'\| ≤ (49/50)\|B\|` w.p. `≥ 1 − e^{−\|B\|/4850}` | `expected_minority_step`, `phaseII_step` |
+| **Theorem 4**: `λ_G ≤ 3/5 − ε` and a minority of size `≤ (ε/5) n`: after `T` rounds the majority holds everywhere except with probability `≤ (24/25)^T \|B\| + T e^{−εn/24250}` | `two_choices_expander_explicit` |
+| **Theorem 4**, `O(log n)` form: after `⌈C log n⌉` rounds, failure `≤ 1/n + (C log n + 1) e^{−εn/C}` (`C = 25000`), which tends to `0` for fixed `ε` | `two_choices_expander`, `two_choices_failure_tendsto` |
+
+The proof replaces the paper's Phases II and III by a single supermartingale argument
+(`expList_le_of_contract`); see [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
+
+**Provenance (Theorem 4).** The statements were written and fixed in advance by a Claude
+agent and reviewed against the paper by a second agent, which found no problem with them (it
+corrected the paper's lemma numbers cited in the docstrings and suggested stating the one-round
+expectation bound separately, which was added as `expected_minority_step`); the proofs are by a
+Claude agent under the fixed-statement protocol, and verified mechanically (statements
+unchanged, no placeholders, warning-free build, axiom audit).
+
 Build and audit:
 
 ```bash

@@ -78,6 +78,72 @@ are numbered differently.
    (`ManyValuesScalar.lean`) are plain real inequalities. They live in namespace `Median` until
    the shared core provides them.
 
+## Two-sample voting on expanders (`Expander`)
+
+Source: Cooper, Elsässer and Radzik, *The power of two choices in distributed voting*
+(ICALP 2014, arXiv:1404.7479), Theorem 4, with its Lemma 3 (expander mixing lemma) and Lemma 5.
+Lemma numbers follow the arXiv version.
+
+1. **Model.** The graph is a simple `d`-regular graph on a finite vertex type with `d > 0` (no
+   loops or multiple edges). Every vertex samples two neighbours independently and uniformly
+   with replacement, the case the paper analyses; sampling without replacement is not covered.
+   A round is a pair of the core's `NeighborRound G` (`GraphRound G`), and the update is the
+   median of the own opinion and the two samples, which for two opinions is the 2-Choices rule
+   (`graphStep_bool`). Opinions are Booleans and the majority opinion is any `a : Bool`; the
+   minority `B` is the set of vertices whose opinion differs from `a`.
+2. **The spectral quantity.** `lambdaG G d = max {λ₂, |λₙ|}`, where `λ₁ ≥ ⋯ ≥ λₙ` are Mathlib's
+   sorted eigenvalues (`Matrix.IsHermitian.eigenvalues₀`) of the transition matrix
+   `(1/d) A`; it is set to `0` on graphs with fewer than two vertices, which cannot be
+   `d`-regular with `d > 0`. The expander mixing lemma is stated with this quantity, which equals
+   the paper's `max {|λ₂|, |λₙ|}`. `E(S, T)` (`edgeCount`) counts ordered pairs `(u, v) ∈ S × T`
+   of adjacent vertices, so `E(S, S) = 2 |E(S)|`; "`S` spans at most `α d |S|` edges" is written
+   `E(S, S) ≤ 2 α d |S|`. The mixing lemma holds for every `d`-regular graph, including `d = 0`
+   and graphs with `λ_G ≥ 1`, where it is trivial.
+3. **Hypothesis of Theorem 4.** The paper assumes `λ_G = 3/5 − ε`; the formal statements assume
+   `λ_G ≤ 3/5 − ε` with `ε > 0`, which is more general. The bound on the minority, at most
+   `(ε/5) n`, is the paper's.
+4. **"With high probability" made explicit.** `two_choices_expander_explicit` bounds the failure
+   probability after `T` rounds by `(24/25)^T |B| + T e^{−εn/24250}`, where failure means that
+   not every vertex holds `a` after `T` rounds (consensus is absorbing, so the vote is then
+   completed). `two_choices_expander` takes `T = ⌈C log n⌉` with an absolute constant `C`
+   (`C = 25000` in the proof) and bounds the failure probability by
+   `1/n + (C log n + 1) e^{−εn/C}`; `two_choices_failure_tendsto` shows that this tends to `0`
+   for fixed `ε > 0` (as in the paper, the bound is only small when `εn` is large compared with
+   `log n`).
+5. **Lemma 5 at `α = 3/10` only, with explicit constants.** `phaseII_step` and
+   `expected_minority_step` are the paper's Lemma 5 for the value `α = 3/10` used in the proof of
+   Theorem 4, so `γ = (1 − 2α)(1 − 3α)/2 = 1/50`; the unspecified constant `γ̃` is `1/4850`. The
+   hypothesis `A > B` of the paper is not needed. The expected decrease is bounded as in the
+   paper; the concentration step uses one multiplicative Chernoff bound on the new minority
+   `|B'| = ∑ᵥ [v holds an opinion ≠ a]` (a sum of independent indicators), with mean bound
+   `(24/25) |B|` and `δ = 1/48`, instead of separate bounds on the two flows `Δ_{AB}` and
+   `Δ_{BA}`. For this, one round on a `d`-regular graph is identified with `|V|` independent
+   uniform draws from `Fin d × Fin d` through an enumeration of each neighbourhood
+   (`roundEquiv`).
+6. **Proof route of Theorem 4.** The paper combines its Lemma 6 and Corollary 4 (Phase II: the
+   minority falls from `(3/13)(3/5 − λ_G) n` to a slowly growing `ω` in `O(log n)` rounds)
+   with its Lemma 9 and Corollary 5 (Phase III: from `ω` to `0`), for `ω = log n / log log n`. The
+   formalization uses instead one supermartingale argument (`expList_le_of_contract`). In the
+   region `|B| ≤ (ε/5) n`, every superset of `B` of size at most `(13/3) |B| ≤ εn` is sparse by
+   the mixing lemma (`sparse_of_lambdaG`: `E(S, S) ≤ d |S|² / n + λ_G d |S|`), so the expected
+   minority contracts by `24/25` per round, and by the Chernoff bound one round leaves the
+   region with probability at most `e^{−εn/24250}`. This gives the explicit bound of item 4
+   directly; for fixed `ε` (more generally, when `εn` is large compared with `log n`) the
+   failure probability is polynomially small in `n`, while the paper's phases give `e^{−Θ(ω)}`,
+   which for `ω = log n / log log n` is `n^{−Θ(1/log log n)}`. The sparsity threshold `εn`
+   replaces the paper's `c n` with `c = 1 − (2/5)(1 − λ)^{−1} ≥ ε`, and the mixing lemma
+   replaces the conductance bound of Jerrum and Sinclair used in the proof of Lemma 6.
+7. **No adversary.** The paper notes that its theorems hold against an adversary that
+   redistributes the opinions before every round (keeping their numbers). The formal statements
+   cover the process without an adversary. The one-round bounds hold for every configuration in
+   the region `|B| ≤ (ε/5) n`, so the argument extends to such an adversary, but this is not
+   formalized.
+8. **Generic lemmas not yet in the shared core.** `expList_le_of_contract`
+   (`ExpanderDrift.lean`) only uses `avg` and `expList`. The spectral lemmas of
+   `ExpanderMixing.lean` (Parseval for Mathlib's eigenbasis, the spectral expansion of a
+   bilinear form, and the expander mixing lemma itself) are candidates for the spectral toolkit
+   of the core.
+
 ## Against an adaptive adversary (`Adversary`)
 
 Theorem and lemma numbers below follow the 2009 version of the paper; the main theorem with

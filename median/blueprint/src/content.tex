@@ -7,7 +7,9 @@ from a gap of order $\sqrt{n\log n}$ within $O(\log n)$ rounds with high probabi
 consensus from any binary configuration and, by a union bound over the thresholds, from any
 configuration (Theorem~1 of the paper, without adversary). With an odd number of equally
 supported values, the middle one wins within $O(\log m+\log\log n)$ rounds (the odd case of
-Theorem~21).
+Theorem~21). On $d$-regular graphs with $\lambda_G\le 3/5-\varepsilon$, two-sample voting
+eliminates a minority of size at most $(\varepsilon/5)n$ within $O(\log n)$ rounds with high
+probability (Theorem~4 of Cooper, Elsässer and Radzik, ICALP 2014).
 \end{abstract}
 
 \section{The model}
@@ -144,6 +146,84 @@ $1-C/n$. This is the deterministic core of the odd case of Theorem~21 of Doerr e
 \begin{proof}\leanok
 Both margins around the middle value equal $n/(2k+1)\ge C_0\sqrt{n\log n}$, and
 $\log(n/\Delta)=\log(2k+1)$; apply Theorem~\ref{thm:median-fast} with $C=2C_0$.
+\end{proof}
+
+\section{Two-sample voting on expanders}
+This section formalizes Theorem~4 of Cooper, Elsässer and Radzik, \emph{The power of two choices
+in distributed voting} (ICALP 2014, arXiv:1404.7479); lemma numbers follow the arXiv version.
+
+\begin{definition}[Two-sample voting on a graph]\label{def:graph-voting}
+\lean{Median.GraphRound,Median.graphStep,Median.graphRun,Median.graphStep_bool,Median.minority,Median.edgeCount}\leanok\uses{def:median}
+On a simple graph $G$, in a round every vertex samples two neighbours independently and uniformly
+at random (with replacement) and adopts the median of its own opinion and the two sampled ones;
+with two opinions it adopts the sampled opinion when the two samples agree. For a majority
+opinion $a$, the minority $B$ is the set of vertices holding another opinion. $E(S,T)$ is the
+number of ordered pairs $(u,v)\in S\times T$ of adjacent vertices, so $E(S,S)=2|E(S)|$.
+\end{definition}
+
+\begin{definition}[Second eigenvalue]\label{def:lambdaG}
+\lean{Median.transitionMatrix,Median.transitionMatrix_isHermitian,Median.walkEigenvalues,Median.lambdaG}\leanok
+For a $d$-regular graph, $\lambda_1\ge\lambda_2\ge\dots\ge\lambda_n$ are the eigenvalues of the
+transition matrix $P=A/d$ and $\lambda_G=\max\{\lambda_2,|\lambda_n|\}$.
+\end{definition}
+
+\begin{lemma}[Expander mixing lemma, the paper's Lemma~3]\label{lem:eml}
+\lean{Median.expander_mixing}\leanok\uses{def:graph-voting,def:lambdaG}
+On every $d$-regular $n$-vertex graph and for all vertex sets $S,T$,
+$|E(S,T)-d|S||T|/n|\le\lambda_G\,d\sqrt{|S||T|}$.
+\end{lemma}
+\begin{proof}\leanok
+Expand $1_S\cdot P1_T=\sum_k\mu_k s_kt_k$ in an orthonormal eigenbasis. If $\lambda_G<1$, every
+eigenvector other than the top one has eigenvalue at most $\lambda_2<1$, hence is orthogonal to
+the all-ones vector, which is fixed by $P$; so the top term is $|S||T|/n$, and Cauchy--Schwarz
+bounds the others by $\lambda_G\sqrt{|S||T|}$. If $\lambda_G\ge1$, both $E(S,T)$ and $d|S||T|/n$
+lie in $[0,d\sqrt{|S||T|}]$.
+\end{proof}
+
+\begin{lemma}[Small sets are sparse]\label{lem:sparse}
+\lean{Median.sparse_of_lambdaG}\leanok\uses{lem:eml}
+If $\lambda_G\le 3/5-\varepsilon$ and $|S|\le\varepsilon n$, then $E(S,S)\le (3/5)\,d|S|$.
+\end{lemma}
+\begin{proof}\leanok
+By Lemma~\ref{lem:eml} with $T=S$,
+$E(S,S)\le d|S|^2/n+\lambda_Gd|S|\le(\varepsilon+3/5-\varepsilon)d|S|$.
+\end{proof}
+
+\begin{lemma}[One round, the paper's Lemma~5 at $\alpha=3/10$]\label{lem:phase2}
+\lean{Median.expected_minority_step,Median.phaseII_step}\leanok\uses{def:graph-voting}
+If every superset $S\supseteq B$ with $|S|\le(1+1/\alpha)|B|$ spans at most $\alpha d|S|$ edges,
+then after one round $\mathbb E|B'|\le(1-(1-2\alpha)(1-3\alpha))|B|=(24/25)|B|$, and
+$|B'|\le(49/50)|B|$ with probability at least $1-e^{-|B|/4850}$.
+\end{lemma}
+\begin{proof}\leanok
+Let $p_v$ be the fraction of neighbours of $v$ in $B$ and $y=\sum_{v\in B}(1-p_v)$, which equals
+$\sum_{v\notin B}p_v$ by double counting. Then
+$\mathbb E|B'|=\sum_{v\notin B}p_v^2+\sum_{v\in B}(1-(1-p_v)^2)$. Cauchy--Schwarz gives
+$\sum_{v\in B}(1-p_v)^2\ge y^2/|B|$. With $C=\{v\notin B:p_v>3/10\}$, the chord bound
+$p^2\le(3/10)p+(p-3/10)^+$ and the sparsity of $B\cup C$ (which has at most $(13/3)|B|$
+vertices) give $\sum_{v\notin B}p_v^2\le(3/10)y+(y-(2/5)|B|)/2$. Altogether
+$\mathbb E|B'|\le(24/25)|B|-(y-(2/5)|B|)^2/|B|$. The new minority is a sum of independent
+indicators; the multiplicative Chernoff bound with mean bound $(24/25)m$ and $\delta=1/48$ gives
+$\Pr(|B'|\ge(49/50)m)\le e^{-m/4850}$ for every $m\ge|B|$.
+\end{proof}
+
+\begin{theorem}[Theorem~4]\label{thm:expander}
+\lean{Median.two_choices_expander_explicit,Median.two_choices_expander,Median.two_choices_failure_tendsto}\leanok\uses{lem:sparse,lem:phase2}
+Let $G$ be a $d$-regular $n$-vertex graph with $d>0$ and $\lambda_G\le3/5-\varepsilon$, $\varepsilon>0$,
+and let the minority have size at most $(\varepsilon/5)n$. After $T$ rounds every vertex holds
+the majority opinion except with probability at most
+$(24/25)^T|B|+Te^{-\varepsilon n/24250}$. For $T=\lceil C\log n\rceil$ with $C=25000$ the failure
+probability is at most $1/n+(C\log n+1)e^{-\varepsilon n/C}$, which tends to $0$ for fixed
+$\varepsilon$.
+\end{theorem}
+\begin{proof}\leanok
+While $|B|\le(\varepsilon/5)n$, every superset of $B$ of size at most $(13/3)|B|\le\varepsilon n$
+is sparse (Lemma~\ref{lem:sparse}), so by Lemma~\ref{lem:phase2} the expected minority contracts by
+$24/25$ in every round and one round leaves this region with probability at most
+$e^{-\varepsilon n/24250}$ (take $m=(\varepsilon/5)n$). By induction on $T$, a $[0,1]$-valued
+observable bounded by the potential $|B|$ in the region has expectation at most
+$(24/25)^T|B_0|+Te^{-\varepsilon n/24250}$; apply it to the indicator of not being in consensus.
+For the $O(\log n)$ form, $(24/25)^T\le e^{-T/25}\le n^{-2}$ and $|B_0|\le n$.
 \end{proof}
 
 \section{Almost stable consensus against an adaptive adversary}
