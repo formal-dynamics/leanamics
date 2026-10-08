@@ -47,13 +47,6 @@ lemma exp_neg_three_log {n : ℕ} (hn : (0 : ℝ) < n) :
     rw [show (3 : ℝ) * log n = ((3 : ℕ) : ℝ) * log n by norm_num, exp_nat_mul, exp_log hn]
   rw [exp_neg, h3, one_div]
 
-/-- `e^{-2 log n} = 1/n²`. -/
-lemma exp_neg_two_log' {n : ℕ} (hn : (0 : ℝ) < n) :
-    exp (-(2 * log (n : ℝ))) = 1 / (n : ℝ) ^ 2 := by
-  have h2 : exp (2 * log (n : ℝ)) = (n : ℝ) ^ 2 := by
-    rw [show (2 : ℝ) * log n = ((2 : ℕ) : ℝ) * log n by norm_num, exp_nat_mul, exp_log hn]
-  rw [exp_neg, h2, one_div]
-
 variable {n k : ℕ}
 
 /-- The plurality colour has at least `n/k` nodes when there are no undecided nodes. -/
@@ -468,7 +461,7 @@ lemma prob_allM_eq [NeZero n] (T : ℕ) (x : Config n k) (m : Fin k) :
     · rw [if_neg hl, if_neg (show l.foldl step x ∉ allM m from hl)]
       norm_num
   simp_rw [h]
-  rw [Undecided.expList_one_sub]
+  rw [Undecided.Sequential.expList_one_sub]
   rfl
 
 /-- From `C k ≤ (n / log n)^{1/3}` to `(C k)³ log n ≤ n`. -/
