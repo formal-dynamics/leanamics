@@ -4,8 +4,30 @@ and bond percolation, after Kempe, Kleinberg and Tardos: with one coin per edge,
 infected in round $t$ are exactly those at distance $t$ from the initial set in the graph of
 open edges. Consequently the final outbreak is the set of nodes connected to the initial set by
 open edges, and with i.i.d.\ Bernoulli$(p)$ coins the probability of eventual infection is a
-bond-percolation connection probability. The development is in the finite layer of the shared
-\texttt{dynamics} package.
+bond-percolation connection probability. Below the threshold, on graphs of maximum degree $d$ with
+$p(d-1)\le1-\varepsilon$, every cluster has at most $(10/\varepsilon^2)\log n$ vertices with
+probability at least $1-1/n$ (Becchetti et al.), so a subcritical Reed--Frost epidemic stays
+small and dies out within $O(\log n)$ rounds. We then formalize the supercritical phase of the
+Erd\H{o}s--R\'enyi random graph $G(n,(1+\varepsilon)/n)$ (bond percolation on $K_n$) by the
+depth-first-search argument of Krivelevich and Sudakov: with probability at least $1-C/n$ there is
+a path of length $\varepsilon^2 n/5$ and a component of $\varepsilon n/2$ vertices; read through
+the coupling, a Reed--Frost epidemic on $K_n$ with $R_0=pn>1$ infects $\Omega(n)$ nodes with
+probability $\Omega(1)$. The development is in the finite layer of the shared \texttt{dynamics}
+package.
+
+We also formalize the deterministic Kermack--McKendrick SIR model: for every solution of
+$s'=-\beta si$, $i'=\beta si-\gamma i$, $r'=\gamma i$ on $[0,\infty)$ with $r(0)=0$, the threshold
+theorem ($i$ initially increases iff $R_0s(0)>1$, with $R_0=\beta/\gamma$), the epidemic peak, and
+the final-size equation $s_\infty=s(0)e^{-R_0(1-s_\infty)}$, following Hethcote (SIAM Review
+2000, Theorem~2.1). This part uses Mathlib's real analysis.
+
+We also formalize the upper bounds of Doerr and Kostrygin's analysis of general rumor-spreading
+processes (\emph{Randomized rumor spreading revisited}, ICALP 2017): the exponential growth and
+shrinking regimes and the total spreading time $\log_{1+\gamma}n+\frac1\rho\ln n+O(1)$, with
+exponential tails. Lemma~20 of that paper is false as stated; we prove corrected versions.
+
+We also formalize the duality between the coalescing-branching random walk (COBRA) and the BIPS
+epidemic of Cooper, Radzik and Rivera (Theorem~4), pathwise and by time reversal of i.i.d.\ rounds.
 \end{abstract}
 
 \section{The model}
@@ -62,3 +84,406 @@ The coupling is pathwise because every edge is used at most once: once its coin 
 from an infected endpoint, that endpoint is recovered for good. This is why a single coin per edge
 gives the same process, in distribution, as fresh coins in every round (that distributional
 statement is not formalized here).
+
+\section{Subcritical percolation and small outbreaks (EPI-2)}
+After Becchetti, Clementi, Denni, Pasquale, Trevisan, Ziccardi (arXiv:2103.16398), Theorem 2.3
+and its proof, Theorem E.1. Throughout, the degrees of $G$ are at most $d$, $n = |V|$, and
+$p(d-1) \le 1 - \varepsilon$ with $0 < \varepsilon < 1$.
+
+\begin{lemma}[Binomial tail and Chernoff bound]\label{lem:chernoff}
+\lean{Epidemics.binTail,Epidemics.binTail_succ_succ,Epidemics.one_sub_mul_exp_le,Epidemics.binomial_tail_le}\leanok\uses{thm:perc}
+At least $t$ successes among $t(d-1)+1$ independent Bernoulli$(p)$ trials occur with probability
+at most $\exp(\varepsilon - \varepsilon^2 t/2)$.
+\end{lemma}
+\begin{proof}\leanok
+Markov's inequality on $e^{\varepsilon X}$ and the bound $\mathbb E[e^{\varepsilon X}] \le
+\exp(\mu(e^{\varepsilon}-1))$ for a sum of independent trials with mean $\mu \le
+(1-\varepsilon)(t+1)$ (the Chernoff layer of the shared \texttt{dynamics} package, before
+optimizing the tilt: \texttt{Distribution.prob\_ge\_le\_exp}), then $(1-\varepsilon)e^{\varepsilon} \le 1 - \varepsilon^2/2$.
+\end{proof}
+
+\begin{theorem}[Deferred decisions]\label{thm:deferred}
+\lean{Epidemics.reachSet,Epidemics.closeOff,Epidemics.frontier,Epidemics.prob_reachSet_le_binTail,Epidemics.prob_cluster_gt_le_binTail,Epidemics.prob_cluster_gt_le_binomial}\leanok\uses{lem:chernoff}
+The component of $s$ in $G_p$ has more than $t$ vertices with probability at most that of at
+least $t$ successes in $t(d-1)+1$ independent Bernoulli$(p)$ trials.
+\end{theorem}
+\begin{proof}\leanok
+For an exploration state (discovered set $D$, examined pairs $X$, forced closed), induction on a
+budget $m \ge \mathrm{frontier}(D, X) + (k-1)(d-1)$: conditioning on the coin of one frontier edge,
+a closed coin removes that edge from the frontier, and an open one adds a vertex and at most $d-1$
+new frontier edges at it while removing the examined one. This is the recursion of the binomial
+tail. The initial frontier of $\{s\}$ has at most $d$ edges.
+\end{proof}
+
+\begin{theorem}[Theorems E.1 and 2.3]\label{thm:subcritical}
+\lean{Epidemics.prob_cluster_gt_le,Epidemics.prob_components_le_of_tail,Epidemics.card_mul_exp_le,Epidemics.prob_components_small}\leanok\uses{thm:deferred}
+The component of any vertex has more than $t$ vertices with probability at most
+$\exp(\varepsilon - \varepsilon^2 t/2)$, and with probability at least $1 - 1/n$ every component of
+$G_p$ has at most $(10/\varepsilon^2)\log n$ vertices.
+\end{theorem}
+\begin{proof}\leanok
+Theorem~\ref{thm:deferred} and Lemma~\ref{lem:chernoff}, then a union bound over the vertices.
+\end{proof}
+
+\begin{corollary}[Subcritical Reed--Frost and Erd\H{o}s--R\'enyi]\label{cor:subcritical}
+\lean{Epidemics.card_recovered_le,Epidemics.infected_eq_empty_of_ncard_le,Epidemics.reedFrost_subcritical,Epidemics.erdosRenyi_subcritical}\leanok\uses{thm:subcritical,cor:final}
+With probability at least $1 - 1/n$, the Reed--Frost epidemic with $R_0 = p(d-1) \le 1 -
+\varepsilon$ infects at most $|I_0| (10/\varepsilon^2)\log n$ nodes and nobody is infected in round
+$\lfloor (10/\varepsilon^2)\log n \rfloor$; and every component of $G(n, c/n)$ with
+$c \le 1 - \varepsilon$ has at most $(10/\varepsilon^2)\log n$ vertices.
+\end{corollary}
+\begin{proof}\leanok
+The final outbreak is the union of the components of $I_0$, and distances inside a component are
+smaller than its size (Corollary~\ref{cor:final}). $G(n, c/n)$ is bond percolation on $K_n$, with
+$d = n - 1$ and $p(d-1) \le c$.
+\end{proof}
+
+\section{The supercritical giant component}
+Source: M.~Krivelevich and B.~Sudakov, \emph{The phase transition in random graphs: a simple
+proof}, Random Structures \& Algorithms 43 (2013), arXiv:1201.6529. Throughout, $G(n,p)$ is the
+percolated complete graph $(K_V)_\omega$ with i.i.d.\ Bernoulli$(p)$ coins, $n=|V|$, and
+$p=(1+\varepsilon)/n$ is written $pn=1+\varepsilon$.
+
+\begin{lemma}[Principle of deferred decisions]\label{lem:deferred}
+\lean{Epidemics.queryAnswers,Epidemics.FreshUpTo,Epidemics.prob_forall_eval_eq,Epidemics.queryAnswers_eq_iff,Epidemics.prob_queryAnswers_eq,Epidemics.expect_queryAnswers,Epidemics.prob_queryAnswers}\leanok
+If an adaptive strategy queries the coins one at a time, the next coordinate being a function of
+the answers so far, and never queries a coordinate twice among its first $m$ queries, then its
+first $m$ answers are i.i.d.\ Bernoulli$(p)$.
+\end{lemma}
+\begin{proof}\leanok
+The answers equal a list $L$ iff the coordinates queried along $L$, which are determined by $L$
+and distinct, take the values of $L$: a cylinder event of probability $\prod_k w(L_k)$.
+\end{proof}
+
+\begin{definition}[Depth-first search fed with answers]\label{def:dfs}
+\lean{Epidemics.DFS.State,Epidemics.DFS.State.pending,Epidemics.DFS.State.move,Epidemics.DFS.State.answer,Epidemics.DFS.State.settle,Epidemics.DFS.ofAnswers,Epidemics.DFS.nextQuery}\leanok
+The search of Krivelevich--Sudakov (Section~2) with the sets $S$ (done), $U$ (stack) and $T$
+(unvisited), stopped before each query; after $U=T=\emptyset$ the remaining pairs are queried.
+\end{definition}
+
+\begin{lemma}[Properties of the search]\label{lem:dfs}
+\lean{Epidemics.DFS.State.Inv,Epidemics.DFS.State.move_settle,Epidemics.DFS.fresh_nextQuery,Epidemics.DFS.card_queried_ofAnswers,Epidemics.DFS.mem_found_iff_of_queryAnswers,Epidemics.DFS.queried_of_mem_done_of_mem_unvisited,Epidemics.DFS.stack_chain_ofAnswers,Epidemics.DFS.length_stack_le,Epidemics.DFS.count_true_le_card,Epidemics.DFS.card_union_append_le,Epidemics.DFS.reachable_of_mem_comp,Epidemics.DFS.count_drop_le_card_comp,Epidemics.DFS.exists_of_epochs_lt}\leanok\uses{def:dfs,lem:deferred}
+Every pair is queried at most once; all pairs between $S$ and $T$ have been queried negatively;
+$U$ spans a path; $|U|\le 1+\sum X_i$ and, while $T\ne\emptyset$, $|S\cup U|\ge\sum X_i$; the
+vertices of one epoch are connected; when an epoch starts, the explored set $D$ has all its pairs
+with $V\setminus D$ queried.
+\end{lemma}
+\begin{proof}\leanok
+An invariant preserved by every move and answer; moves without query terminate because
+$2|S|+|U|\le 2n$ increases.
+\end{proof}
+
+\begin{lemma}[Deterministic analysis]\label{lem:analysis}
+\lean{Epidemics.DFS.three_mul_explored_lt,Epidemics.DFS.le_length_stack,Epidemics.DFS.exists_epoch_start,Epidemics.DFS.le_card_comp,Epidemics.DFS.exists_path_of_stack,Epidemics.DFS.card_comp_le_ncard}\leanok\uses{lem:dfs}
+The deterministic steps of the proofs of Theorems~1 and~2 of the paper: $|S\cup U|<n/3$ at time
+$N_0$, $|U|\ge \ell n+1$, and the current epoch started before $t_1$.
+\end{lemma}
+\begin{proof}\leanok
+In each case $|S||T|$ (or $|D|(n-|D|)$) would exceed the number of queries.
+\end{proof}
+
+\begin{lemma}[Krivelevich--Sudakov, Lemma~1(2), with Chernoff]\label{lem:ks1}
+\lean{Epidemics.prob_count_take_far,Epidemics.Good,Epidemics.prob_not_good_le}\leanok
+Among $N_0$ i.i.d.\ Bernoulli$(p)$ trials, the number of successes deviates from $N_0p$ by
+$\delta N_0p$ with probability at most $2e^{-\delta^2N_0p/3}$ (Chernoff bounds of FND-3 instead of
+Chebyshev, as in the paper's Discussion, item~1); the same holds at every time of a window.
+\end{lemma}
+\begin{proof}\leanok
+Chernoff bounds and the union bound.
+\end{proof}
+
+\begin{theorem}[Long path; Theorem~1(2)]\label{thm:path}
+\lean{Epidemics.core_path,Epidemics.exists_long_path}\leanok\uses{lem:analysis,lem:ks1}
+For every small enough $\varepsilon>0$ there is $C$ such that $G(n,(1+\varepsilon)/n)$ contains a
+path with at least $\varepsilon^2n/5$ edges with probability at least $1-C/n$.
+\end{theorem}
+\begin{proof}\leanok
+Run the search for $N_0=\lfloor\varepsilon n^2/2\rfloor$ queries; on the typical event the stack is
+a path of the required length.
+\end{proof}
+
+\begin{theorem}[Giant component; Theorem~2 and every $\varepsilon$]\label{thm:giant}
+\lean{Epidemics.core_component,Epidemics.exists_giant_component,Epidemics.exists_linear_component}\leanok\uses{lem:analysis,lem:ks1}
+For every small enough $\varepsilon>0$ there is $C$ such that $G(n,(1+\varepsilon)/n)$ has a
+component with at least $\varepsilon n/2$ vertices with probability at least $1-C/n$; for every
+$\varepsilon>0$ there are $c>0$ and $C$ such that it has a component with at least $cn$ vertices
+with probability at least $1-C/n$.
+\end{theorem}
+\begin{proof}\leanok
+No epoch starts between the times $t_1=\lfloor\eta n^2\rfloor$ and $N_0=\lfloor\theta n^2\rfloor$,
+so the positive answers in between lie in one component; $\theta=\varepsilon/2$ for the first
+statement, $\theta$ small in terms of $\varepsilon$ for the second.
+\end{proof}
+
+\begin{corollary}[Supercritical Reed--Frost epidemics]\label{cor:outbreak}
+\lean{Epidemics.card_final_recovered,Epidemics.coins_prob_perm,Epidemics.prob_component_ge,Epidemics.reedFrost_large_outbreak_explicit,Epidemics.reedFrost_large_outbreak}\leanok\uses{thm:giant,thm:perc}
+On $K_n$ with $pn=R_0>1$, the Reed--Frost epidemic started from any single node infects at least
+$cn$ nodes with probability at least $q>0$ for $n\ge n_0$; for $R_0=1+\varepsilon$ with
+$\varepsilon$ small, at least $\varepsilon n/2$ nodes with probability at least
+$\varepsilon/2-C/n$.
+\end{corollary}
+\begin{proof}\leanok
+The final outbreak is the component of the initial node (Corollary~\ref{cor:final}); by symmetry
+of $K_n$ this node lies in a component of size $\ge k$ with probability at least $k/n$ times the
+probability that such a component exists.
+\end{proof}
+
+\section{The Kermack--McKendrick SIR model}
+\begin{definition}[Solutions]\label{def:km}
+\lean{Epidemics.KermackMcKendrick.R₀,Epidemics.KermackMcKendrick.sirField,Epidemics.KermackMcKendrick.IsSolution}\leanok
+Let $\beta,\gamma>0$ and $R_0=\beta/\gamma$. A solution is a triple $(s,i,r)$ of real functions
+such that $t\mapsto(s,i,r)(t)$ is an integral curve on $[0,\infty)$ (one-sided derivative at $0$)
+of the field $(s,i,r)\mapsto(-\beta si,\ \beta si-\gamma i,\ \gamma i)$, with $s(0),i(0)>0$,
+$r(0)=0$ and $s(0)+i(0)+r(0)=1$. Solutions are assumed, not constructed.
+\end{definition}
+
+\begin{theorem}[Invariants]\label{thm:km-basic}
+\lean{Epidemics.KermackMcKendrick.IsSolution.sum_eq_one,Epidemics.KermackMcKendrick.IsSolution.s_pos,Epidemics.KermackMcKendrick.IsSolution.i_pos,Epidemics.KermackMcKendrick.IsSolution.r_nonneg,Epidemics.KermackMcKendrick.IsSolution.strictAntiOn_s,Epidemics.KermackMcKendrick.IsSolution.strictMonoOn_r,Epidemics.KermackMcKendrick.IsSolution.s_eq_mul_exp}\leanok\uses{def:km}
+On $[0,\infty)$: $s+i+r=1$; $s,i>0$ and $r\ge0$; $s$ is strictly decreasing and $r$ strictly
+increasing; and $s(t)=s(0)e^{-R_0r(t)}$.
+\end{theorem}
+\begin{proof}\leanok
+The derivatives of $s+i+r$ and of $se^{R_0r}$ vanish ($R_0\gamma=\beta$), and a function with
+zero right derivative is constant. For $i>0$, compare $i$ with the barrier
+$b(t)=\tfrac{i(0)}2e^{-\gamma t}$: where they touch, $b'=-\gamma i<\beta si-\gamma i=i'$ since
+$s>0$, so $i\ge b$. Monotonicity follows from the signs of $s'=-\beta si$ and $r'=\gamma i$.
+\end{proof}
+
+\begin{theorem}[Threshold]\label{thm:km-threshold}
+\lean{Epidemics.KermackMcKendrick.IsSolution.strictAntiOn_i,Epidemics.KermackMcKendrick.IsSolution.initially_increasing_iff}\leanok\uses{thm:km-basic}
+If $R_0s(0)\le1$, then $i$ is strictly decreasing on $[0,\infty)$. The function $i$ is strictly
+increasing on some $[0,\varepsilon]$, $\varepsilon>0$, iff $R_0s(0)>1$.
+\end{theorem}
+\begin{proof}\leanok
+$i'=i(\beta s-\gamma)$ and $s(t)<s(0)$ for $t>0$. If $R_0s(0)>1$, then $\beta s-\gamma>0$ near $0$
+by continuity.
+\end{proof}
+
+\begin{theorem}[Limits and final size]\label{thm:km-final}
+\lean{Epidemics.KermackMcKendrick.IsSolution.tendsto_i,Epidemics.KermackMcKendrick.IsSolution.exists_tendsto_s,Epidemics.KermackMcKendrick.IsSolution.tendsto_r,Epidemics.KermackMcKendrick.IsSolution.final_size,Epidemics.KermackMcKendrick.IsSolution.limit_pos,Epidemics.KermackMcKendrick.IsSolution.R₀_mul_limit_lt_one,Epidemics.KermackMcKendrick.IsSolution.final_size_unique,Epidemics.KermackMcKendrick.IsSolution.final_size_unique_of_le_one}\leanok\uses{thm:km-threshold}
+$i(t)\to0$, $s(t)\to s_\infty$ and $r(t)\to1-s_\infty$; moreover
+$s_\infty=s(0)e^{-R_0(1-s_\infty)}$, $0<s_\infty<1/R_0$, and $s_\infty$ is the unique root of this
+equation in $(0,1/R_0]$ and in $(0,1]$.
+\end{theorem}
+\begin{proof}\leanok
+$s$ and $r$ are monotone and bounded, so $i=1-s-r$ converges; if $i\to L>0$, the mean value
+theorem makes $r$ grow by more than $1$. Pass to the limit in $s=s(0)e^{-R_0r}$. If
+$R_0s_\infty\ge1$ then $i'>0$ forever, contradicting $i\to0$. Uniqueness: $\log x-R_0x$ is strictly
+increasing on $(0,1/R_0]$ and strictly decreasing on $[1/R_0,\infty)$, and at $x=1$ it exceeds its
+value $\log s(0)-R_0$ at the roots because $s(0)<1$.
+\end{proof}
+
+\begin{theorem}[Peak]\label{thm:km-peak}
+\lean{Epidemics.KermackMcKendrick.IsSolution.exists_peak}\leanok\uses{thm:km-final}
+If $R_0s(0)>1$, there is $t_{\max}>0$ with $s(t_{\max})=1/R_0$ such that $i$ is strictly
+increasing on $[0,t_{\max}]$ and strictly decreasing on $[t_{\max},\infty)$, and
+$i(t_{\max})=i(0)+s(0)-1/R_0-\log(R_0s(0))/R_0$.
+\end{theorem}
+\begin{proof}\leanok
+Intermediate value theorem between $s(0)>1/R_0$ and $s_\infty<1/R_0$; the sign of $\beta s-\gamma$
+changes at $t_{\max}$. The value follows from $\log s=\log s(0)-R_0r$ and $r=1-s-i$.
+\end{proof}
+
+\section{Kurtz's law of large numbers for SIR, in discrete time}
+\begin{definition}[The uniformized SIR chain]\label{def:kurtz}
+\lean{Epidemics.Kurtz.Compartment,Epidemics.Kurtz.Config,Epidemics.Kurtz.count,Epidemics.Kurtz.scaled,Epidemics.Kurtz.Round,Epidemics.Kurtz.step,Epidemics.Kurtz.chain,Epidemics.Kurtz.deviationProb}\leanok\uses{def:km}
+Let $\beta,\gamma\in\mathbb N$. A configuration assigns to each of $N$ agents a compartment
+$S$, $I$ or $R$; $X=(S,I,R)/N$ are the scaled counts. One step draws $(u,v)$ uniformly in
+$[N]^2$ and one of $\beta+\gamma$ equally likely clocks: on one of the $\beta$ infection clocks an
+infected $u$ infects a susceptible $v$, on one of the $\gamma$ recovery clocks an infected $u$
+recovers. This is the continuous-time chain ($S+I\to2I$ at rate $\beta SI/N$, $I\to R$ at rate
+$\gamma I$) uniformized at rate $(\beta+\gamma)N$. The deviation probability is the probability
+that $\|X_k-x(k/((\beta+\gamma)N))\|_\infty>\theta$ for some $k\le n$.
+\end{definition}
+
+\begin{lemma}[Drift and bounded increments]\label{lem:kurtz-drift}
+\lean{Epidemics.Kurtz.drift_susceptible,Epidemics.Kurtz.drift_infected,Epidemics.Kurtz.drift_recovered,Epidemics.Kurtz.dist_scaled_step_le,Epidemics.Kurtz.iterate_chain}\leanok\uses{def:kurtz}
+$\mathbb E[X_{k+1}-X_k\mid X_k=x]=F(x)/((\beta+\gamma)N)$ with $F$ the Kermack--McKendrick field,
+and $\|X_{k+1}-X_k\|_\infty\le1/N$.
+\end{lemma}
+\begin{proof}\leanok
+Among the $N^2(\beta+\gamma)$ rounds, $\beta IS$ move an agent from $S$ to $I$ and $\gamma NI$ move
+one from $I$ to $R$; a round changes the compartment of at most one agent.
+\end{proof}
+
+\begin{lemma}[Maximal Azuma--Hoeffding]\label{lem:azuma}
+\lean{Epidemics.Kurtz.incrementSum,Epidemics.Kurtz.expList_azuma}\leanok
+If increments $D(X_j,\rho_j)$ along i.i.d.\ uniform rounds have zero conditional mean and
+$|D|\le c$, their partial sums $M_k$ satisfy
+$\mathbb P(\exists k\le n,\ M_k\ge\lambda)\le e^{-\lambda^2/(2nc^2)}$.
+\end{lemma}
+\begin{proof}\leanok
+Hoeffding's lemma ($\mathbb E e^{\theta D}\le\cosh(\theta c)\le e^{\theta^2c^2/2}$ by convexity)
+makes $e^{\theta M_k-k\theta^2c^2/2}$ a nonnegative supermartingale; Ville's maximal inequality,
+proved by induction on $n$ peeling off the first round, bounds the probability that it reaches
+$\mu$ by $1/\mu$; take $\theta=\lambda/(nc^2)$.
+\end{proof}
+
+\begin{theorem}[Law of large numbers]\label{thm:kurtz}
+\lean{Epidemics.Kurtz.law_of_large_numbers,Epidemics.Kurtz.tendsto_deviationProb}\leanok\uses{lem:kurtz-drift,lem:azuma,thm:km-basic}
+Let $\beta,\gamma,T>0$. There are $C,c>0$ and $L$ such that for every $N$, every initial
+configuration, every solution $x$ of the Kermack--McKendrick system started in the simplex and
+every $\varepsilon>0$, with probability at least $1-Ce^{-c\varepsilon^2N}$,
+$\|X_k-x(k/((\beta+\gamma)N))\|_\infty\le L\|X_0-x(0)\|_\infty+\varepsilon$ for all
+$k\le T(\beta+\gamma)N$. Hence, if $X_0\to x(0)$, the scaled chain converges to $x$ in probability,
+uniformly on $[0,T]$.
+\end{theorem}
+\begin{proof}\leanok
+The simplex is invariant under the ODE (first integral for $s$, integrating factor for $i$); there
+$F$ is $(2\beta+\gamma)$-Lipschitz and bounded by $\beta+\gamma$, so one Euler step errs by
+$O(h^2)$, $h=1/((\beta+\gamma)N)$. By Lemma~\ref{lem:kurtz-drift} each coordinate of
+$X_k-X_0-h\sum_{j<k}F(X_j)$ is a martingale with increments at most $2/N$; on the event where the
+six one-sided maximal deviations stay below $\delta=\varepsilon/(2L)$, the discrete Gr\"onwall
+inequality gives the bound with $L=e^{(2\beta+\gamma)T}$, once $\varepsilon N\ge2LT(2\beta+\gamma)$;
+Lemma~\ref{lem:azuma} bounds the complement by $6e^{-c\varepsilon^2N}$. Small $N$ and
+$\varepsilon\ge2$ are absorbed in $C$.
+\end{proof}
+
+\section{Randomized rumor spreading revisited}
+We follow Doerr and Kostrygin, \emph{Randomized rumor spreading revisited} (ICALP 2017; long
+version arXiv:2303.11150), with the numbering of the long version.
+
+\begin{definition}[Rumor-spreading processes]\label{def:rumor-process}
+\lean{Epidemics.Revisited.RumorProcess,Epidemics.Revisited.RumorProcess.informProb,Epidemics.Revisited.RumorProcess.cov,Epidemics.Revisited.RumorProcess.Homogeneous,Epidemics.Revisited.RumorProcess.notYet}\leanok
+A rumor-spreading process on $n$ nodes is a Markov kernel on the set $S$ of informed nodes under
+which informed nodes stay informed. For a round started from $S$, $\mathrm{informProb}(S,x)$ is
+the probability that $x$ is informed after the round and $\mathrm{cov}(S,x,y)$ the covariance of
+the events that $x$ and $y$ are. The tail of the spreading time is
+$\mathrm{notYet}(m,t,S)=\Pr[\text{fewer than }m\text{ nodes informed after }t\text{ rounds from
+}S]=\Pr[T(|S|,m)>t]$; expected times are bounded through all partial sums of
+$\sum_t\Pr[T>t]$. Homogeneity (Definition~6) is defined but not assumed.
+\end{definition}
+
+\begin{definition}[Upper growth and shrinking conditions]\label{def:rumor-conditions}
+\lean{Epidemics.Revisited.RumorProcess.UpperGrowth,Epidemics.Revisited.RumorProcess.UpperShrinking}\leanok\uses{def:rumor-process}
+Upper exponential growth (Definition~9): for $1\le|S|=k<fn$, every uninformed node is informed
+with probability at least $\gamma\frac kn(1-a\frac kn-\frac b{\ln n})$ and covariances are at
+most $ck/n^2$. Upper exponential shrinking (Definition~11): when $u=n-|S|\le gn$, every
+uninformed node stays uninformed with probability at most $e^{-\rho}+au/n$ and covariances are
+at most $c/u$.
+\end{definition}
+
+\begin{lemma}[Lemma 9]\label{lem:rumor-variance}
+\lean{Epidemics.Revisited.variance_card_le}\leanok\uses{def:rumor-process}
+If distinct uninformed nodes have covariance at most $c$, the number of informed nodes after one
+round has variance at most its expected increase plus $c(n-|S|)^2$.
+\end{lemma}
+\begin{proof}\leanok
+Expand the variance of a sum of indicators.
+\end{proof}
+
+\begin{lemma}[Lemma 19]\label{lem:rumor-connect}
+\lean{Epidemics.Revisited.connect_tail,Epidemics.Revisited.connect_expect}\leanok\uses{def:rumor-process}
+If every uninformed node is informed with probability at least $p$ in every round started with
+$\ell\le|S|<m$ informed nodes, then $\Pr[T(\ell,m)>r]\le\frac{n-\ell}{n-m}(1-p)^r$ and
+$E[T(\ell,m)]\le\frac{n-\ell}{n-m}\cdot\frac1p$.
+\end{lemma}
+\begin{proof}\leanok
+The potential $n-|S|$ (set to $0$ once $|S|\ge m$) contracts by $1-p$ in expectation.
+\end{proof}
+
+\begin{theorem}[Theorem 21: exponential growth]\label{thm:rumor-growth}
+\lean{Epidemics.Revisited.growth_upper_tail,Epidemics.Revisited.growth_upper_expect}\leanok\uses{def:rumor-conditions,lem:rumor-variance,lem:rumor-connect}
+Under the upper exponential growth conditions, with $\gamma$ between two positive constants and
+$af<1$, from any nonempty $S$: $\Pr[T(|S|,fn)>\lceil\log_{1+\gamma}n\rceil+r]\le Ae^{-\alpha r}$ and
+$E[T(|S|,fn)]\le\log_{1+\gamma}n+B$, with constants depending only on the parameters.
+\end{theorem}
+\begin{proof}\leanok
+Phases $k_{j+1}=k_j+E_0(k_j)$ with a round target $E_0(k)=E(k)-Ak^{3/4}$; Cantelli's inequality
+(Lemma~\ref{lem:rumor-variance}) bounds the probability of missing a target, and a phase potential
+on the iterated kernel replaces the paper's domination by geometric variables. Lemma~\ref{lem:rumor-connect}
+crosses the last stretch up to $fn$.
+\end{proof}
+
+\begin{lemma}[Lemma 20, corrected]\label{lem:rumor-jump}
+\lean{Epidemics.Revisited.JumpsOver,Epidemics.Revisited.RumorProcess.jumpProb,Epidemics.Revisited.overshoot_round,Epidemics.Revisited.jumpProb_le}\leanok\uses{lem:rumor-variance}
+If every round started with $1\le|S|<fn$ has $p_k\le p$ and covariances at most $c/n$, then
+(one round) for every $f'\in\,]f+p(1-f),1[$, a round from $|S|<fn$ ends with at least $f'n$
+informed nodes with probability at most $C/n$; and (path form) there is $f'\in\,]f,1[$ such that
+the probability of jumping over $[fn,f'n[$ within $t$ rounds is at most $\frac Cn$ times the
+expected number of these rounds started below $fn$, i.e.\ $O(E[T(|S|,fn)]/n)$.
+\end{lemma}
+\begin{proof}\leanok
+Chebyshev's inequality with Lemma~\ref{lem:rumor-variance} for one round, then a union bound over
+the rounds along the trajectory.
+\end{proof}
+The paper's Lemma~20 claims probability $1-O(1/n)$ of landing in $[fn,f'n]$; this is false: the
+process that from every $|S|<fn$ informs all nodes with probability $c/n$ (and otherwise none)
+satisfies the hypotheses and jumps from $1$ to $n$ with probability one. See
+\texttt{FORMALIZATION\_DIFFERENCES.md}.
+
+\begin{theorem}[Theorem 31: exponential shrinking]\label{thm:rumor-shrinking}
+\lean{Epidemics.Revisited.shrinking_upper_tail,Epidemics.Revisited.shrinking_upper_expect}\leanok\uses{def:rumor-conditions,lem:rumor-variance,lem:rumor-connect}
+Under the upper exponential shrinking conditions, with $\rho$ between two positive constants and
+$e^{-\rho_{lo}}+ag<1$, from any $S$ with $n-|S|\le gn$:
+$\Pr[T(|S|,n)>\lceil\ln n/\rho\rceil+r]\le Ae^{-\alpha r}$ and $E[T(|S|,n)]\le\ln n/\rho+B$.
+\end{theorem}
+\begin{proof}\leanok
+Lemma~\ref{lem:rumor-connect} first brings the number $u$ of uninformed nodes below $g_0n$; then
+the potential $\Phi=u+\frac\beta nu^2$ satisfies $E[\Phi']\le e^{-\rho}(1+K/n)\Phi$
+(Lemma~\ref{lem:rumor-variance} for the second moment), which replaces the paper's phase calculus.
+\end{proof}
+
+\begin{theorem}[Total spreading time]\label{thm:rumor-total}
+\lean{Epidemics.Revisited.spreading_upper_tail,Epidemics.Revisited.spreading_upper_expect}\leanok\uses{thm:rumor-growth,thm:rumor-shrinking,lem:rumor-connect}
+Under the growth conditions on $[1,fn[$, the shrinking conditions below $gn$ uninformed nodes and
+a probability at least $p>0$ of being informed in between, from any nonempty $S$:
+$\Pr[T>\lceil\log_{1+\gamma}n\rceil+\lceil\ln n/\rho\rceil+r]\le Ae^{-\alpha r}$ and
+$E[T]\le\log_{1+\gamma}n+\ln n/\rho+B$.
+\end{theorem}
+\begin{proof}\leanok
+Compose the three exponential tails (Theorem~\ref{thm:rumor-growth}, Lemma~\ref{lem:rumor-connect},
+Theorem~\ref{thm:rumor-shrinking}) by the Markov property at fixed times, and sum the tail.
+\end{proof}
+
+\section{COBRA and BIPS: the model}
+We follow Cooper, Radzik and Rivera, \emph{The coalescing-branching random walk on expanders and
+the dual epidemic process}, PODC 2016 (arXiv:1602.05768).
+\begin{definition}[Rounds of neighbour choices]\label{def:choices}
+\lean{Epidemics.Choices,Epidemics.instFintypeChoices,Epidemics.choices_nonempty}\leanok
+In a round $r$, every vertex $x$ of a finite graph $G$ samples $k$ neighbours
+$r(x,0),\dots,r(x,k-1)$. A uniform round is exactly the paper's sampling: $k$ uniform neighbours
+with replacement, independently for every vertex; $t$ i.i.d.\ uniform rounds are averaged with
+\texttt{Dynamics.expList}. If $G$ is connected and has at least two vertices, rounds exist.
+\end{definition}
+\begin{proof}\leanok
+Every vertex of a connected graph with at least two vertices has a neighbour.
+\end{proof}
+\begin{definition}[COBRA and BIPS]\label{def:cobra}
+\lean{Epidemics.cobraStep,Epidemics.cobraRun,Epidemics.bipsStep,Epidemics.bipsRun}\leanok\uses{def:choices}
+COBRA from $C_0=C$: $C_{s+1}=\{r_{s+1}(x,i) : x\in C_s,\ i<k\}$. BIPS with persistent source $v$
+from $A_0$: $A_{s+1}=\{v\}\cup\{u : \exists i,\ r_{s+1}(u,i)\in A_s\}$.
+\end{definition}
+
+\section{COBRA--BIPS duality}
+\begin{lemma}[Time reversal of i.i.d.\ rounds]\label{lem:reverse}
+\lean{Dynamics.expList_comp_reverse,Epidemics.expList_congr_length}\leanok
+For every functional $F$ of $T$ i.i.d.\ uniform rounds,
+$\mathbb E[F(r_T,\dots,r_1)]=\mathbb E[F(r_1,\dots,r_T)]$.
+\end{lemma}
+\begin{proof}\leanok
+The uniform average over $\mathrm{Fin}\,T\to\alpha$ is invariant under $\omega\mapsto\omega\circ\mathrm{rev}$
+(the time-reversal lemma of the shared \texttt{dynamics} package).
+\end{proof}
+\begin{lemma}[Pathwise duality]\label{lem:pathwise}
+\lean{Epidemics.cobra_hit_iff_bips_reverse}\leanok\uses{def:cobra}
+For all rounds $r_1,\dots,r_t$: COBRA from $C$ along $r_1,\dots,r_t$ visits $v$ at some time
+$s\le t$ (time $0$ included) iff BIPS from $\{v\}$ along $r_t,\dots,r_1$ infects a vertex of $C$.
+\end{lemma}
+\begin{proof}\leanok
+Induction on $t$, generalizing $C$. Both sides say that a chain $x_0\in C$,
+$x_j=r_j(x_{j-1},i_j)$, reaches $v$ within $t$ steps: COBRA unfolds the first round, BIPS the
+last round of the reversed sequence.
+\end{proof}
+\begin{theorem}[Theorem 4 of Cooper--Radzik--Rivera]\label{thm:duality}
+\lean{Epidemics.cobra_bips_duality,Epidemics.cobra_bips_duality_singleton}\leanok\uses{lem:reverse,lem:pathwise}
+For every finite graph, every $k$, every vertex $v$, set $C$ and time $t$:
+$\hat{\mathbb P}(\mathrm{Hit}_C(v)>t\mid C_0=C)=\mathbb P(C\cap A_t=\emptyset\mid A_0=\{v\})$. In
+particular (equation (2)), $\hat{\mathbb P}(\mathrm{Hit}_u(v)>t)=\mathbb P(u\notin A_t\mid A_0=\{v\})$.
+The paper assumes $G$ connected and regular and $k\ge1$; none of this is needed.
+\end{theorem}
+\begin{proof}\leanok
+Lemma~\ref{lem:pathwise} identifies the two events after reversing the rounds, and
+Lemma~\ref{lem:reverse} says that reversing the rounds preserves their law. The paper proves the
+theorem instead by induction on $t$ with one-step conditioning.
+\end{proof}

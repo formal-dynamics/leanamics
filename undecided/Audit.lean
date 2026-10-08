@@ -9,3 +9,6 @@ import Undecided
 #print axioms Undecided.majority_whp
 #print axioms Undecided.majority_whp_abs
 #print axioms Undecided.majority_whp_of_ratio
+#print axioms Undecided.Sequential.consensus_whp
+#print axioms Undecided.Sequential.majority_whp
+#print axioms Undecided.Sequential.approximate_majority

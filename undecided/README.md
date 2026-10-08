@@ -3,18 +3,48 @@
 Synchronous undecided-state dynamics with two opinions on the complete graph (each node samples one node uniformly, with replacement). Main results in [`Undecided/Basic.lean`](Undecided/Basic.lean), namespace `Undecided`; see the
 [blueprint](blueprint/src/content.tex) for the statements and the map to Lean declarations.
 
-**Majority phase (UND-1)**, in [`Undecided/Majority.lean`](Undecided/Majority.lean): for
-`log n ≥ C` and any configuration (undecided nodes allowed) in which one opinion leads by at
-least `C √(n log n)`, all nodes hold the initial majority opinion after `⌈C log n⌉` rounds with
-probability at least `1 - C/n` (`majority_whp`, `majority_whp_abs`, with `C = 10⁴`; Clementi et
-al., MFCS 2018, Theorem 3.2), and the two-colour case of Theorem 11 of Becchetti et al. (SODA 2015)
-(`majority_whp_of_ratio`). The proof (Hoeffding per round, three phases composed by the Markov
-property) is in `Undecided/Majority{Round,Arith,Stages,Assembly,Symm}.lean`; see
-[PROGRESS.md](PROGRESS.md).
+## Majority phase (UND-1)
 
-**Provenance.** The statements were written and pinned by hand; the proofs were produced by a Grok
-agent under a fixed-statement protocol and verified mechanically (statements unchanged, no
-placeholders, warning-free build, axiom audit).
+After Becchetti, Clementi, Natale, Pasquale and Silvestri, *Plurality consensus in the gossip
+model* (SODA 2015, Theorem 11 with two colours) and Clementi, Ghaffari, Gualà, Natale, Pasquale
+and Scornavacca (MFCS 2018, Theorem 3.2). Results in
+[`Undecided/Majority.lean`](Undecided/Majority.lean) and
+[`Undecided/MajorityAssembly.lean`](Undecided/MajorityAssembly.lean), namespace `Undecided`:
+
+| Result | Lean declaration |
+| --- | --- |
+| A round leaves the counts of `a`, `b` and undecided nodes within `Λ` of their expectations except with probability `4 exp(-2Λ²/n)` | `bad_round` |
+| Explicit form: if `log n ≥ 10⁴` and `count a - count b ≥ 10⁴ √(n log n)` (any number of undecided nodes), not all nodes hold `a` after `⌈10⁴ log n⌉` rounds with probability at most `2/n` | `majority_explicit` |
+| MFCS 2018, Theorem 3.2: there is `C` such that, if `log n ≥ C` and `count a - count b ≥ C √(n log n)`, all nodes hold `a` after `⌈C log n⌉` rounds with probability `≥ 1 - C/n` | `majority_whp` |
+| The same for either opinion (`|count a - count b| ≥ C √(n log n)`, the initial majority wins) | `majority_whp_abs` |
+| SODA 2015, Theorem 11 for two colours: no undecided nodes and `count a ≥ (1 + α) count b` | `majority_whp_of_ratio` |
+
+The proof uses Hoeffding's inequality in every round and three phases (growth of the bias, a
+bridge, contraction of the potential `12 count b + count u`) composed by the Markov property; see
+[`FORMALIZATION_DIFFERENCES.md`](FORMALIZATION_DIFFERENCES.md) for the route and the differences
+from the papers.
+
+## Sequential version (UND-2)
+
+[`Undecided/SequentialMain.lean`](Undecided/SequentialMain.lean)
+formalizes the approximate-majority protocol of Angluin, Aspnes and Eisenstat (Distributed
+Computing 2008), one uniformly random ordered pair of agents per step: from any non-blank
+configuration consensus within `O(n log n)` interactions, and from a gap of `C √n log n` the
+initial majority wins, each with probability `1 - O(n^{-c})` for every `c` (`consensus_whp`,
+`majority_whp`, `approximate_majority`). The proof uses six weighted supermartingales along finite
+paths; see [`FORMALIZATION_DIFFERENCES.md`](FORMALIZATION_DIFFERENCES.md) for the route and the
+deviations from the paper.
+
+## Provenance
+
+For `Undecided/Basic.lean`, the statements were written and pinned by hand; the
+proofs were produced by a Grok agent under a fixed-statement protocol and verified mechanically
+(statements unchanged, no placeholders, warning-free build, axiom audit). The sequential
+statements and their proofs were written by a Claude agent under the same protocol; the statements
+were reviewed by hand against the paper. The majority-phase statements (`Majority*`) and their
+proofs were written by a Claude agent under the same protocol.
+
+## Build
 
 Build and audit:
 

@@ -4,10 +4,12 @@ on:
   push:
     paths:
       - 'rumor_spread/**'
+      - 'dynamics/**'
       - '.github/workflows/rumor_spread-ci.yml'
   pull_request:
     paths:
       - 'rumor_spread/**'
+      - 'dynamics/**'
       - '.github/workflows/rumor_spread-ci.yml'
   workflow_dispatch:
 

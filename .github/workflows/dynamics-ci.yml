@@ -9,6 +9,7 @@ on:
       - 'undecided/**'
       - 'averaging/**'
       - 'median/**'
+      - 'crn/**'
       - 'scripts/check_axioms.py'
       - '.github/workflows/dynamics-ci.yml'
   pull_request:
@@ -20,6 +21,7 @@ on:
       - 'undecided/**'
       - 'averaging/**'
       - 'median/**'
+      - 'crn/**'
       - 'scripts/check_axioms.py'
       - '.github/workflows/dynamics-ci.yml'
   workflow_dispatch:
@@ -29,7 +31,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [dynamics, voter, moran, epidemics, undecided, averaging, median]
+        package: [dynamics, voter, moran, epidemics, undecided, averaging, median, crn]
     steps:
       - uses: actions/checkout@v5
       - uses: leanprover/lean-action@434f25c2f80ded67bba02502ad3a86f25db50709
@@ -46,6 +48,6 @@ jobs:
         run: |
           # `sorry`/`admit` anywhere; `axiom` only as a declaration keyword, so that
           # prose such as "no axiom beyond Lean core" in a docstring does not fail CI.
-          if grep -R -n -E '\b(sorry|admit)\b|^\s*((private|protected|noncomputable|unsafe)\s+)*axiom\s' dynamics/Dynamics.lean dynamics/Dynamics voter/Voter.lean voter/Voter moran/Moran.lean moran/Moran epidemics/Epidemics.lean epidemics/Epidemics undecided/Undecided.lean undecided/Undecided averaging/Averaging.lean averaging/Averaging median/Median.lean median/Median; then
+          if grep -R -n -E '\b(sorry|admit)\b|^\s*((private|protected|noncomputable|unsafe)\s+)*axiom\s' dynamics/Dynamics.lean dynamics/Dynamics voter/Voter.lean voter/Voter moran/Moran.lean moran/Moran epidemics/Epidemics.lean epidemics/Epidemics undecided/Undecided.lean undecided/Undecided averaging/Averaging.lean averaging/Averaging median/Median.lean median/Median crn/Crn.lean crn/Crn; then
             exit 1
           fi

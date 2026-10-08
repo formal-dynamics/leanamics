@@ -29,18 +29,31 @@ dependency graph and a formalization-progress view; `leanblueprint
 checkdecls` (run in CI) fails the build if a tagged declaration doesn't
 exist.
 
+**PULL and PUSH–PULL** (roadmap EPI-5, after Karp, Schindelhauer, Shenker,
+Vöcking, *Randomized rumor spreading*, FOCS 2000): with the same random calls,
+`RumorPush.pull_informs_all_whp` ([PullMain.lean](RumorSpread/PullMain.lean))
+and `RumorPush.pushPull_informs_all_whp`
+([PullPushPull.lean](RumorSpread/PullPushPull.lean)) inform all nodes after
+`⌈160 ln n⌉` rounds with probability at least `1 - 2/n`;
+[PullOneRound.lean](RumorSpread/PullOneRound.lean) has the exact one-round
+picture (PULL's quadratic shrinking `𝔼u' = u(u-1)/(n-1) ≤ u²/n`). Deviations
+from the paper are listed in
+[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
+
 ## Design
 
 The development avoids measure theory, `PMF`, `ENNReal`, the exponential
 function, Chernoff bounds and martingales entirely:
 
-- **Probability** ([Prob.lean](RumorSpread/Prob.lean)): all randomness is
+- **Probability** (the shared [`Dynamics.Uniform`](../dynamics/Dynamics/Uniform.lean)
+  of the [dynamics package](../dynamics)): all randomness is
   uniform over finite types. `avg` is a sum divided by a cardinality;
   `expList α T F` — the expectation of a trajectory functional over `T`
   i.i.d. uniform rounds — is defined by recursion on `T`, which makes
   conditioning on a round a definitional unfolding.
-  [Equivalence.lean](RumorSpread/Equivalence.lean) proves this equals the
-  uniform average over the product space of all round sequences.
+  [Equivalence.lean](RumorSpread/Equivalence.lean) records that this equals the
+  uniform average over the product space of all round sequences
+  (`Dynamics.Bridge` adds Mathlib's `Finset.expect` and the product distribution).
 - **Model** ([Model.lean](RumorSpread/Model.lean)): a round is
   `Tgt n := ∀ v : Fin n, {u // u ≠ v}` (every node picks a target ≠ itself);
   `step I r = I ∪ I.image r`; trajectories are lists of rounds.
