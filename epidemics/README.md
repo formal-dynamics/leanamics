@@ -219,8 +219,9 @@ under the same protocol and checks; the statements were reviewed by hand against
 proved under the same protocol and checks, the growth regime (Lemma 9, Lemma 19, Theorem 21) by a
 Grok agent and the rest (Lemma 20, Theorem 31, total time) by a Claude agent. The double
 exponential shrinking regime (Theorem 43) and the push, pull and push–pull instances (EPI-8 (c)):
-the statements were pinned by a Claude agent and reviewed by a second agent against the paper;
-the proofs are by a Claude agent under the fixed-statement protocol and the same checks. Supercritical giant
+the statements were written by a Claude agent and reviewed by a second agent against the paper
+before the proofs, which are by a Claude agent under the fixed-statement protocol and the same
+checks. Supercritical giant
 component (EPI-3): the statements were pinned and then proved by a Claude agent under the same
 protocol and checks; the statements were reviewed by hand against the source. Subcritical
 percolation (EPI-2): statements and proofs were written by a Claude agent under the same protocol
