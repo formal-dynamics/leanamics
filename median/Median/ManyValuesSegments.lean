@@ -128,7 +128,7 @@ lemma linear_sat_segment (hL : (128 : ℝ) ≤ log n) {y : Config n Bool}
       max_le (mul_le_left_of_le_one (by positivity)
         (pow_le_one₀ (by norm_num) (by norm_num))) (by linarith only [hβn8, hβ0])
     exact le_trans (sat_move hL ht0 htn ha)
-      (prob_mono_set' _ (satSet_sub n (sat_threshold_step _ _ hβ0 j)))
+      (Distribution.prob_mono _ (satSet_sub n (sat_threshold_step _ _ hβ0 j)))
   have hy0 : y ∈ satSet n (max ((n : ℝ) / 4 * (7 / 8 : ℝ) ^ 0) (512 * log n)) := by
     rw [pow_zero, mul_one]
     exact lt_of_lt_of_le hy (le_max_left _ _)
@@ -162,7 +162,7 @@ lemma quad_sat_segment (hL : (128 : ℝ) ≤ log n) {T : ℕ}
     intro j a ha
     have hstep := max_sq_div_le (q := (n : ℝ) / 4 * (1 / 2 : ℝ) ^ 2 ^ j) hβ0 hn0 hβn4
     rw [quad_threshold_succ hn0.ne' j] at hstep
-    exact (quad_move hL ha).trans (prob_mono_set' _ (satSet_sub n hstep))
+    exact (quad_move hL ha).trans (Distribution.prob_mono _ (satSet_sub n hstep))
   have hy0 : y ∈ satSet n (max ((n : ℝ) / 4 * (1 / 2 : ℝ) ^ 2 ^ 0) (512 * log n)) := by
     rw [quad_threshold_zero]
     exact lt_of_lt_of_le hy (le_max_left _ _)
@@ -203,7 +203,7 @@ lemma consensus_segment (hL : (128 : ℝ) ≤ log n) {y : Config n Bool}
     · rw [hA1] at ha ⊢
       have hstep : max ((7 / 8 : ℝ) * (512 * log n)) (512 * log n) ≤ 512 * log n :=
         max_le (by linarith only [hβ0]) le_rfl
-      exact le_trans (sat_move hL hβ0 hβn4 ha) (prob_mono_set' _ (satSet_sub n hstep))
+      exact le_trans (sat_move hL hβ0 hβn4 ha) (Distribution.prob_mono _ (satSet_sub n hstep))
     · rw [hA2] at ha ⊢
       rw [cons_absorb ha]
       have : (0 : ℝ) ≤ 1 / (n : ℝ) ^ 2 := by positivity

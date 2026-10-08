@@ -26,7 +26,7 @@ rounds, per-round failure `ε = n⁻²` and per-move failure `ν = n^{-1/2}`
 `T ≤ 13 log n + 6`, so the `4T ≤ 52 log n + 24 ≤ ⌈128 log n⌉₊` rounds fit
 (`log n ≥ 128`), and the failure budget is `T (4n⁻² + ν⁴) = 5T/n² ≤ 128/n`
 (because `log n ≤ n`). Padding to the exact round count uses that the
-all-`true` event absorbs (`event_absorb_mono`).
+all-`true` event absorbs (`Dynamics.Kernel.event_monotone`).
 -/
 
 namespace Median
@@ -279,7 +279,7 @@ theorem binary_consensus {n : ℕ} [NeZero n] (hL : (128 : ℝ) ≤ Real.log n)
             * (128 * √((n : ℝ) * Real.log n))) :=
         le_mul_five_fourth
           (mul_nonneg (pow_nonneg (by norm_num) _) (by positivity))
-      exact le_trans hmove' (prob_mono_set' _ (growthSet_sub n hle))
+      exact le_trans hmove' (Distribution.prob_mono _ (growthSet_sub n hle))
     by_cases h2 : i ≤ T1 + T2
     · rw [hA2 _ (by omega) h2] at ha ⊢
       have ht0 : (0 : ℝ) ≤ max ((n : ℝ) / 4 * ((7 / 8 : ℝ) ^ (i - T1 - 1)))
@@ -297,7 +297,7 @@ theorem binary_consensus {n : ℕ} [NeZero n] (hL : (128 : ℝ) ≤ Real.log n)
           ≤ max ((n : ℝ) / 4 * ((7 / 8 : ℝ) ^ (i - T1 - 1))) (512 * Real.log n) := by
         refine max_le_iff.mpr ⟨?_, le_max_right _ _⟩
         exact mul_le_right_le_one ht0 (by norm_num : (7 / 8 : ℝ) ≤ 1)
-      exact le_trans hmove' (prob_mono_set' _ (satSet_sub n hstayle))
+      exact le_trans hmove' (Distribution.prob_mono _ (satSet_sub n hstayle))
     · rw [hA3 _ (by omega)] at ha ⊢
       rw [cons_absorb ha]
       linarith [hε]
@@ -308,7 +308,7 @@ theorem binary_consensus {n : ℕ} [NeZero n] (hL : (128 : ℝ) ≤ Real.log n)
     · rw [hA1 _ (by omega)] at ha
       rw [hA1 _ h1, show i + 1 - 1 = (i - 1) + 1 from by omega, pow_succ]
       have hmove' := growth_move hL (by positivity) (hG2gen i hi1) ha
-      refine le_trans (by linarith [hinv]) (le_trans hmove' (prob_mono_set' _ ?_))
+      refine le_trans (by linarith [hinv]) (le_trans hmove' (Distribution.prob_mono _ ?_))
       exact growthSet_sub n (le_of_eq (by ring))
     by_cases h2 : i ≤ T1
     · rw [hA1 _ h2] at ha
@@ -320,7 +320,7 @@ theorem binary_consensus {n : ℕ} [NeZero n] (hL : (128 : ℝ) ≤ Real.log n)
         rw [hi]
         exact hgrow
       have hmove' := growth_move hL (by positivity) (hG2gen i hi1) ha
-      refine le_trans (by linarith [hinv]) (le_trans hmove' (prob_mono_set' _ ?_))
+      refine le_trans (by linarith [hinv]) (le_trans hmove' (Distribution.prob_mono _ ?_))
       exact le_trans (growthSet_sub_satSet n hgrowI) (satSet_sub n (le_max_left _ _))
     by_cases h3 : i + 1 ≤ T1 + T2
     · rw [hA2 _ (by omega) h3, show (i + 1) - T1 - 1 = (i - T1 - 1) + 1 from by omega]
@@ -334,7 +334,7 @@ theorem binary_consensus {n : ℕ} [NeZero n] (hL : (128 : ℝ) ≤ Real.log n)
         exact mul_le_left_of_le_one (by positivity)
           (pow_le_one₀ (by norm_num) (by norm_num))
       have hmove' := sat_move hL ht0 htn ha
-      refine le_trans (by linarith [hinv]) (le_trans hmove' (prob_mono_set' _ ?_))
+      refine le_trans (by linarith [hinv]) (le_trans hmove' (Distribution.prob_mono _ ?_))
       exact satSet_sub n (sat_threshold_step _ _ hβpos (i - T1 - 1))
     · rw [hA3 _ (by omega)]
       rw [hA2 _ (by omega) (by omega)] at ha
@@ -367,8 +367,7 @@ theorem binary_consensus {n : ℕ} [NeZero n] (hL : (128 : ℝ) ≤ Real.log n)
     exact Nat.cast_le.mp (le_trans h4T' (Nat.le_ceil _))
   have habs : ∀ a : Config n Bool, a ∈ consSet →
       (Median.kernel n Bool a).prob (· ∈ consSet) = 1 := fun a ha => cons_absorb ha
-  have hpad := event_absorb_mono (K := Median.kernel n Bool)
-    (P := fun y => y ∈ consSet) habs (4 * (T1 + T2 + 1)) ⌈128 * Real.log n⌉₊ x h4T
+  have hpad := Kernel.event_monotone (Median.kernel n Bool) (P := fun y => y ∈ consSet) habs x h4T
   -- the failure budget
   have hLn : Real.log n ≤ (n : ℝ) := log_le_of_big (big_log_le hL) hL0
   have hTn : (T1 : ℝ) + (T2 : ℝ) + 1 ≤ 13 * Real.log n + 6 := by

@@ -1,5 +1,6 @@
 import Dynamics.Rounds
 import Dynamics.Absorption
+import Dynamics.Tail
 import Mathlib
 
 /-! # The median dynamics: definitions
