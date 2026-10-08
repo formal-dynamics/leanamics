@@ -61,7 +61,8 @@ lemma card_subtype_compl : (Fintype.card {v // ¬ v ∈ V₁} : ℝ) = Fintype.c
   rw [h3, hG.card_subtype]; ring
 
 omit hG in
-lemma sum_signVec_split (V₁ : Finset V) (σ : V → ℤˣ) : ∑ v, signVec σ v = blockSum V₁ σ + blockSum V₁ᶜ σ := by
+lemma sum_signVec_split (V₁ : Finset V) (σ : V → ℤˣ) :
+    ∑ v, signVec σ v = blockSum V₁ σ + blockSum V₁ᶜ σ := by
   rw [blockSum, blockSum, Finset.sum_add_sum_compl]
 
 omit hG in

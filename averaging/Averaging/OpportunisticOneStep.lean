@@ -274,7 +274,8 @@ lemma avg_restSq_edgeAvg_le (h3 : ThirdEigenvalueLB G V₁ d lam3) (x : V → �
   have hl : (2 * b / d : ℝ) / N * ((2 * b / d) / N) * β ^ 2 ≥ 0 := by positivity
   have hJ' : (1 - (2 * b / d : ℝ) / N) ^ 2 * β ^ 2 ≤ A := by rw [← mul_pow]; exact hJ
   have e1 : N * ((1 - (2 * b / d : ℝ) / N) ^ 2 * β ^ 2) =
-      N * β ^ 2 - 2 * (2 * b / d) * β ^ 2 + N * ((2 * b / d : ℝ) / N * ((2 * b / d) / N) * β ^ 2) := by
+      N * β ^ 2 - 2 * (2 * b / d) * β ^ 2 +
+        N * ((2 * b / d : ℝ) / N * ((2 * b / d) / N) * β ^ 2) := by
     field_simp; ring
   have : N * ((1 - (2 * b / d : ℝ) / N) ^ 2 * β ^ 2) ≤ N * A := by gcongr
   have hlamR : (1 - lam3 / N) * R = R - lam3 * R / N := by ring

@@ -123,13 +123,16 @@ noncomputable def cutDevBound (N l2 l3 s z : ℝ) (T : ℕ) : ℝ :=
   T * (l2 / N) * (1 + 8 / N) * s + 4 * l2 / (N * l3) * z + 4 * T * l2 ^ 2 * (s + z) / (N ^ 2 * l3)
 
 lemma cutDevBound_mono {N l2 l3 s z : ℝ} (hN : 0 < N) (hl2 : 0 ≤ l2) (hl3 : 0 < l3) (hs : 0 ≤ s)
-    (hz : 0 ≤ z) {t T : ℕ} (htT : t ≤ T) : cutDevBound N l2 l3 s z t ≤ cutDevBound N l2 l3 s z T := by
+    (hz : 0 ≤ z) {t T : ℕ} (htT : t ≤ T) :
+    cutDevBound N l2 l3 s z t ≤ cutDevBound N l2 l3 s z T := by
   unfold cutDevBound
   have ht : (t : ℝ) ≤ T := by exact_mod_cast htT
   have h1 : 0 ≤ (l2 / N) * (1 + 8 / N) * s := by positivity
   have h2 : 0 ≤ 4 * l2 ^ 2 * (s + z) / (N ^ 2 * l3) := by positivity
-  have e1 : 4 * (t : ℝ) * l2 ^ 2 * (s + z) / (N ^ 2 * l3) = t * (4 * l2 ^ 2 * (s + z) / (N ^ 2 * l3)) := by ring
-  have e2 : 4 * (T : ℝ) * l2 ^ 2 * (s + z) / (N ^ 2 * l3) = T * (4 * l2 ^ 2 * (s + z) / (N ^ 2 * l3)) := by ring
+  have e1 : 4 * (t : ℝ) * l2 ^ 2 * (s + z) / (N ^ 2 * l3) =
+      t * (4 * l2 ^ 2 * (s + z) / (N ^ 2 * l3)) := by ring
+  have e2 : 4 * (T : ℝ) * l2 ^ 2 * (s + z) / (N ^ 2 * l3) =
+      T * (4 * l2 ^ 2 * (s + z) / (N ^ 2 * l3)) := by ring
   rw [e1, e2, mul_assoc (t : ℝ), mul_assoc (T : ℝ), mul_assoc (t : ℝ), mul_assoc (T : ℝ)]
   have := mul_le_mul_of_nonneg_right ht h1
   have := mul_le_mul_of_nonneg_right ht h2
@@ -323,7 +326,8 @@ theorem expList_sum_sq_dev_signVec_le (hl3 : 0 < lam3) (hN : (8 : ℝ) ≤ Finty
     (σ : V → ℤˣ) (T : ℕ) :
     expList G.Dart T (fun l => ∑ v, (projCut V₁ (avgRun G (signVec σ) l) v +
         projRest V₁ (avgRun G (signVec σ) l) v - projCut V₁ (signVec σ) v) ^ 2) ≤
-      (1 + 2 * ((2 * b / d) / lam3)) * (T * (2 * b / d) / Fintype.card V * (1 + 8 / Fintype.card V) *
+      (1 + 2 * ((2 * b / d) / lam3)) *
+        (T * (2 * b / d) / Fintype.card V * (1 + 8 / Fintype.card V) *
           (Fintype.card V * cutCoef V₁ (signVec σ) ^ 2) + 4 * ((2 * b / d) / lam3) +
           4 * (T * (2 * b / d) / Fintype.card V) * ((2 * b / d) / lam3)) +
         Fintype.card V * (1 - lam3 / Fintype.card V) ^ T +
