@@ -300,8 +300,8 @@ SODA 2019 (arXiv:1611.02460); Cooper, Elsässer, Ono, Radzik, SIAM J. Discrete M
 Source: Berenbrink, Giakkoupis, Kermarrec, Mallmann-Trenn, *Bounds on the voter model in
 dynamic networks*, ICALP 2016, arXiv:1603.01895 (BGKM16). Numbering: Theorem 1.1 (upper
 bound), Lemma 2.1 (potential drop), Lemma 2.2 (drift implies time), Lemma 2.3 (phases for
-`κ` opinions), Lemma 2.4 (the bound `n log n / φ²`). Files: `Conductance*.lean`. The dynamics is the lazy voter
-[`lazyNeighbor`](Voter/Lazy.lean) `= (I + D⁻¹A)/2` of §3.
+`κ` opinions), Lemma 2.4 (the bound `n log n / φ²`). Files: `Conductance*.lean`. The
+dynamics is the lazy voter [`lazyNeighbor`](Voter/Lazy.lean) `= (I + D⁻¹A)/2` of §3.
 
 ### 5.1 Lemma 2.1 of BGKM16 is false as printed
 * The paper states
