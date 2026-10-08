@@ -55,14 +55,6 @@ lemma bernstein_exponent {ℓ M : ℝ} (hℓ : 0 < ℓ) (hM : 2 * ℓ ≤ M) :
 
 variable {n : ℕ} {γ : Type*} [Fintype γ]
 
-/-- An indicator coordinate has variance at most its mean. -/
-lemma variance_le_avg_of_01 [Nonempty γ] {f : γ → ℝ} (hf : ∀ x, f x = 0 ∨ f x = 1) :
-    variance f ≤ avg f := by
-  refine (variance_le_avg_sq f).trans_eq ?_
-  congr 1
-  funext x
-  rcases hf x with h | h <;> simp [h]
-
 lemma avg_01_nonneg {f : γ → ℝ} (hf : ∀ x, f x = 0 ∨ f x = 1) : 0 ≤ avg f :=
   avg_nonneg fun x => by rcases hf x with h | h <;> simp [h]
 
@@ -80,7 +72,7 @@ theorem tail_up [Nonempty γ] (Y : Fin n → γ → ℝ) (hY : ∀ i x, Y i x = 
   have hμ0 : 0 ≤ μ := sum_nonneg fun i _ => avg_01_nonneg (hY i)
   have hM : 2 * ℓ ≤ μ + 2 * ℓ := by linarith
   have hσ : ∑ i, variance (Y i) ≤ μ + 2 * ℓ := by
-    have : ∑ i, variance (Y i) ≤ μ := sum_le_sum fun i _ => variance_le_avg_of_01 (hY i)
+    have : ∑ i, variance (Y i) ≤ μ := sum_le_sum fun i _ => variance_le_avg_of_zero_one (hY i)
     linarith
   have hb : ∀ i x, Y i x - avg (Y i) ≤ 1 := fun i x => by
     have := avg_01_nonneg (hY i)
@@ -113,7 +105,7 @@ theorem tail_down [Nonempty γ] (Y : Fin n → γ → ℝ) (hY : ∀ i x, Y i x 
   have hσ : ∑ i, variance (Z i) ≤ μ + 2 * ℓ := by
     have : ∑ i, variance (Z i) ≤ μ := by
       simp_rw [hvarZ]
-      exact sum_le_sum fun i _ => variance_le_avg_of_01 (hY i)
+      exact sum_le_sum fun i _ => variance_le_avg_of_zero_one (hY i)
     linarith
   have hb : ∀ i x, Z i x - avg (Z i) ≤ 1 := fun i x => by
     rw [havgZ]
