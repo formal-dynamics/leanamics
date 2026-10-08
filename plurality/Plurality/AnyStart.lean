@@ -405,7 +405,39 @@ theorem majority3_symmetry_breaking : ∃ C : ℝ, 0 < C ∧ ∀ (n : ℕ) [NeZe
     40 ≤ Real.log n → ∀ (I₀ : Finset (Fin n)) (t : ℕ), C * Real.log n ≤ t →
       1 - 1 / (n : ℝ)
         ≤ (binKernel n).hitProb (fun I => 22 * √(3 * n * Real.log n) ≤ |gap I|) t I₀ := by
-  sorry
+  /- The hitting-time bound of Doerr et al. (Claim 2.9) with `X = gapUnits`, `q = n`,
+  `c₁ = 5/4`, `c₂ = 1/320000`, `c₃ = 9/64`, `c₄ = 1000`, `c₆ = 1`: `X` reaches `1000 log n`,
+  that is `|s| ≥ 10 √n log n ≥ 22 √(3 n log n)`, within `C log n` rounds w.p. `1 - 1/n`. -/
+  obtain ⟨C, hC, hdrift⟩ := Kernel.drift_hitting_log.{0} (c₁ := 5 / 4) (c₂ := 1 / 320000)
+    (c₃ := 9 / 64) (c₄ := 1000) (c₆ := 1) (by norm_num) (by norm_num) (by norm_num)
+    (by norm_num) (by norm_num)
+  refine ⟨C, hC, fun n _ hL I₀ t ht => ?_⟩
+  obtain ⟨hn0, hw⟩ := sqrt_ge_of_log hL
+  have hww := Real.sq_sqrt hn0.le
+  have hw0 : 0 < √(n : ℝ) := Real.sqrt_pos.mpr hn0
+  -- `X ≤ |s| / (√n/100) ≤ 100 √n ≤ n`
+  have hX (I : Finset (Fin n)) : gapUnits I ≤ n := by
+    have h1 := gapUnits_mul_le I
+    have h2 := abs_gap_le I
+    have h3 : (gapUnits I : ℝ) * (√(n : ℝ) / 100) ≤ n * (√(n : ℝ) / 100) := by nlinarith
+    have h4 : (gapUnits I : ℝ) ≤ n := le_of_mul_le_mul_right h3 unit_pos
+    exact_mod_cast h4
+  have hzero (I : Finset (Fin n)) (h0 : gapUnits I = 0) :
+      9 / 64 ≤ (binKernel n I).prob (fun J => 1 ≤ gapUnits J) :=
+    (units_near hL I (by omega)).trans (Distribution.prob_mono _ fun J hJ => by omega)
+  have hq : 1000 * Real.log n ≤ (n : ℝ) := by nlinarith
+  have key := hdrift (binKernel n) gapUnits n hX (units_grow hL) hzero hq I₀ t ht
+  rw [Real.rpow_neg_one, ← one_div] at key
+  refine key.trans (hitProb_mono _ (fun I hI => ?_) t I₀)
+  -- `|s| ≥ 1000 log n · √n/100 = 10 √n log n ≥ 22 √(3 n log n)`
+  have h1 := gapUnits_mul_le I
+  have h2 : 10 * Real.log n * √(n : ℝ) ≤ |gap I| := by nlinarith
+  refine le_trans ?_ h2
+  rw [← le_div_iff₀' (by norm_num : (0 : ℝ) < 22), Real.sqrt_le_left]
+  · rw [div_pow, mul_pow, mul_pow, hww]
+    have hnL : 0 ≤ (n : ℝ) * Real.log n := mul_nonneg hn0.le (by linarith)
+    nlinarith [mul_le_mul_of_nonneg_left hL hnL]
+  · positivity
 
 /-- **Binary 3-Majority from any configuration.** There is `C > 0` such that, for `log n ≥ 40`,
 from any configuration `I₀` (in particular from a perfectly balanced one), all nodes hold the same
