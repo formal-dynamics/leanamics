@@ -6,4 +6,6 @@ import Averaging.OpportunisticModel
 import Averaging.OpportunisticFirstMoment
 import Averaging.OpportunisticClustered
 import Averaging.OpportunisticSigns
+import Averaging.OpportunisticOneStep
+import Averaging.OpportunisticSecondMoment
 import Averaging.OpportunisticSparseCut

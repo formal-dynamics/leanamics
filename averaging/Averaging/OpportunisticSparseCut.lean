@@ -1,4 +1,4 @@
-import Averaging.OpportunisticClustered
+import Averaging.OpportunisticSecondMoment
 
 /-! # Averaging whenever you meet: community recovery on clustered graphs with a sparse cut
 
@@ -56,7 +56,9 @@ theorem secondMoment_bound :
         avg (fun σ : Fin n → ℤˣ => expList G.Dart t fun l =>
           ∑ v, (projCut V₁ (avgRun G (signVec σ) l) v + projRest V₁ (avgRun G (signVec σ) l) v -
             projCut V₁ (signVec σ) v) ^ 2) ≤ (3 * (2 * b / d) * t / n : ℝ) := by
-  sorry
+  refine ⟨100, by norm_num, fun n G _ V₁ d b lam3 hG h3 hc t ht _ => ?_⟩
+  have := hG.secondMoment_bound_aux h3 (by simpa using hc) t (by simpa using ht)
+  simpa using this
 
 /-- Lemma 4.2 (non-ephemeral good nodes): on an `(n, d, b)`-clustered regular graph with
 `λ₂/λ₃ ≤ λ₃ ε⁴/(c log² n)` for a large enough constant `c` (`λ₂ = 2b/d`), with probability at least
