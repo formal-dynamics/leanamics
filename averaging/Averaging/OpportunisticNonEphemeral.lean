@@ -136,4 +136,145 @@ lemma avg_snd_mem (B : Finset V) :
 
 end IsClusteredRegular
 
+/-! ### Arithmetic of the bound `Yb` -/
+
+lemma cutDevBound_le_small {N l2 l3 s z : ℝ} {T : ℕ} (hN : 16 ≤ N) (hl3 : 0 < l3) (hs : 0 ≤ s)
+    (hz : 0 ≤ z) (hL0 : 0 ≤ T * l2 / N) (hL : T * l2 / N ≤ 1 / 8) (hr0 : 0 ≤ l2 / l3)
+    (hr : l2 / l3 ≤ 1 / 8) :
+    cutDevBound N l2 l3 s z T ≤ 2 * (T * l2 / N) * s + l2 / l3 * z := by
+  have hN0 : 0 < N := by linarith
+  set L := T * l2 / N with hL_def
+  set r := l2 / l3 with hr_def
+  have e : cutDevBound N l2 l3 s z T =
+      L * (1 + 8 / N) * s + 4 * r / N * z + 4 * L * r * (s + z) / N := by
+    unfold cutDevBound; rw [hL_def, hr_def]; field_simp
+  rw [e]
+  have h8 : 8 / N ≤ 1 / 2 := by rw [div_le_iff₀ hN0]; linarith
+  have h4 : 4 / N ≤ 1 / 4 := by rw [div_le_iff₀ hN0]; linarith
+  have e1 : 4 * r / N * z = r * z * (4 / N) := by ring
+  have e2 : 4 * L * r * (s + z) / N = L * r * (s + z) * (4 / N) := by ring
+  rw [e1, e2]
+  have hLr : L * r ≤ 1 / 64 := by nlinarith
+  have hLr0 : 0 ≤ L * r := by positivity
+  nlinarith [mul_le_mul_of_nonneg_left h8 (mul_nonneg hL0 hs),
+    mul_le_mul_of_nonneg_left h4 (mul_nonneg hr0 hz),
+    mul_le_mul_of_nonneg_left h4 (mul_nonneg hLr0 (add_nonneg hs hz)),
+    mul_nonneg hr0 hz, mul_nonneg hL0 hs]
+
+lemma cutDevBound_le_start {N l2 l3 s z : ℝ} {T : ℕ} (hN : 16 ≤ N) (hl3 : 0 < l3) (hs : 0 ≤ s)
+    (hz : 0 ≤ z) (hzN : z ≤ N) (hszN : s + z ≤ N) (hL0 : 0 ≤ T * l2 / N)
+    (hL : T * l2 / N ≤ 1 / 8) (hr0 : 0 ≤ l2 / l3) (hr : l2 / l3 ≤ 1 / 8) :
+    cutDevBound N l2 l3 s z T ≤ 2 * (T * l2 / N) * s + 5 * (l2 / l3) := by
+  have hN0 : 0 < N := by linarith
+  set L := T * l2 / N with hL_def
+  set r := l2 / l3 with hr_def
+  have e : cutDevBound N l2 l3 s z T =
+      L * (1 + 8 / N) * s + 4 * r * (z / N) + 4 * L * r * ((s + z) / N) := by
+    unfold cutDevBound; rw [hL_def, hr_def]; field_simp
+  rw [e]
+  have h8 : 8 / N ≤ 1 / 2 := by rw [div_le_iff₀ hN0]; linarith
+  have h1 : z / N ≤ 1 := (div_le_one hN0).mpr hzN
+  have h2 : (s + z) / N ≤ 1 := (div_le_one hN0).mpr hszN
+  have hLr : L * r ≤ 1 / 64 := by nlinarith
+  have hLr0 : 0 ≤ L * r := by positivity
+  have hz0 : 0 ≤ z / N := by positivity
+  have hsz0 : 0 ≤ (s + z) / N := by positivity
+  nlinarith [mul_le_mul_of_nonneg_left h8 (mul_nonneg hL0 hs), mul_le_mul_of_nonneg_left h1 hr0,
+    mul_le_mul_of_nonneg_left h2 hLr0]
+
+/-! ### Expectation bounds for one choice of the initial signs -/
+
+namespace IsClusteredRegular
+variable (hG : IsClusteredRegular G V₁ d b) (h3 : ThirdEigenvalueLB G V₁ d lam3)
+include hG h3
+
+/-- The cut coefficient moves little up to the start of the phase:
+`E ‖y⁽ᵗ¹⁾ - y⁽⁰⁾‖² ≤ 2 L₁ ‖y⁽⁰⁾‖² + 5 λ₂/λ₃` with `L₁ = λ₂ t₁/n`. -/
+lemma expList_cutDev_signVec_le (hl3 : 0 < lam3) (hN : (16 : ℝ) ≤ Fintype.card V)
+    (σ : V → ℤˣ) (t₁ : ℕ) (hL : (t₁ : ℝ) * (2 * b / d) / Fintype.card V ≤ 1 / 8)
+    (hr : (2 * b / d) / lam3 ≤ 1 / 8) :
+    expList G.Dart t₁ (fun l => Fintype.card V *
+        (cutCoef V₁ (avgRun G (signVec σ) l) - cutCoef V₁ (signVec σ)) ^ 2) ≤
+      2 * (t₁ * (2 * b / d) / Fintype.card V) * (Fintype.card V * cutCoef V₁ (signVec σ) ^ 2) +
+        5 * ((2 * b / d) / lam3) := by
+  have hNpos := hG.card_real_pos
+  refine (hG.expList_secondMoment_le h3 hl3 (by linarith) (signVec σ) t₁).1.trans ?_
+  exact cutDevBound_le_start hN hl3 (by positivity) (restSq_nonneg _) (hG.restSq_signVec_le σ)
+    (hG.cutCoef_sq_add_restSq_signVec_le σ) (by positivity) hL (by positivity) hr
+
+/-- The rest component is small at the start of the phase:
+`E ‖z⁽ᵗ¹⁾‖² ≤ n (1 - λ₃/n)^{t₁} + 3 r ‖y⁽⁰⁾‖² + 10 r²` with `r = λ₂/λ₃`. -/
+lemma expList_restSq_signVec_le (hl3 : 0 < lam3) (hN : (16 : ℝ) ≤ Fintype.card V)
+    (σ : V → ℤˣ) (t₁ : ℕ) (hL : (t₁ : ℝ) * (2 * b / d) / Fintype.card V ≤ 1 / 8)
+    (hr : (2 * b / d) / lam3 ≤ 1 / 8) :
+    expList G.Dart t₁ (fun l => restSq V₁ (avgRun G (signVec σ) l)) ≤
+      Fintype.card V * (1 - lam3 / Fintype.card V) ^ t₁ +
+        3 * ((2 * b / d) / lam3) * (Fintype.card V * cutCoef V₁ (signVec σ) ^ 2) +
+        10 * ((2 * b / d) / lam3) ^ 2 := by
+  have hNpos := hG.card_real_pos
+  have hl3le := hG.lam3_le_two h3
+  refine (hG.expList_secondMoment_le h3 hl3 (by linarith) (signVec σ) t₁).2.trans ?_
+  have hCD := cutDevBound_le_start hN hl3 (by positivity) (restSq_nonneg _)
+    (hG.restSq_signVec_le σ) (hG.cutCoef_sq_add_restSq_signVec_le σ) (by positivity) hL
+    (by positivity) hr (l2 := 2 * b / d) (T := t₁)
+  set N : ℝ := (Fintype.card V : ℝ)
+  set r := (2 * b / d : ℝ) / lam3
+  set L := t₁ * (2 * b / d : ℝ) / N
+  set s := N * cutCoef V₁ (signVec σ) ^ 2
+  have hq0 : 0 ≤ 1 - lam3 / N := by rw [sub_nonneg, div_le_one hNpos]; linarith
+  have hqz : (1 - lam3 / N) ^ t₁ * restSq V₁ (signVec σ) ≤ N * (1 - lam3 / N) ^ t₁ := by
+    rw [mul_comm N]; exact mul_le_mul_of_nonneg_left (hG.restSq_signVec_le σ) (pow_nonneg hq0 _)
+  have hr0 : 0 ≤ r := by positivity
+  have hs : 0 ≤ s := by positivity
+  have hL0 : 0 ≤ L := by positivity
+  have := mul_le_mul_of_nonneg_left hCD (show 0 ≤ 2 * r by positivity)
+  have hLs : r * (L * s) ≤ r * (s / 8) := by
+    apply mul_le_mul_of_nonneg_left _ hr0; nlinarith
+  nlinarith
+
+/-- From an arbitrary state `x₁` (the start of the phase): the deviation `r` after `k` more
+rounds satisfies `E ‖r⁽ᵏ⁾‖² ≤ (2.5 L_k + 2 r) ‖y₁‖² + 2 ‖z₁‖²`, with `L_k = λ₂ k/n`. -/
+lemma expList_devVec_le (hl3 : 0 < lam3) (hN : (16 : ℝ) ≤ Fintype.card V)
+    (x₁ : V → ℝ) (k : ℕ) (hL : (k : ℝ) * (2 * b / d) / Fintype.card V ≤ 1 / 8)
+    (hr : (2 * b / d) / lam3 ≤ 1 / 8) :
+    expList G.Dart k (fun p => ∑ v, devVec V₁ x₁ (avgRun G x₁ p) v ^ 2) ≤
+      (5 / 2 * (k * (2 * b / d) / Fintype.card V) + 2 * ((2 * b / d) / lam3)) *
+          (Fintype.card V * cutCoef V₁ x₁ ^ 2) + 2 * restSq V₁ x₁ := by
+  have hNpos := hG.card_real_pos
+  have hl3le := hG.lam3_le_two h3
+  have hdev : ∀ p : List G.Dart, ∑ v, devVec V₁ x₁ (avgRun G x₁ p) v ^ 2 =
+      Fintype.card V * (cutCoef V₁ (avgRun G x₁ p) - cutCoef V₁ x₁) ^ 2 +
+        restSq V₁ (avgRun G x₁ p) := fun p => by
+    rw [← sum_sq_dev_eq hG]
+    have havg : avg (avgRun G x₁ p) = avg x₁ := by simp only [avg, sum_avgRun]
+    refine Finset.sum_congr rfl fun v _ => ?_
+    simp only [devVec, projCut_eq, projRest, projOne, projCut, havg, cutCoef]
+    ring
+  simp_rw [hdev]
+  rw [expList_add]
+  obtain ⟨hY, hZ⟩ := hG.expList_secondMoment_le h3 hl3 (by linarith) x₁ k
+  have hCD := cutDevBound_le_small hN hl3 (by positivity) (restSq_nonneg (V₁ := V₁) x₁)
+    (by positivity) hL
+    (by positivity) hr (l2 := 2 * b / d) (s := Fintype.card V * cutCoef V₁ x₁ ^ 2) (T := k)
+  set N : ℝ := (Fintype.card V : ℝ)
+  set r := (2 * b / d : ℝ) / lam3
+  set L := k * (2 * b / d : ℝ) / N
+  set s := N * cutCoef V₁ x₁ ^ 2
+  set z := restSq V₁ x₁
+  have hq0 : 0 ≤ 1 - lam3 / N := by rw [sub_nonneg, div_le_one hNpos]; linarith
+  have hq1 : 1 - lam3 / N ≤ 1 := by have : 0 ≤ lam3 / N := by positivity
+                                    linarith
+  have hqz : (1 - lam3 / N) ^ k * z ≤ z :=
+    mul_le_of_le_one_left (restSq_nonneg _) (pow_le_one₀ hq0 hq1)
+  have hr0 : 0 ≤ r := by positivity
+  have hs : 0 ≤ s := by positivity
+  have hz : 0 ≤ z := restSq_nonneg _
+  have hL0 : 0 ≤ L := by positivity
+  have := mul_le_mul_of_nonneg_left hCD (show 0 ≤ 2 * r by positivity)
+  have h1 : r * (L * s) ≤ (1 / 8) * (L * s) := mul_le_mul_of_nonneg_right hr (by positivity)
+  have h2 : r * (r * z) ≤ (1 / 8) * (r * z) := mul_le_mul_of_nonneg_right hr (by positivity)
+  nlinarith [mul_nonneg hr0 hz]
+
+end IsClusteredRegular
+
 end Averaging.Opportunistic
