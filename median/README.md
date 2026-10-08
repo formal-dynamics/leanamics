@@ -4,7 +4,7 @@ Doerr, Goldberg, Minder, Sauerwald and Scheideler, *Stabilizing consensus with t
 choices* (SPAA 2011): every node holds a value from a linearly ordered set and, every round,
 adopts the median of its own value and the values of two nodes sampled uniformly at random (with
 replacement). With two values this is the 2-Choices dynamics.
-Theorem and lemma numbers follow the earlier (2009) version of the paper; in the
+Theorem and lemma numbers follow the 2009 version of the paper (Dagstuhl Seminar Proceedings 09371); in the
 SPAA 2011 proceedings, Theorem 1 is Theorem 1.1 and Theorem 21 is Theorem 4.1, and the lemmas
 are numbered differently.
 

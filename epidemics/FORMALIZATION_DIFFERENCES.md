@@ -126,8 +126,9 @@ a chance to jump in each.
 `ε = c/n` and otherwise none. For `n ≥ c/p`, `p_k = ε ≤ p` and `c_k = ε(1 - ε) ≤ c/n`, but the
 process started from one node jumps from `1` to `n` with probability 1. (The same process with
 `ε_k = c k / n²` satisfies the lower exponential growth conditions, so the last sentence of
-Theorem 1, which rests on Lemma 20, needs another argument in general. That sentence is a lower-bound
-statement, outside the scope of this formalization.)
+Theorem 1, which rests on Lemma 20 (through Theorem 27), needs another argument in general. That
+sentence is a lower-bound statement, outside the scope of this formalization. The long version
+also uses Lemma 20 in the proofs of Theorems 57 and 58.)
 
 Two corrected versions are formalized instead:
 
