@@ -26,3 +26,10 @@ import Plurality
 #print axioms Plurality.theorem_4_12
 #print axioms Plurality.theorem_4_12_log
 #print axioms Plurality.majority3_vanishing_bias
+#print axioms Plurality.jump_near_balance
+#print axioms Plurality.growth_far
+#print axioms Plurality.hitProb_sub_le_event
+#print axioms Plurality.event_amplify
+#print axioms Plurality.majority3_symmetry_breaking
+#print axioms Plurality.majority3_any_start
+#print axioms Plurality.majority3_any_start_whp

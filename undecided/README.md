@@ -37,11 +37,11 @@ deviations from the paper.
 
 ## Provenance
 
-For `Undecided/Basic.lean`, the statements were written and pinned by hand; the
+For `Undecided/Basic.lean`, the statements were written and pinned by a second agent; the
 proofs were produced by a Grok agent under a fixed-statement protocol and verified mechanically
 (statements unchanged, no placeholders, warning-free build, axiom audit). The sequential
 statements and their proofs were written by a Claude agent under the same protocol; the statements
-were reviewed by hand against the paper. The majority-phase statements (`Majority*`) and their
+were reviewed by a second agent against the paper. The majority-phase statements (`Majority*`) and their
 proofs were written by a Claude agent under the same protocol.
 
 ## Build

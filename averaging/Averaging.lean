@@ -2,3 +2,12 @@ import Averaging.Basic
 import Averaging.Rate
 import Averaging.Sequential
 import Averaging.Reconstruction
+import Averaging.OpportunisticModel
+import Averaging.OpportunisticFirstMoment
+import Averaging.OpportunisticClustered
+import Averaging.OpportunisticSigns
+import Averaging.OpportunisticOneStep
+import Averaging.OpportunisticSecondMoment
+import Averaging.OpportunisticGood
+import Averaging.OpportunisticNonEphemeral
+import Averaging.OpportunisticSparseCut

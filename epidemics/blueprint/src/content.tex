@@ -24,7 +24,7 @@ the final-size equation $s_\infty=s(0)e^{-R_0(1-s_\infty)}$, following Hethcote 
 We also formalize the upper bounds of Doerr and Kostrygin's analysis of general rumor-spreading
 processes (\emph{Randomized rumor spreading revisited}, ICALP 2017): the exponential growth and
 shrinking regimes and the total spreading time $\log_{1+\gamma}n+\frac1\rho\ln n+O(1)$, with
-exponential tails. Lemma~20 of that paper is false as stated; we prove corrected versions.
+exponential tails. Lemma~20 of that paper needs a major correction; we prove corrected versions.
 
 We also formalize the duality between the coalescing-branching random walk (COBRA) and the BIPS
 epidemic of Cooper, Radzik and Rivera (Theorem~4), pathwise and by time reversal of i.i.d.\ rounds.
@@ -407,8 +407,8 @@ expected number of these rounds started below $fn$, i.e.\ $O(E[T(|S|,fn)]/n)$.
 Chebyshev's inequality with Lemma~\ref{lem:rumor-variance} for one round, then a union bound over
 the rounds along the trajectory.
 \end{proof}
-The paper's Lemma~20 claims probability $1-O(1/n)$ of landing in $[fn,f'n]$; this is false: the
-process that from every $|S|<fn$ informs all nodes with probability $c/n$ (and otherwise none)
+The paper's Lemma~20 claims probability $1-O(1/n)$ of landing in $[fn,f'n]$; this needs a
+correction, as the process that from every $|S|<fn$ informs all nodes with probability $c/n$ (and otherwise none)
 satisfies the hypotheses and jumps from $1$ to $n$ with probability one. See
 \texttt{FORMALIZATION\_DIFFERENCES.md}.
 
@@ -434,6 +434,85 @@ $E[T]\le\log_{1+\gamma}n+\ln n/\rho+B$.
 \begin{proof}\leanok
 Compose the three exponential tails (Theorem~\ref{thm:rumor-growth}, Lemma~\ref{lem:rumor-connect},
 Theorem~\ref{thm:rumor-shrinking}) by the Markov property at fixed times, and sum the tail.
+\end{proof}
+
+\begin{definition}[Upper double exponential shrinking conditions]\label{def:rumor-double}
+\lean{Epidemics.Revisited.RumorProcess.UpperDoubleShrinking,Epidemics.Revisited.RumorProcess.FastFinishing}\leanok\uses{def:rumor-process}
+Definition~13: when $n^{1-\alpha}\le u=n-|S|\le gn$, every uninformed node stays uninformed with
+probability at most $a(u/n)^{\ell-1}$ and covariances are at most $cn/u^2$. Fast finishing (the
+second hypothesis of Theorem~43): when $u\le n^{1-\alpha}$, every uninformed node stays
+uninformed with probability at most $n^{-\tau}$.
+\end{definition}
+
+\begin{theorem}[Theorem 43: double exponential shrinking]\label{thm:rumor-double}
+\lean{Epidemics.Revisited.double_shrinking_upper_tail,Epidemics.Revisited.double_shrinking_upper_expect}\leanok\uses{def:rumor-double,lem:rumor-variance}
+Let $\ell>1$, $a,c\ge0$, $g,\alpha\in[0,1]$, $ag^{\ell-1}<1$ and $\tau>0$. Under the upper double
+exponential shrinking conditions and fast finishing, from any $S$ with $n-|S|\le gn$:
+$\Pr[T(|S|,n)>\lceil\log_\ell\ln n\rceil+r]\le Cn^{A'-\alpha'r}$ and
+$E[T(|S|,n)]\le\log_\ell\ln n+B$.
+\end{theorem}
+\begin{proof}\leanok
+Three stages. Geometric targets $g\mu^jn$, $\mu=(1+ag^{\ell-1})/2$, bring $u$ below $g_0n$ in a
+constant number of phases; double exponential targets $\varepsilon_{j+1}=2a_1\varepsilon_j^\ell$,
+i.e.\ $\varepsilon_j=e^{-(\kappa+\ell^jD_0)}$, bring it below $\varepsilon_Jn\le n^{1-\beta/(2\ell)}$
+in $J\le\log_\ell\ln n$ phases; below that, every uninformed node stays uninformed with
+probability at most $n^{-\tau_3}$ and Markov's inequality finishes. A phase fails with
+probability at most $n^{-2\delta}$ (Chebyshev with Lemma~\ref{lem:rumor-variance} above
+$n^{1-\alpha}$ uninformed nodes, Markov with fast finishing below), and the phase potential
+$\lambda^{J-j}$, $\lambda=n^\delta$, contracts by $n^{-2\delta}+n^{-\delta}$ per round. The
+paper's first stage uses Lemma~19, whose tail rate does not depend on $n$; the per-round
+Chebyshev bound gives the polynomial tail.
+\end{proof}
+
+\begin{theorem}[Total spreading time, double exponential shrinking]\label{thm:rumor-total-double}
+\lean{Epidemics.Revisited.spreading_upper_tail_double,Epidemics.Revisited.spreading_upper_expect_double}\leanok\uses{thm:rumor-growth,thm:rumor-double,lem:rumor-connect}
+Under the growth conditions on $[1,fn[$, the double exponential shrinking conditions and fast
+finishing below $gn$ uninformed nodes ($g>0$), and a probability at least $p>0$ of being informed
+in between, from any nonempty $S$:
+$\Pr[T>\lceil\log_{1+\gamma}n\rceil+\lceil\log_\ell\ln n\rceil+r]\le Ae^{-\kappa r}$ and
+$E[T]\le\log_{1+\gamma}n+\log_\ell\ln n+B$.
+\end{theorem}
+\begin{proof}\leanok
+As Theorem~\ref{thm:rumor-total}, with Theorem~\ref{thm:rumor-double} in the last stage (its
+polynomial tail is an exponential tail once $\ln n\ge1$).
+\end{proof}
+
+\begin{definition}[Push, pull and push--pull on $K_n$]\label{def:rumor-protocols}
+\lean{Epidemics.Revisited.calls,Epidemics.Revisited.pushRound,Epidemics.Revisited.pullRound,Epidemics.Revisited.pushPullRound,Epidemics.Revisited.push,Epidemics.Revisited.pull,Epidemics.Revisited.pushPull}\leanok\uses{def:rumor-process}
+In a round every node calls a uniformly random node (itself included), independently. Push:
+informed nodes inform the nodes they call. Pull: uninformed nodes calling an informed node become
+informed. Push--pull: both.
+\end{definition}
+
+\begin{lemma}[One-round quantities and conditions]\label{lem:rumor-protocol-conditions}
+\lean{Epidemics.Revisited.push_informProb,Epidemics.Revisited.pull_informProb,Epidemics.Revisited.pushPull_informProb,Epidemics.Revisited.push_homogeneous,Epidemics.Revisited.pull_homogeneous,Epidemics.Revisited.pushPull_homogeneous,Epidemics.Revisited.push_cov_nonpos,Epidemics.Revisited.pull_cov_eq_zero,Epidemics.Revisited.pushPull_cov_nonpos,Epidemics.Revisited.push_upperGrowth,Epidemics.Revisited.push_upperShrinking,Epidemics.Revisited.pull_upperGrowth,Epidemics.Revisited.pull_upperDoubleShrinking,Epidemics.Revisited.pull_fastFinishing,Epidemics.Revisited.pushPull_upperGrowth,Epidemics.Revisited.pushPull_upperDoubleShrinking,Epidemics.Revisited.pushPull_fastFinishing}\leanok\uses{def:rumor-protocols,def:rumor-conditions,def:rumor-double}
+With $k=|S|$ informed nodes, an uninformed node is informed with probability
+$1-(1-\frac1n)^k$ (push), $\frac kn$ (pull), $1-(1-\frac1n)^k(1-\frac kn)$ (push--pull);
+distinct uninformed nodes are nonpositively correlated (independent for pull). Hence push
+satisfies the upper growth conditions with $\gamma=1$, $a=\frac12$ and the upper shrinking
+conditions with $\rho=1$, $a=\frac2e$, $g=\frac12$; pull and push--pull satisfy the growth
+conditions with $\gamma=1$, $a=0$ and $\gamma=2$, $a=\frac34$, and the double exponential
+shrinking conditions with $\ell=2$, $a=1$, $g=\alpha=\frac12$ and fast finishing with
+$\tau=\frac12$ (all with $b=c=0$, $f=\frac12$).
+\end{lemma}
+\begin{proof}\leanok
+The calls are independent uniform coordinates, so the events ``$x$ stays uninformed'' and
+``$x$ and $y$ stay uninformed'' have product probabilities. The bounds use
+$(1-x)^k\le1-kx+(kx)^2/2$ and $e^t\le1+2t$ on $[0,1]$.
+\end{proof}
+
+\begin{theorem}[Theorems 51, 52, 53: push, pull, push--pull, upper bounds]\label{thm:rumor-protocols}
+\lean{Epidemics.Revisited.push_spreading_tail,Epidemics.Revisited.push_spreading_expect,Epidemics.Revisited.pull_spreading_tail,Epidemics.Revisited.pull_spreading_expect,Epidemics.Revisited.pushPull_spreading_tail,Epidemics.Revisited.pushPull_spreading_expect}\leanok\uses{lem:rumor-protocol-conditions,thm:rumor-total,thm:rumor-total-double}
+From any nonempty set of informed nodes on $K_n$, all nodes are informed within
+$\lceil\log_2n\rceil+\lceil\ln n\rceil+r$ (push), $\lceil\log_2n\rceil+\lceil\log_2\ln n\rceil+r$
+(pull) and $\lceil\log_3n\rceil+\lceil\log_2\ln n\rceil+r$ (push--pull) rounds, except with
+probability at most $Ae^{-\kappa r}$; the expected times are at most $\log_2n+\ln n+B$,
+$\log_2n+\log_2\ln n+B$ and $\log_3n+\log_2\ln n+B$.
+\end{theorem}
+\begin{proof}\leanok
+Instantiate Theorem~\ref{thm:rumor-total} (push) and Theorem~\ref{thm:rumor-total-double}
+(pull, push--pull) with Lemma~\ref{lem:rumor-protocol-conditions}; the middle range is empty since
+$f=g=\frac12$.
 \end{proof}
 
 \section{COBRA and BIPS: the model}
