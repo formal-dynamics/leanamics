@@ -698,7 +698,7 @@ lemma badRound_bound (hl3 : 0 < lam3) (hN : (16 : ℝ) ≤ Fintype.card V) {ε :
       have hdev := hG.expList_devVec_le h3 hl3 hN x₁ k hLk hr
       have hs1 : N * cutCoef V₁ x₁ ^ 2 ≤ 5 / 2 * s₀ := by
         unfold CutMoved at h
-        push_neg at h
+        have h := le_of_not_gt h
         have hε2 : ε ^ 2 ≤ 1 := by nlinarith
         nlinarith [sq_nonneg (cutCoef V₁ x₁ - 2 * cutCoef V₁ x₀), hn]
       have h1 : (5 / 2 * Lk + 2 * r) * (N * cutCoef V₁ x₁ ^ 2) ≤
@@ -726,5 +726,259 @@ lemma badRound_bound (hl3 : 0 < lam3) (hN : (16 : ℝ) ≤ Fintype.card V) {ε :
   linarith
 
 end IsClusteredRegular
+
+
+/-! ### Lemma 4.2 -/
+
+/-- `n (1 - λ₃/n)ᵗ ≤ 1/n⁵` once `λ₃ t/n ≥ 6 log n`. -/
+lemma card_mul_pow_le_six {N l3 : ℝ} {T : ℕ} (hN : 0 < N) (hl3 : 0 < l3) (hq : 0 ≤ 1 - l3 / N)
+    (hT : 6 * N / l3 * Real.log N ≤ T) :
+    N * (1 - l3 / N) ^ T ≤ 1 / N ^ 5 := by
+  have h1 : (1 - l3 / N) ^ T ≤ Real.exp (-(l3 / N)) ^ T :=
+    pow_le_pow_left₀ hq (Real.one_sub_le_exp_neg _) T
+  have h2 : Real.exp (-(l3 / N)) ^ T = Real.exp (-(l3 * T / N)) := by
+    rw [← Real.exp_nat_mul]; congr 1; ring
+  have h3 : -(l3 * T / N) ≤ -(6 * Real.log N) := by
+    have : 6 * Real.log N ≤ l3 * T / N := by
+      rw [le_div_iff₀ hN]
+      have := mul_le_mul_of_nonneg_left hT hl3.le
+      rw [show l3 * (6 * N / l3 * Real.log N) = 6 * Real.log N * N by field_simp] at this
+      linarith
+    linarith
+  have h4 : Real.exp (-(6 * Real.log N)) = 1 / N ^ 6 := by
+    rw [Real.exp_neg, show 6 * Real.log N = (6 : ℕ) * Real.log N by norm_num, Real.exp_nat_mul,
+      Real.exp_log hN]; simp
+  calc N * (1 - l3 / N) ^ T ≤ N * Real.exp (-(l3 * T / N)) := by
+        rw [← h2]; exact mul_le_mul_of_nonneg_left h1 hN.le
+    _ ≤ N * (1 / N ^ 6) := by rw [← h4]; gcongr
+    _ = 1 / N ^ 5 := by field_simp
+
+lemma one_div_sqrt_le {N δ : ℝ} (hN : 0 ≤ N) (hδ : 0 < δ) (h : 1 ≤ δ ^ 2 * (N + 1)) :
+    1 / Real.sqrt (N + 1) ≤ δ := by
+  have hs : 0 < Real.sqrt (N + 1) := Real.sqrt_pos.mpr (by linarith)
+  rw [div_le_iff₀ hs]
+  have : Real.sqrt (δ ^ 2 * (N + 1)) = δ * Real.sqrt (N + 1) := by
+    rw [Real.sqrt_mul (sq_nonneg _), Real.sqrt_sq hδ.le]
+  rw [← this]
+  exact Real.le_sqrt_of_sq_le (by simpa using h)
+
+/-! ### The final arithmetic of Lemma 4.2 -/
+
+section Arith
+variable {N LN l3 ε r w u L : ℝ}
+
+lemma arith_T1 (hε0 : 0 < ε) (hε1 : ε ≤ 1) (hL : L ≤ 7 * (r * LN))
+    (hrLN : 10 ^ 6 * (r * LN) ≤ 2 * ε ^ 4) : 8 * L / ε ^ 2 ≤ ε / 100 := by
+  have h43 : ε ^ 4 ≤ ε ^ 3 := pow_le_pow_of_le_one hε0.le hε1 (by norm_num)
+  rw [div_le_iff₀ (by positivity)]
+  have : ε / 100 * ε ^ 2 = ε ^ 3 / 100 := by ring
+  rw [this]
+  have : 0 ≤ ε ^ 3 := by positivity
+  linarith
+
+lemma arith_T2 (hn : 0 < N) (hε0 : 0 < ε) (hε1 : ε ≤ 1) (hLN1 : 1 ≤ LN)
+    (hNε : 5 * 10 ^ 5 * LN ^ 2 ≤ N * ε ^ 4) (hu : u = 1 / Real.sqrt (N + 1)) :
+    u ≤ ε / 100 := by
+  rw [hu]
+  refine one_div_sqrt_le hn.le (by positivity) ?_
+  have h42 : ε ^ 4 ≤ ε ^ 2 := pow_le_pow_of_le_one hε0.le hε1 (by norm_num)
+  have h1 : N * ε ^ 4 ≤ N * ε ^ 2 := mul_le_mul_of_nonneg_left h42 hn.le
+  have h2 : (1 : ℝ) ≤ LN ^ 2 := by nlinarith
+  have e : (ε / 100) ^ 2 * (N + 1) = N * ε ^ 2 / 10000 + ε ^ 2 / 10000 := by ring
+  rw [e]
+  have : 0 ≤ ε ^ 2 / 10000 := by positivity
+  linarith
+
+lemma arith_T3 (hε0 : 0 < ε) (hLN1 : 1 ≤ LN) : 2 * (ε / (100 * LN)) * (1 + LN) ≤ ε / 25 := by
+  have hLN : 0 < LN := by linarith
+  have e : 2 * (ε / (100 * LN)) * (1 + LN) = ε * (1 + LN) / (50 * LN) := by field_simp; ring
+  rw [e, div_le_div_iff₀ (by positivity) (by norm_num)]
+  nlinarith [mul_le_mul_of_nonneg_left hLN1 hε0.le]
+
+lemma arith_T4 (hε0 : 0 < ε) (hLN1 : 1 ≤ LN) (hr0 : 0 ≤ r)
+    (hrLN : 10 ^ 6 * (r * LN) ≤ 2 * ε ^ 4) : 12 * r / ε ^ 3 ≤ ε / 100 := by
+  have : r ≤ r * LN := le_mul_of_one_le_right hr0 hLN1
+  rw [div_le_iff₀ (by positivity)]
+  have e : ε / 100 * ε ^ 3 = ε ^ 4 / 100 := by ring
+  rw [e]
+  linarith
+
+lemma arith_wLN (hn : 0 < N) (hε0 : 0 < ε) (hε1 : ε ≤ 1) (hLN1 : 1 ≤ LN) (hNbig : 5 * 10 ^ 5 ≤ N)
+    (hNε : 5 * 10 ^ 5 * LN ^ 2 ≤ N * ε ^ 4) (hw : w * N ^ 2 = 1) : 800 * (w * LN) ≤ ε ^ 3 := by
+  have h43 : ε ^ 4 ≤ ε ^ 3 := pow_le_pow_of_le_one hε0.le hε1 (by norm_num)
+  have hN2 : 0 < N ^ 2 := by positivity
+  refine le_of_mul_le_mul_right ?_ hN2
+  have e : 800 * (w * LN) * N ^ 2 = 800 * LN := by
+    rw [show 800 * (w * LN) * N ^ 2 = 800 * LN * (w * N ^ 2) by ring, hw, mul_one]
+  rw [e]
+  have h1 : (N * ε ^ 4) * N ≤ ε ^ 3 * N ^ 2 := by
+    rw [show ε ^ 3 * N ^ 2 = (N * ε ^ 3) * N by ring]
+    exact mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left h43 hn.le) hn.le
+  have h2 : 5 * 10 ^ 5 * LN ^ 2 * N ≤ (N * ε ^ 4) * N := mul_le_mul_of_nonneg_right hNε hn.le
+  have h3 : LN ≤ LN ^ 2 := by nlinarith
+  have h4 : 800 * LN ≤ 5 * 10 ^ 5 * LN ^ 2 * N := by nlinarith
+  linarith
+
+lemma arith_T5 (hε0 : 0 < ε) (hε1 : ε ≤ 1) (hLN1 : 1 ≤ LN) (hw0 : 0 ≤ w) (hr0 : 0 ≤ r)
+    (hwLN : 800 * (w * LN) ≤ ε ^ 3) (hrLN : 10 ^ 6 * (r * LN) ≤ 2 * ε ^ 4) :
+    2 * (2 * (w + 4 * r) / ε ^ 2) * (1 + LN) ≤ ε / 50 := by
+  have h43 : ε ^ 4 ≤ ε ^ 3 := pow_le_pow_of_le_one hε0.le hε1 (by norm_num)
+  have h1 : 2 * (2 * (w + 4 * r) / ε ^ 2) * (1 + LN) ≤ 2 * (2 * (w + 4 * r) / ε ^ 2) * (2 * LN) :=
+    mul_le_mul_of_nonneg_left (by linarith) (by positivity)
+  refine h1.trans ?_
+  have e : 2 * (2 * (w + 4 * r) / ε ^ 2) * (2 * LN) = 8 * (w * LN + 4 * (r * LN)) / ε ^ 2 := by
+    ring
+  rw [e, div_le_iff₀ (by positivity)]
+  have e2 : ε / 50 * ε ^ 2 = ε ^ 3 / 50 := by ring
+  rw [e2]
+  have : 0 ≤ ε ^ 3 := by positivity
+  linarith
+
+lemma arith_T6 (hε0 : 0 < ε) (hε1 : ε ≤ 1) (hl3 : 0 < l3) {l2 : ℝ} (hr : r = l2 / l3)
+    (hrLN : 10 ^ 6 * (r * LN) ≤ 2 * ε ^ 4) : 6 * LN / (l3 * ε) * (l2 / 2) ≤ ε / 100 := by
+  have h42 : ε ^ 4 ≤ ε ^ 2 := pow_le_pow_of_le_one hε0.le hε1 (by norm_num)
+  have e : 6 * LN / (l3 * ε) * (l2 / 2) = 3 * (r * LN) / ε := by rw [hr]; field_simp; ring
+  rw [e, div_le_iff₀ hε0]
+  have e2 : ε / 100 * ε = ε ^ 2 / 100 := by ring
+  rw [e2]
+  have : 0 ≤ ε ^ 4 := by positivity
+  linarith
+
+lemma arith_T7 (hε0 : 0 < ε) (hl3 : 0 < l3) (hLN1 : 1 ≤ LN) (hr0 : 0 ≤ r)
+    (hrLN2 : 10 ^ 6 * (r * LN ^ 2) ≤ l3 * ε ^ 4) :
+    6 * LN / (l3 * ε) * (2 * (4 / ε ^ 2 * (25 / 4 * (6 * (r * LN)) + 11 * r))) ≤ ε / 100 := by
+  have hrr : r ≤ r * LN := le_mul_of_one_le_right hr0 hLN1
+  have h1 : 25 / 4 * (6 * (r * LN)) + 11 * r ≤ 49 * (r * LN) := by linarith
+  have h2 : 6 * LN / (l3 * ε) * (2 * (4 / ε ^ 2 * (25 / 4 * (6 * (r * LN)) + 11 * r))) ≤
+      6 * LN / (l3 * ε) * (2 * (4 / ε ^ 2 * (49 * (r * LN)))) := by
+    have hLN : 0 ≤ LN := by linarith
+    gcongr
+  refine h2.trans ?_
+  have e : 6 * LN / (l3 * ε) * (2 * (4 / ε ^ 2 * (49 * (r * LN)))) =
+      2352 * (r * LN ^ 2) / (l3 * ε ^ 3) := by field_simp; ring
+  rw [e, div_le_iff₀ (by positivity)]
+  have e2 : ε / 100 * (l3 * ε ^ 3) = l3 * ε ^ 4 / 100 := by ring
+  rw [e2]
+  have : 0 ≤ l3 * ε ^ 4 := by positivity
+  linarith
+
+lemma arith_T8 (hn : 0 < N) (hε0 : 0 < ε) (hl3 : 0 < l3) (hLN1 : 1 ≤ LN)
+    (hC : 2 * 10 ^ 6 * LN ^ 2 ≤ N * l3 ^ 2 * ε ^ 4) (hu : u = 1 / Real.sqrt (N + 1)) :
+    6 * LN / (l3 * ε) * (2 * u) ≤ ε / 20 := by
+  have hLN : 0 < LN := by linarith
+  have hu' : u ≤ ε ^ 2 * l3 / (240 * LN) := by
+    rw [hu]
+    refine one_div_sqrt_le hn.le (by positivity) ?_
+    have e : (ε ^ 2 * l3 / (240 * LN)) ^ 2 * (N + 1) =
+        (N * l3 ^ 2 * ε ^ 4 + l3 ^ 2 * ε ^ 4) / (57600 * LN ^ 2) := by field_simp; ring
+    rw [e, le_div_iff₀ (by positivity)]
+    have : 0 ≤ l3 ^ 2 * ε ^ 4 := by positivity
+    have : 0 ≤ LN ^ 2 := by positivity
+    linarith
+  calc 6 * LN / (l3 * ε) * (2 * u) ≤ 6 * LN / (l3 * ε) * (2 * (ε ^ 2 * l3 / (240 * LN))) := by
+        gcongr
+    _ = ε / 20 := by field_simp; ring
+
+lemma arith_T9 (hn : 0 < N) (hε0 : 0 < ε) (hε1 : ε ≤ 1) (hl3 : 0 < l3) (hl3le : l3 ≤ 2)
+    (hLN1 : 1 ≤ LN) (hw0 : 0 ≤ w) (hr0 : 0 ≤ r) (hw : w * N ^ 2 = 1) (hNbig : 5 * 10 ^ 5 ≤ N)
+    (hC : 2 * 10 ^ 6 * LN ^ 2 ≤ N * l3 ^ 2 * ε ^ 4)
+    (hrLN2 : 10 ^ 6 * (r * LN ^ 2) ≤ l3 * ε ^ 4) :
+    6 * LN / (l3 * ε) * (2 * (2 * (3 * (w + 4 * r) / ε) * (1 + LN))) ≤ ε / 20 := by
+  have hLN : 0 < LN := by linarith
+  have h43 : ε ^ 4 ≤ ε ^ 3 := pow_le_pow_of_le_one hε0.le hε1 (by norm_num)
+  have h1 : 6 * LN / (l3 * ε) * (2 * (2 * (3 * (w + 4 * r) / ε) * (1 + LN))) ≤
+      6 * LN / (l3 * ε) * (2 * (2 * (3 * (w + 4 * r) / ε) * (2 * LN))) := by
+    gcongr; linarith
+  refine h1.trans ?_
+  have e : 6 * LN / (l3 * ε) * (2 * (2 * (3 * (w + 4 * r) / ε) * (2 * LN))) =
+      144 * (LN ^ 2 * w + 4 * (r * LN ^ 2)) / (l3 * ε ^ 2) := by field_simp; ring
+  rw [e, div_le_iff₀ (by positivity)]
+  have e2 : ε / 20 * (l3 * ε ^ 2) = l3 * ε ^ 3 / 20 := by ring
+  rw [e2]
+  -- `LN² w` is tiny
+  have hwL : 5760 * (LN ^ 2 * w) ≤ l3 * ε ^ 3 := by
+    have hN2 : 0 < N ^ 2 := by positivity
+    refine le_of_mul_le_mul_right ?_ hN2
+    have e3 : 5760 * (LN ^ 2 * w) * N ^ 2 = 5760 * LN ^ 2 := by
+      rw [show 5760 * (LN ^ 2 * w) * N ^ 2 = 5760 * LN ^ 2 * (w * N ^ 2) by ring, hw, mul_one]
+    rw [e3]
+    have h4 : (N * l3 ^ 2 * ε ^ 4) * N ≤ 2 * (l3 * ε ^ 3 * N ^ 2) := by
+      have : l3 ^ 2 * ε ^ 4 ≤ 2 * (l3 * ε ^ 3) := by
+        have a1 : l3 ^ 2 ≤ 2 * l3 := by nlinarith
+        have a2 : l3 ^ 2 * ε ^ 4 ≤ 2 * l3 * ε ^ 4 := mul_le_mul_of_nonneg_right a1 (by positivity)
+        have a3 : 2 * l3 * ε ^ 4 ≤ 2 * l3 * ε ^ 3 := mul_le_mul_of_nonneg_left h43 (by positivity)
+        linarith
+      have := mul_le_mul_of_nonneg_left this (show 0 ≤ N * N by positivity)
+      nlinarith
+    have h5 : 2 * 10 ^ 6 * LN ^ 2 * N ≤ (N * l3 ^ 2 * ε ^ 4) * N :=
+      mul_le_mul_of_nonneg_right hC hn.le
+    have h6 : 5760 * LN ^ 2 ≤ 10 ^ 6 * LN ^ 2 * N := by nlinarith [sq_nonneg LN]
+    nlinarith
+  have : 0 ≤ l3 * ε ^ 3 := by positivity
+  have : l3 * ε ^ 4 ≤ l3 * ε ^ 3 := mul_le_mul_of_nonneg_left h43 hl3.le
+  linarith
+
+end Arith
+
+/-- The final arithmetic of Lemma 4.2 (`c = 10⁶`). -/
+lemma lemma42_arith {N LN l2 l3 ε u : ℝ} {t₁ M : ℕ} (hn : 0 < N) (hLN1 : 1 ≤ LN)
+    (hl3 : 0 < l3) (hl3le : l3 ≤ 2) (hε0 : 0 < ε) (hε1 : ε ≤ 1) (hl2 : 0 ≤ l2)
+    (hcr : l2 / l3 * (10 ^ 6 * LN ^ 2) ≤ l3 * ε ^ 4) (hC : 2 * 10 ^ 6 * LN ^ 2 ≤ N * l3 ^ 2 * ε ^ 4)
+    (hL1 : (t₁ : ℝ) * l2 / N ≤ 7 * (l2 / l3 * LN)) (hM : (M : ℝ) ≤ 6 * N / l3 * LN)
+    (hu : u = 1 / Real.sqrt (N + 1)) :
+    (8 * ((t₁ : ℝ) * l2 / N) / ε ^ 2 + u + 2 * (ε / (100 * LN)) * (1 + LN)) +
+      (12 * (l2 / l3) / ε ^ 3 + u + 2 * (2 * (1 / N ^ 2 + 4 * (l2 / l3)) / ε ^ 2) * (1 + LN)) +
+      1 / (ε * N) * (M * (l2 / 2 + 2 * (4 / ε ^ 2 * (25 / 4 * (6 * (l2 / l3 * LN)) +
+        11 * (l2 / l3)) + u + 2 * (3 * (1 / N ^ 2 + 4 * (l2 / l3)) / ε) * (1 + LN)))) ≤ ε := by
+  obtain ⟨r, hr⟩ : ∃ r, r = l2 / l3 := ⟨_, rfl⟩
+  obtain ⟨w, hw⟩ : ∃ w, w = 1 / N ^ 2 := ⟨_, rfl⟩
+  rw [← hr, ← hw]
+  rw [← hr] at hcr hL1
+  have hr0 : 0 ≤ r := by rw [hr]; positivity
+  have hw0 : 0 ≤ w := by rw [hw]; positivity
+  have hε4' : ε ^ 4 ≤ 1 := pow_le_one₀ hε0.le hε1
+  have hLN2 : LN ≤ LN ^ 2 := by nlinarith
+  have hrLN : 10 ^ 6 * (r * LN) ≤ 2 * ε ^ 4 := by
+    have h1 : r * LN ≤ r * LN ^ 2 := mul_le_mul_of_nonneg_left hLN2 hr0
+    have h2 : l3 * ε ^ 4 ≤ 2 * ε ^ 4 := mul_le_mul_of_nonneg_right hl3le (by positivity)
+    linarith
+  have hrLN2 : 10 ^ 6 * (r * LN ^ 2) ≤ l3 * ε ^ 4 := by linarith
+  have hNε : 5 * 10 ^ 5 * LN ^ 2 ≤ N * ε ^ 4 := by
+    have h1 : l3 ^ 2 ≤ 4 := by nlinarith
+    have := mul_le_mul_of_nonneg_left h1 (show 0 ≤ N * ε ^ 4 by positivity)
+    linarith
+  have hNbig : 5 * 10 ^ 5 ≤ N := by
+    have h1 : N * ε ^ 4 ≤ N := mul_le_of_le_one_right hn.le hε4'
+    have h2 : (1 : ℝ) ≤ LN ^ 2 := by nlinarith
+    linarith
+  have hwN : w * N ^ 2 = 1 := by rw [hw]; field_simp
+  have T1 := arith_T1 hε0 hε1 hL1 hrLN
+  have T2 := arith_T2 hn hε0 hε1 hLN1 hNε hu
+  have T3 := arith_T3 hε0 hLN1
+  have T4 := arith_T4 hε0 hLN1 hr0 hrLN
+  have T5 := arith_T5 hε0 hε1 hLN1 hw0 hr0 (arith_wLN hn hε0 hε1 hLN1 hNbig hNε hwN) hrLN
+  have T6 := arith_T6 hε0 hε1 hl3 hr hrLN (LN := LN)
+  have T7 := arith_T7 hε0 hl3 hLN1 hr0 hrLN2
+  have T8 := arith_T8 hn hε0 hl3 hLN1 hC hu
+  have T9 := arith_T9 hn hε0 hε1 hl3 hl3le hLN1 hw0 hr0 hwN hNbig hC hrLN2
+  -- the factor `M/(ε n)`
+  have hF : 1 / (ε * N) * M ≤ 6 * LN / (l3 * ε) := by
+    rw [one_div_mul_eq_div, div_le_div_iff₀ (by positivity) (by positivity)]
+    have := mul_le_mul_of_nonneg_left hM (show 0 ≤ l3 * ε by positivity)
+    have e : l3 * ε * (6 * N / l3 * LN) = 6 * LN * (ε * N) := by field_simp
+    rw [e] at this
+    linarith
+  obtain ⟨X, hX⟩ : ∃ X, X = l2 / 2 + 2 * (4 / ε ^ 2 * (25 / 4 * (6 * (r * LN)) + 11 * r) + u +
+      2 * (3 * (w + 4 * r) / ε) * (1 + LN)) := ⟨_, rfl⟩
+  rw [← hX]
+  have hu0 : 0 ≤ u := by rw [hu]; positivity
+  have hX0 : 0 ≤ X := by rw [hX]; positivity
+  have hFX : 1 / (ε * N) * (M * X) ≤ 6 * LN / (l3 * ε) * X := by
+    rw [← mul_assoc]; exact mul_le_mul_of_nonneg_right hF hX0
+  have hsplit : 6 * LN / (l3 * ε) * X = 6 * LN / (l3 * ε) * (l2 / 2) +
+      6 * LN / (l3 * ε) * (2 * (4 / ε ^ 2 * (25 / 4 * (6 * (r * LN)) + 11 * r))) +
+      6 * LN / (l3 * ε) * (2 * u) +
+      6 * LN / (l3 * ε) * (2 * (2 * (3 * (w + 4 * r) / ε) * (1 + LN))) := by rw [hX]; ring
+  linarith
 
 end Averaging.Opportunistic
