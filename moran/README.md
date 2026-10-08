@@ -36,13 +36,13 @@ probabilities, identified through an invariant potential (`fixation_eq_of_invari
 shared finite-horizon optional stopping theorem `Dynamics.Kernel.iSup_event_of_invariant` and
 the shared absorption theorem of [`dynamics/`](../dynamics); no path-space measure is used.
 
-Only the "if" direction is formalized: the commonly quoted "if and only if" is false
+Only the "if" direction is formalized: the commonly quoted "if and only if" does not hold in general
 (Galanis, Göbel, Goldberg, Lapinskas and Richerby, *Amplifiers for the Moran process*, J. ACM
 2017, Proposition 12), and the classical proof, which projects onto the number of mutants,
 needs care because that projection is not Markov in general (Keller and Uğurlu,
 arXiv:2403.12598).
 
-**Provenance.** The statements were written and pinned by hand; the proofs (of both files) were produced by a
+**Provenance.** The statements were written and pinned by a second agent; the proofs (of both files) were produced by a
 Grok agent under a fixed-statement protocol and verified mechanically (statements unchanged,
 no placeholders, warning-free build, axiom audit). The star files (`Moran/Star*.lean`, roadmap MOR-3, first item) were pinned
 and proved by a Claude agent under the same protocol; the closed forms were also checked exactly

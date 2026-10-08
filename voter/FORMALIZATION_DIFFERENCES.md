@@ -71,17 +71,20 @@ The following portions of the paper were not formalized:
 
 ## 2. Key Differences, Adaptations, and Mathematical Nuances
 
-### 2.1 Correction of the "W.L.O.G. White" Handwave in Lemma 2.1 Proof
+### 2.1 The "w.l.o.g. white" step in the proof of Lemma 2.1
 * **Paper text (page 252)**:
   > *"Under this state, there must be two neighbors with the same color. This must happen because $G$ is nonbipartite, so it must contain an odd cycle, and any 2-coloring on this cycle must assign the same color to two neighbors. Let $i$ and $j$ be two such neighboring nodes, and **w.l.o.g assume that they are colored white**. We prove by induction that there is a positive probability that at time $k$ all nodes of distance $k$ from $i$ or $j$ are colored white. Hence at time step $\text{Diam}(V)$, $s$ can be absorbed to the all-white state..."*
-* **The issue**:
-  Assuming "without loss of generality" that the monochromatic edge is white is invalid when analyzing an arbitrary non-monochromatic state $s$. An initial state $s$ could contain monochromatic *black* edges but *no* monochromatic white edges (e.g. if the white vertices form an independent set). From such an edge, the region propagation argument can only guarantee reaching the *all-black* state in $\text{Diam}(V)$ steps, not necessarily the all-white state directly.
-* **Lean's rigorous treatment**:
-  [`Voter.possible_consensus`](Voter/Graph.lean#L90) explicitly proves:
+* **Reading of the step**:
+  The lemma only claims that non-consensus states are transient, so it suffices that *some* consensus
+  state is reachable from every state. Swapping the two colours justifies the "w.l.o.g.": from a
+  monochromatic black edge the same propagation argument reaches the all-black state. The formal
+  statement makes the colour explicit.
+* **Formal statement**:
+  [`Voter.possible_consensus`](Voter/Graph.lean#L90) proves
   ```lean
   ∃ c, Relation.ReflTransGen (Possible G) s (fun _ => c)
   ```
-  That is, consensus is reachable in **some** color $c \in \{\text{true}, \text{false}\}$ (the color of the monochromatic edge found by [`Nonemonochromatic_edge`](Voter/Graph.lean#L18)). This suffices to prove that the probability of staying in non-consensus states decays to 0 ([`Noneconsensus_tendsto`](Voter/Absorption.lean#L109)), fixing the paper's informal leap.
+  that is, consensus is reachable in **some** color $c \in \{\text{true}, \text{false}\}$ (the color of the monochromatic edge found by [`Nonemonochromatic_edge`](Voter/Graph.lean#L18)). This is what the proof that the probability of staying in non-consensus states decays to 0 ([`Noneconsensus_tendsto`](Voter/Absorption.lean#L109)) uses.
 
 ---
 
@@ -235,11 +238,11 @@ Further sources: Becchetti, Clementi, Natale, *Consensus dynamics: an overview*,
 51(1), 2020 (the "survey"); Kanade, Mallmann-Trenn, Sauerwald, *On coalescence time in graphs*,
 SODA 2019 (arXiv:1611.02460); Cooper, Elsässer, Ono, Radzik, SIAM J. Discrete Math. 2013.
 
-### 4.1 Survey Theorem 8 is false as stated; the lazy walk is formalized
+### 4.1 Survey Theorem 8 needs a minor correction; the lazy walk is formalized
 * Theorem 8 of the survey states: "Let G be any connected undirected graph. Starting from an
   arbitrary initial configuration c on G, the Voter dynamics reaches consensus w.h.p. in
-  O(n³ log n) rounds." For the synchronous voter with plain uniform-neighbour sampling this
-  **fails on bipartite graphs**: two tokens on opposite sides of a bipartite graph never meet,
+  O(n³ log n) rounds." For the synchronous voter with plain uniform-neighbour sampling the statement needs a
+  **nonbipartiteness hypothesis** (or a lazy walk): two tokens on opposite sides of a bipartite graph never meet,
   and an alternating colouring never reaches consensus
   (cf. [`twoVertex_never_consensus`](Voter/Examples.lean)). Hassin and Peleg's standing
   hypotheses (§2.1) do require a nonbipartite graph, and their Theorem 2.5 is the uniform case
@@ -303,12 +306,13 @@ bound), Lemma 2.1 (potential drop), Lemma 2.2 (drift implies time), Lemma 2.3 (p
 `κ` opinions). Files: `Conductance*.lean`. The dynamics is the lazy voter
 [`lazyNeighbor`](Voter/Lazy.lean) `= (I + D⁻¹A)/2` of §3.
 
-### 5.1 Lemma 2.1 of BGKM16 is false as printed
+### 5.1 Lemma 2.1 of BGKM16 needs a minor correction
 * The paper states
   `𝔼[Ψ(S_{t+1}) | S_t = s_t] ≤ Ψ(s_t) - ∑_{u ∈ V} λ_{u,t} d_u / (32 Ψ(s_t)³)`,
   with the sum over **all** vertices, where `Ψ(s) = √(vol(minority))` and `λ_u` is the
-  number of neighbours of `u` with the other opinion. This is false. Counterexample: the star
-  `K_{1,k}` with `k ≥ 15` and a single leaf in the minority (`Ψ = 1`). Only the leaf and the
+  number of neighbours of `u` with the other opinion. With the sum over all vertices the inequality
+  does not hold. Example: the star
+  `K_{1,k}` with `k ≥ 12` and a single leaf in the minority (`Ψ = 1`). Only the leaf and the
   hub can change opinion, and exactly
   `𝔼[Ψ'] = ½ (1 - 1/(2k)) + (√(k-1) + √k)/(4k)`; for `k = 15` this is `0.6102`, while the
   printed bound is `1 - (1 + 15)/32 = 0.5` (the hub contributes `λ d = 15`); for `k = 40` it is

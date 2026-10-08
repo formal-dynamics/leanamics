@@ -113,7 +113,7 @@ Source: B. Doerr, A. Kostrygin, *Randomized rumor spreading revisited*, ICALP 20
 arXiv:2303.11150 (numbering of the long version: Lemma 9, Lemma 19, Lemma 20, Definition 11,
 Theorem 21, Theorem 31).
 
-### Lemma 20 of the paper is false as stated
+### Lemma 20 of the paper needs a major correction
 
 Lemma 20 (Lemma 5 of the overview) claims: if `p_k ≤ p` and `c_k ≤ c/n` for every `k < f n`,
 then there is `f' ∈ ]f, 1[` such that, with probability `1 - O(1/n)`, the number of informed
@@ -122,14 +122,15 @@ nodes lies in `[f n, f' n]` at the end of some round. The proof bounds one round
 `[f n, f' n]` with probability `O(1/n)`, but the process may spend many rounds below `f n`, with
 a chance to jump in each.
 
-**Counterexample.** From every `S` with `|S| < f n`, inform all nodes with probability
+**Example.** The printed statement does not hold for the following process. From every `S` with `|S| < f n`, inform all nodes with probability
 `ε = c/n` and otherwise none. For `n ≥ c/p`, `p_k = ε ≤ p` and `c_k = ε(1 - ε) ≤ c/n`, but the
 process started from one node jumps from `1` to `n` with probability 1. (The same process with
 `ε_k = c k / n²` satisfies the lower exponential growth conditions, so the last sentence of
-Theorem 1, which rests on Lemma 20, is also unproved in general. That sentence is a lower-bound
-statement, outside the scope of this formalization.)
+Theorem 1, which rests on Lemma 20 (through Theorem 27), needs another argument in general. That
+sentence is a lower-bound statement, outside the scope of this formalization. The long version
+also uses Lemma 20 in the proofs of Theorems 57 and 58.)
 
-Two true versions are formalized instead:
+Two corrected versions are formalized instead:
 
 * `overshoot_round`, the one-round estimate of the proof, for every `f' ∈ ]f + p(1-f), 1[`;
 * `jumpProb_le`, the path statement with the union bound over rounds:

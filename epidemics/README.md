@@ -149,9 +149,9 @@ the probability that fewer than `m` nodes are informed after `t` rounds from `S`
 | Exponential shrinking regime: from `≤ g n` uninformed nodes, all informed after `(1/ρ) ln n + O(1)` rounds, exponential tail | Theorem 31 (Theorem 2, upper bounds) | `shrinking_upper_tail`, `shrinking_upper_expect` |
 | Total spreading time `log_{1+γ} n + (1/ρ) ln n + O(1)`, exponential tail | Theorems 21 and 31 with Lemma 19 | `spreading_upper_tail`, `spreading_upper_expect` |
 
-**Lemma 20 of the paper is false as stated** (a process can stay below `f n` for many rounds,
+**Lemma 20 of the paper needs a major correction** (a process can stay below `f n` for many rounds,
 with a chance to jump over `[f n, f' n]` in each); the one-round estimate of its proof and a
-corrected path statement are formalized instead. The counterexample and the other deviations
+corrected path statement are formalized instead. The example and the other deviations
 (conditions for every state instead of homogeneity, arbitrary starting sets, a uniform side
 condition in Definition 11, the composed total-time theorems) are listed in
 [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md). Theorem 31 is proved with a
@@ -183,19 +183,19 @@ Deviations from the paper are listed in [FORMALIZATION_DIFFERENCES.md](FORMALIZA
 The statements were pinned and then proved by a Claude agent under the fixed-statement protocol and
 checks of the provenance note below.
 
-**Provenance.** Reed–Frost: the statements were written and pinned by hand; the proofs were produced
+**Provenance.** Reed–Frost: the statements were written and pinned by a second agent; the proofs were produced
 by a Grok agent under a fixed-statement protocol and verified mechanically (statements unchanged, no
 placeholders, warning-free build, axiom audit). Kermack–McKendrick: the statements were pinned and
-then proved by a Claude agent under the same protocol and checks; the statements were reviewed by
-hand against the source. Kurtz (CRN-2): the statements were pinned and then proved by a Claude agent
-under the same protocol and checks; the statements were reviewed by hand against the source
+then proved by a Claude agent under the same protocol and checks; the statements were reviewed by a second
+agent against the source. Kurtz (CRN-2): the statements were pinned and then proved by a Claude agent
+under the same protocol and checks; the statements were reviewed by a second agent against the source
 (Wormald's Theorem 5.1). Rumor spreading revisited (EPI-8): the statements were pinned and then
 proved under the same protocol and checks, the growth regime (Lemma 9, Lemma 19, Theorem 21) by a
 Grok agent and the rest (Lemma 20, Theorem 31, total time) by a Claude agent. Supercritical giant
 component (EPI-3): the statements were pinned and then proved by a Claude agent under the same
-protocol and checks; the statements were reviewed by hand against the source. Subcritical
+protocol and checks; the statements were reviewed by a second agent against the source. Subcritical
 percolation (EPI-2): statements and proofs were written by a Claude agent under the same protocol
-and checks; the statements were reviewed by hand against the paper.
+and checks; the statements were reviewed by a second agent against the paper.
 
 Build and audit:
 

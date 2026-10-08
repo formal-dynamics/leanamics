@@ -151,8 +151,8 @@ FND-7:
    adversaries that are functions of the current state; time- or history-dependent ones need
    that information in the finite state (as FND-5 deviation 3). A `_seq` version would need a
    time-dependent `hitProb`.
-3. **Added hypothesis `c₄ log q ≤ q`** (the target is a possible value of `X`). Without it the
-   claim is false: for `c₄ = 10`, `q = 2` the target `10 log 2 > 2` is never hit, while
+3. **Added hypothesis `c₄ log q ≤ q`** (the target is a possible value of `X`). It is needed for a
+   non-asymptotic statement: for `c₄ = 10`, `q = 2` the target `10 log 2 > 2` is never hit, while
    `1 - 2^{-c₆} > 0`. The paper is asymptotic in `q`, where this holds.
 4. **Growth only below the target** (generalization): the first property is assumed only at
    states with `X a < c₄ log q`, since `T` depends only on the chain before hitting. This
