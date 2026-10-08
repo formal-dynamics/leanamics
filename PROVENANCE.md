@@ -32,10 +32,11 @@ size hypothesis beyond `n ≥ 1` or `n ≥ 2`, or hide it in an existential cons
 
 ## Results
 
-"Pinned" means that the definitions and statements were written and frozen before the proof
-work started (by the author the entry names, when it names one), and an AI agent wrote the
-proofs under the fixed-statement protocol: statements byte-identical to the pinned
-baseline, no placeholders, a warning-free build, and only standard axioms.
+"Pinned" means that the definitions and statements were fixed before the proof was attempted,
+and an AI agent then wrote the proofs under the fixed-statement protocol: statements byte-identical to the pinned
+baseline, no placeholders, a warning-free build, and only standard axioms. Pinning does not
+mean that a human wrote the statements: contributors are free to use AI tools for that too, and
+an entry names who pinned the statements only where this is recorded.
 
 Entries naming a Claude or Grok agent reproduce what the commit messages and package READMEs
 state. An entry says that the statements were reviewed by a second agent against the source only when the
