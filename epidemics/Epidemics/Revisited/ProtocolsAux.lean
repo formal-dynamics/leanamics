@@ -310,4 +310,240 @@ lemma pushPull_prob_not_mem₂ {S : Finset (Fin n)} {x y : Fin n} (hx : x ∉ S)
       · simp only [if_neg hvS, if_neg hvx, if_neg hvy, inter_univ, mul_one]
         exact card_univ_div hn
 
+/-! ### Elementary inequalities -/
+
+lemma two_le_of_ne {x y : Fin n} (hxy : x ≠ y) : 2 ≤ n := by
+  have := Fintype.card_le_of_injective (fun b : Bool => if b then x else y) (by
+    intro a b hab
+    cases a <;> cases b <;> simp_all [eq_comm])
+  simpa using this
+
+/-- Second-order Bonferroni: `(1 - x)^k ≤ 1 - k x + (k x)² / 2` for `0 ≤ x ≤ 1`. -/
+lemma one_sub_pow_le_quad {x : ℝ} (hx0 : 0 ≤ x) (hx1 : x ≤ 1) (k : ℕ) :
+    (1 - x) ^ k ≤ 1 - k * x + (k * x) ^ 2 / 2 := by
+  induction k with
+  | zero => simp
+  | succ k ih =>
+    have h1 : 0 ≤ 1 - x := by linarith
+    have hk : (0 : ℝ) ≤ k := Nat.cast_nonneg k
+    rw [pow_succ]
+    have hmul := mul_le_mul_of_nonneg_right ih h1
+    push_cast
+    nlinarith [mul_nonneg (mul_nonneg hk hk) (mul_nonneg (mul_nonneg hx0 hx0) hx0),
+      mul_nonneg hx0 hx0]
+
+/-- `e^t ≤ 1 + 2t` on `[0, 1]`. -/
+lemma exp_le_one_add_two_mul {t : ℝ} (ht0 : 0 ≤ t) (ht1 : t ≤ 1) :
+    Real.exp t ≤ 1 + 2 * t := by
+  have h := Real.abs_exp_sub_one_le (x := t) (by rw [abs_of_nonneg ht0]; exact ht1)
+  rw [abs_of_nonneg ht0] at h
+  have := le_abs_self (Real.exp t - 1)
+  linarith
+
+/-- Push, shrinking regime: `(1 - 1/n)^k ≤ e^{-1} + (2/e)((n - k)/n)` for `k ≤ n`. -/
+lemma push_stay_le {k : ℕ} (hn : (0 : ℝ) < n) (hk : (k : ℝ) ≤ n) :
+    (1 - 1 / (n : ℝ)) ^ k ≤ Real.exp (-1) + 2 / Real.exp 1 * (((n : ℝ) - k) / n) := by
+  have h1n : 1 / (n : ℝ) ≤ 1 := by
+    rw [div_le_one hn]
+    have : (1 : ℝ) ≤ n := by
+      have : (0 : ℕ) < n := by exact_mod_cast hn
+      exact_mod_cast this
+    exact this
+  have hbase : 0 ≤ 1 - 1 / (n : ℝ) := by linarith
+  have hexp : (1 - 1 / (n : ℝ)) ^ k ≤ Real.exp (-(k / n)) := by
+    calc (1 - 1 / (n : ℝ)) ^ k ≤ Real.exp (-(1 / n)) ^ k :=
+          pow_le_pow_left₀ hbase (by linarith [Real.add_one_le_exp (-(1 / (n : ℝ)))]) k
+      _ = Real.exp (-(k / n)) := by
+          rw [← Real.exp_nat_mul]
+          congr 1
+          ring
+  set t : ℝ := ((n : ℝ) - k) / n with ht
+  have ht0 : 0 ≤ t := div_nonneg (by linarith) hn.le
+  have ht1 : t ≤ 1 := by
+    rw [ht, div_le_one hn]
+    have : (0 : ℝ) ≤ k := Nat.cast_nonneg k
+    linarith
+  have hsplit : -(k / (n : ℝ)) = -1 + t := by
+    rw [ht]
+    field_simp
+    ring
+  rw [hsplit, Real.exp_add] at hexp
+  have hb := exp_le_one_add_two_mul ht0 ht1
+  have he : Real.exp (-1) = 1 / Real.exp 1 := by rw [Real.exp_neg, one_div]
+  have hpos : 0 < Real.exp (-1) := Real.exp_pos _
+  calc (1 - 1 / (n : ℝ)) ^ k ≤ Real.exp (-1) * Real.exp t := hexp
+    _ ≤ Real.exp (-1) * (1 + 2 * t) := mul_le_mul_of_nonneg_left hb hpos.le
+    _ = Real.exp (-1) + 2 / Real.exp 1 * t := by rw [he]; ring
+
+/-! ### One-round probabilities and covariances -/
+
+lemma push_informProb_proof {S : Finset (Fin n)} {x : Fin n} (hx : x ∉ S) :
+    (push n).informProb S x = 1 - (1 - 1 / (n : ℝ)) ^ S.card := by
+  rw [informProb_eq, push_prob_not_mem hx]
+
+lemma pull_informProb_proof {S : Finset (Fin n)} {x : Fin n} (hx : x ∉ S) :
+    (pull n).informProb S x = S.card / (n : ℝ) := by
+  rw [informProb_eq, pull_prob_not_mem hx]
+  ring
+
+lemma pushPull_informProb_proof {S : Finset (Fin n)} {x : Fin n} (hx : x ∉ S) :
+    (pushPull n).informProb S x = 1 - (1 - 1 / (n : ℝ)) ^ S.card * (1 - S.card / (n : ℝ)) := by
+  rw [informProb_eq, pushPull_prob_not_mem hx]
+
+lemma two_pow_le {S : Finset (Fin n)} {x y : Fin n} (hxy : x ≠ y) :
+    (1 - 2 / (n : ℝ)) ^ S.card ≤ ((1 - 1 / (n : ℝ)) ^ S.card) ^ 2 := by
+  have h2 : (2 : ℝ) ≤ n := by exact_mod_cast two_le_of_ne hxy
+  have hn : (0 : ℝ) < n := by linarith
+  have h0 : 0 ≤ 1 - 2 / (n : ℝ) := by
+    rw [sub_nonneg, div_le_one hn]
+    exact h2
+  have hle : 1 - 2 / (n : ℝ) ≤ (1 - 1 / (n : ℝ)) ^ 2 := by
+    have : (1 - 1 / (n : ℝ)) ^ 2 = 1 - 2 / n + (1 / n) ^ 2 := by ring
+    rw [this]
+    nlinarith [sq_nonneg (1 / (n : ℝ))]
+  rw [← pow_mul, mul_comm, pow_mul]
+  exact pow_le_pow_left₀ h0 hle _
+
+lemma push_cov_nonpos_proof {S : Finset (Fin n)} {x y : Fin n} (hx : x ∉ S) (hy : y ∉ S)
+    (hxy : x ≠ y) : (push n).cov S x y ≤ 0 := by
+  rw [cov_eq, push_prob_not_mem₂ hx hy hxy, push_prob_not_mem hx, push_prob_not_mem hy]
+  have := two_pow_le (S := S) hxy
+  nlinarith
+
+lemma pull_cov_eq_zero_proof {S : Finset (Fin n)} {x y : Fin n} (hx : x ∉ S) (hy : y ∉ S)
+    (hxy : x ≠ y) : (pull n).cov S x y = 0 := by
+  rw [cov_eq, pull_prob_not_mem₂ hx hy hxy, pull_prob_not_mem hx, pull_prob_not_mem hy]
+  ring
+
+lemma pushPull_cov_nonpos_proof {S : Finset (Fin n)} {x y : Fin n} (hx : x ∉ S) (hy : y ∉ S)
+    (hxy : x ≠ y) : (pushPull n).cov S x y ≤ 0 := by
+  rw [cov_eq, pushPull_prob_not_mem₂ hx hy hxy, pushPull_prob_not_mem hx,
+    pushPull_prob_not_mem hy]
+  have h := two_pow_le (S := S) hxy
+  have hsq : 0 ≤ (1 - S.card / (n : ℝ)) ^ 2 := sq_nonneg _
+  have := mul_le_mul_of_nonneg_right h hsq
+  nlinarith
+
+/-! ### The conditions -/
+
+lemma card_le_n (S : Finset (Fin n)) : (S.card : ℝ) ≤ n := by
+  have := card_le_univ S
+  simp only [Fintype.card_fin] at this
+  exact_mod_cast this
+
+lemma push_upperGrowth_proof : (push n).UpperGrowth 1 (1 / 2) 0 0 (1 / 2) := by
+  intro S hS _
+  refine ⟨fun x hx => ?_, fun x hx y hy hxy => ?_⟩
+  · have hn := n_pos_of_mem x
+    rw [push_informProb_proof hx]
+    have h1n : 1 / (n : ℝ) ≤ 1 := by
+      rw [div_le_one hn]
+      have : (1 : ℕ) ≤ n := x.pos
+      exact_mod_cast this
+    have hq := one_sub_pow_le_quad (by positivity) h1n S.card
+    have hk : (S.card : ℝ) * (1 / n) = S.card / n := by ring
+    rw [hk] at hq
+    simp only [zero_div, sub_zero]
+    nlinarith
+  · simp only [zero_mul, zero_div]
+    exact push_cov_nonpos_proof hx hy hxy
+
+lemma push_upperShrinking_proof : (push n).UpperShrinking 1 (2 / Real.exp 1) 0 (1 / 2) := by
+  intro S _
+  refine ⟨fun x hx => ?_, fun x hx y hy hxy => ?_⟩
+  · rw [push_informProb_proof hx, sub_sub_cancel]
+    exact push_stay_le (n_pos_of_mem x) (card_le_n S)
+  · simp only [zero_div]
+    exact push_cov_nonpos_proof hx hy hxy
+
+lemma pull_upperGrowth_proof : (pull n).UpperGrowth 1 0 0 0 (1 / 2) := by
+  intro S _ _
+  refine ⟨fun x hx => ?_, fun x hx y hy hxy => ?_⟩
+  · rw [pull_informProb_proof hx]
+    simp
+  · simp only [zero_mul, zero_div]
+    exact (pull_cov_eq_zero_proof hx hy hxy).le
+
+lemma pull_upperDoubleShrinking_proof :
+    (pull n).UpperDoubleShrinking 2 1 0 (1 / 2) (1 / 2) := by
+  intro S _ _
+  refine ⟨fun x hx => ?_, fun x hx y hy hxy => ?_⟩
+  · have hn := n_pos_of_mem x
+    rw [pull_informProb_proof hx, show (2 : ℝ) - 1 = 1 by norm_num, Real.rpow_one, one_mul,
+      sub_div, div_self hn.ne']
+  · simp only [zero_mul, zero_div]
+    exact (pull_cov_eq_zero_proof hx hy hxy).le
+
+lemma frac_le_rpow {u : ℝ} (hn : (0 : ℝ) < n) (hu : u ≤ (n : ℝ) ^ (1 - 1 / 2 : ℝ)) :
+    u / n ≤ (n : ℝ) ^ (-(1 / 2 : ℝ)) := by
+  rw [div_le_iff₀ hn]
+  calc u ≤ (n : ℝ) ^ (1 - 1 / 2 : ℝ) := hu
+    _ = (n : ℝ) ^ (-(1 / 2 : ℝ)) * n := by
+      rw [← Real.rpow_add_one hn.ne']
+      norm_num
+
+lemma pull_fastFinishing_proof : (pull n).FastFinishing (1 / 2) (1 / 2) := by
+  intro S hS x hx
+  have hn := n_pos_of_mem x
+  rw [pull_informProb_proof hx]
+  have h := frac_le_rpow hn hS
+  rw [sub_div, div_self hn.ne'] at h
+  exact h
+
+lemma pushPull_upperGrowth_proof : (pushPull n).UpperGrowth 2 (3 / 4) 0 0 (1 / 2) := by
+  intro S hS _
+  refine ⟨fun x hx => ?_, fun x hx y hy hxy => ?_⟩
+  · have hn := n_pos_of_mem x
+    rw [pushPull_informProb_proof hx]
+    have h1n : 1 / (n : ℝ) ≤ 1 := by
+      rw [div_le_one hn]
+      have : (1 : ℕ) ≤ n := x.pos
+      exact_mod_cast this
+    have hq := one_sub_pow_le_quad (by positivity) h1n S.card
+    have hk : (S.card : ℝ) * (1 / n) = S.card / n := by ring
+    rw [hk] at hq
+    set y : ℝ := S.card / n with hy
+    have hy0 : 0 ≤ y := by positivity
+    have hy1 : 1 - y ≥ 0 := by
+      rw [hy, ge_iff_le, sub_nonneg, div_le_one hn]
+      exact card_le_n S
+    have hm := mul_le_mul_of_nonneg_right hq hy1
+    simp only [zero_div, sub_zero]
+    nlinarith [mul_nonneg (mul_nonneg hy0 hy0) hy0]
+  · simp only [zero_mul, zero_div]
+    exact pushPull_cov_nonpos_proof hx hy hxy
+
+lemma pushPull_stay_le {S : Finset (Fin n)} {x : Fin n} (hx : x ∉ S) :
+    1 - (pushPull n).informProb S x ≤ ((n : ℝ) - S.card) / n := by
+  have hn := n_pos_of_mem x
+  rw [pushPull_informProb_proof hx, sub_sub_cancel]
+  have h1n : 1 / (n : ℝ) ≤ 1 := by
+    rw [div_le_one hn]
+    have : (1 : ℕ) ≤ n := x.pos
+    exact_mod_cast this
+  have hp0 : 0 ≤ (1 - 1 / (n : ℝ)) ^ S.card := pow_nonneg (by linarith) _
+  have hp1 : (1 - 1 / (n : ℝ)) ^ S.card ≤ 1 := pow_le_one₀ (by linarith) (by
+    have : 0 ≤ 1 / (n : ℝ) := by positivity
+    linarith)
+  have hy1 : 0 ≤ 1 - S.card / (n : ℝ) := by
+    rw [sub_nonneg, div_le_one hn]
+    exact card_le_n S
+  have heq : ((n : ℝ) - S.card) / n = 1 - S.card / n := by
+    rw [sub_div, div_self hn.ne']
+  rw [heq]
+  nlinarith
+
+lemma pushPull_upperDoubleShrinking_proof :
+    (pushPull n).UpperDoubleShrinking 2 1 0 (1 / 2) (1 / 2) := by
+  intro S _ _
+  refine ⟨fun x hx => ?_, fun x hx y hy hxy => ?_⟩
+  · rw [show (2 : ℝ) - 1 = 1 by norm_num, Real.rpow_one, one_mul]
+    exact pushPull_stay_le hx
+  · simp only [zero_mul, zero_div]
+    exact pushPull_cov_nonpos_proof hx hy hxy
+
+lemma pushPull_fastFinishing_proof : (pushPull n).FastFinishing (1 / 2) (1 / 2) := by
+  intro S hS x hx
+  exact le_trans (pushPull_stay_le hx) (frac_le_rpow (n_pos_of_mem x) hS)
+
 end Epidemics.Revisited
