@@ -1,9 +1,11 @@
 # Formalization differences
 
 Where the statements and proofs of `median/` deviate from Doerr, Goldberg, Minder, Sauerwald and
-Scheideler, *Stabilizing consensus with the power of two choices* (SPAA 2011), and why.
+Scheideler, *Stabilizing consensus with the power of two choices* (SPAA 2011), and why. The
+sections on expanders, on plurality consensus with `k` colours and on the lower bound for
+2-Choices name their own sources.
 
-Theorem and lemma numbers follow the 2009 version of the paper (Dagstuhl Seminar Proceedings 09371); in the
+Theorem and lemma numbers of Doerr et al. follow the 2009 version of the paper (Dagstuhl Seminar Proceedings 09371); in the
 SPAA 2011 proceedings, Theorem 1 is Theorem 1.1 and Theorem 21 is Theorem 4.1, and the lemmas
 are numbered differently.
 
@@ -222,3 +224,172 @@ adversary is Theorem 1.1 of the SPAA 2011 proceedings.
    `expList` facts `expList_le_of_length`, `expList_le_of_split`. They are candidates for the
    shared core, where they would give adversarial versions of the drift and phase lemmas of
    other packages.
+
+## Plurality consensus with `k` colours (`TwoChoices*`, roadmap MAJ-4)
+
+Source: Elsässer, Friedetzky, Kaaser, Mallmann-Trenn and Trinker, arXiv:1602.04667 (arXiv v5
+numbering: its latest version, v5, February 2017, titled *Rapid asynchronous plurality consensus*):
+Theorem 1.2 (the synchronous upper bound), and in Section 2.1 Observation 2.1, Lemma 2.2 (the
+distance increases), Lemma 2.3 (the coupling) and the proof of Theorem 1.2. In v1 to v4 (titled
+*Efficient k-party voting with two choices*) these are Theorem 1, Observation 3, Lemma 4 and
+Lemma 5.
+
+### The model and the statements
+
+`Median/TwoChoicesDefs.lean` (namespace `Median.TwoChoices`): colours are any type `α` with
+decidable equality (the probabilistic theorems use `Fin k`); configurations and rounds are those
+of the median dynamics (`Median.Config n α = Fin n → α`, `Median.Round n = Fin n → Fin n × Fin n`:
+every node samples two nodes independently and uniformly, with replacement, possibly itself).
+`rule own a b = if a = b then a else own`, `step`, `run`, `count x i` (the number of nodes of
+colour `i`), `twice x r i` (the number of nodes whose two samples both hold `i`) and `kernel`. On
+`Bool` the rule is the median (`rule_bool`, `step_bool`, `run_bool`, `count_true`), and the
+indicator of a colour dominates, node by node and for the same rounds, the binary median process
+started from that indicator (`run_dominates`).
+
+`Median/TwoChoicesExpect.lean`: the one-round expectations of Section 2.1: the expectation of
+`c_i'` (`expected_count`, `expected_count_mul`), Observation 2.1 (`expected_count_mono`), the
+expected gap `𝔼(c_i' − c_j') = (c_i − c_j)(1 + (c_i + c_j)/n − S/n²)` with `S = ∑_j c_j²`
+(`expected_gap`), the aggregation of the minority colours `S ≤ c_i² + (n − c_i) b`
+(`sum_sq_le_aggregate`) and its consequence for the largest and second largest colour
+(`expected_gap_ge`).
+
+`Median/TwoChoicesPlurality.lean`: `distance_increases` (Lemma 2.2), `count_stochDom` (Lemma
+2.3), `growth_round` and `growth_phase` (the growth part of the proof of Theorem 1.2),
+`finish_phase`, `plurality_whp` (Theorem 1.2 without the adversary) and `plurality_whp_k`, plus
+`two_colours_consensus_whp` (the case `k = 2`, from `Median.consensus_whp`) and `absorbed`
+(almost-sure consensus, the "almost agreement" of the last paragraph of the proof).
+
+`plurality_whp`: there are `z, C > 0` such that, for every `n` with `log n ≥ C`, every `k`, every
+configuration `x` with colours in `Fin k` and every colour `i` that leads every other colour by
+at least `z √(n log n)`, all nodes hold `i` after `⌈C (n/c_i) log n⌉` rounds with probability at
+least `1 − C/n`. The proof gives `z = 128` and `C = 384`.
+
+### Differences in the statements
+
+1. **No bound on the number of colours.** Theorem 1.2 assumes `k = O(n^ε)` for a small constant
+   `ε`. The proof uses it only in Lemma 2.2, to make the multiplicative Chernoff bounds
+   applicable (`δ_i < 1` needs `a, b ≥ n^{1−ε}`). The formal statements `distance_increases`,
+   `growth_round`, `growth_phase` and `plurality_whp` have no hypothesis on `k`, so they are
+   stronger; item 1 of the differences in the proofs explains why none is needed.
+2. **The time bound.** The theorem's bound `O((n/c₁) log n)` is `plurality_whp`; the roadmap's
+   `O(k log n)` is the corollary `plurality_whp_k` (`c₁ ≥ n/k`).
+3. **No adversary, and no lower bounds.** Theorem 1.2 also covers an `F = c₁(c₁ − c₂)/(8n)`-dynamic
+   adversary (stabilizing near-plurality); this is not formalized (roadmap MAJ-3 has an adversary
+   for two values). The `Ω(n/c₁ + log n)` part of Theorem 1.2 and Theorems 2.5 (a gap `O(√n)`
+   loses with constant probability) and 2.6 are not formalized.
+4. **"With high probability" made explicit.** It is `1 − C/n` for the theorems and `1 − C/n²` for
+   the one-round lemmas, with `∃ C` and the regime `log n ≥ C`. The proofs give `z = 128` and
+   `C = 2` (`distance_increases`, `growth_round`), `C = 128` (`growth_phase`, `finish_phase`) and
+   `C = 384` (`plurality_whp`). Lemma 2.2 is stated with the paper's strict inequality and factor
+   `1 + a/(4n)`, and with the hypothesis `a ≤ n/2` that its proof assumes.
+5. **Lemma 2.3 as a stochastic domination.** The paper states the existence of a coupling of the
+   round with a process `P'` in which `c' ≤ b'`. The formal statement `count_stochDom` is the
+   stochastic domination `P(c' ≥ t) ≤ P(b' ≥ t)` for every `t`, for any two colours with
+   `c ≤ b`, which is what such a coupling gives and how the proof of Theorem 1.2 uses it.
+
+### Differences in the proofs
+
+1. **Bernstein instead of Chernoff, so no bound on `k`.** For one round, `a' − c_j'` and `a'` are
+   sums of independent per-node contributions (`Median/TwoChoicesConc.lean`). Their variances are
+   bounded node by node: a node of colour `i` or `j` contributes only when it leaves its colour,
+   with probability at most `S/n² ≤ a/n`, and any other node contributes with probability at most
+   `2a²/n²`, so `Var(a' − c_j') ≤ 10 a²/n` (`gap_dev_le`) and `Var(a') ≤ 2a²/n` (`count_dev_le`).
+   Bernstein's inequality (the shared `Dynamics.avg_bernstein`) with the deviation
+   `λ = (a − b) a/(8n)` has exponent at least `(a − b)²/(1344 n) ≥ (z²/1344) log n`, so for
+   `z = 128` one colour fails with probability at most `n⁻¹²` (`gap_tail_twelve`,
+   `count_tail_twelve`). This holds for every `k`; the union bound runs over the at most `n`
+   colours present, since an absent colour stays absent (`count_step_eq_zero`).
+2. **Lemma 2.3 is not used.** In the growth step, Observation 2.1 gives `𝔼c_j' ≤ 𝔼b'` for every
+   colour `j` other than the plurality colour (`b` the second largest), so the expected gap to
+   every colour grows at least like the gap to `b`, by `expected_gap_ge`. Together with the
+   per-colour tail bounds of item 1 this replaces the coupling. `count_stochDom` is proved
+   separately, by a matching of nodes and of sample pairs: a permutation of the nodes sends the
+   nodes of colour `c` to nodes of colour `b`, and for each node a permutation of the sample pairs
+   embeds the pairs that make it adopt `c` into those that make its image adopt `b`; the induced
+   bijection of rounds preserves the uniform distribution.
+3. **Growth up to `3n/4`, then two colours.** The paper grows the gap while `a ≤ n/2` (Lemma 2.2),
+   then appeals to the two-colour result of Cooper, Elsässer and Radzik once
+   `a ≥ (1/2 + ε₁) n`. Formally, `growth_round` works for `a ≤ 3n/4` with the factor
+   `1 + a/(8n)`: the drift `(a/n)(1 − a/n) ≥ a/(4n)` minus the deviation `a/(8n)`. It also keeps
+   `a` from decreasing (`a' ≥ a`, from the drift `𝔼a' − a ≥ a g/(4n)` of the aggregation bound and
+   the tail of `a'`). `growth_phase` chains these rounds with moving targets
+   (`Dynamics.expList_escape`): after `⌈128 (n/a₀) log n⌉` rounds the gap would exceed `n`
+   (`growth_ratio_pow_gt`) unless the plurality colour already holds `3n/4` of the nodes, where it
+   then stays (`stay_three_quarters`). `finish_phase` dominates the colour by the binary median
+   process (`run_dominates`), whose gap is at least `n/2`, and applies `Median.binary_consensus`.
+4. **Generic lemmas not yet in `dynamics/`.** `variance_le_avg_sub` (the variance is at most the
+   second moment about any point) and the scalar facts `gap_exponent_ge`, `count_exponent_ge`,
+   `exp_neg_twelve_log` and `one_div_pow_twelve_le` (`Median/TwoChoicesConc.lean`) do not mention
+   the dynamics.
+
+### Remarks on the sources
+
+* **The proof of Theorem 1.2 needs a minor correction.** Lemma 2.2 is proved for `a ≤ n/2`, while
+  the hand-off to the two-colour process needs `a ≥ (1/2 + ε₁) n`, so the range between is not
+  covered. The time bound `O((n/a) log n)` uses the initial `a`, while the growth factor
+  `1 + a/(4n)` of Lemma 2.2 uses the current one, and the proof does not show that `a` does not
+  decrease. Both are repaired by `growth_round`, which is valid up to `3n/4` and gives `a' ≥ a`
+  with high probability.
+* **The proof of Lemma 2.3 needs a minor correction.** Read literally (in `P'`, every node samples
+  `π(v)` whenever it samples `v` in `P`, and the configuration is unchanged), the coupling does not
+  give `c' ≤ b'` round by round, even under the lemma's hypotheses: for `n = 5` and colours
+  `(A, A, A, B, C)`, where `π` swaps the node of `C` with the node of `B`, it fails in 2 406 250 of
+  the 9 765 625 rounds. The coupling moves the samples but not the nodes, so a node of `C` that
+  keeps its colour is not matched with a node of `B̂` that keeps its colour. The statement itself
+  holds, as a stochastic domination (`count_stochDom`, item 5 of the differences in the statements
+  and item 2 of the differences in the proofs).
+
+## The lower bound for 2-Choices (`TwoChoicesLower`, roadmap MAJ-6 (a))
+
+Source: Berenbrink, Clementi, Elsässer, Kling, Mallmann-Trenn and Natale, *Ignore or comply? On
+breaking symmetry in consensus*, PODC 2017: Theorem 5 of arXiv:1702.04921 (v1) (Section 4, proof
+in Appendix A.8) and the 2-Choices half of Theorem 1 (Simplified).
+
+### The statements
+
+`lower_bound_strong` (Theorem 5): there is `γ₀ > 0` such that, for every `γ ≥ γ₀`, every
+configuration whose colours have at most `ℓ` nodes each, `ℓ' = max {2ℓ, γ log n}` and every `T`
+with `T < n/(γ ℓ')`, the probability that some colour has more than `ℓ'` nodes at some time
+`t ≤ T` is at most `1/n`. The proof gives `γ₀ = 8`.
+
+`consensus_time_lower` (Theorem 1 (Simplified), lower bound): for every `β > 0` there is `C > 0`
+such that, from every configuration in which every colour has at most `β log n` nodes, the
+probability that 2-Choices reaches consensus at some time `t ≤ T` is at most `1/n`, for every `T`
+with `(T + 1) C log n < n`. The proof gives `C = max(8, 2β)²`.
+
+### Differences in the statements
+
+1. **Theorem 5.** The paper's `ℓ` is the largest support; the formal `ℓ` is any upper bound on all
+   supports. "`γ` a sufficiently large constant" is "every `γ ≥ γ₀`", and the window
+   "`t < n/(γ ℓ')`" is "every `t ≤ T` with `T < n/(γ ℓ')`".
+2. **Theorem 1 (Simplified).** "Each colour is supported by at most `O(log n)` nodes" is "at most
+   `β log n` nodes, for any `β > 0`", and "2-Choices needs `Ω(n/log n)` rounds with high
+   probability" is the bound `1/n` on reaching consensus within `T` rounds when
+   `(T + 1) C log n < n`. Consensus is `∃ c, run x l = fun _ => c`.
+
+### Differences in the proofs
+
+1. **An exponential supermartingale instead of the binomial domination.** The paper dominates the
+   support of a colour by a process `P` with binomial increments and applies a Chernoff bound to
+   the sum of the increments. The formal proof needs no coupling: a colour gains only nodes that
+   see it twice (`count_step_le`), the number of such nodes is a sum of `n` independent Bernoulli
+   variables with exponential moment `(1 + (c_i/n)²(e^θ − 1))ⁿ` (`avg_exp_twice`), and an
+   induction on the horizon with `θ = 1` gives
+   `P(∃ t ≤ T, c_i(t) > L) ≤ exp(−(L − c_i) + (e − 1) T L²/n)` (`colour_escape_le`). With
+   `L = ℓ'`, `L − c_i ≥ ℓ'/2` and `T ℓ'²/n < ℓ'/γ`, one colour fails with probability at most
+   `n⁻²` for `γ ≥ 8`, and the union bound runs over the at most `n` colours present.
+2. **The expected number of changes.** `expected_see_distinct` and `expected_changed_le` make
+   precise the remark of the paper's sketch that most nodes see two different colours and keep
+   their own: if every colour has at most `ℓ` nodes, at most `ℓ` nodes change colour in
+   expectation. They are not needed by the proof of Theorem 5.
+
+### Remarks on the sources
+
+* **The proof of Theorem 5 needs a minor correction of a constant.** In equation (21), the
+  threshold `(1 + δ)μ = max {2μ, (γ/2) log n}` (with `μ = 𝔼B`) has `δ ≥ 1`, and the Chernoff bound
+  `exp(−δμ/3)` for `δ ≥ 1` gives, since `δμ = (1 + δ)μ − μ ≥ (γ/4) log n`, only
+  `exp(−(γ/12) log n)`, not the `exp(−(γ/6) log n)` written there (which uses `(1 + δ)μ` in place
+  of `δμ`). The bound is attained at `δ = 1` (`ℓ' = (γ²/4) log n`), where even the full Chernoff
+  bound `(e/4)^μ` gives only about `n^{−0.097γ}`. Taking `γ ≥ 36` instead of `γ ≥ 18` restores
+  the `1/n³` of equation (21). The theorem is unaffected, since `γ` is any sufficiently large
+  constant.
