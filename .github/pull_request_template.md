@@ -13,5 +13,5 @@ you did; if an item does not apply, say why.
 - [ ] `RESULTS.md` has a row for each new or changed result
 - [ ] `PROVENANCE.md` has an entry for each new or changed result
 - [ ] The status in `ROADMAP.md` is updated
-- [ ] The landing page `home_page/index.md` is updated, or an issue to update it is opened: #
+- [ ] The landing page `home_page/index.md` is updated (at most a phrase per paper, linked to its blueprint section), or an issue to update it is opened: #
 - [ ] The build is `sorry`-free and the axiom audit passes (`python3 ../scripts/check_axioms.py` in the package)
