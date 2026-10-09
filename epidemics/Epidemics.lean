@@ -36,6 +36,11 @@ import Epidemics.Revisited.ProtocolsDefs
 import Epidemics.Revisited.ProtocolsAux
 import Epidemics.Revisited.Protocols
 import Epidemics.Revisited.Instances
+import Epidemics.Revisited.LowerGeneric
+import Epidemics.Revisited.LowerPush
+import Epidemics.Revisited.LowerPull
+import Epidemics.Revisited.LowerPushPull
+import Epidemics.Revisited.Lower
 import Epidemics.GiantCoins
 import Epidemics.GiantDFS
 import Epidemics.GiantAnalysis
