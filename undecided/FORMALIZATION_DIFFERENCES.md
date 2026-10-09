@@ -143,7 +143,8 @@ hold `m` after `⌈C · md(x) · log n⌉` rounds with probability at least `1 -
 7. **`md`** is defined with `c₁ = maxCount x = maxᵢ cᵢ`; for a configuration without any colour
    `md = 0` (Lean's `x / 0 = 0`), which does not matter for the theorem.
 8. **Finite probability**: probabilities are `expList` expectations over i.i.d. uniform rounds.
-9. **Not covered**: Theorem 8 (the `Ω(md(c))` lower bound) and Section 4 (expanders).
+9. **Not covered**: Section 4 (expanders). The `Ω(md(c))` lower bound (Theorem 8) is in the next
+   section.
 
 ### Differences in the proofs
 
@@ -171,6 +172,141 @@ of undecided nodes, `S = n - q - c = ∑_{j≠m} cⱼ`, `µᵢ = cᵢ(cᵢ + 2q)
    `E[4S' + q'] ≤ (3/4)(4S + q)` and `{4S + q ≤ n/10}` is kept by a good round (the pattern of
    UND-1's final phase). The total number of rounds is at most `C md(x) log n`, and the failure
    probability at most `T (k + 4)/n³ + (3/4)^{T₃} n/10 ≤ 6/n`.
+
+## The lower bound with `k` colours (`LowerBound*`, roadmap UND-3)
+
+Source: [BCNPS15], Theorem 8 (Section 3.5), proved from Lemma 3 (Section 3.3, the first round),
+Lemma 6 (Section 3.4, the descent of the undecided nodes) and Lemma 7 (Section 3.5, the
+plateau); equations (16) and (17) are in the proof of Lemma 6, (19), (20) and (23) in the proof
+of Lemma 7. The paper writes `R(c) = ∑ᵢ cᵢ/c₁` and `Λ(c) = R(c)²/md(c)` (Section 2.1), where
+colour `1` is the initial plurality.
+
+### The statements
+
+`Undecided/LowerBoundBasic.lean` (namespace `Undecided.Plurality`) defines `ratioR x = ∑ᵢ cᵢ /
+maxⱼ cⱼ` and `ratioLam x = ratioR x ² / md x` and proves `md ≤ R ≤ k`, the paper's (2) `Λ ≤ k`,
+`md ≤ Λ`, their values without undecided nodes (`R = n / maxᵢ cᵢ`, `Λ = n² / ∑ᵢ cᵢ²`), and the
+expectations (20) `µᵢ = (1 + (2δ + cᵢ)/n) cᵢ` and (19) `E[Q' - n/2] = (2δ² - ∑ⱼ cⱼ²)/n`, with
+`δ = q - n/2` (`mu_eq_half`, `muU_sub_half`). Below, `q` is the number of undecided nodes,
+`miss S T y` the probability of not being in `S` after `T` rounds from `y` (as in
+`PluralityStages.lean`), and every constant `C` is existential.
+
+* `first_round` (Lemma 3; `C k ≤ (n / log n)^{1/2}`): from `x` without undecided nodes and a
+  plurality colour `m`, after one round, with probability at least `1 - C/n`: `c_m ≥ n/(2R²)`,
+  every colour is at most `2n/R²`, and `n(1 - 2/Λ) ≤ q ≤ n(1 - 1/(2Λ))` (`R`, `Λ` of `x`).
+* `undecided_square` ((16); `C k ≤ (n / log n)^{1/6}`): if `q = (1 + δ)n/2` and
+  `1 - δ ≥ 1/(2k)`, then after one round `Q' ≤ (1 + δ²) n/2` with probability at least
+  `1 - C/n²`.
+* `undecided_not_below` ((17), corrected; `C k ≤ (n / log n)^{1/6}`): for every `γ ≥ 1` and
+  `D ∈ (0, k]`, if every colour is at most `γ n/D`, then after one round `Q' ≥ n/2 - 2γ² n/D`
+  with probability at least `1 - C/n²` (`C` does not depend on `γ`).
+* `descent` (Lemma 6, corrected; `C k ≤ (n / log n)^{1/6}`): there are `γ ≥ 1` and `C` such
+  that, for `x` without undecided nodes with `md(x) ≥ C` and `y` satisfying the conclusion of
+  Lemma 3 (every colour at most `2n/R(x)²`, `n(1 - 2/Λ(x)) ≤ q ≤ n(1 - 1/(2Λ(x)))`), there is a
+  round `t ≤ C log n` such that, with probability at least `1 - C/n`, every colour is at most
+  `γ n/md(x)` at each round `s ≤ t`, and at round `t` moreover `|q - n/2| ≤ 2γ² n/md(x)`.
+* `plateau_step` (one round of Lemma 7, corrected; `C k ≤ (n / log n)^{1/4}`): for every
+  `γ ≥ 1` there is `C` such that, if `C ≤ D ≤ k`, `|q - n/2| ≤ 2γ² n/D` and every colour is at
+  most `B ∈ [γ n/D, 2γ n/D]`, then after one round, with probability at least `1 - C/n²`, every
+  colour is at most `(1 + (4γ² + 2γ + 1)/D) B` and still `|q - n/2| ≤ 2γ² n/D`.
+* `plateau` (Lemma 7, corrected; `C k ≤ (n / log n)^{1/4}`): for every `γ ≥ 1` there is `C`
+  such that, if `C ≤ D ≤ k`, `|q - n/2| ≤ 2γ² n/D` and every colour is at most `γ n/D`, then for
+  every `T ≤ D/C`, after `T` rounds, with probability at least `1 - C/n`, every colour is at
+  most `2γ n/D` and `|q - n/2| ≤ 2γ² n/D`.
+* `lower_bound_whp` (Theorem 8; `C k ≤ (n / log n)^{1/6}`, `log n ≥ C`): for `x` without
+  undecided nodes and every `T` with `C T ≤ md(x)`, after `T` rounds, with probability at least
+  `1 - C/n`, every colour is at most `C n/md(x)`.
+* `lower_bound_consensus` (Theorem 8, the convergence time; same range): for `x` without
+  undecided nodes and every `T` with `C(T + 1) ≤ md(x)`, the probability that all nodes hold the
+  same colour after `T` rounds is at most `C/n`.
+
+The proofs give `C = 100` for `first_round`, `C = 8` for `undecided_square` and
+`undecided_not_below`, the witnesses `γ = 24` and `C = 10⁶` for `descent`, `C = 16γ²` for
+`plateau_step`, `C = 30γ²` for `plateau`, and `C = 1017429` for `lower_bound_whp` (twice that
+for `lower_bound_consensus`).
+
+### Differences in the statements
+
+1. **Explicit "w.h.p.", `O`, `Ω`, `o` and "sufficiently small `ε`"**: one existential constant
+   `C` per statement, with `log n ≥ C`, `C k ≤ (n / log n)^{a}` with the paper's exponent `a`
+   (`1/2` for `k = o(√(n / log n))` in Lemma 3, `1/4` in Lemma 7, `1/6` in Lemma 6 and
+   Theorem 8), failure probability `C/n`, and `T ≤ md/C` rounds for `Ω(md)`. The one-round steps
+   (16), (17) and the step of Lemma 7 are stated with failure probability `C/n²` (a bad round has
+   probability `(k + 4)/n³` at deviation level `3 log n`), so that they can be iterated over
+   `O(log n)` (respectively `O(md) ≤ n`) rounds.
+2. **All colours, not only the initial plurality.** The lower bound needs that *no* colour
+   reaches all nodes. Lemmas 6 and 7 bound only the initial plurality `C₁`, but their proofs use
+   properties of the largest colour (`∑ⱼ cⱼ² ≤ c₁ (n - q)`, `c₁ ≥ (n - q)/k`), and without a bias
+   another colour may overtake the initial plurality. This needs a minor correction: every upper
+   bound is stated for `maxCount`. Lemma 3 also keeps the paper's lower bound on the plurality
+   colour `m`.
+3. **Theorem 8, form of the conclusion.** "The convergence time is `Ω(md(c̄))` w.h.p." becomes
+   (a) `lower_bound_whp`: at every round `T ≤ md(x)/C`, w.h.p. no colour has more than
+   `C n/md(x)` nodes (what the proof shows), and (b) `lower_bound_consensus`: if
+   `C(T + 1) ≤ md(x)`, the probability of a monochromatic configuration after `T` rounds is at
+   most `C/n`. Monochromatic configurations are absorbing (`step_const`), so this bounds the
+   probability of converging within `T` rounds. The `+ 1` excludes `T = 0` with `md(x) < C` (for
+   instance a monochromatic `x`). Convergence means that all nodes hold the same colour (the
+   target of Section 2); the all-undecided configuration, also absorbing, is not counted as
+   convergence.
+4. **Initial configurations without undecided nodes** (`count x none = 0`), as in the paper
+   (Section 2.1: "In the initial state we always have `q⁽⁰⁾ = 0`"). No bias is assumed, as in the
+   paper.
+5. **Lemma 6 and Theorem 8: `2γ² n/md(c̄)`.** The window `|Q - n/2| ≤ 2γ²/md(c̄)` in the
+   statement of Lemma 6 and in the proof of Theorem 8 needs a minor correction (a typo): it
+   should read `2γ² n/md(c̄)`, the interval used in the proof of Lemma 6.
+6. **Lemma 6: a deterministic round, and all rounds before it.** The paper gives a round
+   `t̄ = O(log n)` at which, w.h.p., `C₁ ≤ γ n/md` and `|Q - n/2| ≤ 2γ² n/md`. Here the round
+   `t` is deterministic (it depends on `n`, `Λ(c̄)` and `md(c̄)`; the proof takes the first `s`
+   with `(1 - 1/Λ)^{2^s} ≤ 4γ²/md`), and the bound `γ n/md` on the colours holds at every round
+   `s ≤ t`, not only at `t`. This is what the proof shows, it avoids a random round (a stopping
+   time) in the composition, and the per-round form `lower_bound_whp` needs it: when
+   `md(c̄) ≪ log Λ(c̄)`, some rounds `T ≤ md/C` lie before `t̄`. (For the convergence time alone
+   the paper's composition suffices: at `t̄` about `n/2` nodes are undecided, so the process has
+   not converged before `t̄`, consensus being absorbing.) The step (16) is stated for every `δ`
+   with `1 - δ ≥ 1/(2k)` (also `δ < 1/md(c̄)`, possibly negative), which contains the paper's
+   range `1/md(c̄) ≤ δ ≤ 1 - 1/(2Λ(c̄))` since `Λ ≤ k`; the paper's computation holds verbatim on
+   the larger range.
+7. **(17) needs a minor correction.** The paper's proof writes `∑ⱼ cⱼ² = c₁² md(c̄)`, with the
+   monochromatic distance of the *initial* configuration instead of the current one. The bound
+   `∑ⱼ cⱼ² ≤ (maxⱼ cⱼ)(n - q) ≤ γ n²/md` gives `E[Q'] ≥ n/2 - γ n/md`, and the statement for every
+   `γ ≥ 1`.
+8. **Lemma 7 needs minor corrections.**
+   * The growth factor is `1 + (4γ² + 2γ + 1)/md` instead of `1 + (2γ(γ + 1) + 1)/md`: with
+     `|δ| ≤ 2γ² n/md`, the term `2δ/n` of (20) is at most `4γ²/md`, not `2γ²/md`. The number of
+     rounds changes accordingly (still `Ω(md)`).
+   * The lower bound (23), `E[Δ'] ≥ -(4/9) n/md`, uses `∑ⱼ cⱼ² ≤ k ((n - q)/k)²`, which is the
+     reverse of the Cauchy–Schwarz inequality `∑ⱼ cⱼ² ≥ (n - q)²/k`. With
+     `∑ⱼ cⱼ² ≤ (maxⱼ cⱼ)(n - q) ≤ (2γ n/md)(2n/3)` one gets `E[Δ'] ≥ -(4γ/3) n/md`, which stays
+     inside the window `-2γ² n/md` for `γ ≥ 1`.
+   * The lemma is stated for `γ ≥ 1` instead of "an arbitrary positive constant `γ`": the proof's
+     invariant (the window `|Δ| ≤ 2γ² n/md`, part of the formal conclusion) is not preserved for
+     `γ < 1/2`, since from `q = n/2` and `md/(4γ)` colours of size `2γ n/md` one gets
+     `E[Δ'] = -γ n/md < -2γ² n/md`. Whether the paper's conclusion (which bounds only `C₁`) holds
+     for small `γ` is left open; Theorem 8 needs only one large `γ`.
+   * `md(c̄)` is a real parameter `D` with `C ≤ D ≤ k`; the paper assumes `md(c̄) ≥ 8γ²`, a
+     "sufficiently large constant".
+9. **Lemma 3** is stated with the same constant `C` in the range `C k ≤ (n / log n)^{1/2}` (the
+   paper: `k = o(√(n / log n))`), which is what its Chernoff bounds need
+   (`E[C_m'] = n/R² ≥ n/k² ≥ C² log n`).
+10. **Lemma 4** (`R(C⁽¹⁾) ≤ md(c̄)(1 + o(1))`) is not used by the lower bound and is not
+    formalized.
+11. **Model**: as for `plurality_whp` (sampling with replacement, possibly oneself; finite
+    probability via `expList`); `k` is the size of the palette (colours may be absent).
+
+### Differences in the proofs
+
+Every one-round statement follows from the good event of `PluralityRound.lean` at deviation level
+`ℓ = 3 log n` (`bad_le`: a bad round has probability at most `(k + 4)/n³`; `round_le` in
+`PluralityStages.lean`), by a
+deterministic lemma on a good round (`LowerBoundRound.lean`: `first_of_good`, `square_of_good`,
+`not_below_of_good`; `plateau_of_good`). `plateau` and `descent` iterate their steps with moving
+targets (`Dynamics.expList_escape`). In `descent` (`LowerBoundDescentCore.lean`) the colour
+envelope is the recursion `descentGrowth`: in a first phase the colours stay at most `8n/D`, in a
+second at most `γ n/D` with `γ = 24`, while the number of undecided nodes tracks
+`max((1 - 1/Λ)^{2^s}, 4γ²/D)` until this quantity reaches the window `4γ²/D`. `lower_bound_whp`
+composes `first_round`, `descent` and `plateau` by the Markov property (`miss_comp`); a round `T`
+up to the descent round `t` is covered by the bound at every round `s ≤ t` of `descent`.
 
 ## Sequential approximate majority (`Sequential*`, roadmap UND-2)
 
