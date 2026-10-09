@@ -1,12 +1,15 @@
 # Leanamics
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23265329.svg)](https://doi.org/10.5281/zenodo.23265329)
+
 Lean 4 + Mathlib formalizations of classical results on opinion dynamics and
 related distributed processes. Each project is paired with a
 [leanblueprint](https://github.com/PatrickMassot/leanblueprint) connecting the
 paper proof to the Lean code statement-by-statement.
 
 **[https://formal-dynamics.github.io/leanamics/](https://formal-dynamics.github.io/leanamics/)** (landing
-page, blueprints, dependency graphs and API docs for everything below).
+page, blueprints, dependency graphs and API docs for everything below). To cite Leanamics, see
+[How to cite](#how-to-cite).
 
 ## Results
 
@@ -24,6 +27,27 @@ is used. Concentration bounds (Chernoff, Hoeffding, Bernstein, a maximal Azumaâ€
 inequality) and (super)martingale arguments are proved within this layer, and the deterministic
 parts use Mathlib's analysis and linear algebra (integral curves and the discrete Gronwall
 inequality for the SIR model, the spectrum of symmetric matrices for averaging).
+
+## How to cite
+
+If you use Leanamics, please cite it. The metadata are in [CITATION.cff](CITATION.cff) (GitHub's
+"Cite this repository" button shows them as APA and BibTeX), and every release is archived on
+[Zenodo](https://zenodo.org/) with its own DOI; [10.5281/zenodo.23265329](https://doi.org/10.5281/zenodo.23265329) always resolves to the
+latest release. Please cite the version you used (here v0.1.0):
+
+```bibtex
+@software{leanamics,
+  author  = {Kumar, Aakash and Bucarelli, Maria Sofia and D'Archivio, Niccol{\`o} and Natale, Emanuele},
+  title   = {Leanamics: {Lean} 4 formalizations of opinion dynamics and related distributed processes},
+  year    = {2026},
+  version = {0.1.0},
+  doi     = {10.5281/zenodo.23265330},
+  url     = {https://github.com/formal-dynamics/leanamics}
+}
+```
+
+The same section is on the [website](https://formal-dynamics.github.io/leanamics/#cite), and every
+blueprint page links to it.
 
 ## Layout
 
@@ -114,11 +138,20 @@ produced it.
 **Every pull request that adds or changes a result must keep the documentation up to date:** the
 package's `README.md` and blueprint, its `FORMALIZATION_DIFFERENCES.md`, a row in
 [RESULTS.md](RESULTS.md), an entry in [PROVENANCE.md](PROVENANCE.md), the status in
-[ROADMAP.md](ROADMAP.md), and the landing page `home_page/index.md`. If the landing page is not
+[ROADMAP.md](ROADMAP.md), and the landing page `home_page/index.md` (kept short: at most a phrase per
+paper, linked to its blueprint section; the details go in the blueprint). If the landing page is not
 updated in the pull request itself, open an issue to update it. Each formalized paper has a
 blueprint section with a stable `\label{sec:...}` (used for links to the website); do not rename
 existing labels. The [pull request template](.github/pull_request_template.md) lists these items,
 together with the axiom audit.
+
+## Releases
+
+To make a release `vX.Y.Z`: in a pull request, update `version` and `date-released` in
+[CITATION.cff](CITATION.cff) and the BibTeX entries (here and on the landing page); after merging it,
+create the GitHub release `vX.Y.Z`. Zenodo archives every release automatically; then add the new
+version DOI to `identifiers` in `CITATION.cff` and to the BibTeX entries. The concept DOI
+(`10.5281/zenodo.23265329`) never changes.
 
 ## License
 

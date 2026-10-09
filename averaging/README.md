@@ -124,3 +124,7 @@ Provenance of AVG-3: the statements were fixed by a Claude agent before the proo
 by a second Claude agent against the paper (the review led to `±1` labels in Definition 2.3); the
 proofs are by Claude agents under the fixed-statement protocol, verified mechanically (no
 placeholders, warning-free build, axiom audit).
+
+## How to cite
+
+See [How to cite](../README.md#how-to-cite) in the main README.

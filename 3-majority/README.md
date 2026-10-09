@@ -96,3 +96,7 @@ lake build           # verifies every proof
 
 Toolchain: see [lean-toolchain](lean-toolchain). The main theorem depends only
 on the standard axioms (`propext`, `Classical.choice`, `Quot.sound`).
+
+## How to cite
+
+See [How to cite](../README.md#how-to-cite) in the main README.
