@@ -91,7 +91,8 @@ sharp upper bounds from a general analysis ([Doerr and Kostrygin, ICALP 2017]({{
 Reed–Frost epidemics as percolation, with small outbreaks below the threshold, also on small-world
 networks ([Becchetti et al.]({{ '/epidemics/blueprint/' | relative_url }}#sec:bcdptz-small-world)), and a giant component above it
 ([Krivelevich and Sudakov, 2013]({{ '/epidemics/blueprint/' | relative_url }}#sec:krivelevich-sudakov)); the COBRA–BIPS duality
-([Cooper, Radzik and Rivera, PODC 2016]({{ '/epidemics/blueprint/' | relative_url }}#sec:crr-cobra-bips)); and the SIR equations
+([Cooper, Radzik and Rivera, PODC 2016]({{ '/epidemics/blueprint/' | relative_url }}#sec:crr-cobra-bips)) and the COBRA cover time
+$O(\log n/(1-\lambda)^3)$ on regular expanders ([details]({{ '/epidemics/blueprint/' | relative_url }}#sec:crr-cover)); and the SIR equations
 ([Kermack–McKendrick]({{ '/epidemics/blueprint/' | relative_url }}#sec:kermack-mckendrick)) with their law of large numbers
 ([Kurtz]({{ '/epidemics/blueprint/' | relative_url }}#sec:kurtz)).
 

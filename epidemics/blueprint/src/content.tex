@@ -744,8 +744,9 @@ $3/n^3$ for $T\ge60000\log n/(1-\lambda)^3$, and $\sum_{s<H}\Pr(A_s\ne V)\le
 \end{theorem}
 \begin{proof}\leanok
 Chain the three phases at their first hitting times with $m=\ceil{4000\log n/(1-\lambda)^2}$ and
-$C=3$. For the expectation, restart from the current set: monotonicity and the persistent source
-give $\Pr(A_{s+T_0}\ne V)\le\Pr(A_s\ne V)/2$.
+$C=3$. (The paper's proof takes $m=4000\log n/(1-\lambda^2)$, which needs a minor correction:
+Lemma~3 needs $|A|\ge4000\log n/(1-\lambda)^2$.) For the expectation, restart from the current
+set: monotonicity and the persistent source give $\Pr(A_{s+T_0}\ne V)\le\Pr(A_s\ne V)/2$.
 \end{proof}
 
 \begin{theorem}[Theorem~1]\label{thm:crr-cobra}
