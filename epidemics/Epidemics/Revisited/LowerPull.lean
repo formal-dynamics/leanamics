@@ -1,5 +1,6 @@
 import Epidemics.Revisited.Protocols
 import Epidemics.Revisited.LowerGeneric
+import Epidemics.Revisited.LowerRound
 
 /-! # Lower bound for pull on `K_n`: the two phases (EPI-8, Theorem 52)
 
@@ -53,8 +54,8 @@ uninformed nodes, fewer than `u² / (2n)` nodes stay uninformed with probability
 `4 n² / u³`. -/
 theorem pull_round_lower (S : Finset (Fin n)) :
     ((pull n).K S).prob (fun T => (n : ℝ) - T.card < ((n : ℝ) - S.card) ^ 2 / (2 * n)) ≤
-      4 * (n : ℝ) ^ 2 / ((n : ℝ) - S.card) ^ 3 := by
-  sorry
+      4 * (n : ℝ) ^ 2 / ((n : ℝ) - S.card) ^ 3 :=
+  pull_round_lower_proof S
 
 /-- Final phase (Theorem 48 for pull, `ℓ = 2`): from at least `n / 2` uninformed nodes, pull
 informs all nodes within `log₂ ln n - r₀` rounds with probability at most `C n^{-1/2}`. -/

@@ -6,17 +6,22 @@ halves) are in `Revisited/Instances.lean`. This roadmap item pins the matching l
 
 ## Status
 
-Phase 1 (pinning) done: statements in `Epidemics/Revisited/Lower*.lean`, listed in `PINNED.txt`.
-`lake build Epidemics` succeeds with only `declaration uses 'sorry'` warnings.
+Phase 1 (pinning) done. One-round lemmas are proved in `LowerRound.lean` and wired into the
+pinned statements. Final phases and the six main theorems are still in progress.
 
 * Proved: `envelope_le`, `envelope_seq_le`, `reach_le_of_expect_card_le`, `reach_add_le`,
   the one-round expectation facts (`*_expect_card_le`, `*_expect_uninformed`) and the growth
-  bounds (`*_growth_lower`) for the three protocols, and the helpers `one_sub_iterate`,
-  `one_sub_notYet_eq`,
-  `iterate_card_le`, `expect_card_le_of_informProb_le`, `one_sub_one_sub_inv_pow_le`.
-* Remaining (`sorry`): `push_round_lower`, `pull_round_lower`, `pushPull_round_lower`,
-  `push_final_lower`, `pull_final_lower`, `pushPull_final_lower`, and the six main theorems in
-  `Lower.lean`.
+  bounds (`*_growth_lower`) for the three protocols, the helpers `one_sub_iterate`,
+  `one_sub_notYet_eq`, `iterate_card_le`, `expect_card_le_of_informProb_le`,
+  `one_sub_one_sub_inv_pow_le`, and the one-round lower bounds `push_round_lower`,
+  `pull_round_lower`, `pushPull_round_lower` (via `prob_deficit_lt_cheb` and
+  `one_sub_inv_pow_ge_exp_neg` in `LowerRound.lean`). `lake build Epidemics.Revisited.LowerRound`
+  succeeds.
+* Remaining (`sorry`): `push_final_lower`, `pull_final_lower`, `pushPull_final_lower`, and the
+  six main theorems in `Lower.lean`.
+* Current plan: `LowerFinal.lean` for the three final phases (`C = 128`, `r₀ = 5`, `N = 3` for
+  pull; `C = 128 e²` for push–pull; push with slack 20, threshold `40^4 = 2560000`, `C = 1600`,
+  `κ = 1/2`), then `LowerTotal.lean` for the six tail and expectation theorems.
 
 ## Pinned statements
 

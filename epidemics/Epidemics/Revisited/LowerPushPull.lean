@@ -1,5 +1,6 @@
 import Epidemics.Revisited.Protocols
 import Epidemics.Revisited.LowerGeneric
+import Epidemics.Revisited.LowerRound
 
 /-! # Lower bound for push–pull on `K_n`: the two phases (EPI-8, Theorem 53)
 
@@ -63,8 +64,8 @@ probability at most `4 e² n² / u³`. -/
 theorem pushPull_round_lower (S : Finset (Fin n)) :
     ((pushPull n).K S).prob (fun T => (n : ℝ) - T.card <
         ((n : ℝ) - S.card) ^ 2 / (2 * Real.exp 1 * n)) ≤
-      4 * Real.exp 1 ^ 2 * (n : ℝ) ^ 2 / ((n : ℝ) - S.card) ^ 3 := by
-  sorry
+      4 * Real.exp 1 ^ 2 * (n : ℝ) ^ 2 / ((n : ℝ) - S.card) ^ 3 :=
+  pushPull_round_lower_proof S
 
 /-- Final phase (Theorem 48 for push–pull, `ℓ = 2`): from at least `n / 2` uninformed nodes,
 push–pull informs all nodes within `log₂ ln n - r₀` rounds with probability at most

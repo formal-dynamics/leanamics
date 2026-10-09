@@ -1,5 +1,6 @@
 import Epidemics.Revisited.Protocols
 import Epidemics.Revisited.LowerGeneric
+import Epidemics.Revisited.LowerRound
 
 /-! # Lower bound for push on `K_n`: the two phases (EPI-8, Theorem 51)
 
@@ -57,8 +58,8 @@ uninformed with probability at most `v^{-1/2}`. -/
 theorem push_round_lower (S : Finset (Fin n)) {v : ℝ} (hv : 4 ≤ v)
     (hvu : v ≤ (n : ℝ) - S.card) :
     ((push n).K S).prob (fun T => (n : ℝ) - T.card < v / Real.exp 1 - v ^ (3 / 4 : ℝ)) ≤
-      v ^ (-(1 / 2 : ℝ)) := by
-  sorry
+      v ^ (-(1 / 2 : ℝ)) :=
+  push_round_lower_proof S hv hvu
 
 /-- Final phase (Theorem 38 for push, `ρ = 1`): from `u = n - |S|` uninformed nodes, push
 informs all nodes within `t` rounds with probability at most `C e^{κ (t - ln u)}`, that is,
