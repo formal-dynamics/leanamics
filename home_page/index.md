@@ -42,7 +42,9 @@ consensus from any start, even a balanced one ([details]({{ '/plurality/blueprin
 Every round, each node adopts the median of its own value and two random values; with two values
 this is 2-Choices. Formalized: consensus within $O(\log n)$ rounds from any configuration and
 almost stable consensus against an adaptive adversary ([Doerr et al., SPAA 2011]({{ '/median/blueprint/' | relative_url }}#sec:dgmss-median));
-two-sample voting on expanders ([Cooper, Elsässer and Radzik, ICALP 2014]({{ '/median/blueprint/' | relative_url }}#sec:cer-two-choices)).
+two-sample voting on expanders ([Cooper, Elsässer and Radzik, ICALP 2014]({{ '/median/blueprint/' | relative_url }}#sec:cer-two-choices));
+and, for 2-Choices with any number of colours, plurality consensus ([Elsässer et al.]({{ '/median/blueprint/' | relative_url }}#sec:efkmt-plurality))
+and an $\Omega(n/\log n)$ lower bound ([Berenbrink et al., PODC 2017]({{ '/median/blueprint/' | relative_url }}#sec:bcekmn-lower)).
 
 [Blueprint]({{ '/median/blueprint/' | relative_url }}) · [PDF]({{ '/median/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/median/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/median/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/median)
 
@@ -52,7 +54,7 @@ two-sample voting on expanders ([Cooper, Elsässer and Radzik, ICALP 2014]({{ '/
 A node that sees the other opinion becomes undecided; an undecided node adopts the opinion it
 sees. Formalized: majority consensus from a bias of order $\sqrt{n \log n}$ within $O(\log n)$
 rounds ([Clementi et al., MFCS 2018]({{ '/undecided/blueprint/' | relative_url }}#sec:cggnps-majority)); plurality consensus with $k$
-colours ([Becchetti et al., SODA 2015]({{ '/undecided/blueprint/' | relative_url }}#sec:bcnps-plurality)); and the sequential
+colours ([Becchetti et al., SODA 2015]({{ '/undecided/blueprint/' | relative_url }}#sec:bcnps-plurality)) and its [lower bound]({{ '/undecided/blueprint/' | relative_url }}#sec:bcnps-lower-bound); and the sequential
 approximate-majority protocol ([Angluin, Aspnes and Eisenstat, 2008]({{ '/undecided/blueprint/' | relative_url }}#sec:aae-approx-majority)).
 
 [Blueprint]({{ '/undecided/blueprint/' | relative_url }}) · [PDF]({{ '/undecided/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/undecided/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/undecided/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/undecided)
@@ -63,7 +65,8 @@ approximate-majority protocol ([Angluin, Aspnes and Eisenstat, 2008]({{ '/undeci
 Every round, each node copies the opinion of a random neighbour. Formalized: the consensus
 probabilities on connected graphs and neutral Wright–Fisher fixation ([Hassin and
 Peleg]({{ '/voter/blueprint/' | relative_url }}#sec:hassin-peleg)); consensus within $O(n^3 \log n)$ rounds on every connected graph
-([details]({{ '/voter/blueprint/' | relative_url }}#sec:kms-meeting-time)); and consensus times via conductance, also on dynamic
+([details]({{ '/voter/blueprint/' | relative_url }}#sec:kms-meeting-time)), also without laziness on
+non-bipartite graphs ([Hassin and Peleg]({{ '/voter/blueprint/' | relative_url }}#sec:hp-plain-walk)); and consensus times via conductance, also on dynamic
 graphs ([Berenbrink et al., ICALP 2016]({{ '/voter/blueprint/' | relative_url }}#sec:bgkm-conductance)).
 
 [Blueprint]({{ '/voter/blueprint/' | relative_url }}) · [PDF]({{ '/voter/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/voter/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/voter/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/voter)
@@ -84,7 +87,7 @@ Formalized: the isothermal theorem on regular graphs ([Lieberman, Hauert and Now
 
 Formalized: push, pull and push–pull rumor spreading on $K_n$ inform all nodes within $O(\log n)$
 rounds ([push]({{ '/rumor_spread/blueprint/' | relative_url }}#sec:main-statement), [pull and push–pull]({{ '/rumor_spread/blueprint/' | relative_url }}#sec:pull)), with
-sharp upper bounds from a general analysis ([Doerr and Kostrygin, ICALP 2017]({{ '/epidemics/blueprint/' | relative_url }}#sec:doerr-kostrygin));
+sharp upper bounds from a general analysis ([Doerr and Kostrygin, ICALP 2017]({{ '/epidemics/blueprint/' | relative_url }}#sec:doerr-kostrygin)) and the matching [lower bounds]({{ '/epidemics/blueprint/' | relative_url }}#sec:doerr-kostrygin-lower);
 Reed–Frost epidemics as percolation, with small outbreaks below the threshold, also on small-world
 networks ([Becchetti et al.]({{ '/epidemics/blueprint/' | relative_url }}#sec:bcdptz-small-world)), and a giant component above it
 ([Krivelevich and Sudakov, 2013]({{ '/epidemics/blueprint/' | relative_url }}#sec:krivelevich-sudakov)); the COBRA–BIPS duality

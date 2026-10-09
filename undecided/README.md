@@ -48,6 +48,30 @@ route (Bernstein per round, an invariant on the colour ratios, growth of `c_m (c
 final contraction), in
 `Undecided/Plurality{Conc,Round,Alg,Arith,Steps,Progress,Stages,Assembly}.lean`.
 
+### The `Ω(md(c))` lower bound
+
+The same paper (SODA 2015, Theorem 8 with Lemmas 3, 6 and 7) shows that, without any bias, the
+dynamics needs `Ω(md(c))` rounds: after the first round most nodes are undecided, their number
+descends to about `n/2` within `O(log n)` rounds while no colour exceeds `O(n/md(c))` nodes, and
+then no colour grows faster than by a factor `1 + O(1/md(c))` per round. Main theorems in
+[`Undecided/LowerBound.lean`](Undecided/LowerBound.lean), with `R(c) = ∑ᵢ cᵢ / maxⱼ cⱼ`
+(`ratioR`) and `Λ(c) = R(c)²/md(c)` (`ratioLam`, in
+[`Undecided/LowerBoundBasic.lean`](Undecided/LowerBoundBasic.lean)); all constants are
+existential:
+
+| Result | Lean declaration |
+| --- | --- |
+| `md ≤ R ≤ k`, `md ≤ Λ ≤ k`, and the expectations in terms of `δ = q - n/2` (the paper's (19) and (20)) | `md_le_ratioR`, `ratioR_le_card`, `md_le_ratioLam`, `ratioLam_le_card`, `mu_eq_half`, `muU_sub_half` |
+| Lemma 3 (first round): from a configuration without undecided nodes, w.h.p. every colour has at most `2n/R²` nodes, the plurality at least `n/(2R²)`, and `n(1 - 2/Λ) ≤ q ≤ n(1 - 1/(2Λ))` | `first_round` |
+| Lemma 6 (descent): w.h.p. the undecided nodes reach `n/2 ± 2γ² n/md(c)` within `O(log n)` rounds, while every colour stays at most `γ n/md(c)` | `undecided_square`, `undecided_not_below`, `descent` |
+| Lemma 7 (plateau): from there, w.h.p. every colour stays at most `2γ n/md(c)` for `Ω(md(c))` rounds | `plateau_step`, `plateau` |
+| SODA 2015, Theorem 8: there is `C` such that, if `log n ≥ C`, `C k ≤ (n / log n)^{1/6}` and there are no undecided nodes, then after every `T ≤ md(x)/C` rounds every colour has at most `C n/md(x)` nodes with probability `≥ 1 - C/n`; if `C(T + 1) ≤ md(x)`, all nodes hold the same colour after `T` rounds with probability at most `C/n` | `lower_bound_whp`, `lower_bound_consensus` |
+
+Lemmas 6 and 7 need minor corrections (a missing factor `n`, the growth factor of Lemma 7, the
+direction of a Cauchy–Schwarz bound, bounds on the largest colour rather than the initial
+plurality); see [`FORMALIZATION_DIFFERENCES.md`](FORMALIZATION_DIFFERENCES.md) for these and the
+proof route, in `Undecided/LowerBound{Basic,Arith,Round,First,DescentCore,Descent,Plateau}.lean`.
+
 ## Sequential version (UND-2)
 
 [`Undecided/SequentialMain.lean`](Undecided/SequentialMain.lean)
@@ -68,7 +92,9 @@ statements and their proofs were written by a Claude agent under the same protoc
 were reviewed by a second agent against the paper. The majority-phase statements (`Majority*`) and their
 proofs were written by a Claude agent under the same protocol. The `k`-colour statements (`Plurality*`) and their proofs
 were written by a Claude agent under the same protocol; the statements were reviewed by a second
-agent against the paper.
+agent against the paper. The lower-bound statements (`LowerBound*`) were pinned by a Claude agent
+and reviewed by a second agent; their proofs were produced by a Grok agent under the same
+protocol.
 
 ## Build
 

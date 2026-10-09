@@ -628,6 +628,108 @@ Instantiate Theorem~\ref{thm:rumor-total} (push) and Theorem~\ref{thm:rumor-tota
 $f=g=\frac12$.
 \end{proof}
 
+\section{Rumor spreading revisited: lower bounds for push, pull and push--pull}\label{sec:doerr-kostrygin-lower}
+The lower halves of Theorems~51 to~53 of Doerr and Kostrygin (same paper and numbering as
+Section~\ref{sec:doerr-kostrygin}): started from one informed node, push, pull and push--pull
+need $\log_2n+\ln n$, $\log_2n+\log_2\ln n$ and $\log_3n+\log_2\ln n$ rounds minus $O(1)$, in
+expectation and with exponential tails. With Theorem~\ref{thm:rumor-protocols} this determines the
+spreading times up to additive constants. The general lower bounds (Theorems~27, 38 and~48) are
+not formalized: the paper joins them through Lemma~20, which needs a major correction, and the
+formal proofs take a direct route for the instances. The growth phase is bounded by the first
+moment, the final phase by a round-by-round lower envelope, and the two are joined at a fixed time.
+
+The paper's joining of the phases also needs a minor correction (Theorems~38 and~48 start from an
+exact number of uninformed nodes, which the process started from one node need not visit), and so
+do Corollary~17 (not for $u=0$), the statement of Lemma~42 ($q(u_{j+1})$ for $q(u_j)$), some typos
+in Lemmas~39 and~40, and a constant in the proof of Theorem~27; none affects the statements
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/epidemics/FORMALIZATION_DIFFERENCES.md#lower-bounds-of-theorems-51-to-53-lowerlean}{details}).
+
+\begin{lemma}[Lower envelopes and joining at a fixed time]\label{lem:rumor-lower-generic}
+\lean{Epidemics.Revisited.envelope_le,Epidemics.Revisited.envelope_seq_le,Epidemics.Revisited.reach_le_of_expect_card_le,Epidemics.Revisited.reach_add_le}\leanok\uses{def:rumor-process}
+Let $V$ be an observable of a Markov kernel and $(g_i)$, $(\delta_i)$ sequences with
+$\delta_i\ge0$. If from every state with $V\ge g_i$ the observable falls below $g_{i+1}$ in one
+round with probability at most $\delta_i$, then from a state with $V\ge g_0$ it is below $g_t$
+after $t$ rounds with probability at most $\sum_{i<t}\delta_i$ (the round-by-round form of
+Lemmas~42 and~50). For a rumor-spreading process: if one round multiplies the expected number of
+informed nodes by at most $\mu$, then $\Pr[T(|S|,m)\le t]\le\mu^t|S|/m$; and if every state with
+fewer than $m'$ informed nodes reaches $m$ within $t$ rounds with probability at most $B$, then
+$\Pr[T(|S|,m)\le s+t]\le\Pr[T(|S|,m')\le s]+B$.
+\end{lemma}
+\begin{proof}\leanok
+Induction on $t$ for the envelope; Markov's inequality on $E|S_t|\le\mu^t|S|$; the Markov
+property at time $s$.
+\end{proof}
+
+\begin{lemma}[Expectations and growth]\label{lem:rumor-lower-growth}
+\lean{Epidemics.Revisited.push_expect_card_le,Epidemics.Revisited.push_expect_uninformed,Epidemics.Revisited.push_growth_lower,Epidemics.Revisited.pull_expect_card_le,Epidemics.Revisited.pull_expect_uninformed,Epidemics.Revisited.pull_growth_lower,Epidemics.Revisited.pushPull_expect_card_le,Epidemics.Revisited.pushPull_expect_uninformed,Epidemics.Revisited.pushPull_growth_lower}\leanok\uses{lem:rumor-protocol-conditions,lem:rumor-lower-generic}
+After one round from $S$, $E|S'|\le2|S|$ (push, pull) and $E|S'|\le3|S|$ (push--pull), and
+$E[n-|S'|]=(n-|S|)(1-\frac1n)^{|S|}$, $(n-|S|)(1-\frac{|S|}n)$ and
+$(n-|S|)(1-\frac1n)^{|S|}(1-\frac{|S|}n)$. Hence $\Pr[T(|S|,m)\le t]\le2^t|S|/m$ (push, pull) and
+$3^t|S|/m$ (push--pull).
+\end{lemma}
+\begin{proof}\leanok
+Sum the exact probabilities of Lemma~\ref{lem:rumor-protocol-conditions} over the uninformed
+nodes, with $1-(1-\frac1n)^k\le\frac kn$; then Lemma~\ref{lem:rumor-lower-generic}.
+\end{proof}
+
+\begin{lemma}[One round of the final phase; Lemmas 39 and 49]\label{lem:rumor-lower-round}
+\lean{Epidemics.Revisited.push_round_lower,Epidemics.Revisited.pull_round_lower,Epidemics.Revisited.pushPull_round_lower}\leanok\uses{lem:rumor-protocol-conditions,lem:rumor-variance,lem:rumor-lower-growth}
+Let $u=n-|S|$ and $u'$ the number of uninformed nodes after one round. Push, at any level
+$4\le v\le u$: $\Pr[u'<v/e-v^{3/4}]\le v^{-1/2}$. Pull: $\Pr[u'<u^2/(2n)]\le4n^2/u^3$.
+Push--pull: $\Pr[u'<u^2/(2en)]\le4e^2n^2/u^3$.
+\end{lemma}
+\begin{proof}\leanok
+Chebyshev's inequality on the lower tail of $u'$, with $\mathrm{Var}[u']\le u$
+(Lemma~\ref{lem:rumor-variance} with nonpositive covariances) and $E[u']\ge u/e$ (push, from
+$(1-\frac1n)^k\ge e^{-1}$ for $k<n$), $E[u']=u^2/n$ (pull), $E[u']\ge u^2/(en)$ (push--pull).
+\end{proof}
+
+\begin{theorem}[Final phase of push; Theorem 38 for push]\label{thm:rumor-lower-final-push}
+\lean{Epidemics.Revisited.push_final_lower}\leanok\uses{lem:rumor-lower-round,lem:rumor-lower-generic}
+For every $n$, every $S$ with $u=n-|S|$ uninformed nodes and every $t$:
+$\Pr[T(|S|,n)\le t]\le1600\,e^{(t-\ln u)/2}$.
+\end{theorem}
+\begin{proof}\leanok
+Lower envelope (Lemma~\ref{lem:rumor-lower-generic}) along the explicit targets
+$g_i=q_i^3(q_i-20)$, $q_i=(ue^{-i})^{1/4}$, which replace the paper's recursive $u_{j+1}=E_0(u_j)$
+(Lemma~40). The step $g(qe^{-1/4})\le g(q)/e-g(q)^{3/4}$ reduces to $c^4-20c+20\le0$ for
+$c=e^{1/4}$; while $q_i\ge40$, round $i$ fails with probability at most $2/q_i^2$
+(Lemma~\ref{lem:rumor-lower-round}) and these failure probabilities sum to at most
+$4e^{(t-\ln u)/2}$; when $q_t<40$ the bound exceeds $1$.
+\end{proof}
+
+\begin{theorem}[Final phase of pull and push--pull; Theorem 48 with $\ell=2$]\label{thm:rumor-lower-final-double}
+\lean{Epidemics.Revisited.pull_final_lower,Epidemics.Revisited.pushPull_final_lower}\leanok\uses{lem:rumor-lower-round,lem:rumor-lower-generic}
+For $n\ge3$, every $S$ with $2|S|\le n$ and every $t\le\log_2\ln n-5$:
+$\Pr[T(|S|,n)\le t]\le128\,n^{-1/2}$ (pull) and $128e^2n^{-1/2}$ (push--pull).
+\end{theorem}
+\begin{proof}\leanok
+Lower envelope along the double exponential targets $g_i=2n(1/4)^{2^i}$ (pull) and
+$2en(1/(4e))^{2^i}$ (push--pull), the paper's $\varepsilon_{j+1}=E(\varepsilon_j)/2$, with
+Lemma~\ref{lem:rumor-lower-round}. The paper's exponent $-1+2\alpha\ell$ is replaced by the weaker
+$-1/2$, which comes from the cruder variance bound and suffices below.
+\end{proof}
+
+\begin{theorem}[Theorems 51, 52, 53: push, pull, push--pull, lower bounds]\label{thm:rumor-protocols-lower}
+\lean{Epidemics.Revisited.push_spreading_lower_tail,Epidemics.Revisited.push_spreading_lower_expect,Epidemics.Revisited.pull_spreading_lower_tail,Epidemics.Revisited.pull_spreading_lower_expect,Epidemics.Revisited.pushPull_spreading_lower_tail,Epidemics.Revisited.pushPull_spreading_lower_expect}\leanok\uses{lem:rumor-lower-growth,thm:rumor-lower-final-push,thm:rumor-lower-final-double,lem:rumor-lower-generic}
+There are $A$, $B$, $\kappa>0$ and $N$ such that, for $n\ge N$ and one informed node on $K_n$, all
+nodes are informed within $\lfloor\log_2n\rfloor+\lfloor\ln n\rfloor-r$ (push),
+$\lfloor\log_2n\rfloor+\lfloor\log_2\ln n\rfloor-r$ (pull) and
+$\lfloor\log_3n\rfloor+\lfloor\log_2\ln n\rfloor-r$ (push--pull) rounds with probability at most
+$Ae^{-\kappa r}$; the expected times are at least $\log_2n+\ln n-B$, $\log_2n+\log_2\ln n-B$ and
+$\log_3n+\log_2\ln n-B$ (stated for every partial sum $\sum_{t<R}\Pr[T>t]$ with $R$ at least the
+bound).
+\end{theorem}
+\begin{proof}\leanok
+Join the two phases at a fixed time (Lemma~\ref{lem:rumor-lower-generic}) with $m'=n/2$. Push:
+after $\lfloor\log_2n\rfloor-\lceil r/2\rceil$ rounds at most $n/2$ nodes are informed except with
+probability $O(2^{-r/2})$ (Lemma~\ref{lem:rumor-lower-growth}), and from there
+Theorem~\ref{thm:rumor-lower-final-push} bounds the rest. Pull and push--pull: the same with
+$\lfloor\log_2\ln n\rfloor-5$ rounds for the final phase (Theorem~\ref{thm:rumor-lower-final-double}),
+whose $n^{-1/2}$ becomes $e^{-(\ln2/4)r}$ since a nontrivial time forces $r\le2\log_2n$. The tails
+have rate $\kappa=\ln2/4$; the expectations follow by summing the tail series.
+\end{proof}
+
 \section{COBRA and BIPS: the model}\label{sec:crr-cobra-bips}
 We follow Cooper, Radzik and Rivera, \emph{The coalescing-branching random walk on expanders and
 the dual epidemic process}, PODC 2016 (arXiv:1602.05768). The duality itself (their Theorem~4)
