@@ -6,30 +6,51 @@ halves) are in `Revisited/Instances.lean`. This roadmap item pins the matching l
 
 ## Status
 
-Phase 1 (pinning) done. One-round lemmas are proved in `LowerRound.lean` and wired into the
-pinned statements. Final phases and the six main theorems are still in progress.
+**Done.** All 25 pinned declarations are proved; `lake build Epidemics` succeeds without
+warnings and `python3 ../scripts/check_axioms.py` reports only standard Lean axioms. No pinned
+statement needed to change.
 
-* Proved: `envelope_le`, `envelope_seq_le`, `reach_le_of_expect_card_le`, `reach_add_le`,
-  the one-round expectation facts (`*_expect_card_le`, `*_expect_uninformed`) and the growth
-  bounds (`*_growth_lower`) for the three protocols, the helpers `one_sub_iterate`,
-  `one_sub_notYet_eq`, `iterate_card_le`, `expect_card_le_of_informProb_le`,
-  `one_sub_one_sub_inv_pow_le`, and the one-round lower bounds `push_round_lower`,
-  `pull_round_lower`, `pushPull_round_lower` (via `prob_deficit_lt_cheb` and
-  `one_sub_inv_pow_ge_exp_neg` in `LowerRound.lean`). `lake build Epidemics.Revisited.LowerRound`
-  succeeds.
-* Remaining (`sorry`): `push_final_lower`, `pull_final_lower`, `pushPull_final_lower`, and the
-  six main theorems in `Lower.lean`.
-* Current plan: `LowerFinal.lean` for the three final phases (`C = 128`, `r₀ = 5`, `N = 3` for
-  pull; `C = 128 e²` for push–pull; push with slack 20, threshold `40^4 = 2560000`, `C = 1600`,
-  `κ = 1/2`), then `LowerTotal.lean` for the six tail and expectation theorems.
+### Files
+
+| File | Lines | Content |
+| --- | --- | --- |
+| `LowerGeneric.lean` | 248 | generic tools (pinned, proved at the pin) |
+| `LowerRound.lean` | 380 | `prob_deficit_lt_cheb` (lower-tail Chebyshev on the deficit), `one_sub_inv_pow_ge_exp_neg` (`(1 - 1/n)^k ≥ e^{-1}` for `k < n`), `push_level_algebra`, the three one-round proofs |
+| `LowerFinal.lean` | 511 | final phases of pull and push–pull: `reach_le_envelope`, targets `pullTarget`, `pushPullTarget`, `pull_final_lower_explicit` (`C = 128`, `r₀ = 5`, `N = 3`), `pushPull_final_lower_explicit` (`C = 128 e²`) |
+| `LowerFinalPush.lean` | 226 | final phase of push: targets `pushTarget q = q³ (q - 20)` at `q = pushRoot L i = exp((ln u - i)/4)`, the key step `pushTarget_step`, `push_final_lower_explicit` (`C = 1600`, `κ = 1/2`) |
+| `LowerPush.lean`, `LowerPull.lean`, `LowerPushPull.lean` | 73, 69, 80 | pinned phase statements (bodies point to the files above) |
+| `LowerTotal.lean` | 427 | `sum_notYet_ge_of_tail`, `lower_expect_of_tail`, `double_tail_generic` (pull and push–pull, growth factor `ρ ∈ {2, 3}`), `push_tail_explicit`, the three `*_expect_explicit` |
+| `Lower.lean` | 96 | the six pinned main theorems |
+
+All main tails have rate `κ = ln 2 / 4`. Thresholds: `N = 2` for push; for pull and push–pull,
+`N = max 3 N₁` with `ln N₁ ≥ 2^5` (so that `⌊log₂ ln n⌋ ≥ r₀ = 5`).
+
+### Proof outline
+
+1. **One round** (Lemmas 39 and 49): Chebyshev on the lower tail of `n - |T|`
+   (`prob_deficit_lt_cheb`, with `Var|T| ≤ E|T| - |S| ≤ u` from Lemma 9 and nonpositive
+   covariances), with `E[u'] ≥ u/e` (push), `= u²/n` (pull), `≥ u²/(en)` (push–pull).
+2. **Final phases**: `envelope_seq_le` along explicit targets (see the files above). For push the
+   step `g(q e^{-1/4}) ≤ g(q)/e - g(q)^{3/4}` reduces to `c⁴ - 20 c + 20 ≤ 0` for
+   `c = e^{1/4} ∈ [5/4, 3^{1/4}]`; while `q_i ≥ 40`, round `i` fails with probability at most
+   `2 / q_i²` and these sum to `≤ 4 e^{(t - ln u)/2}`; when `q_t < 40` the bound
+   `1600 / q_t²` exceeds `1`.
+3. **Main tails**: `reach_add_le` with `m' = n/2`. Push: `s = a - ⌈r/2⌉`, `τ = b - ⌊r/2⌋`
+   (`a = ⌊log₂ n⌋`, `b = ⌊ln n⌋`). Pull and push–pull: `τ = d - 5`, `s = t* - τ`
+   (`d = ⌊log₂ ln n⌋`). A positive `t*` forces `r ≤ 2 log₂ n`, which turns `n^{-1/2}` and `1/n`
+   into `e^{-(ln 2/4) r}`; `t* = 0` has reach probability `0`.
+4. **Expectations**: reflection of the sum (`sum_range_reflect`) and a geometric series give
+   `∑_{t<R} P[T > t] ≥ t₀ - A / (1 - e^{-κ})`, and `t₀ = ⌊X⌋ + ⌊Y⌋ ≥ X + Y - 2`.
 
 ## Pinned statements
+
+All of the following are proved.
 
 Notation: `1 - P.notYet m t S` is the probability that at least `m` nodes are informed after
 `t` rounds started from the informed set `S`, that is `P[T(|S|, m) ≤ t]`; `u = n - |S|` is the
 number of uninformed nodes.
 
-### Generic tools (`LowerGeneric.lean`, all proved)
+### Generic tools (`LowerGeneric.lean`)
 
 * `envelope_le`: for a finite kernel and an observable `V`, if from every state with `V ≥ v` the
   observable falls below `f v` in one round with probability at most `δ v ≥ 0`, then after `t`
@@ -47,9 +68,9 @@ number of uninformed nodes.
 
 ### Push (`LowerPush.lean`, Theorem 51)
 
-* `push_expect_card_le`: `E|S'| ≤ 2|S|` (proved).
-* `push_expect_uninformed`: `E[n - |S'|] = (n - |S|)(1 - 1/n)^{|S|}` (proved).
-* `push_growth_lower`: `P[T(|S|, m) ≤ t] ≤ 2^t |S| / m` (proved).
+* `push_expect_card_le`: `E|S'| ≤ 2|S|`.
+* `push_expect_uninformed`: `E[n - |S'|] = (n - |S|)(1 - 1/n)^{|S|}`.
+* `push_growth_lower`: `P[T(|S|, m) ≤ t] ≤ 2^t |S| / m`.
 * `push_round_lower` (Lemma 39 with `ρ = 1`, `A = 1`, `B = 1/4`, at any level `4 ≤ v ≤ u`):
   `P[u' < v/e - v^{3/4}] ≤ v^{-1/2}`.
 * `push_final_lower` (Theorem 38 with `ρ = 1`): there are `C` and `κ > 0` such that for every
@@ -57,9 +78,9 @@ number of uninformed nodes.
 
 ### Pull (`LowerPull.lean`, Theorem 52)
 
-* `pull_expect_card_le`: `E|S'| ≤ 2|S|` (proved).
-* `pull_expect_uninformed`: `E[n - |S'|] = (n - |S|)(1 - |S|/n)` (proved).
-* `pull_growth_lower`: `P[T(|S|, m) ≤ t] ≤ 2^t |S| / m` (proved).
+* `pull_expect_card_le`: `E|S'| ≤ 2|S|`.
+* `pull_expect_uninformed`: `E[n - |S'|] = (n - |S|)(1 - |S|/n)`.
+* `pull_growth_lower`: `P[T(|S|, m) ≤ t] ≤ 2^t |S| / m`.
 * `pull_round_lower` (Lemma 49 with `ℓ = 2`, `a = 1`): `P[u' < u²/(2n)] ≤ 4 n² / u³`.
 * `pull_final_lower` (Theorem 48 with `ℓ = 2`): there are `C`, `r₀`, `N` such that for
   `n ≥ N`, every `S` with `2|S| ≤ n` and every `t ≤ log₂ ln n - r₀`,
@@ -67,9 +88,9 @@ number of uninformed nodes.
 
 ### Push–pull (`LowerPushPull.lean`, Theorem 53)
 
-* `pushPull_expect_card_le`: `E|S'| ≤ 3|S|` (proved).
-* `pushPull_expect_uninformed`: `E[n - |S'|] = (n - |S|)(1 - 1/n)^{|S|}(1 - |S|/n)` (proved).
-* `pushPull_growth_lower`: `P[T(|S|, m) ≤ t] ≤ 3^t |S| / m` (proved).
+* `pushPull_expect_card_le`: `E|S'| ≤ 3|S|`.
+* `pushPull_expect_uninformed`: `E[n - |S'|] = (n - |S|)(1 - 1/n)^{|S|}(1 - |S|/n)`.
+* `pushPull_growth_lower`: `P[T(|S|, m) ≤ t] ≤ 3^t |S| / m`.
 * `pushPull_round_lower` (Lemma 49 with `ℓ = 2`, `a = 1/e`):
   `P[u' < u²/(2en)] ≤ 4 e² n² / u³`.
 * `pushPull_final_lower` (Theorem 48 with `ℓ = 2`): as for pull.
@@ -112,10 +133,10 @@ sides.
    lower halves of Theorems 1 to 3) are not formalized. The paper derives the lower halves of
    Theorems 51 to 53 by joining Theorem 27 with Theorem 38 or 48 through Lemma 20, which needs a
    major correction (see `Lemma20.lean` and `FORMALIZATION_DIFFERENCES.md`). Here the phases are
-   joined at a fixed time (`reach_add_le`): after `log₂ n - r/2` rounds (resp. `log₃ n - r/2`)
-   at most `n/2` nodes are informed except with probability `O(2^{-r/2})` by the first moment,
-   and from any state with at least `n/2` uninformed nodes the final phase is slow. No overshoot
-   estimate is needed.
+   joined at a fixed time (`reach_add_le`): after `⌊log₂ n⌋ - ⌈r/2⌉` rounds for push (about
+   `log_ρ n + 5 - r` rounds for pull, `ρ = 2`, and push–pull, `ρ = 3`) at most `n/2` nodes are
+   informed except with probability `O(2^{-r/2})` by the first moment, and from any state with
+   at least `n/2` uninformed nodes the final phase is slow. No overshoot estimate is needed.
 2. **Growth phase by the first moment.** Instead of the target-phase calculus of Theorem 27
    (Lemmas 28 to 30 and the stochastic domination by a sum of independent variables), the growth
    lower bound is Markov's inequality on `E|S_t| ≤ (1 + γ)^t |S|`, with `γ = 1, 1, 2`. This
@@ -139,6 +160,9 @@ sides.
    `E₀(u) = u/e - u^{3/4}` for push (`A = 1`, `B = 1/4` in (9), with `E(u) = u/e` since
    `(1 - 1/n)^{n-u} ≥ 1/e`), and the double exponential targets `u²/(2n)` (pull) and
    `u²/(2en)` (push–pull), that is `E(ε)/2` of Lemma 49 with `a = 1` and `a = 1/e`.
+   The push envelope uses the targets `g i = q_i³ (q_i - 20)` with `q_i = (u e^{-i})^{1/4}`, in
+   place of the paper's recursively defined `u_{j+1} = E₀(u_j)` (Lemma 40), so that its lower
+   bound `g i ≥ (u e^{-i})/2` (for `q_i ≥ 40`) is explicit.
 7. **Threshold `N`.** The main theorems hold for `n ≥ N`; some threshold is needed (for `n = 1`
    the single informed node is everybody).
 

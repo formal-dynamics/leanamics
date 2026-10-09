@@ -1,11 +1,16 @@
 import Epidemics.Revisited.LowerRound
 import Epidemics.Revisited.LowerGeneric
 
-/-! # Final-phase lower bounds (EPI-8, Theorems 38 and 48 for the three protocols)
+/-! # Final-phase lower bounds for pull and push–pull (EPI-8, Theorem 48)
 
-Round-by-round lower envelopes of the number of uninformed nodes. Pull and push–pull use the
-double exponential targets `g (i+1) = g i ^ 2 / (2 n)` and `g (i+1) = g i ^ 2 / (2 e n)`,
-started at `n / 2`. Push uses `g i = y i - 20 (y i)^{3/4}` with `y i = u e^{-i}`.
+Round-by-round lower envelopes of the number of uninformed nodes (`reach_le_envelope`, from
+`envelope_seq_le`). Pull and push–pull use the double exponential targets
+`g i = 2 n (1/4)^{2^i}` and `g i = 2 e n (1/(4e))^{2^i}`, so that `g 0 = n / 2` and
+`g (i+1) = g i ^ 2 / (2 n)` (resp. `g i ^ 2 / (2 e n)`): the paper's `ε_{j+1} = E(ε_j)/2` of
+Lemma 49 with `a = 1` (resp. `a = 1/e`). While `g i ≥ n^{7/8}` (that is, for
+`i ≤ log₂ ln n - 5`) a round fails with probability at most `4 n^{-5/8}` (resp.
+`4 e² n^{-5/8}`), and `t ≤ log₂ ln n ≤ 16 n^{1/8}` such rounds fail with probability
+`O(n^{-1/2})`. The exponential final phase of push is in `LowerFinalPush`.
 -/
 
 namespace Epidemics.Revisited
@@ -278,12 +283,10 @@ lemma pull_step {n : ℕ} (hn : 0 < n) (i : ℕ) (a : Finset (Fin n))
     rw [if_neg hbig]
     exact ((pull n).K a).prob_le_one _
 
-lemma pull_final_lower_proof :
-    ∃ C : ℝ, ∃ r₀ N : ℕ, ∀ n : ℕ, N ≤ n → ∀ S : Finset (Fin n), 2 * S.card ≤ n →
-      ∀ t : ℕ, (t : ℝ) + r₀ ≤ logb 2 (log n) →
-        1 - (pull n).notYet n t S ≤ C * (n : ℝ) ^ (-(1 / 2 : ℝ)) := by
-  refine ⟨128, 5, 3, ?_⟩
-  intro n hn S hS t ht
+/-- Final phase of pull with explicit constants `C = 128`, `r₀ = 5`, `N = 3`. -/
+lemma pull_final_lower_explicit (n : ℕ) (hn : 3 ≤ n) (S : Finset (Fin n))
+    (hS : 2 * S.card ≤ n) (t : ℕ) (ht : (t : ℝ) + 5 ≤ logb 2 (log n)) :
+    1 - (pull n).notYet n t S ≤ 128 * (n : ℝ) ^ (-(1 / 2 : ℝ)) := by
   have hn0 : 0 < n := by omega
   have hn0r : (0 : ℝ) < n := by exact_mod_cast hn0
   have hlog1 : 1 < log (n : ℝ) := by
@@ -429,12 +432,10 @@ lemma pushPull_step {n : ℕ} (hn : 0 < n) (i : ℕ) (a : Finset (Fin n))
     rw [if_neg hbig]
     exact ((pushPull n).K a).prob_le_one _
 
-lemma pushPull_final_lower_proof :
-    ∃ C : ℝ, ∃ r₀ N : ℕ, ∀ n : ℕ, N ≤ n → ∀ S : Finset (Fin n), 2 * S.card ≤ n →
-      ∀ t : ℕ, (t : ℝ) + r₀ ≤ logb 2 (log n) →
-        1 - (pushPull n).notYet n t S ≤ C * (n : ℝ) ^ (-(1 / 2 : ℝ)) := by
-  refine ⟨128 * exp 1 ^ 2, 5, 3, ?_⟩
-  intro n hn S hS t ht
+/-- Final phase of push–pull with explicit constants `C = 128 e²`, `r₀ = 5`, `N = 3`. -/
+lemma pushPull_final_lower_explicit (n : ℕ) (hn : 3 ≤ n) (S : Finset (Fin n))
+    (hS : 2 * S.card ≤ n) (t : ℕ) (ht : (t : ℝ) + 5 ≤ logb 2 (log n)) :
+    1 - (pushPull n).notYet n t S ≤ 128 * exp 1 ^ 2 * (n : ℝ) ^ (-(1 / 2 : ℝ)) := by
   have hn0 : 0 < n := by omega
   have hn0r : (0 : ℝ) < n := by exact_mod_cast hn0
   have hlog1 : 1 < log (n : ℝ) := by
@@ -492,5 +493,19 @@ lemma pushPull_final_lower_proof :
     have hnn : 0 ≤ exp 1 ^ 2 * (n : ℝ) ^ (-(1 / 2 : ℝ)) := by positivity
     linarith
   exact le_trans henv (le_trans hsum (le_trans hmul h128))
+
+lemma pull_final_lower_proof :
+    ∃ C : ℝ, ∃ r₀ N : ℕ, ∀ n : ℕ, N ≤ n → ∀ S : Finset (Fin n), 2 * S.card ≤ n →
+      ∀ t : ℕ, (t : ℝ) + r₀ ≤ logb 2 (log n) →
+        1 - (pull n).notYet n t S ≤ C * (n : ℝ) ^ (-(1 / 2 : ℝ)) :=
+  ⟨128, 5, 3, fun n hn S hS t ht =>
+    pull_final_lower_explicit n hn S hS t (by exact_mod_cast ht)⟩
+
+lemma pushPull_final_lower_proof :
+    ∃ C : ℝ, ∃ r₀ N : ℕ, ∀ n : ℕ, N ≤ n → ∀ S : Finset (Fin n), 2 * S.card ≤ n →
+      ∀ t : ℕ, (t : ℝ) + r₀ ≤ logb 2 (log n) →
+        1 - (pushPull n).notYet n t S ≤ C * (n : ℝ) ^ (-(1 / 2 : ℝ)) :=
+  ⟨128 * exp 1 ^ 2, 5, 3, fun n hn S hS t ht =>
+    pushPull_final_lower_explicit n hn S hS t (by exact_mod_cast ht)⟩
 
 end Epidemics.Revisited

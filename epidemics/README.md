@@ -214,13 +214,18 @@ informed nodes:
 | Push: all informed within `log₂ n + ln n + O(1)` rounds, exponential tail and expectation | Theorem 51 (upper bound) | `push_spreading_tail`, `push_spreading_expect` |
 | Pull: `log₂ n + log₂ ln n + O(1)` | Theorem 52 (upper bound) | `pull_spreading_tail`, `pull_spreading_expect` |
 | Push–pull: `log₃ n + log₂ ln n + O(1)` | Theorem 53 (upper bound) | `pushPull_spreading_tail`, `pushPull_spreading_expect` |
+| Push, from one informed node: all informed within `⌊log₂ n⌋ + ⌊ln n⌋ - r` rounds with probability at most `A e^{-κ r}`, expected time at least `log₂ n + ln n - O(1)` | Theorem 51 (lower bound) | `push_spreading_lower_tail`, `push_spreading_lower_expect` |
+| Pull: `log₂ n + log₂ ln n - O(1)` | Theorem 52 (lower bound) | `pull_spreading_lower_tail`, `pull_spreading_lower_expect` |
+| Push–pull: `log₃ n + log₂ ln n - O(1)` | Theorem 53 (lower bound) | `pushPull_spreading_lower_tail`, `pushPull_spreading_lower_expect` |
+| The phases of the lower bounds: growth by the first moment, one-round lower tails, final phases | Theorems 27, 38, 48 and Lemmas 39, 49 for the instances | `*_growth_lower`, `*_round_lower`, `*_final_lower` (`LowerPush.lean`, `LowerPull.lean`, `LowerPushPull.lean`) |
 
 For push this is the sharp upper bound of Frieze and Grimmett and of Pittel (all nodes informed
 after `log₂ n + ln n + O(1)` rounds), with an exponential tail. The package `rumor_spread/` has
 its own PUSH, PULL and PUSH–PULL models (without self-calls) and proves `O(log n)` bounds with
-large constants; the two developments are independent. Lower bounds are not formalized.
-Deviations (Theorem 43's proof, the parameters of the instances) are listed in
-[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
+large constants; the two developments are independent. The lower bounds join the growth phase
+and the final phase at a fixed time (Markov property) instead of through Lemma 20. Deviations
+(Theorem 43's proof, the parameters of the instances, the direct route of the lower bounds) are
+listed in [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 
 ## COBRA ⇔ BIPS duality (EPI-4)
 

@@ -1,6 +1,7 @@
 import Epidemics.Revisited.LowerPush
 import Epidemics.Revisited.LowerPull
 import Epidemics.Revisited.LowerPushPull
+import Epidemics.Revisited.LowerTotal
 
 /-! # Sharp lower bounds for push, pull and push–pull on `K_n` (EPI-8, instances)
 
@@ -39,7 +40,8 @@ theorem push_spreading_lower_tail :
       ∀ S : Finset (Fin n), S.card = 1 → ∀ r : ℕ,
         1 - (push n).notYet n (⌊Real.logb 2 n⌋₊ + ⌊Real.log n⌋₊ - r) S
           ≤ A * Real.exp (-κ * r) := by
-  sorry
+  obtain ⟨A, κ, -, hκ, N, h⟩ := push_tail_explicit
+  exact ⟨A, κ, hκ, N, h⟩
 
 /-- Theorem 51 (lower bound): started from one informed node, the expected time of push to
 inform all nodes of `K_n` is at least `log₂ n + ln n - B`, stated for every partial sum of the
@@ -48,7 +50,7 @@ theorem push_spreading_lower_expect :
     ∃ B : ℝ, ∃ N : ℕ, ∀ n : ℕ, N ≤ n →
       ∀ S : Finset (Fin n), S.card = 1 → ∀ R : ℕ, Real.logb 2 n + Real.log n ≤ R →
         Real.logb 2 n + Real.log n - B ≤ ∑ t ∈ range R, (push n).notYet n t S := by
-  sorry
+  exact push_expect_explicit
 
 /-- Theorem 52 (lower bound), tail form: started from one informed node, pull informs all
 nodes of `K_n` within `⌊log₂ n⌋ + ⌊log₂ ln n⌋ - r` rounds with probability at most
@@ -58,7 +60,8 @@ theorem pull_spreading_lower_tail :
       ∀ S : Finset (Fin n), S.card = 1 → ∀ r : ℕ,
         1 - (pull n).notYet n (⌊Real.logb 2 n⌋₊ + ⌊Real.logb 2 (Real.log n)⌋₊ - r) S
           ≤ A * Real.exp (-κ * r) := by
-  sorry
+  obtain ⟨A, κ, -, hκ, N, h⟩ := pull_tail_explicit
+  exact ⟨A, κ, hκ, N, h⟩
 
 /-- Theorem 52 (lower bound): started from one informed node, the expected time of pull to
 inform all nodes of `K_n` is at least `log₂ n + log₂ ln n - B`. -/
@@ -67,7 +70,7 @@ theorem pull_spreading_lower_expect :
       ∀ S : Finset (Fin n), S.card = 1 → ∀ R : ℕ,
         Real.logb 2 n + Real.logb 2 (Real.log n) ≤ R →
         Real.logb 2 n + Real.logb 2 (Real.log n) - B ≤ ∑ t ∈ range R, (pull n).notYet n t S := by
-  sorry
+  exact pull_expect_explicit
 
 /-- Theorem 53 (lower bound), tail form: started from one informed node, push–pull informs
 all nodes of `K_n` within `⌊log₃ n⌋ + ⌊log₂ ln n⌋ - r` rounds with probability at most
@@ -77,7 +80,8 @@ theorem pushPull_spreading_lower_tail :
       ∀ S : Finset (Fin n), S.card = 1 → ∀ r : ℕ,
         1 - (pushPull n).notYet n (⌊Real.logb 3 n⌋₊ + ⌊Real.logb 2 (Real.log n)⌋₊ - r) S
           ≤ A * Real.exp (-κ * r) := by
-  sorry
+  obtain ⟨A, κ, -, hκ, N, h⟩ := pushPull_tail_explicit
+  exact ⟨A, κ, hκ, N, h⟩
 
 /-- Theorem 53 (lower bound): started from one informed node, the expected time of push–pull
 to inform all nodes of `K_n` is at least `log₃ n + log₂ ln n - B`. -/
@@ -87,6 +91,6 @@ theorem pushPull_spreading_lower_expect :
         Real.logb 3 n + Real.logb 2 (Real.log n) ≤ R →
         Real.logb 3 n + Real.logb 2 (Real.log n) - B ≤
           ∑ t ∈ range R, (pushPull n).notYet n t S := by
-  sorry
+  exact pushPull_expect_explicit
 
 end Epidemics.Revisited

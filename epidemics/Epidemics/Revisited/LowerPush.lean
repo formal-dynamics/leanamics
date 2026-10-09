@@ -1,6 +1,7 @@
 import Epidemics.Revisited.Protocols
 import Epidemics.Revisited.LowerGeneric
 import Epidemics.Revisited.LowerRound
+import Epidemics.Revisited.LowerFinalPush
 
 /-! # Lower bound for push on `K_n`: the two phases (EPI-8, Theorem 51)
 
@@ -66,7 +67,7 @@ informs all nodes within `t` rounds with probability at most `C e^{κ (t - ln u)
 `P[T(|S|, n) ≤ ln u - r] ≤ C e^{-κ r}`. Uniform in `n` and in the starting set. -/
 theorem push_final_lower :
     ∃ C κ : ℝ, 0 < κ ∧ ∀ (n : ℕ) (S : Finset (Fin n)) (t : ℕ),
-      1 - (push n).notYet n t S ≤ C * Real.exp (κ * ((t : ℝ) - Real.log ((n : ℝ) - S.card))) := by
-  sorry
+      1 - (push n).notYet n t S ≤ C * Real.exp (κ * ((t : ℝ) - Real.log ((n : ℝ) - S.card))) :=
+  ⟨1600, 1 / 2, by norm_num, push_final_lower_explicit⟩
 
 end Epidemics.Revisited

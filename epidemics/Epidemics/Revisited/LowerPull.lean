@@ -1,6 +1,7 @@
 import Epidemics.Revisited.Protocols
 import Epidemics.Revisited.LowerGeneric
 import Epidemics.Revisited.LowerRound
+import Epidemics.Revisited.LowerFinal
 
 /-! # Lower bound for pull on `K_n`: the two phases (EPI-8, Theorem 52)
 
@@ -62,7 +63,7 @@ informs all nodes within `log₂ ln n - r₀` rounds with probability at most `C
 theorem pull_final_lower :
     ∃ C : ℝ, ∃ r₀ N : ℕ, ∀ n : ℕ, N ≤ n → ∀ S : Finset (Fin n), 2 * S.card ≤ n →
       ∀ t : ℕ, (t : ℝ) + r₀ ≤ Real.logb 2 (Real.log n) →
-        1 - (pull n).notYet n t S ≤ C * (n : ℝ) ^ (-(1 / 2 : ℝ)) := by
-  sorry
+        1 - (pull n).notYet n t S ≤ C * (n : ℝ) ^ (-(1 / 2 : ℝ)) :=
+  pull_final_lower_proof
 
 end Epidemics.Revisited

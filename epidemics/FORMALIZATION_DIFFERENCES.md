@@ -127,8 +127,9 @@ a chance to jump in each.
 process started from one node jumps from `1` to `n` with probability 1. (The same process with
 `ε_k = c k / n²` satisfies the lower exponential growth conditions, so the last sentence of
 Theorem 1, which rests on Lemma 20 (through Theorem 27), needs another argument in general. That
-sentence is a lower-bound statement, outside the scope of this formalization. The long version
-also uses Lemma 20 in the proofs of Theorems 57 and 58.)
+sentence belongs to the general lower bounds (Theorems 1 to 3 and 27), which are not formalized;
+the lower bounds of the instances, Theorems 51 to 53, are formalized by a route that does not use
+Lemma 20, see below. The long version also uses Lemma 20 in the proofs of Theorems 57 and 58.)
 
 Two corrected versions are formalized instead:
 
@@ -259,8 +260,52 @@ Source: the same paper, Definition 13, Theorem 43 (Appendix B.6) and Theorems 51
    `γ = 2` for push–pull (from `p_k ≥ 2k/n - 3k²/(2n²)`), `ℓ = 2`, `a = 1`, `c = 0`,
    `α = τ = 1/2` for the double exponential shrinking of pull and push–pull, and `ρ = 1`,
    `a = 2/e`, `c = 0`, `g = 1/2` for the exponential shrinking of push, as in the paper.
-9. **Statements of Theorems 51 to 53.** The paper states the expected times `± O(1)`; only the
-   upper bounds are formalized, with exponential tails added. Lower bounds are out of scope.
+9. **Statements of Theorems 51 to 53.** The paper states the expected times `± O(1)`. Both
+   sides are formalized with exponential tails added: the upper bounds in `Instances.lean`, the
+   lower bounds in `Lower.lean` (next subsection).
+
+### Lower bounds of Theorems 51 to 53 (`Lower*.lean`)
+
+Source: the same paper, Theorems 27, 38 and 48 (lower bounds for exponential growth, exponential
+shrinking and double exponential shrinking), Lemmas 39 and 49, and the lower halves of
+Theorems 51, 52 and 53.
+
+1. **Direct route, not through Lemma 20.** The general lower bounds (Theorems 27, 38 and 48, and
+   the lower halves of Theorems 1 to 3) are not formalized. The paper derives the lower halves of
+   Theorems 51 to 53 by joining Theorem 27 with Theorem 38 or 48 through Lemma 20, which needs a
+   major correction (above). Here the two phases are joined at a fixed time (`reach_add_le`, the
+   Markov property): after `⌊log₂ n⌋ - ⌈r/2⌉` rounds for push (about `log_ρ n + 5 - r` rounds for
+   pull, `ρ = 2`, and push–pull, `ρ = 3`) at most `n/2` nodes are informed except with
+   probability `O(2^{-r/2})`, by the first moment, and from any state with at least `n/2`
+   uninformed nodes the final phase is slow. No overshoot estimate is needed. This also avoids a
+   second gap in the paper's joining: Theorems 38 and 48 start from an exact number of uninformed
+   nodes, which the process started from one node need not visit.
+2. **Growth by the first moment.** Instead of the target-phase calculus of Theorem 27 (Lemmas 28
+   to 30 and the domination by a sum of independent variables), the growth bound is Markov's
+   inequality on `E|S_t| ≤ (1 + γ)^t |S|` with `γ = 1, 1, 2` (`*_growth_lower`).
+3. **Final phases as deterministic lower envelopes.** `envelope_seq_le` (the round-by-round form
+   of Lemmas 42 and 50) along explicit targets, with the one-round lemmas `*_round_lower`
+   (Lemma 39 with `A = 1`, `B = 1/4`, `E(u) = u/e`; Lemma 49 with `a = 1` and `a = 1/e`). Push:
+   `g i = q_i³ (q_i - 20)` with `q_i = (u e^{-i})^{1/4}`, giving
+   `P[T(|S|, n) ≤ t] ≤ 1600 e^{(t - ln u)/2}` from any set with `u` uninformed nodes. Pull and
+   push–pull: `g i = 2 n (1/4)^{2^i}` and `2 e n (1/(4e))^{2^i}` (the paper's
+   `ε_{j+1} = E(ε_j)/2`), giving `O(n^{-1/2})` for `t ≤ log₂ ln n - 5` from any set with at
+   least `n/2` uninformed nodes. The paper's Theorem 48 has `O(n^{-1+2αℓ})` from `⌈g n⌉`
+   uninformed nodes with `g` small; the weaker exponent comes from the cruder variance bound
+   `Var ≤ u` (Lemma 9 with nonpositive covariances) and suffices for the main theorems.
+4. **Time convention.** Started from one informed node, for `n ≥ N`, the tails are
+   `P[T ≤ ⌊log₂ n⌋ + ⌊ln n⌋ - r] ≤ A e^{-κ r}` (natural subtraction; `⌊log₂ n⌋ + ⌊log₂ ln n⌋`
+   and `⌊log₃ n⌋ + ⌊log₂ ln n⌋` for pull and push–pull), all with `κ = ln 2 / 4`. The floors
+   cost at most two rounds, absorbed in `A`. Expectations are bounded from below through every
+   partial sum `∑_{t < R} P[T > t]` with `R` at least `log₂ n + ln n` (resp.
+   `log₂ n + log₂ ln n`, `log₃ n + log₂ ln n`), which implies the bound on `E[T]`. A threshold
+   `N` is needed (for `n = 1` the single informed node is everybody).
+5. **Minor corrections in the source,** none of which affects the statements: Corollary 17 holds
+   for `1 ≤ u < n`, not for `u = 0`; the proof of Lemma 42 gives the bound `q(u_{j+1})`, not
+   `q(u_j)`; in the subsection of Theorem 38, Lemma 39 is for `u ≤ g n`, Lemma 40 should read
+   `u_j ≥ (1/2) u_0 e^{-j ρ_n}` for `j ≤ ln n / ρ_n`, and the phases are defined by the number of
+   uninformed nodes; in the proof of Theorem 27, `P[d_j ≥ h] ≤ q_{h-1}(k_j)` misses a constant
+   factor from the rounds spent in phase `j`.
 
 ## Subcritical percolation and small outbreaks (`Subcritical*`, EPI-2)
 
