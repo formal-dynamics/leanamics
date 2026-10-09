@@ -134,7 +134,8 @@ produced it.
 **Every pull request that adds or changes a result must keep the documentation up to date:** the
 package's `README.md` and blueprint, its `FORMALIZATION_DIFFERENCES.md`, a row in
 [RESULTS.md](RESULTS.md), an entry in [PROVENANCE.md](PROVENANCE.md), the status in
-[ROADMAP.md](ROADMAP.md), and the landing page `home_page/index.md`. If the landing page is not
+[ROADMAP.md](ROADMAP.md), and the landing page `home_page/index.md` (kept short: at most a phrase per
+paper, linked to its blueprint section; the details go in the blueprint). If the landing page is not
 updated in the pull request itself, open an issue to update it. Each formalized paper has a
 blueprint section with a stable `\label{sec:...}` (used for links to the website); do not rename
 existing labels. The [pull request template](.github/pull_request_template.md) lists these items,
