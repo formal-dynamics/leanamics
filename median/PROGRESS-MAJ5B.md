@@ -11,21 +11,51 @@ quantity `lambdaG`, the mixing lemma `expander_mixing` and Theorem 4
 
 ## Status
 
-Pinning phase done. The build succeeds with only `declaration uses 'sorry'` warnings.
+**Done.** Every pinned statement is proved; `lake build Median` succeeds without warnings and
+`python3 ../scripts/check_axioms.py` reports only `propext`, `Classical.choice` and
+`Quot.sound` for all 40 audited declarations (including the 14 MAJ-5B theorems). The pinned
+text (up to `:=`) of all 37 declarations of `PINNED.txt` is unchanged, and no definition of
+part (a) or of `ExpanderGeneralDefs.lean` was modified. No pinned statement turned out to be
+false.
 
-* Proved: `majority_add_minority`, `minority_add_gainCount`, `mixingProp_of_lambdaG`,
-  `growth_small`, `growth_large`, `phaseI_expander` (from `phaseI`), the `*_spec` theorems.
-* Remaining (`sorry`): `expected_gain_ge`, `expected_loss_le`, `gain_tail`, `loss_tail`,
+* Proved: everything, i.e. `expected_gain_ge`, `expected_loss_le`, `gain_tail`, `loss_tail`,
   `phaseI_step`, `phaseI`, `two_choices_expander_general_explicit`,
-  `two_choices_expander_general`.
-* `Audit.lean` has a `#print axioms` line for every pinned theorem (they report `sorryAx`
-  until proved).
+  `two_choices_expander_general`, besides the results proved at pinning time.
+* Remaining: nothing. Current errors: none.
+
+How the proofs are organized (helper files, each imported where needed):
+
+* `ExpanderGeneralPhaseI.lean` (Steps 1-4): the flows `Δ_{BA}`, `Δ_{AB}` as sums of
+  independent indicators (`gainCount_eq_sum`, `lossCount_eq_sum`; through `roundEquiv` for the
+  Chernoff bounds), their expectations `∑_{v ∈ B} (1 − p_v)²` and `∑_{v ∈ A} p_v²`
+  (`avg_gainCount`, `avg_lossCount`, from `avg_pair`), the bounds `2α ≤ η ≤ c/25`
+  (`phaseEta_bounds`), the Cauchy-Schwarz and mixing bound (`sum_gain_ge`), the two tails
+  (`avg_chernoff_lower`/`avg_chernoff_upper` with mean bounds), the algebra of (bchwc)
+  (`phaseI_step_algebra`) and `phaseI` from `phaseI_of_step` with `growth_small` and
+  `growth_large`.
+* `ExpanderGeneralLoss.lean` (Step 8): `sum_sq_nbCount_le`, the combinatorial core of
+  (eq-upperOnDAB): `∑_{v ∈ A} (d_v^B/d)² ≤ (A B²/n²)(1 + 15η)`. Layer cake over the upper sets
+  `{v ∈ A : p_v ≥ (1 + 2^j η) B/n}` (`sq_le_layers`, `sum_sq_le_layers`), each of size at most
+  `A/4^j` by the mixing hypothesis (`card_mul_sq_le`), with `4^m ≤ n²/(ηB²) < 4^{m+1}`
+  (`exists_nat_pow_near`) and `(1 + 3m) η ≤ 5` from `(m + 1)³ ≤ 2 · 4^m`
+  (`one_add_three_mul_le`).
+* `ExpanderGeneralHitting.lean` (Step 5): `phaseI_of_step`, Lemma 2 from the one-round
+  recursion: a process frozen once the minority is at most `c n`, the deterministic envelope
+  `(5/4)^t ν₀ ∧ 1/2`, then `1 − (3/4)^{t − t₁}/2`, `expList_escape`, and the prefix lemma
+  `exists_take_of_frozen`.
+* `ExpanderGeneral.lean` (Step 6): `not_consensus_le`, the composition of Phase I with
+  Theorem 4 at the hitting time, by induction on the length of Phase I.
+* `ExpanderGeneralArith.lean` (Step 7): `general_of_explicit`, Theorem 2 in `O(log n)` form
+  from its explicit form, with `K = 4000`, `C = 2 · 10¹⁰` (`phaseIRounds_le`:
+  `T₁ ≤ 5 log n + 7`; `two_le_card`, `one_div_card_le_imbalance`, `imbalance_le_one`).
 
 ## Files
 
 * `Median/ExpanderGeneralDefs.lean`: definitions and small lemmas.
 * `Median/ExpanderGeneralPhaseI.lean`: Phase I (Lemma 2 and Corollary 2).
 * `Median/ExpanderGeneral.lean`: Theorem 2.
+* `Median/ExpanderGeneralLoss.lean`, `Median/ExpanderGeneralHitting.lean`,
+  `Median/ExpanderGeneralArith.lean`: helper theorems (see the plan above).
 
 All declarations are in the namespace `Median.ExpanderGeneral`.
 

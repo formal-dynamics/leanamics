@@ -144,6 +144,69 @@ Lemma numbers follow the arXiv version.
    bilinear form, and the expander mixing lemma itself) are candidates for the spectral toolkit
    of the core.
 
+## Two-sample voting on expanders with a small imbalance (`ExpanderGeneral`, MAJ-5B)
+
+Source: Cooper, Elsässer and Radzik, *The power of two choices in distributed voting*
+(ICALP 2014, arXiv:1404.7479), Theorem 2, with Lemma 2 (Phase I), Corollary 2 and Section 7.
+Numbering follows the arXiv version. The model and the definitions are those of `Expander`
+above (items 1, 2 and 7 there apply unchanged).
+
+1. **Theorem 2 needs a major correction for very small `λ_G`.** The paper claims success with
+   high probability ("probability tending to 1 as `n` increases", footnote in Section 2)
+   whenever `ν₀ ≥ K λ_G`, for "an `n`-vertex `d`-regular graph" and "an absolute constant `K`
+   (independent of `d` and `λ_G`)" (the abstract: "for any regular graph"). Its proof goes
+   through Corollary 2, whose success probability is only `1 − e^{−Θ(λ² n)}`: Lemma 2 assumes
+   `α² c² n = Ω(n^ε)`, which the proof of Corollary 2 does not check when it takes `α = λ`,
+   and Section 7 does not state a probability for Phase I. When `λ_G` is of order `1/√n` or
+   smaller this is not `1 − o(1)`, and the printed statement does not hold: on the complete
+   graph `λ_G = 1/(n − 1)`, so `A − B = K + 2` (a constant) satisfies `ν₀ ≥ K λ_G`; the first
+   round already produces fluctuations of order `√n` in `A − B`, and by the symmetry between
+   the two opinions the initial majority then wins with probability tending to `1/2` (with
+   `A − B` of order `√n` it still loses with probability bounded away from `0`). Since
+   `λ_G² ≥ (n − d)/(d (n − 1))` (the trace of `P²`), this regime only concerns dense graphs
+   (`d` of order `n`). The formal theorem applies Phase I with `α = ν₀ / K ≥ λ_G` instead of
+   `α = λ_G`, which gives the failure probability `(2 C log n + C) e^{−ν₀² n / C}` (plus
+   `1/n`): it tends to `0` once `ν₀² n` is large compared with `log log n` (for example, for
+   any fixed `ν₀ > 0`, or whenever `λ_G ≥ n^{−1/2+ε}`, the regime of Lemma 2).
+2. **Explicit constants.** `K = 120` in Lemma 2, `K = 4000` and `c = 1/20` in the explicit form
+   of Theorem 2. "With high probability" is the explicit failure bound above. The number of
+   rounds `phaseIRounds` is the paper's `⌈log_{5/4}(1/(2ν₀))⌉ + ⌈log_{4/3}(1/(4c))⌉`.
+3. **Assembly of the phases.** The paper combines Corollary 2 (with `c = 1/10`), Lemma 6 and
+   Corollary 5 (Phases II and III, with `λ_G ≤ 1/6`). Here Phases II and III are Theorem 4 as
+   formalized in part (a) (`two_choices_expander_explicit`, one supermartingale argument),
+   applied with `ε = 1/4`, which needs `λ_G ≤ 7/20` and a minority of at most `n/20`; hence
+   Phase I runs down to `c = 1/20`.
+4. **Lemma 2 in "hitting" form.** The paper says that the minority "decreases to `c n` within
+   `K' (log(1/ν₀) + log(1/c))` steps". `phaseI` states that at some time `t ≤ T₁` the minority
+   is at most `c n` (`∃ t ≤ T₁` over prefixes `l.take t` of the rounds). The graph is not
+   assumed connected (the paper's Lemma 2 assumes it, but the proof does not use it), and
+   the condition `α² c² n = Ω(n^ε)` is replaced by the explicit failure bound.
+5. **Concentration with mean bounds.** `gain_tail` and `loss_tail` use Chernoff bounds with a
+   lower (respectively upper) bound on the mean (`avg_chernoff_lower`, `avg_chernoff_upper`);
+   the paper's lower bound `𝔼 Δ_{AB} ≥ c² n / 4` used for (eq-fger2) is not needed.
+6. **Model.** As in part (a): sampling with replacement, no adversary redistributing the
+   opinions between rounds, and Boolean opinions with `a` the majority (the hypothesis
+   `K λ_G ≤ ν₀` with `λ_G ≥ 0` forces `ν₀ ≥ 0`).
+7. **Not formalized.** Theorem 1, Corollary 1 and Theorem 3 (random regular graphs, which need
+   the configuration model) and the robustness Corollary 6 (`robustness`).
+8. **Proof route of Lemma 2.** The one-round expectations, tails and the recursion
+   (ncnwd-Appx) follow the paper. The flows `Δ_{BA}` and `Δ_{AB}` are sums of independent
+   indicators over the vertices of `B` and of `A`, through the identification of a round with
+   `|V|` independent uniform draws from `Fin d × Fin d` (`roundEquiv`, as in `Expander`). The
+   upper bound (eq-upperOnDAB) on `𝔼 Δ_{AB}` is proved with the paper's thresholds
+   `(1 + 2^j η) B/n` and the paper's size bound `|{v ∈ A : d_v^B ≥ (1 + 2^j η) dB/n}| ≤ A/4^j`
+   (from the mixing hypothesis), summed as a layer cake over these upper sets instead of the
+   paper's slices `C_i` (`ExpanderGeneralLoss.lean`). The paper's condition `η(1 + 4q) ≤ 1` is
+   replaced by the bound `(1 + 3m) η ≤ 5` that the layer-cake sum needs, where
+   `4^m ≤ n²/(ηB²) < 4^{m+1}`. The union bound over the rounds of Phase I ("for all steps
+   `t = 1, …, T`") is formalized with a process frozen at the first time the minority is at
+   most `c n` and a deterministic envelope `g t` for the imbalance (`(5/4)^t ν₀` up to `1/2`,
+   then `1 − (3/4)^{t − t₁}/2`), via `expList_escape` (`ExpanderGeneralHitting.lean`).
+9. **Composition at the hitting time.** The composition of Phase I with Theorem 4 at the (random) first
+   time the minority is at most `n/20` is proved by induction on the length of Phase I
+   (`not_consensus_le`, the strong Markov property for `expList`), and the `O(log n)` form is
+   bookkeeping on the explicit bound (`ExpanderGeneralArith.lean`).
+
 ## Against an adaptive adversary (`Adversary`)
 
 Theorem and lemma numbers below follow the 2009 version of the paper; the main theorem with

@@ -70,6 +70,35 @@ expectation bound separately, which was added as `expected_minority_step`); the 
 Claude agent under the fixed-statement protocol, and verified mechanically (statements
 unchanged, no placeholders, warning-free build, axiom audit).
 
+### A small initial imbalance (Theorem 2)
+
+The paper's Theorem 2: on a `d`-regular graph, an initial imbalance `ν₀ = (A − B)/n ≥ K λ_G`
+suffices for the majority to win in `O(log n)` rounds. Phase I (the paper's Lemma 2 and
+Corollary 2) brings the minority down to `n/20`, and Theorem 4 finishes. In
+[`Median/ExpanderGeneralPhaseI.lean`](Median/ExpanderGeneralPhaseI.lean) and
+[`Median/ExpanderGeneral.lean`](Median/ExpanderGeneral.lean), with `η = α n / √(A B)` and the
+mixing hypothesis `MixingProp G d α c` of Lemma 2 (implied by `λ_G ≤ α`):
+
+| Result | Lean declaration |
+| --- | --- |
+| Expected flows in one round: `𝔼 Δ_{BA} ≥ (A²B/n²)(1 − 2η)`, `𝔼 Δ_{AB} ≤ (AB²/n²)(1 + 15η)` | `expected_gain_ge`, `expected_loss_le` |
+| Their tails: `P(Δ_{BA} ≤ (A²B/n²)(1 − 3η)) ≤ e^{−α²cn/6}`, `P(Δ_{AB} ≥ (AB²/n²)(1 + 17η)) ≤ e^{−α²c²n/2}` | `gain_tail`, `loss_tail` |
+| One round of Phase I: `ν' ≥ ν + ν(1 − ν²)/2 − 12α/√(1 − ν²)` w.p. `≥ 1 − e^{−α²cn/6} − e^{−α²c²n/2}`, hence `ν' ≥ (5/4)ν` or `1 − ν' ≤ (3/4)(1 − ν)` | `phaseI_step`, `growth_small`, `growth_large` |
+| **Lemma 2** (`K = 120`) and **Corollary 2**: if `ν₀ ≥ 120 α`, the minority drops to `≤ cn` within `T₁ = ⌈log_{5/4}(1/(2ν₀))⌉ + ⌈log_{4/3}(1/(4c))⌉` rounds, except w.p. `≤ T₁ (e^{−α²cn/6} + e^{−α²c²n/2})` | `phaseI`, `phaseI_expander` |
+| **Theorem 2**, explicit form: `4000 λ_G ≤ ν₀`; after `T₁ + T₂` rounds the majority holds everywhere except w.p. `≤ T₁(e^{−α²n/120} + e^{−α²n/800}) + (24/25)^{T₂} n + (T₁ + T₂) e^{−n/97000}` with `α = ν₀/4000` | `two_choices_expander_general_explicit` |
+| **Theorem 2**, `O(log n)` form: `K λ_G ≤ ν₀`; after `⌈C log n⌉` rounds, failure `≤ 1/n + (2C log n + C) e^{−ν₀²n/C}` (`K = 4000`, `C = 2·10¹⁰`) | `two_choices_expander_general` |
+
+The paper's Theorem 2 claims success with probability tending to `1` whenever `ν₀ ≥ K λ_G`;
+this fails when `λ_G` is of order `1/√n` or smaller (for instance on the complete graph with
+`A − B` constant), and the formal bound is in terms of `ν₀² n` instead; see
+[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md) and
+[PROGRESS-MAJ5B.md](PROGRESS-MAJ5B.md).
+
+**Provenance (Theorem 2).** The statements were written and fixed in advance (pinned, together
+with the defining equations `*_spec` of the definitions they use); the proofs are by Claude
+agents (Opus) under the fixed-statement protocol, and verified mechanically (statements
+unchanged, no placeholders, warning-free build, axiom audit).
+
 Build and audit:
 
 ```bash
