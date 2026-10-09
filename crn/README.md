@@ -39,8 +39,31 @@ remainder predicates (the semilinear predicates) is stably decided by such a CRN
   [`StableSemilinearSet`](Crn/StableSemilinearSet.lean),
   [`StableTransfer`](Crn/StableTransfer.lean) (counts of encounters, input tagging).
 
+## Majority on graphs with very small local memory (CRN-4)
+
+Population protocols on a connected interaction graph, where two agents interact only along an
+edge (Mertzios, Nikoletseas, Raptopoulos, Spirakis, ICALP 2014, arXiv:1404.7671; Distributed
+Computing 2017). The 4-state *ambassador protocol* stably computes the initial majority on every
+connected graph, ties excluded (Theorem 2); no protocol with at most 3 states does, already on
+complete graphs, so 4 states are optimal (Theorem 1); and the 3-state approximate-majority
+protocol of Angluin, Aspnes and Eisenstat, with a uniformly random oriented edge per step and a
+uniformly random placement of the two types, converges to the majority with probability at least
+that of converging to the minority, at every finite time, hence with probability at least `1/2`
+on connected graphs (Theorem 4). The proofs of Theorems 1, 2 and 4 need minor corrections (see
+the differences file). Graphs are undirected.
+
+* [`Crn/GraphMajorityBasic.lean`](Crn/GraphMajorityBasic.lean): protocols on an interaction
+  graph, stable computation on graphs (agreeing with CRN-3 on complete graphs), majority.
+* [`Crn/GraphMajorityAmbassador.lean`](Crn/GraphMajorityAmbassador.lean): the ambassador
+  protocol and `Crn.ambassador_graphStablyComputes`.
+* [`Crn/GraphMajorityLowerBound.lean`](Crn/GraphMajorityLowerBound.lean):
+  `Crn.not_stablyComputesOnGraph_top_majority`, `not_graphStablyComputes_majority` and
+  `rank_majority_eq_four`.
+* [`Crn/GraphMajorityRandom.lean`](Crn/GraphMajorityRandom.lean): the one-way rule on a graph,
+  `Crn.ApproxMajority.winProb_minority_le_majority` and `half_le_absorbProb_majority`.
+
 **Status.** All statements proved (no `sorry`, standard axioms only). Deviations from the
-sources (CRN-1 and CRN-3) are listed in
+sources (CRN-1, CRN-3 and CRN-4) are listed in
 [`FORMALIZATION_DIFFERENCES.md`](FORMALIZATION_DIFFERENCES.md).
 
 Build and audit:

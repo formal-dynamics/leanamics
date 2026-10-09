@@ -44,7 +44,8 @@ not yet formalized ([Berenbrink et al., PODC 2017]({{ '/3-majority/blueprint/' |
 Every round, each node adopts the median of its own value and two random values; with two values
 this is 2-Choices. Formalized: consensus within $O(\log n)$ rounds from any configuration and
 almost stable consensus against an adaptive adversary ([Doerr et al., SPAA 2011]({{ '/median/blueprint/' | relative_url }}#sec:dgmss-median));
-two-sample voting on expanders ([Cooper, Elsässer and Radzik, ICALP 2014]({{ '/median/blueprint/' | relative_url }}#sec:cer-two-choices));
+two-sample voting on expanders ([Cooper, Elsässer and Radzik, ICALP 2014]({{ '/median/blueprint/' | relative_url }}#sec:cer-two-choices)), also from a
+small initial imbalance on any regular graph ([details]({{ '/median/blueprint/' | relative_url }}#sec:cer-small-imbalance));
 and, for 2-Choices with any number of colours, plurality consensus ([Elsässer et al.]({{ '/median/blueprint/' | relative_url }}#sec:efkmt-plurality))
 and an $\Omega(n/\log n)$ lower bound ([Berenbrink et al., PODC 2017]({{ '/median/blueprint/' | relative_url }}#sec:bcekmn-lower)).
 
@@ -89,7 +90,7 @@ Formalized: the isothermal theorem on regular graphs ([Lieberman, Hauert and Now
 
 Formalized: push, pull and push–pull rumor spreading on $K_n$ inform all nodes within $O(\log n)$
 rounds ([push]({{ '/rumor_spread/blueprint/' | relative_url }}#sec:main-statement), [pull and push–pull]({{ '/rumor_spread/blueprint/' | relative_url }}#sec:pull)), with
-sharp upper bounds from a general analysis ([Doerr and Kostrygin, ICALP 2017]({{ '/epidemics/blueprint/' | relative_url }}#sec:doerr-kostrygin));
+sharp upper bounds from a general analysis ([Doerr and Kostrygin, ICALP 2017]({{ '/epidemics/blueprint/' | relative_url }}#sec:doerr-kostrygin)) and the matching [lower bounds]({{ '/epidemics/blueprint/' | relative_url }}#sec:doerr-kostrygin-lower);
 Reed–Frost epidemics as percolation, with small outbreaks below the threshold, also on small-world
 networks ([Becchetti et al.]({{ '/epidemics/blueprint/' | relative_url }}#sec:bcdptz-small-world)), and a giant component above it
 ([Krivelevich and Sudakov, 2013]({{ '/epidemics/blueprint/' | relative_url }}#sec:krivelevich-sudakov)); the COBRA–BIPS duality
@@ -106,7 +107,9 @@ networks ([Becchetti et al.]({{ '/epidemics/blueprint/' | relative_url }}#sec:bc
 Formalized: the stochastic mass-action kinetics of a bimolecular network has the same jump
 chain as the population protocol on the same reactions, and population protocols stably compute every
 threshold and remainder predicate and their Boolean combinations ([Angluin et al.,
-2006]({{ '/crn/blueprint/' | relative_url }}#sec:aadfp-stable)).
+2006]({{ '/crn/blueprint/' | relative_url }}#sec:aadfp-stable)); on every connected interaction graph, 4 states suffice and are needed
+for exact majority, and approximate majority from a random placement favours the majority
+([Mertzios et al., ICALP 2014]({{ '/crn/blueprint/' | relative_url }}#sec:mnrs-graph-majority)).
 
 [Blueprint]({{ '/crn/blueprint/' | relative_url }}) · [PDF]({{ '/crn/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/crn/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/crn/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/crn)
 
