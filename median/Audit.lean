@@ -25,3 +25,17 @@ import Median
 #print axioms Median.binary_almost_stable_of_isAdvRun
 #print axioms Median.binary_almost_stable
 #print axioms Median.median_almost_stable
+#print axioms Median.ExpanderGeneral.majority_add_minority
+#print axioms Median.ExpanderGeneral.minority_add_gainCount
+#print axioms Median.ExpanderGeneral.mixingProp_of_lambdaG
+#print axioms Median.ExpanderGeneral.expected_gain_ge
+#print axioms Median.ExpanderGeneral.expected_loss_le
+#print axioms Median.ExpanderGeneral.gain_tail
+#print axioms Median.ExpanderGeneral.loss_tail
+#print axioms Median.ExpanderGeneral.phaseI_step
+#print axioms Median.ExpanderGeneral.growth_small
+#print axioms Median.ExpanderGeneral.growth_large
+#print axioms Median.ExpanderGeneral.phaseI
+#print axioms Median.ExpanderGeneral.phaseI_expander
+#print axioms Median.ExpanderGeneral.two_choices_expander_general_explicit
+#print axioms Median.ExpanderGeneral.two_choices_expander_general
