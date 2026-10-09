@@ -15,11 +15,19 @@ Discrete Math. 6 (1993).
 
 ## Status
 
-Phase 1 (pinning) done: `lake build Voter` succeeds with only `declaration uses 'sorry'`
-warnings. Proved at pinning time: `doubleCover_adj`, `doubleCover_degree`,
-`doubleCover_degree_pos`, `volume_doubleCover`, `plain_meeting_le_half` (from
-`plain_meeting_core`), `plain_disagreement_le` (from `plain_meeting_core`). Remaining: the
-other 14 declarations.
+Proving the 14 pinned `sorry`s. Order: `PlainCover.lean` (connectivity, hitting uniqueness,
+layer symmetry, plain-step equations), then `PlainMeeting.lean` (additive drift and the
+double-cover potential), then `PlainConsensus.lean`.
+
+Already proved at pinning time: `doubleCover_adj`, `doubleCover_degree`,
+`doubleCover_degree_pos`, `volume_doubleCover`, `plain_meeting_le_half`,
+`plain_disagreement_le`.
+
+Proved: all five `PlainCover.lean` sorries (`doubleCover_connected`, `hitting_unique`,
+`hitting_doubleCover_flip`, `uniformNeighbor_expect_hitting`,
+`uniformNeighbor_doubleCover_expect`). `lake build Voter.PlainCover` succeeds.
+Remaining: eight sorries in `PlainMeeting.lean`, one in `PlainConsensus.lean`.
+Current errors: none (`PlainCover` clean). Next: additive drift and `plainPotential_drift`.
 
 ## Pinned statements
 

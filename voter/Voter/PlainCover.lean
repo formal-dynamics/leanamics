@@ -42,12 +42,104 @@ instance (G : SimpleGraph V) [DecidableRel G.Adj] : DecidableRel (doubleCover G)
 
 variable {G : SimpleGraph V}
 
+lemma bool_not_ne_iff {a b : Bool} : (Bool.not a ≠ Bool.not b) ↔ (a ≠ b) := by
+  cases a <;> cases b <;> decide
+
+lemma bool_ne_not_iff {a b : Bool} : (a ≠ Bool.not b) ↔ (Bool.not a ≠ b) := by
+  cases a <;> cases b <;> decide
+
+/-- Swapping the two layers is an automorphism of the double cover. -/
+def doubleCoverFlip (G : SimpleGraph V) : doubleCover G →g doubleCover G where
+  toFun p := (p.1, !p.2)
+  map_rel' := by
+    intro p q h
+    exact ⟨h.1, bool_not_ne_iff.mpr h.2⟩
+
+@[simp] lemma doubleCoverFlip_apply (p : V × Bool) :
+    doubleCoverFlip G p = (p.1, !p.2) := rfl
+
+/-- A walk of `G` lifts to the double cover, flipping the layer at every step. -/
+lemma doubleCover_reachable_of_walk {u v : V} (p : G.Walk u v) (i : Bool) :
+    ∃ j : Bool, (doubleCover G).Reachable (u, i) (v, j) := by
+  induction p generalizing i with
+  | nil => exact ⟨i, SimpleGraph.Reachable.refl _⟩
+  | @cons u v w huv tail ih =>
+    obtain ⟨j, hj⟩ := ih (!i)
+    have he : (doubleCover G).Adj (u, i) (v, !i) := ⟨huv, by cases i <;> simp⟩
+    exact ⟨j, (SimpleGraph.Adj.reachable he).trans hj⟩
+
+/-- Reachability is preserved by swapping both layers. -/
+lemma doubleCover_reachable_flip {a b : V} {i j : Bool}
+    (h : (doubleCover G).Reachable (a, i) (b, j)) :
+    (doubleCover G).Reachable (a, !i) (b, !j) := by
+  simpa using SimpleGraph.Reachable.map (doubleCoverFlip G) h
+
 /-- **Connectivity of the double cover.** If `G` is connected and nonbipartite (not
 2-colourable), then its bipartite double cover is connected. This is where the
 nonbipartiteness hypothesis of Hassin–Peleg (§2.1, Lemma 2.4) enters. -/
 lemma doubleCover_connected (hc : G.Connected) (hnb : ¬ G.Colorable 2) :
     (doubleCover G).Connected := by
-  sorry
+  obtain ⟨x₀⟩ := hc.nonempty
+  refine (SimpleGraph.connected_iff_exists_forall_reachable _).2 ⟨(x₀, false), ?_⟩
+  intro q
+  obtain ⟨v, j⟩ := q
+  by_contra hmiss
+  -- the missed vertex forces the two layers of `x₀` to lie in different components
+  have hnotx : ¬ (doubleCover G).Reachable (x₀, false) (x₀, true) := by
+    intro hx
+    obtain ⟨p⟩ := hc x₀ v
+    obtain ⟨k, hk⟩ := doubleCover_reachable_of_walk p false
+    have hkne : k ≠ j := by
+      intro hkj
+      exact hmiss (hkj ▸ hk)
+    have hk' : k = !j := by
+      cases k <;> cases j
+      · exact (hkne rfl).elim
+      · rfl
+      · rfl
+      · exact (hkne rfl).elim
+    have hother : (doubleCover G).Reachable (x₀, false) (v, !j) := hk' ▸ hk
+    have hback : (doubleCover G).Reachable (x₀, true) (v, j) := by
+      simpa [Bool.not_false, Bool.not_not] using doubleCover_reachable_flip hother
+    exact hmiss (hx.trans hback)
+  -- exactly one layer of every vertex is reachable from `(x₀, false)`
+  have hexact (w : V) :
+      ((doubleCover G).Reachable (x₀, false) (w, false) ∨
+        (doubleCover G).Reachable (x₀, false) (w, true)) ∧
+      ¬ ((doubleCover G).Reachable (x₀, false) (w, false) ∧
+        (doubleCover G).Reachable (x₀, false) (w, true)) := by
+    obtain ⟨p⟩ := hc x₀ w
+    obtain ⟨k, hk⟩ := doubleCover_reachable_of_walk p false
+    refine ⟨?_, ?_⟩
+    · cases k
+      · exact Or.inl hk
+      · exact Or.inr hk
+    · intro ⟨hf, ht⟩
+      have hflip : (doubleCover G).Reachable (x₀, true) (w, false) := by
+        simpa [Bool.not_false, Bool.not_true] using doubleCover_reachable_flip ht
+      exact hnotx (hflip.trans hf.symm).symm
+  -- the reachable layer is a proper 2-colouring
+  classical
+  let c : V → Bool := fun w => decide ((doubleCover G).Reachable (x₀, false) (w, false))
+  have hc_iff (w : V) : c w = true ↔ (doubleCover G).Reachable (x₀, false) (w, false) := by
+    simp [c]
+  have hvalid {v w : V} (hvw : G.Adj v w) : c v ≠ c w := by
+    intro hcw
+    cases hcv : c v
+    · have hv : ¬ (doubleCover G).Reachable (x₀, false) (v, false) := by
+        intro hv
+        exact Bool.false_ne_true (hcv.symm.trans ((hc_iff v).mpr hv))
+      have hw : ¬ (doubleCover G).Reachable (x₀, false) (w, false) := by
+        intro hw
+        exact Bool.false_ne_true ((hcw.symm.trans hcv).symm.trans ((hc_iff w).mpr hw))
+      have hvtrue := Or.resolve_left (hexact v).1 hv
+      have he : (doubleCover G).Adj (v, true) (w, false) := ⟨hvw, by simp⟩
+      exact hw (hvtrue.trans (SimpleGraph.Adj.reachable he))
+    · have hv := (hc_iff v).mp hcv
+      have hw := (hc_iff w).mp (hcw.symm.trans hcv)
+      have he : (doubleCover G).Adj (v, false) (w, true) := ⟨hvw, by simp⟩
+      exact (hexact w).2 ⟨hw, hv.trans (SimpleGraph.Adj.reachable he)⟩
+  exact hnb (by simpa using (SimpleGraph.Coloring.mk c hvalid).colorable)
 
 variable [Fintype V] [DecidableRel G.Adj]
 
@@ -89,27 +181,122 @@ variable [DecidableEq V]
 lemma hitting_unique (hc : G.Connected) {y : V} {h : V → ℝ} (hy : h y = 0)
     (hlap : ∀ x, x ≠ y → (G.lapMatrix ℝ *ᵥ h) x = 2 * G.degree x) :
     h = hitting G hc y := by
-  sorry
+  set d : V → ℝ := h - hitting G hc y with hd_def
+  have hd0 : d y = 0 := by simp [hd_def, hy, hitting_self]
+  have hdlap (x : V) (hx : x ≠ y) : (G.lapMatrix ℝ *ᵥ d) x = 0 := by
+    rw [mulVec_sub, Pi.sub_apply, hlap x hx, hitting_lapMatrix_of_ne hc hx, sub_self]
+  funext x
+  have hle : d x ≤ 0 :=
+    le_zero_of_lapMatrix_le G hc (by simp [hd0]) (fun z hz => (hdlap z hz).le) x
+  have hge : -d x ≤ 0 :=
+    le_zero_of_lapMatrix_le G hc (u := -d) (by rw [Pi.neg_apply, hd0]; simp)
+      (fun z hz => by rw [mulVec_neg, Pi.neg_apply, hdlap z hz, neg_zero]) x
+  have : d x = 0 := le_antisymm hle (neg_nonpos.mp hge)
+  rw [hd_def, Pi.sub_apply, sub_eq_zero] at this
+  exact this
 
 /-- **Layer symmetry.** Hitting times of the double cover are invariant under swapping the
 two layers of both the start and the target. -/
 lemma hitting_doubleCover_flip (hc' : (doubleCover G).Connected) (x y : V) (i j : Bool) :
     hitting (doubleCover G) hc' (y, !j) (x, !i) = hitting (doubleCover G) hc' (y, j) (x, i) := by
-  sorry
+  let σ : V × Bool → V × Bool := fun p => (p.1, !p.2)
+  let hσ : V × Bool → ℝ := fun p => hitting (doubleCover G) hc' (y, j) (σ p)
+  have hσσ (p : V × Bool) : σ (σ p) = p := by
+    cases p with
+    | mk a b => cases b <;> rfl
+  have hy : hσ (y, !j) = 0 := by
+    simp [hσ, σ, hitting_self]
+  have hlap (p : V × Bool) (hp : p ≠ (y, !j)) :
+      ((doubleCover G).lapMatrix ℝ *ᵥ hσ) p = 2 * (doubleCover G).degree p := by
+    have hpσ : σ p ≠ (y, j) := by
+      intro h
+      apply hp
+      have := congrArg σ h
+      simpa [σ, hσσ] using this
+    have hdeg : (doubleCover G).degree p = (doubleCover G).degree (σ p) := by
+      obtain ⟨a, k⟩ := p
+      rw [doubleCover_degree, doubleCover_degree]
+    have hsum : ∑ q ∈ (doubleCover G).neighborFinset p, hσ q =
+        ∑ q ∈ (doubleCover G).neighborFinset (σ p), hitting (doubleCover G) hc' (y, j) q := by
+      refine Finset.sum_nbij' σ σ ?_ ?_ ?_ ?_ ?_
+      · intro q hq
+        simp only [SimpleGraph.mem_neighborFinset, doubleCover_adj, σ] at hq ⊢
+        exact ⟨hq.1, bool_not_ne_iff.mpr hq.2⟩
+      · intro q hq
+        simp only [SimpleGraph.mem_neighborFinset, doubleCover_adj, σ] at hq ⊢
+        exact ⟨hq.1, bool_ne_not_iff.mpr hq.2⟩
+      · intro q _
+        exact hσσ q
+      · intro q _
+        exact hσσ q
+      · intro q _
+        rfl
+    rw [SimpleGraph.lapMatrix_mulVec_apply, hsum, hdeg]
+    rw [← SimpleGraph.lapMatrix_mulVec_apply]
+    exact hitting_lapMatrix_of_ne hc' hpσ
+  have huniq := hitting_unique hc' hy hlap
+  have := congr_fun huniq (x, !i)
+  simpa [hσ, σ] using this.symm
+
+omit [DecidableEq V] in
+/-- Expectation under uniform neighbour sampling is the average over the neighbours. -/
+lemma uniformNeighbor_expect (hd : ∀ i, 0 < G.degree i) (x : V) (f : V → ℝ) :
+    (uniformNeighbor G hd x).expect f =
+      (∑ w ∈ G.neighborFinset x, f w) / G.degree x := by
+  simp only [Distribution.expect, uniformNeighbor]
+  have h (j : V) :
+      (if G.Adj x j then (G.degree x : ℝ)⁻¹ else 0) * f j =
+        if G.Adj x j then f j / G.degree x else 0 := by
+    by_cases hj : G.Adj x j
+    · simp [hj, div_eq_mul_inv, mul_comm]
+    · simp [hj]
+  simp_rw [h]
+  rw [← Finset.sum_filter]
+  have he : Finset.univ.filter (G.Adj x) = G.neighborFinset x := by
+    ext j
+    simp
+  rw [he, ← Finset.sum_div]
 
 /-- A plain uniform-neighbour step away from the target lowers the (lazy-normalised) hitting
 time by `2` in expectation: `hitting` is twice the hitting time of the plain walk. -/
 lemma uniformNeighbor_expect_hitting (hd : ∀ i, 0 < G.degree i) (hc : G.Connected) {x y : V}
     (hxy : x ≠ y) :
     (uniformNeighbor G hd x).expect (hitting G hc y) = hitting G hc y x - 2 := by
-  sorry
+  have hlap := hitting_lapMatrix_of_ne hc hxy
+  rw [SimpleGraph.lapMatrix_mulVec_apply] at hlap
+  have hS : ∑ w ∈ G.neighborFinset x, hitting G hc y w =
+      G.degree x * hitting G hc y x - 2 * G.degree x := by linarith
+  have hdx : (G.degree x : ℝ) ≠ 0 := by exact_mod_cast (hd x).ne'
+  rw [uniformNeighbor_expect hd, hS]
+  field_simp
 
+omit [DecidableEq V] in
 /-- A uniform-neighbour step of the double cover from `(x, i)` is a uniform-neighbour step of
 `G` from `x` followed by a flip of the layer. -/
 lemma uniformNeighbor_doubleCover_expect (hd : ∀ i, 0 < G.degree i)
     (hd' : ∀ p, 0 < (doubleCover G).degree p) (x : V) (i : Bool) (f : V × Bool → ℝ) :
     (uniformNeighbor (doubleCover G) hd' (x, i)).expect f =
       (uniformNeighbor G hd x).expect fun a => f (a, !i) := by
-  sorry
+  rw [uniformNeighbor_expect hd' (x, i), uniformNeighbor_expect hd x, doubleCover_degree]
+  refine congrArg (fun s : ℝ => s / (G.degree x : ℝ)) ?_
+  refine Finset.sum_nbij' (fun q : V × Bool => q.1) (fun a => (a, !i)) ?_ ?_ ?_ ?_ ?_
+  · intro q hq
+    simp only [SimpleGraph.mem_neighborFinset, doubleCover_adj] at hq ⊢
+    exact hq.1
+  · intro a ha
+    simp only [SimpleGraph.mem_neighborFinset, doubleCover_adj] at ha ⊢
+    exact ⟨ha, by cases i <;> simp⟩
+  · intro q hq
+    simp only [SimpleGraph.mem_neighborFinset, doubleCover_adj] at hq
+    ext
+    · rfl
+    · cases i <;> cases hq2 : q.2 <;> simp_all
+  · intro a _
+    rfl
+  · intro q hq
+    simp only [SimpleGraph.mem_neighborFinset, doubleCover_adj] at hq
+    obtain ⟨a, b⟩ := q
+    have hb : b = !i := by cases i <;> cases b <;> simp_all
+    simp [hb]
 
 end Voter
