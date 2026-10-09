@@ -54,7 +54,7 @@ and an $\Omega(n/\log n)$ lower bound ([Berenbrink et al., PODC 2017]({{ '/media
 A node that sees the other opinion becomes undecided; an undecided node adopts the opinion it
 sees. Formalized: majority consensus from a bias of order $\sqrt{n \log n}$ within $O(\log n)$
 rounds ([Clementi et al., MFCS 2018]({{ '/undecided/blueprint/' | relative_url }}#sec:cggnps-majority)); plurality consensus with $k$
-colours ([Becchetti et al., SODA 2015]({{ '/undecided/blueprint/' | relative_url }}#sec:bcnps-plurality)); and the sequential
+colours ([Becchetti et al., SODA 2015]({{ '/undecided/blueprint/' | relative_url }}#sec:bcnps-plurality)) and its [lower bound]({{ '/undecided/blueprint/' | relative_url }}#sec:bcnps-lower-bound); and the sequential
 approximate-majority protocol ([Angluin, Aspnes and Eisenstat, 2008]({{ '/undecided/blueprint/' | relative_url }}#sec:aae-approx-majority)).
 
 [Blueprint]({{ '/undecided/blueprint/' | relative_url }}) · [PDF]({{ '/undecided/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/undecided/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/undecided/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/undecided)
