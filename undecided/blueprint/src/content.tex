@@ -169,6 +169,97 @@ or $4S+q\le n/10$, which end in $\{4S+q\le n/10\}$ since $\Phi\le n$; then
 $T_3=\lceil 8\log n\rceil$ rounds in which $4S+q$ contracts by $3/4$ in expectation. The failure
 probability is at most $T(k+4)/n^3+(3/4)^{T_3}n/10\le 6/n$.
 \end{proof}
+
+\section{Many colours: the $\Omega(\mathrm{md}(c))$ lower bound (UND-3)}\label{sec:bcnps-lower-bound}
+The same paper (SODA 2015, Theorem~8) shows that, without any bias, the dynamics needs
+$\Omega(\mathrm{md}(c))$ rounds. With $R(c)=\sum_i c_i/c_1$ and $\Lambda(c)=R(c)^2/\mathrm{md}(c)$:
+after the first round most nodes are undecided (Lemma~3); their number $q$ then descends to about
+$n/2$ within $O(\log n)$ rounds while no colour exceeds $\gamma n/\mathrm{md}$ (Lemma~6); from
+there no colour grows faster than by a factor $1+O(1/\mathrm{md})$ per round (Lemma~7). All
+constants are existential, ``w.h.p.'' is $1-C/n$, and $k$ ranges over $Ck\le(n/\log n)^{a}$ with
+the paper's exponent $a$.
+
+Lemmas~6 and~7 need minor corrections: the window $|Q-n/2|\le 2\gamma^2/\mathrm{md}(\bar c)$ should
+read $2\gamma^2n/\mathrm{md}(\bar c)$; the proof of (17) uses the initial instead of the current
+monochromatic distance; in Lemma~7 the growth factor is $1+(4\gamma^2+2\gamma+1)/\mathrm{md}$, the
+lower bound (23) on $E[\Delta']$ reverses the Cauchy--Schwarz inequality, and the proof needs
+$\gamma\ge1$ (any $\gamma>1/2$ would do) rather than an arbitrary $\gamma>0$; and both lemmas must
+bound the largest colour, not only the initial plurality
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/undecided/FORMALIZATION_DIFFERENCES.md#the-lower-bound-with-k-colours-lowerbound-roadmap-und-3}{details}).
+
+\begin{lemma}[Ratios and expectations]\label{lem:lb-basic}
+\lean{Undecided.Plurality.ratioR,Undecided.Plurality.ratioLam,Undecided.Plurality.md_le_ratioR,Undecided.Plurality.ratioR_le_card,Undecided.Plurality.md_le_ratioLam,Undecided.Plurality.ratioLam_le_card,Undecided.Plurality.ratioR_of_und_zero,Undecided.Plurality.ratioLam_of_und_zero,Undecided.Plurality.mu_eq_half,Undecided.Plurality.muU_sub_half}\leanok\uses{thm:pmodel}
+$\mathrm{md}\le R\le k$ and $\mathrm{md}\le\Lambda\le k$; without undecided nodes $R=n/c_1$ and
+$\Lambda=n^2/\sum_ic_i^2$. With $\delta=q-n/2$: $\mu_i=(1+(2\delta+c_i)/n)\,c_i$ and
+$E[Q'-n/2]=(2\delta^2-\sum_jc_j^2)/n$ (the paper's (20) and (19)).
+\end{lemma}
+\begin{proof}\leanok
+$c_i/c_1\in[0,1]$ gives $(c_i/c_1)^2\le c_i/c_1\le1$; Cauchy--Schwarz gives $R^2\le k\,\mathrm{md}$.
+The expectations are (3)--(4) rewritten with $q=n/2+\delta$.
+\end{proof}
+
+\begin{lemma}[First round; Lemma~3]\label{lem:lb-first}
+\lean{Undecided.Plurality.first_round}\leanok\uses{lem:lb-basic,lem:pgood}
+Let $Ck\le(n/\log n)^{1/2}$. From a configuration $x$ without undecided nodes, with plurality
+colour $m$, after one round, with probability at least $1-C/n$: $c_m\ge n/(2R^2)$, every colour has
+at most $2n/R^2$ nodes, and $n(1-2/\Lambda)\le q\le n(1-1/(2\Lambda))$ ($R$, $\Lambda$ of $x$).
+\end{lemma}
+\begin{proof}\leanok
+With $q=0$, $\mu_i=c_i^2/n\le\mu_m=n/R^2$ and $\mu_q=n-\sum_ic_i^2/n=n(1-1/\Lambda)$; in a good
+round (Lemma~\ref{lem:pgood}, deviation level $3\log n$) the deviations are small compared with
+$\mu_m\ge n/k^2\ge C^2\log n$ and with $n/\Lambda\ge n/k$. Proved with $C=100$.
+\end{proof}
+
+\begin{lemma}[Descent of the undecided nodes; Lemma~6]\label{lem:lb-descent}
+\lean{Undecided.Plurality.undecided_square,Undecided.Plurality.undecided_not_below,Undecided.Plurality.descent}\leanok\uses{lem:lb-basic,lem:pgood}
+Let $Ck\le(n/\log n)^{1/6}$. If $q=(1+\delta)n/2$ with $1-\delta\ge1/(2k)$, then after one round
+$Q'\le(1+\delta^2)n/2$ with probability at least $1-C/n^2$ (16). If every colour is at most
+$\gamma n/D$, with $\gamma\ge1$ and $0<D\le k$, then $Q'\ge n/2-2\gamma^2n/D$ with probability at
+least $1-C/n^2$ (17, corrected). Hence there are $\gamma\ge1$ and $C$ such that, for $x$ without
+undecided nodes with $\mathrm{md}(x)\ge C$ and $y$ satisfying the conclusion of
+Lemma~\ref{lem:lb-first}, there is a round $t\le C\log n$ such that, with probability at least
+$1-C/n$, every colour is at most $\gamma n/\mathrm{md}(x)$ at each round $s\le t$, and at round $t$
+also $|q-n/2|\le2\gamma^2n/\mathrm{md}(x)$.
+\end{lemma}
+\begin{proof}\leanok
+(16): $\mu_q=(1+\delta^2)n/2-\sum_jc_j^2/n$ and $\sum_jc_j^2\ge(n-q)^2/k$. (17):
+$\mu_q\ge n/2-\sum_jc_j^2/n$ and $\sum_jc_j^2\le(\max_jc_j)(n-q)\le\gamma n^2/D$. The round $t$ is
+deterministic: the first $s$ with $(1-1/\Lambda)^{2^s}\le4\gamma^2/\mathrm{md}$. The colours follow
+an explicit envelope (at most $8n/D$, then at most $\gamma n/D$ with $\gamma=24$), iterated with
+moving targets. Proved with $\gamma=24$ and $C=10^6$.
+\end{proof}
+
+\begin{lemma}[Plateau; Lemma~7]\label{lem:lb-plateau}
+\lean{Undecided.Plurality.plateau_step,Undecided.Plurality.plateau}\leanok\uses{lem:lb-basic,lem:pgood}
+Let $\gamma\ge1$ and $Ck\le(n/\log n)^{1/4}$. If $C\le D\le k$, $|q-n/2|\le2\gamma^2n/D$ and every
+colour is at most $\gamma n/D$, then for every $T\le D/C$, after $T$ rounds, with probability at
+least $1-C/n$, every colour is at most $2\gamma n/D$ and $|q-n/2|\le2\gamma^2n/D$.
+\end{lemma}
+\begin{proof}\leanok
+One round multiplies the bound $B\in[\gamma n/D,2\gamma n/D]$ on the colours by at most
+$1+(4\gamma^2+2\gamma+1)/D$ and keeps the window, with probability at least $1-C/n^2$: by (20),
+$2\delta+c_i\le(4\gamma^2+2\gamma)n/D$, and by (19) $E[\Delta']\le 8\gamma^4n/D^2$ and
+$E[\Delta']\ge-(\max_jc_j)(n-q)/n\ge-(4\gamma/3)n/D$. Iterate for $T\le D/C$ rounds, during which
+the factor stays at most $2$. Proved with $C=30\gamma^2$.
+\end{proof}
+
+\begin{theorem}[Lower bound; Theorem~8]\label{thm:lb}
+\lean{Undecided.Plurality.lower_bound_whp,Undecided.Plurality.lower_bound_consensus}\leanok\uses{lem:lb-first,lem:lb-descent,lem:lb-plateau}
+There is $C>0$ such that, for every $n$ with $\log n\ge C$, every $k$ with $Ck\le(n/\log n)^{1/6}$
+and every configuration $x$ without undecided nodes: for every $T$ with $CT\le\mathrm{md}(x)$, after
+$T$ rounds every colour has at most $Cn/\mathrm{md}(x)$ nodes with probability at least $1-C/n$; and
+for every $T$ with $C(T+1)\le\mathrm{md}(x)$, all nodes hold the same colour after $T$ rounds with
+probability at most $C/n$. Since monochromatic configurations are absorbing, the convergence time
+is $\Omega(\mathrm{md}(x))$ with probability at least $1-C/n$.
+\end{theorem}
+\begin{proof}\leanok
+Compose Lemma~\ref{lem:lb-first}, Lemma~\ref{lem:lb-descent} and Lemma~\ref{lem:lb-plateau}
+(with the $\gamma$ of Lemma~\ref{lem:lb-descent}, $D=\mathrm{md}(x)$) by the Markov property; a
+round $T$ up to the descent round is covered by the bound at every round of
+Lemma~\ref{lem:lb-descent}. A monochromatic configuration has $n>Cn/\mathrm{md}(x)$ nodes of one
+colour once $\mathrm{md}(x)>C$. Proved with $C=1017429$ for the first form and $2C$ for the second.
+\end{proof}
+
 \section{The sequential dynamics: approximate majority}\label{sec:aae-approx-majority}
 \begin{definition}[Sequential undecided-state dynamics]\label{def:seq}
 \lean{Undecided.Sequential.Interaction,Undecided.Sequential.step,Undecided.Sequential.run}\leanok

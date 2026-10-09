@@ -12,7 +12,7 @@ The one-round step (`plateau_step`) has failure probability `C / n²`, so that i
 over `T ≤ D / C ≤ n` rounds. Here the monochromatic distance `md(c̄)` of the initial
 configuration is a real parameter `D ≤ k` (as `md(c̄) ≤ k`, `md_le_card`).
 
-Corrections (see `PROGRESS-UND3.md`):
+Corrections (see `FORMALIZATION_DIFFERENCES.md`):
 * the bound is kept for **every** colour (`maxCount`): the proof bounds `∑ⱼ cⱼ²` and uses
   `c_m ≥ (n - q)/k`, which hold for the largest colour, not for a fixed colour `m`;
 * the growth factor is `1 + (4γ² + 2γ + 1)/D`, not `1 + (2γ(γ + 1) + 1)/D`: from

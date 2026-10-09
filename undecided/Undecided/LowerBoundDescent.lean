@@ -14,7 +14,7 @@ that they can be iterated over `O(log n)` rounds):
 * (17) `undecided_not_below`: if all colours are at most `γ n / D`, then w.h.p.
   `Q' ≥ n/2 - 2γ² n / D` (`Q` cannot jump over the window around `n/2`).
 
-Corrections (see `PROGRESS-UND3.md`):
+Corrections (see `FORMALIZATION_DIFFERENCES.md`):
 * the conclusion `|Q - n/2| ≤ 2γ² / md(c̄)` of the paper is a typo for `2γ² n / md(c̄)`;
 * the proof of (17) uses `∑ⱼ cⱼ² = c₁² md(c̄)`, which mixes the current configuration and the
   initial one; the bound `∑ⱼ cⱼ² ≤ maxⱼ cⱼ · (n - q) ≤ maxⱼ cⱼ · n` gives (17) for every `γ ≥ 1`;
