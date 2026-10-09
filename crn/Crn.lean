@@ -17,3 +17,9 @@ import Crn.StableSemilinearSet
 import Crn.StableSemilinear
 import Crn.StableTransfer
 import Crn.StableCrn
+import Crn.ExactMajorityOutput
+import Crn.ExactMajorityStatic
+import Crn.ExactMajorityDynamic
+import Crn.ExactMajorityCompose
+import Crn.ExactMajorityAbsolute
+import Crn.ExactMajorityRelative
