@@ -6,8 +6,6 @@ twitter_username:
 github_username: formal-dynamics
 repository: formal-dynamics/leanamics
 
-authors: Aakash Kumar, Maria Sofia Bucarelli and Emanuele Natale
-
 remote_theme: pages-themes/cayman@v0.2.0
 plugins:
   - jekyll-remote-theme
