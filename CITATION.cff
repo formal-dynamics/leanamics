@@ -4,6 +4,14 @@ title: "Leanamics: Lean 4 formalizations of opinion dynamics and related distrib
 type: software
 version: 0.1.0
 date-released: 2026-10-09
+doi: 10.5281/zenodo.23265329
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23265329
+    description: "All versions (resolves to the latest release)"
+  - type: doi
+    value: 10.5281/zenodo.23265330
+    description: "Version 0.1.0"
 license: MIT
 repository-code: "https://github.com/formal-dynamics/leanamics"
 url: "https://formal-dynamics.github.io/leanamics/"
