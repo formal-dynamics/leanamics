@@ -8,3 +8,4 @@ import Voter.ConductanceDrift
 import Voter.ConductanceTime
 import Voter.ConductanceMany
 import Voter.ConductanceSq
+import Voter.PlainConsensus

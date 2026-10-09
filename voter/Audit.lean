@@ -48,3 +48,10 @@ import Voter
 #print axioms Voter.dynamic_consensus_conductance_sq_many
 #print axioms Voter.dynamic_consensus_conductance_min
 #print axioms Voter.lazy_consensus_conductance_min
+#print axioms Voter.doubleCover_connected
+#print axioms Voter.plainPotential_drift
+#print axioms Voter.plain_apart_mul_le
+#print axioms Voter.plain_meeting_le_half
+#print axioms Voter.plain_apart_le_pow
+#print axioms Voter.plain_disagreement_le
+#print axioms Voter.plain_voter_consensus_whp
