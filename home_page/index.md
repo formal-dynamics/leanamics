@@ -65,7 +65,8 @@ approximate-majority protocol ([Angluin, Aspnes and Eisenstat, 2008]({{ '/undeci
 Every round, each node copies the opinion of a random neighbour. Formalized: the consensus
 probabilities on connected graphs and neutral Wright–Fisher fixation ([Hassin and
 Peleg]({{ '/voter/blueprint/' | relative_url }}#sec:hassin-peleg)); consensus within $O(n^3 \log n)$ rounds on every connected graph
-([details]({{ '/voter/blueprint/' | relative_url }}#sec:kms-meeting-time)); and consensus times via conductance, also on dynamic
+([details]({{ '/voter/blueprint/' | relative_url }}#sec:kms-meeting-time)), also without laziness on
+non-bipartite graphs ([Hassin and Peleg]({{ '/voter/blueprint/' | relative_url }}#sec:hp-plain-walk)); and consensus times via conductance, also on dynamic
 graphs ([Berenbrink et al., ICALP 2016]({{ '/voter/blueprint/' | relative_url }}#sec:bgkm-conductance)).
 
 [Blueprint]({{ '/voter/blueprint/' | relative_url }}) · [PDF]({{ '/voter/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/voter/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/voter/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/voter)
