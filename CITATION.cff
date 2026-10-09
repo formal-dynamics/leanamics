@@ -1,0 +1,30 @@
+cff-version: 1.2.0
+message: "If you use Leanamics, please cite it as below."
+title: "Leanamics: Lean 4 formalizations of opinion dynamics and related distributed processes"
+type: software
+version: 0.1.0
+date-released: 2026-10-09
+license: MIT
+repository-code: "https://github.com/formal-dynamics/leanamics"
+url: "https://formal-dynamics.github.io/leanamics/"
+abstract: >-
+  Lean 4 + Mathlib formalizations of classical results on opinion dynamics and related
+  distributed processes (voter model, Moran process, majority, median and undecided-state
+  dynamics, epidemics and rumor spreading, chemical reaction networks, averaging), each paired
+  with a blueprint connecting the paper proof to the Lean code statement by statement.
+keywords:
+  - Lean 4
+  - Mathlib
+  - formal verification
+  - opinion dynamics
+  - distributed computing
+  - Markov chains
+authors:
+  - given-names: Aakash
+    family-names: Kumar
+  - given-names: Maria Sofia
+    family-names: Bucarelli
+  - given-names: Niccolò
+    family-names: D'Archivio
+  - given-names: Emanuele
+    family-names: Natale

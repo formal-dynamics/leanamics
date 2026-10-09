@@ -6,7 +6,8 @@ related distributed processes. Each project is paired with a
 paper proof to the Lean code statement-by-statement.
 
 **[https://formal-dynamics.github.io/leanamics/](https://formal-dynamics.github.io/leanamics/)** (landing
-page, blueprints, dependency graphs and API docs for everything below).
+page, blueprints, dependency graphs and API docs for everything below). To cite Leanamics, see
+[How to cite](#how-to-cite).
 
 ## Results
 
@@ -24,6 +25,25 @@ is used. Concentration bounds (Chernoff, Hoeffding, Bernstein, a maximal Azumaâ€
 inequality) and (super)martingale arguments are proved within this layer, and the deterministic
 parts use Mathlib's analysis and linear algebra (integral curves and the discrete Gronwall
 inequality for the SIR model, the spectrum of symmetric matrices for averaging).
+
+## How to cite
+
+If you use Leanamics, please cite it. The metadata are in [CITATION.cff](CITATION.cff) (GitHub's
+"Cite this repository" button shows them as APA and BibTeX), and every release is archived on
+[Zenodo](https://zenodo.org/) with a DOI. Please cite the version you used:
+
+```bibtex
+@software{leanamics,
+  author  = {Kumar, Aakash and Bucarelli, Maria Sofia and D'Archivio, Niccol{\`o} and Natale, Emanuele},
+  title   = {Leanamics: {Lean} 4 formalizations of opinion dynamics and related distributed processes},
+  year    = {2026},
+  version = {0.1.0},
+  url     = {https://github.com/formal-dynamics/leanamics}
+}
+```
+
+The same section is on the [website](https://formal-dynamics.github.io/leanamics/#cite), and every
+blueprint page links to it.
 
 ## Layout
 

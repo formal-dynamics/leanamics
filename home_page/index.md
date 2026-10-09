@@ -282,6 +282,24 @@ phases, and round types on graphs.
 * [API docs]({{ '/dynamics/docs/' | relative_url }})
 * [Source and README](https://github.com/formal-dynamics/leanamics/tree/main/dynamics)
 
+## How to cite
+{: #cite}
+
+If you use Leanamics, please cite it. Every release is archived on [Zenodo](https://zenodo.org/)
+with a DOI; the metadata are in
+[CITATION.cff](https://github.com/formal-dynamics/leanamics/blob/main/CITATION.cff). Please cite
+the version you used:
+
+```bibtex
+@software{leanamics,
+  author  = {Kumar, Aakash and Bucarelli, Maria Sofia and D'Archivio, Niccol{\`o} and Natale, Emanuele},
+  title   = {Leanamics: {Lean} 4 formalizations of opinion dynamics and related distributed processes},
+  year    = {2026},
+  version = {0.1.0},
+  url     = {https://github.com/formal-dynamics/leanamics}
+}
+```
+
 ---
 
 Each project is a separate Lean package (its own `lakefile.toml` and toolchain) living in its own
