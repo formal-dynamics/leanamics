@@ -15,19 +15,34 @@ Discrete Math. 6 (1993).
 
 ## Status
 
-Proving the 14 pinned `sorry`s. Order: `PlainCover.lean` (connectivity, hitting uniqueness,
-layer symmetry, plain-step equations), then `PlainMeeting.lean` (additive drift and the
-double-cover potential), then `PlainConsensus.lean`.
+**Done.** All 14 pinned `sorry`s are proved. `lake build Voter` succeeds without warnings and
+`python3 ../scripts/check_axioms.py` reports only standard Lean axioms (`propext`,
+`Classical.choice`, `Quot.sound`). The pinned statements and the definitions `doubleCover`,
+`plainPotential` are unchanged from the pin commit.
 
 Already proved at pinning time: `doubleCover_adj`, `doubleCover_degree`,
 `doubleCover_degree_pos`, `volume_doubleCover`, `plain_meeting_le_half`,
 `plain_disagreement_le`.
 
-Proved: all five `PlainCover.lean` sorries (`doubleCover_connected`, `hitting_unique`,
-`hitting_doubleCover_flip`, `uniformNeighbor_expect_hitting`,
-`uniformNeighbor_doubleCover_expect`). `lake build Voter.PlainCover` succeeds.
-Remaining: eight sorries in `PlainMeeting.lean`, one in `PlainConsensus.lean`.
-Current errors: none (`PlainCover` clean). Next: additive drift and `plainPotential_drift`.
+Files (lines): `Voter/PlainCover.lean` (302), `Voter/PlainMeeting.lean` (342),
+`Voter/PlainConsensus.lean` (77).
+
+Main unpinned helpers:
+* `PlainCover.lean`: `doubleCoverFlip` (layer swap as a graph homomorphism `G̃ →g G̃`),
+  `doubleCover_reachable_of_walk` (walks of `G` lift to `G̃`), `doubleCover_reachable_flip`,
+  `uniformNeighbor_expect` (a uniform step is the neighbour average). `doubleCover_connected`
+  follows the 2-colouring argument: if `G̃` were disconnected, "`(w, 0)` is reachable from
+  `(x₀, 0)`" would be a proper 2-colouring of `G`.
+* `PlainMeeting.lean`: `doubleCover_hitting_sum_flip` (`Σ_z d_z h̃_{(b, j)} z` does not
+  depend on `j`), `meetingPotential_doubleCover_flip` (layer symmetry of the potential),
+  `expect_meetingPotential_fst` / `_snd` (a plain step of one token of `G̃`, not on the
+  other token, lowers the potential by exactly `2`). `plainPotential_drift` is then: flip
+  both tokens to layer `1`, step the second token from `(y, 0)` (it is in a different layer
+  from `(a, 1)`, so `−2`), step the first token from `(x, 0)` (`x ≠ y`, so `−2`).
+* `pairWalk_apart_mul_le`: additive drift with the potential truncated to `0` on the
+  diagonal, induction `iterate T F' + c Σ_{t<T} P(apart at t) ≤ F'`, then antitonicity.
+* `plain_voter_consensus_whp`: `A = 80 = 5 · 16`, the template of
+  `lazy_voter_consensus_whp`.
 
 ## Pinned statements
 

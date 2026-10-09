@@ -41,6 +41,37 @@ theorem plain_voter_consensus_whp :
         A * (Fintype.card V : ℝ) ^ 3 * Real.log (Fintype.card V) ≤ T →
           (transition (uniformNeighbor G hd)).iterate T disagreement s ≤
             1 / (Fintype.card V : ℝ) := by
-  sorry
+  refine ⟨80, by norm_num, ?_⟩
+  intro V _ _ G _ hc hnb hd C _ s T hT
+  haveI : Nonempty V := hc.nonempty
+  obtain ⟨u₀⟩ := ‹Nonempty V›
+  have hcard : 1 ≤ Fintype.card V := Fintype.card_pos
+  have hn1 : (1 : ℝ) ≤ Fintype.card V := by exact_mod_cast hcard
+  have hc16 : (0 : ℝ) < 16 * (Fintype.card V : ℝ) ^ 3 := by positivity
+  -- the number of halvings of the probability of being apart
+  set k : ℕ := ⌊(T : ℝ) / (16 * (Fintype.card V : ℝ) ^ 3)⌋₊ with hk_def
+  have hkT : k * 16 * (Fintype.card V : ℝ) ^ 3 ≤ T := by
+    have := Nat.floor_le (div_nonneg (Nat.cast_nonneg T) hc16.le)
+    rw [← hk_def, le_div_iff₀ hc16] at this
+    linarith
+  have hk : 5 * Real.log (Fintype.card V) < k + 1 := by
+    have hlt := Nat.lt_floor_add_one ((T : ℝ) / (16 * (Fintype.card V : ℝ) ^ 3))
+    rw [← hk_def] at hlt
+    have : 5 * Real.log (Fintype.card V) ≤ (T : ℝ) / (16 * (Fintype.card V : ℝ) ^ 3) := by
+      rw [le_div_iff₀ hc16]
+      linarith
+    linarith
+  calc (transition (uniformNeighbor G hd)).iterate T disagreement s
+      ≤ ∑ v ∈ Finset.univ.erase u₀,
+          (pairWalk (uniformNeighbor G hd)).event (fun p => p.1 ≠ p.2) T (v, u₀) :=
+        iterate_disagreement_le_pairWalk _ s T u₀
+    _ ≤ ∑ v ∈ Finset.univ.erase u₀, ((1 : ℝ) / 2) ^ k := by
+        refine Finset.sum_le_sum fun v _ => ?_
+        rw [event_pairWalk]
+        exact plain_apart_le_pow hc hnb hd v u₀ k T hkT
+    _ = ((Fintype.card V : ℝ) - 1) * (1 / 2) ^ k := by
+        rw [Finset.sum_const, Finset.card_erase_of_mem (Finset.mem_univ u₀), Finset.card_univ,
+          nsmul_eq_mul, Nat.cast_sub hcard, Nat.cast_one]
+    _ ≤ 1 / (Fintype.card V : ℝ) := card_sub_one_mul_half_pow_le hcard hk
 
 end Voter

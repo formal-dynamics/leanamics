@@ -66,7 +66,8 @@ lemma pairWalk_apart_mul_le (H : Kernel V) (F : V × V → ℝ) (hF : ∀ p, 0 �
       · have happ : (pairWalk H).apply F' (x, y) ≤ (pairWalk H).apply F (x, y) := by
           simp only [Kernel.apply]
           exact ((pairWalk H) (x, y)).expect_mono hF'le
-        rw [outside_diagonal_apply, if_neg hxy, show F' (x, y) = F (x, y) by simp [F', hxy]]
+        rw [outside_diagonal_apply, if_neg hxy, mul_one,
+          show F' (x, y) = F (x, y) by simp [F', hxy]]
         exact happ.trans (hdrift x y hxy)
     have hind : ∀ n q, (pairWalk H).iterate n F' q +
         c * ∑ t ∈ Finset.range n, g t q ≤ F' q := by
@@ -79,8 +80,7 @@ lemma pairWalk_apart_mul_le (H : Kernel V) (F : V × V → ℝ) (hF : ∀ p, 0 �
         intro q
         have hineq : (pairWalk H).iterate (n + 1) F' q ≤
             (pairWalk H).iterate n F' q + (-c) * g n q := by
-          rw [← Kernel.iterate_add_time (pairWalk H) n 1]
-          simp only [Kernel.iterate_succ, Kernel.iterate_zero]
+          rw [Kernel.iterate_add_time (pairWalk H) n 1]
           have hfun : (fun r => F' r - c * Kernel.outside (Set.diagonal V) r) =
               fun r => F' r + (-c) * Kernel.outside (Set.diagonal V) r := by
             funext r
@@ -98,7 +98,7 @@ lemma pairWalk_apart_mul_le (H : Kernel V) (F : V × V → ℝ) (hF : ∀ p, 0 �
                 c * (∑ t ∈ Finset.range n, g t q + g n q) := by rw [hsum]
           _ ≤ ((pairWalk H).iterate n F' q + (-c) * g n q) +
                 c * (∑ t ∈ Finset.range n, g t q + g n q) :=
-              add_le_add_right hineq _
+              by linarith [hineq]
           _ = (pairWalk H).iterate n F' q + c * ∑ t ∈ Finset.range n, g t q := by ring
           _ ≤ F' q := ih q
     have hnn := (pairWalk H).iterate_nonneg T hF'0 p
@@ -112,11 +112,11 @@ lemma pairWalk_apart_mul_le (H : Kernel V) (F : V × V → ℝ) (hF : ∀ p, 0 �
             Finset.sum_le_sum fun t ht =>
               pairWalk_iterate_outside_antitone H p (Finset.mem_range.mp ht).le
     calc c * (T : ℝ) * g T p ≤ c * ∑ t ∈ Finset.range T, g t p := by
-          rw [← mul_assoc]
+          rw [mul_assoc]
           exact mul_le_mul_of_nonneg_left hTg hc
       _ ≤ F' p := hsumle
       _ ≤ F p := hF'le p
-  · push_neg at hc
+  · replace hc := not_le.mp hc
     have hg := pairWalk_iterate_outside_nonneg H T p
     have hnonpos : c * (T : ℝ) * (pairWalk H).iterate T
         (Kernel.outside (Set.diagonal V)) p ≤ 0 :=
@@ -139,7 +139,7 @@ lemma doubleCover_hitting_le (hd : ∀ i, 0 < G.degree i) (hc' : (doubleCover G)
     hitting (doubleCover G) hc' v u ≤ 16 * (Fintype.card V : ℝ) ^ 3 := by
   haveI : Nonempty (V × Bool) := hc'.nonempty
   haveI : Nonempty V := ⟨hc'.nonempty.some.1⟩
-  set n : ℝ := Fintype.card V with hn
+  set n : ℝ := (Fintype.card V : ℝ) with hn
   have hn1 : (1 : ℝ) ≤ n := by
     rw [hn]
     exact_mod_cast Fintype.card_pos
@@ -152,12 +152,9 @@ lemma doubleCover_hitting_le (hd : ∀ i, 0 < G.degree i) (hc' : (doubleCover G)
       _ = n * (n - 1) := by rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul, hn]
   have hpair := hitting_add_hitting_le hc' (doubleCover_degree_pos hd) u v
   rw [volume_doubleCover] at hpair
-  have hcard : 1 ≤ Fintype.card (V × Bool) := by
-    rw [Fintype.card_prod, Fintype.card_bool]
-    omega
-  have hsub : ((Fintype.card (V × Bool) - 1 : ℕ) : ℝ) = 2 * n - 1 := by
-    rw [Nat.cast_sub hcard, Fintype.card_prod, Fintype.card_bool, hn]
-    norm_cast
+  have hsub : ((Fintype.card (V × Bool) : ℝ) - 1) = 2 * n - 1 := by
+    rw [Fintype.card_prod, Fintype.card_bool, hn]
+    push_cast
     ring
   rw [hsub] at hpair
   have hnn := hitting_nonneg hc' (doubleCover_degree_pos hd) u v
@@ -182,6 +179,56 @@ lemma plainPotential_le (hd : ∀ i, 0 < G.degree i) (hc' : (doubleCover G).Conn
   simp only [plainPotential] at h ⊢
   linarith
 
+/-- The weighted hitting sum `Σ_z d_z h̃_{(b, j)} z` of the double cover does not depend on the
+layer `j` of the target. -/
+lemma doubleCover_hitting_sum_flip (hc' : (doubleCover G).Connected) (b : V) (j : Bool) :
+    ∑ z, ((doubleCover G).degree z : ℝ) * hitting (doubleCover G) hc' (b, !j) z =
+      ∑ z, ((doubleCover G).degree z : ℝ) * hitting (doubleCover G) hc' (b, j) z := by
+  let e : V × Bool ≃ V × Bool :=
+    { toFun := fun p => (p.1, !p.2)
+      invFun := fun p => (p.1, !p.2)
+      left_inv := fun p => by simp
+      right_inv := fun p => by simp }
+  rw [← Equiv.sum_comp e]
+  refine Finset.sum_congr rfl fun z _ => ?_
+  obtain ⟨a, i⟩ := z
+  show ((doubleCover G).degree (a, !i) : ℝ) * hitting (doubleCover G) hc' (b, !j) (a, !i) = _
+  rw [doubleCover_degree, doubleCover_degree, hitting_doubleCover_flip]
+
+/-- The Coppersmith–Tetali–Winkler potential of the double cover is invariant under swapping
+the layers of both tokens. -/
+lemma meetingPotential_doubleCover_flip (hc' : (doubleCover G).Connected) (B₀ : ℝ) (a b : V)
+    (i j : Bool) :
+    meetingPotential hc' B₀ ((a, !i), (b, !j)) = meetingPotential hc' B₀ ((a, i), (b, j)) := by
+  simp only [meetingPotential]
+  rw [hitting_doubleCover_flip hc', doubleCover_hitting_sum_flip hc']
+
+/-- A plain step of the first token of the double cover, away from the second token, lowers the
+potential by `2`. -/
+lemma expect_meetingPotential_fst (hd : ∀ i, 0 < G.degree i) (hc' : (doubleCover G).Connected)
+    (B₀ : ℝ) {x : V} {i : Bool} {q : V × Bool} (hne : (x, i) ≠ q) :
+    (uniformNeighbor G hd x).expect (fun a => meetingPotential hc' B₀ ((a, !i), q)) =
+      meetingPotential hc' B₀ ((x, i), q) - 2 := by
+  have hexp := uniformNeighbor_doubleCover_expect hd (doubleCover_degree_pos hd) x i
+    (hitting (doubleCover G) hc' q)
+  simp only [meetingPotential]
+  rw [Distribution.expect_add, Distribution.expect_sub, Distribution.expect_const,
+    Distribution.expect_const, ← hexp,
+    uniformNeighbor_expect_hitting (doubleCover_degree_pos hd) hc' hne]
+  ring
+
+/-- A plain step of the second token of the double cover, away from the first token, lowers
+the potential by `2` (by the symmetry `meetingPotential_swap`). -/
+lemma expect_meetingPotential_snd (hd : ∀ i, 0 < G.degree i) (hc' : (doubleCover G).Connected)
+    (B₀ : ℝ) {y : V} {j : Bool} {q : V × Bool} (hne : (y, j) ≠ q) :
+    (uniformNeighbor G hd y).expect (fun b => meetingPotential hc' B₀ (q, (b, !j))) =
+      meetingPotential hc' B₀ (q, (y, j)) - 2 := by
+  haveI : Nonempty (V × Bool) := hc'.nonempty
+  have hsymm (p : V × Bool) : meetingPotential hc' B₀ (q, p) = meetingPotential hc' B₀ (p, q) :=
+    meetingPotential_swap (doubleCover_degree_pos hd) hc' B₀ q p
+  simp only [hsymm]
+  exact expect_meetingPotential_fst hd hc' B₀ hne
+
 /-- **Drift of the plain meeting potential** (the Tetali–Winkler reduction in Hassin–Peleg's
 proof of Lemma 2.4). Off the diagonal, one synchronous step of two plain uniform-neighbour
 walks lowers the potential by exactly `4` in expectation (`2` per token, in the
@@ -191,72 +238,21 @@ lemma plainPotential_drift (hd : ∀ i, 0 < G.degree i) (hc' : (doubleCover G).C
     (pairWalk (uniformNeighbor G hd)).apply (plainPotential hc' B₀) (x, y) =
       plainPotential hc' B₀ (x, y) - 4 := by
   haveI : Nonempty (V × Bool) := hc'.nonempty
-  let Φ := meetingPotential hc' B₀
-  let G̃ := doubleCover G
-  let hd' : ∀ p, 0 < G̃.degree p := doubleCover_degree_pos hd
-  have hS (b : V) (j : Bool) :
-      ∑ z, ((G̃.degree z : ℝ) * hitting G̃ hc' (b, !j) z) =
-        ∑ z, ((G̃.degree z : ℝ) * hitting G̃ hc' (b, j) z) := by
-    let e : (V × Bool) ≃ (V × Bool) :=
-      { toFun := fun p => (p.1, !p.2)
-        invFun := fun p => (p.1, !p.2)
-        left_inv := fun p => by cases p with | mk _ i => cases i <;> rfl
-        right_inv := fun p => by cases p with | mk _ i => cases i <;> rfl }
-    have hpt (z : V × Bool) :
-        (G̃.degree (e z) : ℝ) * hitting G̃ hc' (b, !j) (e z) =
-          (G̃.degree z : ℝ) * hitting G̃ hc' (b, j) z := by
-      obtain ⟨a, i⟩ := z
-      rw [doubleCover_degree, doubleCover_degree]
-      congr 1
-      simpa using hitting_doubleCover_flip hc' a b i j
-    calc ∑ z, (G̃.degree z : ℝ) * hitting G̃ hc' (b, !j) z
-        = ∑ z, (G̃.degree (e z) : ℝ) * hitting G̃ hc' (b, !j) (e z) :=
-          (Equiv.sum_comp e (fun z => (G̃.degree z : ℝ) * hitting G̃ hc' (b, !j) z)).symm
-      _ = ∑ z, (G̃.degree z : ℝ) * hitting G̃ hc' (b, j) z :=
-          Finset.sum_congr rfl fun z _ => hpt z
-  have hΦ (a b : V) (i j : Bool) : Φ ((a, !i), (b, !j)) = Φ ((a, i), (b, j)) := by
-    simp only [Φ, meetingPotential]
-    rw [hitting_doubleCover_flip hc', hS b j]
   rw [pairWalk_apply_of_ne _ _ hxy]
-  change (uniformNeighbor G hd x).expect
-      (fun a => (uniformNeighbor G hd y).expect (fun b => Φ ((a, false), (b, false)))) =
-    Φ ((x, false), (y, false)) - 4
+  -- second token: read the pair in layer `1`, where the step of `y` leaves `(y, 0)`
   have hinner (a : V) :
-      (uniformNeighbor G hd y).expect (fun b => Φ ((a, false), (b, false))) =
-        Φ ((a, true), (y, false)) - 2 := by
-    have hpt (b : V) : Φ ((a, false), (b, false)) =
-        hitting G̃ hc' (a, true) (b, true) -
-          (∑ z, (G̃.degree z : ℝ) * hitting G̃ hc' (a, true) z) / volume G̃ + B₀ := by
-      rw [← hΦ a b false false]
-      simpa [Φ] using meetingPotential_swap hd' hc' B₀ (a, true) (b, true)
-    simp_rw [hpt]
-    rw [Distribution.expect_add, Distribution.expect_sub, Distribution.expect_const,
-      Distribution.expect_const]
-    have hne : (y, false) ≠ (a, true) := fun h => Bool.false_ne_true (congrArg Prod.snd h)
-    have hexp := uniformNeighbor_doubleCover_expect hd hd' y false (hitting G̃ hc' (a, true))
-    simp only [Bool.not_false] at hexp
-    rw [← hexp, uniformNeighbor_expect_hitting hd' hc' hne]
-    have hback := meetingPotential_swap hd' hc' B₀ (a, true) (y, false)
-    simp only [Φ, meetingPotential] at hback ⊢
-    linarith
-  have houter : (uniformNeighbor G hd x).expect (fun a => Φ ((a, true), (y, false))) =
-      Φ ((x, false), (y, false)) - 2 := by
-    have hpt (a : V) : Φ ((a, true), (y, false)) =
-        hitting G̃ hc' (y, false) (a, true) -
-          (∑ z, (G̃.degree z : ℝ) * hitting G̃ hc' (y, false) z) / volume G̃ + B₀ := by
-      simp [Φ, meetingPotential]
-    simp_rw [hpt]
-    rw [Distribution.expect_add, Distribution.expect_sub, Distribution.expect_const,
-      Distribution.expect_const]
-    have hne : (x, false) ≠ (y, false) := fun h => hxy (congrArg Prod.fst h)
-    have hexp := uniformNeighbor_doubleCover_expect hd hd' x false (hitting G̃ hc' (y, false))
-    simp only [Bool.not_false] at hexp
-    rw [← hexp, uniformNeighbor_expect_hitting hd' hc' hne]
-    simp only [Φ, meetingPotential]
-    ring
-  have hfun : (fun a => (uniformNeighbor G hd y).expect (fun b => Φ ((a, false), (b, false)))) =
-      fun a => Φ ((a, true), (y, false)) - 2 := funext hinner
-  rw [hfun, Distribution.expect_sub, Distribution.expect_const, houter]
+      (uniformNeighbor G hd y).expect (fun b => plainPotential hc' B₀ (a, b)) =
+        meetingPotential hc' B₀ ((a, !false), (y, false)) - 2 := by
+    have hfun : (fun b => plainPotential hc' B₀ (a, b)) =
+        fun b => meetingPotential hc' B₀ ((a, true), (b, !false)) :=
+      funext fun b => meetingPotential_doubleCover_flip hc' B₀ a b true true
+    rw [hfun]
+    exact expect_meetingPotential_snd hd hc' B₀
+      (fun h => Bool.false_ne_true (congrArg Prod.snd h))
+  -- first token: the pair `((x, 0), (y, 0))` of distinct vertices of `G̃`
+  rw [funext hinner, Distribution.expect_sub, Distribution.expect_const,
+    expect_meetingPotential_fst hd hc' B₀ (fun h => hxy (congrArg Prod.fst h))]
+  simp only [plainPotential]
   ring
 
 /-- **Meeting tail, Markov form.** On a connected nonbipartite graph with `n` vertices, two
