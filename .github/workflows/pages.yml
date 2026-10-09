@@ -321,6 +321,21 @@ jobs:
           fi
           mkdir -p "$GITHUB_WORKSPACE/site/${{ matrix.dir }}"
           cp -r "$DOC" "$GITHUB_WORKSPACE/site/${{ matrix.dir }}/docs"
+          # doc-gen4's front page has no link back to the site: add one under its
+          # heading (only a warning if doc-gen4 changes its markup).
+          python3 - "$GITHUB_WORKSPACE/site/${{ matrix.dir }}/docs/index.html" "${{ matrix.dir }}" <<'PY'
+          import sys
+          path, pkg = sys.argv[1], sys.argv[2]
+          s = open(path, encoding="utf-8").read()
+          anchor = "<h1>Welcome to the documentation page </h1>"
+          link = ('<p>API documentation of the package <code>%s</code> of <a href="../../">Leanamics</a>; '
+                  'see also its <a href="../blueprint/">blueprint</a> and '
+                  '<a href="../../#cite">how to cite Leanamics</a>.</p>' % pkg)
+          if anchor in s:
+              open(path, "w", encoding="utf-8").write(s.replace(anchor, anchor + link, 1))
+          else:
+              print("::warning::doc-gen4 index.html changed; no link back to the site added")
+          PY
           du -sh "$GITHUB_WORKSPACE/site/${{ matrix.dir }}"
 
       - name: Upload this project's slice of the site

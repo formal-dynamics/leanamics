@@ -32,6 +32,8 @@ and indicator projections give the probability for every color in a finite palet
 | Section 2.4, any sampling kernel: duality with two coalescing tokens; Theorem 2.4 (tail form) | `pairWalk`, `iterate_disagreement_le_pairWalk`, `iterate_disagreement_le_of_meeting` |
 | Section 2.4, Fact 2.3 and Lemma 2.4 for lazy walks: meeting within `51 n³` steps w.p. `≥ 1/2` | `hitting_add_hitting_le`, `lazyNeighbor`, `lazy_meeting_le_half`, `lazy_meeting_le_pow` |
 | Theorem 2.5 (Survey Thm 8), lazy voter: consensus within `255 n³ log n` rounds w.p. `≥ 1 - 1/n` on every connected graph | `lazy_voter_consensus_whp` |
+| Section 2.4, Lemma 2.4 for plain walks on connected nonbipartite graphs, via the bipartite double cover: meeting within `16 n³` steps w.p. `≥ 1/2` | `doubleCover`, `doubleCover_connected`, `plainPotential`, `plainPotential_drift`, `plain_apart_mul_le`, `plain_meeting_le_half`, `plain_apart_le_pow` |
+| Theorem 2.5 (Survey Thm 8 with the nonbipartiteness hypothesis), plain voter: consensus within `80 n³ log n` rounds w.p. `≥ 1 - 1/n` on every connected nonbipartite graph | `plain_disagreement_le`, `plain_voter_consensus_whp` |
 | BGKM16 Section 2: volume, conductance `φ`, minority side, potential `Ψ = √vol(s_t)` (VOT-5) | `vol`, `conductance`, `discordant`, `minority`, `potential`, `dynamicLazy` |
 | BGKM16 Lemma 2.1 (corrected: sum over the minority side): `𝔼Ψ' ≤ Ψ - ∑_{u∈s_t} λ_u d_u / (32 Ψ³)` (VOT-5) | `potential_drift`, `potential_drift_conductance` |
 | BGKM16 Lemma 2.2 and Theorem 1.1 (i), two opinions: consensus within `128 m / (d_min φ)` rounds w.p. `≥ 1/2`, expected time `≤ 2·` that, dynamic graphs with fixed degrees (VOT-5) | `lazy_consensus_of_minority`, `lazy_consensus_conductance`, `lazy_expected_consensus_time`, `dynamic_consensus_conductance` |
@@ -93,9 +95,17 @@ sampling kernel and the `O(n³ log n)` consensus time of the lazy voter dynamics
 keeps its colour with probability `1/2`, otherwise copies a uniform neighbour). Hitting times
 are solutions of the Laplacian system (`MeetingHitting.lean`), and the meeting time follows
 Kanade, Mallmann-Trenn, Sauerwald's comparison of synchronous and sequential walks
-(`MeetingDrift.lean`). Hassin–Peleg's plain walk on nonbipartite graphs is covered only
-conditionally on a meeting bound (`iterate_disagreement_le_of_meeting`); see
-[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
+(`MeetingDrift.lean`). For Hassin–Peleg's own setting, the plain voter (copy a uniformly
+random neighbour) on connected nonbipartite graphs, `Plain*.lean` follows their Lemma 2.4:
+a synchronous step of two tokens on `G` is two successive moves on the bipartite double cover
+`G̃` (`PlainCover.lean`), along which the Coppersmith–Tetali–Winkler potential of `G̃` drops
+by exactly `4` per step (`PlainMeeting.lean`); hence meeting within `16 n³` steps w.p.
+`≥ 1/2`, and consensus within `80 n³ log n` rounds w.p. `≥ 1 - 1/n`
+(`plain_voter_consensus_whp`, `PlainConsensus.lean`). The proof of Lemma 2.4 needs a minor
+correction (the diameter of `G̃` can exceed `n`; it does not affect our route); see
+[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md) §4. The plain-walk statements
+were pinned by a Claude agent and reviewed by a second agent before any proof; the proofs were
+started by a Grok agent and completed by a Claude agent under the fixed-statement protocol.
 
 `ConductanceSq*.lean` (VOT-5, BGKM16 Theorem 1.1 (ii)) proves the alternative bound
 `O(n log n / φ²)`: the corrected Lemma 2.1 and Cauchy–Schwarz give a multiplicative drift of the
@@ -106,3 +116,7 @@ reviewed against the paper by a second agent before any proof; the proofs are by
 under the fixed-statement protocol, with the axiom audit in `Audit.lean`.
 
 Future work: dynamic networks and extremal coalition results.
+
+## How to cite
+
+See [How to cite](../README.md#how-to-cite) in the main README.

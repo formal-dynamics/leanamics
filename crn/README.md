@@ -52,3 +52,7 @@ python3 ../scripts/check_axioms.py
 ```
 
 This package uses the sibling `dynamics/` package's Lean 4.32.0 toolchain and exact Mathlib pin.
+
+## How to cite
+
+See [How to cite](../README.md#how-to-cite) in the main README.

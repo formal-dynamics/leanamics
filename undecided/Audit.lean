@@ -16,6 +16,12 @@ import Undecided
 #print axioms Undecided.Plurality.foldl_two
 #print axioms Undecided.Plurality.plurality_explicit
 #print axioms Undecided.Plurality.plurality_whp
+#print axioms Undecided.Plurality.ratioLam_le_card
+#print axioms Undecided.Plurality.first_round
+#print axioms Undecided.Plurality.descent
+#print axioms Undecided.Plurality.plateau
+#print axioms Undecided.Plurality.lower_bound_whp
+#print axioms Undecided.Plurality.lower_bound_consensus
 #print axioms Undecided.Sequential.consensus_whp
 #print axioms Undecided.Sequential.majority_whp
 #print axioms Undecided.Sequential.approximate_majority

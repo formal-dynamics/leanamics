@@ -109,3 +109,7 @@ lake exe cache get
 lake build
 python3 ../scripts/check_axioms.py   # audits the theorems listed in Audit.lean
 ```
+
+## How to cite
+
+See [How to cite](../README.md#how-to-cite) in the main README.

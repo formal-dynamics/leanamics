@@ -60,3 +60,7 @@ Mathlib's `Finset.expect`. Where the statements deviate from their sources, see
 through compatibility declarations: `ThreeMajority.avg` is a reducible alias of `avg`.
 All concentration and tail bounds of `median/`, `plurality/` and `3-majority/` live in
 `Concentration`, `Chernoff` and `Tail`; the packages no longer keep local copies.
+
+## How to cite
+
+See [How to cite](../README.md#how-to-cite) in the main README.
