@@ -28,7 +28,7 @@ variable {V : Type*} [Fintype V] [DecidableEq V]
 A uniformly random element of this finite product type is exactly the paper's sampling: for
 every vertex, `k` neighbours chosen uniformly at random with replacement, independently across
 vertices (and, through `Dynamics.expList`, across rounds). -/
-abbrev Choices (G : SimpleGraph V) (k : ℕ) : Type _ := (x : V) → Fin k → G.neighborSet x
+def Choices (G : SimpleGraph V) (k : ℕ) : Type _ := (x : V) → Fin k → G.neighborSet x
 
 /-- Rounds of neighbour choices form a finite type, so `Dynamics.expList` can average over them. -/
 instance instFintypeChoices (G : SimpleGraph V) [DecidableRel G.Adj] (k : ℕ) :

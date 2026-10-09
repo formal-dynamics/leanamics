@@ -19,7 +19,7 @@ The spectral core of Lemma 1 is `‖P 1_A‖² ≤ λ² |A| + (1 - λ²) |A|² /
 -/
 
 namespace Epidemics
-open Finset Matrix
+open Finset
 
 variable {V : Type*} [Fintype V] [DecidableEq V] (G : SimpleGraph V) [DecidableRel G.Adj]
 
@@ -52,6 +52,8 @@ lemma lambdaG_nonneg (d : ℕ) : 0 ≤ lambdaG G d := by
   split_ifs
   · exact (abs_nonneg _).trans (le_max_right _ _)
   · exact le_rfl
+
+open Matrix
 
 /-! ### Copies of the `Median` eigenbasis lemmas
 

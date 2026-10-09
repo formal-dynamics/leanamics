@@ -6,15 +6,14 @@ the dual epidemic process*, PODC 2016, arXiv:1602.05768 (v2, 23 May 2016). The d
 `cobra_bips_duality_singleton`, `cobra_hit_iff_bips_reverse`). This file tracks the cover-time
 part (Theorems 1 to 3) and its lemmas.
 
-Status: **Lemmas 1 to 4 are proved** (`sum_sq_neighbor_le`, `bips_expected_growth`, `bips_mgf_le`,
-`bips_chernoff_lower`, `bips_small_phase`, `bips_large_phase`, `bips_end_phase`), by a generic
-round-driven engine (`round_small_phase`, `round_large_phase`, `round_end_phase`) with growth
-constant `c = 1 - λ` (using `1 - λ ≤ 1 - λ²`). Theorems 1 to 3 are still `sorry`. The spectral
-eigenbasis lemmas in `CobraCoverSpectral.lean` (`sum_eigvec_mul_eigvec`,
-`dotProduct_eq_sum_eigvec`, `eigvec_dotProduct_mulVec`, `dotProduct_mulVec_eq_sum_eigvec`,
-`indVec`, `indVec_dotProduct_self`, `one_dotProduct_indVec`, `transitionMatrix_mulVec_one`,
-`abs_eigenvalues_le_lambdaG`) are copies of `Median.mixing_transition` and its helpers, for a
-later move to `dynamics/`. `Choices` in `Cobra.lean` is an `abbrev` (it was a `def`).
+Status: **all pinned statements are proved** (Lemmas 1 to 4, Theorems 1 to 3, Corollary 1 and
+the duality for branching factor `1 + ρ`). `lake build Epidemics` succeeds without warnings and
+`python3 ../scripts/check_axioms.py` reports only the standard axioms (`propext`,
+`Classical.choice`, `Quot.sound`) for the pinned theorems and the main new lemmas listed in
+`Audit.lean`. Lemmas 1 to 4 and the generic phase engine were proved by a first agent (Grok, run
+interrupted); a second agent (Claude) generalized its BIPS chain, proved Theorems 1 to 3 and
+restored `Choices` in `Cobra.lean` to a `def` (the first agent had made it an `abbrev`; the file
+is now identical to the pin commit).
 The pinned statements were reviewed by a second agent (faithfulness to the paper, quantifier
 order, casts, vacuity, small-`n` edge cases, numerical checks of Lemmas 1 to 4 and of the coin
 model); no statement changes were needed.
@@ -97,6 +96,18 @@ helper lemmas (not pinned): `lambdaG_nonneg`, `source_mem_bipsStep`, `bipsStep_m
    (`cobraCoin_bips_duality`) and the BIPS infection time (`bipsCoin_infection_time`) are pinned
    as intermediate steps ("the proof of Theorem 3 follows from the proof of Theorem 1, by using
    Corollary 1").
+9. **Restarting (equation (1)), proof route.** The paper restarts COBRA after `T` steps "with any
+   of the existing particles". The formal proof restarts from the whole current set `C_s`: the
+   cover bound `P(⋃_{t=1}^{T₀+1} C_t ≠ V) ≤ n ε` holds from every nonempty start set (only
+   `C₁ ≠ ∅` is used), so `P(cov > s + T₀ + 1) ≤ n ε P(cov > s)` and, with `n ε ≤ 1/2`, every tail
+   sum is at most `2 (T₀ + 1)`. For BIPS, the process from a state `A ∋ v` dominates the one from
+   `{v}` (monotonicity, persistent source), so `P(A_{s+T₀} ≠ V) ≤ P(A_s ≠ V)/2`.
+10. **Theorem 3, proof route.** "The proof of Theorem 3 follows from the proof of Theorem 1, by
+   using Corollary 1" is made precise by proving Lemmas 2 to 4, their chaining and the COBRA
+   union bound for an abstract growth rate `c` (`GrowthProcess`), then using
+   `c = min 1 (ρ₀ (1 - max λ₀ 0)) ≤ (p/q)(1 - λ²)` for the coin processes. The MGF bound (12)
+   for the coin processes uses the same independence across vertices, after regrouping a round
+   by vertex.
 
 ## Duplication to move to `dynamics/` later
 
@@ -105,8 +116,55 @@ are copies of the `Median` declarations of the same names (median package,
 `Median/ExpanderDefs.lean`, `Median/ExpanderMixing.lean`); the spectral part of
 `sum_sq_neighbor_le` reuses the eigenbasis argument of `Median.mixing_transition` and of
 `Averaging.mulVec_dotProduct_mulVec_le` (averaging package). The epidemics package depends only on
-`dynamics`, so these are restated here; they should move to `dynamics/` and be shared.
+`dynamics`, so these are restated here; they should move to `dynamics/` and be shared. The
+eigenbasis lemmas in `CobraCoverSpectral.lean` (`sum_eigvec_mul_eigvec`,
+`dotProduct_eq_sum_eigvec`, `eigvec_dotProduct_mulVec`, `dotProduct_mulVec_eq_sum_eigvec`,
+`indVec`, `indVec_dotProduct_self`, `one_dotProduct_indVec`, `transitionMatrix_mulVec_one`,
+`abs_eigenvalues_le_lambdaG`) are copies of `Median.mixing_transition` and its helpers
+(`Median/ExpanderMixing.lean`), renamed into the `Epidemics` namespace.
+
+Inside the package, `avg_pi_prod`/`avg_pi_eval`/`pi_count_mgf_le` (any dependent product) and
+`avg_lower_tail_of_mgf` (any observable) generalize `avg_choices_prod`/`avg_choices_depends`/
+`bips_mgf_le` and `bips_chernoff_lower`; the generic round lemmas (`roundRun`, `round_first_hit`,
+`sum_range_shift_le`, `GrowthProcess`) are candidates for `dynamics/` as well.
+
+## Proof architecture (files, line counts, main lemmas)
+
+| File | Lines | Content |
+| --- | --- | --- |
+| `CobraCoverSpectral.lean` | 400 | pinned definitions, copies of the `Median` eigenbasis lemmas, `sum_sq_neighbor_le` (Lemma 1, (6)–(7)) |
+| `CobraCoverRound.lean` | 202 | one BIPS round: independence over `Choices G k` (`avg_choices_prod`, `avg_choices_depends`), infection probability `1 - (1 - P_u)^k` (`bips_infect_prob`), `E|A'| = ∑_u P(u ∈ A')` |
+| `CobraCoverGrowth.lean` | 291 | Lemma 1 (`bips_expected_growth`), MGF (`bips_mgf_le`), Chernoff lower tail (`bips_chernoff_lower`) |
+| `CobraCoverNumerics.lean` | 437 | real-number estimates of Lemmas 2 to 4 (`log (1 + x) ≤ x - x²/3`, `(1 + c/23)^T ≥ n`, end-phase tail) |
+| `CobraCoverEngine.lean` | 367 | generic round-driven process `roundRun step`, Lemma 2 for any growth rate `c` (`round_small_phase`) |
+| `CobraCoverEngineLarge.lean` | 392 | Lemma 3 for any `c` (`round_large_phase`, stopped step + `Dynamics.expList_escape`) |
+| `CobraCoverEngineEnd.lean` | 466 | Lemma 4 for any `c` (`round_end_phase`: staying above `9n/10`, healthy-vertex recursion) |
+| `CobraCoverSmall.lean`, `CobraCoverLarge.lean` | 71, 144 | pinned Lemmas 2 to 4 (instances of the engine with `c = 1 - λ`) |
+| `CobraCoverChain.lean` | 251 | first-hit chaining (`round_first_hit`), geometric tail sums (`sum_range_shift_le`) |
+| `CobraCoverSchedule.lean` | 268 | phase lengths: `T₁ + T₂ + T₃ ≤ 60000 log n/c³` under `c ≥ 128 √(log n/n)` (`phase_schedule`) |
+| `CobraCoverPhases.lean` | 317 | `GrowthProcess step src c` (hypotheses (H1)–(H5)), `avg_lower_tail_of_mgf`, the three phases chained (`GrowthProcess.fail_le`: failure `≤ 3/n³` after `60000 log n/c³` rounds), restarting (`GrowthProcess.tail_sum_le_log`: tail sums `≤ 130000 log n/c³`) |
+| `CobraCoverUnion.lean` | 277 | from BIPS to COBRA for any dual pair: union bound and first-round split (`cover_fail_le`, `cover_fail_le_log`: `≤ 3/n²` after `60002 log n/c³` rounds), restarting COBRA from `C_s` (`cover_tail_sum_le`, `cover_tail_sum_le_log`) |
+| `CobraCoverBips.lean` | 57 | BIPS is a `GrowthProcess` with `c = 1 - λ` (`bips_growthProcess`), `growth_of_rate_le` |
+| `CobraCover.lean` | 127 | pinned Theorems 1 and 2 (`C₀ = 128`) |
+| `CobraCoverIndep.lean` | 95 | independence over a dependent pi type (`avg_pi_prod`, `avg_pi_eval`), MGF of a count of independent events (`pi_count_mgf_le`) |
+| `CobraCoverTargets.lean` | 167 | COBRA/BIPS with target sets `tg ρ x` (`tgtCobraStep`, `tgtBipsStep`): pathwise duality and Theorem 4 (`tgt_duality`), MGF and expected size for independent targets |
+| `CobraCoverCoin.lean` | 197 | the coin round regrouped by vertex (`coinEquiv`, `coinTgt`), infection probability `(1 + ρ) P - ρ P²` (`coin_hit_prob`), Corollary 1 (`coin_expected_growth`), rate and `N` of Theorem 3 (`coin_rate`, `exists_gap_N`) |
+| `CobraCoverBranching.lean` | 208 | pinned coin definitions, `cobraCoin_bips_duality`, Corollary 1, `bipsCoin_growthProcess`, Theorem 3 |
+
+Main idea of the second part: everything after Lemma 1 only uses (H1)–(H5), so the chain of
+Lemmas 2 to 4 (`GrowthProcess.fail_le`) and the COBRA union bound/restart (`cover_*`) are proved
+once for an abstract process and instantiated twice: BIPS with `c = 1 - λ` (Theorems 1 and 2) and
+BIPS with branching factor `1 + p/q` with `c = min 1 (ρ₀ (1 - max λ₀ 0))` (Theorem 3). The coin
+processes are target-set processes by definition (`cobraCoinStep p = tgtCobraStep (coinTargets
+p)`), so their duality is `tgt_duality`; their independence across vertices goes through the
+equivalence `coinEquiv : Choices G 2 × (V → Fin q) ≃ (u : V) → (Fin 2 → N(u)) × Fin q`.
+
+Constants obtained: Theorem 2: `C₀ = 128`, `C = 60000` (probability; the proof gives `3/n³`) and
+`C = 130000` (expectation). Theorem 1: `C₀ = 128`, `C = 60002` (probability; the proof gives
+`3/n²`) and `C = 130000` (expectation). Theorem 3 and `bipsCoin_infection_time`: with
+`c = min 1 (ρ₀ (1 - max λ₀ 0))`, `C = 60000/c³`, `60002/c³`, `130000/c³` and
+`N = ⌈(32768/c²)²⌉₊ + 2` (so that `128 √(log n/n) ≤ c` for `n ≥ N`).
 
 ## Remaining
 
-All pinned theorems (proofs `sorry`).
+Nothing: no `sorry` in `epidemics/`. Current errors: none.

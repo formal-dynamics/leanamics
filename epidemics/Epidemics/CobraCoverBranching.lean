@@ -1,4 +1,5 @@
 import Epidemics.CobraCover
+import Epidemics.CobraCoverCoin
 
 /-! # COBRA with branching factor `1 + ρ` (EPI-4, Corollary 1 and Theorem 3)
 
@@ -67,8 +68,8 @@ theorem cobraCoin_bips_duality (p : ℕ) (v : V) (C : Finset V) (t : ℕ) :
     expList (CoinChoices G q) t
         (fun l => if ∀ s ≤ t, v ∉ cobraCoinRun p C (l.take s) then (1 : ℝ) else 0) =
       expList (CoinChoices G q) t
-        (fun l => if C ∩ bipsCoinRun p v {v} l = ∅ then (1 : ℝ) else 0) := by
-  sorry
+        (fun l => if C ∩ bipsCoinRun p v {v} l = ∅ then (1 : ℝ) else 0) :=
+  tgt_duality (tg := coinTargets p) v C t
 
 /-- **Corollary 1** (Section 3). On an `r`-regular graph (`r > 0`), for `0 ≤ ρ = p/q ≤ 1`, one
 round of BIPS with branching factor `1 + ρ` from the infected set `A` gives
@@ -77,8 +78,35 @@ theorem bipsCoin_expected_growth {r : ℕ} (hreg : G.IsRegularOfDegree r) (hr : 
     (hq : 0 < q) (hpq : p ≤ q) (v : V) (A : Finset V) :
     (A.card : ℝ) *
         (1 + (p : ℝ) / q * (1 - lambdaG G r ^ 2) * (1 - A.card / Fintype.card V)) ≤
-      avg (fun ρ : CoinChoices G q => ((bipsCoinStep p v A ρ).card : ℝ)) := by
-  sorry
+      avg (fun ρ : CoinChoices G q => ((bipsCoinStep p v A ρ).card : ℝ)) :=
+  coin_expected_growth hreg hr hq hpq v A
+
+/-- BIPS with branching factor `1 + p/q` and source `w` is a growth process (`GrowthProcess`)
+with every rate `c ≤ (p/q)(1 - λ²)`: source, moment generating function (`tgtBips_mgf_le`),
+Corollary 1, monotonicity, `V` absorbing. -/
+theorem bipsCoin_growthProcess {r : ℕ} (hreg : G.IsRegularOfDegree r) (hr : 0 < r)
+    (hq : 0 < q) (hpq : p ≤ q) (w : V) {c : ℝ}
+    (hc : c ≤ (p : ℝ) / q * (1 - lambdaG G r ^ 2)) :
+    GrowthProcess (bipsCoinStep p w : Finset V → CoinChoices G q → Finset V) w c where
+  src_mem A ρ := src_mem_tgtBipsStep (tg := coinTargets p) w A ρ
+  mgf A ψ := tgtBips_mgf_le (tg := coinTargets p) (coinEquiv G q) (fun _ a => coinTgt p a)
+    (fun _ _ => rfl) w A ψ
+  growth A := growth_of_rate_le hc A (bipsCoin_expected_growth hreg hr hq hpq w A)
+  mono _ _ ρ h := tgtBipsStep_mono (tg := coinTargets p) w h ρ
+  univ_eq ρ := tgtBipsStep_univ (tg := coinTargets p)
+    (fun ρ u => coinTgt_nonempty p (coinEquiv G q ρ u)) w ρ
+
+omit [Fintype V] [DecidableRel G.Adj] in
+lemma coinTargets_nonempty (ρ : CoinChoices G q) (u : V) : (coinTargets p ρ u).Nonempty :=
+  coinTgt_nonempty p (coinEquiv G q ρ u)
+
+omit [DecidableRel G.Adj] in
+/-- `ρ₀ ≤ p/q` with `ρ₀ > 0` forces `q > 0`. -/
+lemma pos_of_rho {ρ₀ : ℝ} (hρ₀ : 0 < ρ₀) (h : ρ₀ ≤ (p : ℝ) / q) : 0 < q := by
+  rcases Nat.eq_zero_or_pos q with h0 | h0
+  · rw [h0, Nat.cast_zero, div_zero] at h
+    linarith
+  · exact h0
 
 /-- **Theorem 2 for branching factor `1 + ρ`** (the BIPS half of Theorem 3, "the proof of
 Theorem 3 follows from the proof of Theorem 1, by using Corollary 1"). For constants
@@ -94,7 +122,23 @@ theorem bipsCoin_infection_time (lam₀ ρ₀ : ℝ) (hlam₀ : lam₀ < 1) (hρ
       expList (CoinChoices G q) T
           (fun l => if bipsCoinRun p v {v} l = univ then (0 : ℝ) else 1) ≤
         C / (Fintype.card V : ℝ) ^ 3 := by
-  sorry
+  obtain ⟨c, hc0, hc1, hcle⟩ := coin_rate hlam₀ hρ₀
+  obtain ⟨N, -, hN⟩ := exists_gap_N hc0
+  refine ⟨60000 / c ^ 3, N, ?_⟩
+  intro V _ _ G _ r p q hreg hr hpq hρ hlam hNV v T hT
+  haveI : Nonempty V := ⟨v⟩
+  have hq := pos_of_rho hρ₀ hρ
+  haveI : Nonempty (Fin q) := ⟨⟨0, hq⟩⟩
+  haveI := choices_nonempty_of_regular hreg hr (k := 2)
+  have hP := bipsCoin_growthProcess hreg hr hq hpq v
+    (hcle _ _ hρ (lambdaG_nonneg G r) hlam)
+  have hT' : 60000 * Real.log (Fintype.card V) / c ^ 3 ≤ T := by
+    rw [mul_div_right_comm]
+    exact hT
+  refine (hP.fail_le hc1 (two_le_card_of_pos_regular hreg hr) (hN _ hNV) hT').trans ?_
+  gcongr
+  rw [le_div_iff₀ (by positivity)]
+  nlinarith [pow_le_one₀ hc0.le hc1 (n := 3)]
 
 /-- **Theorem 3** (Section 1), probability bound. For constants `λ₀ < 1` and `ρ₀ > 0` there are
 `C` and `N` such that on every `r`-regular graph (`r > 0`) with `n ≥ N` vertices and `λ ≤ λ₀`,
@@ -110,7 +154,26 @@ theorem cobra_cover_time_branching (lam₀ ρ₀ : ℝ) (hlam₀ : lam₀ < 1) (
           (fun l => if (Icc 1 T).biUnion (fun s => cobraCoinRun p {u} (l.take s)) = univ
             then (0 : ℝ) else 1) ≤
         C / (Fintype.card V : ℝ) ^ 2 := by
-  sorry
+  obtain ⟨c, hc0, hc1, hcle⟩ := coin_rate hlam₀ hρ₀
+  obtain ⟨N, -, hN⟩ := exists_gap_N hc0
+  refine ⟨60002 / c ^ 3, N, ?_⟩
+  intro V _ _ G _ r p q hreg hr hpq hρ hlam hNV u T hT
+  haveI : Nonempty V := ⟨u⟩
+  have hq := pos_of_rho hρ₀ hρ
+  haveI : Nonempty (Fin q) := ⟨⟨0, hq⟩⟩
+  haveI := choices_nonempty_of_regular hreg hr (k := 2)
+  have hT' : 60002 * Real.log (Fintype.card V) / c ^ 3 ≤ T := by
+    rw [mul_div_right_comm]
+    exact hT
+  refine (cover_fail_le_log (cobraCoinStep p : Finset V → CoinChoices G q → Finset V)
+    (fun w => bipsCoinStep p w) (fun w C t => cobraCoin_bips_duality p w C t)
+    (fun D ρ hD => tgtCobraStep_nonempty (tg := coinTargets p) coinTargets_nonempty hD ρ)
+    (fun w => bipsCoin_growthProcess hreg hr hq hpq w
+      (hcle _ _ hρ (lambdaG_nonneg G r) hlam))
+    hc1 (two_le_card_of_pos_regular hreg hr) (hN _ hNV) (singleton_nonempty u) hT').trans ?_
+  gcongr
+  rw [le_div_iff₀ (by positivity)]
+  nlinarith [pow_le_one₀ hc0.le hc1 (n := 3)]
 
 /-- **Theorem 3** (Section 1), expectation bound: under the same hypotheses, every partial tail
 sum `∑_{s < H} P(cov(u) > s)` of the cover time of COBRA with branching factor `1 + ρ` is at most
@@ -126,6 +189,20 @@ theorem cobra_cover_time_branching_expectation (lam₀ ρ₀ : ℝ) (hlam₀ : l
             (fun l => if (Icc 1 s).biUnion (fun t => cobraCoinRun p {u} (l.take t)) = univ
               then (0 : ℝ) else 1) ≤
         C * Real.log (Fintype.card V) := by
-  sorry
+  obtain ⟨c, hc0, hc1, hcle⟩ := coin_rate hlam₀ hρ₀
+  obtain ⟨N, -, hN⟩ := exists_gap_N hc0
+  refine ⟨130000 / c ^ 3, N, ?_⟩
+  intro V _ _ G _ r p q hreg hr hpq hρ hlam hNV u H
+  haveI : Nonempty V := ⟨u⟩
+  have hq := pos_of_rho hρ₀ hρ
+  haveI : Nonempty (Fin q) := ⟨⟨0, hq⟩⟩
+  haveI := choices_nonempty_of_regular hreg hr (k := 2)
+  rw [← mul_div_right_comm]
+  exact cover_tail_sum_le_log (cobraCoinStep p : Finset V → CoinChoices G q → Finset V)
+    (fun w => bipsCoinStep p w) (fun w C t => cobraCoin_bips_duality p w C t)
+    (fun D ρ hD => tgtCobraStep_nonempty (tg := coinTargets p) coinTargets_nonempty hD ρ)
+    (fun w => bipsCoin_growthProcess hreg hr hq hpq w
+      (hcle _ _ hρ (lambdaG_nonneg G r) hlam))
+    hc1 (two_le_card_of_pos_regular hreg hr) (hN _ hNV) (singleton_nonempty u) H
 
 end Epidemics

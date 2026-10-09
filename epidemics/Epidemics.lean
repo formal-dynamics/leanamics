@@ -11,6 +11,14 @@ import Epidemics.CobraCoverEngineLarge
 import Epidemics.CobraCoverEngineEnd
 import Epidemics.CobraCoverSmall
 import Epidemics.CobraCoverLarge
+import Epidemics.CobraCoverChain
+import Epidemics.CobraCoverSchedule
+import Epidemics.CobraCoverPhases
+import Epidemics.CobraCoverUnion
+import Epidemics.CobraCoverBips
+import Epidemics.CobraCoverIndep
+import Epidemics.CobraCoverTargets
+import Epidemics.CobraCoverCoin
 import Epidemics.CobraCover
 import Epidemics.CobraCoverBranching
 import Epidemics.ReedFrost

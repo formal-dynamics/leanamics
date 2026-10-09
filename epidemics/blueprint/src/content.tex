@@ -27,7 +27,11 @@ shrinking regimes and the total spreading time $\log_{1+\gamma}n+\frac1\rho\ln n
 exponential tails. Lemma~20 of that paper needs a major correction; we prove corrected versions.
 
 We also formalize the duality between the coalescing-branching random walk (COBRA) and the BIPS
-epidemic of Cooper, Radzik and Rivera (Theorem~4), pathwise and by time reversal of i.i.d.\ rounds.
+epidemic of Cooper, Radzik and Rivera (Theorem~4), pathwise and by time reversal of i.i.d.\ rounds,
+and their bounds on the COBRA cover time on regular expanders: $O(\log n/(1-\lambda)^3)$ when
+$1-\lambda\ge C_0\sqrt{\log n/n}$ (Theorems~1 and~2), and $O(\log n)$ with branching factor
+$1+\rho$ for constant $\lambda<1$ and $\rho>0$ (Theorem~3), with high probability and in
+expectation.
 \end{abstract}
 
 \section{The model}\label{sec:kkt-live-edge}
@@ -680,3 +684,100 @@ Lemma~\ref{lem:pathwise} identifies the two events after reversing the rounds, a
 Lemma~\ref{lem:reverse} says that reversing the rounds preserves their law. The paper proves the
 theorem instead by induction on $t$ with one-step conditioning.
 \end{proof}
+
+\section{COBRA cover time on expanders}\label{sec:crr-cover}
+Here $G$ is $r$-regular with $r>0$ on $n$ vertices, $P=A(G)/r$, $\lambda=\max(\lambda_2,|\lambda_n|)$,
+$k\ge2$, and $d_A(x)=|N(x)\cap A|$. Expectations of unbounded times $\tau$ are written as tail
+sums: every partial sum $\sum_{s<H}\Pr(\tau>s)$ is bounded uniformly in $H$.
+
+\begin{definition}[Second eigenvalue]\label{def:lambda}
+\lean{Epidemics.transitionMatrix,Epidemics.walkEigenvalues,Epidemics.lambdaG}\leanok
+$\lambda=\max(\lambda_2,|\lambda_n|)$ for the sorted eigenvalues of $P$ ($0$ if $n<2$).
+\end{definition}
+
+\begin{lemma}[Spectral core of Lemma~1]\label{lem:crr-spectral}
+\lean{Epidemics.sum_sq_neighbor_le}\leanok\uses{def:lambda}
+For every set $A$: $\sum_x (d_A(x)/r)^2\le\lambda^2|A|+(1-\lambda^2)|A|^2/n$.
+\end{lemma}
+\begin{proof}\leanok
+$\sum_x(d_A(x)/r)^2=\|P1_A\|^2$; expand $1_A$ in an orthonormal eigenbasis of $P$: the top
+eigenvector is constant with coefficient $|A|/\sqrt n$, and every other eigenvalue has square
+at most $\lambda^2$. If $\lambda\ge1$, use $d_A(x)\le r$ and $\sum_x d_A(x)=r|A|$.
+\end{proof}
+
+\begin{lemma}[Lemma~1, MGF and Chernoff bound]\label{lem:crr-growth}
+\lean{Epidemics.bips_expected_growth,Epidemics.bips_mgf_le,Epidemics.bips_chernoff_lower}\leanok\uses{lem:crr-spectral,def:cobra}
+One BIPS round from $A$ gives $\E|A'|\ge|A|(1+(1-\lambda^2)(1-|A|/n))$,
+$\E e^{-\varphi|A'|}\le\exp(-(1-e^{-\varphi})\E|A'|)$ for every real $\varphi$, and
+$\Pr(|A'|\le(1-\delta)\mu)\le e^{-\delta^2\mu/2}$ for $\mu\le\E|A'|$, $0<\delta<1$.
+\end{lemma}
+\begin{proof}\leanok
+Vertices are infected independently; $u\ne v$ with probability $1-(1-d_A(u)/r)^k\ge
+2d_A(u)/r-(d_A(u)/r)^2$. Sum and apply Lemma~\ref{lem:crr-spectral}. The MGF factors over the
+vertices and $1-x\le e^{-x}$; the Chernoff bound is Markov's inequality with
+$\varphi=-\log(1-\delta)$.
+\end{proof}
+
+\begin{theorem}[Lemmas~2 to~4, for an abstract growth process]\label{thm:crr-phases}
+\lean{Epidemics.GrowthProcess,Epidemics.round_small_phase,Epidemics.round_large_phase,Epidemics.round_end_phase,Epidemics.bips_small_phase,Epidemics.bips_large_phase,Epidemics.bips_end_phase}\leanok\uses{lem:crr-growth}
+Let a round-driven set process have a persistent source, the MGF bound of
+Lemma~\ref{lem:crr-growth}, growth $\E|A'|\ge|A|(1+c(1-|A|/n))$ with $0<c\le1$, be monotone, and
+have $V$ absorbing. From $\{v\}$ the size exceeds $m\le n/2$ within $13m/c+24C\log n/c^2$ rounds
+except with probability $n^{-C}$; from $|A_0|\ge4000\log n/c^2$ it reaches $9n/10$ within
+$T\ge24\log n/c$ rounds except with probability $T n^{-5}$; from $|A_0|\ge9n/10$ (if
+$4000\log n/c^2\le 9n/10$) it covers $V$ after $T\ge8\log n/c$ rounds except with probability
+$n^{-5}$. BIPS satisfies the hypotheses with $c=1-\lambda$.
+\end{theorem}
+\begin{proof}\leanok
+Lemma~2: the exponential supermartingale $e^{-\varphi|A_t|}$ on the event of staying small,
+$\varphi=\log(1+c/2)$. Lemma~3: a round with $|A'|<|A|(1+c/23)$ has probability $\le n^{-5}$;
+union bound over rounds with moving targets. Lemma~4: staying above $9n/10$ and the recursion
+$\E B_{t+1}\le\theta\E B_t+tn^{-7}$ for the number $B_t$ of healthy vertices. The paper's
+Lemmas~3 and~4 need minor corrections ($\log_2$ versus $\ln$ doublings; a missing factor $B_0$).
+\end{proof}
+
+\begin{theorem}[Theorem~2]\label{thm:crr-bips}
+\lean{Epidemics.round_first_hit,Epidemics.GrowthProcess.fail_le,Epidemics.GrowthProcess.tail_sum_le_log,Epidemics.bips_growthProcess,Epidemics.bips_infection_time,Epidemics.bips_infection_time_expectation}\leanok\uses{thm:crr-phases}
+If $1-\lambda\ge128\sqrt{\log n/n}$, BIPS from $\{v\}$ has $A_T\ne V$ with probability at most
+$3/n^3$ for $T\ge60000\log n/(1-\lambda)^3$, and $\sum_{s<H}\Pr(A_s\ne V)\le
+130000\log n/(1-\lambda)^3$.
+\end{theorem}
+\begin{proof}\leanok
+Chain the three phases at their first hitting times with $m=\ceil{4000\log n/(1-\lambda)^2}$ and
+$C=3$. For the expectation, restart from the current set: monotonicity and the persistent source
+give $\Pr(A_{s+T_0}\ne V)\le\Pr(A_s\ne V)/2$.
+\end{proof}
+
+\begin{theorem}[Theorem~1]\label{thm:crr-cobra}
+\lean{Epidemics.cover_fail_le_log,Epidemics.cover_tail_sum_le_log,Epidemics.cobra_cover_time,Epidemics.cobra_cover_time_expectation}\leanok\uses{thm:crr-bips,thm:duality}
+If $1-\lambda\ge128\sqrt{\log n/n}$, COBRA from $\{u\}$ has $\bigcup_{t=1}^T C_t\ne V$ with
+probability at most $3/n^2$ for $T\ge60002\log n/(1-\lambda)^3$, and every partial tail sum of
+the cover time is at most $130000\log n/(1-\lambda)^3$.
+\end{theorem}
+\begin{proof}\leanok
+Union bound over the missed vertex $w$. Splitting off the first round, missing $w$ at the times
+$1,\dots,T$ is not hitting $w$ within $T-1$ rounds from $C_1\ne\emptyset$, which by
+Theorem~\ref{thm:duality} has probability $\Pr(C_1\cap A_{T-1}=\emptyset)\le\Pr(A_{T-1}\ne V)$.
+For the expectation, restart COBRA from the nonempty set $C_s$ (equation~(1)).
+\end{proof}
+
+\begin{definition}[Branching factor $1+p/q$]\label{def:coin}
+\lean{Epidemics.CoinChoices,Epidemics.coinTargets,Epidemics.cobraCoinStep,Epidemics.cobraCoinRun,Epidemics.bipsCoinStep,Epidemics.bipsCoinRun}\leanok\uses{def:choices}
+A round gives every vertex two neighbour samples and a uniform coin in $\{0,\dots,q-1\}$; a vertex
+uses its second sample iff its coin is $<p$. COBRA pushes to the used samples, BIPS contacts them.
+\end{definition}
+
+\begin{theorem}[Theorem~4, Corollary~1 and Theorem~3]\label{thm:crr-coin}
+\lean{Epidemics.tgt_duality,Epidemics.cobraCoin_bips_duality,Epidemics.coin_hit_prob,Epidemics.bipsCoin_expected_growth,Epidemics.bipsCoin_growthProcess,Epidemics.bipsCoin_infection_time,Epidemics.cobra_cover_time_branching,Epidemics.cobra_cover_time_branching_expectation}\leanok\uses{def:coin,thm:crr-bips,thm:crr-cobra}
+The duality holds for the coin processes; with $\rho=p/q$,
+$\E|A'|\ge|A|(1+\rho(1-\lambda^2)(1-|A|/n))$; and for constants $\lambda_0<1$, $\rho_0>0$ there
+are $C,N$ such that for $n\ge N$, $\lambda\le\lambda_0$ and $\rho\in[\rho_0,1]$ the COBRA cover time
+with branching factor $1+\rho$ is at most $C\log n$ with probability $1-C/n^2$ and in expectation.
+\end{theorem}
+\begin{proof}\leanok
+Both coin processes are target-set processes, whose duality is proved as Theorem~4. A vertex
+$u\ne v$ is infected with probability $(1+\rho)P_u-\rho P_u^2$, $P_u=d_A(u)/r$; sum and apply
+Lemma~\ref{lem:crr-spectral}. Then Theorems~\ref{thm:crr-phases} to~\ref{thm:crr-cobra} apply
+with $c=\min(1,\rho_0(1-\max(\lambda_0,0)))$, and $128\sqrt{\log n/n}\le c$ for $n$ large.
+\end{proof}
+

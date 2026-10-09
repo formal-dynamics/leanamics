@@ -18,6 +18,8 @@ independently, so an average of a product of one-vertex observables factors. -/
 lemma avg_choices_prod {k : ℕ} (f : (u : V) → (Fin k → G.neighborSet u) → ℝ) :
     avg (fun ρ : Choices G k => ∏ u, f u (ρ u)) = ∏ u, avg (f u) := by
   unfold avg
+  change (∑ ρ : (u : V) → Fin k → G.neighborSet u, ∏ u, f u (ρ u)) /
+      (Fintype.card ((u : V) → Fin k → G.neighborSet u) : ℝ) = _
   rw [← Fintype.prod_sum, Fintype.card_pi, Nat.cast_prod, ← Finset.prod_div_distrib]
 
 /-- **Independence over the `k` samples** of one vertex. -/

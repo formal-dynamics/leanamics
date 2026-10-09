@@ -1,5 +1,6 @@
 import Epidemics.CobraCoverSmall
 import Epidemics.CobraCoverLarge
+import Epidemics.CobraCoverBips
 
 /-! # The BIPS infection time and the COBRA cover time on expanders (EPI-4, Theorems 1 and 2)
 
@@ -43,7 +44,15 @@ theorem bips_infection_time :
       ∀ (v : V) (T : ℕ), C * Real.log (Fintype.card V) / (1 - lambdaG G r) ^ 3 ≤ T →
       expList (Choices G k) T (fun l => if bipsRun v {v} l = univ then (0 : ℝ) else 1) ≤
         C / (Fintype.card V : ℝ) ^ 3 := by
-  sorry
+  refine ⟨128, 60000, ?_⟩
+  intro V _ _ G _ r k hreg hr hk hgap v T hT
+  haveI : Nonempty V := ⟨v⟩
+  haveI := choices_nonempty_of_regular hreg hr (k := k)
+  obtain ⟨hlam, hc1⟩ := lambdaG_lt_one_of_gap hreg hr hgap
+  refine ((bips_growthProcess hreg hr hk hlam v).fail_le hc1
+    (two_le_card_of_pos_regular hreg hr) hgap hT).trans ?_
+  gcongr
+  norm_num
 
 /-- **Theorem 2** (Section 1), expectation bound `Infec(G) = O(log n/(1 - λ)³)`: under the same
 hypotheses, every partial tail sum `∑_{s < H} P(infec(v) > s) = ∑_{s < H} P(A_s ≠ V)` (that is,
@@ -56,7 +65,13 @@ theorem bips_infection_time_expectation :
       ∑ s ∈ range H,
           expList (Choices G k) s (fun l => if bipsRun v {v} l = univ then (0 : ℝ) else 1) ≤
         C * Real.log (Fintype.card V) / (1 - lambdaG G r) ^ 3 := by
-  sorry
+  refine ⟨128, 130000, ?_⟩
+  intro V _ _ G _ r k hreg hr hk hgap v H
+  haveI : Nonempty V := ⟨v⟩
+  haveI := choices_nonempty_of_regular hreg hr (k := k)
+  obtain ⟨hlam, hc1⟩ := lambdaG_lt_one_of_gap hreg hr hgap
+  exact (bips_growthProcess hreg hr hk hlam v).tail_sum_le_log hc1
+    (two_le_card_of_pos_regular hreg hr) hgap H
 
 /-- **Theorem 1** (Section 1), probability bound. There are constants `C₀, C` such that for every
 `r`-regular graph (`r > 0`) on `n` vertices with `1 - λ ≥ C₀ √(log n / n)`, every `k ≥ 2`, every
@@ -72,7 +87,18 @@ theorem cobra_cover_time :
           (fun l => if (Icc 1 T).biUnion (fun s => cobraRun {u} (l.take s)) = univ
             then (0 : ℝ) else 1) ≤
         C / (Fintype.card V : ℝ) ^ 2 := by
-  sorry
+  refine ⟨128, 60002, ?_⟩
+  intro V _ _ G _ r k hreg hr hk hgap u T hT
+  haveI : Nonempty V := ⟨u⟩
+  haveI := choices_nonempty_of_regular hreg hr (k := k)
+  obtain ⟨hlam, hc1⟩ := lambdaG_lt_one_of_gap hreg hr hgap
+  refine (cover_fail_le_log (cobraStep : Finset V → Choices G k → Finset V)
+    (fun w => bipsStep w) (fun w C t => cobra_bips_duality w C t)
+    (fun D ρ hD => cobraStep_nonempty (by omega) hD ρ)
+    (fun w => bips_growthProcess hreg hr hk hlam w) hc1 (two_le_card_of_pos_regular hreg hr)
+    hgap (singleton_nonempty u) hT).trans ?_
+  gcongr
+  norm_num
 
 /-- **Theorem 1** (Section 1), expectation bound `COV(G) = max_u E cov(u) = O(log n/(1 - λ)³)`:
 under the same hypotheses, every partial tail sum
@@ -87,6 +113,15 @@ theorem cobra_cover_time_expectation :
             (fun l => if (Icc 1 s).biUnion (fun t => cobraRun {u} (l.take t)) = univ
               then (0 : ℝ) else 1) ≤
         C * Real.log (Fintype.card V) / (1 - lambdaG G r) ^ 3 := by
-  sorry
+  refine ⟨128, 130000, ?_⟩
+  intro V _ _ G _ r k hreg hr hk hgap u H
+  haveI : Nonempty V := ⟨u⟩
+  haveI := choices_nonempty_of_regular hreg hr (k := k)
+  obtain ⟨hlam, hc1⟩ := lambdaG_lt_one_of_gap hreg hr hgap
+  exact cover_tail_sum_le_log (cobraStep : Finset V → Choices G k → Finset V)
+    (fun w => bipsStep w) (fun w C t => cobra_bips_duality w C t)
+    (fun D ρ hD => cobraStep_nonempty (by omega) hD ρ)
+    (fun w => bips_growthProcess hreg hr hk hlam w) hc1 (two_le_card_of_pos_regular hreg hr)
+    hgap (singleton_nonempty u) H
 
 end Epidemics

@@ -455,13 +455,17 @@ Lemma 1, Theorem 1, Theorem 2 in Discussion item 3).
     `dynamics/`; their move to the core is tracked in issue #42. Monotonicity and the
     expectation form of `prob` are the core's.
 
-## COBRA ⇔ BIPS duality (`Cobra*`, EPI-4)
+## COBRA ⇔ BIPS duality and the COBRA cover time (`Cobra*`, EPI-4)
 
 Source: C. Cooper, T. Radzik, N. Rivera, *The coalescing-branching random walk on expanders and
 the dual epidemic process*, PODC 2016, arXiv:1602.05768: Theorem 4 (Section 2) and its case
 `C = {u}`, equation (2) (Section 1). The paper's Theorem 4: for a connected regular graph and
 `k ≥ 1`, `P̂(Hit_C(v) > t | C₀ = C) = P(C ∩ A_t = ∅ | A₀ = v)` for all `v`, `C ⊆ V`, `t ≥ 0`.
-The cover-time bounds (Theorems 1 to 3) are not formalized.
+The cover-time part (Theorems 1 to 3, Lemmas 1 to 4, Corollary 1) is formalized in
+`CobraCover*.lean`; its differences are listed after the duality items.
+
+### Duality (Theorem 4)
+
 
 1. **Hypotheses dropped (statement strengthened).** The paper assumes `G` connected and regular
    and `k ≥ 1`. `cobra_bips_duality`, `cobra_bips_duality_singleton` and the pathwise lemma hold
@@ -495,3 +499,70 @@ The cover-time bounds (Theorems 1 to 3) are not formalized.
    `k`-sample version of the core's `NeighborRound G` (`Dynamics.GraphRounds`, one uniform
    neighbour per vertex); it is equivalent to `k` independent such rounds (`Fin k → NeighborRound
    G`, after swapping the arguments) but is kept in `epidemics/` with the statements as written.
+
+### Cover time (Theorems 1 to 3, Lemmas 1 to 4, Corollary 1)
+
+Notation: `G` is `r`-regular with `r > 0`, `n = |V|`, `λ = lambdaG G r`, BIPS with source `v` runs
+along i.i.d. uniform rounds, probabilities are `Dynamics.expList` averages of indicators.
+
+1. **Hypotheses dropped.** The paper assumes `G` connected and, in Theorems 1 and 2 and Lemmas 1
+   to 4, `k = 2`. All statements hold for every `k ≥ 2` (Lemma 1 only needs
+   `1 - (1 - p)^k ≥ 1 - (1 - p)²`, and Lemmas 2 to 4 only use Lemma 1, independence across
+   vertices and monotonicity). Connectivity follows from `λ < 1` (resp. from
+   `1 - λ ≥ C₀ √(log n/n) > 0`) and is not assumed. Lemma 1, its spectral core
+   (`sum_sq_neighbor_le`) and the one-round bounds hold for every regular graph and every infected
+   set.
+2. **`λ`.** The paper's `λ = max_{i ≥ 2} |λᵢ|` is written `max {λ₂, |λₙ|}` (equal since
+   `λₙ ≤ λ₂`), as in `Median.lambdaG`; on graphs with fewer than two vertices it is `0`.
+3. **Asymptotic notation.** "`1 - λ ≫ √(log n/n)`" is the paper's footnote form
+   `1 - λ ≥ C₀ √(log n/n)` with `∃ C₀` (the proofs use `C₀ = 128`); "`O(T)` w.h.p." is `∃ C`, with
+   failure probability `≤ C n^{-3}` (Theorem 2) or `≤ C n^{-2}` (Theorem 1, as derived in the
+   paper's proof) for every number of rounds `≥ C T`. The proofs give `C = 60000` (Theorem 2,
+   failure `3/n³`), `C = 60002` (Theorem 1, failure `3/n²`) and `C = 130000` for both expectation
+   bounds. For Theorem 3 (constant `λ`, `ρ`) the constants depend on bounds `λ₀ < 1`, `ρ₀ > 0` and
+   the statements hold for `n ≥ N` (`∃ N`); with `c = min 1 (ρ₀ (1 - max λ₀ 0))` the proofs give
+   `C = 60000/c³`, `60002/c³`, `130000/c³` and `N = ⌈(32768/c²)²⌉₊ + 2`.
+4. **Expectations.** `COV(u) = E cov(u)` and `INF(v) = E infec(v)` are expectations of unbounded
+   times, not available in the finite layer. They are written through the tail sums
+   `E τ = ∑_{s ≥ 0} P(τ > s)`: every partial sum `∑_{s < H} P(τ > s) = E min(τ, H)` is bounded by
+   `C T`, uniformly in `H`. For BIPS, `infec(v) > s` iff `A_s ≠ V` since `V` is absorbing.
+5. **Cover time.** `cov(u) = min {T : ⋃_{t=1}^T C_t = V}` uses the times `1, …, T` (the paper's
+   definition, so the start vertex must be revisited); the paper's proof uses
+   `cov(u) = max_v Hit_u(v)`, which counts time `0`. The statements follow the definition
+   (slightly stronger); the extra step for the start vertex is one application of the duality from
+   the first round's image.
+6. **Explicit constants in the lemmas.** Lemma 2 is stated with the paper's explicit `T` and the
+   exact bound `n^{-C}` (the proof gives it; the paper writes `1 - O(n^{-C})`). Lemma 3: the
+   paper's `23 log n/(1 - λ)` rounds come from "the infection doubles every `23/(1 - λ)` rounds",
+   which gives `log₂ n` doublings, not `ln n` (needs a minor correction); the formal version uses
+   `24 log n/(1 - λ)` rounds, enough since `(1 + (1 - λ)/23)^T ≥ e^{T(1 - λ)/24}`, and keeps the
+   union bound `T n^{-5}` instead of `n^{-4}`. Lemma 4: the paper's display (24) drops a factor
+   `B₀ ≤ n/10` (`E B_T ≤ θ^T + …` should be `θ^T n/10 + …`) and switches from
+   `T = 5 log n/log(1/θ)` to `6 log n/log(1/θ)` (minor corrections); with `6` the proof gives
+   `n^{-5} + O(T² n^{-7})`, and with `T ≤ n` this is at most `n^{-5}`, the paper's statement. The
+   paper's "`1 - λ ≫ √(log n/n)`" in Lemma 4 is the explicit condition
+   `4000 log n/(1 - λ)² ≤ 9n/10` used in its proof.
+7. **Proof of Theorem 2.** The paper applies Lemma 2 with `m = 4000 log n/(1 - λ²)`; Lemma 3
+   needs `|A| ≥ 4000 log n/(1 - λ)²`, so `m` should be `4000 log n/(1 - λ)²` (minor correction;
+   this gives the `(1 - λ)^{-3}` of the theorem). The phases are chained at their first hitting
+   times (`round_first_hit`) with `m = ⌈4000 log n/(1 - λ)²⌉₊`, `C = 3` in Lemma 2.
+8. **Branching factor `1 + ρ` (Theorem 3).** The paper's coin of bias `ρ` is a uniform coin in
+   `Fin q` compared with `p`, so `ρ = p/q` is rational: the finite uniform-round layer has no
+   biased coins with irrational bias. Theorem 3 is stated for all `ρ = p/q ∈ [ρ₀, 1]`, which
+   covers every constant `ρ ∈ (0, 1]` from below by rationals. The duality for these processes
+   (`cobraCoin_bips_duality`) and the BIPS infection time (`bipsCoin_infection_time`) are stated
+   as intermediate steps.
+9. **Restarting (equation (1)), proof route.** The paper restarts COBRA after `T` steps "with any
+   of the existing particles". The formal proof restarts from the whole current set `C_s`: the
+   cover bound holds from every nonempty start set, so `P(cov > s + T₀ + 1) ≤ P(cov > s)/2` and
+   every tail sum is at most `2 (T₀ + 1)`. For BIPS, the process from a state `A ∋ v` dominates
+   the one from `{v}`, so `P(A_{s+T₀} ≠ V) ≤ P(A_s ≠ V)/2`.
+10. **Theorem 3, proof route.** "The proof of Theorem 3 follows from the proof of Theorem 1, by
+   using Corollary 1" is made precise by proving Lemmas 2 to 4, their chaining and the COBRA
+   union bound once for an abstract growth rate `c` (`GrowthProcess`, `cover_fail_le_log`), then
+   using `c = min 1 (ρ₀ (1 - max λ₀ 0)) ≤ (p/q)(1 - λ²)` for the coin processes. Both coin
+   processes are instances of COBRA/BIPS with target sets (`tgtCobraStep`, `tgtBipsStep`), whose
+   duality is proved like Theorem 4.
+11. **Copies.** `transitionMatrix`, `walkEigenvalues`, `lambdaG` and the eigenbasis lemmas of
+   `CobraCoverSpectral.lean` are copies of the `Median` declarations of the same names (the
+   epidemics package depends only on `dynamics`).
