@@ -23,3 +23,30 @@ div.corollary_thmcontent {
 div.proof_content {
 	border-left: .08rem solid grey;
 }
+
+/* Navigation bar back to the Leanamics pages; it stays visible while scrolling,
+ * since links to the website often point to a section in the middle of the page. */
+nav.lnm-nav {
+	position: sticky;
+	top: 0;
+	z-index: 100;
+	background: #fff;
+	border-bottom: 1px solid #ddd;
+	padding: .4rem 0;
+	margin-bottom: 1rem;
+	font-size: .9rem;
+	display: flex;
+	flex-wrap: wrap;
+	gap: .2rem 1rem;
+	justify-content: space-between;
+	/* Covers the strip above the bar while scrolling. */
+	box-shadow: 0 -1.5rem 0 0 #fff;
+}
+nav.lnm-nav a { text-decoration: none; }
+nav.lnm-nav a:hover { text-decoration: underline; }
+/* Keep anchored headings and statements clear of the sticky bar. */
+[id] { scroll-margin-top: 4.5rem; }
+@media (max-width: 700px) {
+	nav.lnm-nav .lnm-nav-links { display: none; }
+	[id] { scroll-margin-top: 3rem; }
+}
