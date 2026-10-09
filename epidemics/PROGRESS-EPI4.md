@@ -6,7 +6,15 @@ the dual epidemic process*, PODC 2016, arXiv:1602.05768 (v2, 23 May 2016). The d
 `cobra_bips_duality_singleton`, `cobra_hit_iff_bips_reverse`). This file tracks the cover-time
 part (Theorems 1 to 3) and its lemmas.
 
-Status: **statements pinned** (all proofs are `sorry`), see `PINNED.txt` at the repository root.
+Status: **Lemmas 1 to 4 are proved** (`sum_sq_neighbor_le`, `bips_expected_growth`, `bips_mgf_le`,
+`bips_chernoff_lower`, `bips_small_phase`, `bips_large_phase`, `bips_end_phase`), by a generic
+round-driven engine (`round_small_phase`, `round_large_phase`, `round_end_phase`) with growth
+constant `c = 1 - λ` (using `1 - λ ≤ 1 - λ²`). Theorems 1 to 3 are still `sorry`. The spectral
+eigenbasis lemmas in `CobraCoverSpectral.lean` (`sum_eigvec_mul_eigvec`,
+`dotProduct_eq_sum_eigvec`, `eigvec_dotProduct_mulVec`, `dotProduct_mulVec_eq_sum_eigvec`,
+`indVec`, `indVec_dotProduct_self`, `one_dotProduct_indVec`, `transitionMatrix_mulVec_one`,
+`abs_eigenvalues_le_lambdaG`) are copies of `Median.mixing_transition` and its helpers, for a
+later move to `dynamics/`. `Choices` in `Cobra.lean` is an `abbrev` (it was a `def`).
 The pinned statements were reviewed by a second agent (faithfulness to the paper, quantifier
 order, casts, vacuity, small-`n` edge cases, numerical checks of Lemmas 1 to 4 and of the coin
 model); no statement changes were needed.

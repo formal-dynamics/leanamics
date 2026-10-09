@@ -3,7 +3,12 @@ import Epidemics.CobraDuality
 import Epidemics.CobraLemmas
 import Epidemics.CobraReverse
 import Epidemics.CobraCoverSpectral
+import Epidemics.CobraCoverRound
 import Epidemics.CobraCoverGrowth
+import Epidemics.CobraCoverNumerics
+import Epidemics.CobraCoverEngine
+import Epidemics.CobraCoverEngineLarge
+import Epidemics.CobraCoverEngineEnd
 import Epidemics.CobraCoverSmall
 import Epidemics.CobraCoverLarge
 import Epidemics.CobraCover

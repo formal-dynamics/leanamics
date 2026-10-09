@@ -1,4 +1,5 @@
 import Epidemics.CobraCoverGrowth
+import Epidemics.CobraCoverEngine
 
 /-! # BIPS from a single source: the small-set phase (EPI-4, Lemma 2)
 
@@ -30,6 +31,41 @@ theorem bips_small_phase {r : ℕ} (hreg : G.IsRegularOfDegree r) (hr : 0 < r) (
     expList (Choices G k) T
         (fun l => if ∀ s ≤ T, (bipsRun v {v} (l.take s)).card ≤ m then (1 : ℝ) else 0) ≤
       (Fintype.card V : ℝ) ^ (-C) := by
-  sorry
+  classical
+  haveI : Nonempty (Choices G k) := choices_nonempty_of_regular hreg hr
+  have hc0 : 0 < 1 - lambdaG G r := by linarith
+  have hc1 : 1 - lambdaG G r ≤ 1 := by linarith [lambdaG_nonneg G r]
+  have hgrowth (A : Finset V) :
+      (A.card : ℝ) * (1 + (1 - lambdaG G r) * (1 - (A.card : ℝ) / ↑(Fintype.card V))) ≤
+        avg (fun ρ : Choices G k => ((bipsStep v A ρ).card : ℝ)) := by
+    have hlam0 : 0 ≤ lambdaG G r := lambdaG_nonneg G r
+    have hsq : lambdaG G r ^ 2 ≤ lambdaG G r := by
+      simpa using pow_le_pow_of_le_one hlam0 (le_of_lt hlam) (by omega : 1 ≤ 2)
+    haveI : Nonempty V := ⟨v⟩
+    have hdiv : (A.card : ℝ) / ↑(Fintype.card V) ≤ 1 := by
+      rw [div_le_one (by exact_mod_cast Fintype.card_pos)]
+      exact_mod_cast Finset.card_le_univ A
+    have hfrac : 0 ≤ 1 - (A.card : ℝ) / ↑(Fintype.card V) := by linarith
+    have hcoef : (1 - lambdaG G r) * (1 - (A.card : ℝ) / ↑(Fintype.card V)) ≤
+        (1 - lambdaG G r ^ 2) * (1 - (A.card : ℝ) / ↑(Fintype.card V)) :=
+      mul_le_mul_of_nonneg_right (by linarith) hfrac
+    calc (A.card : ℝ) * (1 + (1 - lambdaG G r) * (1 - (A.card : ℝ) / ↑(Fintype.card V)))
+        ≤ (A.card : ℝ) * (1 + (1 - lambdaG G r ^ 2) * (1 - (A.card : ℝ) / ↑(Fintype.card V))) :=
+          mul_le_mul_of_nonneg_left (by linarith) (by exact_mod_cast Nat.zero_le A.card)
+      _ ≤ avg (fun ρ : Choices G k => ((bipsStep v A ρ).card : ℝ)) := by
+          simpa using bips_expected_growth hreg hr hk v A
+  have hphase :=
+    round_small_phase (bipsStep v) v (fun A ρ => source_mem_bipsStep v A ρ)
+      (fun A ψ => bips_mgf_le v A ψ) hc0 hc1 hgrowth hm C hT
+  rw [smallProb] at hphase
+  have heq :
+      expList (Choices G k) T
+          (fun l => if ∀ s ≤ T, (bipsRun v {v} (l.take s)).card ≤ m then (1 : ℝ) else 0) =
+        expList (Choices G k) T (fun l =>
+          if ∀ s ≤ T, (roundRun (bipsStep v) {v} (l.take s)).card ≤ m then (1 : ℝ) else 0) := by
+    refine congrArg (expList (Choices G k) T) (funext fun l => ?_)
+    refine if_congr ?_ rfl rfl
+    simp [bipsRun, roundRun]
+  exact (heq.trans_le hphase)
 
 end Epidemics
