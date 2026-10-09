@@ -42,7 +42,8 @@ consensus from any start, even a balanced one ([details]({{ '/plurality/blueprin
 Every round, each node adopts the median of its own value and two random values; with two values
 this is 2-Choices. Formalized: consensus within $O(\log n)$ rounds from any configuration and
 almost stable consensus against an adaptive adversary ([Doerr et al., SPAA 2011]({{ '/median/blueprint/' | relative_url }}#sec:dgmss-median));
-two-sample voting on expanders ([Cooper, Elsässer and Radzik, ICALP 2014]({{ '/median/blueprint/' | relative_url }}#sec:cer-two-choices));
+two-sample voting on expanders ([Cooper, Elsässer and Radzik, ICALP 2014]({{ '/median/blueprint/' | relative_url }}#sec:cer-two-choices)), also from a
+small initial imbalance on any regular graph ([details]({{ '/median/blueprint/' | relative_url }}#sec:cer-small-imbalance));
 and, for 2-Choices with any number of colours, plurality consensus ([Elsässer et al.]({{ '/median/blueprint/' | relative_url }}#sec:efkmt-plurality))
 and an $\Omega(n/\log n)$ lower bound ([Berenbrink et al., PODC 2017]({{ '/median/blueprint/' | relative_url }}#sec:bcekmn-lower)).
 
