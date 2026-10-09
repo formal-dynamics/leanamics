@@ -8,21 +8,27 @@ The paper writes `Λ(c) = R(c)² / md(c)` (Section 2.1).
 
 ## Status
 
-Phase 1 (pinning) done: statements below, `lake build Undecided` succeeds with only
-`declaration uses 'sorry'` warnings. The two forms of Theorem 8 (`lower_bound_whp`,
-`lower_bound_consensus`) are **already proved** from the pinned Lemmas 3, 6 and 7 (file
-`Undecided/LowerBound.lean`), so the remaining work is exactly the six `sorry`s:
+All six pinned statements are proved. `lake build Undecided` succeeds with no warnings, and
+`python3 ../scripts/check_axioms.py` reports only `propext`, `Classical.choice`, and `Quot.sound`.
+The two forms of Theorem 8 (`lower_bound_whp`, `lower_bound_consensus`) are proved from Lemmas 3, 6
+and 7 (file `Undecided/LowerBound.lean`).
 
 | declaration | file | status |
 | --- | --- | --- |
-| `first_round` (Lemma 3) | `LowerBoundFirst.lean` | sorry |
-| `undecided_square` ((16)) | `LowerBoundDescent.lean` | sorry |
-| `undecided_not_below` ((17)) | `LowerBoundDescent.lean` | sorry |
-| `descent` (Lemma 6) | `LowerBoundDescent.lean` | sorry |
-| `plateau_step` (proof of Lemma 7) | `LowerBoundPlateau.lean` | sorry |
-| `plateau` (Lemma 7) | `LowerBoundPlateau.lean` | sorry |
+| `first_round` (Lemma 3) | `LowerBoundFirst.lean` | proved (`C = 100`) |
+| `undecided_square` ((16)) | `LowerBoundDescent.lean` | proved (`C = 8`) |
+| `undecided_not_below` ((17)) | `LowerBoundDescent.lean` | proved (`C = 8`, independent of `γ`) |
+| `descent` (Lemma 6) | `LowerBoundDescent.lean` | proved (witness `γ = 24`, `C = 1000000`; envelope in `LowerBoundDescentCore.lean`) |
+| `plateau_step` (proof of Lemma 7) | `LowerBoundPlateau.lean` | proved (`C = 16 γ²`) |
+| `plateau` (Lemma 7) | `LowerBoundPlateau.lean` | proved (`C = C_step + 14 γ²`) |
 | `lower_bound_whp`, `lower_bound_consensus` (Thm 8) | `LowerBound.lean` | proved from the above |
 | `ratioR`, `ratioLam` and their basic facts | `LowerBoundBasic.lean` | proved |
+
+Helper files (no pinned statements): `LowerBoundArith.lean` (range and exponential inequalities),
+`LowerBoundRound.lean` (one-round deterministic cores `first_of_good`, `square_of_good`,
+`not_below_of_good`, and `miss_round_le`), `LowerBoundDescentCore.lean` (`descentGrowth`,
+`descent_step_of_good`, `descentGrowth_phaseA`, `descentGrowth_phaseB`, `envelope_le`). No `sorry`
+remains.
 
 ## The pinned statements in words
 
@@ -141,10 +147,11 @@ Not an error, but a change of form: Lemma 6 is stated with a deterministic round
 at every round before it, which the per-round form `lower_bound_whp` of Theorem 8 needs (the
 paper's composition is sufficient for the convergence time, by absorption).
 
-## Plan for the proofs
+## How the proofs are organised
 
-See the prover's task file (kept outside the repository). In short: every one-round statement
-follows from the good event `Good ℓ m y z` of `PluralityRound.lean` with `ℓ = 3 log n`
-(`round_le`, `bad_le`: a bad round has probability `(k + 4)/n³`), by a deterministic lemma on a
-good round; multi-round statements use `Dynamics.expList_escape` with moving targets and
-`miss_comp` (`PluralityStages.lean`).
+Every one-round statement follows from the good event `Good ℓ m y z` of `PluralityRound.lean`
+with `ℓ = 3 log n` (`round_le`, `bad_le`: a bad round has probability `(k + 4)/n³`), by a
+deterministic lemma on a good round. `plateau` and `descent` use `Dynamics.expList_escape` with
+moving targets. In `descent` the colour envelope is the recursion `descentGrowth` (phase A at most
+`8n/D`, phase B at most `γ n/D` with `γ = 24`), and the undecided count tracks
+`max((1 - 1/Λ)^{2^s}, 4γ²/D)` until that quantity hits the window `4γ²/D`.

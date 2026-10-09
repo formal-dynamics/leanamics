@@ -143,7 +143,19 @@ hold `m` after `⌈C · md(x) · log n⌉` rounds with probability at least `1 -
 7. **`md`** is defined with `c₁ = maxCount x = maxᵢ cᵢ`; for a configuration without any colour
    `md = 0` (Lean's `x / 0 = 0`), which does not matter for the theorem.
 8. **Finite probability**: probabilities are `expList` expectations over i.i.d. uniform rounds.
-9. **Not covered**: Theorem 8 (the `Ω(md(c))` lower bound) and Section 4 (expanders).
+9. **Lower bound (Theorem 8).** `lower_bound_whp` and `lower_bound_consensus`
+   (`Undecided/LowerBound.lean`) give the `Ω(md(c))` lower bound: for `k` in the range
+   `C k ≤ (n / log n)^{1/6}` and an initial configuration without undecided nodes, every colour
+   stays at most `C n/md(x)` for the next `md(x)/C` rounds with probability at least `1 - C/n`,
+   and the probability of a monochromatic configuration within that window is at most `C/n`.
+   They are proved from `first_round` (Lemma 3, `C = 100`), `descent` (Lemma 6, witnesses
+   `γ = 24` and `C = 1000000`) and `plateau` (Lemma 7). The one-round steps are
+   `undecided_square` and `undecided_not_below` (`C = 8`, the latter independent of `γ`) and
+   `plateau_step` (`C = 16 γ²`). The deviations from the source (the factor `2γ² n/md` in place
+   of `2γ²/md`, bounds on `maxCount` rather than the plurality alone, growth
+   `1 + (4γ² + 2γ + 1)/D`, the hypothesis `γ ≥ 1`, and a deterministic descent round at which
+   the colour bound holds at every earlier round) are listed in `PROGRESS-UND3.md`. Section 4
+   (expanders) is not covered.
 
 ### Differences in the proofs
 
