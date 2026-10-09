@@ -335,3 +335,261 @@ namespace `Crn.ApproxMajority`).
   minority with high probability although the majority is `n − Θ(log n)`) and Theorem 7 (two
   cliques joined by an edge, expected exponential convergence time), with Lemmas 7 to 11.
 * Directed interaction graphs and Observation 1.
+
+## Deterministic exact majority and plurality (`ExactMajority*`, CRN-5)
+
+Source: L. Gąsieniec, D. Hamilton, R. Martin, P. G. Spirakis, G. Stachowiak, *Deterministic
+population protocols for exact majority and plurality*, OPODIS 2016, LIPIcs 70, paper 14,
+doi:10.4230/LIPIcs.OPODIS.2016.14 [GHMSS16]. No longer version with more detailed proofs was
+found; the conference version is the reference.
+
+### The statements
+
+| File | Content |
+| --- | --- |
+| `Crn/ExactMajorityOutput.lean` | stable computation with outputs in any type, and marking (`StablyMarks`) |
+| `Crn/ExactMajorityStatic.lean` | Section 2: the static protocol `P₁`, Lemmas 1 and 2, Theorem 3 |
+| `Crn/ExactMajorityDynamic.lean` | Section 3: the dynamic protocol `P₂`, its invariants, Lemmas 4 and 5, stabilization |
+| `Crn/ExactMajorityCompose.lean` | the composition step: `P₂` driven by another protocol (`Protocol.drive`) |
+| `Crn/ExactMajorityAbsolute.lean` | Section 4: Absolute-Majority, Theorem 6 |
+| `Crn/ExactMajorityRelative.lean` | Section 5.1: Relative-Majority, Theorem 7 |
+
+Notation: colours are `k`-bit labels `L : Fin k → Bool` (`Label k`), bits read as `±1`
+(`bitSign`); `x : Label k → ℕ` is the input count vector; the scheduler is fair, in the
+reachability form of `StableBasic.lean` (CRN-3). `StablyMarks P O g`: for every nonempty population,
+from every configuration reachable from the initial one, a configuration is reachable from which
+every agent `v` forever outputs `O(state) = g x (ι v)` (`ι v` its input); `StablyComputesWith P O f`
+is the case `g x _ = f x`.
+
+**Outputs** (`ExactMajorityOutput`).
+
+* `Protocol.OutputStableAt`, `Protocol.StablyMarks`, `Protocol.StablyComputesWith`: stable
+  computation with outputs in any type `Y`, read through a map `O : Q → Y`, and possibly depending
+  on the agent's own input.
+* `stablyComputesWith_output_iff`: with the protocol's own `Bool` output, `StablyComputesWith` is
+  CRN-3's `StablyComputes`.
+
+**The static protocol, [GHMSS16, Section 2]** (`ExactMajorityStatic`).
+
+* `StaticState`, `StaticState.δ`, `staticMajority`: the 6-state protocol `P₁` (Figs. 1 and 2),
+  `card_staticState`.
+* `StaticState.weight_sum_eq` (Lemma 1): the weight sum equals the colour sum along every
+  execution.
+* `StaticState.absWeight_sum_step_le`, `StaticState.exists_reaches_absWeight_sum_eq` (Lemma 2):
+  `R = ∑ |w|` does not increase, and `R = |∑ colours|` is reachable.
+* **`staticMajority_stablyComputes`** (Theorem 3): `P₁` stably computes `sign(#1 − #(−1))`, with
+  output `0` for a tie.
+
+**The dynamic protocol, [GHMSS16, Section 3]** (`ExactMajorityDynamic`).
+
+* `DynState`, `DynState.δ`, `DynState.recolour`, `dynamicMajority`: the 8-state protocol `P₂`
+  (Figs. 3 and 4) and the state change forced by a colour change, `card_dynState`.
+* `Protocol.GStep`, `Protocol.GReaches`: steps between agents of the same group (for Section 5).
+* `DynInv`: per group, the colour sum equals the weight sum (Invariant 1); `|w − c| ≤ 1`
+  (Invariant 2); every group contains a strong state (a third invariant, see the corrections).
+  `DynInv.input`: the initial configuration `[c_a]` satisfies it.
+* `DynInv.gstep`, `DynInv.recolour` (Lemma 4): interactions inside groups and colour changes with
+  `recolour` preserve `DynInv`.
+* `DynState.absWeight_sum_gstep_le`, `DynState.exists_greaches_noOpposite` (Lemma 5): `R` does not
+  increase, and a configuration without opposite weights in a group is reachable.
+* `DynInv.exists_stable` (the conclusion of Section 3): from `DynInv`, a configuration is reachable
+  from which every agent forever outputs the sign of its group's colour sum.
+* **`dynamicMajority_stabilizes`**: after any finite interleaving of interactions and colour
+  changes (`DynExtStep`), `P₂` stabilizes on the sign of the final colour sum;
+  `dynamicMajority_stablyComputes`: without the external force, `P₂` stably computes
+  `sign(#1 − #(−1))`.
+
+**Composition, [GHMSS16, Sections 4 and 5]** (`ExactMajorityCompose`).
+
+* `Protocol.drive D col grp`: `P₂` driven by a protocol `D` through colours `col : Q → SignType`,
+  inside groups `grp`, with the recolouring in the same encounter.
+* `Protocol.drive_dynInv` (Lemma 4 for the composition): along every execution of `D.drive`,
+  `DynInv` holds for the derived colours.
+* **`Protocol.drive_stablyMarks`**: if `D` stably marks the agents with their eventual colours,
+  `D.drive` stably marks them with the sign of their group's eventual colour sum.
+
+**Absolute majority, [GHMSS16, Section 4]** (`ExactMajorityAbsolute`).
+
+* `bitsProtocol`, `majBit`, `bitsProtocol_stablyMarks`: `k` copies of `P₁` on the bits stably
+  compute the `k` majority bits (memory (1) and (2) of Section 4).
+* `absColour`, `absoluteMajority`, `absOutput` (Algorithm Absolute-Majority, Section 4.1) and the
+  specification `IsAbsMajority`, `absMajority`, `absTarget`; `absMajority_eq_some_iff`:
+  `absMajority x = some L ↔ 2·x_L > n`.
+* `absTarget_sum_sign_eq_one_iff`, `majBit_eq_of_isAbsMajority`: the combinatorial part of the
+  proof of Theorem 6.
+* **`absoluteMajority_stablyComputes`** (Theorem 6): all agents eventually and forever output
+  `some L` (`L` held by more than half of the agents) or `none` if there is no such colour.
+* `card_absState` (Theorem 6, space): `2^k · 6^k · 8 ≤ 2^(4k+3)` states.
+
+**Relative majority (plurality), [GHMSS16, Section 5.1]** (`ExactMajorityRelative`).
+
+* `RelState`, `RelState.label`, `RelState.won`, `stageColour`, `relativeMajorityLevel`,
+  `relativeMajority`: Algorithm Relative-Majority as `k` nested `drive`s.
+* `IsGroupWinner`, `IsPlurality`, `duelColour`, `wins`, `bitAt`, `prefixMask`: the specification
+  (the most frequent colour, ties to the lexicographically largest label).
+* `duel_wins_iff` (one stage of the proof of Theorem 7): the stage-`i` duel selects the winner of
+  the prefix group; `isGroupWinner_zero_iff`: the winner of the whole population is the plurality
+  colour.
+* `relativeMajority_level_stablyMarks` (the induction of the proof of Theorem 7): level `m ≤ k`
+  stably marks each agent with whether it wins its group of prefix length `k − m`.
+* **`relativeMajority_stablyMarks`** (Theorem 7, as formalized): eventually and forever, every
+  agent outputs whether its own colour is the plurality colour. The agents learn whether they hold
+  the winning colour, not the winner's label (difference 6 below).
+* `card_relState_level`, `card_relState` (Theorem 7, space): `2^k · 8^k = 2^(4k)` states.
+
+| [GHMSS16] | Lean |
+| --- | --- |
+| Section 1, model (stable computation, outputs) | `Protocol.StablyMarks`, `Protocol.StablyComputesWith`, `stablyComputesWith_output_iff` |
+| Section 2, Figs. 1 and 2 | `StaticState`, `StaticState.δ`, `staticMajority` |
+| Lemma 1 | `StaticState.weight_sum_eq` |
+| Lemma 2 | `StaticState.absWeight_sum_step_le`, `StaticState.exists_reaches_absWeight_sum_eq` |
+| Theorem 3 | `staticMajority_stablyComputes` |
+| Section 3, Figs. 3 and 4 | `DynState`, `DynState.δ`, `DynState.recolour`, `dynamicMajority` |
+| Section 3, invariants 1 and 2 | `DynInv`, `DynInv.input` |
+| Lemma 4 | `DynInv.gstep`, `DynInv.recolour`, `Protocol.drive_dynInv` |
+| Lemma 5 | `DynState.absWeight_sum_gstep_le`, `DynState.exists_greaches_noOpposite` |
+| Section 3, after Lemma 5 | `DynInv.exists_stable`, `dynamicMajority_stabilizes`, `dynamicMajority_stablyComputes` |
+| Sections 4 and 5, composition | `Protocol.drive`, `Protocol.drive_stablyMarks` |
+| Section 4.1, Algorithm Absolute-Majority | `bitsProtocol`, `absColour`, `absoluteMajority`, `absOutput` |
+| Theorem 6 | `absoluteMajority_stablyComputes`, `card_absState` |
+| Section 5.1, Algorithm Relative-Majority | `RelState`, `stageColour`, `relativeMajorityLevel`, `relativeMajority` |
+| Theorem 7 | `duel_wins_iff`, `relativeMajority_level_stablyMarks`, `relativeMajority_stablyMarks`, `card_relState` |
+
+### Differences in the statements
+
+1. **Outputs.** CRN-3's `StablyComputes` has `Bool` outputs, read through the protocol's `output`
+   field. Theorem 3 outputs a sign, Theorem 6 a colour or none, and the protocol of Theorem 7
+   *marks* the agents (each agent learns whether its own colour wins). `StablyMarks` reads the
+   outputs through a separate map and allows targets depending on the agent's input; for the
+   `Bool` output it is `StablyComputes` (`stablyComputesWith_output_iff`). The transitions and
+   reachability are CRN-3's.
+2. **Colours.** The `C ≤ 2^k` colours are the `k`-bit labels (`Label k`); a population with fewer
+   colours leaves some labels unused (count `0`). The paper's `±1` reading of bits is `bitSign`.
+3. **Dynamic inputs.** The external force of Section 3 is modelled without changing the protocol
+   framework: since the interaction table of `P₂` does not read the colours, the colours are a
+   separate assignment `col` linked to the states by the invariants (`DynInv`); a colour change is a
+   separate step (`DynExtStep`), and `dynamicMajority_stabilizes` covers every finite interleaving
+   of interactions and changes. In the compositions the force is internal: the colour is a
+   function of the driver's state, and the recolouring happens in the encounter that changes it
+   (`Protocol.drive`), as the paper assumes that a colour does not change during an interaction of
+   `P₂`. The hypothesis `0 < n` of `dynamicMajority_stabilizes` is not used (the statement is
+   trivial for the empty population).
+4. **Absolute-Majority.** The colour of an agent for `P₂` is `1` iff every copy `P₁(i)` currently
+   reports the agent's own bit `l[i]` (the paper: "the contents of `s[i]` and `l[i]` reflect the
+   initial setting"); a reported tie (`0`) counts as inconsistent. The output is `some L*` (the
+   reported majority bits) if `P₂` reports `1`, and `none` otherwise; a colour held by exactly half
+   of the agents is not an absolute majority (`P₂` then reports a tie).
+5. **Relative-Majority.** The colours `c[i]` are derived from the label and the states of the
+   stages `> i` instead of being stored, so that a change propagates to all lower stages within the
+   same encounter (Stabilisation Stage 2). This saves the `k` bits of `c`: `2^k · 8^k = 2^(4k)`
+   states. The protocol is the `k`-fold iteration of `Protocol.drive` (level `m` holds the stages
+   `k − 1, …, k − m`), so that the proof of Theorem 7 is an induction on levels, each step being the
+   composition theorem plus the duel lemma. Stage `k − 1` uses `P₂` with constant colours (the paper
+   writes `P₁(k − 1)` in Stabilisation Stage 1 and `P₂(k − 1)` in the proof; both work). Ties are
+   broken in favour of the lexicographically largest label, bit `0` first and `−1 < 1`: this is the
+   paper's own specification (Section 5: "the colour with the latest in the lexicographical order
+   label") and what its protocol does (Stabilisation Stage 2: on a tie the agents with `c[i] = 1`
+   win); only the reading of `l[0]` as the most significant bit is implicit in the paper.
+6. **What Theorem 7 delivers.** Theorem 7 is formalized in the sense of Section 5: the protocol of
+   Section 5.1 *marks* the agents of the winning colour, i.e. eventually and forever every agent
+   outputs whether its own colour is the winner (the most frequent colour, the lexicographically
+   largest among several). It is not plurality consensus in the sense of all agents outputting the
+   winner's label: Section 1.2's "all nodes learn about the most frequent colour with the largest
+   label" needs an additional dissemination layer, which the paper does not give and which is not
+   formalized. Section 1.2's "all most frequent colours eventually become aware of their dominance"
+   is not what Section 5.1 does either: among several most frequent colours only the
+   lexicographically largest is marked, the others lose a tie at some stage.
+7. **Space.** The paper claims `O(k)` bits; the formal bounds are exact state counts:
+   `2^k · 6^k · 8 ≤ 2^(4k+3)` (Absolute-Majority, `card_absState`) and `2^(4k)`
+   (Relative-Majority, `card_relState`).
+
+### Corrections to the source
+
+* **Fig. 4 needs a minor correction.** The prose rules of Section 3 are formalized. The table of
+  Fig. 4 differs from them in five entries. Four are harmless (`[2]` meeting `[−1]` gives
+  `[1], ⟨1⟩` instead of `[1], [0]`, symmetrically for `[−2]`, `[1]`: same weights). The entry for
+  the initiator `[1]` meeting the responder `[0]`, printed `(⟨1⟩, [1])`, moves the weight to the
+  `[0]` agent and breaks Invariant 2 (`|w(s_a) − c_a| ≤ 1`): an agent of colour `−1` in state `[0]`
+  (reachable, e.g. after `[−1]` meets `[1]`) gets `[1]`, and a later change of its colour to `1`
+  asks for the nonexistent state `[3]`. With the printed table, Absolute-Majority reaches this
+  situation already for `k = 2` and the four colours `00, 00, 01, 01`. The text's `([1], ⟨1⟩)` is
+  used.
+* **The final argument of Section 3 needs a minor correction.** It uses, in the tie case ("the
+  last entity that reached state `[0]`"), that every group contains a strong state, an invariant
+  the paper does not state; Invariants 1 and 2 alone do not suffice (colours all `0` with states
+  `⟨1⟩, ⟨−1⟩` satisfy them and never change). `DynInv` adds this third invariant: it holds
+  initially and is preserved (an interaction never removes the last strong state, and a colour
+  change makes a state strong), so the conclusion stands.
+* **Section 5.2 (uniqueness) needs a major correction and is not formalized.** Section 5.2 adds a
+  bit `c'` meant to inform all agents whether the most frequent colour is unique. Rule (2) sets the
+  bit `c'` of a potential winner to `1` when it sees a tie, and only losers can reset it (rule (4)).
+  A tie seen before the stages stabilize then persists: for `k = 1` and colours `1, 1, −1`, the
+  `−1`-agent must eventually annihilate with one of the `1`-agents, which then reports `[0]` (a
+  tie) and keeps `c' = 1` forever, while the other `1`-agent stays in `[1]` and keeps `c' = 0`; the
+  loser's bit then changes forever (rules (3) and (4)). So the mechanism of Section 5.2 never
+  stabilizes on this input, in any execution (checked by exhaustive search: none of the 25
+  reachable configurations is output-stable for `c'`), and the claim that all entities are
+  eventually informed does not hold as stated. A repaired rule, in which a potential winner
+  recomputes `c'` from its current stage reports (`1` iff one of the stages it currently wins is a
+  tie) and losers copy `c'` from potential winners, was checked by exhaustive search for
+  `k = 1, n ≤ 5` and `k = 2, n ≤ 4`; it is not proved. Section 5.1 and Theorem 7 do not depend on
+  Section 5.2.
+* **Typos.** In the proof of Theorem 7, "let `i > k − 1`" should read `i < k − 1`; in the proof of
+  Theorem 6, "instances of `P`" and "`P(2)`" should read `P₁` and `P₂`, and "`l(i)`" should read
+  `l[i]`.
+
+### Proof route
+
+* **Generic tools** (end of `ExactMajorityOutput.lean`): `Protocol.outputStableAt_of_invariant`,
+  `Protocol.sum_interact` (sums over agents across an encounter), `Protocol.forall_step` and
+  `Protocol.exists_step` (closure of "all agents" and "some agent" properties under steps),
+  `exists_reflTransGen_of_measure` (strong induction on a potential), `exists_recruit` (moving every
+  agent into its target set, one agent per step), `Protocol.StablyMarks.congr`.
+* **Per-encounter facts** are proved by `decide` over the finite state types: e.g.
+  `StaticState.absWeight_δ_le`, `StaticState.δ_recruit`, `StaticState.δ_out`,
+  `DynState.close_δ_fst` and `close_δ_snd` (Invariant 2 under interactions), `DynState.δ_strong`
+  (a strong state survives), `DynState.natAbs_δ_lt` (opposite weights decrease `R`),
+  `DynState.δ_recruit`, `DynState.δ_out`.
+* **Theorem 3.** Reach `R = |S|`; then every weight is `0` or `s = sign S`, a strong agent `[s]`
+  exists (for `s = 0` it is the strong agent that is never lost), and it recruits every agent into
+  `{q | out q = s}`, which is closed under `δ`.
+* **Section 3.** `sum_group_interact` (group sums across an encounter inside a group),
+  `sum_eq_add_of_eq_off` (for the recolouring), `DynInv.greaches`. In `DynInv.exists_stable` the
+  target of agent `v` is `s v`, the sign of its group's colour sum; after Lemma 5 every nonzero
+  weight in a group has sign `s v`, a strong agent of weight sign `s v` exists in each group (the
+  third invariant gives it in the tie case), and it recruits its group into `{q | out q = s v}`.
+* **Composition.** `drive_interact_fst`, `drive_reaches_fst`, `drive_lift_fst`, `drive_grp`
+  (groups are constant along paths), `drive_interact_snd` (if `D` does not change the colours, the
+  `P₂`-part of an encounter is a `P₂` encounter in a group, or nothing), `drive_lift_snd`,
+  `drive_greaches_snd`, `drive_dynInv_interact` (one encounter is a group interaction followed by
+  two recolourings, i.e. `DynInv.gstep` then `DynInv.recolour` twice).
+* **Theorem 6.** `bitsProtocol_interact_snd`, `bitsProtocol_reaches_snd`, `bitsProtocol_lift`
+  (the `k` copies of `P₁` are stabilized one at a time by induction on a `Finset` of indices),
+  `sign_counts_bit_eq_majBit`; `majBit_eq_bitSign_of_isAbsMajority`, `sum_mul_absTarget_of`; then
+  `Protocol.drive_stablyMarks` with a single group.
+* **Theorem 7.** `winKey` (the ranking `(count, label)` in the lexicographic product, a linear
+  order), `exists_groupWinner_bit`, `groupWinner_unique`, `toLex_lt_of_bit`, `duel_sum_eq` (the
+  colour sum of a group is `x W₊ − x W₋`); `relativeMajorityLevel_δ_label`,
+  `relativeMajorityLevel_input_label`, `relativeMajorityLevel_zero_reaches`; the level induction
+  applies `Protocol.drive_stablyMarks` and `duel_wins_iff` at each level. `duel_wins_iff` needs no
+  positivity of the counts.
+
+### Numerical checks of the statements
+
+* The transition functions of the Lean definitions (`P₁`, `P₂`, the recolouring, Absolute-Majority
+  for `k = 1` with its outputs, Relative-Majority for `k = 2` with its outputs; 74,894 table
+  entries) were evaluated and compared with an independent model, on which stable computation was
+  checked by exhaustive reachability on multisets of states: `P₁` for all inputs with `n ≤ 7`;
+  `P₂` with arbitrary interleavings of interactions and colour changes for `n ≤ 6`;
+  Absolute-Majority for `k = 1, n ≤ 5` and `k = 2, n ≤ 4`; Relative-Majority for `k = 1, n ≤ 5`,
+  `k = 2, n ≤ 5` and `k = 3, n ≤ 3`.
+* The duel lemma (`duel_wins_iff`) for all count vectors with entries `≤ 2` (`k ≤ 2`) and `≤ 1`
+  (`k = 3`).
+* The table of Fig. 2 against the rules of Section 2 (all entries agree).
+
+### Not covered
+
+* Section 5.2 (informing all agents whether the most frequent colour is unique), which needs a
+  major correction (see above).
+* Dissemination of the winner's label to all agents (plurality consensus in the sense of
+  Section 1.2), which the paper does not give.

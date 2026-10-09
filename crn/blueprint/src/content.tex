@@ -389,3 +389,171 @@ An initiator $s \ne B$ activated twice on the same responder makes it $s$, so an
 spreads to all agents along the edges of a connected graph, and all-blank is never reached.
 Absorption in a finite chain follows, and the two convergence probabilities sum to $1$.
 \end{proof}
+
+\section{Deterministic exact majority and plurality (CRN-5)}\label{sec:ghmss-exact-majority}
+This section formalizes Theorems~3, 6 and~7 of Gąsieniec, Hamilton, Martin, Spirakis and
+Stachowiak, \emph{Deterministic population protocols for exact majority and plurality} (OPODIS
+2016, LIPIcs 70, paper 14). Colours are $k$-bit labels, so $C \le 2^k$ colours need $O(k)$ bits of
+memory. Fig.~4 of the paper needs a minor correction: one entry of its table breaks Invariant~2,
+and the rules of the text are used. The final argument of Section~3 needs a minor correction: it
+uses, in the tie case, that every group keeps a strong state, an invariant the paper does not
+state, which is added and proved. Section~5.2, which should inform all agents whether the most
+frequent colour is unique, needs a major correction and is not formalized: on the colours
+$1, 1, -1$ its bit never stabilizes, in any execution (a repaired rule passes exhaustive checks on
+small populations). Theorem~7 is formalized as the protocol of Section~5.1 computes it: every
+agent learns whether its own colour is the plurality colour, not the winner's label
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/crn/FORMALIZATION_DIFFERENCES.md#deterministic-exact-majority-and-plurality-exactmajority-crn-5}{details}).
+
+\begin{definition}[Stable computation with general outputs]\label{def:em-marks}
+\lean{Crn.Protocol.OutputStableAt,Crn.Protocol.StablyMarks,Crn.Protocol.StablyComputesWith,Crn.Protocol.stablyComputesWith_output_iff}\leanok\uses{def:stable}
+For an output map $O : Q \to Y$ into any type and a target $g(x, i) \in Y$ depending on the input
+counts $x$ and on an agent's input $i$, a protocol stably marks the agents with $g$ if, for every
+nonempty population, every configuration reachable from the initial one can reach a configuration
+from which every agent $v$ forever outputs $g(x, \iota(v))$. Stable computation of $f$ is the case
+$g(x, i) = f(x)$; with the protocol's Boolean output it is Definition~\ref{def:stable}.
+\end{definition}
+
+\begin{definition}[The static protocol]\label{def:em-static}
+\lean{Crn.StaticState,Crn.StaticState.δ,Crn.staticMajority,Crn.card_staticState}\leanok\uses{def:protocol}
+Colours are in $\{-1, 0, 1\}$. The six states are the strong states $[x]$ and the weak states
+$\langle x \rangle$, $x \in \{-1, 0, 1\}$, of weight $x$ and $0$. The states $[1]$ and $[-1]$
+annihilate into $[0], [0]$; a strong $[x]$ turns a weak state into $\langle x \rangle$, and, for
+$x \ne 0$, turns $[0]$ into $\langle x \rangle$. The output of $[x]$ and $\langle x \rangle$ is
+$x$.
+\end{definition}
+
+\begin{lemma}[Lemmas 1 and 2]\label{lem:em-static}
+\lean{Crn.StaticState.weight_sum_eq,Crn.StaticState.absWeight_sum_step_le,Crn.StaticState.exists_reaches_absWeight_sum_eq}\leanok\uses{def:em-static}
+Along every execution the weight sum equals the colour sum $S$, the sum $R$ of the absolute
+weights does not increase, and a configuration with $R = |S|$ is reachable.
+\end{lemma}
+\begin{proof}\leanok
+Check the encounters (by computation over the $36$ pairs); while weights of both signs are
+present, bring two of them together, which decreases $R$.
+\end{proof}
+
+\begin{theorem}[GHMSS16, Theorem 3]\label{thm:em-static}
+\lean{Crn.staticMajority_stablyComputes}\leanok\uses{lem:em-static,def:em-marks}
+The static protocol stably computes $\operatorname{sign}(\#1 - \#(-1))$: all agents eventually
+and forever output $1$, $-1$, or $0$ for a tie.
+\end{theorem}
+\begin{proof}\leanok
+Once $R = |S|$, every weight is $0$ or $s = \operatorname{sign} S$ and a strong agent $[s]$
+exists (for $s = 0$, a strong state is never lost). It recruits every agent into the states of
+output $s$, a set closed under the transitions.
+\end{proof}
+
+\begin{definition}[The dynamic protocol]\label{def:em-dynamic}
+\lean{Crn.DynState,Crn.DynState.δ,Crn.DynState.recolour,Crn.dynamicMajority,Crn.card_dynState,Crn.Protocol.GStep,Crn.Protocol.GReaches}\leanok\uses{def:protocol}
+The eight states are the strong states $[-2], \dots, [2]$ and the weak states
+$\langle -1 \rangle, \langle 0 \rangle, \langle 1 \rangle$. Opposite strong states cancel as far
+as possible, and strong states recruit weak ones and $[0]$ as in the static protocol; the
+transitions do not read the colours. When an external force changes a colour $c$ to $c'$, the
+state becomes $[w + c' - c]$, $w$ its weight. For Section~5 the protocol runs separately in groups
+of agents, with encounters inside a group.
+\end{definition}
+
+\begin{definition}[Invariants of Section~3]\label{def:em-dyninv}
+\lean{Crn.DynInv,Crn.DynInv.input}\leanok\uses{def:em-dynamic}
+In every group the colour sum equals the weight sum, every agent's weight is within $1$ of its
+colour, and every group contains a strong state. The initial configuration $[c_a]$ satisfies
+them.
+\end{definition}
+
+\begin{lemma}[Lemmas 4 and 5]\label{lem:em-dynamic}
+\lean{Crn.DynInv.gstep,Crn.DynInv.recolour,Crn.DynState.absWeight_sum_gstep_le,Crn.DynState.exists_greaches_noOpposite}\leanok\uses{def:em-dyninv}
+The invariants are preserved by encounters inside groups and by colour changes. The sum of the
+absolute weights does not increase, and a configuration without opposite weights in a group is
+reachable.
+\end{lemma}
+\begin{proof}\leanok
+Encounter by encounter (by computation over the finite state space); a colour change moves the
+weight by the change of colour and makes the state strong.
+\end{proof}
+
+\begin{theorem}[GHMSS16, Section 3]\label{thm:em-dynamic}
+\lean{Crn.DynInv.exists_stable,Crn.DynExtStep,Crn.dynamicMajority_stabilizes,Crn.dynamicMajority_stablyComputes}\leanok\uses{lem:em-dynamic,def:em-marks}
+From every configuration satisfying the invariants, a configuration is reachable from which every
+agent forever outputs the sign of the colour sum of its group. Hence after any finite interleaving
+of encounters and colour changes the dynamic protocol stabilizes on the sign of the final colour
+sum, and without the force it stably computes $\operatorname{sign}(\#1 - \#(-1))$.
+\end{theorem}
+\begin{proof}\leanok
+After Lemma~5, every nonzero weight in a group has the sign $s$ of the group's colour sum, and a
+strong agent of weight sign $s$ exists in the group (the third invariant gives it in the tie
+case). It recruits the group into the states of output $s$.
+\end{proof}
+
+\begin{definition}[Driving the dynamic protocol]\label{def:em-drive}
+\lean{Crn.Protocol.drive}\leanok\uses{def:em-dynamic}
+Given a protocol $D$, a colour map from its states to $\{-1, 0, 1\}$ and a group map that $D$
+never changes, the driven protocol runs $D$ and a copy of the dynamic protocol: in an encounter
+$D$ makes its transition, the dynamic protocol makes its transition if the two agents are in the
+same group, and each agent whose colour changed applies the state change of the force.
+\end{definition}
+
+\begin{theorem}[Composition]\label{thm:em-drive}
+\lean{Crn.Protocol.drive_dynInv,Crn.Protocol.drive_stablyMarks}\leanok\uses{def:em-drive,thm:em-dynamic}
+Along every execution of the driven protocol the invariants of Section~3 hold for the derived
+colours. If $D$ stably marks the agents with their eventual colours, the driven protocol stably
+marks every agent with the sign of the eventual colour sum of its group.
+\end{theorem}
+\begin{proof}\leanok
+An encounter is an encounter of the dynamic protocol inside a group followed by two colour
+changes. Once $D$ has stabilized, the colours are fixed and Theorem~\ref{thm:em-dynamic} applies
+in every group.
+\end{proof}
+
+\begin{definition}[Absolute-Majority]\label{def:em-absolute}
+\lean{Crn.Label,Crn.bitSign,Crn.bitsProtocol,Crn.majBit,Crn.absColour,Crn.absoluteMajority,Crn.absOutput,Crn.IsAbsMajority,Crn.absMajority,Crn.absTarget}\leanok\uses{def:em-static,def:em-drive}
+Every agent keeps its label $l$ and runs $k$ copies of the static protocol on the bits $l[i]$,
+read as $\pm 1$. They drive a copy of the dynamic protocol, with colour $1$ if every copy currently
+reports the agent's own bit and $-1$ otherwise. An agent outputs the reported majority bits if its
+dynamic protocol outputs $1$, and none otherwise. The specification is the colour held by more
+than half of the agents, if any.
+\end{definition}
+
+\begin{theorem}[GHMSS16, Theorem 6]\label{thm:em-absolute}
+\lean{Crn.bitsProtocol_stablyMarks,Crn.absMajority_eq_some_iff,Crn.absTarget_sum_sign_eq_one_iff,Crn.majBit_eq_of_isAbsMajority,Crn.absoluteMajority_stablyComputes,Crn.card_absState}\leanok\uses{def:em-absolute,thm:em-static,thm:em-drive}
+Absolute-Majority stably computes the absolute majority colour, or reports that there is none,
+with $2^k \cdot 6^k \cdot 8 \le 2^{4k+3}$ states.
+\end{theorem}
+\begin{proof}\leanok
+The $k$ copies stabilize on the majority bits one at a time. Then the colour of an agent is $1$
+exactly when its label consists of the majority bits, so the eventual colour sum is positive if
+and only if that label is held by more than half of the agents, and the composition theorem
+applies with a single group.
+\end{proof}
+
+\begin{definition}[Relative-Majority]\label{def:em-relative}
+\lean{Crn.RelState,Crn.RelState.label,Crn.RelState.won,Crn.stageColour,Crn.relativeMajorityLevel,Crn.relativeMajority,Crn.IsGroupWinner,Crn.IsPlurality,Crn.duelColour,Crn.wins,Crn.bitAt,Crn.prefixMask}\leanok\uses{def:em-drive}
+Stages $i = k - 1, \dots, 0$: the agents whose labels share the prefix $l[0..i-1]$ form a group,
+and a copy of the dynamic protocol runs in each group, with colour $l[i]$ (as $\pm 1$) for the
+agents that won all the stages above $i$ and $0$ for the others. An agent wins stage $i$ if its
+colour is $-1$ and the stage outputs $-1$, or its colour is $1$ and the stage outputs $0$ or $1$.
+The protocol is the $k$-fold iteration of the driven protocol, the colours being derived from the
+states. The plurality colour is the most frequent one, ties broken in favour of the
+lexicographically largest label.
+\end{definition}
+
+\begin{lemma}[The duel]\label{lem:em-duel}
+\lean{Crn.duel_wins_iff,Crn.isGroupWinner_zero_iff}\leanok\uses{def:em-relative}
+Once the stages above $i$ have stabilized, the duel of stage $i$ between the winners of the two
+groups extending a prefix $p$ selects the winner of the group of $p$. The winner of the whole
+population is the plurality colour.
+\end{lemma}
+\begin{proof}\leanok
+The colour sum of the group of $p$ is the difference of the counts of the two group winners, and
+ties go to the larger label.
+\end{proof}
+
+\begin{theorem}[GHMSS16, Theorem 7]\label{thm:em-relative}
+\lean{Crn.relativeMajority_level_stablyMarks,Crn.relativeMajority_stablyMarks,Crn.card_relState_level,Crn.card_relState}\leanok\uses{lem:em-duel,thm:em-drive}
+Relative-Majority stably marks the agents of the plurality colour: eventually and forever, every
+agent outputs whether its own colour is the plurality colour. It has $2^k \cdot 8^k = 2^{4k}$
+states.
+\end{theorem}
+\begin{proof}\leanok
+Induction on the levels: level $m$ stably marks every agent with whether its label wins its group
+of prefix length $k - m$, by the composition theorem and the duel lemma.
+\end{proof}
