@@ -249,8 +249,8 @@ Theorem~2.5 of Hassin and Peleg (Theorem~8 of the survey of Becchetti, Clementi 
 the meeting-time argument of Kanade, Mallmann-Trenn and Sauerwald, \emph{On coalescence time in
 graphs} (SODA 2019), Proposition~B.9 ($t_{\mathrm{meet}}\le 4t_{\mathrm{hit}}$). For the
 synchronous voter with plain uniform-neighbour sampling, Theorem~8 of the survey needs a minor
-correction (a nonbipartiteness hypothesis, or a lazy walk), and the lazy version is what is
-formalized
+correction (a nonbipartiteness hypothesis, or a lazy walk); this section formalizes the lazy
+version, and Section~\ref{sec:hp-plain-walk} the plain walk on nonbipartite graphs
 (\href{https://github.com/formal-dynamics/leanamics/blob/main/voter/FORMALIZATION_DIFFERENCES.md#41-survey-theorem-8-needs-a-minor-correction-the-lazy-walk-is-formalized}{details}).
 \begin{definition}[Two-token walk, lazy sampling]\label{def:pairwalk}
 \lean{Voter.pairWalk,Voter.leftRounds}\leanok\uses{def:backward,thm:lazy}
@@ -329,6 +329,92 @@ dynamics reaches consensus within $255\,n^3\log n$ rounds with probability at le
 \begin{proof}\leanok
 With $k=\lfloor T/(51n^3)\rfloor$, Lemma~\ref{lem:duality-general} and
 Theorem~\ref{thm:meeting-lazy} bound the failure probability by $(n-1)2^{-k}\le 1/n$.
+\end{proof}
+
+\section{Section 2.4 for the plain walk: the bipartite double cover}\label{sec:hp-plain-walk}
+Hassin and Peleg's own setting is the plain synchronous voter, in which every vertex copies a
+uniformly random neighbour, on a connected nonbipartite graph. Their Lemma~2.4 bounds the
+meeting time through the bipartite double cover $\tilde G$, quoting Tetali and Winkler
+(\emph{Simultaneous reversible Markov chains}, 1993). We follow the reduction to $\tilde G$, but
+prove the meeting bound with the potential of Coppersmith, Tetali and Winkler
+(\emph{Collisions among random walks on a graph}, SIAM J.\ Discrete Math.\ 1993) on $\tilde G$.
+The proof of Lemma~2.4 needs a minor correction: it uses $\mathrm{Diam}(\tilde G)\le n$, but the
+diameter of $\tilde G$ can be $2n-3$ (a path ending in a triangle); $\mathrm{Diam}(\tilde G)\le
+2n-1$ only changes the constant, and our route does not use the diameter
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/voter/FORMALIZATION_DIFFERENCES.md#43-the-plain-walk-on-connected-nonbipartite-graphs-lemma-24-and-theorem-25}{details}).
+Hitting times $h$ are those of Lemma~\ref{lem:hitting}, twice the hitting times of the plain walk.
+\begin{definition}[Bipartite double cover]\label{def:double-cover}
+\lean{Voter.doubleCover,Voter.doubleCover_adj,Voter.doubleCoverFlip,Voter.doubleCover_degree,Voter.doubleCover_degree_pos,Voter.volume_doubleCover}\leanok\uses{def:step}
+The graph $\tilde G=G\times K_2$ has vertices $(a,i)$, $a\in V$, $i\in\{0,1\}$, and
+$(a,i)\sim(b,j)$ iff $a\sim b$ in $G$ and $i\neq j$. Swapping the layers is an automorphism,
+degrees are those of $G$, and $\mathrm{vol}\,\tilde G=2\,\mathrm{vol}\,G$.
+\end{definition}
+\begin{lemma}[Connectivity of the double cover]\label{lem:double-cover-connected}
+\lean{Voter.doubleCover_reachable_of_walk,Voter.doubleCover_reachable_flip,Voter.doubleCover_connected}\leanok\uses{def:double-cover}
+If $G$ is connected and not $2$-colourable, then $\tilde G$ is connected.
+\end{lemma}
+\begin{proof}\leanok
+Walks of $G$ lift to $\tilde G$, flipping the layer at every step. If $\tilde G$ were
+disconnected, ``$(w,0)$ is reachable from $(x_0,0)$'' would be a proper $2$-colouring of $G$.
+\end{proof}
+\begin{lemma}[Hitting times on the double cover]\label{lem:hitting-flip}
+\lean{Voter.hitting_unique,Voter.hitting_doubleCover_flip,Voter.uniformNeighbor_expect,Voter.uniformNeighbor_expect_hitting,Voter.uniformNeighbor_doubleCover_expect}\leanok\uses{lem:hitting,def:double-cover,lem:double-cover-connected,cor:22}
+The hitting-time system has a unique solution, so the hitting times of $\tilde G$ satisfy
+$\tilde h_{(y,1-j)}(x,1-i)=\tilde h_{(y,j)}(x,i)$. A plain step away from $y$ lowers $h_y$ by $2$
+in expectation, and a plain step of $\tilde G$ from $(x,i)$ is a plain step of $G$ from $x$
+followed by a flip of the layer.
+\end{lemma}
+\begin{proof}\leanok
+Swapping the layers maps solutions to solutions; the maximum principle gives uniqueness. The
+first-step equation is the row $x$ of the Laplacian system.
+\end{proof}
+\begin{lemma}[Additive drift for two tokens]\label{lem:additive-drift}
+\lean{Voter.pairWalk_apart_mul_le}\leanok\uses{def:pairwalk}
+If a nonnegative potential $F$ drops by at least $c$ in expectation under one step of the
+two-token walk from every pair of distinct vertices, then
+$cT\cdot\Pr[\text{apart after }T\text{ steps}]\le F$.
+\end{lemma}
+\begin{proof}\leanok
+Truncate $F$ to $0$ on the diagonal, show
+$\mathbb E[F'_T]+c\sum_{t<T}\Pr[\text{apart at }t]\le F'$ by induction on $T$, and use that
+being apart is antitone in $t$.
+\end{proof}
+\begin{lemma}[Exact drift of the potential]\label{lem:plain-drift}
+\lean{Voter.plainPotential,Voter.doubleCover_hitting_le,Voter.plainPotential_nonneg,Voter.plainPotential_le,Voter.doubleCover_hitting_sum_flip,Voter.meetingPotential_doubleCover_flip,Voter.expect_meetingPotential_fst,Voter.expect_meetingPotential_snd,Voter.plainPotential_drift}\leanok\uses{lem:hitting-flip,thm:meeting-lazy}
+Let $\Phi$ be the Coppersmith--Tetali--Winkler potential of $\tilde G$ (as in
+Theorem~\ref{thm:meeting-lazy}) and $\Psi(x,y)=\Phi((x,0),(y,0))$. Every hitting time of
+$\tilde G$ is at most $16n^3$, $0\le\Psi\le 32n^3$, and for $x\neq y$ one synchronous plain step
+of the two tokens lowers $\Psi$ by exactly $4$ in expectation.
+\end{lemma}
+\begin{proof}\leanok
+The bound is the commute bound of Lemma~\ref{lem:hitting} on $\tilde G$ ($2n$ vertices, volume
+at most $2n^2$). A synchronous step at $(x,y)$ is, on $\tilde G$, a move of the first token from
+$(x,0)$ to layer $1$ followed by a move of the second token from $(y,0)$ to layer $1$. Between
+the two moves the tokens lie in different layers, hence are distinct, and each move lowers
+$\Phi$ by $2$. The layer symmetry of Lemma~\ref{lem:hitting-flip} returns both tokens to
+layer $0$.
+\end{proof}
+\begin{theorem}[Meeting time of plain walks; Lemma 2.4]\label{thm:meeting-plain}
+\lean{Voter.plain_apart_mul_le,Voter.plain_meeting_core,Voter.plain_apart_le_pow,Voter.plain_meeting_le_half}\leanok\uses{lem:additive-drift,lem:plain-drift,lem:double-cover-connected,thm:hp24}
+On a connected nonbipartite graph with $n$ vertices, two synchronous plain walks are apart after
+$T$ steps with probability at most $8n^3/T$; hence after $16n^3$ steps with probability at most
+$1/2$, and after $16kn^3$ steps with probability at most $2^{-k}$, from every pair of start
+vertices.
+\end{theorem}
+\begin{proof}\leanok
+Lemma~\ref{lem:additive-drift} with $c=4$ and Lemma~\ref{lem:plain-drift} give
+$4T\cdot\Pr[\text{apart}]\le 32n^3$; then submultiplicativity in blocks.
+\end{proof}
+\begin{theorem}[Hassin--Peleg Theorem 2.5, plain walk; Survey Theorem 8 with the nonbipartiteness hypothesis]\label{thm:hp25-plain}
+\lean{Voter.plain_disagreement_le,Voter.plain_voter_consensus_whp}\leanok\uses{thm:meeting-plain,lem:duality-general,thm:hp24,thm:hp25}
+On every connected nonbipartite graph with $n$ vertices and from every initial colouring, the
+plain voter dynamics fails to reach consensus after $16kn^3$ rounds with probability at most
+$(n-1)2^{-k}$, and reaches consensus within $80\,n^3\log n$ rounds with probability at least
+$1-1/n$.
+\end{theorem}
+\begin{proof}\leanok
+As for Theorem~\ref{thm:hp25}, with $k=\lfloor T/(16n^3)\rfloor$ and
+Theorem~\ref{thm:meeting-plain}.
 \end{proof}
 
 \section{Consensus time via conductance (VOT-5)}\label{sec:bgkm-conductance}
@@ -455,8 +541,8 @@ On the two-vertex graph, every vertex must copy the other vertex.
 The alternating coloring flips each round and returns after two rounds;
 neither coloring is constant. Thus connectedness alone is insufficient.
 \end{lemma}
-Hassin--Peleg Theorem~2.5 is formalized for the lazy walk; for the plain walk on
-nonbipartite graphs it holds conditionally on a meeting-time bound
-(Theorem~\ref{thm:hp24}). Dynamic networks and extremal coalition results are future work
+Hassin--Peleg Theorem~2.5 is formalized for the lazy walk on every connected graph
+(Theorem~\ref{thm:hp25}) and for the plain walk on connected nonbipartite graphs
+(Theorem~\ref{thm:hp25-plain}). Dynamic networks and extremal coalition results are future work
 beyond this milestone. Chernoff bounds remain in the
 3-majority package until another theorem requires their extraction.

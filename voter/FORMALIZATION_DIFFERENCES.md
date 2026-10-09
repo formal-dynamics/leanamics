@@ -35,7 +35,8 @@ and its Lean 4 formalization in the `voter` package (`leanamics/voter`).
 
 The following portions of the paper were not formalized:
 1. **Section 2.4: Time Bounds** (formalized since VOT-3 and VOT-6, with the deviations of
-   §4; only the plain walk on nonbipartite graphs remains open)
+   §4, for the lazy walk on every connected graph and for the plain walk on connected
+   nonbipartite graphs)
    - Dual coalescing random walks: on the complete graph with self-loops in
      [`Coalescence.lean`](Voter/Coalescence.lean); for every sampling kernel
      [`iterate_disagreement_le_pairWalk`](Voter/Meeting.lean) (two coalescing tokens, union bound).
@@ -46,13 +47,18 @@ The following portions of the paper were not formalized:
      $\ge 1/2$, [`lazy_meeting_le_half`](Voter/MeetingTime.lean), via the comparison of
      synchronous and sequential walks of Kanade, Mallmann-Trenn, Sauerwald instead of
      $M = O(n Z_{\max})$.
+   - Lemma 2.4 (plain walks on connected nonbipartite graphs, tail form): meeting within
+     $16 n^3$ steps with probability $\ge 1/2$, [`plain_meeting_le_half`](Voter/PlainMeeting.lean),
+     via the bipartite double cover as in the paper, with a potential on the double cover
+     instead of quoting Tetali and Winkler (§4.3).
    - Theorem 2.4 (tail form, no Chernoff bound needed): consensus fails after $k T_0$ rounds with
      probability $\le (n-1)2^{-k}$ if tokens meet within $T_0$ steps with probability $\ge 1/2$,
      [`iterate_disagreement_le_of_meeting`](Voter/Meeting.lean), for every kernel.
    - Theorem 2.5 (lazy uniform walk, high-probability form): consensus within
      $255 n^3 \log n$ rounds with probability $\ge 1 - 1/n$ on every connected graph,
-     [`lazy_voter_consensus_whp`](Voter/MeetingConsensus.lean). The plain walk on connected
-     nonbipartite graphs (the paper's setting) is covered only conditionally on a meeting bound.
+     [`lazy_voter_consensus_whp`](Voter/MeetingConsensus.lean); for the plain walk on connected
+     nonbipartite graphs (the paper's setting), within $80 n^3 \log n$ rounds,
+     [`plain_voter_consensus_whp`](Voter/PlainConsensus.lean).
 2. **Section 3: Application to Distributed Consensus & Dynamic Networks**
    - Section 3.1: Formal specification of the consensus problem (Agreement, Validity, Stopping) and Proportionate Consensus.
    - Section 3.2: Algorithm `PropCon` (choice of degree-to-reliability factor $k = \max_i \lceil d_i / R_i \rceil$, normalized weights $\tilde{R}_i$, and weight matrix $H$ with self-loops $H_{ii} = 1 - d_i/\tilde{R}_i$).
@@ -233,7 +239,9 @@ fixation. Files: [`LazyPropagation.lean`](Voter/LazyPropagation.lean),
 
 Files: [`MeetingRounds.lean`](Voter/MeetingRounds.lean), [`Meeting.lean`](Voter/Meeting.lean),
 [`MeetingDrift.lean`](Voter/MeetingDrift.lean), [`MeetingHitting.lean`](Voter/MeetingHitting.lean),
-[`MeetingTime.lean`](Voter/MeetingTime.lean), [`MeetingConsensus.lean`](Voter/MeetingConsensus.lean).
+[`MeetingTime.lean`](Voter/MeetingTime.lean), [`MeetingConsensus.lean`](Voter/MeetingConsensus.lean);
+for the plain walk (§4.3) [`PlainCover.lean`](Voter/PlainCover.lean),
+[`PlainMeeting.lean`](Voter/PlainMeeting.lean), [`PlainConsensus.lean`](Voter/PlainConsensus.lean).
 Further sources: Becchetti, Clementi, Natale, *Consensus dynamics: an overview*, SIGACT News
 51(1), 2020 (the "survey"); Kanade, Mallmann-Trenn, Sauerwald, *On coalescence time in graphs*,
 SODA 2019 (arXiv:1611.02460); Cooper, Elsässer, Ono, Radzik, SIAM J. Discrete Math. 2013.
@@ -257,9 +265,11 @@ SODA 2019 (arXiv:1611.02460); Cooper, Elsässer, Ono, Radzik, SIAM J. Discrete M
   (`t_meet ≤ 4 t_hit`) gives a clean meeting-time argument
   ([`iterate_outside_succ_le`](Voter/MeetingDrift.lean)). The main theorem is
   [`lazy_voter_consensus_whp`](Voter/MeetingConsensus.lean).
-* Hassin and Peleg's own setting (plain walk on a connected nonbipartite graph) is covered
-  only **conditionally** on a meeting bound:
-  [`iterate_disagreement_le_of_meeting`](Voter/Meeting.lean) holds for every sampling kernel.
+* Hassin and Peleg's own setting (plain walk on a connected nonbipartite graph) is formalized
+  too, with the corrected hypothesis: [`plain_voter_consensus_whp`](Voter/PlainConsensus.lean)
+  (§4.3). Both versions go through
+  [`iterate_disagreement_le_of_meeting`](Voter/Meeting.lean), which holds for every sampling
+  kernel.
 * The complete-graph model of [`Coalescence.lean`](Voter/Coalescence.lean) (uniform sampling
   over all vertices, i.e. Wright–Fisher) is not a special case: `lazyNeighbor ⊤ ≠ wfKernel`.
   The self-loop generalization (uniform over the closed neighbourhood) would contain it, but
@@ -276,9 +286,10 @@ SODA 2019 (arXiv:1611.02460); Cooper, Elsässer, Ono, Radzik, SIAM J. Discrete M
   Theorem 2.4 in tail form needs no Chernoff bound (Proposition 2.1): the diagonal of the
   two-token walk is absorbing, so being apart is submultiplicative in blocks.
 * **Existential constants.** `O(·)` is rendered as `∃ A > 0`, uniform over all graphs, vertex
-  types of a fixed universe and palettes. The proofs give `A = 51` (meeting) and `A = 255`
-  (consensus); the literature route gives `A = 16` for the meeting bound (our commute bound
-  loses a factor `2` over darts, and the `3/4`-per-block step loses more).
+  types of a fixed universe and palettes. For the lazy walk the proofs give `A = 51` (meeting)
+  and `A = 255` (consensus); the literature route gives `A = 16` for the meeting bound (our
+  commute bound loses a factor `2` over darts, and the `3/4`-per-block step loses more). For
+  the plain walk they give `A = 16` (meeting) and `A = 80` (consensus), see §4.3.
 * **Two coalescing tokens driven by common rounds** ([`pairWalk`](Voter/Meeting.lean), the
   survey's Definition 5 with two tokens) instead of two independent walks with the path event
   "never met up to `T`". Before meeting the tokens are independent (distinct coordinates of
@@ -295,6 +306,108 @@ SODA 2019 (arXiv:1611.02460); Cooper, Elsässer, Ono, Radzik, SIAM J. Discrete M
   connected graph this only excludes `n = 1`, where consensus is trivial.
 * **Arbitrary finite palette** (the survey uses `n` colours; Hassin and Peleg two colours,
   reduced from `k`).
+
+### 4.3 The plain walk on connected nonbipartite graphs (Lemma 2.4 and Theorem 2.5)
+
+Hassin and Peleg's Theorem 2.5 for the **plain** synchronous voter (every vertex copies a
+uniformly random neighbour) on connected nonbipartite graphs, from their Lemma 2.4 (meeting
+time via the bipartite double cover), Fact 2.3 and Theorem 2.4. Further sources: Tetali,
+Winkler, *Simultaneous reversible Markov chains* (1993); Coppersmith, Tetali, Winkler,
+*Collisions among random walks on a graph*, SIAM J. Discrete Math. 6 (1993).
+
+#### The statements
+
+Below `n = |V|`, `G̃ = doubleCover G`, and `hitting` is the lazy-normalised hitting time of
+[`MeetingHitting.lean`](Voter/MeetingHitting.lean) (the solution of `h y = 0`,
+`(L h) x = 2 d_x` for `x ≠ y`), which is twice the hitting time of the plain walk.
+
+[`PlainCover.lean`](Voter/PlainCover.lean), the bipartite double cover:
+
+| Declaration | Statement | Source |
+| --- | --- | --- |
+| `doubleCover`, `doubleCover_adj` | `G̃` on `V × Bool`: `(a, i) ∼ (b, j)` iff `a ∼ b` and `i ≠ j` (the tensor product `G × K₂`) | Proof of Lemma 2.4 |
+| `doubleCover_connected` | `G` connected and not 2-colourable ⇒ `G̃` connected | Lemma 2.4 (implicit) |
+| `doubleCover_degree`, `doubleCover_degree_pos`, `volume_doubleCover` | `deg_G̃ (x, i) = deg_G x`, positive degrees lift, `vol G̃ = 2 vol G` | |
+| `hitting_unique` | the hitting-time system has a unique solution | |
+| `hitting_doubleCover_flip` | `h̃_{(y,¬j)}(x,¬i) = h̃_{(y,j)}(x,i)`: swapping the layers is an automorphism | |
+| `uniformNeighbor_expect_hitting` | a plain step away from `y` lowers `hitting G hc y` by `2` in expectation | first-step equation |
+| `uniformNeighbor_doubleCover_expect` | a plain step of `G̃` from `(x, i)` is a plain step of `G` from `x` with the layer flipped | |
+
+[`PlainMeeting.lean`](Voter/PlainMeeting.lean), the meeting bound:
+
+| Declaration | Statement | Source |
+| --- | --- | --- |
+| `pairWalk_apart_mul_le` | additive drift: `F ≥ 0` dropping by `c` off the diagonal ⇒ `c T · P(apart at T) ≤ F p` | (standard) |
+| `plainPotential` | `Φ̃((x, 0), (y, 0))`, the Coppersmith–Tetali–Winkler potential (`meetingPotential`) of `G̃` | Tetali–Winkler, via Lemma 2.4 |
+| `doubleCover_hitting_le` | every hitting time of `G̃` is `≤ 16 n³` | Fact 2.3 on `G̃` |
+| `plainPotential_nonneg`, `plainPotential_le` | `0 ≤ plainPotential ≤ 32 n³` (with `B₀ = 16 n³`) | |
+| `plainPotential_drift` | off the diagonal, one synchronous plain step lowers the potential by exactly `4` | Tetali–Winkler reduction in Lemma 2.4 |
+| `plain_apart_mul_le` | connected nonbipartite ⇒ `T · P(apart at T) ≤ 8 n³` | Lemma 2.4, tail form |
+| `plain_meeting_core` | apart after `16 n³` steps with probability `≤ 1/2` | Lemma 2.4 |
+| `plain_apart_le_pow` | apart after `T ≥ 16 k n³` steps with probability `≤ 2^{-k}` | |
+| `plain_meeting_le_half` | `∃ A > 0`, uniform over graphs: apart after `T ≥ A n³` steps with probability `≤ 1/2`; exactly the hypothesis `hmeet` of `iterate_disagreement_le_of_meeting` (the proof gives `A = 16`) | Lemma 2.4; meeting `O(n³)` |
+
+[`PlainConsensus.lean`](Voter/PlainConsensus.lean), the consequence:
+
+| Declaration | Statement | Source |
+| --- | --- | --- |
+| `plain_disagreement_le` | no consensus after `16 k n³` rounds with probability `≤ (n − 1) 2^{-k}` | Theorem 2.4, tail form |
+| `plain_voter_consensus_whp` | `∃ A > 0`: on every connected nonbipartite graph, for every palette and colouring, no consensus after `T ≥ A n³ log n` rounds with probability `≤ 1/n` (the proof gives `A = 80`) | Theorem 2.5; Survey Theorem 8 |
+
+#### The proof route
+
+*Why the lazy argument does not apply.* For the plain walk two adjacent tokens can swap
+without meeting, so the Coppersmith–Tetali–Winkler potential read on `G` has no drift at
+adjacent pairs, and the comparison of synchronous and sequential walks of
+[`MeetingDrift.lean`](Voter/MeetingDrift.lean) needs laziness.
+
+*The double cover.* A simultaneous step of the two tokens at `(x, y)` is, on `G̃`, a move of
+the first token from `(x, 0)` to `(x', 1)` followed by a move of the second token from
+`(y, 0)` to `(y', 1)`. Between the two moves the tokens are in different layers, so they are
+distinct vertices of `G̃`, and the potential of `G̃` drops by `2` at each move
+(`expect_meetingPotential_fst`, `expect_meetingPotential_snd`). The layer symmetry
+(`hitting_doubleCover_flip`, `meetingPotential_doubleCover_flip`) returns the tokens to layer
+`0`, so `plainPotential` drops by exactly `4` per synchronous step off the diagonal. With the
+commute bound on `G̃` (`2n` vertices, volume `2 vol G ≤ 2 n²`) the potential is at most
+`32 n³`, and additive drift (`pairWalk_apart_mul_le`: the potential truncated to `0` on the
+diagonal, induction on `T`, then antitonicity of being apart) gives
+`4 T · P(apart at T) ≤ 32 n³`. `G̃` is connected exactly when `G` is connected and
+nonbipartite; the formal proof of `doubleCover_connected` lifts walks of `G` to `G̃` and shows
+that, if `G̃` were disconnected, "`(w, 0)` is reachable from `(x₀, 0)`" would be a proper
+2-colouring of `G`. The consensus theorem follows the template of `lazy_voter_consensus_whp`
+with blocks of `16 n³` steps.
+
+#### Differences
+
+1. **Tail form instead of expected time**, as for the lazy walk (§4.2): Lemma 2.4 bounds the
+   expected meeting time `M`; we prove `P(apart at T) ≤ 8 n³/T`, hence `≤ 1/2` at
+   `T = 16 n³`. Theorem 2.5 bounds the expected consensus time; we prove
+   `P(no consensus at T) ≤ 1/n` for `T ≥ A n³ log n`, the survey's "w.h.p." form.
+2. **Lemma 2.4 through a potential on the double cover rather than by quoting Tetali and
+   Winkler.** Hassin and Peleg quote "the meeting time of `G` is bounded by twice the hitting
+   time of `G̃`" from Tetali and Winkler, and then bound hitting times along a shortest path by
+   `n` times the maximal commute time of adjacent vertices (Fact 2.3). We instead use the
+   Coppersmith–Tetali–Winkler potential of `G̃` at the pair `((x, 0), (y, 0))`, whose exact
+   drift `−4` per synchronous step (lazy-normalised units) gives the meeting bound in terms of
+   the maximal hitting time of `G̃`, and we bound that by the commute bound already in the
+   library ([`hitting_add_hitting_le`](Voter/MeetingHitting.lean): a path and Cauchy–Schwarz)
+   instead of a sum of adjacent commute times along a path. Both give `O(n · m) = O(n³)`.
+3. **Nonbipartiteness as `¬ G.Colorable 2`**, as in [`Graph.lean`](Voter/Graph.lean);
+   positive degrees `hd` as in the lazy version (on a connected nonbipartite graph they hold
+   automatically).
+4. **Explicit constants**: meeting within `16 n³` steps with probability `≥ 1/2`, `A = 16` for
+   `plain_meeting_le_half`, and `A = 80 = 5 · 16` for `plain_voter_consensus_whp` (both
+   statements are existential in `A`). These are smaller than the lazy constants (`51`,
+   `255`), since the exact drift needs no comparison with sequential walks.
+5. **The proof of Lemma 2.4 needs a minor correction.** It states `l ≤ Diam(G̃) ≤ n`, but the
+   double cover has `2n` vertices and its diameter can be close to `2n`: for a path of length
+   `L` ending in a triangle (`n = L + 3`), the distance in `G̃` from `(x, 0)` to `(x, 1)`, with
+   `x` the free end of the path, is `2L + 3 = 2n − 3`. An exhaustive search over all connected
+   nonbipartite graphs with `n ≤ 6` vertices confirms that `2n − 3` is the maximum there. The
+   bound `Diam(G̃) ≤ 2n − 1` only changes the constant. Our route does not use the diameter of
+   `G̃`, only a path in `G̃` (inside `hitting_add_hitting_le`).
+6. **Survey Theorem 8** needs a minor correction (the nonbipartiteness hypothesis, §4.1);
+   `plain_voter_consensus_whp` is the corrected statement.
 
 ---
 
