@@ -1,4 +1,4 @@
-import ThreeMajority.AnyStartMajorization
+import ThreeMajority.AnyStartRinott
 import Dynamics.Kernel
 
 /-!
@@ -50,8 +50,8 @@ agent form: the expectation of a Schur-convex observable of the multinomial conf
 theorem multinomial_schurConvex (p q : Distribution σ) (hpq : Majorizes p.weight q.weight)
     (φ : (Fin n → σ) → ℝ) (hφ : SchurConvex φ) :
     (Distribution.independent fun _ : Fin n => q).expect φ ≤
-      (Distribution.independent fun _ : Fin n => p).expect φ := by
-  sorry
+      (Distribution.independent fun _ : Fin n => p).expect φ :=
+  expect_le_of_majorizes p q hpq φ hφ
 
 /-- **Theorem 2** (BCEKMN17), distributional form: if the AC-process `P_α` dominates `P_α'` and
 `c ⪰ c'`, then at every time `T` every Schur-convex observable has at least the expectation
@@ -60,7 +60,33 @@ theorem ac_comparison (α α' : (Fin n → σ) → Distribution σ) (h : Dominat
     (φ : (Fin n → σ) → ℝ) (hφ : SchurConvex φ) (c c' : Fin n → σ)
     (hc : Majorizes (countVec c) (countVec c')) (T : ℕ) :
     (acKernel α').iterate T φ c' ≤ (acKernel α).iterate T φ c := by
-  sorry
+  classical
+  induction T generalizing c c' with
+  | zero => exact hφ c c' hc
+  | succ T ih =>
+    -- `u = u_T ≤ w ≤ v = v_T` with `w y = max {u_T z | z ⪯ y}` Schur-convex
+    obtain ⟨u, hu⟩ : ∃ u, u = (acKernel α').iterate T φ := ⟨_, rfl⟩
+    obtain ⟨v, hv⟩ : ∃ v, v = (acKernel α).iterate T φ := ⟨_, rfl⟩
+    have hne (y : Fin n → σ) :
+        (univ.filter fun z => Majorizes (countVec y) (countVec z)).Nonempty :=
+      ⟨y, mem_filter.mpr ⟨mem_univ _, Majorizes.refl _⟩⟩
+    let w : (Fin n → σ) → ℝ := fun y =>
+      (univ.filter fun z => Majorizes (countVec y) (countVec z)).sup' (hne y) u
+    have huw (y : Fin n → σ) : u y ≤ w y :=
+      le_sup' u (mem_filter.mpr ⟨mem_univ _, Majorizes.refl _⟩)
+    have hwv (y : Fin n → σ) : w y ≤ v y :=
+      sup'_le _ _ fun z hz => hu ▸ hv ▸ ih y z (mem_filter.mp hz).2
+    have hw : SchurConvex w := fun y y' hyy' =>
+      sup'_le _ _ fun z hz =>
+        le_sup' u (mem_filter.mpr ⟨mem_univ _, hyy'.trans (mem_filter.mp hz).2⟩)
+    simp only [Kernel.iterate_succ, Kernel.apply, acKernel, ← hu, ← hv]
+    calc (Distribution.independent fun _ : Fin n => α' c').expect u
+        ≤ (Distribution.independent fun _ : Fin n => α' c').expect w :=
+          Distribution.expect_mono _ huw
+      _ ≤ (Distribution.independent fun _ : Fin n => α c).expect w :=
+          multinomial_schurConvex _ _ (h c c' hc) w hw
+      _ ≤ (Distribution.independent fun _ : Fin n => α c).expect v :=
+          Distribution.expect_mono _ hwv
 
 /-- **Theorem 2** (BCEKMN17), for the number of colours: started from the same configuration,
 the dominating AC-process has at most `κ` colours at time `T` with at least the probability of

@@ -5,6 +5,7 @@ import ThreeMajority
 #print axioms ThreeMajority.stepCol_bool
 #print axioms ThreeMajority.numColours_le_of_majorizes
 #print axioms ThreeMajority.schurConvex_numColours_le
+#print axioms ThreeMajority.expect_le_of_majorizes
 #print axioms ThreeMajority.multinomial_schurConvex
 #print axioms ThreeMajority.ac_comparison
 #print axioms ThreeMajority.ac_numColours
@@ -21,4 +22,5 @@ import ThreeMajority
 #print axioms ThreeMajority.walk_expect_le
 #print axioms ThreeMajority.voter_reduce_whp
 #print axioms ThreeMajority.threeMaj_reduce_whp
+#print axioms ThreeMajority.anyStart_asymptotics
 #print axioms ThreeMajority.threeMaj_anyStart_consensus

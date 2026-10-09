@@ -59,7 +59,30 @@ def SchurConvex (φ : (Fin n → σ) → ℝ) : Prop :=
 colours (BCEKMN17, Section 2.3, observation 1 after Lemma 1: consensus is maximal for `⪯`). -/
 theorem numColours_le_of_majorizes {c c' : Fin n → σ}
     (h : Majorizes (countVec c) (countVec c')) : numColours c ≤ numColours c' := by
-  sorry
+  obtain ⟨S', hcard, hsum⟩ := h.2 (univ.image c')
+  -- the colours of `c'` carry all `n` agents
+  have himg : ∑ a ∈ univ.image c', countVec c' a = n := by
+    simp only [countVec, colourCount]
+    rw [← Nat.cast_sum, ← card_eq_sum_card_image]
+    simp
+  have htot : ∑ a, countVec c a = n := by
+    simp only [countVec, colourCount]
+    rw [← Nat.cast_sum, ← card_eq_sum_card_fiberwise (fun v _ => mem_univ (c v))]
+    simp
+  -- hence so do the colours of `S'` for `c`, and every colour of `c` lies in `S'`
+  have hsub : univ.image c ⊆ S' := by
+    intro a ha
+    by_contra haS
+    obtain ⟨v, -, rfl⟩ := mem_image.mp ha
+    have hpos : 0 < countVec c (c v) := by
+      simp only [countVec, colourCount]
+      exact_mod_cast card_pos.mpr ⟨v, by simp⟩
+    have hle : ∑ a ∈ insert (c v) S', countVec c a ≤ ∑ a, countVec c a :=
+      sum_le_univ_sum_of_nonneg fun _ => by simp only [countVec]; positivity
+    rw [sum_insert haS] at hle
+    linarith
+  calc numColours c ≤ S'.card := card_le_card hsub
+    _ = numColours c' := hcard
 
 /-- The indicator of "at most `κ` colours" is Schur-convex. -/
 theorem schurConvex_numColours_le (κ : ℕ) :

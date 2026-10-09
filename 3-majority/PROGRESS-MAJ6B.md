@@ -7,9 +7,10 @@ the numbering of v1. Roadmap row MAJ-6, part (b): the upper bound
 anonymous consensus processes that dominates 3-Majority's colour reduction by the Voter
 model's. Part (a) (the 2-Choices lower bound) is handled separately.
 
-Status: **statements pinned** (phase 1 of the fixed-statement protocol). The pinned
-declarations are listed in `PINNED.txt` at the repository root. Proved so far: the bridge to the
-two-opinion model and the small infrastructure lemmas listed at the end.
+Status: **complete**. All pinned statements are proved; `lake build ThreeMajority` succeeds
+without warnings and `python3 ../scripts/check_axioms.py` reports only the standard axioms
+(`propext`, `Classical.choice`, `Quot.sound`). The only hypothesis left is the cited Phase 2
+result (`Bcnpt16Phase2`, deviation 5), an explicit assumption of the main theorem.
 
 ## Files
 
@@ -19,9 +20,11 @@ All new files are imported from `ThreeMajority.lean`.
 | --- | --- |
 | `ThreeMajority/AnyStartModel.lean` | k-colour 3-Majority on `Tgt3 n`, Voter, colour counts |
 | `ThreeMajority/AnyStartMajorization.lean` | majorization, Schur-convex observables |
+| `ThreeMajority/AnyStartRinott.lean` | proof of Proposition 1 (`expect_le_of_majorizes`) |
 | `ThreeMajority/AnyStartComparison.lean` | AC-processes, dominance, Proposition 1, Theorem 2 |
 | `ThreeMajority/AnyStartVsVoter.lean` | Equations (1), (2), both are AC-processes, Lemma 2 |
 | `ThreeMajority/AnyStartVoter.lean` | coalescing walks, Lemma 4 (duality), Equation (7), Lemma 3 |
+| `ThreeMajority/AnyStartAsymptotics.lean` | the real inequalities of Theorem 4 (`anyStart_asymptotics`) |
 | `ThreeMajority/AnyStartMain.lean` | Phase 1, the cited Phase 2 result as a hypothesis, Theorem 4 |
 
 `Audit.lean` prints the axioms of the package's main theorems, including the pinned theorems
@@ -214,18 +217,64 @@ non-Schur-convex `φ`); `ac_comparison` for 3-Majority from `c` against Voter fr
 of `voter_reduce_whp` (`n < 3000`); and `⌊n^{1/4} log^{1/8} n⌋ ≤ n^{7/24}` for
 `44 ≤ n < 10⁶` (it fails at `n = 42, 43`; Theorem 4 only needs large `n`). All passed.
 
-## Proved so far
+## Proofs
 
-`stepCol_bool`, `runCol_eq_foldl`, `runCol_append`, `voterRun_eq_foldl`,
-`image_stepCol_subset`, `numColours_stepCol_le`, `numColours_runCol_append_le`,
-`numColours_voterStep_le`, `Majorizes.refl`, `Majorizes.trans`; and, from pinned lemmas still
-open, `schurConvex_numColours_le` (from `numColours_le_of_majorizes`), `ac_numColours` (from
-`ac_comparison`) and `walk_drift_paper` (from `walk_drift`).
+All 16 pinned theorems that were open are proved, together with the helper lemmas below.
+Line counts: `AnyStartMajorization` 98, `AnyStartRinott` 534, `AnyStartComparison` 101,
+`AnyStartVsVoter` 296, `AnyStartVoter` 422, `AnyStartAsymptotics` 119, `AnyStartMain` 128.
+
+* `numColours_le_of_majorizes`: the colours of `c'` carry all `n` agents, so the set `S'` given by
+  the majorization carries all agents of `c`, and every colour of `c` lies in `S'`.
+* `multinomial_schurConvex` (Proposition 1) is `expect_le_of_majorizes` (`AnyStartRinott.lean`).
+  The paper cites it (Rinott; Marshall–Olkin–Arnold 11.E.11) without proof; the proof here
+  avoids the decomposition by the agents of colours `a, b` and all binomial sums:
+  * `expect_le_of_transfer` (one Robin Hood transfer from `a` to `b`): with `F(θ)` the
+    expectation when `a` has mass `θ` and `b` mass `s − θ`, `F` is nondecreasing on `[s/2, s]`
+    (`monotoneOn_of_deriv_nonneg`). Its derivative is a sum over agents `v`; swapping `a, b` for
+    all agents and then for agent `v` only pairs the terms into products
+    `(Π_θ − Π_{s−θ}) (φ(v ↦ a) − φ(v ↦ b))` of two factors of the same sign, both governed by
+    whether the other agents have colour `a` at least as often as `b`
+    (`sum_transferSlope_nonneg`, `transfer_term_nonneg`, `majorizes_countVec_update`).
+  * `expect_le_of_partial_sums`: a chain of transfers (the Hardy–Littlewood–Pólya step
+    `exists_transfer_step`, by strong induction on the number of differing colours), for `q`
+    sorted along an enumeration of the colours and partial sums of `p` dominating those of `q`.
+  * `expect_le_of_majorizes`: sorting (`exists_equiv_antitone`, from `Tuple.sort`) and
+    relabelling the colours of `p` (`expect_independent_perm`, Schur-convex observables are
+    invariant under relabelling) reduce the sort-free `Majorizes` to that case.
+* `ac_comparison` (Theorem 2): by induction on `T`, with `w y = sup' {u_T z | z ⪯ y}`
+  (deviation 2).
+* `alphaVoter_weight`, `alpha3M_weight` (Equations (1), (2)): normalized fibre counts
+  (`uniform_map_weight`); for 3-Majority, the indicator identity
+  `[maj = a] = [x₂ = a][x₃ = a] + [x₁ = a] − [x₂ = x₃][x₁ = a]` (`ite_majority_eq`) and
+  `∑_{u,v} [c u = c v] = ∑_b c_b²` (`card_majColour_eq`, `sum_sq_colourCount`).
+* `apply_ofStep_stepCol`, `apply_ofStep_voterStep`: independent push-forwards
+  (`independent_map_expect`) and `Distribution.independent_uniform_expect`.
+* `dominates_alpha3M_alphaVoter` (Lemma 2's inequality): a top set of the same size
+  (`exists_top_set`, exchange argument) and the sort-free form of the paper's inequality,
+  `‖x‖₂² ∑_S x ≤ ∑_S x²` on a top set `S` (`sq_norm_mul_sum_le`, from
+  `∑_{i∈S} ∑_j x_i x_j (x_i − x_j) ≥ 0`), instead of the paper's induction on the sorted vector.
+* `voter_le_threeMaj` (Lemma 2): both processes are AC-processes (`iterate_eq_of_apply_eq`),
+  then `ac_numColours`.
+* `numColours_voterRun_le`, `voter_dual` (Lemma 4, Equation (6)): pathwise inclusion of the
+  colours in the image of the walks (`image_voterRun_subset`), then time reversal.
+* `walk_drift`: the expected occupancy `n (1 − (1 − 1/n)^x)` (`avg_card_walkStep`) and the
+  degree-3 Bonferroni bound for `(1 − q)^x` (`bonferroni_le_one_sub_pow`).
+* `walk_expect_le`: `m_{t+1} ≤ f(m_t)` for the concave `f(x) = x − x(x−1)/(3n)`, by the tangent
+  line bound (`walk_drift_le_tangent`, which replaces Jensen) and monotonicity of `f` on
+  `[0, n+1]` (`walk_drift_mono`); then induction.
+* `voter_reduce_whp` (Lemma 3): blocks of `τ = ⌈6n/k⌉` rounds, Markov on `X_τ − 1` (the walks
+  never vanish, `walk_iterate_mono_of_closed`), `Kernel.geometric_blocks` with factor `1/2`,
+  `Kernel.iterate_antitone`, and `j = ⌊T/τ⌋` blocks.
+* `threeMaj_reduce_whp` (Phase 1): complement of `voter_le_threeMaj`, and `voter_reduce_whp`.
+* `threeMaj_anyStart_consensus` (Theorem 4): `T = T₁ + T₂` with `T₁ = ⌈24 (n/k) log n⌉`,
+  `k = phase1Colours n`; after `T₁` rounds either more than `k` colours remain (probability
+  `≤ 1/n`) or the Phase 2 hypothesis applies to the current configuration. The real
+  inequalities (`1 ≤ k ≤ n^{7/24}`, both phases within `C n^{3/4} log^{7/8} n` rounds, with
+  `C = 49 + 4|C₂|`) are `anyStart_asymptotics`, through `log y ≤ y^{1/4}` and
+  `log^{1/8} y ≤ y^{1/24}` for large `y`.
+
+`Audit.lean` also prints the axioms of `expect_le_of_majorizes` and `anyStart_asymptotics`.
 
 ## Remaining
 
-16 pinned theorems (`sorry`). Suggested order: `numColours_le_of_majorizes`;
-`alphaVoter_weight`, `alpha3M_weight`, `apply_ofStep_stepCol`, `apply_ofStep_voterStep`,
-`dominates_alpha3M_alphaVoter`; `numColours_voterRun_le`, `voter_dual`, `walk_drift`,
-`walk_expect_le`, `voter_reduce_whp`; `multinomial_schurConvex` (the hardest);
-`ac_comparison`, `voter_le_threeMaj`; `threeMaj_reduce_whp`; `threeMaj_anyStart_consensus`.
+Nothing. Current errors: none.
