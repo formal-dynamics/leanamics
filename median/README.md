@@ -70,7 +70,7 @@ expectation bound separately, which was added as `expected_minority_step`); the 
 Claude agent under the fixed-statement protocol, and verified mechanically (statements
 unchanged, no placeholders, warning-free build, axiom audit).
 
-### A small initial imbalance (Theorem 2)
+### A small initial imbalance (Theorem 2, roadmap MAJ-5 (b))
 
 The paper's Theorem 2: on a `d`-regular graph, an initial imbalance `ν₀ = (A − B)/n ≥ K λ_G`
 suffices for the majority to win in `O(log n)` rounds. Phase I (the paper's Lemma 2 and
@@ -88,16 +88,20 @@ mixing hypothesis `MixingProp G d α c` of Lemma 2 (implied by `λ_G ≤ α`):
 | **Theorem 2**, explicit form: `4000 λ_G ≤ ν₀`; after `T₁ + T₂` rounds the majority holds everywhere except w.p. `≤ T₁(e^{−α²n/120} + e^{−α²n/800}) + (24/25)^{T₂} n + (T₁ + T₂) e^{−n/97000}` with `α = ν₀/4000` | `two_choices_expander_general_explicit` |
 | **Theorem 2**, `O(log n)` form: `K λ_G ≤ ν₀`; after `⌈C log n⌉` rounds, failure `≤ 1/n + (2C log n + C) e^{−ν₀²n/C}` (`K = 4000`, `C = 2·10¹⁰`) | `two_choices_expander_general` |
 
-The paper's Theorem 2 claims success with probability tending to `1` whenever `ν₀ ≥ K λ_G`;
-this fails when `λ_G` is of order `1/√n` or smaller (for instance on the complete graph with
-`A − B` constant), and the formal bound is in terms of `ν₀² n` instead; see
-[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md) and
-[PROGRESS-MAJ5B.md](PROGRESS-MAJ5B.md).
+The paper's Theorem 2 needs a major correction: it claims success with probability tending to
+`1` whenever `ν₀ ≥ K λ_G`, but when `λ_G` is of order `1/√n` or smaller this does not follow
+from Phase I, and on the complete graph (`λ_G = 1/(n − 1)`) a constant difference `A − B ≥ K + 2`
+lets the majority win only with probability tending to `1/2`. The formal theorem keeps the
+hypothesis `ν₀ ≥ K λ_G` and bounds the failure probability in terms of `ν₀² n` instead (it tends
+to `0` once `ν₀² n` is large compared with `log log n`, for instance for every fixed `ν₀ > 0`);
+see [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md#theorem-2-of-the-paper-needs-a-major-correction).
+Theorems 1 and 3 (random regular graphs) and the robustness result are not formalized.
 
-**Provenance (Theorem 2).** The statements were written and fixed in advance (pinned, together
-with the defining equations `*_spec` of the definitions they use); the proofs are by Claude
-agents (Opus) under the fixed-statement protocol, and verified mechanically (statements
-unchanged, no placeholders, warning-free build, axiom audit).
+**Provenance (Theorem 2).** The statements were pinned by a Claude agent (together with the
+defining equations `*_spec` of the definitions they use) and reviewed by a second agent, which
+confirmed the major correction; the proofs are by a Claude agent under the fixed-statement
+protocol, and verified mechanically (statements unchanged, no placeholders, warning-free build,
+axiom audit).
 
 ## Plurality consensus with `k` colours (k-party 2-Choices)
 
