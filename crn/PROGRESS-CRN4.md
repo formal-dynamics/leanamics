@@ -7,22 +7,87 @@ Distributed Computing 30 (2017). The 3-state protocol is that of D. Angluin, J. 
 D. Eisenstat, *A simple population protocol for fast robust approximate majority*, Distributed
 Computing 21 (2008) [AAE08].
 
-Status: **statements pinned** (phase 1). Files:
+Status: **all pinned statements proved** (phase 2). `lake build Crn` succeeds without
+warnings, there is no `sorry` left in the four files, and `python3 ../scripts/check_axioms.py`
+reports only the standard axioms (`propext`, `Classical.choice`, `Quot.sound`) for every audited
+declaration, including all CRN-4 pins. No pinned statement, definition body or section `variable`
+was changed; the proofs only add helper lemmas (and one new section, `Absorption`).
 
-| File | Content |
-| --- | --- |
-| `Crn/GraphMajorityBasic.lean` | protocols on an interaction graph, stable computation on graphs, majority |
-| `Crn/GraphMajorityAmbassador.lean` | the 4-state ambassador protocol, [MNRS14, Theorem 2] |
-| `Crn/GraphMajorityLowerBound.lean` | at least 4 states are needed, [MNRS14, Theorem 1] |
-| `Crn/GraphMajorityRandom.lean` | the 3-state protocol of [AAE08] on a graph, [MNRS14, Theorem 4] |
+| File | Content | Lines |
+| --- | --- | --- |
+| `Crn/GraphMajorityBasic.lean` | protocols on an interaction graph, stable computation on graphs, majority | 184 |
+| `Crn/GraphMajorityAmbassador.lean` | the 4-state ambassador protocol, [MNRS14, Theorem 2] | 451 |
+| `Crn/GraphMajorityLowerBound.lean` | at least 4 states are needed, [MNRS14, Theorem 1] | 165 |
+| `Crn/GraphMajorityRandom.lean` | the 3-state protocol of [AAE08] on a graph, [MNRS14, Theorem 4] | 678 |
 
-The pinned declarations are listed in `PINNED.txt` at the repository root. Proved already:
-the agreement with `Protocol.StablyComputes` on the complete graph, the transition tables,
+The pinned declarations are listed in `PINNED.txt` at the repository root. Proved at the pin
+commit: the agreement with `Protocol.StablyComputes` on the complete graph, the transition tables,
 the closure lemmas `graphOutputStable_of_allColor` and `prob_unanimous_of_unanimous`, the
 one-step coupling and symmetry `graphStep_mono`, `graphStep_swap`, the bounds
 `winProb_mem_Icc`, and the corollaries `not_graphStablyComputes_majority`,
 `rank_majority_eq_four`, `tendsto_winProb`, `absorbProb_minority_le_majority`,
-`ambassador_stablyComputesOnGraph_top`. Remaining `sorry`s: 17.
+`ambassador_stablyComputesOnGraph_top`. The 17 remaining `sorry`s are now proved (see
+"Proofs" below). Remaining: none.
+
+## Proofs (phase 2)
+
+### `GraphMajorityBasic`
+
+* `GraphReaches.extend`: induction on `ReflTransGen`; a step along `d` is simulated by the dart
+  `(f d.fst, f d.snd)` of `G'`; on the range of `f` both sides agree by injectivity, off the
+  range both are frozen (`Function.extend_apply'`).
+
+### `GraphMajorityAmbassador` (Theorem 2)
+
+* Counting: `ambInd`, `ambCount_eq_sum`, `ambCount_interact_add` (`sum_add_pair` over one
+  encounter) and the table facts `ambInd_δ_le`, `ambInd_δ_sub` (by `decide` over the 16 pairs)
+  give `ambCount_interact_le` and `ambCount_sub_interact`; `ambCount_input` by `simp`.
+* One-step facts: `interact_move` (an ambassador moves onto a vertex without ambassador and
+  paints it), `ambCount_interact_move` (a move changes no count), `ambCount_interact_annihilate`
+  (both counts drop by one); `card_filter_add_pair` (counting a state predicate when two agents
+  change); `exists_adj_dist_lt` (on a connected graph, a neighbour strictly closer to `w`).
+* `exists_reaches_annihilate_of_dist`: strong induction on the distance from a red ambassador
+  `u` to a green ambassador `w`; the red ambassador walks along a shortest path, moving onto free
+  vertices and handing over to red ambassadors it meets, until it meets a green one. This is the
+  fix of the "blocking" gap noted below.
+* `exists_reaches_spread_of_dist` (strong induction on the distance from a `b`-ambassador to a
+  vertex of color `!b`, no `!b`-ambassadors): reaches a configuration with strictly fewer
+  `!b`-colored vertices; `exists_reaches_allColor` iterates it (strong induction on that number).
+* `ambCount_sub_reaches` (the invariant along reachability), `exists_reaches_ambCount_eq_zero`
+  (iterated annihilation, `𝒞_{k,ℓ} → 𝒞_{k−ℓ,0}`), then `ambassador_graphStablyComputes`.
+* `graphReaches_eq_of_noAmb` (configurations without ambassadors are frozen) for
+  `ambassador_tie_stuck`.
+
+### `GraphMajorityLowerBound` (Theorem 1)
+
+* `Protocol.GraphReaches.eq_of_fin_one` (one agent has no partner),
+  `output_input_of_stablyComputesOnGraph_top_majority` (both outputs occur, on `Fin 1`),
+  `not_stablyComputesOnGraph_top_majority_of_unique` (the core argument, once for both colors:
+  if `q₁` is the only state with output `b`, the inputs `(b, b, !b)` and `(b, b, b)` on `Fin 3`
+  reach "all `q₁`", and embedding them into `Fin 5` with two extra `!b` agents
+  (`GraphReaches.extend` along `Fin.castLE`) gives a common configuration reachable from inputs
+  with majorities `!b` and `b`). The main theorem counts the two output classes of `Q`.
+
+### `GraphMajorityRandom` (Theorem 4)
+
+* Coupling and symmetry: `graphKernel_apply`, `iterate_graphKernel_mono` (monotone observables
+  stay monotone at every time), `iterate_graphKernel_swap`, `unanimous_swap_iff`; then
+  `event_allX_mono`, `event_swap`, `winProb_monotone`.
+* Hall: `exists_injective_of_regular` by `Finset.all_card_le_biUnion_card_iff_exists_injective`
+  and double counting (`card_mul_eq_card_mul`, `card_mul_le_card_mul`);
+  `exists_injective_subset` applies it to `T S = {A ⊆ S, #A = n − m}` with
+  `r = d = C(m, n − m)` (bijections with `S.powersetCard (n − m)` and, via complements, with
+  `Aᶜ.powersetCard (n − m)`).
+* `winProb_minority_le_majority`: as in eqs. (18) to (23), with `τ S = (σ S)ᶜ` a bijection of
+  the `m`-sets, so the final inequality (23) is an equality (`avg_equiv`).
+* Absorption (section `Absorption`): `rule_fst`, `rule_blank_snd`, `rule_snd_rule_snd` (an
+  initiator `s ≠ B` activated twice on the same responder makes it `s`), `graphStep_fst`,
+  `graphStep_snd`, `graphStep_of_ne`, `graphStep_of_unanimous`, `graphStep_eq_of_fst`,
+  `graphStep_not_unanimous_blank`, `graphReaches_const` (spreading an opinion to all agents,
+  using a boundary dart `SimpleGraph.Walk.exists_boundary_dart`), `exists_iterate_lt_one`
+  (reachability of a state where `g < 1` gives `K^k g < 1`), `iterate_unanimous_blank`. Then
+  `tendsto_event_unanimous` by `Kernel.finite_absorption` on the indicator of "not unanimous",
+  and `half_le_absorbProb_majority` from the limits and `absorbProb_minority_le_majority`.
 
 ## Pinned statements in words
 
@@ -208,4 +273,4 @@ one-step coupling and symmetry `graphStep_mono`, `graphStep_swap`, the bounds
 
 | ID | Result | Source | Needs | Size | Status |
 | --- | --- | --- | --- | --- | --- |
-| CRN-4 | **Majority on arbitrary graphs with very small local memory.** Population protocols on a connected interaction graph `G` (interactions along edges), two input types. (a) The 4-state *ambassador protocol* stably computes the initial majority on every connected graph (ties excluded), in the reachability form of CRN-3 generalized to graphs; (b) no protocol with at most 3 states does, already on complete graphs, so 4 states are optimal; (c) the 3-state approximate-majority protocol (CRN-1) on any graph, with a uniformly random oriented edge per step and a uniformly random placement of the two types, converges to the majority with probability at least that of converging to the minority (at every finite time, by a monotone coupling, the colour symmetry and Hall's theorem), hence with probability at least 1/2 on connected graphs. Remaining: expected convergence times (`O(n⁶)`, clique `O(n² log n / gap)`), robustness on the clique (minority below `n/7` wins with probability `e^{−Θ(n)}`) and the failure families (lollipop graphs: the minority wins w.h.p.; two cliques joined by an edge: exponential time). | Mertzios–Nikoletseas–Raptopoulos–Spirakis, ICALP 2014 (arXiv:1404.7671; Distributed Computing 2017); Angluin–Aspnes–Eisenstat 2008 | CRN-1, CRN-3, FND-2, FND-7 | M (a–c) / L (times, failure families) | open |
+| CRN-4 | **Majority on arbitrary graphs with very small local memory.** Population protocols on a connected interaction graph `G` (interactions along edges), two input types. (a) The 4-state *ambassador protocol* stably computes the initial majority on every connected graph (ties excluded), in the reachability form of CRN-3 generalized to graphs; (b) no protocol with at most 3 states does, already on complete graphs, so 4 states are optimal; (c) the 3-state approximate-majority protocol (CRN-1) on any graph, with a uniformly random oriented edge per step and a uniformly random placement of the two types, converges to the majority with probability at least that of converging to the minority (at every finite time, by a monotone coupling, the colour symmetry and Hall's theorem), hence with probability at least 1/2 on connected graphs. Remaining: expected convergence times (`O(n⁶)`, clique `O(n² log n / gap)`), robustness on the clique (minority below `n/7` wins with probability `e^{−Θ(n)}`) and the failure families (lollipop graphs: the minority wins w.h.p.; two cliques joined by an edge: exponential time). | Mertzios–Nikoletseas–Raptopoulos–Spirakis, ICALP 2014 (arXiv:1404.7671; Distributed Computing 2017); Angluin–Aspnes–Eisenstat 2008 | CRN-1, CRN-3, FND-2, FND-7 | M (a–c) / L (times, failure families) | (a–c) proved |

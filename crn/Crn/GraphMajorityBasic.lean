@@ -164,7 +164,20 @@ theorem GraphReaches.extend {m : ℕ} {G : SimpleGraph (Fin m)} {G' : SimpleGrap
     {f : Fin m → Fin n} (hf : Function.Injective f) (hG : ∀ u v, G.Adj u v → G'.Adj (f u) (f v))
     {c d : Fin m → Q} (h : P.GraphReaches G c d) (e : Fin n → Q) :
     P.GraphReaches G' (Function.extend f c e) (Function.extend f d e) := by
-  sorry
+  induction h with
+  | refl => exact Relation.ReflTransGen.refl
+  | tail _ hs ih =>
+    obtain ⟨d, rfl⟩ := hs
+    refine ih.tail ⟨⟨(f d.fst, f d.snd), hG _ _ d.adj⟩, ?_⟩
+    funext w
+    by_cases hw : ∃ v, f v = w
+    · obtain ⟨v, rfl⟩ := hw
+      rw [hf.extend_apply, interact_apply, interact_apply]
+      simp only [dartPair, hf.extend_apply, hf.eq_iff]
+    · have h1 : w ≠ f d.fst := fun h => hw ⟨_, h.symm⟩
+      have h2 : w ≠ f d.snd := fun h => hw ⟨_, h.symm⟩
+      rw [Function.extend_apply' _ _ _ hw, interact_of_ne _ _ _ h1 h2,
+        Function.extend_apply' _ _ _ hw]
 
 end Protocol
 
