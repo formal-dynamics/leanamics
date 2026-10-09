@@ -202,9 +202,10 @@ quadratic potential instead of the paper's phase calculus.
 
 The classical protocols on `K_n` with self-calls (the paper's convention; every node calls a
 uniformly random node in each round), as rumor-spreading processes (`push`, `pull`, `pushPull`,
-in [`Epidemics/Revisited/Protocols.lean`](Epidemics/Revisited/Protocols.lean) and
-[`Instances.lean`](Epidemics/Revisited/Instances.lean)), starting from any nonempty set of
-informed nodes:
+in [`Epidemics/Revisited/Protocols.lean`](Epidemics/Revisited/Protocols.lean),
+[`Instances.lean`](Epidemics/Revisited/Instances.lean) and
+[`Lower.lean`](Epidemics/Revisited/Lower.lean)). The upper bounds start from any nonempty set of
+informed nodes, the lower bounds from one informed node:
 
 | Result | Paper | Lean declaration |
 | --- | --- | --- |
@@ -214,13 +215,19 @@ informed nodes:
 | Push: all informed within `log₂ n + ln n + O(1)` rounds, exponential tail and expectation | Theorem 51 (upper bound) | `push_spreading_tail`, `push_spreading_expect` |
 | Pull: `log₂ n + log₂ ln n + O(1)` | Theorem 52 (upper bound) | `pull_spreading_tail`, `pull_spreading_expect` |
 | Push–pull: `log₃ n + log₂ ln n + O(1)` | Theorem 53 (upper bound) | `pushPull_spreading_tail`, `pushPull_spreading_expect` |
+| Push, from one informed node: all informed within `⌊log₂ n⌋ + ⌊ln n⌋ - r` rounds with probability at most `A e^{-κ r}`, expected time at least `log₂ n + ln n - O(1)` | Theorem 51 (lower bound) | `push_spreading_lower_tail`, `push_spreading_lower_expect` |
+| Pull: `log₂ n + log₂ ln n - O(1)` | Theorem 52 (lower bound) | `pull_spreading_lower_tail`, `pull_spreading_lower_expect` |
+| Push–pull: `log₃ n + log₂ ln n - O(1)` | Theorem 53 (lower bound) | `pushPull_spreading_lower_tail`, `pushPull_spreading_lower_expect` |
+| The phases of the lower bounds: growth by the first moment, one-round lower tails, final phases | Theorems 27, 38, 48 and Lemmas 39, 49 for the instances | `*_growth_lower`, `*_round_lower`, `*_final_lower` (`LowerPush.lean`, `LowerPull.lean`, `LowerPushPull.lean`) |
+| Generic tools: round-by-round lower envelope, first-moment bound on reaching `m` nodes, joining two phases at a fixed time | Lemmas 42 and 50 (round-by-round form); replace Theorem 27 and Lemma 20 for the instances | `envelope_le`, `envelope_seq_le`, `reach_le_of_expect_card_le`, `reach_add_le` (`LowerGeneric.lean`) |
 
-For push this is the sharp upper bound of Frieze and Grimmett and of Pittel (all nodes informed
-after `log₂ n + ln n + O(1)` rounds), with an exponential tail. The package `rumor_spread/` has
+For push the two sides give the sharp `log₂ n + ln n ± O(1)` of Frieze and Grimmett and of
+Pittel, with exponential tails on both sides. The package `rumor_spread/` has
 its own PUSH, PULL and PUSH–PULL models (without self-calls) and proves `O(log n)` bounds with
-large constants; the two developments are independent. Lower bounds are not formalized.
-Deviations (Theorem 43's proof, the parameters of the instances) are listed in
-[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
+large constants; the two developments are independent. The lower bounds join the growth phase
+and the final phase at a fixed time (Markov property) instead of through Lemma 20. Deviations
+(Theorem 43's proof, the parameters of the instances, the direct route of the lower bounds) are
+listed in [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 
 ## COBRA ⇔ BIPS duality and the COBRA cover time (EPI-4)
 
@@ -291,7 +298,9 @@ Grok agent and the rest (Lemma 20, Theorem 31, total time) by a Claude agent. Th
 exponential shrinking regime (Theorem 43) and the push, pull and push–pull instances (EPI-8 (c)):
 the statements were written by a Claude agent and reviewed by a second agent against the paper
 before the proofs, which are by a Claude agent under the fixed-statement protocol and the same
-checks. Supercritical giant
+checks. The lower bounds of the instances (EPI-8 (c)): the statements were pinned by a Claude agent
+and reviewed by a second agent; the proofs were started by a Grok agent and completed by a Claude
+agent under the fixed-statement protocol and the same checks. Supercritical giant
 component (EPI-3): the statements were pinned and then proved by a Claude agent under the same
 protocol and checks; the statements were reviewed by a second agent against the source. Subcritical
 percolation (EPI-2): statements and proofs were written by a Claude agent under the same protocol

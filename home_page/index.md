@@ -87,7 +87,7 @@ Formalized: the isothermal theorem on regular graphs ([Lieberman, Hauert and Now
 
 Formalized: push, pull and push–pull rumor spreading on $K_n$ inform all nodes within $O(\log n)$
 rounds ([push]({{ '/rumor_spread/blueprint/' | relative_url }}#sec:main-statement), [pull and push–pull]({{ '/rumor_spread/blueprint/' | relative_url }}#sec:pull)), with
-sharp upper bounds from a general analysis ([Doerr and Kostrygin, ICALP 2017]({{ '/epidemics/blueprint/' | relative_url }}#sec:doerr-kostrygin));
+sharp upper bounds from a general analysis ([Doerr and Kostrygin, ICALP 2017]({{ '/epidemics/blueprint/' | relative_url }}#sec:doerr-kostrygin)) and the matching [lower bounds]({{ '/epidemics/blueprint/' | relative_url }}#sec:doerr-kostrygin-lower);
 Reed–Frost epidemics as percolation, with small outbreaks below the threshold, also on small-world
 networks ([Becchetti et al.]({{ '/epidemics/blueprint/' | relative_url }}#sec:bcdptz-small-world)), and a giant component above it
 ([Krivelevich and Sudakov, 2013]({{ '/epidemics/blueprint/' | relative_url }}#sec:krivelevich-sudakov)); the COBRA–BIPS duality
