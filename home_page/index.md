@@ -104,7 +104,9 @@ networks ([Becchetti et al.]({{ '/epidemics/blueprint/' | relative_url }}#sec:bc
 Formalized: the stochastic mass-action kinetics of a bimolecular network has the same jump
 chain as the population protocol on the same reactions, and population protocols stably compute every
 threshold and remainder predicate and their Boolean combinations ([Angluin et al.,
-2006]({{ '/crn/blueprint/' | relative_url }}#sec:aadfp-stable)).
+2006]({{ '/crn/blueprint/' | relative_url }}#sec:aadfp-stable)); on every connected interaction graph, 4 states suffice and are needed
+for exact majority, and approximate majority from a random placement favours the majority
+([Mertzios et al., ICALP 2014]({{ '/crn/blueprint/' | relative_url }}#sec:mnrs-graph-majority)).
 
 [Blueprint]({{ '/crn/blueprint/' | relative_url }}) · [PDF]({{ '/crn/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/crn/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/crn/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/crn)
 
