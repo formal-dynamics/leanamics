@@ -227,12 +227,12 @@ adversary is Theorem 1.1 of the SPAA 2011 proceedings.
 
 ## Plurality consensus with `k` colours (`TwoChoices*`, roadmap MAJ-4)
 
-Source: Elsässer, Friedetzky, Kaaser, Mallmann-Trenn and Trinker, arXiv:1602.04667. Numbers
-follow its latest version (v5, February 2017, titled *Rapid asynchronous plurality consensus*):
+Source: Elsässer, Friedetzky, Kaaser, Mallmann-Trenn and Trinker, arXiv:1602.04667 (arXiv v5
+numbering: its latest version, v5, February 2017, titled *Rapid asynchronous plurality consensus*):
 Theorem 1.2 (the synchronous upper bound), and in Section 2.1 Observation 2.1, Lemma 2.2 (the
 distance increases), Lemma 2.3 (the coupling) and the proof of Theorem 1.2. In v1 to v4 (titled
 *Efficient k-party voting with two choices*) these are Theorem 1, Observation 3, Lemma 4 and
-Lemma 5. The Lean docstrings call them Theorem 1, Observation 1, Lemma 1 and Lemma 2.
+Lemma 5.
 
 ### The model and the statements
 
@@ -342,9 +342,8 @@ least `1 − C/n`. The proof gives `z = 128` and `C = 384`.
 ## The lower bound for 2-Choices (`TwoChoicesLower`, roadmap MAJ-6 (a))
 
 Source: Berenbrink, Clementi, Elsässer, Kling, Mallmann-Trenn and Natale, *Ignore or comply? On
-breaking symmetry in consensus*, PODC 2017, arXiv:1702.04921 (v1): Theorem 5 (Section 4, proof in
-Appendix A.8) and the 2-Choices half of Theorem 1 (Simplified). The Lean docstrings call
-Theorem 5 "Theorem 3".
+breaking symmetry in consensus*, PODC 2017: Theorem 5 of arXiv:1702.04921 (v1) (Section 4, proof
+in Appendix A.8) and the 2-Choices half of Theorem 1 (Simplified).
 
 ### The statements
 

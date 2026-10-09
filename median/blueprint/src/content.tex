@@ -12,9 +12,10 @@ eliminates a minority of size at most $(\varepsilon/5)n$ within $O(\log n)$ roun
 probability (Theorem~4 of Cooper, Elsässer and Radzik, ICALP 2014). For 2-Choices with any number
 $k$ of colours, the plurality colour wins within $O((n/c_1)\log n)$ rounds from a gap of order
 $\sqrt{n\log n}$ to every other colour (Theorem~1.2 of Elsässer, Friedetzky, Kaaser,
-Mallmann-Trenn and Trinker, without their hypothesis $k=O(n^\varepsilon)$), and from colours of
-$O(\log n)$ nodes each consensus needs $\Omega(n/\log n)$ rounds (Theorem~5 of Berenbrink,
-Clementi, Elsässer, Kling, Mallmann-Trenn and Natale, PODC 2017).
+Mallmann-Trenn and Trinker, arXiv:1602.04667, in arXiv v5 numbering, without their hypothesis
+$k=O(n^\varepsilon)$), and from colours of $O(\log n)$ nodes each consensus needs
+$\Omega(n/\log n)$ rounds (Theorem~5 of arXiv:1702.04921 (v1), Berenbrink, Clementi, Elsässer,
+Kling, Mallmann-Trenn and Natale, PODC 2017).
 \end{abstract}
 
 \section{The model}\label{sec:dgmss-median}
@@ -294,9 +295,8 @@ over the $m-1$ thresholds.
 
 \section{Plurality consensus with $k$ colours}\label{sec:efkmt-plurality}
 This section formalizes the synchronous upper bound of Elsässer, Friedetzky, Kaaser,
-Mallmann-Trenn and Trinker, arXiv:1602.04667 (Theorem~1.2 and Section~2.1 of v5, \emph{Rapid
-asynchronous plurality consensus}; in v1--v4, \emph{Efficient $k$-party voting with two choices},
-these are Theorem~1, Observation~3 and Lemmas~4 and~5), without the adversary and without the
+Mallmann-Trenn and Trinker, arXiv:1602.04667 (arXiv v5 numbering, v5 being titled \emph{Rapid
+asynchronous plurality consensus}): Theorem~1.2 and Section~2.1, without the adversary and without the
 hypothesis $k=O(n^\varepsilon)$
 (\href{https://github.com/formal-dynamics/leanamics/blob/main/median/FORMALIZATION_DIFFERENCES.md#plurality-consensus-with-k-colours-twochoices-roadmap-maj-4}{differences
 from the paper}). Throughout, $c_i$ is the number of nodes of colour $i$, primes denote the values
@@ -458,9 +458,9 @@ has positive probability; conclude with the shared absorption theorem.
 
 \section{A lower bound for 2-Choices}\label{sec:bcekmn-lower}
 This section formalizes the 2-Choices lower bound of Berenbrink, Clementi, Elsässer, Kling,
-Mallmann-Trenn and Natale, \emph{Ignore or comply? On breaking symmetry in consensus} (PODC 2017,
-arXiv:1702.04921): Theorem~5 and the 2-Choices half of Theorem~1 (Simplified), numbered as in the
-arXiv version
+Mallmann-Trenn and Natale, \emph{Ignore or comply? On breaking symmetry in consensus} (PODC 2017):
+Theorem~5 of arXiv:1702.04921 (v1) and the 2-Choices half of its Theorem~1
+(Simplified)
 (\href{https://github.com/formal-dynamics/leanamics/blob/main/median/FORMALIZATION_DIFFERENCES.md#the-lower-bound-for-2-choices-twochoiceslower-roadmap-maj-6-a}{differences
 from the paper}).
 

@@ -8,21 +8,21 @@ import Median.AnyStartDrift
 /-! # The k-party 2-Choices dynamics: plurality consensus from a gap of order `√(n log n)`
 
 Elsässer, Friedetzky, Kaaser, Mallmann-Trenn and Trinker, *Efficient k-party voting with two
-choices* (arXiv:1602.04667; v5, *Rapid asynchronous plurality consensus*), Theorem 1 (upper
-bound, without the adversary): on `K_n`, if the largest colour `A` (count `a = c₁`) leads every
-other colour by at least `z √(n log n)`, 2-Choices reaches consensus on `A` within
-`O((n/c₁) log n) ⊆ O(k log n)` rounds w.h.p.
+choices* (arXiv:1602.04667; v5, *Rapid asynchronous plurality consensus*; arXiv v5 numbering),
+Theorem 1.2 (upper bound, without the adversary): on `K_n`, if the largest colour `A` (count
+`a = c₁`) leads every other colour by at least `z √(n log n)`, 2-Choices reaches consensus on `A`
+within `O((n/c₁) log n) ⊆ O(k log n)` rounds w.h.p.
 
 The proof of the paper, as split here:
-* **Lemma 1** (`distance_increases`): for `a ≤ n/2`, the gap to the second largest colour grows
+* **Lemma 2.2** (`distance_increases`): for `a ≤ n/2`, the gap to the second largest colour grows
   by a factor `1 + a/(4n)` in one round w.h.p.; the expectation part is `expected_gap_ge`
   (with the aggregation `sum_sq_le_aggregate`).
-* **Lemma 2** (`count_stochDom`): a colour that is not larger than another one is stochastically
+* **Lemma 2.3** (`count_stochDom`): a colour that is not larger than another one is stochastically
   dominated by it after one round (the paper states it as a coupling).
-* **Growth phase** (proof of Theorem 1): one round (`growth_round`) and the whole phase
+* **Growth phase** (proof of Theorem 1.2): one round (`growth_round`) and the whole phase
   (`growth_phase`): within `O((n/a) log n)` rounds the plurality colour holds three quarters of
   the nodes w.h.p.
-* **Finishing phase** (proof of Theorem 1, where the paper cites Cooper et al. for two colours):
+* **Finishing phase** (proof of Theorem 1.2, where the paper cites Cooper et al. for two colours):
   from three quarters, the indicator of the colour dominates the binary median process
   (`run_dominates`), which reaches consensus by `Median.binary_consensus` (`finish_phase`).
 
@@ -57,7 +57,7 @@ theorem expList_consensus_mono [NeZero n] (x : Config n α) (i : α) {T₁ T₂ 
   · rw [if_neg h1]
     exact expList_nonneg fun l₂ => by split_ifs <;> norm_num
 
-/-- **Almost agreement** (proof of Theorem 1, last paragraph): from every configuration, the
+/-- **Almost agreement** (proof of Theorem 1.2, last paragraph): from every configuration, the
 probability of not being in consensus after `t` rounds tends to zero. -/
 theorem absorbed [NeZero n] [Fintype α] [Nonempty α] (x : Config n α) :
     Tendsto (fun t => (kernel n α).iterate t notConsensus x) atTop (𝓝 0) := by
@@ -161,9 +161,9 @@ theorem finish_phase [NeZero n] (hL : (128 : ℝ) ≤ Real.log n) (x : Config n 
   · rw [if_neg h1]
     split_ifs <;> norm_num
 
-/-! ### Lemmas 1 and 2 -/
+/-! ### Lemmas 2.2 and 2.3 -/
 
-/-- **Lemma 1** (the distance increases): let `i` be the largest colour (`a = c_i ≤ n/2`) and `j`
+/-- **Lemma 2.2** (the distance increases): let `i` be the largest colour (`a = c_i ≤ n/2`) and `j`
 the second largest (`b = c_j`). There are constants `z` and `C` such that, if `log n ≥ C` and
 `a − b ≥ z √(n log n)`, then after one round `a' − b' > (a − b)(1 + a/(4n))` with probability
 at least `1 − C/n²`. -/
@@ -246,7 +246,7 @@ theorem distance_increases : ∃ z C : ℝ, 0 < z ∧ 0 < C ∧ ∀ (n : ℕ) [N
     linarith [hone, hbad_le, htwo]
   exact hgood
 
-/-! ### Lemma 2: one round of stochastic domination
+/-! ### Lemma 2.3: one round of stochastic domination
 
 The sample pairs that make a node adopt a colour, and a measure-preserving reindexing of rounds.
 Cardinalities are computed from pairs of nodes, so the argument does not need `[Fintype α]`. -/
@@ -412,7 +412,7 @@ lemma count_step_adopt (x : Config n α) (r : Round n) (col : α) :
   ext v
   simp only [mem_filter, mem_univ, true_and]
 
-/-- **Lemma 2** (the coupling), as the stochastic domination it provides: if colour `c` has at
+/-- **Lemma 2.3** (the coupling), as the stochastic domination it provides: if colour `c` has at
 most as many nodes as colour `b`, then after one round `c'` is stochastically dominated by
 `b'`: `P(c' ≥ t) ≤ P(b' ≥ t)` for every `t`. -/
 theorem count_stochDom (x : Config n α) {b c : α} (h : count x c ≤ count x b) (t : ℕ) :
@@ -792,8 +792,8 @@ lemma growth_round_aux [NeZero n] {k : ℕ} (hC : (2 : ℝ) ≤ Real.log n)
   have hgood_avg : 1 - 2 / (n : ℝ) ^ 2 ≤ avg good := by linarith [hone, hbad_le]
   exact hgood_avg
 
-/-- **One round of the growth phase** (proof of Theorem 1: Lemma 1 for every other colour, by
-Lemma 2 and a union bound, here up to `a ≤ 3n/4` with the factor `1 + a/(8n)`): if colour `i`
+/-- **One round of the growth phase** (proof of Theorem 1.2: Lemma 2.2 for every other colour, by
+Lemma 2.3 and a union bound, here up to `a ≤ 3n/4` with the factor `1 + a/(8n)`): if colour `i`
 (count `a ≤ 3n/4`) leads every other colour by at least `g ≥ z √(n log n)`, then with
 probability at least `1 − C/n²` after one round `a' ≥ a` and `i` leads every other colour by at
 least `g (1 + a/(8n))`. -/
@@ -1114,7 +1114,7 @@ lemma growth_ratio_pow_gt {n : ℕ} (hL : (128 : ℝ) ≤ Real.log n) {a : ℝ}
     pow_le_pow_right₀ (by linarith) hBm.le
   exact lt_of_lt_of_le h3gt (hpow3.trans hpowT)
 
-/-- **The growth phase** (proof of Theorem 1): if colour `i` leads every other colour by at
+/-- **The growth phase** (proof of Theorem 1.2): if colour `i` leads every other colour by at
 least `z √(n log n)`, then after `⌈C (n/c_i) log n⌉` rounds it holds at least three quarters of
 the nodes, with probability at least `1 − C/n`. -/
 theorem growth_phase : ∃ z C : ℝ, 0 < z ∧ 0 < C ∧ ∀ (n : ℕ) [NeZero n], C ≤ Real.log n →
@@ -1390,7 +1390,7 @@ theorem growth_phase : ∃ z C : ℝ, 0 < z ∧ 0 < C ∧ ∀ (n : ℕ) [NeZero 
   rw [hflip]
   linarith [hcount_fail, hTmul]
 
-/-! ### Theorem 1 -/
+/-! ### Theorem 1.2 -/
 
 /-- The plurality colour holds at least `n/k` nodes. -/
 lemma div_le_count_of_max {k : ℕ} (x : Config n (Fin k)) (i : Fin k)
@@ -1401,7 +1401,7 @@ lemma div_le_count_of_max {k : ℕ} (x : Config n (Fin k)) (i : Fin k)
         sum_le_sum fun j _ => by exact_mod_cast h j
     _ = k * count x i := by rw [sum_const, card_univ, Fintype.card_fin, nsmul_eq_mul]
 
-/-- **Theorem 1** (upper bound, without the adversary): there are constants `z` and `C` such
+/-- **Theorem 1.2** (upper bound, without the adversary): there are constants `z` and `C` such
 that, if `log n ≥ C` and colour `i` leads every other colour by at least `z √(n log n)`
 (`c₁ − c₂ ≥ z √(n log n)`), then all nodes hold `i` after `⌈C (n/c₁) log n⌉` rounds with
 probability at least `1 − C/n`. No bound on the number `k` of colours is needed (the paper
@@ -1475,7 +1475,7 @@ theorem plurality_whp : ∃ z C : ℝ, 0 < z ∧ 0 < C ∧ ∀ (n : ℕ) [NeZero
         · rw [if_neg hgood, mul_zero]
           exact expList_nonneg fun l₂ => by split_ifs <;> norm_num
 
-/-- **Theorem 1 in the form `O(k log n)`** (roadmap MAJ-4): the same conclusion after
+/-- **Theorem 1.2 in the form `O(k log n)`** (roadmap MAJ-4): the same conclusion after
 `⌈C k log n⌉` rounds, since `c₁ ≥ n/k`. -/
 theorem plurality_whp_k : ∃ z C : ℝ, 0 < z ∧ 0 < C ∧ ∀ (n : ℕ) [NeZero n], C ≤ Real.log n →
     ∀ (k : ℕ) (x : Config n (Fin k)) (i : Fin k),

@@ -5,8 +5,8 @@ import Dynamics.Tail
 /-! # The k-party 2-Choices dynamics: an almost linear lower bound
 
 Berenbrink, Clementi, Elsässer, Kling, Mallmann-Trenn and Natale, *Ignore or comply? On breaking
-symmetry in consensus* (PODC 2017, arXiv:1702.04921), Section 6, Theorem 3 (`lem:lowerTCstrong`;
-proof in Appendix C): let `γ` be a large enough constant, `ℓ` the largest support and
+symmetry in consensus* (PODC 2017, arXiv:1702.04921 v1), Section 4, Theorem 5 (`lem:lowerTCstrong`;
+proof in Appendix A.8): let `γ` be a large enough constant, `ℓ` the largest support and
 `ℓ' = max {2ℓ, γ log n}`. With probability at least `1 − 1/n` no colour has a support larger than
 `ℓ'` during the first `n/(γ ℓ')` rounds. In particular, from a configuration in which every colour
 has `O(log n)` nodes (hence `k = Ω(n/log n)` colours), 2-Choices needs `Ω(n/log n)` rounds to reach
@@ -62,7 +62,7 @@ theorem avg_exp_twice (x : Config n α) (i : α) (θ : ℝ) :
 
 variable [Fintype α]
 
-/-- **Most nodes see two different colours** (proof of Theorem 3): the expected number of nodes
+/-- **Most nodes see two different colours** (proof of Theorem 5): the expected number of nodes
 whose two samples hold different colours, which therefore keep their own colour (`step_of_ne`),
 is `n − ∑_j c_j²/n`. -/
 theorem expected_see_distinct [NeZero n] (x : Config n α) :
@@ -165,7 +165,7 @@ lemma escape_cons_iff (x : Config n α) (i : α) (r : Round n) (l : List (Round 
     rwa [List.take_succ_cons, run_cons]
 
 omit [Fintype α] in
-/-- **Tail bound for one colour** (proof of Theorem 3, with the binomial domination replaced by
+/-- **Tail bound for one colour** (proof of Theorem 5, with the binomial domination replaced by
 an exponential supermartingale at `θ = 1`): if colour `i` has at most `L` nodes, the
 probability that it exceeds `L` at some time `t ≤ T` is at most
 `exp (−(L − c_i) + (e − 1) T L² / n)`. -/
@@ -286,9 +286,9 @@ theorem colour_escape_le [NeZero n] (x : Config n α) (i : α) {L : ℝ}
             field_simp
           linarith
 
-/-! ### Theorem 3 -/
+/-! ### Theorem 5 -/
 
-/-- **Theorem 3** (`lem:lowerTCstrong`): there is a constant `γ₀` such that for every
+/-- **Theorem 5** (`lem:lowerTCstrong`): there is a constant `γ₀` such that for every
 `γ ≥ γ₀`, every configuration whose colours have at most `ℓ` nodes each, with
 `ℓ' = max {2ℓ, γ log n}`, and every `T < n/(γ ℓ')`, the probability that some colour has more
 than `ℓ'` nodes at some time `t ≤ T` is at most `1/n`. -/

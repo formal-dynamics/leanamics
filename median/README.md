@@ -76,11 +76,11 @@ Every node samples two nodes uniformly at random (with replacement) and adopts t
 the two samples agree; otherwise it keeps its own. With two colours this is the median rule
 (`TwoChoices.step_bool`). The colours are any type with decidable equality, and the probabilistic
 theorems use `Fin k` for any `k`. Sources: Elsässer, Friedetzky, Kaaser, Mallmann-Trenn and
-Trinker, arXiv:1602.04667 (v5, *Rapid asynchronous plurality consensus*; v1 to v4 are titled
-*Efficient k-party voting with two choices*), Section 2.1, for the upper bound, and Berenbrink,
+Trinker, arXiv:1602.04667 (arXiv v5 numbering; v5 is titled *Rapid asynchronous plurality
+consensus*, v1 to v4 *Efficient k-party voting with two choices*), Section 2.1, for the upper bound, and Berenbrink,
 Clementi, Elsässer, Kling, Mallmann-Trenn and Natale, *Ignore or comply? On breaking symmetry in
-consensus* (PODC 2017, [arXiv:1702.04921](https://arxiv.org/abs/1702.04921)), Theorem 5 and
-Theorem 1 (Simplified), for the lower bound. Numbers follow these arXiv versions (see
+consensus* (PODC 2017), Theorem 5 and Theorem 1 (Simplified) of
+[arXiv:1702.04921](https://arxiv.org/abs/1702.04921) (v1), for the lower bound (see
 [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md)). Namespace `Median.TwoChoices`:
 
 | Result | Lean declaration |

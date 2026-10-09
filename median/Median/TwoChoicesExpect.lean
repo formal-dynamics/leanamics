@@ -3,15 +3,16 @@ import Median.TwoChoicesDefs
 /-! # The k-party 2-Choices dynamics: one-round expectations
 
 Elsässer, Friedetzky, Kaaser, Mallmann-Trenn and Trinker, *Efficient k-party voting with two
-choices* (arXiv:1602.04667v5), Section 2.1. Write `c_j` for the number of nodes of colour `j`
-and `S = ∑_j c_j²`. A node of colour `i` leaves `i` if and only if its two samples hold the same
-other colour (probability `∑_{j ≠ i} c_j²/n²`), and a node of another colour joins `i` if and only
-if both samples hold `i` (probability `c_i²/n²`). Hence (the paper's equation (1))
+choices* (arXiv:1602.04667v5; arXiv v5 numbering), Section 2.1. Write `c_j` for the number of
+nodes of colour `j` and `S = ∑_j c_j²`. A node of colour `i` leaves `i` if and only if its two
+samples hold the same other colour (probability `∑_{j ≠ i} c_j²/n²`), and a node of another
+colour joins `i` if and only if both samples hold `i` (probability `c_i²/n²`). Hence (the
+paper's equation (1))
 `𝔼[c_i'] = c_i + (n − c_i) c_i²/n² − (c_i/n²) ∑_{j ≠ i} c_j² = c_i (1 + c_i/n − S/n²)`,
-which is monotone in `c_i` (Observation 1), and the gap between two colours evolves as
-`𝔼[c_i' − c_j'] = (c_i − c_j)(1 + (c_i + c_j)/n − S/n²)` (proof of Lemma 1).
+which is monotone in `c_i` (Observation 2.1), and the gap between two colours evolves as
+`𝔼[c_i' − c_j'] = (c_i − c_j)(1 + (c_i + c_j)/n − S/n²)` (proof of Lemma 2.2).
 
-The aggregation of the minority colours (proof of Lemma 1): if `b` bounds every colour other
+The aggregation of the minority colours (proof of Lemma 2.2): if `b` bounds every colour other
 than `i`, then `S ≤ c_i² + (n − c_i) b`; and `S ≤ a n` if `a` bounds every colour. With these,
 `𝔼[a' − b'] ≥ (a − b)(1 + (a/n)(1 − a/n))` for the largest colour `a` and the second largest
 `b`.
@@ -97,7 +98,7 @@ theorem avg_step_node [NeZero n] (x : Config n α) (i : α) (v : Fin n) :
   rw [hs]
   simp_rw [avg_pair]
 
-/-- **Expected count, product form** (proof of Observation 1):
+/-- **Expected count, product form** (proof of Observation 2.1):
 `𝔼[c_i'] = c_i (1 + c_i/n − S/n²)` with `S = ∑_j c_j²`. -/
 theorem expected_count_mul [NeZero n] (x : Config n α) (i : α) :
     avg (fun r : Round n => (count (step x r) i : ℝ))
@@ -125,7 +126,7 @@ theorem expected_count [NeZero n] (x : Config n α) (i : α) :
   field_simp
   ring
 
-/-- **Expected gap** (proof of Lemma 1):
+/-- **Expected gap** (proof of Lemma 2.2):
 `𝔼[c_i' − c_j'] = (c_i − c_j)(1 + (c_i + c_j)/n − S/n²)`. -/
 theorem expected_gap [NeZero n] (x : Config n α) (i j : α) :
     avg (fun r : Round n => (count (step x r) i : ℝ) - count (step x r) j)
@@ -148,7 +149,7 @@ theorem count_le (x : Config n α) (i : α) : count x i ≤ n := by
   unfold count
   exact (card_filter_le _ _).trans (by rw [card_univ, Fintype.card_fin])
 
-/-- `∑_j c_j² ≤ a n` when `a` bounds every count (proof of Lemma 1). -/
+/-- `∑_j c_j² ≤ a n` when `a` bounds every count (proof of Lemma 2.2). -/
 theorem sum_sq_le_max (x : Config n α) {a : ℝ} (ha : ∀ j, (count x j : ℝ) ≤ a) :
     ∑ j : α, (count x j : ℝ) ^ 2 ≤ a * n := by
   have h : ∑ j : α, (count x j : ℝ) = n := by exact_mod_cast sum_count x
@@ -162,7 +163,7 @@ theorem sum_sq_count_le (x : Config n α) : ∑ j : α, (count x j : ℝ) ^ 2 �
   rw [sq (n : ℝ)]
   exact sum_sq_le_max x fun j => by exact_mod_cast count_le x j
 
-/-- **Observation 1**: the expected next count is monotone in the current count:
+/-- **Observation 2.1**: the expected next count is monotone in the current count:
 `c_r ≤ c_s ⇒ 𝔼[c_r'] ≤ 𝔼[c_s']`. -/
 theorem expected_count_mono [NeZero n] (x : Config n α) {r s : α}
     (h : count x r ≤ count x s) :
@@ -190,7 +191,7 @@ theorem expected_count_mono [NeZero n] (x : Config n α) {r s : α}
 
 /-! ### Aggregating the minority colours -/
 
-/-- **Aggregation of the minority colours** (proof of Lemma 1): if `b` bounds the count of every
+/-- **Aggregation of the minority colours** (proof of Lemma 2.2): if `b` bounds the count of every
 colour other than `i`, then `∑_j c_j² ≤ c_i² + (n − c_i) b`. -/
 theorem sum_sq_le_aggregate (x : Config n α) (i : α) {b : ℝ}
     (hb : ∀ j ≠ i, (count x j : ℝ) ≤ b) :
@@ -207,7 +208,7 @@ theorem sum_sq_le_aggregate (x : Config n α) (i : α) {b : ℝ}
   rw [← sum_mul, hrest] at hle
   linarith
 
-/-- **Expected growth of the gap** (proof of Lemma 1): if `i` is the largest colour and `j` the
+/-- **Expected growth of the gap** (proof of Lemma 2.2): if `i` is the largest colour and `j` the
 second largest, `𝔼[c_i' − c_j'] ≥ (c_i − c_j)(1 + (c_i/n)(1 − c_i/n))`. -/
 theorem expected_gap_ge [NeZero n] (x : Config n α) {i j : α} (hji : count x j ≤ count x i)
     (hj : ∀ l ≠ i, count x l ≤ count x j) :

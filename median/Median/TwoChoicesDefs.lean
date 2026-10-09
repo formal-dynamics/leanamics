@@ -4,10 +4,10 @@ import Median.Basic
 
 Elsässer, Friedetzky, Kaaser, Mallmann-Trenn and Trinker, *Efficient k-party voting with two
 choices* (arXiv:1602.04667; the latest arXiv version, v5, is titled *Rapid asynchronous plurality
-consensus*), Section 1.1, synchronous model: on the complete graph `K_n` every node holds one of
-`k` colours; in each round every node samples two nodes uniformly at random (independently, with
-replacement, itself included) and, if the two sampled colours coincide, adopts that colour;
-otherwise it keeps its own colour.
+consensus*; arXiv v5 numbering), Section 1.1, synchronous model: on the complete graph `K_n`
+every node holds one of `k` colours; in each round every node samples two nodes uniformly at
+random (independently, with replacement, itself included) and, if the two sampled colours
+coincide, adopts that colour; otherwise it keeps its own colour.
 
 Rounds are those of the median dynamics (`Median.Round n`: the two nodes sampled by every node),
 so under the uniform distribution on rounds the `2n` samples are independent and uniform. With
@@ -39,7 +39,7 @@ def run (x : Config n α) (l : List (Round n)) : Config n α := l.foldl step x
 def count (x : Config n α) (i : α) : ℕ := (univ.filter fun v => x v = i).card
 
 /-- The number of nodes whose two samples both hold colour `i` in round `r`: the only nodes that
-can join `i` (Berenbrink et al., PODC 2017, proof of Theorem 3). -/
+can join `i` (Berenbrink et al., arXiv:1702.04921 v1, proof of Theorem 5). -/
 def twice (x : Config n α) (r : Round n) (i : α) : ℕ :=
   (univ.filter fun v => x (r v).1 = i ∧ x (r v).2 = i).card
 
@@ -95,8 +95,8 @@ theorem step_eq_imp (x : Config n α) (r : Round n) (v : Fin n) (i : α) (h : st
     exact Or.inl h
 
 /-- **One round can add at most the nodes that see `i` twice**:
-`c_i' ≤ c_i + #{v : both samples of v hold i}` (Berenbrink et al., PODC 2017, proof of
-Theorem 3). -/
+`c_i' ≤ c_i + #{v : both samples of v hold i}` (Berenbrink et al., arXiv:1702.04921 v1,
+proof of Theorem 5). -/
 theorem count_step_le (x : Config n α) (r : Round n) (i : α) :
     count (step x r) i ≤ count x i + twice x r i := by
   unfold count twice
@@ -169,7 +169,7 @@ theorem step_dominates (x : Config n α) (i : α) (y : Config n Bool)
 colour `i` and 2-Choices on `x` with the same rounds; every node holding `true` in the first
 process holds `i` in the second. The node-wise form of the paper's remark that, once colour `i`
 holds a large majority, 2-Choices is dominated by the two-colour process (Elsässer et al.,
-proof of Theorem 1). -/
+proof of Theorem 1.2). -/
 theorem run_dominates (x : Config n α) (i : α) (l : List (Round n)) (v : Fin n)
     (h : Median.run (fun u => decide (x u = i)) l v = true) : run x l v = i := by
   suffices H : ∀ (l : List (Round n)) (x : Config n α) (y : Config n Bool),
