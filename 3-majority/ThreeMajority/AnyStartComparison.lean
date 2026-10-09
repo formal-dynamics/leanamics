@@ -23,7 +23,7 @@ is `acKernel α`, the independent product over the agents of `α c`. Protocol do
 
 The paper proves Theorem 2 through a coupling (Lemma 1) obtained from Strassen's theorem
 (Theorem 3). Here Theorem 2 is stated in its distributional form, which needs no coupling: it
-follows from Proposition 1 alone by induction on `T` (see `PROGRESS-MAJ6B.md`).
+follows from Proposition 1 alone by induction on `T` (see `FORMALIZATION_DIFFERENCES.md`).
 -/
 
 namespace ThreeMajority

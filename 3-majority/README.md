@@ -19,6 +19,11 @@ for a minimal analytic toolkit.
 A self-contained paper proof, written to mirror the formalization
 lemma-for-lemma, is in [latex/three_majority.tex](latex/three_majority.tex).
 
+**Any number of colours, from any configuration.** The package also formalizes the comparison
+of 3-Majority with the Voter model and the `O(n^{3/4} log^{7/8} n)` bound of Berenbrink et al.
+(PODC 2017), conditional on a cited result that is not formalized; see
+[below](#3-majority-from-any-configuration-roadmap-maj-6-b).
+
 **Relation to `plurality/`.** This was the first, self-contained formalization of the
 two-opinion case. The [plurality package](../plurality) generalizes it to `k` colors and to a
 vanishing bias: with two opinions, `Plurality.majority3_vanishing_bias` gives consensus from a
@@ -87,6 +92,47 @@ Because the opinion count is not monotone in the round index, there is no
 "good rounds" counting argument available (the device that carries
 `rumor_spread`'s growth phase); every round genuinely needs concentration.
 
+## 3-Majority from any configuration (roadmap MAJ-6 (b))
+
+`AnyStart*.lean` formalizes Theorem 4 of Berenbrink, Clementi, Elsässer, Kling, Mallmann-Trenn,
+Natale, *Ignore or comply? On breaking symmetry in consensus*, PODC 2017 (arXiv:1702.04921,
+numbering of v1): with any number of colours, from any configuration, 3-Majority reaches
+consensus within `O(n^{3/4} log^{7/8} n)` rounds w.h.p.
+
+**The main theorem is conditional.** The second phase of the paper's proof applies Theorem 3.1
+of Becchetti, Clementi, Natale, Pasquale, Trevisan, *Stabilizing consensus with many opinions*,
+SODA 2016 (arXiv:1508.06782): from `k ≤ n^{1/3−ε}` colours, consensus within
+`O((k² √log n + k log n)(k + log n))` rounds w.h.p. That result is not formalized in this
+repository (roadmap MAJ-12 (a)). `Bcnpt16Phase2 ε` states it, and
+`threeMaj_anyStart_consensus` takes `Bcnpt16Phase2 (1/24)` as a hypothesis, exactly as the
+paper's proof uses it. Everything else below is proved.
+
+| BCEKMN17 (arXiv v1) | Lean |
+| --- | --- |
+| Model, Sections 2.1 and 2.2 (any colour type; ties broken by the first sample, same law) | `majColour`, `stepCol`, `runCol`, `voterStep`, `voterRun`, `colourCount`, `numColours`, `stepCol_bool` |
+| Majorization `⪰`, Schur-convex observables | `Majorizes`, `countVec`, `SchurConvex`, `numColours_le_of_majorizes` |
+| Definitions 1 and 2: AC-processes, protocol dominance | `acKernel`, `Dominates` |
+| Proposition 1 (Rinott; cited without proof in the paper, proved here) | `multinomial_schurConvex`, `expect_le_of_majorizes` |
+| Theorem 2, in distributional form (no coupling) | `ac_comparison`, `ac_numColours` |
+| Equations (1), (2); Lemma 2 (3-Majority is at least as fast as Voter) | `alphaVoter_weight`, `alpha3M_weight`, `dominates_alpha3M_alphaVoter`, `voter_le_threeMaj` |
+| Lemma 4, Equation (6): duality with coalescing walks | `walkStep`, `numColours_voterRun_le`, `voter_dual` |
+| Equation (7); `E[X_t] ≤ 1 + 3n/t` in place of the variable drift theorem | `walk_drift_paper`, `walk_drift`, `walk_expect_le` |
+| Lemma 3: at most `k` colours after `24 (n/k) log n` rounds w.p. `≥ 1 − 1/n` | `voter_reduce_whp` |
+| Phase 1 of Theorem 4, the same bound for 3-Majority | `threeMaj_reduce_whp` |
+| Theorem 8 (Theorem 3.1 of the SODA 2016 paper): **a hypothesis, not proved** | `Bcnpt16Phase2` |
+| Theorem 4, conditional: consensus fails after `T ≥ C n^{3/4} log^{7/8} n` rounds w.p. `≤ 2/n` | `threeMaj_anyStart_consensus`, `anyStart_asymptotics` |
+
+The comparison of Theorem 2 is proved from Proposition 1 alone, by induction on time, without
+the paper's coupling and Strassen's theorem; the Voter bound uses an exact occupancy computation
+for coalescing walks instead of the variable drift theorem. The proof of Theorem 4 needs a minor
+correction (Phase 1 must stop at `n^{1/4} log^{1/8} n` colours, not `n^{1/4}`), which the
+formalization makes. The modules use the finite `Distribution` and `Kernel` layer of the shared
+[`dynamics`](../dynamics) library (still no measure theory). Details:
+[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md) and the
+[blueprint section](https://formal-dynamics.github.io/leanamics/3-majority/blueprint/#sec:bcekmn-any-start).
+The statements were pinned by a Claude agent and reviewed by a second agent before any proof;
+the proofs were written by a Claude agent under the fixed-statement protocol.
+
 ## Building
 
 ```bash
@@ -94,8 +140,10 @@ lake exe cache get   # download prebuilt Mathlib oleans (once)
 lake build           # verifies every proof
 ```
 
-Toolchain: see [lean-toolchain](lean-toolchain). The main theorem depends only
-on the standard axioms (`propext`, `Classical.choice`, `Quot.sound`).
+Toolchain: see [lean-toolchain](lean-toolchain). The main theorems depend only
+on the standard axioms (`propext`, `Classical.choice`, `Quot.sound`):
+[Audit.lean](Audit.lean) prints their axioms, and `python3 ../scripts/check_axioms.py` (run in
+this directory) checks them.
 
 ## How to cite
 
