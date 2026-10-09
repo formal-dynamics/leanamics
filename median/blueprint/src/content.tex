@@ -9,11 +9,16 @@ configuration (Theorem~1 of the paper, without adversary). With an odd number of
 supported values, the middle one wins within $O(\log m+\log\log n)$ rounds (the odd case of
 Theorem~21). On $d$-regular graphs with $\lambda_G\le 3/5-\varepsilon$, two-sample voting
 eliminates a minority of size at most $(\varepsilon/5)n$ within $O(\log n)$ rounds with high
-probability (Theorem~4 of Cooper, Elsässer and Radzik, ICALP 2014).
+probability (Theorem~4 of Cooper, Elsässer and Radzik, ICALP 2014). For 2-Choices with any number
+$k$ of colours, the plurality colour wins within $O((n/c_1)\log n)$ rounds from a gap of order
+$\sqrt{n\log n}$ to every other colour (Theorem~1.2 of Elsässer, Friedetzky, Kaaser,
+Mallmann-Trenn and Trinker, without their hypothesis $k=O(n^\varepsilon)$), and from colours of
+$O(\log n)$ nodes each consensus needs $\Omega(n/\log n)$ rounds (Theorem~5 of Berenbrink,
+Clementi, Elsässer, Kling, Mallmann-Trenn and Natale, PODC 2017).
 \end{abstract}
 
 \section{The model}\label{sec:dgmss-median}
-This section, the four following ones and the last one (against an adaptive adversary) formalize
+This section, the four following ones and the one against an adaptive adversary formalize
 Doerr, Goldberg, Minder, Sauerwald and Scheideler, \emph{Stabilizing consensus with the power of
 two choices} (SPAA 2011). Claim~2.9 of the paper, a hitting-time lemma, is formalized in the
 shared \texttt{dynamics} package, with two points made explicit there: the target $c_4\log q$ is
@@ -285,4 +290,226 @@ the nodes below $w$ are exceptions of the threshold at $w$, and the nodes above 
 of the threshold at the next legal value, so the run is in almost consensus on $w$ with $2K$
 exceptions. Conclude with the internal bound of Theorem~\ref{thm:binary-adv} and a union bound
 over the $m-1$ thresholds.
+\end{proof}
+
+\section{Plurality consensus with $k$ colours}\label{sec:efkmt-plurality}
+This section formalizes the synchronous upper bound of Elsässer, Friedetzky, Kaaser,
+Mallmann-Trenn and Trinker, arXiv:1602.04667 (Theorem~1.2 and Section~2.1 of v5, \emph{Rapid
+asynchronous plurality consensus}; in v1--v4, \emph{Efficient $k$-party voting with two choices},
+these are Theorem~1, Observation~3 and Lemmas~4 and~5), without the adversary and without the
+hypothesis $k=O(n^\varepsilon)$
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/median/FORMALIZATION_DIFFERENCES.md#plurality-consensus-with-k-colours-twochoices-roadmap-maj-4}{differences
+from the paper}). Throughout, $c_i$ is the number of nodes of colour $i$, primes denote the values
+after one round, and $S=\sum_j c_j^2$.
+
+\begin{definition}[$k$-party 2-Choices]\label{def:two-choices}
+\lean{Median.TwoChoices.rule,Median.TwoChoices.step,Median.TwoChoices.run,Median.TwoChoices.count,Median.TwoChoices.twice,Median.TwoChoices.kernel}\leanok\uses{def:median}
+Colours lie in any type with decidable equality. In a round every node samples two nodes uniformly
+at random (independently, with replacement) and adopts their colour if the two samples hold the
+same colour; otherwise it keeps its own. $c_i$ is the number of nodes of colour $i$, and the number
+of nodes whose two samples both hold $i$ is denoted $\mathrm{twice}_i$.
+\end{definition}
+
+\begin{lemma}[Basic facts and two colours]\label{lem:tc-basic}
+\lean{Median.TwoChoices.step_of_ne,Median.TwoChoices.step_of_eq,Median.TwoChoices.step_of_consensus,Median.TwoChoices.count_step_le,Median.TwoChoices.count_step_eq_zero,Median.TwoChoices.rule_bool,Median.TwoChoices.step_bool,Median.TwoChoices.run_bool,Median.TwoChoices.count_true,Median.TwoChoices.run_dominates}\leanok\uses{def:two-choices}
+Consensus configurations are fixed; $c_i'\le c_i+\mathrm{twice}_i$, so an extinct colour stays
+extinct. On two colours the rule is the median of the own colour and the two samples. For the
+same rounds, every node that holds \texttt{true} in the binary median process started from the
+indicator of colour $i$ holds colour $i$.
+\end{lemma}
+\begin{proof}\leanok
+A node that does not hold $i$ adopts $i$ only if both samples hold $i$. With two colours, the new
+colour is the majority among the own colour and the two samples, that is, their median. For the
+domination, the indicator of $\{\text{new colour}=i\}$ is at least the median of the three
+indicators, and the median is monotone; induct on the rounds.
+\end{proof}
+
+\begin{lemma}[One-round expectations]\label{lem:tc-expect}
+\lean{Median.TwoChoices.avg_pair,Median.TwoChoices.avg_step_node,Median.TwoChoices.expected_count,Median.TwoChoices.expected_count_mul,Median.TwoChoices.sum_count,Median.TwoChoices.expected_count_mono,Median.TwoChoices.expected_gap,Median.TwoChoices.sum_sq_le_aggregate,Median.TwoChoices.sum_sq_le_max,Median.TwoChoices.expected_gap_ge}\leanok\uses{def:two-choices}
+$\E c_i'=c_i(1+c_i/n-S/n^2)$; hence $c_r\le c_s$ implies $\E c_r'\le\E c_s'$
+(Observation~2.1), and $\E(c_i'-c_j')=(c_i-c_j)(1+(c_i+c_j)/n-S/n^2)$. If every colour other
+than $i$ has at most $b$ nodes, then $S\le c_i^2+(n-c_i)b$. If $a$ and $b$ are the sizes of the
+largest and the second largest colour, then $\E(a'-b')\ge(a-b)(1+(a/n)(1-a/n))$.
+\end{lemma}
+\begin{proof}\leanok
+A node ends in colour $i$ with probability $(c_i/n)^2+[x_v=i](1-S/n^2)$; sum over the nodes. The
+map $c\mapsto c(1+c/n-S/n^2)$ is increasing on $c\ge0$ since $S\le n^2$. The aggregation bound is
+$\sum_{j\ne i}c_j^2\le b\sum_{j\ne i}c_j=b(n-c_i)$, and with $S\le a^2+nb$ the gap formula gives
+the last bound.
+\end{proof}
+
+\begin{lemma}[One-round concentration]\label{lem:tc-conc}
+\lean{Median.TwoChoices.gap_dev_le,Median.TwoChoices.count_dev_le,Median.TwoChoices.gap_tail_twelve,Median.TwoChoices.count_tail_twelve}\leanok\uses{lem:tc-expect}
+Let colour $i$ be a largest colour, with $a=c_i>0$ nodes, and $j\ne i$. For every $\lambda\ge0$,
+$\Pr(a'-c_j'\le\E(a'-c_j')-\lambda)\le\exp(-\lambda^2/(20a^2/n+4\lambda/3))$ and
+$\Pr(a'\le\E a'-\lambda)\le\exp(-\lambda^2/(4a^2/n+2\lambda/3))$. In particular, if
+$128\sqrt{n\log n}\le g\le a$, both probabilities are at most $n^{-12}$ for $\lambda=ga/(8n)$ and
+$\lambda=ag/(4n)$ respectively.
+\end{lemma}
+\begin{proof}\leanok
+Both quantities are sums of independent per-node contributions bounded by $1$ in absolute value. A
+node of colour $i$ or $j$ contributes only when it leaves its colour, which has probability at most
+$S/n^2\le a/n$, and any other node joins $i$ or $j$ with probability at most $2a^2/n^2$. Bounding
+each variance by the second moment about the node's current contribution gives
+$\mathrm{Var}(a'-c_j')\le10a^2/n$ and $\mathrm{Var}(a')\le2a^2/n$; apply Bernstein's inequality.
+The exponents are then at least $(g^2/(1344n))\ge12\log n$.
+\end{proof}
+
+\begin{lemma}[The distance increases, Lemma~2.2]\label{lem:tc-distance}
+\lean{Median.TwoChoices.distance_increases}\leanok\uses{lem:tc-expect,lem:tc-conc}
+There are constants $z,C>0$ such that, whenever $\log n\ge C$: if colour $i$ is the largest, with
+$a=c_i\le n/2$ nodes, $j$ is the second largest, with $b=c_j$ nodes, and $a-b\ge z\sqrt{n\log n}$,
+then $a'-b'>(a-b)(1+a/(4n))$ with probability at least $1-C/n^2$.
+\end{lemma}
+\begin{proof}\leanok
+Take $z=128$ and $C=2$. By Lemma~\ref{lem:tc-expect} and $a\le n/2$,
+$\E(a'-b')\ge(a-b)(1+a/(2n))$; by Lemma~\ref{lem:tc-conc} with $\lambda=(a-b)a/(8n)$, the gap falls
+below $\E(a'-b')-\lambda$ with probability at most $n^{-12}$. No bound on the number of colours is
+needed.
+\end{proof}
+
+\begin{lemma}[The coupling, Lemma~2.3, as a stochastic domination]\label{lem:tc-stochdom}
+\lean{Median.TwoChoices.count_stochDom}\leanok\uses{def:two-choices}
+If $c_c\le c_b$, then $\Pr(c_c'\ge t)\le\Pr(c_b'\ge t)$ for every $t$.
+\end{lemma}
+\begin{proof}\leanok
+Choose a permutation $\tau$ of the nodes sending every node of colour $c$ to a node of colour $b$.
+For every node $v$, the sample pairs that make $v$ end in colour $c$ are at most as many as those
+that make $\tau(v)$ end in colour $b$: a node of another colour adopts a colour of size $m$ on the
+$m^2$ pairs with both samples on it, a node of that colour keeps it on the $n^2-S+m^2$ pairs that
+do not agree on another colour, and both counts increase with $m$. Choose a permutation of the
+sample pairs embedding the first set into the second.
+The induced bijection of rounds preserves the uniform distribution and maps the rounds with
+$c_c'\ge t$ into the rounds with $c_b'\ge t$. The paper's coupling, read literally, needs a minor
+correction
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/median/FORMALIZATION_DIFFERENCES.md#remarks-on-the-sources}{details}).
+\end{proof}
+
+\begin{lemma}[One round of the growth phase]\label{lem:tc-growth-round}
+\lean{Median.TwoChoices.growth_round}\leanok\uses{lem:tc-expect,lem:tc-conc}
+There are constants $z,C>0$ such that, whenever $\log n\ge C$: if colour $i$ has $a=c_i\le3n/4$
+nodes and leads every other colour by at least $g\ge z\sqrt{n\log n}$, then with probability at
+least $1-C/n^2$ after one round $a'\ge a$ and colour $i$ leads every other colour by at least
+$g(1+a/(8n))$.
+\end{lemma}
+\begin{proof}\leanok
+Take $z=128$ and $C=2$, and let $b$ be the second largest colour. For every other colour $j$,
+Observation~2.1 gives $\E c_j'\le\E b'$, so by Lemma~\ref{lem:tc-expect}
+$\E(a'-c_j')\ge(a-b)(1+(a/n)(1-a/n))\ge g(1+a/(4n))$ since $a\le3n/4$. Lemma~\ref{lem:tc-conc}
+with $\lambda=ga/(8n)$ bounds the failure for $j$ by $n^{-12}$. The aggregation bound gives
+$\E a'-a\ge ag/(4n)$, so $a'<a$ has probability at most $n^{-12}$. A union bound over the at most
+$n$ colours present gives the failure probability $2/n^2$. This replaces the coupling of
+Lemma~2.3, and the range $a\le3n/4$ (instead of $n/2$) closes the gap before the two-colour
+phase.
+\end{proof}
+
+\begin{lemma}[The growth phase]\label{lem:tc-growth-phase}
+\lean{Median.TwoChoices.growth_phase}\leanok\uses{lem:tc-growth-round}
+There are constants $z,C>0$ such that, whenever $\log n\ge C$: if colour $i$ leads every other
+colour by at least $z\sqrt{n\log n}$, then after $\lceil C(n/c_i)\log n\rceil$ rounds it holds at
+least $3n/4$ nodes with probability at least $1-C/n$.
+\end{lemma}
+\begin{proof}\leanok
+Take $z=C=128$, $a_0=c_i$, $g_0$ the initial lead and $q=1+a_0/(8n)$. Consider the moving targets
+``colour $i$ holds $3n/4$ nodes, or it holds at least $a_0$ nodes and leads every other colour by
+$g_0q^t$''. Each round leaves them with probability at most $2/n^2$, by
+Lemma~\ref{lem:tc-growth-round} while $a\le3n/4$, and because a colour holding $3n/4$ nodes keeps
+them except with probability $n^{-2}$ (Bernstein, drift from the aggregation bound). Since
+$q^{\lceil128(n/a_0)\log n\rceil}>n$, a lead of $g_0q^t$ is impossible at the end, so the colour
+holds $3n/4$ nodes.
+\end{proof}
+
+\begin{lemma}[Finishing phase]\label{lem:tc-finish}
+\lean{Median.TwoChoices.finish_phase,Median.TwoChoices.expList_consensus_mono}\leanok\uses{lem:tc-basic,thm:whp}
+If $\log n\ge128$ and colour $i$ holds at least $3n/4$ nodes, all nodes hold $i$ after
+$\lceil128\log n\rceil$ rounds with probability at least $1-128/n$.
+\end{lemma}
+\begin{proof}\leanok
+By Lemma~\ref{lem:tc-basic}, colour $i$ dominates the binary median process started from its
+indicator, whose gap is at least $n/2\ge128\sqrt{n\log n}$; apply Theorem~\ref{thm:whp}.
+\end{proof}
+
+\begin{theorem}[Plurality consensus, Theorem~1.2 without the adversary]\label{thm:tc-plurality}
+\lean{Median.TwoChoices.plurality_whp,Median.TwoChoices.plurality_whp_k}\leanok\uses{lem:tc-growth-phase,lem:tc-finish}
+There are constants $z,C>0$ such that, whenever $\log n\ge C$, for every number $k$ of colours: if
+colour $i$ leads every other colour by at least $z\sqrt{n\log n}$, all nodes hold $i$ after
+$\lceil C(n/c_i)\log n\rceil$ rounds, and hence after $\lceil Ck\log n\rceil$ rounds, with
+probability at least $1-C/n$.
+\end{theorem}
+\begin{proof}\leanok
+Take $z=128$ and $C=384$: Lemma~\ref{lem:tc-growth-phase}, then Lemma~\ref{lem:tc-finish} from the
+configuration reached, with failure at most $256/n$; consensus is absorbing, so more rounds do not
+hurt. For the second form, $c_i\ge n/k$. The paper's proof of Theorem~1.2 needs a minor
+correction (the range $n/2<a<(1/2+\varepsilon_1)n$ and the time bound), which
+Lemma~\ref{lem:tc-growth-round} supplies.
+\end{proof}
+
+\begin{theorem}[Two colours and almost-sure consensus]\label{thm:tc-two}
+\lean{Median.TwoChoices.two_colours_consensus_whp,Median.TwoChoices.absorbed}\leanok\uses{lem:tc-basic,thm:whp}
+With two colours, a gap of $C\sqrt{n\log n}$ gives consensus on the majority after
+$\lceil C\log n\rceil$ rounds with probability at least $1-C/n$, whenever $\log n\ge C$. With
+finitely many colours, consensus is reached almost surely.
+\end{theorem}
+\begin{proof}\leanok
+On two colours the process is the binary median process (Lemma~\ref{lem:tc-basic}); apply
+Theorem~\ref{thm:whp}. The round in which every node samples node $0$ twice gives consensus and
+has positive probability; conclude with the shared absorption theorem.
+\end{proof}
+
+\section{A lower bound for 2-Choices}\label{sec:bcekmn-lower}
+This section formalizes the 2-Choices lower bound of Berenbrink, Clementi, Elsässer, Kling,
+Mallmann-Trenn and Natale, \emph{Ignore or comply? On breaking symmetry in consensus} (PODC 2017,
+arXiv:1702.04921): Theorem~5 and the 2-Choices half of Theorem~1 (Simplified), numbered as in the
+arXiv version
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/median/FORMALIZATION_DIFFERENCES.md#the-lower-bound-for-2-choices-twochoiceslower-roadmap-maj-6-a}{differences
+from the paper}).
+
+\begin{lemma}[Few nodes change colour]\label{lem:tc-few-changes}
+\lean{Median.TwoChoices.avg_exp_twice,Median.TwoChoices.expected_see_distinct,Median.TwoChoices.expected_changed_le}\leanok\uses{def:two-choices}
+The number of nodes that see colour $i$ twice is a sum of $n$ independent Bernoulli variables of
+parameter $(c_i/n)^2$, so $\E e^{\theta\,\mathrm{twice}_i}=(1+(c_i/n)^2(e^\theta-1))^n$. The expected
+number of nodes whose two samples hold different colours is $n-S/n$, and if every colour has at
+most $\ell$ nodes, the expected number of nodes that change colour is at most $\ell$.
+\end{lemma}
+\begin{proof}\leanok
+The samples of different nodes are independent. Two samples hold the same colour with probability
+$S/n^2$, and only such nodes can change colour; $S\le\ell n$.
+\end{proof}
+
+\begin{lemma}[One colour does not grow fast]\label{lem:tc-escape}
+\lean{Median.TwoChoices.colour_escape_le}\leanok\uses{lem:tc-basic,lem:tc-few-changes}
+If $c_i\le L$, then for every $T$, the probability that $c_i(t)>L$ for some $t\le T$ is at most
+$\exp(-(L-c_i)+(e-1)TL^2/n)$.
+\end{lemma}
+\begin{proof}\leanok
+Induction on the horizon. While $c_i\le L$, $c_i'\le c_i+\mathrm{twice}_i$ (Lemma~\ref{lem:tc-basic})
+and, with $\theta=1$, $\E e^{\mathrm{twice}_i}\le\exp((e-1)n(c_i/n)^2)\le\exp((e-1)L^2/n)$, so
+$e^{c_i(t)-(e-1)tL^2/n}$, stopped when $c_i$ exceeds $L$, is a supermartingale; conclude with
+Markov's inequality. This replaces the paper's domination by a process with binomial increments.
+\end{proof}
+
+\begin{theorem}[Theorem~5]\label{thm:tc-lower-strong}
+\lean{Median.TwoChoices.lower_bound_strong}\leanok\uses{lem:tc-escape}
+There is a constant $\gamma_0$ such that for every $\gamma\ge\gamma_0$: if every colour has at most
+$\ell$ nodes, $\ell'=\max\{2\ell,\gamma\log n\}$ and $T<n/(\gamma\ell')$, the probability that some
+colour has more than $\ell'$ nodes at some time $t\le T$ is at most $1/n$.
+\end{theorem}
+\begin{proof}\leanok
+Take $\gamma_0=8$. By Lemma~\ref{lem:tc-escape} with $L=\ell'$, since $L-c_i\ge\ell'/2$ and
+$T\ell'^2/n<\ell'/\gamma$, one colour exceeds $\ell'$ with probability at most
+$\exp(-\ell'(1/2-(e-1)/\gamma))\le n^{-2}$; take a union bound over the at most $n$ colours
+present. A constant in the paper's proof needs a minor correction ($\gamma\ge36$ instead of
+$\gamma\ge18$ in its Chernoff step); the theorem is unaffected.
+\end{proof}
+
+\begin{theorem}[2-Choices needs $\Omega(n/\log n)$ rounds, Theorem~1 (Simplified)]\label{thm:tc-lower}
+\lean{Median.TwoChoices.consensus_time_lower}\leanok\uses{thm:tc-lower-strong}
+For every $\beta>0$ there is $C>0$ such that, from every configuration in which every colour has at
+most $\beta\log n$ nodes, 2-Choices reaches consensus at some time $t\le T$ with probability at
+most $1/n$, for every $T$ with $(T+1)C\log n<n$.
+\end{theorem}
+\begin{proof}\leanok
+Take $\gamma=\max\{8,2\beta\}$ and $C=\gamma^2$. Then $\ell'=\gamma\log n$, the window of
+Theorem~\ref{thm:tc-lower-strong} contains $T$, and consensus would put $n>\ell'$ nodes on one
+colour.
 \end{proof}

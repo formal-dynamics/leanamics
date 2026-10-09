@@ -70,6 +70,44 @@ expectation bound separately, which was added as `expected_minority_step`); the 
 Claude agent under the fixed-statement protocol, and verified mechanically (statements
 unchanged, no placeholders, warning-free build, axiom audit).
 
+## Plurality consensus with `k` colours (k-party 2-Choices)
+
+Every node samples two nodes uniformly at random (with replacement) and adopts their colour if
+the two samples agree; otherwise it keeps its own. With two colours this is the median rule
+(`TwoChoices.step_bool`). The colours are any type with decidable equality, and the probabilistic
+theorems use `Fin k` for any `k`. Sources: Elsässer, Friedetzky, Kaaser, Mallmann-Trenn and
+Trinker, arXiv:1602.04667 (v5, *Rapid asynchronous plurality consensus*; v1 to v4 are titled
+*Efficient k-party voting with two choices*), Section 2.1, for the upper bound, and Berenbrink,
+Clementi, Elsässer, Kling, Mallmann-Trenn and Natale, *Ignore or comply? On breaking symmetry in
+consensus* (PODC 2017, [arXiv:1702.04921](https://arxiv.org/abs/1702.04921)), Theorem 5 and
+Theorem 1 (Simplified), for the lower bound. Numbers follow these arXiv versions (see
+[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md)). Namespace `Median.TwoChoices`:
+
+| Result | Lean declaration |
+| --- | --- |
+| The model; on `Bool` it is the median dynamics; a colour dominates, node by node, the binary median process started from its indicator | `rule`, `step`, `run`, `count`, `twice`, `kernel`, `step_bool`, `run_bool`, `run_dominates` (in [`Median/TwoChoicesDefs.lean`](Median/TwoChoicesDefs.lean)) |
+| One-round expectations: `𝔼c_i' = c_i(1 + c_i/n − ∑_j c_j²/n²)`, Observation 2.1 (larger colours grow more in expectation), the expected gap and the aggregation of the minority colours | `expected_count`, `expected_count_mul`, `expected_count_mono`, `expected_gap`, `expected_gap_ge` (in [`Median/TwoChoicesExpect.lean`](Median/TwoChoicesExpect.lean)) |
+| **Lemma 2.2**: if the largest colour has `a ≤ n/2` nodes and leads the second largest by `a − b ≥ z √(n log n)`, then `a' − b' > (a − b)(1 + a/(4n))` w.p. `≥ 1 − C/n²` (`z = 128`, `C = 2`) | `distance_increases` (in [`Median/TwoChoicesPlurality.lean`](Median/TwoChoicesPlurality.lean)) |
+| **Lemma 2.3**, as a stochastic domination: if `c ≤ b`, then `P(c' ≥ t) ≤ P(b' ≥ t)` for every `t` | `count_stochDom` |
+| **Theorem 1.2** (no adversary, any number of colours): if colour `i` leads every other colour by `z √(n log n)`, all nodes hold `i` after `⌈C (n/c_i) log n⌉` rounds w.p. `≥ 1 − C/n`, for `log n ≥ C` (`z = 128`, `C = 384`); also after `⌈C k log n⌉` rounds | `plurality_whp`, `plurality_whp_k` |
+| The growth phase (the gap grows by `1 + a/(8n)` per round up to `a = 3n/4`) and the finishing phase (via the binary median process) | `growth_round`, `growth_phase`, `finish_phase` |
+| Two colours, and almost-sure consensus | `two_colours_consensus_whp`, `absorbed` |
+| One colour cannot grow fast: `P(∃ t ≤ T, c_i(t) > L) ≤ exp(−(L − c_i) + (e − 1) T L²/n)` | `colour_escape_le` (in [`Median/TwoChoicesLower.lean`](Median/TwoChoicesLower.lean)) |
+| **Theorem 5** of Berenbrink et al.: if every colour has at most `ℓ` nodes, `ℓ' = max {2ℓ, γ log n}` and `T < n/(γ ℓ')`, no colour exceeds `ℓ'` nodes up to time `T` except w.p. `≤ 1/n`, for every `γ ≥ 8` | `lower_bound_strong` |
+| **Theorem 1 (Simplified)**, 2-Choices lower bound: from colours of at most `β log n` nodes each, no consensus within `T` rounds except w.p. `≤ 1/n` whenever `(T + 1) C log n < n` (`C = max(8, 2β)²`), so consensus needs `Ω(n/log n)` rounds | `consensus_time_lower` |
+
+The paper's hypothesis `k = O(n^ε)` is not needed: one-round Bernstein bounds with a node-wise
+variance bound (`Median/TwoChoicesConc.lean`) replace its multiplicative Chernoff bounds, and
+Observation 2.1 replaces the coupling of Lemma 2.3 in the growth step. The adversary of
+Theorem 1.2 and its lower bounds are not formalized. The proofs of Theorem 1.2 and Lemma 2.3 of
+Elsässer et al. and of Theorem 5 of Berenbrink et al. need minor corrections; see
+[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
+
+**Provenance (k-party 2-Choices).** The definitions and statements were pinned by a Claude agent
+and reviewed by a second agent; the proofs are by a Grok agent (grok-4.7) under the
+fixed-statement protocol, and verified mechanically (statements unchanged, no placeholders,
+warning-free build, axiom audit).
+
 Build and audit:
 
 ```bash
