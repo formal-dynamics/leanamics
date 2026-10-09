@@ -8,7 +8,11 @@ direction of the characterization of stably computable predicates (Angluin, Aspn
 Fischer and Peralta, 2006): threshold and remainder predicates on input counts are stably
 computable by population protocols, the class is closed under Boolean operations, and every
 protocol is a count-conserving bimolecular network, so every Boolean combination of threshold and
-remainder predicates is stably decided by such a network.
+remainder predicates is stably decided by such a network. Finally, on arbitrary connected
+interaction graphs (Mertzios, Nikoletseas, Raptopoulos and Spirakis, 2014), a 4-state protocol
+stably computes majority, no protocol with at most 3 states does, and the 3-state
+approximate-majority protocol converges to the majority with probability at least $1/2$ from a
+uniformly random placement.
 \end{abstract}
 
 \section{Chemical reaction networks}
@@ -216,4 +220,172 @@ such a network.
 \begin{proof}\leanok
 Encounters change counts exactly by the corresponding reaction. Tagging the input states keeps
 the input map injective and provides a transition that changes the multiset of states.
+\end{proof}
+
+\section{Majority on graphs with very small local memory (CRN-4)}\label{sec:mnrs-graph-majority}
+This section formalizes Theorems~1, 2 and~4 of Mertzios, Nikoletseas, Raptopoulos and Spirakis,
+\emph{Determining majority in networks with local interactions and very small local memory}
+(ICALP 2014, arXiv:1404.7671, whose numbering we use; Distributed Computing 30, 2017): population
+protocols run on a connected interaction graph, and two agents interact only along an edge. The
+3-state protocol is that of Angluin, Aspnes and Eisenstat (Distributed Computing 21, 2008).
+Graphs are undirected. The proofs of Theorems~1, 2 and~4 need minor corrections: in Theorem~1 the
+type of two agents and one set index are corrected; in Theorem~2 ambassadors of the same color can
+block each other, which a closest pair of opposite ambassadors avoids; in Theorem~4 the
+monotonicity step is stated without proof (it follows from a monotone coupling), and the bound
+$1/2$ also needs absorption with probability $1$
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/crn/FORMALIZATION_DIFFERENCES.md#majority-on-graphs-with-very-small-local-memory-graphmajority-crn-4}{details}).
+
+\begin{definition}[Protocols on an interaction graph]\label{def:graph-stable}
+\lean{Crn.dartPair,Crn.Protocol.GraphStep,Crn.Protocol.GraphReaches,Crn.Protocol.GraphOutputStable,Crn.Protocol.StablyComputesOnGraph,Crn.Protocol.GraphStablyComputes}\leanok\uses{def:stable}
+On a graph $G$ on the agents, an encounter is an oriented edge $(u, v)$ of $G$ (initiator $u$,
+responder $v$). Reachability and output stability on $G$ are defined as before with encounters
+along edges of $G$. A protocol stably computes $\varphi$ on $G$ for inputs in a domain $D$ if, for
+every input whose count vector lies in $D$, every configuration reachable on $G$ can reach an
+output-stable configuration with output $\varphi$; it stably computes $\varphi$ on graphs if it
+does so on every connected graph.
+\end{definition}
+
+\begin{lemma}[The complete graph]\label{lem:graph-top}
+\lean{Crn.Protocol.graphStep_top,Crn.Protocol.graphReaches_top,Crn.Protocol.graphOutputStable_top,Crn.Protocol.stablyComputesOnGraph_top_iff,Crn.Protocol.GraphStablyComputes.stablyComputes}\leanok\uses{def:graph-stable}
+On the complete graph these notions are those of Definition~\ref{def:stable}: stable
+computation on the complete graphs of all nonempty populations, with the trivial domain, is
+stable computation.
+\end{lemma}
+\begin{proof}\leanok
+Every ordered pair of distinct agents is an oriented edge of the complete graph.
+\end{proof}
+
+\begin{lemma}[Embedding a population]\label{lem:graph-extend}
+\lean{Crn.Protocol.GraphReaches.extend}\leanok\uses{def:graph-stable}
+Reachability transfers along an injective map of agents that preserves edges, the other agents
+being frozen.
+\end{lemma}
+\begin{proof}\leanok
+Induction on reachability: an encounter along $(u, v)$ is simulated along $(f(u), f(v))$.
+\end{proof}
+
+\begin{definition}[Majority]\label{def:majority}
+\lean{Crn.majority,Crn.HasMajority}\leanok\uses{def:graph-stable}
+With two input types, red and green, majority is true if red has more agents than green, and the
+domain excludes ties.
+\end{definition}
+
+\begin{definition}[The ambassador protocol]\label{def:ambassador}
+\lean{Crn.AmbState,Crn.ambassadorδ,Crn.ambassador,Crn.card_ambState,Crn.ambassador_table,Crn.ambassador_table_rest,Crn.ambassador_symm}\leanok\uses{def:protocol}
+A state is a color and a bit saying whether the vertex holds an ambassador; every agent starts
+with an ambassador of its input color, and the output is the color. Two ambassadors of different
+colors annihilate; an ambassador meeting a vertex without ambassador moves there and paints it;
+nothing else changes. This is the table of Figure~1, with $4$ states, and the protocol is
+symmetric.
+\end{definition}
+
+\begin{lemma}[Invariants]\label{lem:amb-invariant}
+\lean{Crn.ambCount,Crn.ambCount_input,Crn.ambCount_interact_le,Crn.ambCount_sub_interact}\leanok\uses{def:ambassador}
+The number of ambassadors of each color starts at the input count and never increases, and the
+difference between red and green ambassadors never changes.
+\end{lemma}
+\begin{proof}\leanok
+Count the two agents of an encounter, over the $16$ entries of the table.
+\end{proof}
+
+\begin{lemma}[Annihilation and spreading]\label{lem:amb-steps}
+\lean{Crn.exists_reaches_annihilate,Crn.exists_reaches_allColor,Crn.graphOutputStable_of_allColor}\leanok\uses{lem:amb-invariant,def:graph-stable}
+On a connected graph, while both colors have ambassadors, a configuration with one ambassador
+of each color fewer is reachable. If all ambassadors have color $b$ and there is one, the all-$b$
+coloring is reachable, and it is output-stable.
+\end{lemma}
+\begin{proof}\leanok
+Take a red ambassador and a closest green one. The red ambassador walks along a shortest path,
+moving onto vertices without ambassador and handing over to red ambassadors it meets, until it
+meets the green one (strong induction on the distance). Spreading is similar, by induction on the
+distance to a vertex of the other color and then on the number of such vertices.
+\end{proof}
+
+\begin{theorem}[MNRS14, Theorem 2]\label{thm:ambassador}
+\lean{Crn.ambassador_graphStablyComputes,Crn.ambassador_stablyComputesOnGraph_top,Crn.ambassador_tie_stuck}\leanok\uses{lem:amb-steps,def:majority,lem:graph-top}
+The ambassador protocol stably computes majority on every connected graph, for every input with
+a majority. With one red and one green agent, a configuration is reachable from which no
+output-stable configuration is reachable, so ties must be excluded.
+\end{theorem}
+\begin{proof}\leanok
+From every reachable configuration, annihilate pairs until only ambassadors of the majority
+color remain (there is one by the invariant), then spread that color. Configurations without
+ambassadors are frozen.
+\end{proof}
+
+\begin{theorem}[MNRS14, Theorem 1]\label{thm:three-states}
+\lean{Crn.not_stablyComputesOnGraph_top_majority,Crn.not_graphStablyComputes_majority,Crn.rank_majority_eq_four}\leanok\uses{lem:graph-extend,def:majority,lem:graph-top,thm:ambassador}
+No protocol with at most $3$ states stably computes majority, ties excluded, on the complete
+graphs of all nonempty populations, hence on all connected graphs. With
+Theorem~\ref{thm:ambassador}, $4$ is the minimal number of states.
+\end{theorem}
+\begin{proof}\leanok
+A single agent never interacts, so both outputs occur, and one output $b$ has a single state
+$q_1$. On $3$ agents, the inputs $(b, b, \lnot b)$ and $(b, b, b)$ both reach the configuration in
+which every agent is in $q_1$. Adding two agents of input $\lnot b$ and running the same encounters
+on the first three agents, inputs with majority $\lnot b$ and $b$ reach a common configuration, a
+contradiction.
+\end{proof}
+
+\begin{definition}[Approximate majority on a graph]\label{def:am-graph}
+\lean{Crn.ApproxMajority.rule,Crn.ApproxMajority.protocol,Crn.ApproxMajority.rule_mem_network,Crn.ApproxMajority.exists_rule_of_mem_network,Crn.ApproxMajority.graphStep,Crn.ApproxMajority.graphKernel}\leanok\uses{def:am,def:protocol}
+The one-way rule: the initiator never changes; an initiator $X$ or $Y$ turns an opposite responder
+blank and recruits a blank responder. Its effective transitions are exactly the reactions of the
+approximate-majority network. Each step activates a uniformly random oriented edge of $G$.
+\end{definition}
+
+\begin{definition}[Winning probabilities]\label{def:winprob}
+\lean{Crn.ApproxMajority.Unanimous,Crn.ApproxMajority.placement,Crn.ApproxMajority.winProb,Crn.ApproxMajority.absorbProb,Crn.ApproxMajority.winProb_monotone,Crn.ApproxMajority.tendsto_winProb}\leanok\uses{def:am-graph}
+With $m$ agents of type $Y$ placed on a uniformly random $m$-set and $X$ elsewhere,
+$\mathrm{win}_t(s)$ is the probability that every agent is $s$ at time $t$. Unanimity is absorbing,
+so $\mathrm{win}_t(s)$ is nondecreasing in $t$, and its supremum, the convergence probability, is
+its limit.
+\end{definition}
+
+\begin{lemma}[Coupling and symmetry]\label{lem:am-coupling}
+\lean{Crn.ApproxMajority.rank,Crn.ApproxMajority.rule_mono,Crn.ApproxMajority.graphStep_mono,Crn.ApproxMajority.event_allX_mono,Crn.ApproxMajority.swap,Crn.ApproxMajority.graphStep_swap,Crn.ApproxMajority.event_swap}\leanok\uses{def:winprob}
+For the order $Y < B < X$ the rule is monotone in both states, so the probability that every agent
+is $X$ at time $t$ is monotone in the initial configuration. Exchanging $X$ and $Y$ commutes with
+the dynamics.
+\end{lemma}
+\begin{proof}\leanok
+Run two ordered configurations with the same oriented edges; they stay ordered.
+\end{proof}
+
+\begin{lemma}[MNRS14, Corollary 1]\label{lem:hall}
+\lean{Crn.ApproxMajority.exists_injective_of_regular,Crn.ApproxMajority.exists_injective_subset}\leanok
+A family of $r$-element subsets of a finite universe, with at most as many sets as elements, in
+which every element lies in the same number $d \ge 1$ of sets, has a system of distinct
+representatives. In particular, if $n \le 2m$, every $m$-set $S$ of agents contains an
+$(n - m)$-subset $A_S$, with $S \mapsto A_S$ injective on the $m$-sets.
+\end{lemma}
+\begin{proof}\leanok
+Hall's theorem, with Hall's condition by double counting.
+\end{proof}
+
+\begin{theorem}[MNRS14, Theorem 4, at every finite time]\label{thm:am-graph}
+\lean{Crn.ApproxMajority.winProb_minority_le_majority,Crn.ApproxMajority.absorbProb_minority_le_majority}\leanok\uses{lem:am-coupling,lem:hall}
+On every graph with an edge, if $n \le 2m$, at every time $t$ the probability that the minority
+$X$ has won is at most the probability that the majority $Y$ has won; hence the same holds for the
+convergence probabilities.
+\end{theorem}
+\begin{proof}\leanok
+For each $m$-set $S$, the configuration with $X$ exactly on $A_S$ lies below the one with $X$
+exactly on $S$, which is the swap of the placement with $Y$ on $S$. By monotonicity and symmetry,
+the minority wins from the first with probability at most the probability that the majority wins
+from the placement on $S$. The first configuration is the placement on the $m$-set $A_S^c$, and
+$S \mapsto A_S^c$ is a bijection of the $m$-sets, so averaging over $S$ gives the inequality
+(eqs.~(18) to~(23)).
+\end{proof}
+
+\begin{theorem}[MNRS14, Theorem 4]\label{thm:am-half}
+\lean{Crn.ApproxMajority.tendsto_event_unanimous,Crn.ApproxMajority.half_le_absorbProb_majority}\leanok\uses{thm:am-graph}
+On a connected graph, from every configuration with a non-blank agent, the protocol is absorbed in
+all-$X$ or all-$Y$ with probability tending to $1$. Hence, if $n \le 2m$ and $m \le n$, it converges
+to the majority with probability at least $1/2$.
+\end{theorem}
+\begin{proof}\leanok
+An initiator $s \ne B$ activated twice on the same responder makes it $s$, so an opinion present
+spreads to all agents along the edges of a connected graph, and all-blank is never reached.
+Absorption in a finite chain follows, and the two convergence probabilities sum to $1$.
 \end{proof}

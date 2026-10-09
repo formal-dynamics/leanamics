@@ -17,6 +17,10 @@ import Crn.StableSemilinearSet
 import Crn.StableSemilinear
 import Crn.StableTransfer
 import Crn.StableCrn
+import Crn.GraphMajorityBasic
+import Crn.GraphMajorityAmbassador
+import Crn.GraphMajorityLowerBound
+import Crn.GraphMajorityRandom
 import Crn.ExactMajorityOutput
 import Crn.ExactMajorityStatic
 import Crn.ExactMajorityDynamic
