@@ -14,7 +14,7 @@ developments are `sorry`-free. Probability is finite: randomness lives on finite
 expectations are finite sums (no measure theory, no `PMF`/`ENNReal`), and the concentration
 bounds and martingale arguments are proved within this layer.
 
-This page gives a short overview of each area.
+This page gives a short overview of each area; the blueprint of each package has the precise statements, the proofs and the links to the Lean code.
 [RESULTS.md](https://github.com/formal-dynamics/leanamics/blob/main/RESULTS.md) lists every
 formalized result with its scope, source, main Lean theorems and roadmap ID;
 [ROADMAP.md](https://github.com/formal-dynamics/leanamics/blob/main/ROADMAP.md) lists what we
@@ -27,260 +27,103 @@ sufficiently large $n$" explicit, with thresholds that can be astronomically lar
 ## Majority dynamics: 3-Majority and plurality consensus
 {: #majority}
 
-In the *3-majority* dynamics every node holds one of $k$ colors and, every round, adopts the
-majority color among three nodes sampled uniformly at random (the first one if all three differ).
-With two opinions, a 3/5 share gives consensus within $O(\log n)$ rounds with probability
-$1 - O(1/n)$, by an elementary proof (`ThreeMajority.majority3_consensus_whp`). With $k$ colors,
-if the plurality color has at least $n/\lambda$ nodes and leads every other color by at least
-$22\sqrt{\lambda n \log n}$, then after $O(\lambda \log n)$ rounds **all** nodes support it with
-high probability (`Plurality.theorem_3_8`), formalizing the upper bound of
-Becchetti, Clementi, Natale, Pasquale, Silvestri and Trevisan, *Simple Dynamics for Plurality
-Consensus* (SPAA 2014), whose proof needs a minor correction (small repairs), together with its
-Corollaries 3.10 to 3.12. With two opinions this is consensus from a vanishing imbalance: a gap of
-$22\sqrt{3 n \log n}$, i.e. a fraction $1/2 + O(\sqrt{\log n / n})$, suffices for consensus within
-$390 \log n$ rounds with probability $1 - O(\log n / n)$ (`Plurality.majority3_vanishing_bias`).
-From **any** configuration, even a perfectly balanced one, binary 3-majority reaches consensus
-within $O(\log n)$ rounds with probability $1 - 1/n$ (`Plurality.majority3_any_start_whp`): near
-balance one round creates a gap of order $\sqrt{n}$ with constant probability, and the
-hitting-time lemma of Doerr et al. (SPAA 2011) shows that the gap then grows to the size the
-vanishing-bias theorem needs.
-The package also proves the paper's lower bounds ($\Omega(k \log n)$ rounds from balanced starts,
-and $\Omega(k/h^2)$ rounds for $h$-plurality) and its characterization of the 3-input rules that
-solve plurality consensus, except for one family of rules that remains open.
+Every round, each node adopts the majority colour among three random nodes. Formalized: consensus
+from a 3/5 majority in $O(\log n)$ rounds ([proof]({{ '/3-majority/blueprint/' | relative_url }}#sec:main-statement)); plurality
+consensus with $k$ colours from a bias of order $\sqrt{\lambda n \log n}$ ([Becchetti et al., SPAA
+2014]({{ '/plurality/blueprint/' | relative_url }}#sec:upper)) and its [lower bounds]({{ '/plurality/blueprint/' | relative_url }}#sec:lower); with two colours,
+consensus from any start, even a balanced one ([details]({{ '/plurality/blueprint/' | relative_url }}#sec:any_start)).
 
-* Plurality: [Blueprint]({{ '/plurality/blueprint/' | relative_url }}) · [as pdf]({{ '/plurality/blueprint.pdf' | relative_url }}) ·
-  [dependency graph]({{ '/plurality/blueprint/dep_graph_document.html' | relative_url }}) ·
-  [API docs]({{ '/plurality/docs/' | relative_url }}) · [Source and README](https://github.com/formal-dynamics/leanamics/tree/main/plurality)
-* Two opinions (`3-majority/`): [Blueprint]({{ '/3-majority/blueprint/' | relative_url }}) · [as pdf]({{ '/3-majority/blueprint.pdf' | relative_url }}) ·
-  [dependency graph]({{ '/3-majority/blueprint/dep_graph_document.html' | relative_url }}) ·
-  [API docs]({{ '/3-majority/docs/' | relative_url }}) · [Source and README](https://github.com/formal-dynamics/leanamics/tree/main/3-majority)
+**Plurality:** [Blueprint]({{ '/plurality/blueprint/' | relative_url }}) · [PDF]({{ '/plurality/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/plurality/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/plurality/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/plurality)  
+**Two opinions:** [Blueprint]({{ '/3-majority/blueprint/' | relative_url }}) · [PDF]({{ '/3-majority/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/3-majority/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/3-majority/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/3-majority)
 
 ## Median dynamics and 2-Choices
 {: #median}
 
-Every node holds a value from a linearly ordered set and, every round, adopts the median of its
-own value and the values of two nodes sampled uniformly at random (Doerr, Goldberg, Minder,
-Sauerwald and Scheideler, *Stabilizing consensus with the power of two choices*, SPAA 2011).
-Thresholding the process at any value gives the binary median process, i.e. 2-Choices, driven by
-the same samples (`Median.threshold_run`). With two values, a gap of $128\sqrt{n \log n}$ gives
-consensus on the majority within $\lceil 128 \log n \rceil$ rounds with probability $1 - 128/n$
-(`Median.consensus_whp`), and a gap $\Delta$ of at least that size gives consensus within
-$O(\log(n/\Delta) + \log \log n)$ rounds (`Median.binary_consensus_fast`). From any
-configuration, with any number of values and even from a perfectly balanced start, consensus
-follows within $O(\log n)$ rounds with probability $1 - O(1/n)$ (`Median.median_consensus_any`).
-The paper's Theorem 1 is also formalized with its adaptive adversary: against an adversary that
-knows the history and changes the values of up to $F \le \sqrt{n}/2^{20}$ nodes per round, after
-$O(\log n)$ rounds all but $O(F + \log n)$ nodes agree on one value over any finite window
-(`Median.median_almost_stable`). The odd case of the paper's Theorem 21 is formalized for exactly
-equal supports (`Median.odd_split_consensus`). On graphs, in two-sample voting every vertex
-samples two neighbours and adopts their opinion if they agree; on a $d$-regular expander whose
-second largest eigenvalue in absolute value is at most $3/5 - \varepsilon$, a minority of at most
-$\varepsilon n/5$ vertices disappears within $O(\log n)$ rounds (`Median.two_choices_expander`,
-Theorem 4 of Cooper, Elsässer and Radzik, ICALP 2014).
+Every round, each node adopts the median of its own value and two random values; with two values
+this is 2-Choices. Formalized: consensus within $O(\log n)$ rounds from any configuration and
+almost stable consensus against an adaptive adversary ([Doerr et al., SPAA 2011]({{ '/median/blueprint/' | relative_url }}#sec:dgmss-median));
+two-sample voting on expanders ([Cooper, Elsässer and Radzik, ICALP 2014]({{ '/median/blueprint/' | relative_url }}#sec:cer-two-choices)).
 
-* [Blueprint]({{ '/median/blueprint/' | relative_url }}) · [as pdf]({{ '/median/blueprint.pdf' | relative_url }}) ·
-  [dependency graph]({{ '/median/blueprint/dep_graph_document.html' | relative_url }})
-* [API docs]({{ '/median/docs/' | relative_url }})
-* [Source and README](https://github.com/formal-dynamics/leanamics/tree/main/median)
+[Blueprint]({{ '/median/blueprint/' | relative_url }}) · [PDF]({{ '/median/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/median/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/median/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/median)
 
 ## Undecided-state dynamics
 {: #undecided}
 
-Each node holds opinion $a$, opinion $b$, or is undecided; every round it samples a uniformly random
-node, adopts the sampled opinion if undecided, and becomes undecided if it sees the other opinion.
-With $q$ undecided nodes, the bias between the two opinions grows in expectation by the factor
-$1 + q/n$ in one round (`Undecided.expected_bias`), and every run is eventually absorbed in a
-monochromatic configuration (`Undecided.absorbed`). A bias of order $\sqrt{n \log n}$ suffices,
-from any configuration and with any number of undecided nodes, for all nodes to adopt the majority
-opinion within $O(\log n)$ rounds with probability $1 - O(1/n)$ (`Undecided.majority_whp`, after
-Clementi, Ghaffari, Gualà, Natale, Pasquale and Scornavacca, MFCS 2018). With $k$ colours and no
-undecided nodes, if the plurality color leads every other color by a constant factor, all nodes
-adopt it within $O(\mathrm{md}(c) \log n)$ rounds, where $\mathrm{md}(c)$ is the monochromatic
-distance of the initial configuration (`Undecided.Plurality.plurality_whp`, Theorem 11 of
-Becchetti, Clementi, Natale, Pasquale and Silvestri, SODA 2015, whose range of $k$ needs a minor
-correction). In the sequential version, the
-approximate-majority population protocol of Angluin, Aspnes and Eisenstat (Distributed Computing,
-2008), one random pair of agents interacts per step: from any configuration with a decided agent,
-consensus is reached within $O(n \log n)$ interactions, and from a gap of order
-$\sqrt{n} \log n$ the initial majority wins, each with probability $1 - O(n^{-c})$ for every $c$
-(`Undecided.Sequential.consensus_whp`, `Undecided.Sequential.majority_whp`).
+A node that sees the other opinion becomes undecided; an undecided node adopts the opinion it
+sees. Formalized: majority consensus from a bias of order $\sqrt{n \log n}$ within $O(\log n)$
+rounds ([Clementi et al., MFCS 2018]({{ '/undecided/blueprint/' | relative_url }}#sec:cggnps-majority)); plurality consensus with $k$
+colours ([Becchetti et al., SODA 2015]({{ '/undecided/blueprint/' | relative_url }}#sec:bcnps-plurality)); and the sequential
+approximate-majority protocol ([Angluin, Aspnes and Eisenstat, 2008]({{ '/undecided/blueprint/' | relative_url }}#sec:aae-approx-majority)).
 
-* [Blueprint]({{ '/undecided/blueprint/' | relative_url }}) · [as pdf]({{ '/undecided/blueprint.pdf' | relative_url }}) ·
-  [dependency graph]({{ '/undecided/blueprint/dep_graph_document.html' | relative_url }})
-* [API docs]({{ '/undecided/docs/' | relative_url }})
-* [Source and README](https://github.com/formal-dynamics/leanamics/tree/main/undecided)
+[Blueprint]({{ '/undecided/blueprint/' | relative_url }}) · [PDF]({{ '/undecided/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/undecided/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/undecided/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/undecided)
 
 ## Voter model
 {: #voter}
 
-For a finite connected nonbipartite undirected graph, each vertex independently
-samples a neighbor according to a stochastic matrix (self-loops allowed) and
-copies its previous color. The eventual probability of consensus in a color equals the initial
-stationary weight of vertices with that color. Uniform neighbor sampling gives
-degree weights, and regular graphs give the initial color fraction
-(`Voter.consensus_probability`, formalizing Hassin and Peleg, Sections 2.1 to 2.3). One self-loop
-removes the nonbipartiteness hypothesis, which covers the lazy voter on every connected graph and
-neutral Wright–Fisher, where an allele held by $c$ of the $n$ individuals fixes with probability
-$c/n$ (`Voter.wrightFisher_fixation`). On the complete graph, a duality with coalescing random
-walks gives consensus within $2n\log n$ rounds with probability at least $1 - 1/n$
-(`Voter.voter_consensus_whp`). The lazy voter reaches consensus on every connected graph within
-$O(n^3 \log n)$ rounds with probability at least $1 - 1/n$ (`Voter.lazy_voter_consensus_whp`,
-Hassin and Peleg's Theorem 2.5), and within $O(m/(d\varphi))$ rounds with probability at least
-$1/2$, where $m$ is the number of edges, $d$ the minimum degree and $\varphi$ the conductance,
-also on dynamic graphs and with any number of opinions (`Voter.lazy_consensus_conductance`,
-after Berenbrink, Giakkoupis, Kermarrec and Mallmann-Trenn, ICALP 2016), as well as within
-$O(n \log n/\varphi^2)$ rounds with probability at least $1 - 1/n$, the second bound of the same
-paper (`Voter.lazy_consensus_conductance_sq_many`).
+Every round, each node copies the opinion of a random neighbour. Formalized: the consensus
+probabilities on connected graphs and neutral Wright–Fisher fixation ([Hassin and
+Peleg]({{ '/voter/blueprint/' | relative_url }}#sec:hassin-peleg)); consensus within $O(n^3 \log n)$ rounds on every connected graph
+([details]({{ '/voter/blueprint/' | relative_url }}#sec:kms-meeting-time)); and consensus times via conductance, also on dynamic
+graphs ([Berenbrink et al., ICALP 2016]({{ '/voter/blueprint/' | relative_url }}#sec:bgkm-conductance)).
 
-* [Blueprint]({{ '/voter/blueprint/' | relative_url }}) · [as pdf]({{ '/voter/blueprint.pdf' | relative_url }}) ·
-  [dependency graph]({{ '/voter/blueprint/dep_graph_document.html' | relative_url }})
-* [API docs]({{ '/voter/docs/' | relative_url }})
-* [Source and README](https://github.com/formal-dynamics/leanamics/tree/main/voter)
+[Blueprint]({{ '/voter/blueprint/' | relative_url }}) · [PDF]({{ '/voter/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/voter/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/voter/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/voter)
 
 ## The Moran process and the isothermal theorem
 {: #moran}
 
-In the Birth–death Moran process, an individual chosen with probability proportional to its
-fitness (mutants $r$, residents $1$) places a copy of itself on a uniformly random neighbour.
-On a connected regular graph, $k$ mutants take over with probability
-$(1 - r^{-k})/(1 - r^{-n})$ ($k/n$ when $r = 1$): the "if" direction of the isothermal theorem of
-Lieberman, Hauert and Nowak. The main
-theorem is `Moran.isothermal`; `Moran.moran_formula` is Moran's 1958 formula on the complete graph.
-On an arbitrary connected graph, the neutral push (Birth–death) and pull (death–Birth) processes
-fix a mutant set $S$ with probabilities proportional to $\sum_{v \in S} 1/\deg v$ and to
-$\sum_{v \in S} \deg v$ respectively (`Moran.push_fixation`, `Moran.pull_fixation`). On the star,
-the fixation probability is exact from every configuration (after Broom and Rychtář, 2008), the
-star amplifies selection whenever it has at least two leaves, and from a uniformly random initial mutant
-the fixation probability tends to $1 - 1/r^2$ (`Moran.star_fixation`, `Moran.star_amplifier`,
-`Moran.star_fixation_uniform_tendsto`).
+An individual chosen proportionally to its fitness places a copy of itself on a random neighbour.
+Formalized: the isothermal theorem on regular graphs ([Lieberman, Hauert and Nowak,
+2005]({{ '/moran/blueprint/' | relative_url }}#sec:lhn-isothermal)); neutral fixation of push and pull processes on every graph
+([details]({{ '/moran/blueprint/' | relative_url }}#sec:ars-push-pull)); and exact fixation on the star, which amplifies selection
+([Broom and Rychtář, 2008]({{ '/moran/blueprint/' | relative_url }}#sec:broom-rychtar)).
 
-* [Blueprint]({{ '/moran/blueprint/' | relative_url }}) · [as pdf]({{ '/moran/blueprint.pdf' | relative_url }}) ·
-  [dependency graph]({{ '/moran/blueprint/dep_graph_document.html' | relative_url }})
-* [API docs]({{ '/moran/docs/' | relative_url }})
-* [Source and README](https://github.com/formal-dynamics/leanamics/tree/main/moran)
+[Blueprint]({{ '/moran/blueprint/' | relative_url }}) · [PDF]({{ '/moran/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/moran/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/moran/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/moran)
 
 ## Epidemics and rumor spreading
 {: #epidemics}
 
-**Rumor spreading.** In the uniform *push* model on the complete graph $K_n$, every informed node
-sends the rumor to a uniformly random other node each round; starting from a single informed node,
-after $O(\log n)$ rounds **all** nodes are informed with high probability
-(`RumorPush.push_informs_all_whp`). With the same random calls, *pull* and *push–pull* inform all
-nodes within $\lceil 160 \ln n \rceil$ rounds with probability at least $1 - 2/n$
-(`RumorPush.pull_informs_all_whp`, `RumorPush.pushPull_informs_all_whp`). For general
-rumor-spreading processes, the upper bounds of Doerr and Kostrygin, *Randomized rumor spreading
-revisited* (ICALP 2017), are formalized: exponential growth, exponential shrinking and the total
-spreading time, with exponential tails (`Epidemics.Revisited.spreading_upper_tail`). Lemma 20 of
-the paper needs a major correction. As instances, on $K_n$ (with self-calls) push informs all
-nodes within $\log_2 n + \ln n + O(1)$ rounds, the sharp upper bound of Frieze and Grimmett and
-of Pittel, pull within $\log_2 n + \log_2 \ln n + O(1)$ and push–pull within
-$\log_3 n + \log_2 \ln n + O(1)$, with exponential tails
-(`Epidemics.Revisited.push_spreading_tail`); the lower bounds are not formalized.
+Formalized: push, pull and push–pull rumor spreading on $K_n$ inform all nodes within $O(\log n)$
+rounds ([push]({{ '/rumor_spread/blueprint/' | relative_url }}#sec:main-statement), [pull and push–pull]({{ '/rumor_spread/blueprint/' | relative_url }}#sec:pull)), with
+sharp upper bounds from a general analysis ([Doerr and Kostrygin, ICALP 2017]({{ '/epidemics/blueprint/' | relative_url }}#sec:doerr-kostrygin));
+Reed–Frost epidemics as percolation, with small outbreaks below the threshold, also on small-world
+networks ([Becchetti et al.]({{ '/epidemics/blueprint/' | relative_url }}#sec:bcdptz-small-world)), and a giant component above it
+([Krivelevich and Sudakov, 2013]({{ '/epidemics/blueprint/' | relative_url }}#sec:krivelevich-sudakov)); the COBRA–BIPS duality
+([Cooper, Radzik and Rivera, PODC 2016]({{ '/epidemics/blueprint/' | relative_url }}#sec:crr-cobra-bips)); and the SIR equations
+([Kermack–McKendrick]({{ '/epidemics/blueprint/' | relative_url }}#sec:kermack-mckendrick)) with their law of large numbers
+([Kurtz]({{ '/epidemics/blueprint/' | relative_url }}#sec:kurtz)).
 
-**Reed–Frost and percolation.** In the Reed–Frost (Independent Cascade) epidemic, each infected
-node infects each susceptible neighbour across an open edge and then recovers. With one coin per
-edge, the nodes infected in round $t$ are exactly those at distance $t$ from the initial set in the
-graph of open edges (`Epidemics.infected_iff`), so the final outbreak is the set of nodes connected
-to the initial set, and with independent Bernoulli($p$) coins the probability of eventual infection
-is a bond-percolation connection probability (`Epidemics.prob_infected_eq_prob_connected`). Below
-the threshold (maximum degree $d$ and $p(d-1) \le 1 - \varepsilon$), every component of the
-percolated graph has $O(\log n / \varepsilon^2)$ vertices with probability at least $1 - 1/n$, so
-outbreaks are small and short (`Epidemics.reedFrost_subcritical`, after Becchetti, Clementi,
-Denni, Pasquale, Trevisan and Ziccardi). The same holds on their one-dimensional small-world
-networks, a cycle plus random shortcuts (the edges of $G(n, c/n)$, or a random perfect matching),
-below the thresholds $(\sqrt{c^2 + 6c + 1} - c - 1)/(2c)$ and $1/2$
-(`Epidemics.swg_reedFrost_subcritical`; the supercritical half is not formalized). Above the
-threshold, $G(n, (1+\varepsilon)/n)$ has a linear-size component, and Reed–Frost on $K_n$ with
-basic reproduction number above $1$ infects a linear number of nodes with constant probability (`Epidemics.exists_giant_component`,
-`Epidemics.reedFrost_large_outbreak`, after Krivelevich and Sudakov, 2013).
-
-**COBRA and BIPS.** The coalescing-branching random walk and the BIPS epidemic are dual: on every
-finite graph, the probability that COBRA started from a set $C$ has not visited $v$ by time $t$
-equals the probability that BIPS with source $v$ infects no vertex of $C$ at time $t$
-(`Epidemics.cobra_bips_duality`, Theorem 4 of Cooper, Radzik and Rivera, PODC 2016).
-
-**SIR: the ODE and its law of large numbers.** For every solution of the Kermack–McKendrick SIR
-equations (solutions are assumed, not constructed), the infected fraction initially grows if and
-only if the basic reproduction number times the initial susceptible fraction exceeds $1$, and the
-final susceptible fraction is the unique root of the final-size equation
-(`Epidemics.KermackMcKendrick.IsSolution.final_size`). Kurtz's law of large numbers connects it to
-the stochastic SIR epidemic: in discrete time, the scaled counts stay close to the solution up to
-any fixed time, except with probability exponentially small in the population size
-(`Epidemics.Kurtz.law_of_large_numbers`, with a maximal Azuma–Hoeffding inequality).
-
-* Rumor spreading: [Blueprint]({{ '/rumor_spread/blueprint/' | relative_url }}) · [as pdf]({{ '/rumor_spread/blueprint.pdf' | relative_url }}) ·
-  [dependency graph]({{ '/rumor_spread/blueprint/dep_graph_document.html' | relative_url }}) ·
-  [API docs]({{ '/rumor_spread/docs/' | relative_url }}) · [Source and README](https://github.com/formal-dynamics/leanamics/tree/main/rumor_spread)
-* Epidemics: [Blueprint]({{ '/epidemics/blueprint/' | relative_url }}) · [as pdf]({{ '/epidemics/blueprint.pdf' | relative_url }}) ·
-  [dependency graph]({{ '/epidemics/blueprint/dep_graph_document.html' | relative_url }}) ·
-  [API docs]({{ '/epidemics/docs/' | relative_url }}) · [Source and README](https://github.com/formal-dynamics/leanamics/tree/main/epidemics)
+**Rumor spreading:** [Blueprint]({{ '/rumor_spread/blueprint/' | relative_url }}) · [PDF]({{ '/rumor_spread/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/rumor_spread/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/rumor_spread/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/rumor_spread)  
+**Epidemics:** [Blueprint]({{ '/epidemics/blueprint/' | relative_url }}) · [PDF]({{ '/epidemics/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/epidemics/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/epidemics/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/epidemics)
 
 ## Chemical reaction networks and population protocols
 {: #crn}
 
-In a count-conserving bimolecular chemical reaction network ($A + B \to C + D$) with a common rate
-constant, the jump chain of stochastic mass-action kinetics fires reaction $r$ with probability
-proportional to its propensity. If $a$ and $b$ agents hold species $A \ne B$, a uniformly random
-ordered pair of distinct agents holds one of each with probability $ab / \binom{n}{2}$ (and two $A$
-with probability $\binom{a}{2} / \binom{n}{2}$), which is the propensity up to a common factor. So the
-population protocol that draws such a pair, conditioned on the pair reacting, is exactly the jump
-chain, as kernels on count vectors (`Crn.jumpKernel_eq_ppKernel`). The worked
-instance is the approximate-majority network (`Crn.ApproxMajority.network_jumpKernel_eq_ppKernel`).
+Formalized: the stochastic mass-action kinetics of a bimolecular network has the same jump
+chain as the population protocol on the same reactions, and population protocols stably compute every
+threshold and remainder predicate and their Boolean combinations ([Angluin et al.,
+2006]({{ '/crn/blueprint/' | relative_url }}#sec:aadfp-stable)).
 
-Population protocols with input and output stably compute every threshold predicate (an
-integer linear combination of the input counts is below $c$) and every remainder predicate (it is
-congruent to $c$ modulo $m$), and the stably computable predicates are closed under Boolean operations
-(`Crn.IsSemilinearPred.stablyComputable`, the easy direction of Angluin, Aspnes, Diamadi, Fischer
-and Peralta, 2006). Since every protocol is a count-conserving bimolecular network, every Boolean
-combination of threshold and remainder predicates is stably decided by such a network
-(`Crn.IsSemilinearPred.exists_network`).
-
-* [Blueprint]({{ '/crn/blueprint/' | relative_url }}) · [as pdf]({{ '/crn/blueprint.pdf' | relative_url }}) ·
-  [dependency graph]({{ '/crn/blueprint/dep_graph_document.html' | relative_url }})
-* [API docs]({{ '/crn/docs/' | relative_url }})
-* [Source and README](https://github.com/formal-dynamics/leanamics/tree/main/crn)
+[Blueprint]({{ '/crn/blueprint/' | relative_url }}) · [PDF]({{ '/crn/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/crn/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/crn/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/crn)
 
 ## Averaging dynamics
 {: #averaging}
 
-Every node replaces its value by the average of its neighbours' values. On a connected graph with
-an odd closed walk all values converge to the degree-weighted average of the initial values
-(`Averaging.tendsto_degAvg`); on a connected bipartite graph the values of a 2-colouring flip sign
-forever (`Averaging.not_tendsto_of_colorable`). The convergence is exponential, at a rate given by
-the second largest eigenvalue in absolute value of the random-walk matrix
-(`Averaging.abs_walkMatrix_pow_sub_walkStationary_le`, Theorem 33 of the Becchetti, Clementi,
-Natale survey, after Lovász), and the random sequential version, where one uniformly random edge
-averages its endpoints, has expected step matrix $I - L/2m$ (`Averaging.Sequential.avg_edgeMatrix`).
-On a regular graph made of two clusters with a spectral gap, starting from uniformly random
-$\pm 1$ values, the sign of the change of a node's value in one round recovers the two clusters
-after $O(\log n / \delta)$ rounds with probability at least $1 - 1/\sqrt{\pi n}$
-(`Averaging.strong_reconstruction`, after Becchetti, Clementi, Natale, Pasquale and Trevisan,
-*Find your place*, SODA 2017). In the asynchronous protocol *averaging whenever you meet*, one
-uniformly random edge averages its endpoints per round and a node draws a random $\pm 1$ value at
-its first activation; on the same kind of graph with a sparse cut, the signs of the values recover
-the two communities over a phase of $\Theta(n \log n / \lambda_3)$ rounds, with probability at
-least $1/2 - O(\varepsilon)$ (`Averaging.Opportunistic.weakReconstruction_phase`, after Becchetti,
-Clementi, Manurangsi, Natale, Pasquale, Raghavendra and Trevisan, ESA 2018).
+Every round, each node replaces its value by the average of its neighbours' values. Formalized:
+convergence and its spectral rate ([after Lovász]({{ '/averaging/blueprint/' | relative_url }}#sec:lovasz)), sequential averaging
+([details]({{ '/averaging/blueprint/' | relative_url }}#sec:bgps-gossip)), and community detection by averaging
+([Becchetti et al., SODA 2017]({{ '/averaging/blueprint/' | relative_url }}#sec:bcnpt-reconstruction); [ESA
+2018]({{ '/averaging/blueprint/' | relative_url }}#sec:bcmnprt-opportunistic)).
 
-* [Blueprint]({{ '/averaging/blueprint/' | relative_url }}) · [as pdf]({{ '/averaging/blueprint.pdf' | relative_url }}) ·
-  [dependency graph]({{ '/averaging/blueprint/dep_graph_document.html' | relative_url }})
-* [API docs]({{ '/averaging/docs/' | relative_url }})
-* [Source and README](https://github.com/formal-dynamics/leanamics/tree/main/averaging)
+[Blueprint]({{ '/averaging/blueprint/' | relative_url }}) · [PDF]({{ '/averaging/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/averaging/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/averaging/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/averaging)
 
 ## Shared finite dynamics library
 {: #dynamics}
 
-`Dynamics` supplies uniform and weighted finite expectations (which agree with Mathlib's
-`Finset.expect`), independent products, pushforward, kernels, stationary distributions and
-geometric absorption, together with the tools the dynamics share: Chernoff, Hoeffding and
-Bernstein bounds, finite-horizon optional stopping, time reversal of independent rounds, drift
-theorems, a hitting-time lemma for processes with multiplicative drift, progress through nested
-phases, and round types on graphs.
+Finite probability (expectations that agree with Mathlib's `Finset.expect`, kernels, absorption)
+and the tools the dynamics share: Chernoff, Hoeffding and Bernstein bounds, optional stopping,
+drift theorems and a [hitting-time lemma]({{ '/dynamics/blueprint/' | relative_url }}#sec:dgmss-hitting).
 
-* [Blueprint]({{ '/dynamics/blueprint/' | relative_url }}) · [as pdf]({{ '/dynamics/blueprint.pdf' | relative_url }}) ·
-  [dependency graph]({{ '/dynamics/blueprint/dep_graph_document.html' | relative_url }})
-* [API docs]({{ '/dynamics/docs/' | relative_url }})
-* [Source and README](https://github.com/formal-dynamics/leanamics/tree/main/dynamics)
+[Blueprint]({{ '/dynamics/blueprint/' | relative_url }}) · [PDF]({{ '/dynamics/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/dynamics/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/dynamics/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/dynamics)
 
 ## How to cite
 {: #cite}
