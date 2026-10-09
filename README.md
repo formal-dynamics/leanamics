@@ -1,5 +1,7 @@
 # Leanamics
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23265329.svg)](https://doi.org/10.5281/zenodo.23265329)
+
 Lean 4 + Mathlib formalizations of classical results on opinion dynamics and
 related distributed processes. Each project is paired with a
 [leanblueprint](https://github.com/PatrickMassot/leanblueprint) connecting the
@@ -30,7 +32,8 @@ inequality for the SIR model, the spectrum of symmetric matrices for averaging).
 
 If you use Leanamics, please cite it. The metadata are in [CITATION.cff](CITATION.cff) (GitHub's
 "Cite this repository" button shows them as APA and BibTeX), and every release is archived on
-[Zenodo](https://zenodo.org/) with a DOI. Please cite the version you used:
+[Zenodo](https://zenodo.org/) with its own DOI; [10.5281/zenodo.23265329](https://doi.org/10.5281/zenodo.23265329) always resolves to the
+latest release. Please cite the version you used (here v0.1.0):
 
 ```bibtex
 @software{leanamics,
@@ -38,6 +41,7 @@ If you use Leanamics, please cite it. The metadata are in [CITATION.cff](CITATIO
   title   = {Leanamics: {Lean} 4 formalizations of opinion dynamics and related distributed processes},
   year    = {2026},
   version = {0.1.0},
+  doi     = {10.5281/zenodo.23265330},
   url     = {https://github.com/formal-dynamics/leanamics}
 }
 ```
@@ -140,6 +144,14 @@ updated in the pull request itself, open an issue to update it. Each formalized 
 blueprint section with a stable `\label{sec:...}` (used for links to the website); do not rename
 existing labels. The [pull request template](.github/pull_request_template.md) lists these items,
 together with the axiom audit.
+
+## Releases
+
+To make a release `vX.Y.Z`: in a pull request, update `version` and `date-released` in
+[CITATION.cff](CITATION.cff) and the BibTeX entries (here and on the landing page); after merging it,
+create the GitHub release `vX.Y.Z`. Zenodo archives every release automatically; then add the new
+version DOI to `identifiers` in `CITATION.cff` and to the BibTeX entries. The concept DOI
+(`10.5281/zenodo.23265329`) never changes.
 
 ## License
 
