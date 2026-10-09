@@ -1,4 +1,4 @@
-# Epidemics: Reed–Frost and bond percolation; subcritical percolation; small-world networks below the threshold; the giant component; the COBRA–BIPS duality; the Kermack–McKendrick SIR model; Kurtz's law of large numbers; rumor spreading revisited
+# Epidemics: Reed–Frost and bond percolation; subcritical percolation; small-world networks below the threshold; the giant component; the COBRA–BIPS duality and the COBRA cover time on expanders; the Kermack–McKendrick SIR model; Kurtz's law of large numbers; rumor spreading revisited
 
 A Lean formalization of the pathwise correspondence between the Reed–Frost (Independent Cascade)
 epidemic and bond percolation (after Kempe, Kleinberg and Tardos, KDD 2003; see also Becchetti et
@@ -229,10 +229,11 @@ and the final phase at a fixed time (Markov property) instead of through Lemma 2
 (Theorem 43's proof, the parameters of the instances, the direct route of the lower bounds) are
 listed in [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 
-## COBRA ⇔ BIPS duality (EPI-4)
+## COBRA ⇔ BIPS duality and the COBRA cover time (EPI-4)
 
 After Cooper, Radzik and Rivera, *The coalescing-branching random walk on expanders and the dual
-epidemic process*, PODC 2016 ([arXiv:1602.05768](https://arxiv.org/abs/1602.05768)), Theorem 4.
+epidemic process*, PODC 2016 ([arXiv:1602.05768](https://arxiv.org/abs/1602.05768)), Theorems 1
+to 4, Lemmas 1 to 4 and Corollary 1.
 
 **Model.** In every round each vertex samples `k` uniform neighbours with replacement (a uniform
 element of `Choices G k`). COBRA: every vertex of the current set pushes to its sampled neighbours,
@@ -255,6 +256,36 @@ Deviations from the paper are listed in [FORMALIZATION_DIFFERENCES.md](FORMALIZA
 The statements were pinned and then proved by a Claude agent under the fixed-statement protocol and
 checks of the provenance note below.
 
+**Cover time** (in [`Epidemics/CobraCover.lean`](Epidemics/CobraCover.lean),
+[`Epidemics/CobraCoverBranching.lean`](Epidemics/CobraCoverBranching.lean) and the lemma files
+`CobraCover*.lean`). Here `G` is `r`-regular (`r > 0`) on `n` vertices, `λ` is the absolute second
+eigenvalue of the random walk (`lambdaG G r`) and `k ≥ 2`.
+
+| Result | Lean declaration |
+| --- | --- |
+| Spectral core of Lemma 1: `∑ₓ (d_A(x)/r)² ≤ λ² \|A\| + (1 - λ²) \|A\|²/n` | `sum_sq_neighbor_le` |
+| Lemma 1: `E(\|A_{t+1}\| ∣ A_t = A) ≥ \|A\| (1 + (1 - λ²)(1 - \|A\|/n))` | `bips_expected_growth` |
+| One-round MGF and Chernoff lower tail | `bips_mgf_le`, `bips_chernoff_lower` |
+| Lemma 2: from `{v}`, size `> m` within `13 m/(1 - λ) + 24 C log n/(1 - λ)²` rounds, except w.p. `n^{-C}` | `bips_small_phase` |
+| Lemma 3: from `\|A₀\| ≥ 4000 log n/(1 - λ)²`, size `≥ 9n/10` within `T ≥ 24 log n/(1 - λ)` rounds, except w.p. `T n^{-5}` | `bips_large_phase` |
+| Lemma 4: from `\|A₀\| ≥ 9n/10`, `A_T = V` for `T ≥ 8 log n/(1 - λ)`, except w.p. `n^{-5}` | `bips_end_phase` |
+| Theorem 2: if `1 - λ ≥ C₀ √(log n/n)`, BIPS infects `V` within `O(log n/(1 - λ)³)` rounds w.p. `1 - O(n^{-3})`, and in expectation (the proofs give `C₀ = 128`, failure `3/n³` after `60000 log n/(1 - λ)³` rounds, expectation `≤ 130000 log n/(1 - λ)³`) | `bips_infection_time`, `bips_infection_time_expectation` |
+| Theorem 1: under the same gap, the COBRA cover time is `O(log n/(1 - λ)³)` w.p. `1 - O(n^{-2})`, and in expectation (failure `3/n²` after `60002 log n/(1 - λ)³` rounds, expectation `≤ 130000 log n/(1 - λ)³`) | `cobra_cover_time`, `cobra_cover_time_expectation` |
+| Corollary 1: branching factor `1 + ρ` with `ρ = p/q`, `E\|A'\| ≥ \|A\| (1 + ρ (1 - λ²)(1 - \|A\|/n))` | `bipsCoin_expected_growth` |
+| Theorem 3: `λ ≤ λ₀ < 1`, `ρ ≥ ρ₀ > 0` constant: cover time `O(log n)` w.h.p. and in expectation, for `n ≥ N` | `cobra_cover_time_branching`, `cobra_cover_time_branching_expectation` (with `cobraCoin_bips_duality`, `bipsCoin_infection_time`) |
+
+The phase lemmas are proved once for an abstract round-driven process with growth rate `c`
+(`GrowthProcess`, `round_small_phase`, `round_large_phase`, `round_end_phase`,
+`GrowthProcess.fail_le`), and the passage from BIPS to the COBRA cover time once for any dual pair
+(`cover_fail_le_log`, `cover_tail_sum_le_log`); Theorems 1 and 2 use `c = 1 - λ`, Theorem 3 uses
+`c = min(1, ρ₀ (1 - max(λ₀, 0)))`. Expectations are written as tail sums `∑_{s < H} P(τ > s)`,
+bounded uniformly in `H`. The paper's Lemmas 3 and 4 and its proof of Theorem 2 need minor
+corrections (see [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md)). The cover-time
+statements were pinned by a Claude agent and reviewed by a second agent against the paper before
+any proof; the proofs were started by a Grok agent (Lemmas 1 to 4 and the phase engine) and
+completed by a Claude agent (Theorems 1 to 3 and Corollary 1), under the fixed-statement protocol
+and the checks of the provenance note below.
+
 **Provenance.** Reed–Frost: the statements were written and pinned by a second agent; the proofs were produced
 by a Grok agent under a fixed-statement protocol and verified mechanically (statements unchanged, no
 placeholders, warning-free build, axiom audit). Kermack–McKendrick: the statements were pinned and
@@ -276,7 +307,9 @@ percolation (EPI-2): statements and proofs were written by a Claude agent under 
 and checks; the statements were reviewed by a second agent against the paper. Small-world networks below
 the threshold (EPI-6): the statements were pinned by a Claude agent and reviewed by a second
 agent against the paper; the proofs are by a Claude agent under the fixed-statement protocol and
-the same checks.
+the same checks. COBRA cover time (EPI-4, Theorems 1 to 3): the statements were pinned by a
+Claude agent and reviewed by a second agent against the paper; the proofs were started by a Grok
+agent and completed by a Claude agent under the fixed-statement protocol and the same checks.
 
 Build and audit:
 
