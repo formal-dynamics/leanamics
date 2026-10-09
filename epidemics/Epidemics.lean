@@ -2,6 +2,12 @@ import Epidemics.Cobra
 import Epidemics.CobraDuality
 import Epidemics.CobraLemmas
 import Epidemics.CobraReverse
+import Epidemics.CobraCoverSpectral
+import Epidemics.CobraCoverGrowth
+import Epidemics.CobraCoverSmall
+import Epidemics.CobraCoverLarge
+import Epidemics.CobraCover
+import Epidemics.CobraCoverBranching
 import Epidemics.ReedFrost
 import Epidemics.KermackMcKendrickDefs
 import Epidemics.KermackMcKendrick
