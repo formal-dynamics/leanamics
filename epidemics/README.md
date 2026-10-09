@@ -279,3 +279,7 @@ python3 ../scripts/check_axioms.py
 
 This package requires the sibling `dynamics/` package and shares its Lean 4.32.0 toolchain and exact
 Mathlib pin. The [blueprint](blueprint/src/content.tex) maps the results to declarations.
+
+## How to cite
+
+See [How to cite](../README.md#how-to-cite) in the main README.

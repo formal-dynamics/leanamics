@@ -106,3 +106,7 @@ reviewed against the paper by a second agent before any proof; the proofs are by
 under the fixed-statement protocol, with the axiom audit in `Audit.lean`.
 
 Future work: dynamic networks and extremal coalition results.
+
+## How to cite
+
+See [How to cite](../README.md#how-to-cite) in the main README.
