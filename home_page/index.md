@@ -42,7 +42,8 @@ consensus from any start, even a balanced one ([details]({{ '/plurality/blueprin
 Every round, each node adopts the median of its own value and two random values; with two values
 this is 2-Choices. Formalized: consensus within $O(\log n)$ rounds from any configuration and
 almost stable consensus against an adaptive adversary ([Doerr et al., SPAA 2011]({{ '/median/blueprint/' | relative_url }}#sec:dgmss-median));
-two-sample voting on expanders ([Cooper, Elsässer and Radzik, ICALP 2014]({{ '/median/blueprint/' | relative_url }}#sec:cer-two-choices));
+two-sample voting on expanders ([Cooper, Elsässer and Radzik, ICALP 2014]({{ '/median/blueprint/' | relative_url }}#sec:cer-two-choices)), also from a
+small initial imbalance on any regular graph ([details]({{ '/median/blueprint/' | relative_url }}#sec:cer-small-imbalance));
 and, for 2-Choices with any number of colours, plurality consensus ([Elsässer et al.]({{ '/median/blueprint/' | relative_url }}#sec:efkmt-plurality))
 and an $\Omega(n/\log n)$ lower bound ([Berenbrink et al., PODC 2017]({{ '/median/blueprint/' | relative_url }}#sec:bcekmn-lower)).
 
@@ -91,7 +92,8 @@ sharp upper bounds from a general analysis ([Doerr and Kostrygin, ICALP 2017]({{
 Reed–Frost epidemics as percolation, with small outbreaks below the threshold, also on small-world
 networks ([Becchetti et al.]({{ '/epidemics/blueprint/' | relative_url }}#sec:bcdptz-small-world)), and a giant component above it
 ([Krivelevich and Sudakov, 2013]({{ '/epidemics/blueprint/' | relative_url }}#sec:krivelevich-sudakov)); the COBRA–BIPS duality
-([Cooper, Radzik and Rivera, PODC 2016]({{ '/epidemics/blueprint/' | relative_url }}#sec:crr-cobra-bips)); and the SIR equations
+([Cooper, Radzik and Rivera, PODC 2016]({{ '/epidemics/blueprint/' | relative_url }}#sec:crr-cobra-bips)) and the COBRA cover time
+$O(\log n/(1-\lambda)^3)$ on regular expanders ([details]({{ '/epidemics/blueprint/' | relative_url }}#sec:crr-cover)); and the SIR equations
 ([Kermack–McKendrick]({{ '/epidemics/blueprint/' | relative_url }}#sec:kermack-mckendrick)) with their law of large numbers
 ([Kurtz]({{ '/epidemics/blueprint/' | relative_url }}#sec:kurtz)).
 

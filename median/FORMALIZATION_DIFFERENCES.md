@@ -146,6 +146,137 @@ Lemma numbers follow the arXiv version.
    bilinear form, and the expander mixing lemma itself) are candidates for the spectral toolkit
    of the core.
 
+## Two-sample voting on expanders from a small imbalance (`ExpanderGeneral*`, roadmap MAJ-5 (b))
+
+Source: Cooper, Elsässer and Radzik, *The power of two choices in distributed voting* (ICALP 2014,
+arXiv:1404.7479): Theorem 2, with Lemma 2 (Phase I), Corollary 2 and Section 7 ("Putting the
+phases together"). Numbering follows the arXiv version; equation names such as (eq-upperOnDAB)
+are the labels of the arXiv source. The model and the definitions are those of `Expander` above
+(its items 1, 2 and 7 apply unchanged).
+
+### Theorem 2 of the paper needs a major correction
+
+Theorem 2 states that on "an `n`-vertex `d`-regular graph", for "an absolute constant `K`
+(independent of `d` and `λ_G`)", an initial imbalance `ν₀ = (A − B)/n ≥ K λ_G` makes two-sample
+voting complete in `O(log n)` steps with the initial majority winning with high probability,
+which the paper defines as "probability tending to 1 as `n` increases" (footnote in Section 2);
+the abstract says "for any regular graph". The proof goes through Corollary 2 (Lemma 2 with
+`α = λ_G`), whose success probability is only `1 − e^{−Θ(λ_G² n)}`: Lemma 2 assumes
+`α² c² n = Ω(n^ε)`, which the proof of Corollary 2 does not check when it takes `α = λ_G`, and
+Section 7 does not state a probability for Phase I. When `λ_G` is of order `1/√n` or smaller,
+this is not `1 − o(1)`.
+
+**Example.** The printed statement does not hold on the complete graph `K_n`. There
+`λ_G = 1/(n − 1)`, so the hypothesis `ν₀ ≥ K λ_G` holds for a constant difference
+`A − B ∈ {K + 2, K + 3}` (the one with the parity of `n`) once `n ≥ K + 3`. The first round
+already produces fluctuations of order `√n` in `A − B`, and by the symmetry between the two
+opinions the initial majority then wins with probability tending to `1/2`; even with `A − B` of
+order `√n` it loses with probability bounded away from `0`. Since `λ_G² ≥ (n − d)/(d (n − 1))`
+(from the trace of `P²`), `λ_G` can be this small only on dense graphs (`d` of order `n`).
+
+**What is formalized instead.** `two_choices_expander_general` keeps the hypothesis
+`ν₀ ≥ K λ_G` and the `O(log n)` rounds, and bounds the failure probability by
+`1/n + (2 C log n + C) e^{−ν₀² n / C}` (`K = 4000`, `C = 2 · 10¹⁰`): Phase I is applied with
+`α = ν₀/K ≥ λ_G` instead of `α = λ_G`. This bound tends to `0` once `ν₀² n` is large compared with
+`log log n` (that is, once `|A − B|` is large compared with `√(n log log n)`), for example for
+every fixed `ν₀ > 0`, or whenever `λ_G ≥ n^{−1/2+ε}`, the regime in which Lemma 2 applies with
+`α = λ_G`.
+
+### The model and the statements
+
+`Median/ExpanderGeneralDefs.lean` (namespace `Median.ExpanderGeneral`), on top of the round
+`graphStep`, the minority `minority a x` (the paper's `B`) and `lambdaG` of `Expander`:
+`majority a x` (the paper's `A`, with `majority_add_minority`: `A + B = n`), `imbalance a x`
+(`ν = (A − B)/n`), `phaseEta α a x` (`η = α n/√(A B)` in the proof of Lemma 2), `gainCount` and
+`lossCount` (the flows `Δ_{BA}`, the vertices of `B` that hold `a` after the round, and `Δ_{AB}`,
+the vertices of `A` that no longer hold `a`), `MixingProp G d α c` (the hypothesis (mixing-prop)
+of Lemma 2: for disjoint `X`, `Y` with `|Y| ≥ c n` and `|X| ≥ (2/3) α c^{3/2} n`,
+`|E(X, Y) − d |X| |Y|/n| ≤ α d √(|X| |Y|)`), which holds whenever `λ_G ≤ α`
+(`mixingProp_of_lambdaG`, the paper's Lemma 3), and `phaseIRounds ν c =
+⌈log_{5/4}(1/(2ν))⌉ + ⌈log_{4/3}(1/(4c))⌉`, the length of Phase I. The theorems `*_spec` (proved
+by `rfl`) restate these definitions and those of `Expander` that the statements use; they were
+pinned with the statements, so that the definitions cannot change.
+
+`Median/ExpanderGeneralPhaseI.lean`: the one-round lemmas assume `d > 0`, `G` `d`-regular,
+`0 < c ≤ 1/2`, `0 < α ≤ c^{3/2}/36`, `MixingProp G d α c` and `c n ≤ B ≤ A`.
+
+* `expected_gain_ge`: `𝔼 Δ_{BA} ≥ (A² B/n²)(1 − 2η)` ((hjre21) to (be56sw) in the proof of
+  Lemma 2); `expected_loss_le`: `𝔼 Δ_{AB} ≤ (A B²/n²)(1 + 15η)` ((eq-upperOnDAB)).
+* `gain_tail`: `P(Δ_{BA} ≤ (A² B/n²)(1 − 3η)) ≤ e^{−α² c n/6}` ((eq-fger)); `loss_tail`:
+  `P(Δ_{AB} ≥ (A B²/n²)(1 + 17η)) ≤ e^{−α² c² n/2}` ((eq-fger2)).
+* `phaseI_step` ((bchwc), (ncnwd-Appx)): with probability at least
+  `1 − e^{−α² c n/6} − e^{−α² c² n/2}`, `ν' ≥ ν + ν(1 − ν²)/2 − 12α/√(1 − ν²)`; its deterministic
+  consequences `growth_small` (`ν' ≥ (5/4) ν` if `120 α ≤ ν ≤ 1/2`) and `growth_large`
+  (`1 − ν' ≤ (3/4)(1 − ν)` if `1/2 ≤ ν ≤ 1 − 2c`, (ncnwd-Appx334x)).
+* `phaseI` (Lemma 2, with `K = 120`): if `ν₀ ≥ 120 α`, then at some time `t ≤ T₁ =
+  phaseIRounds ν₀ c` the minority is at most `c n`, except with probability
+  `T₁ (e^{−α² c n/6} + e^{−α² c² n/2})`; `phaseI_expander` (Corollary 2) is the same with
+  `λ_G ≤ α` in place of `MixingProp`.
+
+`Median/ExpanderGeneral.lean`: Theorem 2.
+
+* `two_choices_expander_general_explicit`: if `ν₀ > 0` and `4000 λ_G ≤ ν₀`, then for every `T₂`,
+  after `T₁ + T₂` rounds (`T₁ = phaseIRounds ν₀ (1/20)`) every vertex holds `a`, except with
+  probability at most
+  `T₁ (e^{−α² n/120} + e^{−α² n/800}) + (24/25)^{T₂} n + (T₁ + T₂) e^{−n/97000}`, with
+  `α = ν₀/4000` (the first term is Phase I with `c = 1/20`; the other two are Theorem 4 with
+  `ε = 1/4`).
+* `two_choices_expander_general`: there are absolute constants `K, C > 0` such that on every
+  `d`-regular graph with `d > 0`, if `K λ_G ≤ ν₀`, then after `⌈C log n⌉` rounds every vertex
+  holds `a`, except with probability at most `1/n + (2 C log n + C) e^{−ν₀² n/C}`. The proof gives
+  `K = 4000` and `C = 2 · 10¹⁰`.
+
+The helper files are `Median/ExpanderGeneralLoss.lean` (the combinatorial core of
+(eq-upperOnDAB)), `Median/ExpanderGeneralHitting.lean` (from one round to the hitting time) and
+`Median/ExpanderGeneralArith.lean` (from the explicit to the `O(log n)` form).
+
+### Differences in the statements
+
+1. **The failure probability of Theorem 2.** It is `1/n + (2 C log n + C) e^{−ν₀² n/C}` instead of
+   `o(1)`, because Theorem 2 needs a major correction (see above).
+2. **Explicit constants.** `K = 120` in Lemma 2, `K = 4000` and `c = 1/20` in the explicit form
+   of Theorem 2, `C = 2 · 10¹⁰` in its `O(log n)` form. "With high probability" is the explicit
+   failure bound. The number of rounds `phaseIRounds` is the paper's
+   `⌈log_{5/4}(1/(2ν₀))⌉ + ⌈log_{4/3}(1/(4c))⌉`.
+3. **Lemma 2 in hitting form.** The paper says that the minority "decreases to `c n` within
+   `K' (log(1/ν₀) + log(1/c))` steps". `phaseI` states that at some time `t ≤ T₁` the minority
+   is at most `c n` (`∃ t ≤ T₁` over the prefixes `l.take t` of the rounds). The graph is not
+   assumed connected (the paper's Lemma 2 assumes it, but the proof does not use it), and the
+   condition `α² c² n = Ω(n^ε)` is replaced by the explicit failure bound.
+4. **Model.** As in `Expander`: sampling with replacement, no adversary redistributing the
+   opinions between rounds, and Boolean opinions with `a` the majority (the hypothesis
+   `K λ_G ≤ ν₀` with `λ_G ≥ 0` forces `ν₀ ≥ 0`).
+5. **Not formalized.** Theorem 1, Corollary 1 and Theorem 3 (random regular graphs, which need
+   the configuration model) and the robustness Corollary 6.
+
+### Differences in the proofs
+
+1. **Assembly of the phases.** The paper combines Corollary 2 (with `c = 1/10`), Lemma 6 and
+   Corollary 5 (Phases II and III, with `λ_G ≤ 1/6`). Here Phases II and III are Theorem 4 as
+   formalized in `Expander` (`two_choices_expander_explicit`, one supermartingale argument),
+   applied with `ε = 1/4`, which needs `λ_G ≤ 7/20` and a minority of at most `n/20`; hence
+   Phase I runs down to `c = 1/20`. The composition of Phase I with Theorem 4 at the (random)
+   first time the minority is at most `n/20` is proved by induction on the length of Phase I
+   (`not_consensus_le`, a strong Markov property for `expList`), and the `O(log n)` form is
+   bookkeeping on the explicit bound (`Median/ExpanderGeneralArith.lean`, with
+   `T₁ ≤ 5 log n + 7`).
+2. **Proof route of Lemma 2.** The one-round expectations, tails and the recursion
+   (ncnwd-Appx) follow the paper. The flows `Δ_{BA}` and `Δ_{AB}` are sums of independent
+   indicators over the vertices of `B` and of `A`, through the identification of a round with
+   `|V|` independent uniform draws from `Fin d × Fin d` (`roundEquiv`, as in `Expander`). The
+   upper bound (eq-upperOnDAB) on `𝔼 Δ_{AB}` uses the paper's thresholds `(1 + 2^j η) B/n` and
+   the paper's size bound `|{v ∈ A : d_v^B ≥ (1 + 2^j η) dB/n}| ≤ A/4^j` (from the mixing
+   hypothesis), summed as a layer cake over these upper sets instead of the paper's slices `C_i`
+   (`Median/ExpanderGeneralLoss.lean`). The paper's condition `η(1 + 4q) ≤ 1` is replaced by the
+   bound `(1 + 3m) η ≤ 5` that the layer-cake sum needs, where `4^m ≤ n²/(ηB²) < 4^{m+1}`.
+3. **Concentration with mean bounds.** `gain_tail` and `loss_tail` use Chernoff bounds with a
+   lower (respectively upper) bound on the mean (`avg_chernoff_lower`, `avg_chernoff_upper`);
+   the paper's lower bound `𝔼 Δ_{AB} ≥ c² n/4` used for (eq-fger2) is not needed.
+4. **The union bound over the rounds of Phase I.** The paper's "for all steps `t = 1, …, T`" is
+   formalized with a process frozen at the first time the minority is at most `c n` and a
+   deterministic envelope for the imbalance (`(5/4)^t ν₀` up to `1/2`, then
+   `1 − (3/4)^{t − t₁}/2`), via `expList_escape` (`Median/ExpanderGeneralHitting.lean`).
+
 ## Against an adaptive adversary (`Adversary`)
 
 Theorem and lemma numbers below follow the 2009 version of the paper; the main theorem with

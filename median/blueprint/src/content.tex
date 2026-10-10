@@ -9,7 +9,10 @@ configuration (Theorem~1 of the paper, without adversary). With an odd number of
 supported values, the middle one wins within $O(\log m+\log\log n)$ rounds (the odd case of
 Theorem~21). On $d$-regular graphs with $\lambda_G\le 3/5-\varepsilon$, two-sample voting
 eliminates a minority of size at most $(\varepsilon/5)n$ within $O(\log n)$ rounds with high
-probability (Theorem~4 of Cooper, Elsässer and Radzik, ICALP 2014). For 2-Choices with any number
+probability (Theorem~4 of Cooper, Elsässer and Radzik, ICALP 2014), and on every $d$-regular graph
+an initial imbalance $\nu_0\ge K\lambda_G$ suffices, with a failure probability that tends to $0$
+once $\nu_0^2n$ is large compared with $\log\log n$ (their Theorem~2, which needs a major correction
+for very small $\lambda_G$). For 2-Choices with any number
 $k$ of colours, the plurality colour wins within $O((n/c_1)\log n)$ rounds from a gap of order
 $\sqrt{n\log n}$ to every other colour (Theorem~1.2 of Elsässer, Friedetzky, Kaaser,
 Mallmann-Trenn and Trinker, arXiv:1602.04667, in arXiv v5 numbering, without their hypothesis
@@ -237,6 +240,130 @@ observable bounded by the potential $|B|$ in the region has expectation at most
 $(24/25)^T|B_0|+Te^{-\varepsilon n/24250}$; apply it to the indicator of not being in consensus.
 For the $O(\log n)$ form, $(24/25)^T\le e^{-T/25}\le n^{-2}$ and $|B_0|\le n$.
 \end{proof}
+
+\section{Two-sample voting from a small imbalance}\label{sec:cer-small-imbalance}
+This section formalizes Theorem~2 of Cooper, Elsässer and Radzik (ICALP 2014, arXiv:1404.7479),
+with its Phase~I (Lemma~2 and Corollary~2), on top of
+Section~\ref{sec:cer-two-choices}; numbering follows the arXiv version
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/median/FORMALIZATION_DIFFERENCES.md#two-sample-voting-on-expanders-from-a-small-imbalance-expandergeneral-roadmap-maj-5-b}{differences
+from the paper}). Theorem~2 of the paper needs a major correction for very small $\lambda_G$, and
+the corrected statement is formalized (Remark~\ref{rem:cer-correction}). Throughout, $a$ is the
+majority opinion, $A$ and $B$ are the numbers of vertices holding $a$ and not holding $a$,
+$n=A+B$, and primes denote the values after one round.
+
+\begin{definition}[Imbalance and flows]\label{def:cer-imbalance}
+\lean{Median.ExpanderGeneral.majority,Median.ExpanderGeneral.majority_add_minority,Median.ExpanderGeneral.imbalance,Median.ExpanderGeneral.phaseEta,Median.ExpanderGeneral.gainCount,Median.ExpanderGeneral.lossCount,Median.ExpanderGeneral.minority_add_gainCount,Median.ExpanderGeneral.phaseIRounds}\leanok\uses{def:graph-voting}
+The imbalance is $\nu=(A-B)/n$, and $\eta=\alpha n/\sqrt{AB}$ for a parameter $\alpha$. The flows
+of a round are $\Delta_{BA}$, the number of vertices of $B$ that hold $a$ after the round, and
+$\Delta_{AB}$, the number of vertices of $A$ that no longer hold $a$; so
+$B'+\Delta_{BA}=B+\Delta_{AB}$. The length of Phase~I is
+$T_1(\nu,c)=\ceil{\log_{5/4}(1/(2\nu))}+\ceil{\log_{4/3}(1/(4c))}$.
+\end{definition}
+
+\begin{definition}[The mixing hypothesis of Lemma~2]\label{def:cer-mixing-prop}
+\lean{Median.ExpanderGeneral.MixingProp}\leanok\uses{def:graph-voting}
+A $d$-regular graph satisfies the mixing hypothesis with parameters $\alpha$ and $c$ if
+$|E(X,Y)-d|X||Y|/n|\le\alpha d\sqrt{|X||Y|}$ for all disjoint $X,Y$ with $|Y|\ge cn$ and
+$|X|\ge(2/3)\alpha c^{3/2}n$.
+\end{definition}
+
+\begin{lemma}[Lemma~3]\label{lem:cer-mixing-prop}
+\lean{Median.ExpanderGeneral.mixingProp_of_lambdaG}\leanok\uses{def:cer-mixing-prop,lem:eml}
+If $\lambda_G\le\alpha$, the mixing hypothesis holds with $\alpha$ and every $c$.
+\end{lemma}
+\begin{proof}\leanok
+The expander mixing lemma (Lemma~\ref{lem:eml}) with $\lambda_G\le\alpha$.
+\end{proof}
+
+In the next three lemmas, $G$ is $d$-regular with $d>0$, $0<c\le1/2$,
+$0<\alpha\le c^{3/2}/36$, the mixing hypothesis holds with $\alpha$ and $c$, and $cn\le B\le A$.
+
+\begin{lemma}[Expected flows]\label{lem:cer-flows-expect}
+\lean{Median.ExpanderGeneral.avg_gainCount,Median.ExpanderGeneral.avg_lossCount,Median.ExpanderGeneral.phaseEta_bounds,Median.ExpanderGeneral.sum_gain_ge,Median.ExpanderGeneral.sum_sq_nbCount_le,Median.ExpanderGeneral.expected_gain_ge,Median.ExpanderGeneral.expected_loss_le}\leanok\uses{def:cer-imbalance,def:cer-mixing-prop}
+$\E\Delta_{BA}\ge(A^2B/n^2)(1-2\eta)$ and $\E\Delta_{AB}\le(AB^2/n^2)(1+15\eta)$.
+\end{lemma}
+\begin{proof}\leanok
+Let $p_v$ be the fraction of neighbours of $v$ in $B$. A vertex of $B$ adopts $a$ with probability
+$(1-p_v)^2$ and a vertex of $A$ leaves $a$ with probability $p_v^2$, so
+$\E\Delta_{BA}=\sum_{v\in B}(1-p_v)^2$ and $\E\Delta_{AB}=\sum_{v\in A}p_v^2$. For the first,
+Cauchy--Schwarz gives $\sum_{v\in B}(1-p_v)^2\ge(E(B,A)/d)^2/B$, and the mixing hypothesis gives
+$E(B,A)\ge(dAB/n)(1-\eta)$. For the second, the hypothesis bounds the size of
+$\{v\in A:p_v\ge(1+2^j\eta)B/n\}$ by $A/4^j$; summing $p_v^2$ as a layer cake over these sets,
+up to the $m$ with $4^m\le n^2/(\eta B^2)<4^{m+1}$, gives the bound, since $(1+3m)\eta\le5$.
+\end{proof}
+
+\begin{lemma}[Tails of the flows]\label{lem:cer-flows-tail}
+\lean{Median.ExpanderGeneral.gainCount_eq_sum,Median.ExpanderGeneral.lossCount_eq_sum,Median.ExpanderGeneral.gain_tail,Median.ExpanderGeneral.loss_tail}\leanok\uses{lem:cer-flows-expect}
+$\Pr(\Delta_{BA}\le(A^2B/n^2)(1-3\eta))\le e^{-\alpha^2cn/6}$ and
+$\Pr(\Delta_{AB}\ge(AB^2/n^2)(1+17\eta))\le e^{-\alpha^2c^2n/2}$.
+\end{lemma}
+\begin{proof}\leanok
+Both flows are sums of independent indicators over the vertices of $B$ and of $A$. Apply the
+multiplicative Chernoff bounds with the lower and upper bounds on the means of
+Lemma~\ref{lem:cer-flows-expect}, and $\eta\ge2\alpha$.
+\end{proof}
+
+\begin{lemma}[One round of Phase~I]\label{lem:cer-phaseI-step}
+\lean{Median.ExpanderGeneral.phaseI_step,Median.ExpanderGeneral.growth_small,Median.ExpanderGeneral.growth_large}\leanok\uses{lem:cer-flows-tail}
+With probability at least $1-e^{-\alpha^2cn/6}-e^{-\alpha^2c^2n/2}$,
+$\nu'\ge\nu+\nu(1-\nu^2)/2-12\alpha/\sqrt{1-\nu^2}$. Any such $\nu'$ satisfies
+$\nu'\ge(5/4)\nu$ if $120\alpha\le\nu\le1/2$, and $1-\nu'\le(3/4)(1-\nu)$ if
+$1/2\le\nu\le1-2c$.
+\end{lemma}
+\begin{proof}\leanok
+$\nu'-\nu=2(\Delta_{BA}-\Delta_{AB})/n$. Outside the two events of Lemma~\ref{lem:cer-flows-tail},
+$\Delta_{BA}-\Delta_{AB}\ge AB(A-B)/n^2-\eta(3A^2B+17AB^2)/n^2$; with $A=n(1+\nu)/2$ and
+$B=n(1-\nu)/2$ this is the bound (the paper's (ncnwd-Appx)). The two growth statements are
+elementary inequalities.
+\end{proof}
+
+\begin{theorem}[Phase~I: Lemma~2 and Corollary~2]\label{thm:cer-phaseI}
+\lean{Median.ExpanderGeneral.phaseI_of_step,Median.ExpanderGeneral.phaseI,Median.ExpanderGeneral.phaseI_expander}\leanok\uses{lem:cer-phaseI-step,lem:cer-mixing-prop}
+Let $G$ be $d$-regular with $d>0$, $0<c\le1/2$ and $0<\alpha\le c^{3/2}/36$, and let the mixing
+hypothesis hold with $\alpha$ and $c$ (for instance $\lambda_G\le\alpha$). If $\nu_0\ge120\alpha$,
+then at some time $t\le T_1=T_1(\nu_0,c)$ the minority has at most $cn$ vertices, except with
+probability at most $T_1(e^{-\alpha^2cn/6}+e^{-\alpha^2c^2n/2})$.
+\end{theorem}
+\begin{proof}\leanok
+Freeze the process at the first time the minority has at most $cn$ vertices. While it is not
+frozen, $B\ge cn$ and $\nu\le1-2c$, and by Lemma~\ref{lem:cer-phaseI-step} the imbalance stays
+above the deterministic envelope $(5/4)^t\nu_0$ up to $1/2$, then $1-(3/4)^{t-t_1}/2$, except
+with probability $e^{-\alpha^2cn/6}+e^{-\alpha^2c^2n/2}$ per round. After $T_1$ rounds the envelope
+exceeds $1-2c$, so the process is frozen; a union bound over the rounds gives the claim. With
+$\lambda_G\le\alpha$, Lemma~\ref{lem:cer-mixing-prop} gives the mixing hypothesis.
+\end{proof}
+
+\begin{theorem}[Theorem~2, corrected]\label{thm:cer-theorem2}
+\lean{Median.ExpanderGeneral.not_consensus_le,Median.ExpanderGeneral.two_choices_expander_general_explicit,Median.ExpanderGeneral.phaseIRounds_le,Median.ExpanderGeneral.general_of_explicit,Median.ExpanderGeneral.two_choices_expander_general}\leanok\uses{thm:cer-phaseI,thm:expander}
+Let $G$ be $d$-regular with $d>0$ and $\nu_0>0$, $4000\lambda_G\le\nu_0$, and let
+$\alpha=\nu_0/4000$ and $T_1=T_1(\nu_0,1/20)$. For every $T_2$, after $T_1+T_2$ rounds every
+vertex holds $a$, except with probability at most
+$T_1(e^{-\alpha^2n/120}+e^{-\alpha^2n/800})+(24/25)^{T_2}n+(T_1+T_2)e^{-n/97000}$. Hence there are
+absolute constants $K,C>0$ ($K=4000$, $C=2\cdot10^{10}$) such that, if $K\lambda_G\le\nu_0$,
+after $\ceil{C\log n}$ rounds every vertex holds $a$ except with probability at most
+$1/n+(2C\log n+C)e^{-\nu_0^2n/C}$.
+\end{theorem}
+\begin{proof}\leanok
+Phase~I (Theorem~\ref{thm:cer-phaseI} with $c=1/20$ and $\alpha=\nu_0/4000\ge\lambda_G$; note
+$\alpha\le c^{3/2}/36$ and $120\alpha\le\nu_0$) brings the minority to at most $n/20$ at some time
+$t\le T_1$. From then on, Theorem~4 (Theorem~\ref{thm:expander} with $\varepsilon=1/4$, which
+applies since $\lambda_G\le1/4000\le3/5-1/4$) finishes; the composition at the random time $t$ is
+an induction on the length of Phase~I. For the $O(\log n)$ form, $T_1\le5\log n+7$ (as
+$\nu_0\ge1/n$), and the remaining rounds make $(24/25)^{T_2}n\le1/n$.
+\end{proof}
+
+\begin{remark}[Theorem~2 of the paper needs a major correction]\label{rem:cer-correction}
+The paper states Theorem~2 with success probability $1-o(1)$ whenever $\nu_0\ge K\lambda_G$, on
+every $d$-regular graph. Its proof applies Lemma~2 with $\alpha=\lambda_G$, whose failure
+probability is $e^{-\Theta(\lambda_G^2n)}$; this is not $o(1)$ when $\lambda_G$ is of order
+$1/\sqrt n$ or smaller. On the complete graph, $\lambda_G=1/(n-1)$, so a constant difference
+$A-B\in\{K+2,K+3\}$ satisfies the hypothesis for $n\ge K+3$; the first round produces
+fluctuations of order $\sqrt n$ in $A-B$, and by symmetry the initial majority then wins with
+probability tending to $1/2$. Theorem~\ref{thm:cer-theorem2} is the corrected statement: it keeps
+the hypothesis $\nu_0\ge K\lambda_G$ and bounds the failure probability in terms of $\nu_0^2n$,
+which tends to $0$ once $\nu_0^2n$ is large compared with $\log\log n$
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/median/FORMALIZATION_DIFFERENCES.md#theorem-2-of-the-paper-needs-a-major-correction}{details}).
+\end{remark}
 
 \section{Almost stable consensus against an adaptive adversary}
 \begin{definition}[Adaptive adversary]\label{def:adversary}
