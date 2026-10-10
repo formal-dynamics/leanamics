@@ -26,6 +26,11 @@ suffice --- honest concentration around the process's mean trajectory is
 needed in \emph{both} the growth and saturation phases. This argument has
 been \emph{fully formalized} (no \texttt{sorry}) in Lean~4 + Mathlib; the
 main theorem is \texttt{ThreeMajority.majority3\_consensus\_whp}.
+
+Section~\ref{sec:bcekmn-any-start} formalizes, for any number of colours, the comparison of
+3-Majority with the Voter model of Berenbrink et al.\ (PODC 2017) and their bound
+$O(n^{3/4}\log^{7/8}n)$ on the consensus time from any configuration, conditional on a cited
+result of Becchetti et al.\ (SODA 2016) that is not formalized and is taken as a hypothesis.
 \end{abstract}
 
 \section{The model}\label{sec:model}
@@ -602,6 +607,230 @@ With $T = 10+(T_{2a}(n)+2)$, Theorem~\ref{thm:main}
 Theorem~\ref{lem:mainfailclean} by
 $\Pr[I_T=V] = 1-\Pr[I_T\ne V] \ge 1-500/n$.
 
+\section{\texorpdfstring{3-Majority from any configuration in $O(n^{3/4}\log^{7/8} n)$ rounds}{3-Majority from any configuration}}\label{sec:bcekmn-any-start}
+
+This section formalizes the upper bound for 3-Majority with any number of colours of
+Berenbrink, Clementi, Elsässer, Kling, Mallmann-Trenn and Natale, \emph{Ignore or comply? On
+breaking symmetry in consensus} (PODC 2017) \cite{BCEKMN17}: Theorem~4 of arXiv:1702.04921 (v1),
+with the comparison framework of its Section~2 and its Lemmas~2 to~4
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/3-majority/FORMALIZATION_DIFFERENCES.md#3-majority-from-any-configuration-anystart-roadmap-maj-6-b}{differences
+from the paper}).
+
+\textbf{The main theorem is conditional.} The second phase of its proof applies Theorem~3.1 of
+Becchetti, Clementi, Natale, Pasquale and Trevisan \cite{BCNPT16}, which is not formalized in
+this repository (roadmap MAJ-12~(a)). Definition~\ref{def:as-phase2} states that result, and
+Theorem~\ref{thm:as-main} takes it as a hypothesis, exactly as the paper's proof uses it.
+Everything else in this section is proved.
+
+\subsection{Model and majorization}
+
+Agents $V=\{0,\dots,n-1\}$ hold colours in a finite set $\Sigma$; a configuration is a map
+$c\colon V\to\Sigma$, with $c_a$ agents of colour $a$ and $\kappa(c)=|\{a : c_a>0\}|$ remaining
+colours. Consensus is $\kappa(c)\le1$.
+
+\begin{definition}[3-Majority and Voter with any number of colours]\label{def:as-model}
+\lean{ThreeMajority.majColour,ThreeMajority.stepCol,ThreeMajority.runCol,ThreeMajority.voterStep,ThreeMajority.voterRun,ThreeMajority.colourCount,ThreeMajority.numColours}\leanok
+\uses{def:round}
+In a round of 3-Majority every agent draws an ordered sample triple $(s_1,s_2,s_3)$ uniformly
+with replacement (Definition~\ref{def:round}); if $s_2$ and $s_3$ have the same colour it adopts
+that colour, otherwise the colour of $s_1$. In a round of Voter every agent adopts the colour of
+one uniformly random agent (itself included).
+\end{definition}
+
+The paper breaks a three-way tie by a uniformly random sample; since the samples are i.i.d.,
+taking the first one gives the same law (Lemma~\ref{lem:as-alpha}).
+
+\begin{lemma}[Two colours]\label{lem:as-bool}
+\lean{ThreeMajority.stepCol_bool}\leanok\uses{def:as-model,def:step}
+With colours $\{0,1\}$, a round of 3-Majority is the step of Definition~\ref{def:step}.
+\end{lemma}
+\begin{proof}\leanok
+Case analysis on the colours of the three samples.
+\end{proof}
+
+\begin{definition}[Majorization, Schur-convex observables]\label{def:as-majorization}
+\lean{ThreeMajority.Majorizes,ThreeMajority.countVec,ThreeMajority.SchurConvex}\leanok
+\uses{def:as-model}
+For $x,y\in\R^\Sigma$, $x\succeq y$ if $\sum x=\sum y$ and every sum of $y$ over a set
+$S\subseteq\Sigma$ is at most a sum of $x$ over a set of the same size (equivalently, for every $j$
+the $j$ largest entries of $y$ sum to at most the $j$ largest entries of $x$). An observable $\varphi$
+of configurations is Schur-convex if $(c_a)_a\succeq(c'_a)_a$ implies $\varphi(c')\le\varphi(c)$.
+\end{definition}
+
+\begin{lemma}[Majorization and colours]\label{lem:as-colours}
+\lean{ThreeMajority.numColours_le_of_majorizes,ThreeMajority.schurConvex_numColours_le}\leanok
+\uses{def:as-majorization}
+If $(c_a)_a\succeq(c'_a)_a$ then $\kappa(c)\le\kappa(c')$. Hence the indicator of
+$\kappa(c)\le\kappa$ is Schur-convex.
+\end{lemma}
+\begin{proof}\leanok
+The colours of $c'$ carry all $n$ agents, so a set of $\kappa(c')$ colours carries all agents of $c$.
+\end{proof}
+
+\subsection{Comparison of anonymous consensus processes}
+
+\begin{definition}[AC-processes and dominance, Definitions~1 and~2]\label{def:as-ac}
+\lean{ThreeMajority.acKernel,ThreeMajority.Dominates}\leanok\uses{def:as-majorization}
+An anonymous consensus process with process function $\alpha$ moves from $c$ by letting every
+agent draw its new colour independently from the probability vector $\alpha(c)$. The process
+$\alpha$ dominates $\alpha'$ if $c\succeq c'$ implies $\alpha(c)\succeq\alpha'(c')$.
+\end{definition}
+
+\begin{proposition}[Proposition~1, Rinott]\label{prop:as-rinott}
+\lean{ThreeMajority.multinomial_schurConvex,ThreeMajority.expect_le_of_transfer,ThreeMajority.expect_le_of_partial_sums,ThreeMajority.expect_le_of_majorizes}\leanok
+\uses{def:as-majorization}
+If $p\succeq q$ are probability vectors on $\Sigma$ and $\varphi$ is Schur-convex, the
+expectation of $\varphi$ when the $n$ agents draw their colours i.i.d.\ from $q$ is at most the
+expectation when they draw from $p$.
+\end{proposition}
+\begin{proof}\leanok
+The paper cites this result without proof. For one Robin Hood transfer between colours $a$ and
+$b$, the expectation, as a function of the mass $\theta$ of $a$ (with $a$ and $b$ sharing a fixed
+total $s$), is nondecreasing on $[s/2,s]$: its derivative is a sum over agents, and swapping $a$
+and $b$ for all agents and then for one agent pairs its terms into products of two factors with
+the same sign. A chain of transfers (the Hardy--Littlewood--P\'olya construction) leads from $p$
+to $q$ when $q$ is sorted and the partial sums of $p$ dominate those of $q$; sorting and
+relabelling the colours, under which Schur-convex observables are invariant, reduce the general
+case to this one.
+\end{proof}
+
+\begin{theorem}[Theorem~2, distributional form]\label{thm:as-comparison}
+\lean{ThreeMajority.ac_comparison,ThreeMajority.ac_numColours}\leanok
+\uses{def:as-ac,prop:as-rinott,lem:as-colours}
+If $\alpha$ dominates $\alpha'$ and $c\succeq c'$, then for every Schur-convex $\varphi$ and every
+$T$, $\E_{c'}[\varphi(P'_T)]\le\E_c[\varphi(P_T)]$. In particular, from the same configuration,
+the dominating process has at most $\kappa$ colours at time $T$ with at least the probability of
+the dominated one.
+\end{theorem}
+\begin{proof}\leanok
+Induction on $T$. With $u_T$, $v_T$ the expectations at time $T$ for the dominated and the
+dominating process, $w(y)=\max\{u_T(z):z\preceq y\}$ is Schur-convex and $u_T\le w\le v_T$ on
+comparable configurations, so Proposition~\ref{prop:as-rinott} applied to $w$ gives the step
+from $T$ to $T+1$. The second statement is the case of the indicator of
+Lemma~\ref{lem:as-colours}. The paper's coupling (Lemma~1, from Strassen's theorem) is not
+needed.
+\end{proof}
+
+\subsection{3-Majority is at least as fast as Voter}
+
+\begin{lemma}[Equations~(1) and~(2)]\label{lem:as-alpha}
+\lean{ThreeMajority.alpha3M,ThreeMajority.alphaVoter,ThreeMajority.alphaVoter_weight,ThreeMajority.alpha3M_weight,ThreeMajority.apply_ofStep_stepCol,ThreeMajority.apply_ofStep_voterStep}\leanok
+\uses{def:as-model,def:as-ac}
+Both processes are AC-processes. With $x=c/n$, Voter has $\alpha^V_a(c)=x_a$ and 3-Majority has
+$\alpha^{3M}_a(c)=x_a(1+x_a-\|x\|_2^2)$.
+\end{lemma}
+\begin{proof}\leanok
+The agents' samples are independent. For 3-Majority,
+$[\mathrm{maj}=a]=[x_2=a][x_3=a]+[x_1=a]-[x_2=x_3][x_1=a]$, and the number of pairs of agents of
+equal colour is $\sum_b c_b^2$.
+\end{proof}
+
+\begin{lemma}[Lemma~2]\label{lem:as-vs-voter}
+\lean{ThreeMajority.dominates_alpha3M_alphaVoter,ThreeMajority.voter_le_threeMaj}\leanok
+\uses{lem:as-alpha,thm:as-comparison}
+3-Majority dominates Voter. Hence, from the same configuration, after $T$ rounds 3-Majority has
+at most $\kappa$ colours with at least the probability that Voter has.
+\end{lemma}
+\begin{proof}\leanok
+For a set $S$ of the largest entries of $x$, $\|x\|_2^2\sum_S x\le\sum_S x^2$, since
+$\sum_{i\in S}\sum_j x_ix_j(x_i-x_j)\ge0$; this gives $\alpha^{3M}(c)\succeq\alpha^V(c)$, and with
+$c\succeq c'$ also $\alpha^{3M}(c)\succeq\alpha^V(c')$. Conclude with
+Theorem~\ref{thm:as-comparison}.
+\end{proof}
+
+\subsection{The Voter bound}
+
+\begin{lemma}[Lemma~4 and Equation~(6), duality]\label{lem:as-dual}
+\lean{ThreeMajority.walkStep,ThreeMajority.numColours_voterRun_le,ThreeMajority.voter_dual}\leanok
+\uses{def:as-model}
+Let coalescing random walks start on all $n$ nodes of the complete graph with self-loops. After
+$T$ rounds, Voter has more than $k$ colours with at most the probability that more than $k$
+walks remain.
+\end{lemma}
+\begin{proof}\leanok
+Pathwise, the colours of Voter after rounds $y_1,\dots,y_T$ are colours of the nodes occupied
+by the walks moved by $y_T,\dots,y_1$; the rounds are i.i.d., so reversing their order does not
+change the law. The paper proves an equality under a coupling and uses only this inequality.
+\end{proof}
+
+\begin{lemma}[Equation~(7) and the expected number of walks]\label{lem:as-walks}
+\lean{ThreeMajority.walk_drift,ThreeMajority.walk_drift_paper,ThreeMajority.walk_expect_le}\leanok
+\uses{lem:as-dual}
+If $X_t$ walks remain, $\E[X_{t+1}\mid X_t=x]\le x-x(x-1)/(3n)$ for every $x$, hence
+$\le x-x^2/(10n)$ for $x\ge2$ (Equation~(7)). From any set of walks, $\E X_t\le1+3n/t$ for
+$t\ge1$.
+\end{lemma}
+\begin{proof}\leanok
+$\E[X_{t+1}\mid X_t=x]=n(1-(1-1/n)^x)$, the expected number of occupied cells when $x$ balls go
+into $n$ cells; bound $(1-1/n)^x$ by the Bonferroni inequality of degree~3. The map
+$x\mapsto x-x(x-1)/(3n)$ is concave and nondecreasing on $[0,n+1]$, so its tangent-line bound and
+induction on $t$ give $\E X_t\le1+3n/t$. This replaces the paper's variable drift argument
+for $\E[T^k_C]\le20n/k$.
+\end{proof}
+
+\begin{lemma}[Lemma~3]\label{lem:as-voter-whp}
+\lean{ThreeMajority.voter_reduce_whp}\leanok\uses{lem:as-walks}
+For $n\ge2$, $k\ge1$ and $T\ge24(n/k)\log n$, from any configuration Voter has more than $k$
+colours after $T$ rounds with probability at most $1/n$.
+\end{lemma}
+\begin{proof}\leanok
+Blocks of $\lceil6n/k\rceil$ rounds: by Markov's inequality on $X-1$ (the walks never vanish),
+each block leaves more than $k$ walks with probability at most $1/2$, from any start. Restart
+over $\lfloor T/\lceil6n/k\rceil\rfloor\ge\log_2 n$ blocks (for $k<n$; for $k\ge n$ there is
+nothing to prove) and use Lemma~\ref{lem:as-dual}.
+\end{proof}
+
+\subsection{The main theorem}
+
+\begin{lemma}[Phase~1]\label{lem:as-phase1}
+\lean{ThreeMajority.threeMaj_reduce_whp}\leanok\uses{lem:as-vs-voter,lem:as-voter-whp}
+For $n\ge2$, $k\ge1$ and $T\ge24(n/k)\log n$, from any configuration 3-Majority has more than
+$k$ colours after $T$ rounds with probability at most $1/n$.
+\end{lemma}
+\begin{proof}\leanok
+Lemma~\ref{lem:as-vs-voter} and Lemma~\ref{lem:as-voter-whp}.
+\end{proof}
+
+\begin{definition}[Phase~2: the cited result, not formalized]\label{def:as-phase2}
+\lean{ThreeMajority.Bcnpt16Phase2}\leanok\uses{def:as-model}
+For $\varepsilon>0$, $\mathrm{Phase2}(\varepsilon)$ is the proposition (Theorem~3.1 of
+\cite{BCNPT16}, Theorem~8 of \cite{BCEKMN17}): there are $C,N$ such that for $n\ge N$, from any
+configuration with colours in $\{0,\dots,n-1\}$ and $k\le n^{1/3-\varepsilon}$ colours,
+3-Majority has not reached consensus after any
+$T\ge C(k^2\sqrt{\log n}+k\log n)(k+\log n)$ rounds with probability at most $1/n$.
+This proposition is a hypothesis of Theorem~\ref{thm:as-main}; it is not proved here (roadmap
+MAJ-12~(a)). The cited paper's ``w.h.p.''\ is $1-O(n^{-\lambda})$ for some $\lambda>0$, which gives
+the form $1/n$ by repeating the phase a constant number of times.
+\end{definition}
+
+\begin{lemma}[The asymptotics of Theorem~4]\label{lem:as-asymptotics}
+\lean{ThreeMajority.phase1Colours,ThreeMajority.anyStart_asymptotics}\leanok
+For every $A\ge0$ there are $C,N$ such that for $n\ge N$ and
+$k=\lfloor n^{1/4}\log^{1/8}n\rfloor$: $n\ge2$, $1\le k\le n^{1/3-1/24}$, and
+$24(n/k)\log n+1+A(k^2\sqrt{\log n}+k\log n)(k+\log n)\le Cn^{3/4}\log^{7/8}n$.
+\end{lemma}
+\begin{proof}\leanok
+From $\log y\le y^{1/4}$ and $\log^{1/8}y\le y^{1/24}$ for $y$ large.
+\end{proof}
+
+\begin{theorem}[Theorem~4, conditional on Phase~2]\label{thm:as-main}
+\lean{ThreeMajority.threeMaj_anyStart_consensus}\leanok
+\uses{lem:as-phase1,def:as-phase2,lem:as-asymptotics}
+Assume $\mathrm{Phase2}(1/24)$. There are $C,N$ such that for $n\ge N$, from any configuration
+with colours in $\{0,\dots,n-1\}$, 3-Majority has not reached consensus after any
+$T\ge Cn^{3/4}\log^{7/8}n$ rounds with probability at most $2/n$.
+\end{theorem}
+\begin{proof}\leanok
+Let $k=\lfloor n^{1/4}\log^{1/8}n\rfloor$ and $T_1=\lceil24(n/k)\log n\rceil$. After $T_1$ rounds,
+more than $k$ colours remain with probability at most $1/n$ (Lemma~\ref{lem:as-phase1});
+otherwise the current configuration has at most $k\le n^{1/3-1/24}$ colours, and
+$\mathrm{Phase2}(1/24)$ bounds the failure of the remaining $T-T_1$ rounds by $1/n$.
+Lemma~\ref{lem:as-asymptotics} fits both phases in $Cn^{3/4}\log^{7/8}n$ rounds. The proof in the
+paper needs a minor correction: it applies Lemma~3 with $k=n^{1/4}$, which gives
+$O(n^{3/4}\log n)$ rounds for Phase~1; the choice $k=n^{1/4}\log^{1/8}n$ balances the two phases
+and gives the bound as stated.
+\end{proof}
+
 \section{The Lean formalization}\label{sec:lean}
 
 The argument above is fully formalized (no \texttt{sorry}) in the
@@ -616,7 +845,12 @@ the shared \texttt{Dynamics/Chernoff.lean} (Section~\ref{sec:chernoff}),
 \texttt{OneRound.lean}
 (Section~\ref{sec:map}), \texttt{Growth.lean} (Section~\ref{sec:growth}),
 \texttt{Saturation.lean} (Section~\ref{sec:saturation}), \texttt{Main.lean}
-(Section~\ref{sec:proof-main} and the main theorem). Design constraint
+(Section~\ref{sec:proof-main} and the main theorem). The files
+\texttt{AnyStartModel}, \texttt{AnyStartMajorization}, \texttt{AnyStartRinott},
+\texttt{AnyStartComparison}, \texttt{AnyStartVsVoter}, \texttt{AnyStartVoter},
+\texttt{AnyStartAsymptotics} and \texttt{AnyStartMain} formalize
+Section~\ref{sec:bcekmn-any-start}, on the shared finite \texttt{Distribution} and
+\texttt{Kernel} layer of \texttt{dynamics}. Design constraint
 preserved from \texttt{rumor\_spread}: no measure theory, no
 \texttt{PMF}/\texttt{ENNReal}, no Mathlib \texttt{ProbabilityTheory}
 kernels --- everything is finite sums, plus \texttt{Real.exp}/\texttt{Real.log}
@@ -630,4 +864,9 @@ C.~Scheideler. \emph{Stabilizing consensus with the power of two choices}.
 SPAA 2011.
 \bibitem{BCNPS15} L.~Becchetti, A.~Clementi, E.~Natale, F.~Pasquale,
 R.~Silvestri. \emph{Plurality consensus in the gossip model}. SODA 2015.
+\bibitem{BCEKMN17} P.~Berenbrink, A.~Clementi, R.~Elsässer, P.~Kling,
+F.~Mallmann-Trenn, E.~Natale. \emph{Ignore or comply? On breaking symmetry in consensus}.
+PODC 2017. arXiv:1702.04921.
+\bibitem{BCNPT16} L.~Becchetti, A.~Clementi, E.~Natale, F.~Pasquale, L.~Trevisan.
+\emph{Stabilizing consensus with many opinions}. SODA 2016. arXiv:1508.06782.
 \end{thebibliography}

@@ -31,10 +31,12 @@ Every round, each node adopts the majority colour among three random nodes. Form
 from a 3/5 majority in $O(\log n)$ rounds ([proof]({{ '/3-majority/blueprint/' | relative_url }}#sec:main-statement)); plurality
 consensus with $k$ colours from a bias of order $\sqrt{\lambda n \log n}$ ([Becchetti et al., SPAA
 2014]({{ '/plurality/blueprint/' | relative_url }}#sec:upper)) and its [lower bounds]({{ '/plurality/blueprint/' | relative_url }}#sec:lower); with two colours,
-consensus from any start, even a balanced one ([details]({{ '/plurality/blueprint/' | relative_url }}#sec:any_start)).
+consensus from any start, even a balanced one ([details]({{ '/plurality/blueprint/' | relative_url }}#sec:any_start)); and, with any number of
+colours, consensus from any start within $O(n^{3/4} \log^{7/8} n)$ rounds, conditional on a cited result for few colours that is
+not yet formalized ([Berenbrink et al., PODC 2017]({{ '/3-majority/blueprint/' | relative_url }}#sec:bcekmn-any-start)).
 
 **Plurality:** [Blueprint]({{ '/plurality/blueprint/' | relative_url }}) · [PDF]({{ '/plurality/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/plurality/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/plurality/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/plurality)  
-**Two opinions:** [Blueprint]({{ '/3-majority/blueprint/' | relative_url }}) · [PDF]({{ '/3-majority/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/3-majority/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/3-majority/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/3-majority)
+**3-Majority:** [Blueprint]({{ '/3-majority/blueprint/' | relative_url }}) · [PDF]({{ '/3-majority/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/3-majority/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/3-majority/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/3-majority)
 
 ## Median dynamics and 2-Choices
 {: #median}

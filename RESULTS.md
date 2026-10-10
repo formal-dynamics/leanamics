@@ -38,6 +38,7 @@ READMEs.
 ## Majority and plurality (`3-majority/`, `plurality/`)
 
 [3-majority README](3-majority/README.md) · [plurality README](plurality/README.md) ·
+[3-majority: differences from the sources](3-majority/FORMALIZATION_DIFFERENCES.md) ·
 [plurality: differences from the sources](plurality/FORMALIZATION_DIFFERENCES.md)
 
 | Result | Source | Main theorems | Roadmap |
@@ -47,6 +48,7 @@ READMEs.
 | Corollaries of Theorem 3.8, including the `O(min{k, (n/log n)^{1/3}} log n)` bound. | BCNPST, SPAA 2014, Cors 3.10–3.12 | `Plurality.corollary_3_10`, `corollary_3_11`, `corollary_3_12` | MAJ-7 |
 | Two opinions from a vanishing bias: a gap `22√(3 n log n)` (a fraction `1/2 + O(√(log n / n))`) gives consensus within `390 log n` rounds w.p. `≥ 1 − 429 log n / n`, for `log n ≥ 40`. | BCNPST, SPAA 2014, Thm 3.8 with `k = 2` | `Plurality.majority3_vanishing_bias` | MAJ-2 |
 | 3-Majority with two opinions from **any** configuration, even perfectly balanced: consensus after any `T ≥ C log n` rounds w.p. `≥ 1 − C log n / n` for `log n ≥ 40`, and w.p. `≥ 1 − 1/n` for `log n ≥ C` (`C` exists but is not explicit); the gap first reaches `22√(3 n log n)` through the hitting-time lemma. | Survey §4 Case 3 (the symmetry breaking of Doerr et al. 2011 for 2-Choices), carried out for 3-Majority | `Plurality.majority3_any_start`, `majority3_any_start_whp`, `majority3_symmetry_breaking` | MAJ-8 |
+| 3-Majority with any number of colours from **any** configuration, **conditional on a cited result that is not formalized**: assuming Theorem 3.1 of Becchetti, Clementi, Natale, Pasquale, Trevisan (SODA 2016), the hypothesis `Bcnpt16Phase2 (1/24)` (roadmap MAJ-12 (a)), consensus after any `T ≥ C n^{3/4} log^{7/8} n` rounds w.p. `≥ 1 − 2/n` for `n ≥ N` (`C`, `N` exist but are not explicit). Proved without hypotheses: 3-Majority is at least as fast as Voter in reducing the number of colours (the comparison of anonymous consensus processes, with Proposition 1 and Theorem 2 in distributional form), and both have at most `k` colours after `24 (n/k) log n` rounds w.p. `≥ 1 − 1/n`, for `n ≥ 2`. | Berenbrink, Clementi, Elsässer, Kling, Mallmann-Trenn, Natale, PODC 2017; Thm 4, Prop 1, Thm 2, Lemmas 2–4 of arXiv:1702.04921 (v1); the proof of Thm 4 needs a minor correction | `ThreeMajority.threeMaj_anyStart_consensus`, `threeMaj_reduce_whp`, `voter_le_threeMaj`, `voter_reduce_whp`, `ac_comparison`, `multinomial_schurConvex` | MAJ-6 (b) |
 | Lower bounds from a balanced start: 3-majority needs `Ω(k log n)` rounds for `k ≤ n^{1/4−δ}` (a narrower range than the paper's), and `h`-plurality needs `Ω(k/h²)` rounds. | BCNPST, SPAA 2014, Thms 4.2, 4.12, Lemma 4.11 | `Plurality.theorem_4_2_log`, `lemma_4_11`, `theorem_4_12_log` | MAJ-10 |
 | Classification of 3-input rules: a rule that solves plurality consensus from a clear majority is uniform (part b), and follows the clear majority on every pair (part a) except for rules with `Δ_r, Δ_b ≤ 1`, which remain open. | BCNPST, SPAA 2014, Thm 4.8 | `Plurality.theorem_4_8_a`, `theorem_4_8_b` | MAJ-9 (partial) |
 
