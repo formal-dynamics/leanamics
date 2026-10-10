@@ -37,3 +37,11 @@ import Crn
 #print axioms Crn.ApproxMajority.absorbProb_minority_le_majority
 #print axioms Crn.ApproxMajority.tendsto_event_unanimous
 #print axioms Crn.ApproxMajority.half_le_absorbProb_majority
+#print axioms Crn.staticMajority_stablyComputes
+#print axioms Crn.dynamicMajority_stabilizes
+#print axioms Crn.dynamicMajority_stablyComputes
+#print axioms Crn.Protocol.drive_stablyMarks
+#print axioms Crn.absoluteMajority_stablyComputes
+#print axioms Crn.card_absState
+#print axioms Crn.relativeMajority_stablyMarks
+#print axioms Crn.card_relState

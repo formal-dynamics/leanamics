@@ -110,7 +110,9 @@ chain as the population protocol on the same reactions, and population protocols
 threshold and remainder predicate and their Boolean combinations ([Angluin et al.,
 2006]({{ '/crn/blueprint/' | relative_url }}#sec:aadfp-stable)); on every connected interaction graph, 4 states suffice and are needed
 for exact majority, and approximate majority from a random placement favours the majority
-([Mertzios et al., ICALP 2014]({{ '/crn/blueprint/' | relative_url }}#sec:mnrs-graph-majority)).
+([Mertzios et al., ICALP 2014]({{ '/crn/blueprint/' | relative_url }}#sec:mnrs-graph-majority)); deterministic protocols with `O(log C)`-bit states find
+the absolute majority among `C` colours, if any, and mark the agents of the plurality colour ([Gąsieniec et al.,
+OPODIS 2016]({{ '/crn/blueprint/' | relative_url }}#sec:ghmss-exact-majority)).
 
 [Blueprint]({{ '/crn/blueprint/' | relative_url }}) · [PDF]({{ '/crn/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/crn/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/crn/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/crn)
 

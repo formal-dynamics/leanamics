@@ -21,3 +21,9 @@ import Crn.GraphMajorityBasic
 import Crn.GraphMajorityAmbassador
 import Crn.GraphMajorityLowerBound
 import Crn.GraphMajorityRandom
+import Crn.ExactMajorityOutput
+import Crn.ExactMajorityStatic
+import Crn.ExactMajorityDynamic
+import Crn.ExactMajorityCompose
+import Crn.ExactMajorityAbsolute
+import Crn.ExactMajorityRelative

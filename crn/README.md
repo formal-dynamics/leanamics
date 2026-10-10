@@ -62,8 +62,36 @@ the differences file). Graphs are undirected.
 * [`Crn/GraphMajorityRandom.lean`](Crn/GraphMajorityRandom.lean): the one-way rule on a graph,
   `Crn.ApproxMajority.winProb_minority_le_majority` and `half_le_absorbProb_majority`.
 
+## Deterministic exact majority and plurality (CRN-5)
+
+Deterministic population protocols with `O(k)`-bit states for `C ≤ 2^k` colours given as `k`-bit
+labels (Gąsieniec, Hamilton, Martin, Spirakis, Stachowiak, OPODIS 2016). The static majority
+protocol (6 states) stably computes the sign of `#1 − #(−1)`, reporting ties (Theorem 3); the
+dynamic majority protocol (8 states) does so after any finite sequence of colour changes by an
+external force (Section 3); driven by another protocol, it tolerates the changes of colours that
+this protocol makes while it stabilizes. Hence Absolute-Majority stably computes the colour held
+by more than half of the agents, or reports that there is none (Theorem 6, `2^k·6^k·8` states), and
+Relative-Majority stably marks the agents of the plurality colour, ties to the lexicographically
+largest label (Theorem 7, `2^(4k)` states): each agent learns whether its own colour wins, not the
+winner's label. Fig. 4 and the final argument of Section 3 need minor corrections; the uniqueness
+mechanism of Section 5.2 needs a major correction and is not formalized (see the differences
+file).
+
+* [`Crn/ExactMajorityOutput.lean`](Crn/ExactMajorityOutput.lean): stable computation with outputs
+  in any type, possibly depending on the agent's input (`Protocol.StablyMarks`).
+* [`Crn/ExactMajorityStatic.lean`](Crn/ExactMajorityStatic.lean): the static protocol and
+  `Crn.staticMajority_stablyComputes`.
+* [`Crn/ExactMajorityDynamic.lean`](Crn/ExactMajorityDynamic.lean): the dynamic protocol, its
+  invariants and `Crn.dynamicMajority_stabilizes`.
+* [`Crn/ExactMajorityCompose.lean`](Crn/ExactMajorityCompose.lean): the dynamic protocol driven by
+  another protocol, `Crn.Protocol.drive_stablyMarks`.
+* [`Crn/ExactMajorityAbsolute.lean`](Crn/ExactMajorityAbsolute.lean): Absolute-Majority,
+  `Crn.absoluteMajority_stablyComputes` and `card_absState`.
+* [`Crn/ExactMajorityRelative.lean`](Crn/ExactMajorityRelative.lean): Relative-Majority,
+  `Crn.relativeMajority_stablyMarks` and `card_relState`.
+
 **Status.** All statements proved (no `sorry`, standard axioms only). Deviations from the
-sources (CRN-1, CRN-3 and CRN-4) are listed in
+sources (CRN-1, CRN-3, CRN-4 and CRN-5) are listed in
 [`FORMALIZATION_DIFFERENCES.md`](FORMALIZATION_DIFFERENCES.md).
 
 Build and audit:
