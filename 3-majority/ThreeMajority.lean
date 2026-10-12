@@ -17,6 +17,7 @@ import ThreeMajority.AnyStartAsymptotics
 import ThreeMajority.AnyStartMain
 import ThreeMajority.ManyOpinionsExpect
 import ThreeMajority.ManyOpinionsMoments
+import ThreeMajority.ManyOpinionsTails
 import ThreeMajority.ManyOpinionsDrift
 import ThreeMajority.ManyOpinionsBreaking
 import ThreeMajority.ManyOpinionsDropping

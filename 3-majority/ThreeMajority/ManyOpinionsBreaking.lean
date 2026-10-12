@@ -1,6 +1,7 @@
 import ThreeMajority.ManyOpinionsExpect
 import ThreeMajority.ManyOpinionsMoments
 import ThreeMajority.ManyOpinionsDrift
+import ThreeMajority.ManyOpinionsTails
 import Dynamics.Rounds
 
 /-!
@@ -20,6 +21,14 @@ drift lemma (`hitProb_additive_drift`, Lemma 3.2) then gives Lemma 3.3: within
 * `min_count_overshoot`: **Equation (6)** (Hypothesis 2 of Lemma 3.2; Lemma B.1), in one-step
   form.
 * `symmetry_breaking`: **Lemma 3.3**, as a hitting probability of the round-based kernel.
+
+Equation (6) is a Chernoff lower tail at `n/j − 64 √(j n log n)` with mean at least
+`n/j − 32 √(j n log n)` (`le_avg_colourCount_stepCol_of_forall_lt`) and a union bound over the
+colours. Equation (3) has two cases: far from uniform, Lemma 2.1 for the smallest colour
+(Equation (5)); near uniform, the paper's Central Limit Theorem step (Equation (4)) is replaced by
+the pointwise bound `min_a C_a' ≤ n/j − (1/(2j)) ∑_a |C_a' − n/j|` (`inf'_colourCount_le`) and the
+anti-concentration `𝔼|C_a' − n/j| ≥ (9/256) σ_a` (`avg_abs_colourCount_stepCol_sub_ge`,
+Paley–Zygmund) with `σ_a² ≥ n/(4j)` (`sum_variance_adoptInd_ge`).
 
 The paper assumes nothing on `j` in Lemma 3.3, but its proof uses `c_𝕞 ≥ n/(2j)` whenever
 `c_𝕞 > n/j − √(j n log n)`, which needs `j³ log n = O(n)`; the statements here assume
@@ -136,7 +145,133 @@ theorem min_count_drift :
             (univ.image x).inf' h fun a => (colourCount (stepCol x r) a : ℝ)) ≤
           (univ.image x).inf' h (fun a => (colourCount x a : ℝ)) -
             δ * √(n : ℝ) / (numColours x * √(numColours x : ℝ)) := by
-  sorry
+  refine ⟨1 / 500, 1024, by norm_num, fun n x hj2 hC hall h => ?_⟩
+  have hjn : numColours x ≤ n := by
+    simpa [numColours] using card_image_le (s := (univ : Finset (Fin n))) (f := x)
+  have hn2 : 2 ≤ n := hj2.trans hjn
+  haveI : NeZero n := ⟨by omega⟩
+  have hnR : (2 : ℝ) ≤ n := by exact_mod_cast hn2
+  have hn0 : (0 : ℝ) < n := by linarith
+  have hL := log_ge_of_two_le hn2
+  have hjR : (2 : ℝ) ≤ numColours x := by exact_mod_cast hj2
+  have hj0 : (0 : ℝ) < numColours x := by linarith
+  -- sizes: `32 √(j n log n) ≤ n/j`, hence `n/j ≥ 32`
+  have hsize : 32 * √(numColours x * n * Real.log n) ≤ n / numColours x :=
+    mul_sqrt_le_div (by norm_num) hj0 (by norm_num; linarith)
+  have hJnL : 1 ≤ (numColours x : ℝ) * n * Real.log n := by
+    have h1 : (4 : ℝ) ≤ numColours x * n := by
+      have := mul_le_mul hjR hnR (by norm_num) hj0.le
+      linarith
+    have := mul_le_mul h1 hL (by norm_num) (by positivity)
+    linarith
+  have hnj : 32 ≤ (n : ℝ) / numColours x := by
+    have := Real.one_le_sqrt.mpr hJnL
+    linarith
+  -- the unit `w = √(n/j)`
+  obtain ⟨w, hw⟩ : ∃ w : ℝ, w = √(n : ℝ) / √(numColours x : ℝ) := ⟨_, rfl⟩
+  have hsj : 0 < √(numColours x : ℝ) := Real.sqrt_pos.mpr hj0
+  have hsn : 0 < √(n : ℝ) := Real.sqrt_pos.mpr hn0
+  have hww : w ^ 2 = n / numColours x := by
+    rw [hw, div_pow, Real.sq_sqrt hn0.le, Real.sq_sqrt hj0.le]
+  have hw0 : 0 < w := by rw [hw]; positivity
+  have hw1 : 1 ≤ w := by nlinarith
+  have hwnj : w ≤ n / numColours x := by
+    rw [← hww]
+    nlinarith [mul_nonneg hw0.le (sub_nonneg.mpr hw1)]
+  have hRHS : 1 / 500 * √(n : ℝ) / (numColours x * √(numColours x : ℝ)) =
+      1 / 500 * w / numColours x := by
+    rw [hw]
+    field_simp
+  rw [hRHS]
+  -- the smallest support `μ = c_{a₀}`
+  obtain ⟨a₀, ha₀, hμ⟩ := exists_mem_eq_inf' h (fun a => (colourCount x a : ℝ))
+  rw [hμ]
+  have hμlow : (n : ℝ) / (2 * numColours x) ≤ colourCount x a₀ := by
+    have := hall a₀ ha₀
+    have e : (n : ℝ) / (2 * numColours x) = n / numColours x - n / numColours x / 2 := by ring
+    linarith
+  by_cases hcase : (colourCount x a₀ : ℝ) ≤ n / numColours x - w / 250
+  · -- far from uniform: Lemma 2.1 for the smallest colour (BCNPT16, Equation (5))
+    calc avg (fun r : Tgt3 n => (univ.image x).inf' h fun a => (colourCount (stepCol x r) a : ℝ))
+        ≤ avg (fun r : Tgt3 n => (colourCount (stepCol x r) a₀ : ℝ)) :=
+          avg_le_avg fun r => inf'_le _ ha₀
+      _ ≤ (colourCount x a₀ : ℝ) * (1 + colourCount x a₀ / n - 1 / numColours x) :=
+          avg_colourCount_stepCol_le x a₀
+      _ ≤ _ := by
+          have hD : w / (250 * n) ≤ 1 / numColours x - colourCount x a₀ / n := by
+            have h1 : (colourCount x a₀ : ℝ) / n ≤ (n / numColours x - w / 250) / n :=
+              div_le_div_of_nonneg_right hcase hn0.le
+            have e : ((n : ℝ) / numColours x - w / 250) / n = 1 / numColours x - w / (250 * n) := by
+              field_simp
+            linarith
+          have hprod : (n : ℝ) / (2 * numColours x) * (w / (250 * n)) ≤
+              colourCount x a₀ * (1 / numColours x - colourCount x a₀ / n) :=
+            mul_le_mul hμlow hD (by positivity) (Nat.cast_nonneg _)
+          have e2 : (n : ℝ) / (2 * numColours x) * (w / (250 * n)) =
+              1 / 500 * w / numColours x := by
+            field_simp
+            ring
+          have e3 : (colourCount x a₀ : ℝ) * (1 + colourCount x a₀ / n - 1 / numColours x) =
+              colourCount x a₀ - colourCount x a₀ * (1 / numColours x - colourCount x a₀ / n) := by
+            ring
+          linarith
+  · -- near uniform: anti-concentration (replaces the CLT of BCNPT16, Equation (4))
+    push Not at hcase
+    have hu : 0 ≤ w / 250 / n := by positivity
+    have hallU : ∀ b ∈ univ.image x, (n : ℝ) / numColours x - n * (w / 250 / n) <
+        colourCount x b := by
+      intro b hb
+      have : (colourCount x a₀ : ℝ) ≤ colourCount x b :=
+        hμ ▸ inf'_le (fun a => (colourCount x a : ℝ)) hb
+      rw [show (n : ℝ) * (w / 250 / n) = w / 250 by field_simp]
+      linarith
+    have hju : (numColours x : ℝ) * (w / 250 / n) ≤ 1 / 250 := by
+      rw [show (numColours x : ℝ) * (w / 250 / n) = numColours x * w / (250 * n) by ring,
+        div_le_div_iff₀ (by positivity) (by norm_num)]
+      have : (numColours x : ℝ) * w ≤ n := by
+        rw [le_div_iff₀ hj0] at hwnj
+        linarith
+      linarith
+    have hAC : ∀ a ∈ univ.image x, 9 * w / 512 ≤ avg (fun r : Tgt3 n =>
+        |(colourCount (stepCol x r) a : ℝ) - n / numColours x|) := by
+      intro a ha
+      have hv := sum_variance_adoptInd_ge hu hj2 hju hallU ha
+      have hn4 : (n : ℝ) / (4 * numColours x) = w ^ 2 / 4 := by
+        rw [hww]
+        ring
+      rw [hn4] at hv
+      have hσ1 : 1 ≤ ∑ v, variance (adoptInd x a v) := by nlinarith
+      have h1 := avg_abs_colourCount_stepCol_sub_ge x a (n / numColours x) hσ1
+      have h2 : w / 2 ≤ √(∑ v, variance (adoptInd x a v)) :=
+        Real.le_sqrt_of_sq_le (by linarith [show (w / 2) ^ 2 = w ^ 2 / 4 by ring])
+      have : 9 / 256 * (w / 2) ≤ 9 / 256 * √(∑ v, variance (adoptInd x a v)) :=
+        mul_le_mul_of_nonneg_left h2 (by norm_num)
+      linarith [show 9 * w / 512 = 9 / 256 * (w / 2) by ring]
+    have hpt : ∀ r : Tgt3 n, (univ.image x).inf' h (fun a => (colourCount (stepCol x r) a : ℝ)) ≤
+        n / numColours x - 1 / (2 * numColours x) *
+          ∑ a ∈ univ.image x, |(colourCount (stepCol x r) a : ℝ) - n / numColours x| :=
+      fun r => inf'_colourCount_le h (image_stepCol_subset x r)
+    have hcard : ((univ.image x).card : ℝ) = numColours x := rfl
+    calc avg (fun r : Tgt3 n => (univ.image x).inf' h fun a => (colourCount (stepCol x r) a : ℝ))
+        ≤ avg (fun r : Tgt3 n => n / numColours x - 1 / (2 * numColours x) *
+            ∑ a ∈ univ.image x, |(colourCount (stepCol x r) a : ℝ) - n / numColours x|) :=
+          avg_le_avg hpt
+      _ = n / numColours x - 1 / (2 * numColours x) * ∑ a ∈ univ.image x,
+            avg (fun r : Tgt3 n => |(colourCount (stepCol x r) a : ℝ) - n / numColours x|) := by
+          rw [avg_sub, avg_const, avg_const_mul, avg_sum]
+      _ ≤ n / numColours x - 1 / (2 * numColours x) * ∑ _a ∈ univ.image x, 9 * w / 512 := by
+          have h1 := sum_le_sum hAC
+          have h2 : 0 ≤ 1 / (2 * (numColours x : ℝ)) := by positivity
+          exact sub_le_sub_left (mul_le_mul_of_nonneg_left h1 h2) _
+      _ = n / numColours x - 9 * w / 1024 := by
+          rw [sum_const, nsmul_eq_mul, hcard]
+          field_simp
+          ring
+      _ ≤ (colourCount x a₀ : ℝ) - 1 / 500 * w / numColours x := by
+          have : 1 / 500 * w / numColours x ≤ w / 1000 := by
+            rw [div_le_div_iff₀ hj0 (by norm_num)]
+            nlinarith
+          linarith
 
 /-- **Equation (6)** (BCNPT16, proof of Lemma 3.3, Hypothesis 2 of Lemma 3.2; Lemma B.1), in
 one-step form: there is `C` such that, for every configuration `x` with `j ≥ 2` colours,
@@ -150,7 +285,76 @@ theorem min_count_overshoot :
       avg (fun r : Tgt3 n => if ∃ a ∈ univ.image x, (colourCount (stepCol x r) a : ℝ) <
           n / numColours x - 64 * √(numColours x * n * Real.log n) then (1 : ℝ) else 0) ≤
         1 / (n : ℝ) ^ 2 := by
-  sorry
+  refine ⟨2 ^ 14, fun n x hj2 hC hall => ?_⟩
+  have hjn : numColours x ≤ n := by
+    simpa [numColours] using card_image_le (s := (univ : Finset (Fin n))) (f := x)
+  have hn2 : 2 ≤ n := hj2.trans hjn
+  haveI : NeZero n := ⟨by omega⟩
+  have hnR : (2 : ℝ) ≤ n := by exact_mod_cast hn2
+  have hn0 : (0 : ℝ) < n := by linarith
+  have hL := log_ge_of_two_le hn2
+  have hL0 : 0 < Real.log n := by linarith
+  have hjR : (2 : ℝ) ≤ numColours x := by exact_mod_cast hj2
+  have hj0 : (0 : ℝ) < numColours x := by linarith
+  have hjnR : (numColours x : ℝ) ≤ n := by exact_mod_cast hjn
+  obtain ⟨m, hm⟩ : ∃ m, m = 16 * √(numColours x * n * Real.log n) := ⟨_, rfl⟩
+  rw [← hm] at hall
+  rw [show 64 * √(numColours x * n * Real.log n) = 4 * m by rw [hm]; ring]
+  have hm0 : 0 < m := by
+    rw [hm]
+    have := Real.sqrt_pos.mpr (mul_pos (mul_pos hj0 hn0) hL0)
+    positivity
+  have hmsq : m ^ 2 = 256 * (numColours x * n * Real.log n) := by
+    rw [hm, mul_pow, Real.sq_sqrt (by positivity)]
+    norm_num
+  -- `8 m ≤ n/j`, from `2^14 j³ log n ≤ n`
+  have hsize : 8 * m ≤ n / numColours x := by
+    have := mul_sqrt_le_div (D := 128) (n := n) (j := numColours x) (by norm_num) hj0
+      (by norm_num; linarith)
+    rw [hm]
+    linarith
+  have hjm : 8 * numColours x * m ≤ n := by
+    rw [le_div_iff₀ hj0] at hsize
+    linarith
+  -- one colour
+  have htail : ∀ a ∈ univ.image x, avg (fun r : Tgt3 n =>
+      if (colourCount (stepCol x r) a : ℝ) < n / numColours x - 4 * m then (1 : ℝ) else 0) ≤
+        1 / (n : ℝ) ^ 3 := by
+    intro a ha
+    have hmean := le_avg_colourCount_stepCol_of_forall_lt hm0.le hj2 hjm hall ha
+    have h := avg_colourCount_stepCol_le_tail x a (μ := n / numColours x - 2 * m)
+      (k := n / numColours x - 4 * m) (by linarith) (by linarith) hmean
+    have hμn : (n : ℝ) / numColours x - 2 * m ≤ n := by
+      have : (n : ℝ) / numColours x ≤ n := div_le_self hn0.le (by linarith)
+      linarith
+    have hμ0 : 0 < (n : ℝ) / numColours x - 2 * m := by linarith
+    calc _ ≤ avg (fun r : Tgt3 n =>
+          if (colourCount (stepCol x r) a : ℝ) ≤ n / numColours x - 4 * m then (1 : ℝ)
+          else 0) :=
+          avg_le_avg fun r => by
+            split_ifs with h1 h2 <;> first | exact absurd h1.le h2 | norm_num
+      _ ≤ _ := h
+      _ ≤ Real.exp (-((3 : ℕ) * Real.log n)) := by
+          rw [Real.exp_le_exp, neg_le_neg_iff, le_div_iff₀ (by positivity)]
+          rw [show ((n : ℝ) / numColours x - 2 * m - (n / numColours x - 4 * m)) ^ 2 =
+            4 * m ^ 2 by ring, hmsq]
+          push_cast
+          have h1 : Real.log n * (n / numColours x - 2 * m) ≤ Real.log n * n :=
+            mul_le_mul_of_nonneg_left hμn hL0.le
+          have h2 : 2 * (n * Real.log n) ≤ numColours x * (n * Real.log n) :=
+            mul_le_mul_of_nonneg_right hjR (by positivity)
+          nlinarith
+      _ = 1 / (n : ℝ) ^ 3 := exp_neg_nat_mul_log (by omega) 3
+  calc _ ≤ avg (fun r : Tgt3 n => ∑ a ∈ univ.image x,
+        if (colourCount (stepCol x r) a : ℝ) < n / numColours x - 4 * m then (1 : ℝ)
+        else 0) := avg_le_avg fun r => ite_exists_le_sum _ _
+    _ = ∑ a ∈ univ.image x, avg (fun r : Tgt3 n =>
+        if (colourCount (stepCol x r) a : ℝ) < n / numColours x - 4 * m then (1 : ℝ)
+        else 0) := avg_sum _ _
+    _ ≤ ∑ _a ∈ univ.image x, 1 / (n : ℝ) ^ 3 := sum_le_sum htail
+    _ = numColours x * (1 / (n : ℝ) ^ 3) := by rw [sum_const, nsmul_eq_mul]; rfl
+    _ ≤ n * (1 / (n : ℝ) ^ 3) := mul_le_mul_of_nonneg_right hjnR (by positivity)
+    _ = 1 / (n : ℝ) ^ 2 := by field_simp
 
 /-- **Lemma 3.3** (BCNPT16, symmetry-breaking stage): there is `C` such that, from every
 configuration `c` with `j ≥ 2` colours and `C j³ log n ≤ n`, 3-Majority reaches

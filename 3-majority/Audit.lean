@@ -24,3 +24,6 @@ import ThreeMajority
 #print axioms ThreeMajority.threeMaj_reduce_whp
 #print axioms ThreeMajority.anyStart_asymptotics
 #print axioms ThreeMajority.threeMaj_anyStart_consensus
+#print axioms ThreeMajority.bcnpt16Phase2_of_pos
+#print axioms ThreeMajority.threeMaj_anyStart_consensus_unconditional
+#print axioms ThreeMajority.consensus_many_opinions

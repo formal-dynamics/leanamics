@@ -27,9 +27,74 @@ Proved already (no `sorry` in their own proofs; they depend on the four remainin
 * Theorem 3.1 (`consensus_many_opinions`, `bcnpt16Phase2_of_pos`) from the two previous items.
 * MAJ-6 (b) without hypothesis (`threeMaj_anyStart_consensus_unconditional`).
 
-Remaining (`sorry`): `min_count_drift` (Equation (3)), `min_count_overshoot` (Equation (6) and
-Lemma B.1), `dropping_stage1` (Lemma 3.4), `dropping_stage2` (Lemma 3.5). Once these four are
-proved the development is `sorry`-free; the new main theorems should then be added to `Audit.lean`.
+Phase 2 (prove the pins): **done**. The four remaining statements are proved (next section);
+`lake build ThreeMajority` succeeds **without warnings**, and `python3 ../scripts/check_axioms.py`
+reports only `propext`, `Classical.choice`, `Quot.sound` for all 28 audited declarations,
+including the new `ThreeMajority.bcnpt16Phase2_of_pos`,
+`ThreeMajority.threeMaj_anyStart_consensus_unconditional` and
+`ThreeMajority.consensus_many_opinions` (added to `Audit.lean`). No pinned header, pinned
+definition or model definition was changed (checked against the pin commit).
+
+## Phase 2 (proofs): what was proved and how
+
+All four are proved; no current errors, no remaining work. Constants: `min_count_drift` with
+`δ = 1/500`, `C = 1024`; `min_count_overshoot` with `C = 2^14`; `dropping_stage1` with
+`C = 240`; `dropping_stage2` with `C = 1024`. Below, `m = 16 √(j n log n)`, `L = log n`.
+
+New file `ThreeMajority/ManyOpinionsTails.lean` (499 lines, imported by `ManyOpinionsBreaking.lean`,
+`ManyOpinionsDropping.lean` and the root `ThreeMajority.lean`):
+* scalar facts: `mul_sqrt_le_div` (`D² j³ L ≤ n ⇒ D √(j n L) ≤ n/j`), `exp_neg_nat_mul_log`,
+  `log_ge_of_two_le`, `ite_exists_le_sum` (union bound, pointwise);
+* deterministic facts: dead colours stay dead (`colourCount_runCol_eq_zero`); every support at
+  most `n/j + (j − 1) m'` when all colours exceed `n/j − m'` (`colourCount_le_of_forall_lt`);
+  `∑_b (c_b/n)² ≤ M/n` (`sum_sq_div_le`); `min_{a∈J} c_a ≤ n/|J| − (1/(2|J|)) ∑_{a∈J} |c_a − n/|J||`
+  for `J ⊇ image` (`inf'_colourCount_le`);
+* mean bounds: `le_avg_colourCount_stepCol` (`𝔼 C_a' ≥ c_a (1 + c_a/n − M/n)`),
+  `avg_colourCount_stepCol_le_of_le` (Lemma 2.1 at a level `b ≥ c_a`),
+  `le_avg_colourCount_stepCol_of_forall_lt` (`𝔼 C_a' ≥ n/j − 2m'` under the hypotheses of (6));
+* one-round tails at a threshold `k` (wrappers of `Dynamics.avg_chernoff_upper/lower` with
+  `adoptInd`): `avg_colourCount_stepCol_ge` (`P(C_a' ≥ k) ≤ exp(−(k − μ)²/(k + μ))`),
+  `avg_colourCount_stepCol_le_tail` (`P(C_a' ≤ k) ≤ exp(−(μ − k)²/(2μ))`);
+* anti-concentration: `avg_abs_colourCount_stepCol_sub_ge` (`𝔼|C_a' − θ| ≥ (9/256) σ_a` for any
+  `θ`, from `avg_pz_zero_one`; if `|𝔼C_a' − θ| ≥ σ_a/4` it is Jensen), and
+  `sum_variance_adoptInd_ge` (`σ_a² ≥ n/(4j)` near the uniform configuration, from
+  `(1 − 1/250)²/j ≤ p_a ≤ (1/2 + 1/250)(1 + 1/250)`).
+
+Proofs of the pins:
+* `min_count_overshoot` (Equation (6)): `𝔼 C_a' ≥ n/j − 2m` for every colour `a` of `x`, Chernoff
+  lower tail at `n/j − 4m` with deviation `2m` (`exp(−2m²/μ) ≤ n^{-3}`), union bound over the
+  `j ≤ n` colours. (The plan's mean bound `n/j − 3m` is improved to `n/j − 2m` by monotonicity of
+  `c ↦ c (1 + c/n − M/n)`.)
+* `dropping_stage2` (Lemma 3.5): `avg_colourCount_stepCol_le_half` and
+  `avg_colourCount_stepCol_ge_shrink` (from `c_a ≤ b ≤ n/(2j)`:
+  `P(C_a' ≥ b (1 − 1/(4j))) ≤ exp(−b/(32 j²))`); escape above `n/(2j)` with probability
+  `≤ 1/n⁴` per round (`expList_colourCount_gt_half_le`, via `Dynamics.expList_escape`); the
+  potential `min(c_a, n/(2j))` satisfies `𝔼ψ' ≤ (1 − 1/(2j)) ψ + (n/(4j²)) 1[c_a > n/(2j)]`
+  (`avg_min_colourCount_stepCol_le`), iterated in `expList_min_colourCount_le`
+  (`≤ (1 − 1/(2j))^s n/(2j) + (n/(4j²)) n^{-4} s²`); Markov at `t₀ = ⌈2 j L⌉` gives
+  `P(alive) ≤ 1/2`; later times by monotonicity (`expList_append`). A dead start is trivial (this
+  also covers `n = 1`).
+* `dropping_stage1` (Lemma 3.4): one moving target `stage1Level n j m K s_A s =
+  max(n/j − m (1 + 1/(4j))^s, (n/(2j)) (1 − 1/(4j))^(s − s_A), K)` with
+  `K = min(240 j² L, n/(2j)) ≥ 64 j² L` (the caution of the plan), `s_A = ⌈5 j L⌉` (then
+  `m (1 + 1/(4j))^{s_A} ≥ n`, from `log q ≥ 1 − 1/q`), `s_B = ⌈4 j L⌉`. One round fails with
+  probability `≤ 1/n²` (`stage1_step`): above `n/(2j)` the level is the first term and
+  `avg_colourCount_stepCol_ge_gap` applies (`exp(−g²/(32 j n))`, `g ≥ m`); below `n/(2j)` the next
+  level is at least `(1 − 1/(4j))` times the current one and `avg_colourCount_stepCol_ge_shrink`
+  applies. After `s_A + s_B ≤ 240 j L ≤ t` rounds the level is `K ≤ 240 j² L`; the union bound
+  over the `t ≤ n` rounds gives `t/n² ≤ 1/n`.
+* `min_count_drift` (Equation (3)): with `w = √n/√j`, the target drift is `(1/500) w/j`. Case
+  `c_min ≤ n/j − w/250`: Lemma 2.1 for the smallest colour and `c_min ≥ n/(2j)` (Equation (5)).
+  Case `c_min > n/j − w/250`: `inf'_colourCount_le` pointwise, `avg_abs_colourCount_stepCol_sub_ge`
+  with `σ_a ≥ w/2` (`sum_variance_adoptInd_ge` with `u = w/(250 n)`, `j u ≤ 1/250` since
+  `w ≤ n/j`): `𝔼 min ≤ n/j − 9w/1024 < c_min + w/250 − 9w/1024 ≤ c_min − w/1000`.
+
+Deviations from the task plan (all inside proofs, none in statements): per-round failure
+probabilities `1/n²` (stage 1) and `1/n⁴` (stage 2 escape) instead of `n^{-5}`, `n^{-10}`;
+variance bound `n/(4j)` instead of `0.48 n/j`; constants as listed above.
+
+Final line counts: `ManyOpinionsTails.lean` 499 (new), `ManyOpinionsBreaking.lean` 536 (was 332),
+`ManyOpinionsDropping.lean` 730 (was 59).
 
 ## Review of the pins (second agent, before freezing)
 
@@ -197,7 +262,7 @@ potential `breakPotential` of Lemma 3.3.
 `ManyOpinionsBreaking.lean`, `ManyOpinionsDropping.lean`, `ManyOpinionsMain.lean`, imported from
 `ThreeMajority.lean`.
 
-## Plan for the four remaining lemmas (suggested order)
+## Plan for the four remaining lemmas (as given before Phase 2; carried out above)
 
 1. `min_count_overshoot`: for each colour `a` of `x`, the mean `n p_a` is at least
    `n/j − 3 · 16 √(j n log n)` (deviations `d_b = c_b − n/j > −m` sum to `0`, so
