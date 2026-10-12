@@ -15,3 +15,9 @@ import ThreeMajority.AnyStartVsVoter
 import ThreeMajority.AnyStartVoter
 import ThreeMajority.AnyStartAsymptotics
 import ThreeMajority.AnyStartMain
+import ThreeMajority.ManyOpinionsExpect
+import ThreeMajority.ManyOpinionsMoments
+import ThreeMajority.ManyOpinionsDrift
+import ThreeMajority.ManyOpinionsBreaking
+import ThreeMajority.ManyOpinionsDropping
+import ThreeMajority.ManyOpinionsMain
