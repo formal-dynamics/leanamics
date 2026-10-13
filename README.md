@@ -41,7 +41,7 @@ latest release. Please cite the version you used (here v0.2.0):
   title   = {Leanamics: {Lean} 4 formalizations of opinion dynamics and related distributed processes},
   year    = {2026},
   version = {0.2.0},
-  doi     = {10.5281/zenodo.23265329},
+  doi     = {10.5281/zenodo.23334909},
   url     = {https://github.com/formal-dynamics/leanamics}
 }
 ```
