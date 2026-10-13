@@ -24,6 +24,8 @@ proof routes, explicit constants and authorship. Where a statement deviates from
 package's `FORMALIZATION_DIFFERENCES.md` lists the deviations. Many statements make "for
 sufficiently large $n$" explicit, with thresholds that can be astronomically large.
 
+{% include dictionary.html %}
+
 ## Majority dynamics: 3-Majority and plurality consensus
 {: #majority}
 

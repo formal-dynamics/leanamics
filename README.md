@@ -11,6 +11,18 @@ paper proof to the Lean code statement-by-statement.
 page, blueprints, dependency graphs and API docs for everything below). To cite Leanamics, see
 [How to cite](#how-to-cite).
 
+## The same processes under different names
+
+The same few Markov chains are studied under different names in distributed computing,
+population genetics, epidemiology and chemistry: the sequential pull voter is the neutral Moran
+process with death–Birth updating, and on the complete graph a chemical reaction network;
+Independent Cascade is the Reed–Frost epidemic and bond percolation; COBRA walks are dual to
+BIPS infections. The [cross-field dictionary](https://formal-dynamics.github.io/leanamics/#dictionary)
+lists each correspondence, the conditions under which it holds, its sources and what Leanamics
+proves about it. Its source is [`home_page/_data/dictionary.yml`](home_page/_data/dictionary.yml);
+`python3 scripts/dictionary_tex.py --check` checks its Lean names, blueprint anchors and roadmap
+IDs against the repository.
+
 ## Results
 
 [RESULTS.md](RESULTS.md) lists everything formalized so far, area by area (voter, Moran,

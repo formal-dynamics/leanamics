@@ -1,0 +1,171 @@
+{%- comment -%}
+  The cross-field dictionary, rendered from _data/dictionary.yml (see the header comment of
+  that file for the schema). Included from index.md; markdown="0" keeps kramdown away from the
+  text, whose inline TeX is rendered by MathJax.
+{%- endcomment -%}
+{%- assign dict = site.data.dictionary -%}
+{%- assign dict_empty = "" | split: "," -%}
+<section class="dict" id="dictionary" markdown="0">
+<h2>{{ dict.title }}</h2>
+<p class="dict-intro">{% include dictionary-text.html text=dict.intro %}</p>
+<details class="dict-notes">
+<summary>How to read the dictionary: relations, chemistry, time and formal status</summary>
+<dl class="dict-relations">
+{%- for rel in dict.relations %}
+<dt><span class="dict-kind">{{ rel.short }}</span></dt>
+<dd><strong>{{ rel.name }}:</strong> {% include dictionary-text.html text=rel.description %}</dd>
+{%- endfor %}
+</dl>
+{%- for note in dict.notes %}
+<p>{% include dictionary-text.html text=note %}</p>
+{%- endfor %}
+</details>
+
+<div class="dict-table">
+<div class="dict-head" aria-hidden="true">
+<div class="dict-head-title">Correspondence</div>
+{%- for field in dict.fields %}
+<div title="{{ field.name }}">{{ field.short }}</div>
+{%- endfor %}
+</div>
+{%- for group in dict.groups %}
+<h3 class="dict-group" id="dict-group-{{ group.key }}">{{ group.title }}</h3>
+{%- for row in dict.rows %}
+{%- if row.group == group.key %}
+{%- comment -%} The references of the row, numbered in order of first citation. {%- endcomment -%}
+{%- assign row_refs = dict_empty -%}
+{%- for field in dict.fields -%}
+{%- assign cell = row[field.key] -%}
+{%- if cell.refs -%}{%- assign row_refs = row_refs | concat: cell.refs -%}{%- endif -%}
+{%- endfor -%}
+{%- if row.relation.refs -%}{%- assign row_refs = row_refs | concat: row.relation.refs -%}{%- endif -%}
+{%- assign row_refs = row_refs | uniq -%}
+{%- comment -%} The Lean status badge links to the first blueprint anchor, else to the roadmap. {%- endcomment -%}
+{%- assign lean = row.leanamics -%}
+{%- assign lean_blueprint = lean.blueprint | default: dict_empty -%}
+{%- assign lean_roadmap = lean.roadmap | default: dict_empty -%}
+{%- assign lean_href = "" -%}
+{%- assign lean_target = "" -%}
+{%- if lean.status != "roadmap" and lean_blueprint.size > 0 -%}
+{%- assign bp = lean_blueprint.first | split: "#" -%}
+{%- capture lean_href %}{{ bp[0] | relative_url }}#{{ bp[1] }}{% endcapture -%}
+{%- assign lean_target = "blueprint" -%}
+{%- elsif lean_roadmap.size > 0 -%}
+{%- include dictionary-roadmap.html id=lean_roadmap.first -%}
+{%- assign lean_href = dict_roadmap_href -%}
+{%- assign lean_target = "roadmap" -%}
+{%- endif %}
+<article class="dict-row" id="dict-{{ row.id }}">
+<div class="dict-cells">
+<div class="dict-cell dict-title-cell">
+<a class="dict-title" href="#dict-{{ row.id }}">{% include dictionary-text.html text=row.title %}</a>
+<div class="dict-meta">
+{%- for kind in row.relation.kinds -%}
+{%- for rel in dict.relations -%}
+{%- if rel.key == kind %}
+<span class="dict-kind" title="{{ rel.name }}: {{ rel.description | escape }}">{{ rel.short }}</span>
+{%- endif -%}
+{%- endfor -%}
+{%- endfor %}
+{% if lean_href != "" -%}
+<a class="dict-status dict-status-{{ lean.status }}" href="{{ lean_href }}" title="Lean status: {{ lean.status }} (opens the {{ lean_target }})">Lean: {{ lean.status }}</a>
+{%- else -%}
+<span class="dict-status dict-status-{{ lean.status }}" title="Lean status: {{ lean.status }}">Lean: {{ lean.status }}</span>
+{%- endif %}
+</div>
+</div>
+{%- for field in dict.fields %}
+{%- assign cell = row[field.key] %}
+{%- if cell.none %}
+<div class="dict-cell dict-none" title="{{ cell.none | remove: '$' | remove: '`' | escape }}">
+<span class="dict-label">{{ field.short }}</span>
+<span class="dict-none-text">no counterpart</span>
+</div>
+{%- else %}
+<div class="dict-cell">
+<span class="dict-label">{{ field.short }}</span>
+{% include dictionary-text.html text=cell.name %}
+</div>
+{%- endif %}
+{%- endfor %}
+</div>
+<details class="dict-more">
+<summary>Details, conditions and references</summary>
+<div class="dict-more-body">
+<h4>Relation</h4>
+<p class="dict-meta">
+{%- for kind in row.relation.kinds -%}
+{%- for rel in dict.relations -%}
+{%- if rel.key == kind %}
+<span class="dict-kind" title="{{ rel.description | escape }}">{{ rel.name }}</span>
+{%- endif -%}
+{%- endfor -%}
+{%- endfor %}
+</p>
+<p>{% include dictionary-text.html text=row.relation.statement %} {% include dictionary-cite.html keys=row.relation.refs all=row_refs row=row.id %}</p>
+{%- if row.relation.conditions and row.relation.conditions.size > 0 %}
+<p class="dict-subhead">Conditions</p>
+<ul>
+{%- for condition in row.relation.conditions %}
+<li>{% include dictionary-text.html text=condition %}</li>
+{%- endfor %}
+</ul>
+{%- endif %}
+{%- for field in dict.fields %}
+{%- assign cell = row[field.key] %}
+<h4>{{ field.name }}</h4>
+{%- if cell.none %}
+{%- assign none_start = cell.none | slice: 0, 3 %}
+<p class="dict-none-text">{% if none_start != "No " %}No counterpart: {% endif %}{% include dictionary-text.html text=cell.none %}</p>
+{%- else %}
+<p><strong>{% include dictionary-text.html text=cell.name %}</strong> {% include dictionary-cite.html keys=cell.refs all=row_refs row=row.id %}</p>
+{%- if cell.description %}
+<p>{% include dictionary-text.html text=cell.description %}</p>
+{%- endif %}
+{%- endif %}
+{%- endfor %}
+<h4>In Leanamics</h4>
+<p><span class="dict-status dict-status-{{ lean.status }}">Lean: {{ lean.status }}</span> {% include dictionary-text.html text=lean.summary %}</p>
+<ul class="dict-lean">
+{%- if lean.correspondence and lean.correspondence.size > 0 %}
+<li>Correspondence: {% for name in lean.correspondence %}<code>{{ name }}</code>{% unless forloop.last %}, {% endunless %}{% endfor %}</li>
+{%- endif %}
+{%- if lean.results and lean.results.size > 0 %}
+<li>Results: {% for name in lean.results %}<code>{{ name }}</code>{% unless forloop.last %}, {% endunless %}{% endfor %}</li>
+{%- endif %}
+{%- if lean_blueprint.size > 0 %}
+<li>Blueprint: {% for anchor in lean_blueprint %}{% assign bp = anchor | split: "#" %}{% assign bp_package = bp[0] | remove: "/blueprint/" | remove: "/" %}<a href="{{ bp[0] | relative_url }}#{{ bp[1] }}">{{ bp_package }}, {{ bp[1] }}</a>{% unless forloop.last %} · {% endunless %}{% endfor %}</li>
+{%- endif %}
+{%- if lean_roadmap.size > 0 %}
+<li>Roadmap: {% for roadmap_id in lean_roadmap %}{% include dictionary-roadmap.html id=roadmap_id %}<a href="{{ dict_roadmap_href }}">{{ roadmap_id }}</a>{% unless forloop.last %}, {% endunless %}{% endfor %}</li>
+{%- endif %}
+</ul>
+{%- if row_refs.size > 0 %}
+<h4>References</h4>
+<ol class="dict-refs">
+{%- for key in row_refs %}
+{%- assign ref = dict.references[key] %}
+<li id="dict-{{ row.id }}-ref-{{ key }}">
+{%- if ref -%}
+{{ ref.authors | escape }} ({{ ref.year }}). {% include dictionary-text.html text=ref.title %}. {% include dictionary-text.html text=ref.venue %}.
+{%- if ref.doi %} <a href="https://doi.org/{{ ref.doi | escape }}">doi:{{ ref.doi }}</a>{% endif -%}
+{%- if ref.arxiv %} <a href="https://arxiv.org/abs/{{ ref.arxiv | escape }}">arXiv:{{ ref.arxiv }}</a>{% endif -%}
+{%- if ref.isbn %} <a href="https://openlibrary.org/isbn/{{ ref.isbn | remove: '-' | escape }}">ISBN {{ ref.isbn }}</a>{% endif -%}
+{%- if ref.pmid %} <a href="https://pubmed.ncbi.nlm.nih.gov/{{ ref.pmid | escape }}/">PubMed {{ ref.pmid }}</a>
+{%- elsif ref.no_identifier %} ({{ ref.no_identifier }})
+{%- endif -%}
+{%- else -%}
+{{ key }}
+{%- endif -%}
+</li>
+{%- endfor %}
+</ol>
+{%- endif %}
+</div>
+</details>
+</article>
+{%- endif %}
+{%- endfor %}
+{%- endfor %}
+</div>
+</section>

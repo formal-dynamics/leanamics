@@ -1,0 +1,10 @@
+{%- comment -%}
+  Renders a text of the dictionary as HTML: escapes it, and shows the Lean names
+  in backticks as code. Inline TeX ($...$) is left to MathJax.
+  Usage: {% include dictionary-text.html text=some.text %}
+{%- endcomment -%}
+{%- assign dict_text_parts = include.text | escape | split: "`" -%}
+{%- for dict_text_part in dict_text_parts -%}
+{%- assign dict_text_odd = forloop.index0 | modulo: 2 -%}
+{%- if dict_text_odd == 1 -%}<code>{{ dict_text_part }}</code>{%- else -%}{{ dict_text_part }}{%- endif -%}
+{%- endfor -%}

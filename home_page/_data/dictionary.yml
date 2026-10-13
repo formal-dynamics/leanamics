@@ -1,0 +1,1950 @@
+# The cross-field dictionary of Leanamics: the same Markov processes under different names.
+#
+# Single source of truth for the dictionary section of the website and for the table of the
+# paper, which scripts/dictionary_tex.py generates from the `paper` field of each row
+# (`python3 scripts/dictionary_tex.py --check` checks this file against the blueprints).
+#
+# Each row is one correspondence. The four field cells (dc, popgen, epi, crn) give the name of the
+# process in that field, a precise description and references (keys of `references` below), or
+# `none:` with the reason why the field has no counterpart. `relation` says what kind of
+# correspondence it is (kinds from `relations`), under which conditions it holds, and which
+# sources state it; `leanamics` gives the formal status. Text may contain inline TeX math ($...$),
+# rendered by MathJax on the website; Lean names are in backticks.
+
+title: The same processes under different names
+
+intro: >-
+  The same few Markov chains are studied under different names in distributed computing,
+  population genetics and evolutionary biology, epidemiology, and chemistry. Each entry of this
+  dictionary is one correspondence: what the process is called in each field (or why a field has
+  no counterpart), what kind of correspondence it is and under which conditions it holds, and
+  what Leanamics proves about it. The conditions matter: two processes can be the same chain on
+  the complete graph and differ on other graphs, or agree only up to a time change or in the
+  limit of a large population.
+
+notes:
+  - >-
+    Relations. Two processes are the same chain when they have the same transition kernel. They
+    have the same jump chain when they agree once idle steps are removed (a lazy step, or the
+    holding times of a continuous-time chain): they differ by a random time change, so they have
+    the same absorption and fixation probabilities but not the same running times. Duality and
+    pathwise coupling are exact identities between two different processes. A limit holds only as
+    the population size tends to infinity, and a common mean-field map says nothing about
+    fluctuations.
+  - >-
+    Chemistry. A stochastic chemical reaction network (CRN) with mass-action kinetics is a
+    continuous-time Markov chain on molecule counts in a well-mixed solution. It fires one
+    reaction at a time, so synchronous-round dynamics, in which every individual is updated at
+    once, have no CRN counterpart (their sequential versions may have one); and since the
+    solution is well mixed, a dynamics on a graph has a CRN counterpart only on the complete
+    graph $K_n$. Propensities follow Gillespie: $k\,x_A x_B$ for $A + B$ and $k\binom{x_A}{2}$ for
+    $A + A$, with $k$ the rate constant (the volume absorbed in $k$).
+  - >-
+    Time. Sequential dynamics draw one ordered pair of distinct agents per step. If instead every
+    agent acts at the times of its own rate-1 Poisson clock, the chain observed at its event
+    times is the sequential chain; population protocols count $n$ interactions as one unit of
+    parallel time, which corresponds to mass-action time in a volume proportional to $n$.
+  - >-
+    Formal status. proved: the correspondence itself is a Lean theorem. partial: part of it is a
+    Lean theorem, and the summary says which part. definitional: the library defines the process
+    once and names it after both fields (for example, Wright–Fisher sampling is the voter kernel
+    with uniform rows), so every result proved for it holds under both names, but no theorem
+    compares two definitions. results: the library proves results about some of the columns, not
+    the correspondence. roadmap: a target of the roadmap, not formalized yet.
+  - >-
+    Blueprint links point to the section of a package's blueprint that contains the result; where
+    that section has no label, they point to the label of the theorem itself. References were
+    checked against Crossref, DataCite, arXiv or Open Library. Where a source states a
+    correspondence only for a special case, or where the identification is an elementary
+    computation not found in the sources, the relation says so. Some classic sources could not
+    be read in full (Wright 1931, Moran 1958 beyond its first page, Bartlett 1949, Abbey 1952,
+    Kingman 1982, Daley and Kendall 1965, Kurtz 1970 and 1972, Maki and Thompson 1973, DeGroot
+    1974); what the dictionary says about them follows later sources that restate them, cited in
+    the same row.
+
+fields:
+  - key: dc
+    name: Distributed computing
+    short: Distributed computing
+  - key: popgen
+    name: Population genetics and evolutionary biology
+    short: Population genetics
+  - key: epi
+    name: Epidemiology
+    short: Epidemiology
+  - key: crn
+    name: Chemistry (chemical reaction networks)
+    short: Chemistry (CRN)
+
+relations:
+  - key: same-chain
+    name: Same chain
+    short: same chain
+    description: The same transition kernel, on configurations or, where stated, on counts.
+  - key: same-ctmc
+    name: Same continuous-time chain
+    short: CTMC
+    description: The same continuous-time Markov chain, possibly after scaling time by a constant.
+  - key: jump-chain
+    name: Same jump chain
+    short: jump chain
+    description: >-
+      The same chain once idle steps are removed (lazy steps, or the holding times of a
+      continuous-time chain); the processes differ by a random time change, so absorption
+      probabilities agree but running times need not.
+  - key: coupling
+    name: Pathwise coupling
+    short: coupling
+    description: Built on the same randomness, the processes agree path by path.
+  - key: duality
+    name: Duality
+    short: dual
+    description: >-
+      An exact identity between probabilities of one process and of a dual process run backwards
+      in time.
+  - key: limit
+    name: Large-population limit
+    short: limit
+    description: >-
+      One process, or its scaled counts, converges to the other as the population size tends to
+      infinity.
+  - key: same-recursion
+    name: Same deterministic recursion
+    short: same recursion
+    description: Both are the same deterministic dynamical system.
+  - key: mean-field
+    name: Same mean-field map
+    short: mean field
+    description: >-
+      The expected one-step change, or the deterministic infinite-population recursion,
+      coincides; the stochastic processes may differ.
+
+groups:
+  - key: neutral
+    title: Neutral copying
+  - key: selection
+    title: Selection
+  - key: genealogy
+    title: Duality and genealogy
+  - key: averaging
+    title: Averaging
+  - key: majority
+    title: Majority-type dynamics
+  - key: protocols
+    title: Population protocols and reaction networks
+  - key: spreading
+    title: Spreading processes
+
+rows:
+  # ---------------------------------------------------------------------------------------------
+  - id: wright-fisher
+    group: neutral
+    title: Synchronous neutral copying on the complete graph
+    dc:
+      name: Synchronous pull voter on $K_n$ with self-loops
+      description: >-
+        In every round each of the $n$ nodes copies the opinion of a node drawn uniformly from all
+        $n$ nodes, itself included, independently of the other nodes. On a general graph each
+        node copies a random neighbour (Hassin and Peleg's synchronous voter).
+      refs: [HassinPeleg2001, BecchettiClementiNatale2020]
+    popgen:
+      name: Neutral Wright–Fisher model
+      description: >-
+        Haploid, non-overlapping generations of constant size $N$: each individual of the next
+        generation chooses its parent independently and uniformly at random from the current
+        generation, so the number of copies of an allele evolves as
+        $X_{t+1} \sim \mathrm{Bin}(N, X_t/N)$ and fixes with probability $X_0/N$.
+      refs: [Wright1931, Etheridge2011, Durrett2008]
+    epi:
+      none: >-
+        No counterpart: neutral copying is symmetric between the types, while an epidemic has a
+        distinguished infectious state.
+    crn:
+      none: >-
+        Synchronous rounds replace every individual at once, while a stochastic CRN fires one
+        reaction at a time.
+    relation:
+      kinds: [same-chain]
+      statement: >-
+        The same chain: node $v$ takes the type of node $r(v)$, where $r$ is a uniformly random
+        map $V \to V$, so the two processes have the same kernel on labelled configurations and
+        the same binomial chain on counts. The voter model on the complete graph is "referred to
+        as the Moran model or the Fisher-Wright model (depending on whether continuous-time
+        asynchronous or discrete-time parallel updates are considered)" (Avena et al.).
+      conditions:
+        - Complete graph with self-loops (every node samples among all $n$ nodes, itself included).
+        - Neutral (no selection).
+        - >-
+          Without self-loops the offspring numbers are still exchangeable but not multinomial, so
+          the chains differ, although a colour still fixes with probability equal to its initial
+          frequency (for $n \ge 3$).
+        - >-
+          On other graphs the synchronous voter has no documented population-genetics name; no
+          source defining a "Wright–Fisher model on graphs" with neighbour-restricted parents was
+          found.
+      refs: [AvenaEtAl2024]
+    leanamics:
+      status: definitional
+      summary: >-
+        Wright–Fisher sampling is defined as the voter kernel with uniform rows on $V$, self
+        included (`Voter.wfKernel`); neutral fixation $c_a/n$ follows from Hassin and Peleg's
+        proportionate agreement, and consensus within $2n\log n$ rounds from the duality with
+        coalescing walks (row coalescing). The binomial count chain is not stated.
+      correspondence: [Voter.wfKernel]
+      results:
+        - Voter.wrightFisher_fixation
+        - Voter.wrightFisher_fixation_of_three_le
+        - Voter.consensus_probability_of_selfLoop
+        - Voter.voter_consensus_whp
+      packages: [voter]
+      blueprint:
+        - /voter/blueprint/#sec:hassin-peleg
+        - /voter/blueprint/#thm:wright-fisher
+      roadmap: [VOT-1, VOT-2, VOT-3]
+    paper:
+      dc: 'synchronous pull voter, $K_n$ with self-loops'
+      popgen: 'neutral Wright--Fisher'
+      epi: '--'
+      crn: '--'
+      relation: 'same chain'
+      cite:
+        dc: [HassinPeleg2001]
+        popgen: [Wright1931]
+
+  # ---------------------------------------------------------------------------------------------
+  - id: moran-death-birth
+    group: neutral
+    title: Sequential pull copying (death–Birth)
+    dc:
+      name: Sequential pull voter (the voter model in discrete time)
+      description: >-
+        "In each round one node is selected uniformly at random and it adopts the color of a
+        neighbour sampled uniformly at random" (Becchetti, Clementi and Natale, Definition 3).
+      refs: [BecchettiClementiNatale2020]
+    popgen:
+      name: Neutral Moran process with death–Birth (dB) updating; on $K_n$ with self-loops, Moran's model
+      description: >-
+        A uniformly random individual dies and its neighbours compete for the vacancy
+        proportionally to fitness, so in the neutral case the parent is a uniformly random
+        neighbour. Moran's model draws the reproducing and the dying individual independently and
+        uniformly from the whole population, so the reproducer may be the one that dies (the
+        complete graph with self-loops).
+      refs: [OhtsukiEtAl2006, HindersinTraulsen2015, Moran1958, Moran1959]
+    epi:
+      none: No counterpart (neutral copying).
+    crn:
+      name: 'On $K_n$: $X + Y \to 2X$, $X + Y \to 2Y$ with a common rate constant'
+      description: >-
+        The two copying reactions in a well-mixed solution, an instance of the correspondence
+        between population protocols and bimolecular networks (row population-protocols).
+      refs: [Doty2014]
+    relation:
+      kinds: [same-chain, jump-chain, same-ctmc]
+      statement: >-
+        The same chain on every graph: the copier is the individual that dies and the copied
+        neighbour is the parent. A neutral mutant set $S$ fixes with probability
+        $\sum_{v\in S}\deg v/2m$, its reproductive value under death–Birth. On $K_n$ without
+        self-loops the count moves up and down with the same probability $xy/(n(n-1))$, so its
+        jump chain is that of the network (each reaction with probability $1/2$), and the
+        continuous-time voter model in which every node copies at rate 1 is the network's chain
+        with rate constant $1/(n-1)$; Moran's model (with self-loops) has the same jump chain.
+      conditions:
+        - Neutral; uniform choice among the neighbours (with edge weights, the same weights on both sides).
+        - The CRN counterpart exists only on $K_n$.
+        - >-
+          On regular graphs, $K_n$ in particular, this row coincides with the next one: neutral push
+          and pull are then the same chain.
+        - >-
+          With selection the names diverge: the "biased voter model" of Antal, Redner and Sood
+          puts selection on the death step (their remark that this is equivalent to random death
+          and fitness-proportional replacement needs a minor correction), so it is death–Birth
+          only in the neutral case, and "biased voter" denotes different chains in different
+          communities.
+      refs: [SoodAntalRedner2008, AntalRednerSood2006, Maciejewski2014, Aldous2013]
+    leanamics:
+      status: definitional
+      summary: >-
+        The pull kernel is defined as death–Birth (`Moran.pullKernel`), and a mutant set $S$ fixes
+        with probability $\sum_{v\in S}\deg v/2m$ on every connected graph, exactly (Antal,
+        Redner and Sood's degree laws with selection are mean-field approximations). The network
+        is an instance of CRN-1 (`Crn.jumpKernel_eq_ppKernel`), not stated for it.
+      correspondence: [Moran.pullKernel, Crn.jumpKernel_eq_ppKernel]
+      results: [Moran.pull_fixation, Moran.pull_value_invariant]
+      packages: [moran, crn]
+      blueprint:
+        - /moran/blueprint/#sec:ars-push-pull
+        - /crn/blueprint/#thm:crn1
+      roadmap: [VOT-4, CRN-1]
+    paper:
+      # one line of the paper for this row and the next (pull and push)
+      dc: 'sequential pull / push voter on a graph'
+      popgen: 'neutral Moran, death--Birth / Birth--death'
+      epi: '--'
+      crn: 'on $K_n$: $X{+}Y\to 2X$, $X{+}Y\to 2Y$'
+      relation: 'same chain; CRN: jump chain'
+      cite:
+        dc: [BecchettiClementiNatale2020]
+        popgen: [HindersinTraulsen2015]
+
+  # ---------------------------------------------------------------------------------------------
+  - id: moran-birth-death
+    group: neutral
+    title: Sequential push copying (Birth–death)
+    dc:
+      name: Sequential push voter
+      description: >-
+        At each step a uniformly random node pushes its opinion to a uniformly random neighbour.
+      refs: []
+    popgen:
+      name: Neutral Moran process with Birth–death (Bd) updating
+      description: >-
+        An individual chosen proportionally to fitness (uniformly in the neutral case) reproduces,
+        and its offspring replaces a uniformly random neighbour; called the invasion process in
+        statistical physics.
+      refs: [LiebermanHauertNowak2005, HindersinTraulsen2015, AntalRednerSood2006]
+    epi:
+      none: No counterpart (neutral copying).
+    crn:
+      name: 'On $K_n$: the network of the previous row'
+      description: On $K_n$, neutral push and pull have the same chain.
+      refs: []
+    relation:
+      kinds: [same-chain, jump-chain]
+      statement: >-
+        The same chain on every graph (pushing node = reproducing individual, target = replaced
+        neighbour). A neutral mutant set $S$ fixes with probability
+        $\sum_{v\in S}1/\deg v \,\big/ \sum_{v}1/\deg v$, its reproductive value under Birth–death,
+        against $\sum_{v\in S}\deg v/2m$ for pull: the push/pull asymmetry of distributed
+        computing is the Birth–death/death–Birth asymmetry of evolutionary graph theory. The two
+        agree on regular graphs; with selection, most random graphs amplify selection under
+        Birth–death and suppress it under death–Birth (Hindersin and Traulsen).
+      conditions:
+        - Neutral; uniform choice of the target among the neighbours.
+        - The CRN counterpart exists only on $K_n$, where push and pull coincide.
+      refs: [SoodAntalRedner2008, Maciejewski2014, HindersinTraulsen2015]
+    leanamics:
+      status: definitional
+      summary: >-
+        Neutral push is the Birth–death Moran kernel with $r = 1$ (`Moran.moranKernel`); its
+        fixation probability is proved exactly on every connected graph, and $k/n$ on regular
+        graphs.
+      correspondence: [Moran.moranKernel]
+      results: [Moran.push_fixation, Moran.push_value_invariant, Moran.isothermal_neutral]
+      packages: [moran]
+      blueprint:
+        - /moran/blueprint/#sec:ars-push-pull
+        - /moran/blueprint/#sec:lhn-isothermal
+      roadmap: [VOT-4, MOR-2]
+    paper:
+      include: false   # merged with the previous row in the paper's table
+
+  # ---------------------------------------------------------------------------------------------
+  - id: moran-selection
+    group: selection
+    title: Birth–death with selection
+    dc:
+      name: Push voter with fitness-biased senders
+      description: >-
+        The sender is drawn with probability proportional to its fitness ($r$ for mutants, $1$ for
+        residents) and pushes its type to a uniformly random neighbour. There is no distributed
+        computing name; algorithmic work studies it under its biological name.
+      refs: [DiazEtAl2014, GalanisEtAl2017]
+    popgen:
+      name: Moran process with Birth–death updating and mutant fitness $r$
+      description: >-
+        "At each time step an individual is chosen for reproduction with a probability
+        proportional to its fitness"; its offspring replaces a neighbour (Lieberman, Hauert and
+        Nowak). On regular graphs, as on $K_n$, $k$ mutants fix with probability
+        $(1 - r^{-k})/(1 - r^{-n})$ from every initial set (the "if" direction of the isothermal
+        theorem). Moran's 1958 model is neutral; on the complete graph with self-loops, with
+        selection by fecundity, Moran (1959) found this fixation probability as a gambler's ruin.
+      refs: [Moran1959, LiebermanHauertNowak2005, HindersinTraulsen2015, GalanisEtAl2017]
+    epi:
+      none: No counterpart.
+    crn:
+      name: 'On $K_n$: $M + W \to 2M$ (rate $r$), $M + W \to 2W$ (rate $1$)'
+      description: Mutant and wild-type molecules converting each other, with rate constants in ratio $r$.
+      refs: []
+    relation:
+      kinds: [same-chain, jump-chain, same-ctmc]
+      statement: >-
+        The same chain on every graph. On $K_n$ every mixed state moves up with probability
+        $r/(1+r)$ among its moves, as the jump chain of the network, so the fixation
+        probabilities agree; the continuous-time process in which each individual reproduces at
+        rate equal to its fitness is the network's chain with rate constants $r/(n-1)$ and
+        $1/(n-1)$ (on $\mathbb Z^d$, and on every regular graph, it is the biased voter, or
+        Williams–Bjerknes, model of probability theory; on irregular graphs that model's
+        per-edge rates give a different chain).
+      conditions:
+        - Parent chosen proportionally to fitness among all individuals, target uniform among its neighbours.
+        - The CRN counterpart exists only on $K_n$.
+        - >-
+          Death–Birth with selection on $K_n$ without self-loops has a state-dependent up/down
+          ratio, so no network of two copying reactions with constant rates has its jump chain;
+          with self-loops (Moran's independent draws) it coincides with Birth–death.
+        - >-
+          The isothermal theorem's informal "only if" needs a minor correction (Galanis et al.,
+          Proposition 12: a non-isothermal weighted graph on three vertices on which a uniformly
+          placed mutant fixes with the Moran probability); its formal statement in Lieberman,
+          Hauert and Nowak's supplement is correct.
+      refs: [HindersinTraulsen2015, GalanisEtAl2017, DurrettMoseley2015]
+    leanamics:
+      status: definitional
+      summary: >-
+        The Birth–death kernel (`Moran.moranKernel`) is the push voter with fitness-biased senders.
+        The library proves the "if" direction of the isothermal theorem, Moran's formula on $K_n$
+        and exact fixation on the star. Networks with unequal rate constants are not formalized
+        (CRN-1 assumes a common rate constant).
+      correspondence: [Moran.moranKernel]
+      results:
+        - Moran.isothermal
+        - Moran.moran_formula
+        - Moran.star_fixation
+        - Moran.star_amplifier
+        - Moran.star_fixation_uniform_tendsto
+      packages: [moran]
+      blueprint:
+        - /moran/blueprint/#sec:lhn-isothermal
+        - /moran/blueprint/#sec:broom-rychtar
+      roadmap: [MOR-1, MOR-2, MOR-3]
+    paper:
+      dc: 'push voter, sender chosen $\propto$ fitness'
+      popgen: 'Moran Birth--death, fitness $r$'
+      epi: '--'
+      crn: 'on $K_n$: $M{+}W\to 2M$ (rate $r$), $M{+}W\to 2W$ (rate 1)'
+      relation: 'same chain; CRN: jump chain'
+      cite:
+        popgen: [Moran1959, LiebermanHauertNowak2005]
+
+  # ---------------------------------------------------------------------------------------------
+  - id: coalescing
+    group: genealogy
+    title: Voter model and coalescing random walks; the coalescent
+    dc:
+      name: Duality of the voter model with coalescing random walks
+      description: >-
+        For every sampling kernel, the synchronous voter after rounds $r_1, \dots, r_T$ is the
+        initial configuration read through $r_1 \circ \cdots \circ r_T$, whose point images are
+        coalescing random walks run backwards in time; from $n$ distinct opinions, consensus time
+        and coalescence time have the same law.
+      refs: [HassinPeleg2001, CooperEtAl2013, BecchettiClementiNatale2020]
+    popgen:
+      name: Genealogy of a sample; Kingman's coalescent
+      description: >-
+        The ancestral lineages of a Wright–Fisher sample are coalescing random walks on $K_N$ with
+        self-loops (each lineage picks a uniform parent). As $N \to \infty$, with time in units of
+        $N$ generations, they converge to Kingman's coalescent, in which every pair of lineages
+        merges at rate 1; the genealogy of the continuous-time Moran model is exactly a
+        time-changed Kingman coalescent for every $N$.
+      refs: [Kingman1982, Kingman1982b, Etheridge2011, Durrett2008]
+    epi:
+      none: No counterpart found.
+    crn:
+      name: Constant-kernel coagulation $A_i + A_j \to A_{i+j}$ (Marcus–Lushnikov)
+      description: >-
+        Clusters merge pairwise at a rate independent of their sizes. Kingman's coalescent is the
+        stochastic coalescent with constant kernel, the Marcus–Lushnikov process up to a
+        rescaling of time (Aldous); its number of clusters is the mass-action chain of
+        $2A \to A$ with propensity $k\binom{a}{2}$.
+      refs: [Aldous1999, Lushnikov1978]
+    relation:
+      kinds: [duality, limit, same-ctmc]
+      statement: >-
+        The duality is exact and pathwise, on every graph and for every sampling kernel, in
+        discrete and in continuous time. The Wright–Fisher genealogy is exactly the coalescing
+        walks on $K_N$ with self-loops (two lineages meet in a generation with probability
+        $1/N$), and Kingman's coalescent is its large-population limit, with multiple and
+        simultaneous mergers vanishing; for coalescing walks on $K_n$ in continuous time, and for
+        the continuous-time Moran model, the number of lineages jumps $k \to k-1$ at a rate
+        proportional to $\binom{k}{2}$, Kingman's coalescent up to a constant time change. The
+        reading of the constant-kernel coalescent as the reaction $2A \to A$ is ours.
+      conditions:
+        - Neutral copying; the duality needs no assumption on the graph or the kernel.
+        - >-
+          Kingman's coalescent is exact only in continuous time (coalescing walks on $K_n$, or the
+          Moran model), and a limit for Wright–Fisher.
+      refs: [Aldous2013, Etheridge2011, Durrett2008, Aldous1999]
+    leanamics:
+      status: partial
+      summary: >-
+        The pathwise duality for every sampling kernel (the configuration after $T$ rounds is the
+        initial one composed with the backward map), its two-token form, and on $K_n$ with
+        self-loops the exact probability $(1 - 1/n)^T$ that two backward walks have not met, i.e.
+        that two Wright–Fisher lineages have not coalesced after $T$ generations. Kingman's
+        coalescent and the coagulation reading are not formalized.
+      correspondence:
+        - Voter.runRounds_eq_comp
+        - Voter.disagreement_runRounds_eq_zero
+        - Voter.iterate_transition_eq_leftRounds
+        - Voter.iterate_disagreement_le_pairWalk
+        - ThreeMajority.voter_dual
+      results:
+        - Voter.expList_backward_ne
+        - Voter.voter_consensus_whp
+        - Voter.lazy_voter_consensus_whp
+        - Voter.plain_voter_consensus_whp
+      packages: [voter, 3-majority]
+      blueprint:
+        - /voter/blueprint/#lem:duality
+        - /voter/blueprint/#sec:kms-meeting-time
+        - /3-majority/blueprint/#sec:bcekmn-any-start
+      roadmap: [VOT-3, VOT-6, MAJ-6]
+    paper:
+      dc: 'voter $\Leftrightarrow$ coalescing random walks'
+      popgen: 'Wright--Fisher genealogy $\to$ Kingman coalescent'
+      epi: '--'
+      crn: 'coagulation, $2A\to A$'
+      relation: 'dual; limit; CRN: CTMC'
+      cite:
+        dc: [HassinPeleg2001]
+        popgen: [Kingman1982]
+        crn: [Aldous1999]
+
+  # ---------------------------------------------------------------------------------------------
+  - id: averaging-migration
+    group: averaging
+    title: Averaging and migration
+    dc:
+      name: Averaging dynamics
+      description: >-
+        Synchronous: every node replaces its value by the average of its neighbours' values,
+        $x(t+1) = P x(t)$ with $P = D^{-1}A$. The random sequential version is gossip averaging
+        (a random edge averages its endpoints).
+      refs: [BecchettiClementiNatale2020, BoydEtAl2006]
+    popgen:
+      name: Migration between demes (without selection and drift)
+      description: >-
+        The allele frequencies of the demes follow $p' = M p$, where $m_{\alpha\beta}$ is the
+        probability that an individual of deme $\alpha$ immigrated from deme $\beta$ (the
+        backward migration matrix, row stochastic).
+      refs: [Burger2014]
+    epi:
+      none: No counterpart found.
+    crn:
+      none: No counterpart found.
+    relation:
+      kinds: [same-recursion]
+      statement: >-
+        The same linear recursion when $M = P$, i.e. when every deme draws its individuals in
+        equal proportions from the neighbouring demes; on a connected non-bipartite graph both
+        converge to the average weighted by the stationary distribution,
+        $\sum_v \deg(v)\, x_0(v)/2m$. In population genetics the recursion is the deterministic
+        (infinitely large demes) part of migration; the same recursion is DeGroot's model of
+        consensus in the social sciences, and the expected configuration of the synchronous voter
+        model follows it too.
+      conditions:
+        - Deterministic recursions; no drift (infinitely large demes) and no selection.
+        - The identification compares the two equations; no source stating it was found.
+      refs: [Burger2014, DeGroot1974, ProskurnikovTempo2017]
+    leanamics:
+      status: results
+      summary: >-
+        Convergence to the degree-weighted average on connected non-bipartite graphs, its spectral
+        rate, and the expected step of sequential averaging; migration is not defined in the
+        library.
+      correspondence: []
+      results:
+        - Averaging.tendsto_degAvg
+        - Averaging.abs_walkMatrix_pow_sub_walkStationary_le
+        - Averaging.Sequential.avg_expect_edgeMatrix
+      packages: [averaging]
+      blueprint:
+        - /averaging/blueprint/#thm:conv
+        - /averaging/blueprint/#sec:lovasz
+        - /averaging/blueprint/#sec:bgps-gossip
+      roadmap: [AVG-1]
+    paper:
+      dc: 'averaging dynamics $x\mapsto Px$'
+      popgen: 'migration $p\mapsto Mp$'
+      epi: '--'
+      crn: '--'
+      relation: 'same recursion'
+      cite:
+        dc: [BoydEtAl2006]
+        popgen: [Burger2014]
+
+  # ---------------------------------------------------------------------------------------------
+  - id: three-majority
+    group: majority
+    title: Majority of three samples (binary 3-Majority)
+    dc:
+      name: 3-Majority dynamics
+      description: >-
+        Synchronous rounds: every node samples three nodes uniformly at random, with replacement
+        and possibly itself, and adopts the majority opinion of the three samples, ignoring its
+        own opinion.
+      refs: [BecchettiEtAl2014, BecchettiClementiNatale2020]
+    popgen:
+      name: Conformist transmission with three models (cultural evolution)
+      description: >-
+        Each naive individual samples three models from the previous generation and acquires a
+        variant held by 3, 2, 1, 0 of them with probability $1$, $\frac23 + \frac D3$,
+        $\frac13 - \frac D3$, $0$, so the variant's frequency follows
+        $p' = p + Dp(1-p)(2p-1)$ (Boyd and Richerson, Eq. 7.1). Individual-based versions sample
+        the three models with replacement from the whole previous generation.
+      refs: [BoydRicherson1985, HenrichBoyd1998, AcerbiMesoudiSmolla2022]
+    epi:
+      none: No counterpart found.
+    crn:
+      none: >-
+        Synchronous rounds. The sequential version updates one agent from three others, an
+        interaction of four agents rather than a standard reaction; Condon et al. call synchronous
+        3-Majority "quite similar" to their trimolecular network with three or more species (next
+        row).
+    relation:
+      kinds: [same-chain, mean-field]
+      statement: >-
+        With $D = 1$ the conformist recursion is $p' = 3p^2 - 2p^3$, the expected one-round map of
+        binary 3-Majority with samples drawn with replacement. In a population of $N$ with
+        non-overlapping generations in which every new individual samples its three models with
+        replacement from the whole previous generation, $D = 1$ gives exactly synchronous binary
+        3-Majority on $K_N$ with self-loops; for $0 \le D \le 1$ the rule adopts the majority of
+        the three with probability $D$ and otherwise copies one of them uniformly (the voter
+        rule). Galam's majority rule of sociophysics, with groups of three, has the same map but
+        updates whole groups at once, so only the mean-field maps agree.
+      conditions:
+        - Two variants (opinions); sampling with replacement from the whole population; $D = 1$.
+        - >-
+          No source in either field cites the other; the identification compares the rules, and
+          the reading of Boyd and Richerson's table as "majority with probability $D$, otherwise
+          copy" is ours.
+      refs: [BoydRicherson1985, AcerbiMesoudiSmolla2022, Galam2002]
+    leanamics:
+      status: results
+      summary: >-
+        The exact expected one-round map $\mathbb E[X_{t+1}] = n(3x^2 - 2x^3)$ (the mean-field
+        identity) and consensus theorems for 3-Majority; conformist transmission is not defined in
+        the library.
+      correspondence: []
+      results:
+        - ThreeMajority.avg_card_step
+        - ThreeMajority.majority3_consensus_whp
+        - Plurality.majority3_vanishing_bias
+        - Plurality.majority3_any_start
+        - Plurality.theorem_3_8
+      packages: [3-majority, plurality]
+      blueprint:
+        - /3-majority/blueprint/#sec:map
+        - /3-majority/blueprint/#sec:main-statement
+        - /plurality/blueprint/#sec:upper
+        - /plurality/blueprint/#sec:any_start
+      roadmap: [MAJ-2, MAJ-7, MAJ-8]
+    paper:
+      dc: '3-Majority, two opinions'
+      popgen: 'conformist transmission, three models'
+      epi: '--'
+      crn: '--'
+      relation: 'same chain; mean field'
+      cite:
+        dc: [BecchettiEtAl2014]
+        popgen: [BoydRicherson1985]
+
+  # ---------------------------------------------------------------------------------------------
+  - id: two-choices
+    group: majority
+    title: Majority of oneself and two samples (2-Choices, binary median rule)
+    dc:
+      name: 2-Choices; with two values, the median rule
+      description: >-
+        A node samples two nodes and adopts their opinion if they agree, otherwise keeps its own:
+        the majority of its own and two sampled opinions (the median of three values). Studied
+        synchronously and sequentially (one activated node per step).
+      refs: [DoerrEtAl2011, BecchettiClementiNatale2020, CooperEtAl2025]
+    popgen:
+      none: >-
+        No counterpart found; conformist transmission uses three models and ignores the learner's
+        own variant (previous row).
+    epi:
+      none: No counterpart found.
+    crn:
+      name: 'Trimolecular approximate majority $2X + Y \to 3X$, $X + 2Y \to 3Y$'
+      description: >-
+        Common rate constant; with $k$ species, $2Z_i + Z_j \to 3Z_i$ for all $i \ne j$.
+      refs: [CondonEtAl2020]
+    relation:
+      kinds: [jump-chain, mean-field]
+      statement: >-
+        Condon et al. note that the binary median rule "involves rules that are identical to the
+        interactions" of this network. In the sequential version on $K_n$, where the activated
+        node samples two distinct other nodes, a node of opinion $j$ switches to $i$ at a rate
+        proportional to $x_j\binom{x_i}{2}$, the propensity of $2Z_i + Z_j \to 3Z_i$: the same
+        jump chain. With samples drawn with replacement the rates are proportional to $x_j x_i^2$
+        instead, a difference of order $1/n$. The synchronous dynamics shares only the mean-field
+        map $3p^2 - 2p^3$ with 3-Majority.
+      conditions:
+        - Complete graph; sequential updates; two distinct samples other than the updating node.
+        - The exact identity is an elementary computation, not stated in the sources.
+      refs: [CondonEtAl2020]
+    leanamics:
+      status: results
+      summary: >-
+        Synchronous 2-Choices and the median rule: the expected one-round map $n(3p^2 - 2p^3)$,
+        consensus from a gap and from any configuration, with an adversary, on expanders and with
+        many colours. The sequential version and the network are not formalized.
+      correspondence: []
+      results:
+        - Median.expected_ones
+        - Median.consensus_whp
+        - Median.binary_any_start
+        - Median.median_consensus_any
+        - Median.binary_almost_stable
+        - Median.two_choices_expander
+        - Median.TwoChoices.plurality_whp
+      packages: [median]
+      blueprint:
+        - /median/blueprint/#sec:dgmss-median
+        - /median/blueprint/#thm:binary-adv
+        - /median/blueprint/#sec:cer-two-choices
+        - /median/blueprint/#sec:efkmt-plurality
+      roadmap: [MAJ-1, MAJ-3, MAJ-4, MAJ-5, MAJ-8]
+    paper:
+      dc: '2-Choices (binary median rule)'
+      popgen: '--'
+      epi: '--'
+      crn: 'sequential: $2X{+}Y\to 3X$, $X{+}2Y\to 3Y$'
+      relation: 'CRN: jump chain'
+      cite:
+        dc: [DoerrEtAl2011]
+        crn: [CondonEtAl2020]
+
+  # ---------------------------------------------------------------------------------------------
+  - id: approximate-majority
+    group: majority
+    title: Sequential undecided-state dynamics and approximate majority
+    dc:
+      name: Sequential undecided-state dynamics, i.e. the approximate-majority population protocol
+      description: >-
+        One uniformly random ordered pair (initiator, responder) of distinct agents per step; a
+        decided responder becomes undecided if the initiator holds the other opinion, and an
+        undecided responder adopts the initiator's opinion. In the undecided-state dynamics the
+        node that samples is the responder. Perron, Vasudevan and Vojnović study the
+        continuous-time version.
+      refs: [AngluinAspnesEisenstat2008, BecchettiClementiNatale2020, ClementiEtAl2018, PerronVasudevanVojnovic2009]
+    popgen:
+      none: No counterpart found.
+    epi:
+      none: No counterpart found.
+    crn:
+      name: 'Approximate-majority network $X + Y \to X + B$, $X + Y \to Y + B$, $B + X \to 2X$, $B + Y \to 2Y$'
+      description: >-
+        Common rate constant. Cardelli and Csikász-Nagy argue that the cell-cycle switch computes
+        it; a variant with $X + Y \to 2B$ was built with DNA strand displacement (Chen et al.).
+      refs: [CardelliCsikaszNagy2012, ChenEtAl2013]
+    relation:
+      kinds: [jump-chain, same-ctmc]
+      statement: >-
+        The ordered pairs that change the configuration have weights $xy$, $yx$, $xb$, $yb$ out of
+        $n(n-1)$, proportional to the mass-action propensities, so the protocol's count chain has
+        the jump chain of the network; when every ordered pair interacts at rate $1/(n-1)$ it is
+        the network's continuous-time chain with rate constant $1/(n-1)$. Angluin, Aspnes and
+        Eisenstat consider "the Population-Protocol model which is, in our specific context,
+        equivalent to the sequential PULL model" (Clementi et al.).
+      conditions:
+        - Complete graph (well mixed), sequential.
+        - >-
+          The synchronous undecided-state dynamics is a different chain (for instance, it can make
+          every node undecided) and has no CRN counterpart; on other interaction graphs the
+          protocol is a graph population protocol, without CRN counterpart.
+      refs: [BecchettiClementiNatale2020, ClementiEtAl2018, Doty2014]
+    leanamics:
+      status: partial
+      summary: >-
+        The network's jump chain equals the population protocol of the network conditioned on
+        reacting (`Crn.ApproxMajority.network_jumpKernel_eq_ppKernel`, a protocol that also draws
+        a uniform reaction); the sequential undecided-state dynamics is defined as Angluin,
+        Aspnes and Eisenstat's protocol, and its convergence and correctness are proved. That the
+        two protocols have the same count chain is not formalized.
+      correspondence: [Crn.ApproxMajority.network_jumpKernel_eq_ppKernel, Undecided.Sequential.step]
+      results:
+        - Undecided.Sequential.consensus_whp
+        - Undecided.Sequential.majority_whp
+        - Undecided.Sequential.approximate_majority
+        - Crn.ApproxMajority.winProb_minority_le_majority
+        - Crn.ApproxMajority.half_le_absorbProb_majority
+      packages: [undecided, crn]
+      blueprint:
+        - /undecided/blueprint/#sec:aae-approx-majority
+        - /crn/blueprint/#thm:am
+        - /crn/blueprint/#sec:mnrs-graph-majority
+      roadmap: [UND-2, CRN-1, CRN-4]
+    paper:
+      dc: 'sequential undecided-state (approximate majority)'
+      popgen: '--'
+      epi: '--'
+      crn: '$X{+}Y\to X{+}B$, $X{+}Y\to Y{+}B$, $B{+}X\to 2X$, $B{+}Y\to 2Y$'
+      relation: 'jump chain'
+      cite:
+        dc: [AngluinAspnesEisenstat2008]
+        crn: [CardelliCsikaszNagy2012]
+
+  # ---------------------------------------------------------------------------------------------
+  - id: population-protocols
+    group: protocols
+    title: Population protocols and bimolecular reaction networks
+    dc:
+      name: Population protocols
+      description: >-
+        Anonymous finite-state agents; one ordered pair of distinct agents interacts per step
+        (uniformly at random in the probabilistic model) and both update by a transition
+        function. Examples formalized here: exact majority with four states on any connected
+        graph (the ambassador protocol, which on $K_n$ has the count chain of binary interval
+        consensus) and deterministic plurality protocols.
+      refs: [AngluinEtAl2006, AngluinEtAl2007, MertziosEtAl2014, BenezitThiranVetterli2009, AlistarhAspnesGelashvili2018, GasieniecEtAl2016]
+    popgen:
+      none: >-
+        No general counterpart; individual protocols on $K_n$ are Moran-type models (the copying
+        rows).
+    epi:
+      none: >-
+        No general counterpart; the SI epidemic and the Daley–Kendall and Maki–Thompson rumour
+        models are instances (spreading rows), while the removal $I \to R$ of the SIR epidemic
+        involves a single agent.
+    crn:
+      name: Stochastic CRNs whose reactions have two reactants and two products
+      description: Mass-action kinetics with a common rate constant, in a volume proportional to $n$.
+      refs: [Doty2014, ChenDotySoloveichik2014, DotyEftekhari2021, SoloveichikEtAl2008]
+    relation:
+      kinds: [jump-chain, same-ctmc]
+      statement: >-
+        The uniformly random pair model "coincides precisely with the model of stochastic chemical
+        kinetics, so long as the CRN's reactions each have two reactants and two products"
+        (Doty). A uniformly random ordered pair of distinct agents has species $\{A, B\}$ with
+        probability $x_A x_B/\binom{n}{2}$, or $\binom{x_A}{2}/\binom{n}{2}$ if $A = B$,
+        proportional to the propensity, so the protocol conditioned on the pair reacting is the
+        jump chain of the network, on count vectors; unequal rate constants correspond to a
+        weighted scheduler. Population protocols stably compute exactly the semilinear
+        predicates, hence so do these networks.
+      conditions:
+        - Common rate constant; Gillespie's propensity $k\binom{x_A}{2}$ for $A + A$.
+        - >-
+          Several reactions with the same reactants (or probabilistic outcomes) need a randomized
+          or initiator/responder protocol; deterministic one-way protocols such as approximate
+          majority use the asymmetry of the pair.
+        - Complete interaction graph; protocols on other graphs have no CRN counterpart.
+      refs: [Doty2014, DotyEftekhari2021, Gillespie1977, AngluinEtAl2006, AngluinEtAl2007]
+    leanamics:
+      status: proved
+      summary: >-
+        The jump chain of mass-action kinetics equals the protocol conditioned on reacting
+        (CRN-1). The easy direction of stable computation (CRN-3): Boolean combinations of
+        threshold and remainder predicates are stably computable, hence stably decided by such
+        networks. Majority on connected graphs with four states, optimal (CRN-4), and
+        deterministic exact majority and plurality (CRN-5) in the same framework.
+      correspondence: [Crn.jumpKernel_eq_ppKernel, Crn.condStep_eq_jumpKernel, Crn.pair_prob_eq_propensity]
+      results:
+        - Crn.IsSemilinearPred.stablyComputable
+        - Crn.IsSemilinearPred.exists_network
+        - Crn.ambassador_graphStablyComputes
+        - Crn.rank_majority_eq_four
+        - Crn.absoluteMajority_stablyComputes
+        - Crn.relativeMajority_stablyMarks
+      packages: [crn]
+      blueprint:
+        - /crn/blueprint/#thm:crn1
+        - /crn/blueprint/#sec:aadfp-stable
+        - /crn/blueprint/#sec:mnrs-graph-majority
+        - /crn/blueprint/#sec:ghmss-exact-majority
+      roadmap: [CRN-1, CRN-3, CRN-4, CRN-5]
+    paper:
+      dc: 'population protocols'
+      popgen: '--'
+      epi: '--'
+      crn: '$A{+}B\to C{+}D$, common rate'
+      relation: 'jump chain'
+      cite:
+        dc: [AngluinEtAl2006]
+        crn: [Doty2014]
+
+  # ---------------------------------------------------------------------------------------------
+  - id: si-rumor
+    group: spreading
+    title: Rumor spreading and the SI epidemic
+    dc:
+      name: Push, pull and push–pull rumor spreading
+      description: >-
+        On $K_n$ every node calls a uniformly random node; the rumor goes from caller to callee
+        (push), from callee to caller (pull), or both (push–pull). Synchronously, in rounds, push
+        informs everybody in $\log_2 n + \ln n + O(1)$ rounds; asynchronously, every node calls at
+        the times of a rate-1 Poisson clock. Demers et al. call anti-entropy, in which sites
+        reconcile their databases with random sites by push, pull or push–pull, a "simple
+        epidemic".
+      refs: [FriezeGrimmett1985, Pittel1987, KarpEtAl2000, DoerrKostrygin2017, DemersEtAl1987, AcanEtAl2017]
+    popgen:
+      none: No counterpart.
+    epi:
+      name: SI epidemic (Bailey's simple stochastic epidemic)
+      description: >-
+        Susceptible and infected individuals, no removal; in continuous time, new infections occur
+        at rate $\beta S I$ (Bailey writes $\beta y(n - y + 1)$, with $y$ the number of
+        susceptibles).
+      refs: [Bailey1950]
+    crn:
+      name: $S + I \to 2I$
+      description: Autocatalytic conversion with mass-action kinetics.
+      refs: [Kahramanogullari2019]
+    relation:
+      kinds: [same-ctmc]
+      statement: >-
+        On $K_n$, asynchronous push and asynchronous pull have exactly the same law: every
+        informed–uninformed pair transmits at rate $1/(n-1)$, so the number of informed nodes is
+        Bailey's simple epidemic with $\beta = 1/(n-1)$, the chain of $S + I \to 2I$ with rate
+        constant $1/(n-1)$; push–pull is the same process at twice the speed. The synchronous
+        protocols are discrete-time SI models with one call per node per round; their spreading
+        times differ ($\log_2 n + \ln n$ for push, $\log_2 n + \log_2 \ln n$ for pull,
+        $\log_3 n + \log_2 \ln n$ for push–pull, up to $O(1)$) and they have no CRN counterpart.
+      conditions:
+        - Complete graph; the identity with the network is for the asynchronous protocols.
+        - >-
+          The jump chain of $S + I \to 2I$ is deterministic (one more infected per reaction), so
+          the correspondence is in the timing, between continuous-time chains.
+        - >-
+          Calls to oneself: Frieze and Grimmett and Karp et al. allow them, as `epidemics/` does;
+          `rumor_spread/` does not. The identification above is an elementary computation, not
+          stated in the sources.
+      refs: [AcanEtAl2017, DemersEtAl1987, Bailey1950]
+    leanamics:
+      status: results
+      summary: >-
+        Synchronous push, pull and push–pull on $K_n$: all nodes informed within $O(\log n)$
+        rounds w.h.p. (`rumor_spread/`), and the sharp times with matching lower bounds
+        (`epidemics/`, Doerr and Kostrygin). The asynchronous protocols and the network are not
+        formalized.
+      correspondence: []
+      results:
+        - RumorPush.push_informs_all_whp
+        - RumorPush.pull_informs_all_whp
+        - RumorPush.pushPull_informs_all_whp
+        - Epidemics.Revisited.push_spreading_tail
+        - Epidemics.Revisited.push_spreading_lower_tail
+        - Epidemics.Revisited.pull_spreading_tail
+        - Epidemics.Revisited.pushPull_spreading_tail
+      packages: [rumor_spread, epidemics]
+      blueprint:
+        - /rumor_spread/blueprint/#sec:main-statement
+        - /rumor_spread/blueprint/#sec:pull
+        - /epidemics/blueprint/#sec:doerr-kostrygin
+        - /epidemics/blueprint/#sec:doerr-kostrygin-lower
+      roadmap: [EPI-5, EPI-8]
+    paper:
+      dc: 'push, pull, push--pull rumor spreading'
+      popgen: '--'
+      epi: 'SI (simple) epidemic'
+      crn: '$S{+}I\to 2I$'
+      relation: 'CTMC (asynchronous)'
+      cite:
+        dc: [KarpEtAl2000]
+        epi: [Bailey1950]
+
+  # ---------------------------------------------------------------------------------------------
+  - id: reed-frost
+    group: spreading
+    title: Reed–Frost epidemic, Independent Cascade and bond percolation
+    dc:
+      name: Independent Cascade model
+      description: >-
+        Synchronous rounds; "When node $v$ first becomes active in step $t$, it is given a single
+        chance to activate each currently inactive neighbor $w$; it succeeds with a probability
+        $p_{v,w}$" (Kempe, Kleinberg and Tardos, who note its study in marketing by Goldenberg,
+        Libai and Muller); used for influence maximization.
+      refs: [KempeKleinbergTardos2003, KempeKleinbergTardos2015, GoldenbergLibaiMuller2001]
+    popgen:
+      none: No counterpart.
+    epi:
+      name: Reed–Frost chain-binomial SIR epidemic (on a graph)
+      description: >-
+        Discrete generations; each infective infects each susceptible neighbour independently
+        with probability $p$, and the infectives of a generation are removed at its end (a fixed
+        infectious period).
+      refs: [Abbey1952, Britton2010, DraiefGaneshMassoulie2008]
+    crn:
+      none: >-
+        Generations are synchronous and the infectious period is fixed. The mass-action SIR
+        network (row sir-kermack-mckendrick) has exponentially distributed infectious periods: a
+        different epidemic, which shares only the large-population final-size equation.
+    relation:
+      kinds: [same-chain, coupling]
+      statement: >-
+        Independent Cascade with $p_{v,w} = p$ on an undirected graph is the Reed–Frost epidemic
+        on that graph (Draief, Ganesh and Massoulié call this rule "the Reed-Frost model"). Both
+        are coupled pathwise with bond percolation: "A node $x$ ends up active if and only if
+        there is a path from some node in $A$ to $x$ consisting entirely of live edges" (Kempe,
+        Kleinberg and Tardos, Claim 2.3), and with one coin per edge the nodes infected in round
+        $t$ are those at distance $t$ from the initial set in the graph of open edges. This is
+        exact because the infectious
+        period is fixed: Grassberger shows that a fixed period gives "precisely the problem of
+        bond percolation" while exponential periods give "neither site nor bond percolation";
+        Newman's 2002 claim of an exact isomorphism for random infectious periods needs a major
+        correction (Kenah and Robins: the mapping gives the right threshold and final size, but not
+        the distribution of outbreak sizes or the probability of an epidemic).
+      conditions:
+        - >-
+          Each edge is tried at most once (after its coin is seen from an infected endpoint, that
+          endpoint is removed), so one coin per edge has the same law as fresh coins.
+        - With asymmetric $p_{v,w}$ the coupling is with directed percolation.
+      refs: [KempeKleinbergTardos2003, DraiefGaneshMassoulie2008, Grassberger1983, Newman2002, KenahRobins2007]
+    leanamics:
+      status: proved
+      summary: >-
+        The pathwise coupling with one coin per edge, and the equality of infection and
+        connection probabilities with i.i.d. coins (EPI-1); subcritical and supercritical
+        outbreaks through percolation (EPI-2, EPI-3, EPI-6). The identity in law between one coin
+        per edge and fresh coins in every round is not formalized.
+      correspondence:
+        - Epidemics.infected_iff
+        - Epidemics.final_recovered_iff
+        - Epidemics.prob_infected_eq_prob_connected
+      results:
+        - Epidemics.reedFrost_subcritical
+        - Epidemics.reedFrost_large_outbreak
+        - Epidemics.swg_reedFrost_subcritical
+        - Epidemics.swg3_reedFrost_subcritical
+      packages: [epidemics]
+      blueprint:
+        - /epidemics/blueprint/#sec:kkt-live-edge
+        - /epidemics/blueprint/#sec:bcdptz-small-world
+        - /epidemics/blueprint/#sec:krivelevich-sudakov
+      roadmap: [EPI-1, EPI-2, EPI-3, EPI-6]
+    paper:
+      dc: 'Independent Cascade'
+      popgen: '--'
+      epi: 'Reed--Frost SIR; bond percolation'
+      crn: '--'
+      relation: 'same chain; coupling'
+      cite:
+        dc: [KempeKleinbergTardos2003]
+        epi: [DraiefGaneshMassoulie2008]
+
+  # ---------------------------------------------------------------------------------------------
+  - id: sir-kermack-mckendrick
+    group: spreading
+    title: Markovian SIR epidemic and the Kermack–McKendrick equations
+    dc:
+      name: Rumor mongering with blind loss of interest
+      description: >-
+        Demers et al.'s "blind" variant: an infective site calls a random site and, whatever the
+        outcome, stops spreading with probability $1/k$ ("coin").
+      refs: [DemersEtAl1987]
+    popgen:
+      none: No counterpart.
+    epi:
+      name: General stochastic epidemic (Markovian SIR) and the Kermack–McKendrick equations
+      description: >-
+        Infection at rate $\beta SI/N$, removal at rate $\gamma I$; the deterministic model
+        $s' = -\beta s i$, $i' = \beta s i - \gamma i$, $r' = \gamma i$, with
+        $R_0 = \beta/\gamma$, has an epidemic ($i$ first increases) iff $R_0 s_0 > 1$, and, when
+        $r_0 = 0$, the final size $s_\infty = s_0 e^{-R_0(1 - s_\infty)}$.
+      refs: [KermackMcKendrick1927, Bartlett1949, Hethcote2000, BrittonPardoux2019]
+    crn:
+      name: '$S + I \to 2I$ (rate $\beta/N$), $I \to R$ (rate $\gamma$)'
+      description: >-
+        Stochastic mass-action kinetics; its deterministic rate equations are Kermack and
+        McKendrick's.
+      refs: [Kahramanogullari2019, Kurtz1972]
+    relation:
+      kinds: [same-ctmc, limit, mean-field]
+      statement: >-
+        The Markovian SIR epidemic is the stochastic mass-action chain of the network, and the
+        Kermack–McKendrick equations are its rate equations; by Kurtz's law of large numbers the
+        scaled counts $(S, I, R)/N$ converge to their solution, uniformly on bounded time
+        intervals. On $K_n$, the asynchronous blind–coin rule (calls at rate 1, removal with
+        probability $1/k$ per call) has the infection rate $SI/(n-1)$ and the removal rate $I/k$
+        of the network with $\beta/N = 1/(n-1)$ and $\gamma = 1/k$, but it is not the same chain
+        (one call can infect the callee and remove the caller); its mean field is
+        Kermack–McKendrick with $R_0 = k$, consistent with the residues simulated by Demers et
+        al. The Reed–Frost epidemic has the same large-population
+        final-size equation $1 - z = e^{-R_0 z}$ but a different law (for instance, a different
+        probability of a major outbreak).
+      conditions:
+        - Well mixed; mass action in volume $N$.
+        - >-
+          The SIR reading of Demers et al.'s blind–coin variant and its mean field are ours; they
+          do not call it SIR.
+      refs: [Kurtz1970, BrittonPardoux2019, Britton2010, vonBahrMartinLof1980]
+    leanamics:
+      status: partial
+      summary: >-
+        Kermack–McKendrick (EPI-7): threshold, peak and final-size equation for every solution.
+        Kurtz's law of large numbers (CRN-2) for the uniformized chain in discrete time, with
+        natural-number rates; the continuous-time chain is not formalized.
+      correspondence: [Epidemics.Kurtz.law_of_large_numbers, Epidemics.Kurtz.tendsto_deviationProb]
+      results:
+        - Epidemics.KermackMcKendrick.IsSolution.initially_increasing_iff
+        - Epidemics.KermackMcKendrick.IsSolution.final_size
+        - Epidemics.KermackMcKendrick.IsSolution.final_size_unique
+        - Epidemics.KermackMcKendrick.IsSolution.exists_peak
+      packages: [epidemics]
+      blueprint:
+        - /epidemics/blueprint/#sec:kermack-mckendrick
+        - /epidemics/blueprint/#sec:kurtz
+      roadmap: [EPI-7, CRN-2]
+    paper:
+      dc: 'rumor mongering (blind)'
+      popgen: '--'
+      epi: 'Markovian SIR; Kermack--McKendrick'
+      crn: '$S{+}I\to 2I$, $I\to R$'
+      relation: 'CTMC; ODE: limit'
+      cite:
+        dc: [DemersEtAl1987]
+        epi: [KermackMcKendrick1927]
+        crn: [Kurtz1970]
+
+  # ---------------------------------------------------------------------------------------------
+  - id: daley-kendall
+    group: spreading
+    title: Rumour models with stifling
+    dc:
+      name: Rumor mongering with feedback loss of interest
+      description: >-
+        Demers et al.'s rumor mongering: "When an active individual makes an unnecessary phone
+        call (the recipient already knows the rumor), then with probability $1/k$ the active
+        individual loses interest in sharing the rumor"; in their mean-field equations the residue
+        (sites never reached) solves $s = e^{-(k+1)(1-s)}$, about 20% for $k = 1$ (their
+        simulation on 1000 sites, in cycles, gives 18%).
+      refs: [DemersEtAl1987]
+    popgen:
+      none: No counterpart.
+    epi:
+      name: Daley–Kendall and Maki–Thompson rumour models
+      description: >-
+        Ignorants, spreaders and stiflers: a spreader meeting an ignorant makes it a spreader, a
+        spreader meeting a stifler becomes a stifler, and when two spreaders meet both become
+        stiflers (Daley–Kendall) or only the initiator does (Maki–Thompson). The fraction never
+        hearing the rumour tends to $0.203$.
+      refs: [DaleyKendall1964, DaleyKendall1965, MakiThompson1973, Sudbury1985]
+    crn:
+      name: 'Daley–Kendall: $X + Y \to 2Y$, $2Y \to 2Z$, $Y + Z \to 2Z$'
+      description: >-
+        Common rate constant (propensities $XY$, $\binom{Y}{2}$, $YZ$); Maki–Thompson replaces
+        $2Y \to 2Z$ by $2Y \to Y + Z$ with propensity $Y(Y-1)$.
+      refs: [LebensztaynRodriguez2025]
+    relation:
+      kinds: [same-ctmc, mean-field]
+      statement: >-
+        The Daley–Kendall model is the stochastic mass-action chain of its network, and the
+        continuous-time Maki–Thompson model that of its own. Demers et al.'s feedback–coin rule
+        with $k = 1$ is Maki–Thompson's rule (the calling spreader stops after reaching a site
+        that already knows), and their mean-field residue $s = e^{-2(1-s)}$ has the root $0.2032$,
+        the limit of both rumour models.
+      conditions:
+        - Well mixed.
+        - >-
+          Demers et al. do not cite Daley–Kendall or Maki–Thompson; the identification of their
+          rule with Maki–Thompson's is ours, and so is the writing of both models as reaction
+          networks, from their transition rates (as tabulated by Lebensztayn and Rodriguez). The original Maki–Thompson model is in discrete time;
+          the continuous-time chain is its modern restatement.
+      refs: [LebensztaynMachadoRodriguez2011, LebensztaynRodriguez2025, Sudbury1985, DemersEtAl1987]
+    leanamics:
+      status: roadmap
+      summary: >-
+        Not formalized; the Daley–Kendall limit is listed as remaining work of CRN-2, whose law of
+        large numbers covers the SIR network.
+      correspondence: []
+      results: []
+      packages: []
+      blueprint: []
+      roadmap: [CRN-2]
+    paper:
+      dc: 'rumor mongering (feedback)'
+      popgen: '--'
+      epi: 'Daley--Kendall rumours'
+      crn: '$X{+}Y\to 2Y$, $2Y\to 2Z$, $Y{+}Z\to 2Z$'
+      relation: 'CTMC; mean field'
+      cite:
+        dc: [DemersEtAl1987]
+        epi: [DaleyKendall1965]
+
+  # ---------------------------------------------------------------------------------------------
+  - id: cobra-bips
+    group: spreading
+    title: COBRA walk and the BIPS epidemic
+    dc:
+      name: Coalescing-branching random walk (COBRA)
+      description: >-
+        Synchronous: every vertex holding the token sends it to $k$ neighbours drawn uniformly
+        with replacement; tokens arriving at the same vertex coalesce.
+      refs: [DuttaEtAl2013, DuttaEtAl2015, CooperRadzikRivera2016]
+    popgen:
+      none: No counterpart.
+    epi:
+      name: BIPS (biased infection with persistent source)
+      description: >-
+        "A discrete epidemic process of the SIS (Susceptible-Infected-Susceptible) type": the
+        source $v$ stays infected, and every other vertex samples $k$ neighbours and is infected
+        in the next round iff one of them is infected now.
+      refs: [CooperRadzikRivera2016]
+    crn:
+      none: Synchronous rounds.
+    relation:
+      kinds: [duality]
+      statement: >-
+        $\Pr(\text{COBRA from } C \text{ has not visited } v \text{ by time } t) =
+        \Pr(C \cap A_t = \emptyset \mid A_0 = \{v\})$ for every set $C$, vertex $v$ and time $t$,
+        where $A_t$ is BIPS with source $v$ (Cooper, Radzik and Rivera, Theorem 4, proved by
+        induction on $t$); pathwise, the two events coincide along reversed rounds (the form
+        proved in the library).
+      conditions:
+        - Same $k$ and the same neighbour sampling in both processes.
+        - >-
+          The source states it for connected regular graphs; neither hypothesis is needed, only a
+          neighbour for every vertex to sample.
+        - >-
+          The identity is about the BIPS state at time $t$; BIPS infection is not monotone, so it
+          does not equate the COBRA hitting time with a first infection time of BIPS.
+      refs: [CooperRadzikRivera2016]
+    leanamics:
+      status: proved
+      summary: >-
+        The duality on every finite graph and for every $k$, pathwise and by time reversal of
+        i.i.d. rounds (EPI-4); the COBRA cover time and the BIPS infection time on regular
+        expanders.
+      correspondence:
+        - Epidemics.cobra_bips_duality
+        - Epidemics.cobra_bips_duality_singleton
+        - Epidemics.cobra_hit_iff_bips_reverse
+      results:
+        - Epidemics.cobra_cover_time
+        - Epidemics.bips_infection_time
+        - Epidemics.cobra_cover_time_branching
+      packages: [epidemics]
+      blueprint:
+        - /epidemics/blueprint/#sec:crr-cobra-bips
+        - /epidemics/blueprint/#sec:crr-cover
+      roadmap: [EPI-4]
+    paper:
+      dc: 'COBRA walk'
+      popgen: '--'
+      epi: 'BIPS (SIS type)'
+      crn: '--'
+      relation: 'dual'
+      cite:
+        dc: [DuttaEtAl2013]
+        epi: [CooperRadzikRivera2016]
+
+paper_caption: >-
+  The same processes under different names. Relation: \emph{same chain} (same transition
+  kernel); \emph{jump chain} (same chain once idle steps are removed: a random time change, which
+  preserves absorption probabilities); \emph{CTMC} (same continuous-time chain up to a constant
+  time factor); \emph{dual} (duality); \emph{coupling} (pathwise); \emph{limit} (large
+  population); \emph{mean field} (same expected one-step map). A CRN is well mixed and fires one
+  reaction at a time, so CRN counterparts exist only on $K_n$ and for sequential dynamics. Lean:
+  \checkmark{} correspondence proved; partial: part of it; def.: one definition under both names;
+  results: results on the columns only; roadmap: not formalized yet. Conditions and references
+  for every cell: project website.
+
+# ------------------------------------------------------------------------------------------------
+# References. `in_paper_bib: true` marks keys of the paper's bibliography; the others carry BibTeX
+# fields when the paper's table cites them. Identifiers were checked against Crossref (DataCite
+# for LIPIcs, Open Library for ISBNs, arXiv for preprints); years are those of the volume.
+references:
+  Abbey1952:
+    authors: H. Abbey
+    year: 1952
+    title: An examination of the Reed-Frost theory of epidemics
+    venue: Human Biology 24(3):201–233
+    pmid: '12990130'
+    no_identifier: no DOI; PubMed 12990130
+  AcanEtAl2017:
+    authors: H. Acan, A. Collevecchio, A. Mehrabian, N. Wormald
+    year: 2017
+    title: On the push&pull protocol for rumor spreading
+    venue: SIAM Journal on Discrete Mathematics 31(2):647–668
+    doi: 10.1137/15M1033113
+  AcerbiMesoudiSmolla2022:
+    authors: A. Acerbi, A. Mesoudi, M. Smolla
+    year: 2022
+    title: 'Individual-Based Models of Cultural Evolution: A Step-by-Step Guide Using R'
+    venue: Routledge
+    doi: 10.4324/9781003282068
+  Aldous1999:
+    authors: D. J. Aldous
+    year: 1999
+    title: >-
+      Deterministic and stochastic models for coalescence (aggregation and coagulation): a review
+      of the mean-field theory for probabilists
+    venue: Bernoulli 5(1):3–48
+    doi: 10.2307/3318611
+    bibtex:
+      type: article
+      author: David J. Aldous
+      title: >-
+        Deterministic and Stochastic Models for Coalescence (Aggregation and Coagulation): A
+        Review of the Mean-Field Theory for Probabilists
+      journal: Bernoulli
+      volume: '5'
+      number: '1'
+      pages: 3--48
+      year: '1999'
+      doi: 10.2307/3318611
+  Aldous2013:
+    authors: D. Aldous
+    year: 2013
+    title: Interacting particle systems as stochastic social dynamics
+    venue: Bernoulli 19(4):1122–1149
+    doi: 10.3150/12-BEJSP04
+  AlistarhAspnesGelashvili2018:
+    authors: D. Alistarh, J. Aspnes, R. Gelashvili
+    year: 2018
+    title: Space-optimal majority in population protocols
+    venue: SODA 2018, 2221–2239
+    doi: 10.1137/1.9781611975031.144
+  AngluinAspnesEisenstat2008:
+    authors: D. Angluin, J. Aspnes, D. Eisenstat
+    year: 2008
+    title: A simple population protocol for fast robust approximate majority
+    venue: Distributed Computing 21(2):87–102
+    doi: 10.1007/s00446-008-0059-z
+    in_paper_bib: true
+  AngluinEtAl2006:
+    authors: D. Angluin, J. Aspnes, Z. Diamadi, M. J. Fischer, R. Peralta
+    year: 2006
+    title: Computation in networks of passively mobile finite-state sensors
+    venue: Distributed Computing 18(4):235–253
+    doi: 10.1007/s00446-005-0138-3
+    bibtex:
+      type: article
+      author: Dana Angluin and James Aspnes and Zo{\"e} Diamadi and Michael J. Fischer and Ren{\'e} Peralta
+      title: Computation in networks of passively mobile finite-state sensors
+      journal: Distributed Computing
+      volume: '18'
+      number: '4'
+      pages: 235--253
+      year: '2006'
+      doi: 10.1007/s00446-005-0138-3
+  AngluinEtAl2007:
+    authors: D. Angluin, J. Aspnes, D. Eisenstat, E. Ruppert
+    year: 2007
+    title: The computational power of population protocols
+    venue: Distributed Computing 20(4):279–304
+    doi: 10.1007/s00446-007-0040-2
+  AntalRednerSood2006:
+    authors: T. Antal, S. Redner, V. Sood
+    year: 2006
+    title: Evolutionary dynamics on degree-heterogeneous graphs
+    venue: Physical Review Letters 96:188104
+    doi: 10.1103/PhysRevLett.96.188104
+    in_paper_bib: true
+  AvenaEtAl2024:
+    authors: L. Avena, R. Baldasso, R. S. Hazra, F. den Hollander, M. Quattropani
+    year: 2024
+    title: Discordant edges for the voter model on regular random graphs
+    venue: ALEA Latin American Journal of Probability and Mathematical Statistics 21:431ff
+    doi: 10.30757/ALEA.v21-18
+  Bailey1950:
+    authors: N. T. J. Bailey
+    year: 1950
+    title: A simple stochastic epidemic
+    venue: Biometrika 37(3/4):193–202
+    doi: 10.1093/biomet/37.3-4.193
+    bibtex:
+      type: article
+      author: Norman T. J. Bailey
+      title: A simple stochastic epidemic
+      journal: Biometrika
+      volume: '37'
+      number: 3/4
+      pages: 193--202
+      year: '1950'
+      doi: 10.1093/biomet/37.3-4.193
+  Bartlett1949:
+    authors: M. S. Bartlett
+    year: 1949
+    title: Some evolutionary stochastic processes
+    venue: Journal of the Royal Statistical Society, Series B 11(2):211–229
+    doi: 10.1111/j.2517-6161.1949.tb00031.x
+  BecchettiClementiNatale2020:
+    authors: L. Becchetti, A. Clementi, E. Natale
+    year: 2020
+    title: 'Consensus dynamics: an overview'
+    venue: ACM SIGACT News 51(1):58–104
+    doi: 10.1145/3388392.3388403
+    in_paper_bib: true
+  BecchettiEtAl2014:
+    authors: L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri, L. Trevisan
+    year: 2014
+    title: Simple dynamics for plurality consensus
+    venue: SPAA 2014, 247–256
+    doi: 10.1145/2612669.2612677
+    in_paper_bib: true
+  BenezitThiranVetterli2009:
+    authors: F. Bénézit, P. Thiran, M. Vetterli
+    year: 2009
+    title: 'Interval consensus: from quantized gossip to voting'
+    venue: IEEE ICASSP 2009, 3661–3664
+    doi: 10.1109/ICASSP.2009.4960420
+  BoydEtAl2006:
+    authors: S. Boyd, A. Ghosh, B. Prabhakar, D. Shah
+    year: 2006
+    title: Randomized gossip algorithms
+    venue: IEEE Transactions on Information Theory 52(6):2508–2530
+    doi: 10.1109/TIT.2006.874516
+    bibtex:
+      type: article
+      author: Stephen Boyd and Arpita Ghosh and Balaji Prabhakar and Devavrat Shah
+      title: Randomized gossip algorithms
+      journal: IEEE Transactions on Information Theory
+      volume: '52'
+      number: '6'
+      pages: 2508--2530
+      year: '2006'
+      doi: 10.1109/TIT.2006.874516
+  BoydRicherson1985:
+    authors: R. Boyd, P. J. Richerson
+    year: 1985
+    title: Culture and the Evolutionary Process
+    venue: University of Chicago Press (Chapter 7, Eq. 7.1, Table 7.1)
+    isbn: 978-0-226-06931-9
+    bibtex:
+      type: book
+      author: Robert Boyd and Peter J. Richerson
+      title: Culture and the Evolutionary Process
+      publisher: University of Chicago Press
+      address: Chicago
+      year: '1985'
+      note: ISBN 978-0-226-06931-9
+  Britton2010:
+    authors: T. Britton
+    year: 2010
+    title: 'Stochastic epidemic models: a survey'
+    venue: Mathematical Biosciences 225(1):24–35
+    doi: 10.1016/j.mbs.2010.01.006
+  BrittonPardoux2019:
+    authors: T. Britton, E. Pardoux (eds.)
+    year: 2019
+    title: Stochastic Epidemic Models with Inference
+    venue: Lecture Notes in Mathematics 2255, Springer
+    doi: 10.1007/978-3-030-30900-8
+  Burger2014:
+    authors: R. Bürger
+    year: 2014
+    title: A survey of migration-selection models in population genetics
+    venue: Discrete and Continuous Dynamical Systems B 19(4):883–959
+    doi: 10.3934/dcdsb.2014.19.883
+    bibtex:
+      type: article
+      author: Reinhard B{\"u}rger
+      title: A survey of migration-selection models in population genetics
+      journal: Discrete and Continuous Dynamical Systems - Series B
+      volume: '19'
+      number: '4'
+      pages: 883--959
+      year: '2014'
+      doi: 10.3934/dcdsb.2014.19.883
+  CardelliCsikaszNagy2012:
+    authors: L. Cardelli, A. Csikász-Nagy
+    year: 2012
+    title: The cell cycle switch computes approximate majority
+    venue: Scientific Reports 2:656
+    doi: 10.1038/srep00656
+    bibtex:
+      type: article
+      author: Luca Cardelli and Attila Csik{\'a}sz-Nagy
+      title: The Cell Cycle Switch Computes Approximate Majority
+      journal: Scientific Reports
+      volume: '2'
+      pages: '656'
+      year: '2012'
+      doi: 10.1038/srep00656
+  ChenDotySoloveichik2014:
+    authors: H.-L. Chen, D. Doty, D. Soloveichik
+    year: 2014
+    title: Deterministic function computation with chemical reaction networks
+    venue: Natural Computing 13(4):517–534
+    doi: 10.1007/s11047-013-9393-6
+  ChenEtAl2013:
+    authors: Y.-J. Chen, N. Dalchau, N. Srinivas, A. Phillips, L. Cardelli, D. Soloveichik, G. Seelig
+    year: 2013
+    title: Programmable chemical controllers made from DNA
+    venue: Nature Nanotechnology 8(10):755–762
+    doi: 10.1038/nnano.2013.189
+  ClementiEtAl2018:
+    authors: A. Clementi, M. Ghaffari, L. Gualà, E. Natale, F. Pasquale, G. Scornavacca
+    year: 2018
+    title: A tight analysis of the parallel undecided-state dynamics with two colors
+    venue: MFCS 2018, LIPIcs 117, 28
+    doi: 10.4230/LIPIcs.MFCS.2018.28
+  CondonEtAl2020:
+    authors: A. Condon, M. Hajiaghayi, D. Kirkpatrick, J. Maňuch
+    year: 2020
+    title: Approximate majority analyses using tri-molecular chemical reaction networks
+    venue: Natural Computing 19(1):249–270
+    doi: 10.1007/s11047-019-09756-4
+    bibtex:
+      type: article
+      author: Anne Condon and Monir Hajiaghayi and David Kirkpatrick and J{\'a}n Ma{\v{n}}uch
+      title: Approximate majority analyses using tri-molecular chemical reaction networks
+      journal: Natural Computing
+      volume: '19'
+      number: '1'
+      pages: 249--270
+      year: '2020'
+      doi: 10.1007/s11047-019-09756-4
+  CooperEtAl2013:
+    authors: C. Cooper, R. Elsässer, H. Ono, T. Radzik
+    year: 2013
+    title: Coalescing random walks and voting on connected graphs
+    venue: SIAM Journal on Discrete Mathematics 27(4):1748–1758
+    doi: 10.1137/120900368
+  CooperEtAl2025:
+    authors: C. Cooper, F. Mallmann-Trenn, T. Radzik, N. Shimizu, T. Shiraga
+    year: 2025
+    title: Asynchronous 3-Majority dynamics with many opinions
+    venue: SODA 2025, 4095–4131
+    doi: 10.1137/1.9781611978322.140
+    in_paper_bib: true
+  CooperRadzikRivera2016:
+    authors: C. Cooper, T. Radzik, N. Rivera
+    year: 2016
+    title: The coalescing-branching random walk on expanders and the dual epidemic process
+    venue: PODC 2016, 461–467
+    doi: 10.1145/2933057.2933119
+    arxiv: '1602.05768'
+    bibtex:
+      type: inproceedings
+      author: Colin Cooper and Tomasz Radzik and Nicol{\'a}s Rivera
+      title: The Coalescing-Branching Random Walk on Expanders and the Dual Epidemic Process
+      booktitle: Proceedings of the ACM Symposium on Principles of Distributed Computing (PODC)
+      pages: 461--467
+      year: '2016'
+      doi: 10.1145/2933057.2933119
+  DaleyKendall1964:
+    authors: D. J. Daley, D. G. Kendall
+    year: 1964
+    title: Epidemics and rumours
+    venue: Nature 204:1118
+    doi: 10.1038/2041118a0
+  DaleyKendall1965:
+    authors: D. J. Daley, D. G. Kendall
+    year: 1965
+    title: Stochastic rumours
+    venue: IMA Journal of Applied Mathematics 1(1):42–55
+    doi: 10.1093/imamat/1.1.42
+    bibtex:
+      type: article
+      author: D. J. Daley and D. G. Kendall
+      title: Stochastic Rumours
+      journal: IMA Journal of Applied Mathematics
+      volume: '1'
+      number: '1'
+      pages: 42--55
+      year: '1965'
+      doi: 10.1093/imamat/1.1.42
+  DeGroot1974:
+    authors: M. H. DeGroot
+    year: 1974
+    title: Reaching a consensus
+    venue: Journal of the American Statistical Association 69(345):118–121
+    doi: 10.1080/01621459.1974.10480137
+  DemersEtAl1987:
+    authors: A. Demers, D. Greene, C. Hauser, W. Irish, J. Larson, S. Shenker, H. Sturgis, D. Swinehart, D. Terry
+    year: 1987
+    title: Epidemic algorithms for replicated database maintenance
+    venue: PODC 1987, 1–12
+    doi: 10.1145/41840.41841
+    bibtex:
+      type: inproceedings
+      author: >-
+        Alan Demers and Dan Greene and Carl Hauser and Wes Irish and John Larson and Scott
+        Shenker and Howard Sturgis and Dan Swinehart and Doug Terry
+      title: Epidemic algorithms for replicated database maintenance
+      booktitle: Proceedings of the Sixth Annual ACM Symposium on Principles of Distributed Computing (PODC)
+      pages: 1--12
+      year: '1987'
+      doi: 10.1145/41840.41841
+  DiazEtAl2014:
+    authors: J. Díaz, L. A. Goldberg, G. B. Mertzios, D. Richerby, M. Serna, P. G. Spirakis
+    year: 2014
+    title: Approximating fixation probabilities in the generalized Moran process
+    venue: Algorithmica 69(1):78–91
+    doi: 10.1007/s00453-012-9722-7
+  DoerrEtAl2011:
+    authors: B. Doerr, L. A. Goldberg, L. Minder, T. Sauerwald, C. Scheideler
+    year: 2011
+    title: Stabilizing consensus with the power of two choices
+    venue: SPAA 2011, 149–158
+    doi: 10.1145/1989493.1989516
+    in_paper_bib: true
+  DoerrKostrygin2017:
+    authors: B. Doerr, A. Kostrygin
+    year: 2017
+    title: Randomized rumor spreading revisited
+    venue: ICALP 2017, LIPIcs 80, 138
+    doi: 10.4230/LIPIcs.ICALP.2017.138
+    in_paper_bib: true
+  Doty2014:
+    authors: D. Doty
+    year: 2014
+    title: Timing in chemical reaction networks
+    venue: SODA 2014, 772–784
+    doi: 10.1137/1.9781611973402.57
+    arxiv: '1304.0872'
+    bibtex:
+      type: inproceedings
+      author: David Doty
+      title: Timing in chemical reaction networks
+      booktitle: Proceedings of the 25th Annual ACM-SIAM Symposium on Discrete Algorithms (SODA)
+      pages: 772--784
+      year: '2014'
+      doi: 10.1137/1.9781611973402.57
+  DotyEftekhari2021:
+    authors: D. Doty, M. Eftekhari
+    year: 2021
+    title: A survey of size counting in population protocols
+    venue: Theoretical Computer Science 894:91–102
+    doi: 10.1016/j.tcs.2021.08.038
+  DraiefGaneshMassoulie2008:
+    authors: M. Draief, A. Ganesh, L. Massoulié
+    year: 2008
+    title: Thresholds for virus spread on networks
+    venue: Annals of Applied Probability 18(2):359–378
+    doi: 10.1214/07-AAP470
+    bibtex:
+      type: article
+      author: Moez Draief and Ayalvadi Ganesh and Laurent Massouli{\'e}
+      title: Thresholds for virus spread on networks
+      journal: The Annals of Applied Probability
+      volume: '18'
+      number: '2'
+      pages: 359--378
+      year: '2008'
+      doi: 10.1214/07-AAP470
+  Durrett2008:
+    authors: R. Durrett
+    year: 2008
+    title: Probability Models for DNA Sequence Evolution (2nd ed.)
+    venue: Springer
+    doi: 10.1007/978-0-387-78168-6
+  DurrettMoseley2015:
+    authors: R. Durrett, S. Moseley
+    year: 2015
+    title: 'Spatial Moran models I. Stochastic tunneling in the neutral case'
+    venue: Annals of Applied Probability 25(1):104–115
+    doi: 10.1214/13-AAP989
+  DuttaEtAl2013:
+    authors: C. Dutta, G. Pandurangan, R. Rajaraman, S. Roche
+    year: 2013
+    title: Coalescing-branching random walks on graphs
+    venue: SPAA 2013, 176–185
+    doi: 10.1145/2486159.2486197
+    bibtex:
+      type: inproceedings
+      author: Chinmoy Dutta and Gopal Pandurangan and Rajmohan Rajaraman and Scott Roche
+      title: Coalescing-branching random walks on graphs
+      booktitle: Proceedings of the 25th ACM Symposium on Parallelism in Algorithms and Architectures (SPAA)
+      pages: 176--185
+      year: '2013'
+      doi: 10.1145/2486159.2486197
+  DuttaEtAl2015:
+    authors: C. Dutta, G. Pandurangan, R. Rajaraman, S. Roche
+    year: 2015
+    title: Coalescing-branching random walks on graphs
+    venue: ACM Transactions on Parallel Computing 2(3)
+    doi: 10.1145/2817830
+  Etheridge2011:
+    authors: A. Etheridge
+    year: 2011
+    title: Some Mathematical Models from Population Genetics
+    venue: Lecture Notes in Mathematics 2012, Springer
+    doi: 10.1007/978-3-642-16632-7
+  FriezeGrimmett1985:
+    authors: A. M. Frieze, G. R. Grimmett
+    year: 1985
+    title: The shortest-path problem for graphs with random arc-lengths
+    venue: Discrete Applied Mathematics 10(1):57–77
+    doi: 10.1016/0166-218X(85)90059-9
+    in_paper_bib: true
+  Galam2002:
+    authors: S. Galam
+    year: 2002
+    title: Minority opinion spreading in random geometry
+    venue: European Physical Journal B 25(4):403–406
+    doi: 10.1140/epjb/e20020045
+  GalanisEtAl2017:
+    authors: A. Galanis, A. Göbel, L. A. Goldberg, J. Lapinskas, D. Richerby
+    year: 2017
+    title: Amplifiers for the Moran process
+    venue: Journal of the ACM 64(1)
+    doi: 10.1145/3019609
+    in_paper_bib: true
+  GasieniecEtAl2016:
+    authors: L. Gąsieniec, D. Hamilton, R. Martin, P. G. Spirakis, G. Stachowiak
+    year: 2016
+    title: Deterministic population protocols for exact majority and plurality
+    venue: OPODIS 2016, LIPIcs 70, 14
+    doi: 10.4230/LIPIcs.OPODIS.2016.14
+  Hethcote2000:
+    authors: H. W. Hethcote
+    year: 2000
+    title: The mathematics of infectious diseases
+    venue: SIAM Review 42(4):599–653
+    doi: 10.1137/S0036144500371907
+  HassinPeleg2001:
+    authors: Y. Hassin, D. Peleg
+    year: 2001
+    title: Distributed probabilistic polling and applications to proportionate agreement
+    venue: Information and Computation 171(2):248–268
+    doi: 10.1006/inco.2001.3088
+    in_paper_bib: true
+  HenrichBoyd1998:
+    authors: J. Henrich, R. Boyd
+    year: 1998
+    title: The evolution of conformist transmission and the emergence of between-group differences
+    venue: Evolution and Human Behavior 19(4):215–241
+    doi: 10.1016/S1090-5138(98)00018-X
+  HindersinTraulsen2015:
+    authors: L. Hindersin, A. Traulsen
+    year: 2015
+    title: >-
+      Most undirected random graphs are amplifiers of selection for Birth-death dynamics, but
+      suppressors of selection for death-Birth dynamics
+    venue: PLOS Computational Biology 11(11):e1004437
+    doi: 10.1371/journal.pcbi.1004437
+    in_paper_bib: true
+  Kahramanogullari2019:
+    authors: O. Kahramanoğulları
+    year: 2019
+    title: On quantitative comparison of chemical reaction network models
+    venue: EPTCS 296:14–27
+    doi: 10.4204/EPTCS.296.5
+  KarpEtAl2000:
+    authors: R. Karp, C. Schindelhauer, S. Shenker, B. Vöcking
+    year: 2000
+    title: Randomized rumor spreading
+    venue: FOCS 2000, 565–574
+    doi: 10.1109/SFCS.2000.892324
+    in_paper_bib: true
+  KempeKleinbergTardos2003:
+    authors: D. Kempe, J. Kleinberg, É. Tardos
+    year: 2003
+    title: Maximizing the spread of influence through a social network
+    venue: KDD 2003, 137–146
+    doi: 10.1145/956750.956769
+    in_paper_bib: true
+  KempeKleinbergTardos2015:
+    authors: D. Kempe, J. Kleinberg, É. Tardos
+    year: 2015
+    title: Maximizing the spread of influence through a social network
+    venue: Theory of Computing 11:105–147
+    doi: 10.4086/toc.2015.v011a004
+  KenahRobins2007:
+    authors: E. Kenah, J. M. Robins
+    year: 2007
+    title: Second look at the spread of epidemics on networks
+    venue: Physical Review E 76:036113
+    doi: 10.1103/PhysRevE.76.036113
+  KermackMcKendrick1927:
+    authors: W. O. Kermack, A. G. McKendrick
+    year: 1927
+    title: A contribution to the mathematical theory of epidemics
+    venue: Proceedings of the Royal Society A 115(772):700–721
+    doi: 10.1098/rspa.1927.0118
+    bibtex:
+      type: article
+      author: William Ogilvy Kermack and A. G. McKendrick
+      title: A contribution to the mathematical theory of epidemics
+      journal: Proceedings of the Royal Society of London. Series A
+      volume: '115'
+      number: '772'
+      pages: 700--721
+      year: '1927'
+      doi: 10.1098/rspa.1927.0118
+  Kingman1982:
+    authors: J. F. C. Kingman
+    year: 1982
+    title: The coalescent
+    venue: Stochastic Processes and their Applications 13(3):235–248
+    doi: 10.1016/0304-4149(82)90011-4
+    bibtex:
+      type: article
+      author: J. F. C. Kingman
+      title: The coalescent
+      journal: Stochastic Processes and their Applications
+      volume: '13'
+      number: '3'
+      pages: 235--248
+      year: '1982'
+      doi: 10.1016/0304-4149(82)90011-4
+  Kingman1982b:
+    authors: J. F. C. Kingman
+    year: 1982
+    title: On the genealogy of large populations
+    venue: Journal of Applied Probability 19(A):27–43
+    doi: 10.2307/3213548
+  Gillespie1977:
+    authors: D. T. Gillespie
+    year: 1977
+    title: Exact stochastic simulation of coupled chemical reactions
+    venue: Journal of Physical Chemistry 81(25):2340–2361
+    doi: 10.1021/j100540a008
+  GoldenbergLibaiMuller2001:
+    authors: J. Goldenberg, B. Libai, E. Muller
+    year: 2001
+    title: 'Talk of the network: a complex systems look at the underlying process of word-of-mouth'
+    venue: Marketing Letters 12(3):211–223
+    doi: 10.1023/A:1011122126881
+  Grassberger1983:
+    authors: P. Grassberger
+    year: 1983
+    title: On the critical behavior of the general epidemic process and dynamical percolation
+    venue: Mathematical Biosciences 63(2):157–172
+    doi: 10.1016/0025-5564(82)90036-0
+  Kurtz1970:
+    authors: T. G. Kurtz
+    year: 1970
+    title: Solutions of ordinary differential equations as limits of pure jump Markov processes
+    venue: Journal of Applied Probability 7(1):49–58
+    doi: 10.2307/3212147
+    bibtex:
+      type: article
+      author: Thomas G. Kurtz
+      title: Solutions of ordinary differential equations as limits of pure jump {M}arkov processes
+      journal: Journal of Applied Probability
+      volume: '7'
+      number: '1'
+      pages: 49--58
+      year: '1970'
+      doi: 10.2307/3212147
+  Kurtz1972:
+    authors: T. G. Kurtz
+    year: 1972
+    title: The relationship between stochastic and deterministic models for chemical reactions
+    venue: Journal of Chemical Physics 57(7):2976–2978
+    doi: 10.1063/1.1678692
+  LebensztaynMachadoRodriguez2011:
+    authors: E. Lebensztayn, F. P. Machado, P. M. Rodríguez
+    year: 2011
+    title: Limit theorems for a general stochastic rumour model
+    venue: SIAM Journal on Applied Mathematics 71(4):1476–1486
+    doi: 10.1137/100819588
+  LebensztaynRodriguez2025:
+    authors: E. Lebensztayn, P. M. Rodriguez
+    year: 2025
+    title: The maximum proportion of spreaders in stochastic rumor models
+    venue: arXiv preprint
+    arxiv: '2507.07914'
+  LiebermanHauertNowak2005:
+    authors: E. Lieberman, C. Hauert, M. A. Nowak
+    year: 2005
+    title: Evolutionary dynamics on graphs
+    venue: Nature 433:312–316
+    doi: 10.1038/nature03204
+    in_paper_bib: true
+  Lushnikov1978:
+    authors: A. A. Lushnikov
+    year: 1978
+    title: Coagulation in finite systems
+    venue: Journal of Colloid and Interface Science 65(2):276–285
+    doi: 10.1016/0021-9797(78)90158-3
+  Maciejewski2014:
+    authors: W. Maciejewski
+    year: 2014
+    title: Reproductive value in graph-structured populations
+    venue: Journal of Theoretical Biology 340:285–293
+    doi: 10.1016/j.jtbi.2013.09.032
+  MakiThompson1973:
+    authors: D. P. Maki, M. Thompson
+    year: 1973
+    title: >-
+      Mathematical Models and Applications, with Emphasis on the Social, Life, and Management
+      Sciences
+    venue: Prentice-Hall
+    isbn: 978-0-13-561670-3
+  MertziosEtAl2014:
+    authors: G. B. Mertzios, S. E. Nikoletseas, C. L. Raptopoulos, P. G. Spirakis
+    year: 2014
+    title: Determining majority in networks with local interactions and very small local memory
+    venue: ICALP 2014, LNCS 8572, 871–882 (Distributed Computing 30(1):1–16, 2017)
+    doi: 10.1007/978-3-662-43948-7_72
+  Moran1958:
+    authors: P. A. P. Moran
+    year: 1958
+    title: Random processes in genetics
+    venue: Mathematical Proceedings of the Cambridge Philosophical Society 54:60–71
+    doi: 10.1017/S0305004100033193
+    in_paper_bib: true
+  Moran1959:
+    authors: P. A. P. Moran
+    year: 1959
+    title: The survival of a mutant gene under selection
+    venue: Journal of the Australian Mathematical Society 1(1):121–126
+    doi: 10.1017/S1446788700025155
+    bibtex:
+      type: article
+      author: P. A. P. Moran
+      title: The survival of a mutant gene under selection
+      journal: Journal of the Australian Mathematical Society
+      volume: '1'
+      number: '1'
+      pages: 121--126
+      year: '1959'
+      doi: 10.1017/S1446788700025155
+  Newman2002:
+    authors: M. E. J. Newman
+    year: 2002
+    title: Spread of epidemic disease on networks
+    venue: Physical Review E 66:016128
+    doi: 10.1103/PhysRevE.66.016128
+  OhtsukiEtAl2006:
+    authors: H. Ohtsuki, C. Hauert, E. Lieberman, M. A. Nowak
+    year: 2006
+    title: A simple rule for the evolution of cooperation on graphs and social networks
+    venue: Nature 441:502–505
+    doi: 10.1038/nature04605
+  PerronVasudevanVojnovic2009:
+    authors: E. Perron, D. Vasudevan, M. Vojnović
+    year: 2009
+    title: Using three states for binary consensus on complete graphs
+    venue: IEEE INFOCOM 2009, 2527–2535
+    doi: 10.1109/INFCOM.2009.5062181
+  Pittel1987:
+    authors: B. Pittel
+    year: 1987
+    title: On spreading a rumor
+    venue: SIAM Journal on Applied Mathematics 47(1):213–223
+    doi: 10.1137/0147013
+    in_paper_bib: true
+  ProskurnikovTempo2017:
+    authors: A. V. Proskurnikov, R. Tempo
+    year: 2017
+    title: A tutorial on modeling and analysis of dynamic social networks. Part I
+    venue: Annual Reviews in Control 43:65–79
+    doi: 10.1016/j.arcontrol.2017.03.002
+  SoloveichikEtAl2008:
+    authors: D. Soloveichik, M. Cook, E. Winfree, J. Bruck
+    year: 2008
+    title: Computation with finite stochastic chemical reaction networks
+    venue: Natural Computing 7(4):615–633
+    doi: 10.1007/s11047-008-9067-y
+  SoodAntalRedner2008:
+    authors: V. Sood, T. Antal, S. Redner
+    year: 2008
+    title: Voter models on heterogeneous networks
+    venue: Physical Review E 77:041121
+    doi: 10.1103/PhysRevE.77.041121
+  Sudbury1985:
+    authors: A. Sudbury
+    year: 1985
+    title: The proportion of the population never hearing a rumour
+    venue: Journal of Applied Probability 22(2):443–446
+    doi: 10.2307/3213787
+  vonBahrMartinLof1980:
+    authors: B. von Bahr, A. Martin-Löf
+    year: 1980
+    title: Threshold limit theorems for some epidemic processes
+    venue: Advances in Applied Probability 12(2):319–349
+    doi: 10.2307/1426600
+  Wright1931:
+    authors: S. Wright
+    year: 1931
+    title: Evolution in Mendelian populations
+    venue: Genetics 16(2):97–159
+    doi: 10.1093/genetics/16.2.97
+    bibtex:
+      type: article
+      author: Sewall Wright
+      title: Evolution in {Mendelian} populations
+      journal: Genetics
+      volume: '16'
+      number: '2'
+      pages: 97--159
+      year: '1931'
+      doi: 10.1093/genetics/16.2.97
