@@ -3,7 +3,7 @@
 Where the statements and proofs of `3-majority/` deviate from their sources, and why. The
 two-opinion theorem `majority3_consensus_whp` follows no specific paper (its own proof is in
 [latex/three_majority.tex](latex/three_majority.tex)), so this file covers the multi-colour
-results of roadmap MAJ-6 (b).
+results of roadmap MAJ-6 (b) and MAJ-12 (a).
 
 ## 3-Majority from any configuration (`AnyStart*`, roadmap MAJ-6 (b))
 
@@ -12,14 +12,17 @@ breaking symmetry in consensus*, PODC 2017, cited below as BCEKMN17, with the nu
 arXiv:1702.04921 (v1): Theorem 4 (Section 3, proof in Appendix A.7), the comparison framework of
 Sections 2.1 to 2.3 (Definitions 1 and 2, Proposition 1, Theorem 2) and Lemmas 2 to 4.
 
-**The result is conditional on a cited theorem that is not formalized.** The second phase of the
-proof of Theorem 4 applies Theorem 3.1 of Becchetti, Clementi, Natale, Pasquale, Trevisan,
-*Stabilizing consensus with many opinions*, SODA 2016, arXiv:1508.06782 (restated as Theorem 8
-of BCEKMN17). That theorem is not part of BCEKMN17 and is not formalized in this repository
-(it is roadmap MAJ-12 (a)). The main theorem `threeMaj_anyStart_consensus` takes it as the
-explicit hypothesis `Bcnpt16Phase2 (1/24)`, exactly as the paper's proof uses it; everything
-else (the comparison framework, Lemmas 2 to 4, Phase 1 and the assembly of the two phases) is
-proved. See difference 5 below for how the hypothesis is stated.
+**The result is unconditional; the cited Phase 2 result is formalized separately.** The second
+phase of the proof of Theorem 4 applies Theorem 3.1 of Becchetti, Clementi, Natale, Pasquale,
+Trevisan, *Stabilizing consensus with many opinions*, SODA 2016, arXiv:1508.06782 (restated as
+Theorem 8 of BCEKMN17). That theorem is not part of BCEKMN17; it is formalized in this package
+(roadmap MAJ-12 (a), [next section](#3-majority-with-many-opinions-manyopinions-roadmap-maj-12-a)).
+The bridge theorem `threeMaj_anyStart_consensus` takes it as the explicit hypothesis
+`Bcnpt16Phase2 (1/24)`, exactly as the paper's proof uses it (see difference 5 below for how the
+hypothesis is stated), and `threeMaj_anyStart_consensus_unconditional` discharges that hypothesis
+with `bcnpt16Phase2_of_pos`, which proves `Bcnpt16Phase2 ε` for every `ε > 0`. Everything else
+(the comparison framework, Lemmas 2 to 4, Phase 1 and the assembly of the two phases) is proved
+in this section's files.
 
 ### The statements
 
@@ -86,10 +89,14 @@ Main theorem (`AnyStartMain.lean`, Section 3 and Appendix A.7; `AnyStartAsymptot
   `ε`): there are `C, N` such that for `n ≥ N`, from any configuration `Fin n → Fin n` with
   `k ≤ n^{1/3 − ε}` colours, consensus fails after any
   `T ≥ C (k² log^{1/2} n + k log n)(k + log n)` rounds with probability at most `1/n`. This is a
-  definition (a proposition), not a theorem: it is not proved here.
-* `threeMaj_anyStart_consensus` (Theorem 4, conditional): **assuming `Bcnpt16Phase2 (1/24)`**,
-  there are `C, N` such that for `n ≥ N`, from any configuration `Fin n → Fin n`, consensus
-  fails after any `T ≥ C n^{3/4} log^{7/8} n` rounds with probability at most `2/n`.
+  definition (a proposition); `bcnpt16Phase2_of_pos` proves it for every `ε > 0` (next section).
+* `threeMaj_anyStart_consensus` (Theorem 4 from Phase 2, the bridge): **assuming
+  `Bcnpt16Phase2 (1/24)`**, there are `C, N` such that for `n ≥ N`, from any configuration
+  `Fin n → Fin n`, consensus fails after any `T ≥ C n^{3/4} log^{7/8} n` rounds with probability
+  at most `2/n`.
+* `threeMaj_anyStart_consensus_unconditional` (Theorem 4, `ManyOpinionsMain.lean`): the same
+  conclusion without hypothesis, `threeMaj_anyStart_consensus` applied to
+  `bcnpt16Phase2_of_pos`.
 * `anyStart_asymptotics`: the real inequalities of Theorem 4, for the number of colours
   `phase1Colours n = ⌊n^{1/4} log^{1/8} n⌋` at which Phase 1 stops.
 
@@ -111,8 +118,8 @@ Main theorem (`AnyStartMain.lean`, Section 3 and Appendix A.7; `AnyStartAsymptot
 | Equations (18), (19), Theorem 7 (variable drift) | replaced by `walk_expect_le` (difference 3) |
 | Lemma 3 | `voter_reduce_whp` |
 | Phase 1 of Theorem 4 | `threeMaj_reduce_whp` |
-| Theorem 8 (SODA 2016, Theorem 3.1) | `Bcnpt16Phase2` (a hypothesis, not proved) |
-| Theorem 4 | `threeMaj_anyStart_consensus` (conditional on `Bcnpt16Phase2 (1/24)`) |
+| Theorem 8 (SODA 2016, Theorem 3.1) | `Bcnpt16Phase2`, proved for every `ε > 0` by `bcnpt16Phase2_of_pos` (next section) |
+| Theorem 4 | `threeMaj_anyStart_consensus_unconditional`; the bridge `threeMaj_anyStart_consensus` (from `Bcnpt16Phase2 (1/24)`) |
 
 ### Differences in the statements
 
@@ -140,17 +147,21 @@ Main theorem (`AnyStartMain.lean`, Section 3 and Appendix A.7; `AnyStartAsymptot
    (`T ≥ 24 (n/k) log n`, failure probability `≤ 1/n`, for `n ≥ 2`). Theorem 4 is asymptotic
    (`∃ C N`), as is the cited Phase 2 result it uses; its failure probability is `2/n` (one `1/n`
    for each phase). The proof takes `C = 49 + 4|C₂|`, where `C₂` is the constant of the Phase 2
-   hypothesis, and a threshold `N` that is not explicit.
-5. **The cited Phase 2 result is a hypothesis.** `threeMaj_anyStart_consensus` assumes
-   `Bcnpt16Phase2 (1/24)`, the statement of Theorem 3.1 of the SODA 2016 paper (arXiv:1508.06782
-   v1, "The Adversary-Free Case") for `ε = 1/24`, with two explicit choices.
+   hypothesis (`C₂ = 4 400 250` for the one given by `bcnpt16Phase2_of_pos`, so `C = 17 601 049`
+   in `threeMaj_anyStart_consensus_unconditional`), and a threshold `N` that is not explicit.
+5. **The cited Phase 2 result is a hypothesis of the bridge theorem.**
+   `threeMaj_anyStart_consensus` assumes `Bcnpt16Phase2 (1/24)`, the statement of Theorem 3.1 of
+   the SODA 2016 paper (arXiv:1508.06782 v1, "The Adversary-Free Case") for `ε = 1/24`, with two
+   explicit choices.
    (i) "W.h.p." is `≥ 1 − 1/n`, while that paper defines it as `1 − O(n^{−λ})` for some constant
    `λ > 0`: the `1/n` form follows by running the phase `⌈2/λ⌉` times in a row, since colours
    never increase, the process is Markov and the bound holds from any configuration with at most
-   `k` colours; this only changes `C` and `N`.
+   `k` colours; this only changes `C` and `N`. (The proof of `bcnpt16Phase2_of_pos` gives the
+   `1/n` form directly.)
    (ii) "Reaches consensus within `T₀` rounds" is stated as "no consensus at any time `T ≥ T₀`"
    with probability at most `1/n`, which is the same event since consensus is absorbing.
-   Formalizing this hypothesis is roadmap MAJ-12 (a); until then the theorem is conditional.
+   `bcnpt16Phase2_of_pos` (roadmap MAJ-12 (a), next section) proves this hypothesis for every
+   `ε > 0` without changing it, so `threeMaj_anyStart_consensus_unconditional` has no hypothesis.
 6. **Colours.** The comparison framework and Lemmas 2 to 4 are stated for any finite colour type
    `σ`. Theorem 4 and the Phase 2 hypothesis use colours `Fin n`, the paper's `[k] ⊆ [n]`.
 
@@ -240,3 +251,244 @@ four colours; the same test fails for random observables that are not Schur-conv
 `ac_comparison` for 3-Majority from `c` against Voter from `c' ⪯ c` (random Schur-convex `φ`,
 `n ≤ 5`, three colours, `T ≤ 3`); and `⌊n^{1/4} log^{1/8} n⌋ ≤ n^{7/24}` for `44 ≤ n < 10⁶` (it
 does not hold at `n = 42, 43`; Theorem 4 only needs large `n`).
+
+## 3-Majority with many opinions (`ManyOpinions*`, roadmap MAJ-12 (a))
+
+Source: Becchetti, Clementi, Natale, Pasquale and Trevisan, *Stabilizing consensus with many
+opinions*, SODA 2016, cited below as BCNPT16, with the numbering of arXiv:1508.06782 (v1):
+Theorem 3.1 (Section 3, "The Adversary-Free Case"), with Lemma 2.1 (Equation (1)), Lemma 3.2
+(hitting time under a drift), Lemma 3.3 (symmetry breaking, Equations (3) to (6) of its proof),
+Lemmas 3.4 and 3.5 (the two dropping stages, proved in Appendix B) and Lemma B.1 (the overshoot
+at the hitting time). The results with an adversary (Section 4, roadmap MAJ-12 (b)) are not
+formalized.
+
+Theorem 3.1 is the Phase 2 hypothesis `Bcnpt16Phase2 ε` of the previous section:
+`bcnpt16Phase2_of_pos` proves it for every `ε > 0`, without changing its definition, so
+`threeMaj_anyStart_consensus_unconditional` is Theorem 4 of BCEKMN17 without hypothesis.
+
+### The statements
+
+Notation: `c_a` is the support of colour `a` (`colourCount`), `j` or `k` the number of colours
+(`numColours`), `C_a'` the support of `a` after one round, `m = 16 √(j n log n)`. The model is the
+one of the previous section (`majColour`, `stepCol`, `runCol`): its rule is, pointwise, the rule
+of BCNPT16 (Section 2: three samples uniform with repetition, the agent itself included; on
+three different colours, the first sample). Lemmas 2.1 and 3.2 are general; everything else is
+about configurations `Fin n → Fin n`, as in `Bcnpt16Phase2`.
+
+One round (`ManyOpinionsExpect.lean`, Section 2).
+
+* `numColours_eq_card_image`, `colourCount_eq_card_filter`, `stepCol_apply` (proved by `rfl`):
+  the model unfolded (number of colours, support of a colour, the rule "the colour of `s₂` if
+  `s₂` and `s₃` agree, otherwise that of `s₁`").
+* `avg_colourCount_stepCol` (Lemma 2.1, equality):
+  `𝔼[C_a'] = c_a (1 + c_a/n − ∑_b c_b²/n²)`, for any finite colour type.
+* `avg_colourCount_stepCol_le` (Lemma 2.1, inequality): `𝔼[C_a'] ≤ c_a (1 + c_a/n − 1/|W|)`,
+  where `|W| = numColours c` is the number of remaining colours.
+
+Hitting times (`ManyOpinionsDrift.lean`), for any finite Markov kernel `K`.
+
+* `hitProb_additive_drift` (Lemma 3.2, finite horizon): let `I` be invariant and `B` a target. If,
+  for `x ∈ I`, `f x ≤ M`, and, for `x ∈ I` outside `B`, `f x ≤ β`, `𝔼[f(X₁) | X₀ = x] ≥ f x + λ`
+  (Hypothesis 1) and `P(f(X₁) > β | X₀ = x) ≤ η` (a one-step form of Hypothesis 2), then
+  `λ t P_a(T_B > t) ≤ β + M η t` for every start `a ∈ I` with `f a ≥ 0` and every `t`.
+* `hitProb_mul_le_event` (hit, then absorb; not stated in the paper): if from every state of `B`
+  the chain is in an absorbing event `P` after `s` steps with probability at least `q`, then from
+  any state it is in `P` at time `t + s` with probability at least `q P(T_B ≤ t)`.
+
+Symmetry breaking (`ManyOpinionsBreaking.lean`, Lemma 3.3).
+
+* `BrokenSymmetry j x` (unfolded by `brokenSymmetry_iff`): fewer than `j` colours remain, or at
+  most `j` colours remain and one of them has between `1` and `n/j − m` agents.
+* `min_count_drift` (Equation (3)): there are `δ > 0` and `C` such that, for every `x` with
+  `j ≥ 2` colours, `C j³ log n ≤ n` and every colour above `n/j − m` agents, the expected smallest
+  support among the colours of `x` after one round is at most the current one minus
+  `δ √n / (j √j)` (a colour that dies counts with support `0`).
+* `min_count_overshoot` (Equation (6) and Lemma B.1, one-step form): there is `C` such that, under
+  the same hypotheses, one round puts some colour of `x` below `n/j − 64 √(j n log n)` agents with
+  probability at most `1/n²`.
+* `symmetry_breaking` (Lemma 3.3): there is `C` such that, from every `c` with `j ≥ 2` colours and
+  `C j³ log n ≤ n`, the chain hits `BrokenSymmetry j` within any `t ≥ C j² √(log n)` rounds with
+  probability at least `1/2`.
+
+Dropping (`ManyOpinionsDropping.lean`).
+
+* `dropping_stage1` (Lemma 3.4): there is `C` such that, for `j ≥ 2` with `C j³ log n ≤ n`, from
+  every `x` with at most `j` colours and every colour `a` with at most `n/j − m` agents, at every
+  time `t` with `C j log n ≤ t ≤ n` colour `a` has more than `C j² log n` agents with probability
+  at most `1/n`.
+* `dropping_stage2` (Lemma 3.5): there is `C` such that, for `j ≥ 2` with `C j³ log n ≤ n`, from
+  every `x` with at most `j` colours and every colour `a` with at most `n/(2j)` agents, colour `a`
+  has died after any `t ≥ C j log n` rounds with probability at least `1/2`.
+
+Theorem 3.1 (`ManyOpinionsMain.lean`).
+
+* `phase_colour_dies` (proof of Theorem 3.1, first sentence): there is `C` such that, from every
+  `c` with `j ≥ 2` colours and `C j³ log n ≤ n`, after any `t ≥ C (j² √(log n) + j log n)` rounds
+  fewer than `j` colours remain with probability at least `1/5`.
+* `consensus_of_phases` (proof of Theorem 3.1, second sentence): if from every configuration with
+  `2` to `k` colours a phase of `L` rounds removes a colour with probability at least `p ≤ 1`,
+  then from at most `k` colours consensus fails after `M` phases with probability at most
+  `(1 − p/2)^M 2^k`.
+* `consensus_many_opinions` (Theorem 3.1, strong form): there is `C` such that, from every `c` with
+  `k` colours and `C k³ log n ≤ n`, consensus fails after any
+  `T ≥ C (k² √(log n) + k log n)(k + log n)` rounds with probability at most `1/n`.
+* `bcnpt16Phase2_of_pos` (Theorem 3.1 as stated in the paper): `Bcnpt16Phase2 ε` for every
+  `ε > 0`, that is, there are `C, N` such that for `n ≥ N`, from every configuration with
+  `k ≤ n^{1/3 − ε}` colours, consensus fails after any `T ≥ C (k² √(log n) + k log n)(k + log n)`
+  rounds with probability at most `1/n`. `bcnpt16Phase2_iff` unfolds the definition, unchanged
+  from the previous section.
+* `threeMaj_anyStart_consensus_unconditional`: Theorem 4 of BCEKMN17 (previous section) without
+  hypothesis.
+
+### Correspondence with the paper
+
+| BCNPT16 (arXiv v1) | Lean |
+| --- | --- |
+| Section 2, the 3-Majority rule | `stepCol_apply` (the model of the previous section) |
+| Lemma 2.1, Equation (1) | `avg_colourCount_stepCol`, `avg_colourCount_stepCol_le` |
+| Lemma 3.2 | `hitProb_additive_drift` (finite horizon, difference 1) |
+| Lemma 3.3 | `symmetry_breaking` (hitting form, differences 3 and 4), `BrokenSymmetry` |
+| Equation (3) | `min_count_drift` |
+| Equations (4), (5) | inside the proof of `min_count_drift` (Equation (4) through Paley–Zygmund, proof difference 2) |
+| Equation (6), Lemma B.1 | `min_count_overshoot` (one-step form, difference 5) |
+| Lemma 3.4, Equation (7) | `dropping_stage1`, `stage1_step` |
+| Lemma 3.5 | `dropping_stage2` |
+| Proof of Theorem 3.1, one phase | `phase_colour_dies` (probability `1/5`, difference 6), `hitProb_mul_le_event` |
+| Proof of Theorem 3.1, "standard probabilistic arguments" | `consensus_of_phases` |
+| Theorem 3.1 | `consensus_many_opinions` (`C k³ log n ≤ n`), `bcnpt16Phase2_of_pos` (`k ≤ n^{1/3 − ε}`) |
+| Section 4 (adversaries), Theorem 1.2, Corollary 4.1 | not formalized (roadmap MAJ-12 (b)) |
+
+### Differences in the statements
+
+1. **Lemma 3.2 has a finite horizon.** The paper bounds `𝔼[τ] ≤ 2 α m / λ` by optional stopping
+   and then applies Markov's inequality. Expectations of unbounded hitting times are not available
+   in the finite setting of the package, so `hitProb_additive_drift` bounds `P(τ > t)` directly,
+   at every finite `t`. Hypothesis 2 (`P_x(Y_τ ≥ α m) ≤ α m / n`, about the hitting time) is
+   replaced by a one-step overshoot bound `P(f(X₁) > β | X₀ = x) ≤ η` outside the target, which
+   gives `P(f(X'_t) > β) ≤ η t` for the stopped chain by a union bound; this also replaces
+   Lemma B.1.
+2. **Size of `k`.** All intermediate statements and `consensus_many_opinions` assume
+   `C k³ log n ≤ n` for a constant `C`, which is what the proofs use and is implied by
+   `k ≤ n^{1/3 − ε}` for `n ≥ N(ε)`; `bcnpt16Phase2_of_pos` recovers the paper's form.
+3. **Threshold `16 √(j n log n)`** instead of `√(j n log n)` in Lemmas 3.3 and 3.4, and the floor
+   `C j² log n` of Lemma 3.4 with an explicit large `C`: the proof of Lemma 3.4 needs them (see the
+   remarks on the sources). Lemma 3.3 keeps its order of magnitude, `O(j² √(log n))` rounds.
+4. **Hitting form of Lemma 3.3.** The paper states that at time `t = O(j² √(log n))` some colour
+   is below the threshold with probability at least `1/2`; its proof only shows that the threshold
+   is hit by time `t`. `symmetry_breaking` is stated as the hitting probability, and the phase
+   lemma applies Lemmas 3.4 and 3.5 at the hitting time (`hitProb_mul_le_event`, the strong Markov
+   property, proved by induction on `t` without stopping times). `BrokenSymmetry` also counts the
+   death of a colour (the paper's minimum is over the initial colours, so a dead colour has
+   support `0`) and records "at most `j` colours", so that it is a property of the state.
+5. **Equations (3) and (6) are separate statements.** Equation (3) (`min_count_drift`) is stated
+   with an existential `δ > 0` and the hypothesis `C j³ log n ≤ n`. Equation (6) is stated in
+   one-step form (`min_count_overshoot`): from a configuration where every colour is above
+   `n/j − 16 √(j n log n)`, one round puts a colour below `n/j − 64 √(j n log n)` with
+   probability at most `1/n²`; this is the overshoot hypothesis of difference 1.
+6. **Phase probability `1/5`** instead of `1/4`: the paper multiplies the probabilities `1/2` of
+   Lemmas 3.3 and 3.5 and ignores the failure probability `1/n` of Lemma 3.4.
+7. **Time windows.** Lemma 3.4 ("within `O(j log n)` rounds, `O(j² log n)` w.h.p.") is stated at
+   every time `C j log n ≤ t ≤ n`, with failure probability `1/n`; Lemma 3.5 at every
+   `t ≥ C j log n` (a dead colour stays dead).
+8. **"W.h.p."** is `1 − 1/n` in Theorem 3.1 (as in `Bcnpt16Phase2`) and in Lemma 3.4, and `1/n²`
+   in Equation (6).
+9. **Colours.** Configurations are `Fin n → Fin n`, as in `Bcnpt16Phase2` (at most `n` colours
+   can be present); Lemma 2.1 is stated for any finite colour type.
+
+### Differences in the proofs
+
+1. **Lemma 3.2 without optional stopping.** On the stopped chain `K.stopped B`, the drift gives
+   `𝔼[f(X'_t)] ≥ f(a) + λ t P(τ > t)`, and the one-step overshoot bound gives
+   `𝔼[f(X'_t)] ≤ β + M η t`.
+2. **Equation (3), near-uniform case, without the Central Limit Theorem.** The paper uses the
+   Central Limit Theorem and negative association to show that some colour drops by
+   `Ω(√(n/j))` with probability at least `1/2`. Here, with `w = √(n/j)` and `δ = 1/500`: if the
+   smallest support is at most `n/j − w/250`, Lemma 2.1 for the smallest colour gives the drift (as
+   in the paper, with `c_min ≥ n/(2j)`, Equation (5)). Otherwise, each new support `C_a'` has mean
+   absolute deviation at least `(9/256) σ_a` from `n/j`, where `σ_a² ≥ n/(4j)` is its variance
+   (`avg_abs_colourCount_stepCol_sub_ge`, from the Paley–Zygmund bound `avg_pz_zero_one` on the
+   independent adoption indicators `adoptInd`, and `sum_variance_adoptInd_ge`), and the minimum of
+   numbers summing to `n` is at most `n/j − (1/(2j)) ∑_a |C_a' − n/j|` (`inf'_colourCount_le`).
+   The intermediate claim with probability `1/2` is not formalized. The second and fourth moment
+   bounds (`ManyOpinionsMoments.lean`) are adapted from the `plurality` package, since packages do
+   not depend on each other.
+3. **Equation (6).** Every colour of `x` has mean support at least `n/j − 2m` after one round
+   (`le_avg_colourCount_stepCol_of_forall_lt`: Lemma 2.1 gives `𝔼[C_a'] ≥ c_a (1 + c_a/n − M/n)`
+   with `M` the largest support, which is at most `n/j + (j − 1) m`, and the right-hand side is
+   increasing in `c_a` on the relevant range); the Chernoff lower tail at `n/j − 4m` and a union
+   bound over the at most `n` colours give `1/n²`.
+4. **Lemma 3.3** applies Lemma 3.2 to the potential `breakPotential` (`n/j` minus the smallest
+   support among the `j` colours, the paper's `Y_t`), with `λ = δ √n / (j √j)`,
+   `β = 64 √(j n log n)`, `M = n/j` and `η = 1/n²`, inside the invariant set "at most `j` colours".
+5. **Lemma 3.4: one moving target.** The proof follows Appendix B (the gap `n/j − c_a` grows by a
+   factor `1 + 1/(4j)` per round until `c_a ≤ n/(2j)`, then `c_a` shrinks by `1 − 1/(4j)` per round
+   down to a floor) with a single level per round, `stage1Level`:
+   `max(n/j − m (1 + 1/(4j))^s, (n/(2j)) (1 − 1/(4j))^(s − s_A), K)` with
+   `K = min(240 j² log n, n/(2j))`, `s_A = ⌈5 j log n⌉` and `⌈4 j log n⌉` further rounds. Each round
+   leaves its level with probability at most `1/n²` (`stage1_step`, from the Chernoff upper tail
+   with the mean bound of Lemma 2.1), and a union bound over the `t ≤ n` rounds gives `1/n`.
+6. **Lemma 3.5** follows the paper's sketch with the potential `ψ = min(c_a, n/(2j))`:
+   `𝔼ψ' ≤ (1 − 1/(2j)) ψ + (n/(4j²)) [c_a > n/(2j)]` (`avg_min_colourCount_stepCol_le`), escape
+   above `n/(2j)` with probability at most `1/n⁴` per round (Chernoff), the recursion
+   `expList_min_colourCount_le`, and Markov's inequality at time `⌈2 j log n⌉`; later times by
+   monotonicity, since a dead colour stays dead.
+7. **Amplification.** The paper's "standard probabilistic arguments" (a constant expected number
+   of phases per colour) are the potential `2^{#colours}`: each phase multiplies its expectation by
+   at most `1 − p/2` (`consensus_of_phases`), and `M = 10 (k + ⌈log n⌉)` phases with `p = 1/5` give
+   `(9/10)^M 2^k ≤ 1/n`.
+8. **Explicit constants.** The statements are existential (`∃ C`); the proofs take `δ = 1/500`,
+   `C = 1024` in `min_count_drift`, `C = 2¹⁴` in `min_count_overshoot`, `C = 240` in
+   `dropping_stage1`, `C = 1024` in `dropping_stage2`, hence `C = 145 409` in
+   `symmetry_breaking`, `C = 293 349` in `phase_colour_dies` and `C = 4 400 250` in
+   `consensus_many_opinions` (and in `bcnpt16Phase2_of_pos`, whose threshold `N(ε)` is not
+   explicit).
+
+### Remarks on the sources
+
+* **The proof of Lemma 3.4 needs a minor correction.** At the threshold `c_i = n/j − √(j n log n)`
+  of the statement, the one-round Chernoff bound of Appendix B (Equation (7)) only gives failure
+  probability `exp(−log n / 12) = n^{−1/12}`. The gap `n/j − c_i` grows by a factor at most
+  `1 + 1/(2j)` per round, so during the first `j/10` rounds each per-round bound is still at least
+  `n^{−1/10}`, and the iterated union bound exceeds `1` as soon as `j ≥ 20 n^{1/10}` (which
+  `j ≤ n^{1/3 − ε}` allows). The same happens at the other end of the schedule: near the floor
+  `c_i = j² log n` the exponent of Equation (7) is again about `log n / 12`. With the threshold
+  `16 √(j n log n)` and the floor `C j² log n` for a large `C` (`dropping_stage1` takes `C = 240`)
+  each round fails with probability at most `1/n²`; Lemma 3.3 reaches the larger threshold within
+  the same `O(j² √(log n))` rounds and the floor is still `O(j² log n)`, so Theorem 3.1 is
+  unaffected. Numerically, on the paper's own schedule with `n = 10^15`, `j = 1000`, the sum of the
+  per-round bounds is about `46` with the paper's constants and below `10^{−200}` with `16` and
+  `240`. The obstacle is the per-round union bound itself, not the constant of Equation (7): with
+  the exact binomial tails of one round in place of Equation (7), the sum along the paper's
+  schedule is still about `0.09`, `0.31` and `0.51` for
+  `(n, j) = (10^12, 100), (10^15, 1000), (10^18, 5000)`, far above `1/n`, and grows with `j`.
+* **The statement of Lemma 3.3 needs a minor correction**: it needs the hypothesis
+  `j³ log n = O(n)`, as in Lemmas 3.4 and 3.5. Its proof uses `ĉ_m ≥ n/(2j)` whenever
+  `ĉ_m > n/j − √(j n log n)`, and when `j³ log n > n` the threshold `n/j − √(j n log n)` is
+  negative, so the event `∃ i : C_i^{(t)} ≤ n/j − √(j n log n)` is empty and has probability `0`.
+* **The last step of the proof of Lemma 3.3 needs a minor correction.** The bound
+  `P(∀ i : C_i^{(t)} ≥ n/j − √(j n log n)) ≤ P(τ > t)` compares an event at a fixed time with the
+  hitting time; the composition in Theorem 3.1 should use the strong Markov property at `τ`
+  (difference 4 in the statements). Also `𝔼[τ] < j² √(log n)` should read
+  `𝔼[τ] ≤ (2α/ε) j² √(log n)` (Lemma 3.2 with `m = √(j n log n)` and `λ = ε √n / j^{3/2}`).
+* **The proof of Lemma B.1 needs a minor correction.** The factorization
+  `P(∧_s C_𝕞^{(s)} > θ) = ∏_s P(C_𝕞^{(s)} > θ | C_𝕞^{(s−1)} > θ)` treats `C_𝕞` as a Markov chain,
+  while it is a function of the configuration. The one-step overshoot bound of difference 1 avoids
+  this argument.
+* **The proof of Theorem 3.1 needs a minor correction**: the probability of a phase is
+  `1/4 − O(1/n)` rather than `1/4` (difference 6); any positive constant suffices.
+
+### Numerical checks
+
+Before the proofs, a second agent checked the pinned statements against the paper (constants,
+quantifier order, every constant chosen before `n`) and numerically: the exact drift ratio
+`(c_𝕞 − 𝔼 min_a C_a') j^{3/2}/√n` of Equation (3) is at least `0.7` for `j = 2` (`n ≤ 10^7`, exact
+binomial), at least `1.2` for `j = 3` (exact trinomial) and at least `2.4` for `j = 5, 10, 30`
+(Monte Carlo, `n = 10^8`), against `δ = 1/500`; the probability in Equation (6) is below
+`10^{−300}` at the worst configurations for `j ≤ 50` and `n ∈ {10^9, 10^12, 10^15}`; for Lemma 3.5,
+the chain `Z' ~ Bin(n, (Z/n)(1 + Z/n − 1/j))`, which dominates the support of a colour when at
+most `j` colours remain, is dead at `t = ⌈2 j log n⌉` with probability `1.0000` (exact,
+`n ≤ 3·10^4`, `j ≤ 5`); for Lemma 3.4, along the schedule of its proof with `16` and `240`, the
+sum of the exact one-round binomial tails is below `10^{−290}`. The statements are not vacuous:
+for `j ≥ 2` the hypothesis `C j³ log n ≤ n` holds for all large `n`, and the uniform
+configuration (for Equations (3) and (6)) or a small colour (for Lemmas 3.4 and 3.5) satisfies the
+remaining hypotheses.

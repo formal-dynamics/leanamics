@@ -29,8 +29,10 @@ main theorem is \texttt{ThreeMajority.majority3\_consensus\_whp}.
 
 Section~\ref{sec:bcekmn-any-start} formalizes, for any number of colours, the comparison of
 3-Majority with the Voter model of Berenbrink et al.\ (PODC 2017) and their bound
-$O(n^{3/4}\log^{7/8}n)$ on the consensus time from any configuration, conditional on a cited
-result of Becchetti et al.\ (SODA 2016) that is not formalized and is taken as a hypothesis.
+$O(n^{3/4}\log^{7/8}n)$ on the consensus time from any configuration. Its second phase is
+Theorem~3.1 of Becchetti et al.\ (SODA 2016), from $k\le n^{1/3-\varepsilon}$ colours, which
+Section~\ref{sec:bcnpt16-many-opinions} formalizes; together they give the bound without
+hypothesis.
 \end{abstract}
 
 \section{The model}\label{sec:model}
@@ -616,11 +618,12 @@ with the comparison framework of its Section~2 and its Lemmas~2 to~4
 (\href{https://github.com/formal-dynamics/leanamics/blob/main/3-majority/FORMALIZATION_DIFFERENCES.md#3-majority-from-any-configuration-anystart-roadmap-maj-6-b}{differences
 from the paper}).
 
-\textbf{The main theorem is conditional.} The second phase of its proof applies Theorem~3.1 of
-Becchetti, Clementi, Natale, Pasquale and Trevisan \cite{BCNPT16}, which is not formalized in
-this repository (roadmap MAJ-12~(a)). Definition~\ref{def:as-phase2} states that result, and
-Theorem~\ref{thm:as-main} takes it as a hypothesis, exactly as the paper's proof uses it.
-Everything else in this section is proved.
+\textbf{The second phase.} The proof of Theorem~4 applies Theorem~3.1 of Becchetti, Clementi,
+Natale, Pasquale and Trevisan \cite{BCNPT16}, which is not part of \cite{BCEKMN17}.
+Definition~\ref{def:as-phase2} states that result, Theorem~\ref{thm:as-main} takes it as a
+hypothesis, exactly as the paper's proof uses it, and Section~\ref{sec:bcnpt16-many-opinions}
+(roadmap MAJ-12~(a)) proves it (Theorem~\ref{thm:mo-phase2}), so that
+Theorem~\ref{thm:as-main-unconditional}, Theorem~4 of \cite{BCEKMN17}, has no hypothesis.
 
 \subsection{Model and majorization}
 
@@ -791,16 +794,18 @@ $k$ colours after $T$ rounds with probability at most $1/n$.
 Lemma~\ref{lem:as-vs-voter} and Lemma~\ref{lem:as-voter-whp}.
 \end{proof}
 
-\begin{definition}[Phase~2: the cited result, not formalized]\label{def:as-phase2}
+\begin{definition}[Phase~2: the cited result]\label{def:as-phase2}
 \lean{ThreeMajority.Bcnpt16Phase2}\leanok\uses{def:as-model}
 For $\varepsilon>0$, $\mathrm{Phase2}(\varepsilon)$ is the proposition (Theorem~3.1 of
 \cite{BCNPT16}, Theorem~8 of \cite{BCEKMN17}): there are $C,N$ such that for $n\ge N$, from any
 configuration with colours in $\{0,\dots,n-1\}$ and $k\le n^{1/3-\varepsilon}$ colours,
 3-Majority has not reached consensus after any
 $T\ge C(k^2\sqrt{\log n}+k\log n)(k+\log n)$ rounds with probability at most $1/n$.
-This proposition is a hypothesis of Theorem~\ref{thm:as-main}; it is not proved here (roadmap
-MAJ-12~(a)). The cited paper's ``w.h.p.''\ is $1-O(n^{-\lambda})$ for some $\lambda>0$, which gives
-the form $1/n$ by repeating the phase a constant number of times.
+This proposition is a hypothesis of Theorem~\ref{thm:as-main}; Theorem~\ref{thm:mo-phase2}
+proves it for every $\varepsilon>0$ (Section~\ref{sec:bcnpt16-many-opinions}). The cited paper's
+``w.h.p.''\ is $1-O(n^{-\lambda})$ for some $\lambda>0$, which gives the form $1/n$ by repeating
+the phase a constant number of times; the proof of Theorem~\ref{thm:mo-phase2} gives the form
+$1/n$ directly.
 \end{definition}
 
 \begin{lemma}[The asymptotics of Theorem~4]\label{lem:as-asymptotics}
@@ -813,7 +818,7 @@ $24(n/k)\log n+1+A(k^2\sqrt{\log n}+k\log n)(k+\log n)\le Cn^{3/4}\log^{7/8}n$.
 From $\log y\le y^{1/4}$ and $\log^{1/8}y\le y^{1/24}$ for $y$ large.
 \end{proof}
 
-\begin{theorem}[Theorem~4, conditional on Phase~2]\label{thm:as-main}
+\begin{theorem}[Theorem~4 from Phase~2]\label{thm:as-main}
 \lean{ThreeMajority.threeMaj_anyStart_consensus}\leanok
 \uses{lem:as-phase1,def:as-phase2,lem:as-asymptotics}
 Assume $\mathrm{Phase2}(1/24)$. There are $C,N$ such that for $n\ge N$, from any configuration
@@ -830,6 +835,285 @@ paper needs a minor correction: it applies Lemma~3 with $k=n^{1/4}$, which gives
 $O(n^{3/4}\log n)$ rounds for Phase~1; the choice $k=n^{1/4}\log^{1/8}n$ balances the two phases
 and gives the bound as stated.
 \end{proof}
+
+\begin{theorem}[Theorem~4]\label{thm:as-main-unconditional}
+\lean{ThreeMajority.threeMaj_anyStart_consensus_unconditional}\leanok
+\uses{thm:as-main,thm:mo-phase2}
+There are $C,N$ such that for $n\ge N$, from any configuration with colours in
+$\{0,\dots,n-1\}$, 3-Majority has not reached consensus after any $T\ge Cn^{3/4}\log^{7/8}n$
+rounds with probability at most $2/n$.
+\end{theorem}
+\begin{proof}\leanok
+Theorem~\ref{thm:as-main}, whose hypothesis $\mathrm{Phase2}(1/24)$ is
+Theorem~\ref{thm:mo-phase2} for $\varepsilon=1/24$.
+\end{proof}
+
+\section{3-Majority with many opinions}\label{sec:bcnpt16-many-opinions}
+
+This section formalizes the adversary-free case of Becchetti, Clementi, Natale, Pasquale and
+Trevisan, \emph{Stabilizing consensus with many opinions} (SODA 2016) \cite{BCNPT16}: its
+Theorem~3.1, with its Lemmas~2.1 and~3.2 to~3.5 and Lemma~B.1, in the numbering of
+arXiv:1508.06782 (v1). The
+\href{https://github.com/formal-dynamics/leanamics/blob/main/3-majority/FORMALIZATION_DIFFERENCES.md#3-majority-with-many-opinions-manyopinions-roadmap-maj-12-a}{differences
+from the paper} are listed in the repository. Theorem~3.1 is the proposition $\mathrm{Phase2}(\varepsilon)$ of
+Definition~\ref{def:as-phase2} (Theorem~\ref{thm:mo-phase2}), so it makes Theorem~4 of
+\cite{BCEKMN17} unconditional (Theorem~\ref{thm:as-main-unconditional}).
+
+The process is the 3-Majority of Definition~\ref{def:as-model}, whose rule is, pointwise, the rule
+of the paper (three samples uniform with repetition; on three different colours, the first one),
+with colours in $\{0,\dots,n-1\}$. We write $c_a$ for the support of colour $a$, $C'_a$ for its
+support after one round, $j$ or $k$ for the number of colours, and $m=16\sqrt{jn\log n}$. Where
+the paper assumes $j\le n^{1/3-\varepsilon}$, the statements below assume $Cj^3\log n\le n$ for a
+constant $C$, which is what the proofs use; it holds for $j\le n^{1/3-\varepsilon}$ and $n$
+large. The proofs follow the paper's, with the deviations and the minor corrections noted in each
+proof.
+
+\subsection{One round}
+
+\begin{lemma}[Lemma~2.1]\label{lem:mo-expect}
+\lean{ThreeMajority.numColours_eq_card_image,ThreeMajority.colourCount_eq_card_filter,ThreeMajority.stepCol_apply,ThreeMajority.adoptInd,ThreeMajority.colourCount_stepCol_eq_sum,ThreeMajority.avg_colourCount_stepCol,ThreeMajority.avg_colourCount_stepCol_le}\leanok
+\uses{def:as-model}
+For any finite set of colours, any configuration $c$ and any colour $a$,
+\[
+  \E[C'_a]=c_a\Bigl(1+\frac{c_a}{n}-\sum_b\frac{c_b^2}{n^2}\Bigr)
+  \le c_a\Bigl(1+\frac{c_a}{n}-\frac{1}{\kappa(c)}\Bigr).
+\]
+\end{lemma}
+\begin{proof}\leanok
+$C'_a$ is the sum over the agents of independent indicators of adopting $a$, each with mean
+$x_a(1+x_a-\|x\|_2^2)$ for $x=c/n$ (as in Lemma~\ref{lem:as-alpha}). The inequality is the
+Cauchy--Schwarz bound $\sum_b c_b^2\ge n^2/\kappa(c)$.
+\end{proof}
+
+\begin{lemma}[One-round tails and anti-concentration]\label{lem:mo-tails}
+\lean{ThreeMajority.avg_colourCount_stepCol_ge,ThreeMajority.avg_colourCount_stepCol_le_tail,ThreeMajority.avg_pz_zero_one,ThreeMajority.avg_abs_colourCount_stepCol_sub_ge,ThreeMajority.sum_variance_adoptInd_ge}\leanok
+\uses{lem:mo-expect,lem:chernoff,lem:indep}
+Let $\sigma_a^2$ be the sum of the variances of the agents' indicators of adopting $a$.
+\begin{enumerate}
+  \item If $\E[C'_a]\le\mu<k$, then $\Pr(C'_a\ge k)\le\exp(-(k-\mu)^2/(k+\mu))$; if
+    $0<k<\mu\le\E[C'_a]$, then $\Pr(C'_a\le k)\le\exp(-(\mu-k)^2/(2\mu))$.
+  \item If $\sigma_a^2\ge1$, then $\E|C'_a-\theta|\ge(9/256)\,\sigma_a$ for every $\theta\in\R$.
+  \item If $c$ has $j\ge2$ colours, all with more than $n/j-nu$ agents, where $u\ge0$ and
+    $ju\le1/250$, then $\sigma_a^2\ge n/(4j)$ for every colour $a$ of $c$.
+\end{enumerate}
+\end{lemma}
+\begin{proof}\leanok
+(1) The Chernoff bounds of Section~\ref{sec:chernoff} for a sum of independent indicators.
+(2) If $|\E[C'_a]-\theta|\ge\sigma_a/4$, this is Jensen's inequality. Otherwise, by the
+Paley--Zygmund inequality (from the second and fourth moments of a sum of independent centred
+$\{0,1\}$-coordinates) the centred sum $S$ satisfies $\sigma_a^2\le4S^2$ with probability at least
+$9/64$, and there $|C'_a-\theta|\ge\sigma_a/2-\sigma_a/4$. (3) The adoption probability $p$ of
+Lemma~\ref{lem:mo-expect} lies between $(1-1/250)^2/j$ and $(1/2+1/250)(1+1/250)$, and
+$\sigma_a^2=np(1-p)$.
+\end{proof}
+
+\subsection{Hitting times under a drift}
+
+\begin{lemma}[Lemma~3.2, finite horizon]\label{lem:mo-drift}
+\lean{ThreeMajority.hitProb_additive_drift}\leanok
+Let $K$ be a Markov kernel on a finite set, $I$ a set with $K(x,I)=1$ for $x\in I$, $B$ a target
+set with hitting time $\tau$, and $f$ a real function. Let $\beta,\eta\ge0$, and assume that
+$f(x)\le M$ for $x\in I$ and that, for $x\in I\setminus B$, $f(x)\le\beta$,
+$\E[f(X_1)\mid X_0=x]\ge f(x)+\lambda$ and $\Pr(f(X_1)>\beta\mid X_0=x)\le\eta$. Then for every
+$a\in I$ with $f(a)\ge0$ and every $t$, $\lambda t\Pr_a(\tau>t)\le\beta+M\eta t$.
+\end{lemma}
+\begin{proof}\leanok
+Let $X'$ be the chain stopped at $B$. Summing the drift over the steps before $\tau$,
+$\E_a[f(X'_t)]\ge f(a)+\lambda\E_a[\min(t,\tau)]\ge\lambda t\Pr_a(\tau>t)$. By a union bound over
+the steps, $f(X'_t)>\beta$ with probability at most $\eta t$, and $f\le M$, so
+$\E_a[f(X'_t)]\le\beta+M\eta t$. The paper bounds $\E[\tau]$ by optional stopping, under a
+hypothesis on the overshoot at time $\tau$ (Lemma~B.1); the finite horizon and the one-step
+overshoot bound avoid both.
+\end{proof}
+
+\begin{lemma}[Hit, then absorb]\label{lem:mo-strong-markov}
+\lean{ThreeMajority.hitProb_mul_le_event}\leanok
+Let $P$ be an absorbing set for $K$. If from every state of $B$ the chain is in $P$ after $s$
+steps with probability at least $q$, then from every state $a$ it is in $P$ at time $t+s$ with
+probability at least $q\Pr_a(\tau\le t)$.
+\end{lemma}
+\begin{proof}\leanok
+The strong Markov property at $\tau$, proved by induction on $t$ without stopping times: from a
+state of $B$, the hypothesis and absorption; otherwise, condition on the first step.
+\end{proof}
+
+\subsection{Symmetry breaking}
+
+\begin{definition}[Broken symmetry]\label{def:mo-broken}
+\lean{ThreeMajority.BrokenSymmetry,ThreeMajority.brokenSymmetry_iff}\leanok
+\uses{def:as-model}
+A configuration $x$ has broken symmetry for $j$ colours if $\kappa(x)<j$, or $\kappa(x)\le j$ and
+some colour has between $1$ and $n/j-16\sqrt{jn\log n}$ agents.
+\end{definition}
+
+The paper's threshold is $n/j-\sqrt{jn\log n}$; the factor $16$ is needed in
+Lemma~\ref{lem:mo-stage1}. The death of a colour also breaks the symmetry (the paper's minimum
+is over the initial colours, so a dead colour has support $0$).
+
+\begin{lemma}[Equation~(3)]\label{lem:mo-min-drift}
+\lean{ThreeMajority.min_count_drift}\leanok
+\uses{lem:mo-expect,lem:mo-tails}
+There are $\delta>0$ and $C$ such that, for every configuration $x$ with $j=\kappa(x)\ge2$
+colours, $Cj^3\log n\le n$ and every colour of $x$ above $n/j-m$ agents, the smallest support
+among the colours of $x$ (a colour that dies counting $0$) decreases in expectation by at least
+$\delta\sqrt n/(j\sqrt j)$ in one round.
+\end{lemma}
+\begin{proof}\leanok
+Take $\delta=1/500$, $C=1024$ and $w=\sqrt{n/j}$. If the smallest support $c_{\min}$ is at most
+$n/j-w/250$, Lemma~\ref{lem:mo-expect} for a smallest colour, with $c_{\min}\ge n/(2j)$
+(Equation~(5)), gives the drift. Otherwise all colours are above $n/j-w/250$. The supports sum to
+$n$, so the smallest new support is at most $n/j-\frac1{2j}\sum_a|C'_a-n/j|$, and
+$\E|C'_a-n/j|\ge(9/256)\sigma_a\ge(9/512)w$ by Lemma~\ref{lem:mo-tails}; hence the expected
+smallest new support is at most $n/j-9w/1024<c_{\min}-w/1000$. The paper argues in this case with
+the Central Limit Theorem and negative association instead.
+\end{proof}
+
+\begin{lemma}[Equation~(6) and Lemma~B.1, one step]\label{lem:mo-overshoot}
+\lean{ThreeMajority.min_count_overshoot}\leanok
+\uses{lem:mo-expect,lem:mo-tails}
+There is $C$ such that, under the hypotheses of Lemma~\ref{lem:mo-min-drift}, one round puts some
+colour of $x$ below $n/j-64\sqrt{jn\log n}$ agents with probability at most $1/n^2$.
+\end{lemma}
+\begin{proof}\leanok
+Take $C=2^{14}$. Every support is at most $n/j+(j-1)m$, so by Lemma~\ref{lem:mo-expect} every
+colour of $x$ has $\E[C'_a]\ge n/j-2m$. The Chernoff lower tail at $n/j-4m$
+(Lemma~\ref{lem:mo-tails}) and a union bound over the at most $n$ colours give $1/n^2$. The paper
+bounds the overshoot at the hitting time instead (Lemma~B.1); its proof needs a minor correction,
+since it treats the smallest support as a Markov chain, while it is a function of the
+configuration. The one-step form avoids this argument.
+\end{proof}
+
+\begin{lemma}[Lemma~3.3, symmetry breaking]\label{lem:mo-breaking}
+\lean{ThreeMajority.symmetry_breaking,ThreeMajority.breakPotential}\leanok
+\uses{def:mo-broken,lem:mo-drift,lem:mo-min-drift,lem:mo-overshoot}
+There is $C$ such that, from every configuration $c$ with $j\ge2$ colours and $Cj^3\log n\le n$,
+3-Majority reaches broken symmetry for $j$ colours within any $t\ge Cj^2\sqrt{\log n}$ rounds with
+probability at least $1/2$.
+\end{lemma}
+\begin{proof}\leanok
+Lemma~\ref{lem:mo-drift} with $I=\{\kappa\le j\}$, $B$ the configurations with broken symmetry,
+$f=n/j$ minus the smallest support among the $j$ colours (the paper's $Y_t$),
+$\lambda=\delta\sqrt n/(j\sqrt j)$ (Lemma~\ref{lem:mo-min-drift}), $\beta=64\sqrt{jn\log n}$ and
+$\eta=1/n^2$ (Lemma~\ref{lem:mo-overshoot}), and $M=n/j$. For $t\ge Cj^2\sqrt{\log n}$ (the proof
+takes $C=145\,409$), $\lambda t\ge4\beta$ and $M\eta t\le\lambda t/4$, so $\Pr(\tau>t)\le1/2$.
+
+The paper states the conclusion at the fixed time $t$, while its proof bounds the hitting time,
+which is what is stated here; its composition in Theorem~3.1 needs a minor correction, the strong
+Markov property at the hitting time (Lemma~\ref{lem:mo-strong-markov}). The statement also needs
+a minor correction: it needs the hypothesis $j^3\log n=O(n)$, as do the paper's Lemmas~3.4
+and~3.5 (otherwise
+the threshold $n/j-\sqrt{jn\log n}$ is negative and the event has probability $0$). Finally, its
+bound $\E[\tau]<j^2\sqrt{\log n}$ should read $\E[\tau]\le(2\alpha/\varepsilon)j^2\sqrt{\log n}$.
+\end{proof}
+
+\subsection{Dropping}
+
+\begin{lemma}[Lemma~3.4, dropping stage~1]\label{lem:mo-stage1}
+\lean{ThreeMajority.dropping_stage1,ThreeMajority.stage1Level,ThreeMajority.stage1_step}\leanok
+\uses{lem:mo-expect,lem:mo-tails}
+There is $C$ such that, for $j\ge2$ with $Cj^3\log n\le n$, from every configuration with at most
+$j$ colours and every colour $a$ with at most $n/j-16\sqrt{jn\log n}$ agents, at every time $t$
+with $Cj\log n\le t\le n$ colour $a$ has more than $Cj^2\log n$ agents with probability at most
+$1/n$.
+\end{lemma}
+\begin{proof}\leanok
+Take $C=240$. As in Appendix~B of the paper, the gap $n/j-c_a$ grows by a factor $1+1/(4j)$ per
+round until $c_a\le n/(2j)$, and then $c_a$ shrinks by a factor $1-1/(4j)$ per round down to a
+floor. Here both stages are one moving level,
+$\max\{n/j-m(1+1/(4j))^s,\ (n/(2j))(1-1/(4j))^{s-s_A},\ K\}$ at round $s$, with
+$K=\min\{240j^2\log n,n/(2j)\}$ and $s_A=\lceil5j\log n\rceil$. By Lemma~\ref{lem:mo-expect} and
+the Chernoff upper tail (Lemma~\ref{lem:mo-tails}), $c_a$ exceeds the level of the next round
+with probability at most $1/n^2$; after $s_A+\lceil4j\log n\rceil\le240j\log n$ rounds the level
+is $K$, and a union bound over the $t\le n$ rounds gives $1/n$.
+
+The proof in the paper needs a minor correction. At its threshold $n/j-\sqrt{jn\log n}$, and
+again near its floor $j^2\log n$, the one-round bound of its Equation~(7) is only about
+$n^{-1/12}$, and the union bound over the rounds exceeds $1$ for large $j$ (for instance
+$j\ge20n^{1/10}$, which $j\le n^{1/3-\varepsilon}$ allows). The threshold $16\sqrt{jn\log n}$,
+which Lemma~\ref{lem:mo-breaking} reaches within the same $O(j^2\sqrt{\log n})$ rounds, and the
+floor $240j^2\log n$ make each round fail with probability at most $1/n^2$.
+\end{proof}
+
+\begin{lemma}[Lemma~3.5, dropping stage~2]\label{lem:mo-stage2}
+\lean{ThreeMajority.dropping_stage2,ThreeMajority.avg_min_colourCount_stepCol_le,ThreeMajority.expList_min_colourCount_le}\leanok
+\uses{lem:mo-expect,lem:mo-tails}
+There is $C$ such that, for $j\ge2$ with $Cj^3\log n\le n$, from every configuration with at most
+$j$ colours and every colour $a$ with at most $n/(2j)$ agents, colour $a$ has died after any
+$t\ge Cj\log n$ rounds with probability at least $1/2$.
+\end{lemma}
+\begin{proof}\leanok
+Take $C=1024$. As in the paper's sketch, with the potential $\psi=\min\{c_a,n/(2j)\}$:
+Lemma~\ref{lem:mo-expect} gives $\E[\psi']\le(1-1/(2j))\psi+(n/(4j^2))[c_a>n/(2j)]$, and by the
+Chernoff upper tail $c_a$ escapes above $n/(2j)$ with probability at most $1/n^4$ per round.
+Hence $\E[\psi_s]\le(1-1/(2j))^s\,n/(2j)+(n/(4j^2))\,n^{-4}s^2$, which is at most $1/2$ at
+$s=\lceil2j\log n\rceil$, and Markov's inequality gives $\Pr(c_a\ge1)\le1/2$. Later times follow
+since a dead colour stays dead.
+\end{proof}
+
+\subsection{Consensus}
+
+\begin{lemma}[One phase]\label{lem:mo-phase}
+\lean{ThreeMajority.phase_colour_dies}\leanok
+\uses{lem:mo-breaking,lem:mo-stage1,lem:mo-stage2,lem:mo-strong-markov}
+There is $C$ such that, from every configuration with $j\ge2$ colours and $Cj^3\log n\le n$,
+after any $t\ge C(j^2\sqrt{\log n}+j\log n)$ rounds fewer than $j$ colours remain with probability
+at least $1/5$.
+\end{lemma}
+\begin{proof}\leanok
+From a configuration with broken symmetry, either fewer than $j$ colours remain, or a colour has
+at most $n/j-16\sqrt{jn\log n}$ agents; then Lemma~\ref{lem:mo-stage1} brings it to at most
+$240j^2\log n\le n/(2j)$ agents except with probability $1/n$, and Lemma~\ref{lem:mo-stage2} kills
+it with probability at least $1/2$: in total at least $\frac12(1-\frac1n)\ge\frac25$. Fewer than
+$j$ colours is absorbing, so Lemma~\ref{lem:mo-strong-markov} at the hitting time of broken
+symmetry and Lemma~\ref{lem:mo-breaking} give $\frac12\cdot\frac25=\frac15$ (the proof takes
+$C=293\,349$). The paper's proof of Theorem~3.1 needs a minor correction here: its probability
+$1/4$ ignores the failure probability of Lemma~3.4; any positive constant suffices.
+\end{proof}
+
+\begin{lemma}[Amplification over phases]\label{lem:mo-phases}
+\lean{ThreeMajority.consensus_of_phases}\leanok
+\uses{def:as-model}
+If from every configuration with between $2$ and $k$ colours a phase of $L$ rounds removes a
+colour with probability at least $p\le1$, then from every configuration with at most $k$ colours
+consensus fails after $M$ phases with probability at most $(1-p/2)^M2^k$.
+\end{lemma}
+\begin{proof}\leanok
+The potential equal to $2^{\kappa}$ without consensus and to $0$ at consensus: colours never
+increase, and with probability at least $p$ one of them disappears, so over one phase its
+expectation is multiplied by at most $(1-p)+p/2=1-p/2$. This makes precise the paper's
+``standard probabilistic arguments''.
+\end{proof}
+
+\begin{theorem}[Theorem~3.1, for $Ck^3\log n\le n$]\label{thm:mo-main}
+\lean{ThreeMajority.consensus_many_opinions,ThreeMajority.expList_not_consensus_le}\leanok
+\uses{lem:mo-phase,lem:mo-phases}
+There is $C$ such that, from every configuration with $k$ colours and $Ck^3\log n\le n$,
+3-Majority has not reached consensus after any $T\ge C(k^2\sqrt{\log n}+k\log n)(k+\log n)$
+rounds with probability at most $1/n$.
+\end{theorem}
+\begin{proof}\leanok
+Phases of $L=\lceil C_1(k^2\sqrt{\log n}+k\log n)\rceil$ rounds, with $C_1$ the constant of
+Lemma~\ref{lem:mo-phase}, which applies to every configuration with $2\le j\le k$ colours. By
+Lemma~\ref{lem:mo-phases} with $p=1/5$ and $M=10(k+\lceil\log n\rceil)$ phases, consensus fails
+after $ML$ rounds with probability at most $(9/10)^M2^k\le1/n$, and consensus is absorbing. The
+proof takes $C=15(C_1+1)=4\,400\,250$.
+\end{proof}
+
+\begin{theorem}[Theorem~3.1]\label{thm:mo-phase2}
+\lean{ThreeMajority.bcnpt16Phase2_iff,ThreeMajority.bcnpt16Phase2_of_pos}\leanok
+\uses{thm:mo-main,def:as-phase2}
+For every $\varepsilon>0$, $\mathrm{Phase2}(\varepsilon)$ holds: there are $C,N$ such that for
+$n\ge N$, from every configuration with colours in $\{0,\dots,n-1\}$ and $k\le n^{1/3-\varepsilon}$
+colours, 3-Majority has not reached consensus after any
+$T\ge C(k^2\sqrt{\log n}+k\log n)(k+\log n)$ rounds with probability at most $1/n$.
+\end{theorem}
+\begin{proof}\leanok
+Theorem~\ref{thm:mo-main} with the same $C$: $k^3\le n^{1-3\varepsilon}$ and
+$|C|\log n\le n^{3\varepsilon}$ for $n\ge N$, so $Ck^3\log n\le n$.
+\end{proof}
+
+With $\varepsilon=1/24$, Theorem~\ref{thm:mo-phase2} is the hypothesis of
+Theorem~\ref{thm:as-main}, which gives Theorem~\ref{thm:as-main-unconditional}.
 
 \section{The Lean formalization}\label{sec:lean}
 
@@ -850,7 +1134,10 @@ the shared \texttt{Dynamics/Chernoff.lean} (Section~\ref{sec:chernoff}),
 \texttt{AnyStartComparison}, \texttt{AnyStartVsVoter}, \texttt{AnyStartVoter},
 \texttt{AnyStartAsymptotics} and \texttt{AnyStartMain} formalize
 Section~\ref{sec:bcekmn-any-start}, on the shared finite \texttt{Distribution} and
-\texttt{Kernel} layer of \texttt{dynamics}. Design constraint
+\texttt{Kernel} layer of \texttt{dynamics}; the files \texttt{ManyOpinionsExpect},
+\texttt{ManyOpinionsMoments}, \texttt{ManyOpinionsDrift}, \texttt{ManyOpinionsTails},
+\texttt{ManyOpinionsBreaking}, \texttt{ManyOpinionsDropping} and \texttt{ManyOpinionsMain}
+formalize Section~\ref{sec:bcnpt16-many-opinions}. Design constraint
 preserved from \texttt{rumor\_spread}: no measure theory, no
 \texttt{PMF}/\texttt{ENNReal}, no Mathlib \texttt{ProbabilityTheory}
 kernels --- everything is finite sums, plus \texttt{Real.exp}/\texttt{Real.log}
