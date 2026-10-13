@@ -68,9 +68,9 @@
 {%- endfor -%}
 {%- endfor %}
 {% if lean_href != "" -%}
-<a class="dict-status dict-status-{{ lean.status }}" href="{{ lean_href }}" title="Lean status: {{ lean.status }} (opens the {{ lean_target }})">Lean: {{ lean.status }}</a>
+<a class="dict-status dict-status-{{ lean.status }}" href="{{ lean_href }}" title="Lean status: {{ lean.status | replace: '-', ' ' }} (opens the {{ lean_target }})">Lean: {{ lean.status | replace: '-', ' ' }}</a>
 {%- else -%}
-<span class="dict-status dict-status-{{ lean.status }}" title="Lean status: {{ lean.status }}">Lean: {{ lean.status }}</span>
+<span class="dict-status dict-status-{{ lean.status }}" title="Lean status: {{ lean.status | replace: '-', ' ' }}">Lean: {{ lean.status | replace: '-', ' ' }}</span>
 {%- endif %}
 </div>
 </div>
@@ -125,7 +125,7 @@
 {%- endif %}
 {%- endfor %}
 <h4>In Leanamics</h4>
-<p><span class="dict-status dict-status-{{ lean.status }}">Lean: {{ lean.status }}</span> {% include dictionary-text.html text=lean.summary %}</p>
+<p><span class="dict-status dict-status-{{ lean.status }}">Lean: {{ lean.status | replace: '-', ' ' }}</span> {% include dictionary-text.html text=lean.summary %}</p>
 <ul class="dict-lean">
 {%- if lean.correspondence and lean.correspondence.size > 0 %}
 <li>Correspondence: {% for name in lean.correspondence %}<code>{{ name }}</code>{% unless forloop.last %}, {% endunless %}{% endfor %}</li>

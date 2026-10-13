@@ -3,21 +3,32 @@
 
 The YAML file is the single source of truth for the cross-field dictionary (the website renders
 the full entries). This script writes the compact LaTeX form used in the paper: one line per row
-(the `paper` field of each row), grouped as in the YAML, with booktabs rules and citations as
+(the `paper` field of each row), grouped as in the YAML, with one column per field of `fields`
+(in that order), then the relation and the Lean status, booktabs rules and citations as
 `\\cite{key}`. Keys of references marked `in_paper_bib: true` are those of the paper's
 bibliography; for the others it can also write BibTeX entries generated from the `references`
 section of the YAML (`--bib`).
+
+With six fields the table does not fit the 16 cm text width of a single-column A4 page, so it is
+set on a page of its own in landscape (24.7 cm wide): a `table` float inside a `landscape`
+environment, started with `\\afterpage` so that the current page is filled with text first. With
+`pdflscape` the page is also displayed rotated in PDF viewers (pdfLaTeX, LuaLaTeX and XeLaTeX).
+The table takes its number when it is typeset, that is on the page after the `\\input`.
 
 Usage:
     python3 scripts/dictionary_tex.py [--table OUT.tex] [--bib NEW.bib] [--check-bib PAPER.bib]
     python3 scripts/dictionary_tex.py --check
 
 Without `--table` the table is printed. With `--check-bib`, the keys marked `in_paper_bib` are
-checked against the given BibTeX file, and every other cited key is reported as new. `--check`
-checks the YAML against the repository: every Lean name must be tagged in a blueprint (CI checks
-those tags with `checkdecls`), every blueprint link must point to a `\\label` of that package's
-`content.tex`, and every roadmap ID must be a target of ROADMAP.md.
-The table needs the `booktabs` and `array` packages.
+checked against the given BibTeX file, every other cited key is reported as new, and `--bib`
+writes only the entries whose keys are not in that file yet (append them to it). `--check`
+checks the YAML against itself and the repository: every cell of every field has a `name` (with
+a description and references) or a `none`, every reference is known, cited and has an
+identifier, the `paper` entries have every field and are ASCII, every Lean name is tagged in a
+blueprint (CI checks those tags with `checkdecls`), every blueprint link points to a `\\label` of
+that package's `content.tex`, and every roadmap ID is a target of ROADMAP.md.
+The table needs the packages `booktabs`, `array`, `afterpage` and `pdflscape` (or `lscape`, which
+rotates the page in print but not on screen), and `amssymb` for `\\checkmark`.
 """
 import argparse
 import re
@@ -29,10 +40,15 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "home_page" / "_data" / "dictionary.yml"
 
-# Column widths (cm) for a single-column A4 page with 2.5 cm margins (text width 16 cm), with
-# \tabcolsep = 3pt: five inner gaps of 6pt take about 1.06 cm.
-WIDTHS = {"dc": 3.1, "popgen": 2.8, "epi": 2.55, "crn": 3.1, "relation": 2.0, "lean": 1.35}
-FIELD_ORDER = ["dc", "popgen", "epi", "crn"]
+# Column widths (cm), one per key of `fields` plus the relation and the Lean status, for a
+# landscape A4 page with 2.5 cm margins (line width 24.7 cm), with \tabcolsep = 2.5pt: seven inner
+# gaps of 5pt take about 1.23 cm. The page is 16 cm tall: at 9pt the 15 rows and the caption do
+# not fit, so the table and its caption are set at 8.5/10pt. The widths were chosen by typesetting
+# every cell at every width, to minimise the total height (33 lines for the 15 rows), preferring
+# widths that are not at a line break. If a `paper` entry or the caption grows, check the log for
+# "Float too large".
+WIDTHS = {"dc": 3.25, "popgen": 3.85, "epi": 2.95, "crn": 3.6, "physics": 3.15, "social": 2.75,
+          "relation": 2.65, "lean": 1.25}
 
 LEAN_MARKS = {
     "proved": r"\checkmark",
@@ -40,13 +56,24 @@ LEAN_MARKS = {
     "results": r"results",
     "partial": r"partial",
     "roadmap": r"roadmap",
-    "not-formalized": r"--",
+    "not-formalized": r"none",  # distinct from the `--` of a field without counterpart
 }
+# Keys of `leanamics` that list Lean material (empty when the status is not-formalized).
+LEAN_LISTS = ["correspondence", "results", "packages", "blueprint", "roadmap"]
 
 
 def load(path):
     with open(path, encoding="utf-8") as f:
         return yaml.safe_load(f)
+
+
+def field_keys(data):
+    """Field keys in the order of `fields`; every one needs a column width."""
+    keys = [f["key"] for f in data["fields"]]
+    missing = [k for k in keys if k not in WIDTHS]
+    if missing:
+        sys.exit(f"no column width for the fields {missing}: add them to WIDTHS")
+    return keys
 
 
 def cite(keys):
@@ -78,20 +105,27 @@ def check_ascii(s, where):
 
 
 def table(data):
+    fields = field_keys(data)
     cols = "".join(
         r">{\raggedright\arraybackslash}p{%.2fcm}" % WIDTHS[k]
-        for k in FIELD_ORDER + ["relation", "lean"]
+        for k in fields + ["relation", "lean"]
     )
     heads = {f["key"]: f["short"] for f in data["fields"]}
     out = [
         "% Generated by scripts/dictionary_tex.py from home_page/_data/dictionary.yml; do not edit.",
-        "% Needs \\usepackage{booktabs,array}.",
-        r"\begin{table}[tp]",  # about a page tall: allow a float page
-        r"\centering\small",
-        r"\setlength{\tabcolsep}{3pt}",
+        "% Needs \\usepackage{booktabs,array,afterpage,pdflscape} (and amssymb for \\checkmark).",
+        "% A landscape page of its own, after the page where this file is input.",
+        r"\afterpage{%",
+        r"\begin{landscape}",
+        r"\begin{table}[p]",
+        # 8.5/10pt for the table and its caption (\caption switches to \normalsize), thinner
+        # spaces around the arrows of reactions, small gaps between groups.
+        r"\def\normalsize{\fontsize{8.5}{10}\selectfont}\normalsize\centering",
+        r"\setlength{\tabcolsep}{2.5pt}\setlength{\abovecaptionskip}{4pt}",
+        r"\thickmuskip=3mu plus 2mu",
         r"\begin{tabular}{@{}" + cols + "@{}}",
         r"\toprule",
-        " & ".join(heads[k] for k in FIELD_ORDER) + r" & Relation & Lean \\",
+        " & ".join(heads[k] for k in fields) + r" & Relation & Lean \\",
         r"\midrule",
     ]
     groups = [g["key"] for g in data["groups"]]
@@ -102,10 +136,10 @@ def table(data):
         if not members:
             continue
         if not first:
-            out.append(r"\addlinespace")
+            out.append(r"\addlinespace[2pt]")
         first = False
         for r in members:
-            cells = [cell(r, k) for k in FIELD_ORDER]
+            cells = [cell(r, k) for k in fields]
             cells.append(r["paper"]["relation"])
             cells.append(lean_cell(r))
             line = " & ".join(cells) + r" \\"
@@ -119,6 +153,7 @@ def table(data):
         r"\caption{" + caption + "}",
         r"\label{tab:dictionary}",
         r"\end{table}",
+        r"\end{landscape}}",
     ]
     return "\n".join(out) + "\n"
 
@@ -175,6 +210,18 @@ def roadmap_ids():
     return set(re.findall(r"^\|\s*([A-Z]{3}-\d+)\s*\|", text, re.M))
 
 
+def texts(obj):
+    """All strings in a YAML value."""
+    if isinstance(obj, str):
+        yield obj
+    elif isinstance(obj, dict):
+        for v in obj.values():
+            yield from texts(v)
+    elif isinstance(obj, list):
+        for v in obj:
+            yield from texts(v)
+
+
 def check(data):
     """Consistency of the YAML with itself, the blueprints and the roadmap; returns a list of
     problems."""
@@ -182,6 +229,10 @@ def check(data):
     refs = data["references"]
     kinds = {r["key"] for r in data["relations"]}
     groups = {g["key"] for g in data["groups"]}
+    fields = [f["key"] for f in data["fields"]]
+    for f in fields:
+        if f not in WIDTHS:
+            problems.append(f"field {f} has no column width in scripts/dictionary_tex.py")
     names, labels = blueprint_index()
     targets = roadmap_ids()
     ids = [r["id"] for r in data["rows"]]
@@ -191,11 +242,13 @@ def check(data):
         rid = r["id"]
         if r["group"] not in groups:
             problems.append(f"{rid}: unknown group {r['group']}")
-        for f in FIELD_ORDER:
+        for f in fields:
             c = r.get(f)
-            if not c or ("none" not in c and "name" not in c):
-                problems.append(f"{rid}: field {f} needs `name` or `none`")
+            if not isinstance(c, dict) or ("none" in c) == ("name" in c):
+                problems.append(f"{rid}: field {f} needs either `name` or `none`")
                 continue
+            if "name" in c and not ("description" in c and "refs" in c):
+                problems.append(f"{rid}: field {f} has a name but no description or refs")
             for k in c.get("refs", []):
                 if k not in refs:
                     problems.append(f"{rid}.{f}: unknown reference {k}")
@@ -205,9 +258,17 @@ def check(data):
         for k in r["relation"].get("refs", []):
             if k not in refs:
                 problems.append(f"{rid}.relation: unknown reference {k}")
+        for key in fields + ["relation"]:
+            for s in texts(r.get(key)):
+                if s.count("$") % 2:
+                    problems.append(f"{rid}.{key}: unbalanced $ in {s[:50]!r}")
+                if s.count("`") % 2:
+                    problems.append(f"{rid}.{key}: unbalanced backtick in {s[:50]!r}")
         lean = r["leanamics"]
         if lean["status"] not in LEAN_MARKS:
             problems.append(f"{rid}: unknown status {lean['status']}")
+        if lean["status"] == "not-formalized" and any(lean.get(k) for k in LEAN_LISTS):
+            problems.append(f"{rid}: status not-formalized, but Lean material is listed")
         for n in lean.get("correspondence", []) + lean.get("results", []):
             if n not in names:
                 problems.append(f"{rid}: Lean name {n} is not tagged in any blueprint")
@@ -223,14 +284,26 @@ def check(data):
         for p in lean.get("packages", []):
             if p not in labels:
                 problems.append(f"{rid}: unknown package {p}")
-        for k in r.get("paper", {}).get("cite", {}).values():
-            for key in k:
+        paper = r.get("paper", {})
+        if paper.get("include", True):
+            for key in fields + ["relation"]:
+                if key not in paper:
+                    problems.append(f"{rid}.paper: no {key}")
+                elif any(ord(ch) > 127 for ch in paper[key]):
+                    problems.append(f"{rid}.paper.{key}: non-ASCII characters (use LaTeX)")
+        for f, ks in paper.get("cite", {}).items():
+            if f not in fields:
+                problems.append(f"{rid}.paper.cite: unknown field {f}")
+            for key in ks:
                 if key not in refs:
                     problems.append(f"{rid}.paper: unknown reference {key}")
+                elif not refs[key].get("in_paper_bib") and "bibtex" not in refs[key]:
+                    problems.append(f"{rid}.paper: reference {key} has no `bibtex` fields")
     used = set()
     for r in data["rows"]:
-        for f in FIELD_ORDER:
-            used.update(r[f].get("refs", []))
+        for f in fields:
+            if isinstance(r.get(f), dict):
+                used.update(r[f].get("refs", []))
         used.update(r["relation"].get("refs", []))
         for ks in r.get("paper", {}).get("cite", {}).values():
             used.update(ks)
@@ -239,6 +312,13 @@ def check(data):
             problems.append(f"reference {k}: no DOI, arXiv id or ISBN")
         if k not in used:
             problems.append(f"reference {k} is not cited by any row")
+        b = ref.get("bibtex")
+        if b:
+            extra = set(b) - set(BIB_FIELDS) - {"type"}
+            if "type" not in b or extra:
+                problems.append(f"reference {k}: no BibTeX type or unknown fields {sorted(extra)}")
+            if ref.get("doi") and b.get("doi") != ref["doi"]:
+                problems.append(f"reference {k}: BibTeX doi differs from its doi")
     text = Path(data["_path"]).read_text(encoding="utf-8")
     if "\u2014" in text:
         problems.append("em dash in the YAML")
@@ -252,8 +332,9 @@ def main():
     ap.add_argument("--bib", help="write BibTeX entries of cited keys not in the paper's bibliography")
     ap.add_argument("--check-bib", help="the paper's .bib file, to check the keys marked in_paper_bib")
     ap.add_argument("--check", action="store_true",
-                    help="only check the YAML (references, relation kinds, Lean names against the "
-                         "blueprints' \\lean tags, blueprint links against their \\label's)")
+                    help="only check the YAML (cells of every field, references, relation kinds, "
+                         "Lean names against the blueprints' \\lean tags, blueprint links against "
+                         "their \\label's, roadmap IDs)")
     args = ap.parse_args()
 
     data = load(args.data)
@@ -263,7 +344,7 @@ def main():
         for p in problems:
             print(p, file=sys.stderr)
         n = len(data["rows"])
-        print(f"{n} rows, {len(data['references'])} references: "
+        print(f"{n} rows, {len(data['fields'])} fields, {len(data['references'])} references: "
               + ("ok" if not problems else f"{len(problems)} problems"), file=sys.stderr)
         sys.exit(1 if problems else 0)
     refs = data["references"]
@@ -271,6 +352,7 @@ def main():
     for k in keys:
         if k not in refs:
             sys.exit(f"cited key {k} is not in `references`")
+    have = set()
     if args.check_bib:
         have = bib_keys(args.check_bib)
         for k, ref in refs.items():
@@ -287,7 +369,7 @@ def main():
         sys.stdout.write(tex)
 
     if args.bib:
-        new = [k for k in keys if not refs[k].get("in_paper_bib")]
+        new = [k for k in keys if not refs[k].get("in_paper_bib") and k not in have]
         entries = [bibtex(k, refs[k]) for k in new]
         header = ("% BibTeX entries cited by the dictionary table and not in the paper's "
                   "bibliography.\n% Generated by scripts/dictionary_tex.py from "

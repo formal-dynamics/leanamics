@@ -8,9 +8,14 @@
 
 /* Put your rules below this line */
 
-/* Cross-field dictionary (_includes/dictionary.html). Five columns on large screens; on medium
-   screens the title spans the row above the four fields; below 700px every row is a card. */
+/* Cross-field dictionary (_includes/dictionary.html). On large screens the dictionary is wider
+   than the text column: it takes the width of the window less 2rem on each side, up to 84rem,
+   centred, so that it never scrolls the page sideways. From 72em it is a grid with the title and
+   one column per field (about 150px or more each); on medium screens the title spans the row above
+   the fields, three per line, each with its label; below 700px every row is a card. */
 $dict-small: 43.75em;
+$dict-grid: 72em;
+$dict-wide: 84rem;
 $dict-muted: #8a979e;
 
 .dict {
@@ -59,7 +64,19 @@ $dict-muted: #8a979e;
 .dict-head,
 .dict-cells {
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) repeat(4, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.3fr) repeat(6, minmax(0, 1fr));
+}
+
+@media screen and (min-width: $large-breakpoint) {
+  .dict-table {
+    margin: 0 calc(50% - 50vw + 2rem);
+  }
+}
+
+@media screen and (min-width: $dict-wide + 4rem) {
+  .dict-table {
+    margin: 0 calc(50% - #{$dict-wide / 2});
+  }
 }
 
 .dict-head {
@@ -159,6 +176,12 @@ a.dict-status:hover {
   color: #5a666c;
 }
 
+.dict-status-not-formalized {
+  background: #fbefe9;
+  border-color: #e8c0ae;
+  color: #8a4127;
+}
+
 .dict-label {
   display: none;
 }
@@ -226,14 +249,29 @@ a.dict-status:hover {
   }
 }
 
-@media screen and (min-width: $dict-small) and (max-width: $large-breakpoint) {
-  .dict-head,
-  .dict-cells {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+@media screen and (max-width: $dict-grid) {
+  .dict-head {
+    display: none;
   }
 
-  .dict-head-title {
-    display: none;
+  .dict-label {
+    display: block;
+    color: $section-headings-color;
+    font-size: 0.7rem;
+    font-weight: bold;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .dict-none .dict-label {
+    display: inline;
+    margin-right: 0.4rem;
+  }
+}
+
+@media screen and (min-width: $dict-small) and (max-width: $dict-grid) {
+  .dict-cells {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .dict-title-cell {
@@ -243,10 +281,6 @@ a.dict-status:hover {
 }
 
 @media screen and (max-width: $dict-small) {
-  .dict-head {
-    display: none;
-  }
-
   .dict-cells {
     display: block;
   }
@@ -270,13 +304,9 @@ a.dict-status:hover {
     border-top: 0;
   }
 
-  .dict-label {
-    display: block;
-    color: $section-headings-color;
-    font-size: 0.7rem;
-    font-weight: bold;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
+  .dict-none {
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
   }
 
   .dict-more {
