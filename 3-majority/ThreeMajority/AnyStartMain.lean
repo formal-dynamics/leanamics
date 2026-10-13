@@ -14,9 +14,11 @@ arXiv:1702.04921): from any configuration, 3-Majority reaches consensus w.h.p. w
   Voter) and Lemma 3 (the Voter bound). It is used with `k ≈ n^{1/4} log^{1/8} n`.
 * Phase 2: from `k ≤ n^{1/3−ε}` colours to consensus, the paper cites Theorem 3.1 of
   Becchetti, Clementi, Natale, Pasquale, Trevisan (*Stabilizing consensus with many opinions*,
-  SODA 2016), restated as Theorem 8 of BCEKMN17. That result is not part of this paper and is
-  not formalized here: `Bcnpt16Phase2 ε` states it for one `ε`, and the main theorem
-  `threeMaj_anyStart_consensus` takes it as a hypothesis, exactly as the paper's proof does.
+  SODA 2016), restated as Theorem 8 of BCEKMN17. That result is not part of this paper:
+  `Bcnpt16Phase2 ε` states it for one `ε`, and the bridge theorem `threeMaj_anyStart_consensus`
+  takes it as a hypothesis, exactly as the paper's proof does. It is formalized in
+  `ManyOpinions*.lean` (roadmap MAJ-12 (a)): `bcnpt16Phase2_of_pos` proves `Bcnpt16Phase2 ε` for
+  every `ε > 0`, and `threeMaj_anyStart_consensus_unconditional` is Theorem 4 without hypothesis.
 -/
 
 namespace ThreeMajority
@@ -55,7 +57,8 @@ theorem threeMaj_reduce_whp {n : ℕ} {σ : Type*} [Finite σ] [DecidableEq σ] 
 SODA 2016), for one `ε`, as a hypothesis: there are constants `C, N` such that for `n ≥ N`, from
 any configuration of colours in `[n]` with `k ≤ n^{1/3 − ε}` colours, 3-Majority reaches
 consensus within any `T ≥ C (k² log^{1/2} n + k log n)(k + log n)` rounds, with probability at
-least `1 − 1/n`. -/
+least `1 − 1/n`. It holds for every `ε > 0` (`bcnpt16Phase2_of_pos`, in
+`ManyOpinionsMain.lean`). -/
 def Bcnpt16Phase2 (ε : ℝ) : Prop :=
   ∃ C N : ℝ, ∀ n : ℕ, N ≤ n → ∀ c : Fin n → Fin n,
     (numColours c : ℝ) ≤ (n : ℝ) ^ (1 / 3 - ε) →
@@ -65,7 +68,8 @@ def Bcnpt16Phase2 (ε : ℝ) : Prop :=
 
 /-- **Theorem 4** (BCEKMN17): from any configuration of colours in `[n]`, 3-Majority reaches
 consensus within any `T ≥ C n^{3/4} log^{7/8} n` rounds with probability at least `1 − 2/n`, for
-`n ≥ N`. The cited Phase 2 result (Theorem 8, for `ε = 1/24`) is a hypothesis. -/
+`n ≥ N`. The cited Phase 2 result (Theorem 8, for `ε = 1/24`) is a hypothesis here;
+`threeMaj_anyStart_consensus_unconditional` (in `ManyOpinionsMain.lean`) discharges it. -/
 theorem threeMaj_anyStart_consensus (h : Bcnpt16Phase2 (1 / 24)) :
     ∃ C N : ℝ, ∀ n : ℕ, N ≤ n → ∀ c : Fin n → Fin n, ∀ T : ℕ,
       C * (n : ℝ) ^ ((3 : ℝ) / 4) * Real.log n ^ ((7 : ℝ) / 8) ≤ T →

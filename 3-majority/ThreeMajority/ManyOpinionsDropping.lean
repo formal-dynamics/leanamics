@@ -272,8 +272,9 @@ lemma avg_colourCount_stepCol_ge_gap {y : Fin n → Fin n} {a : Fin n} {j : ℕ}
       ≤ g ^ 2 / (32 * j * n) * (2 * (n / j)) := mul_le_mul_of_nonneg_left hsum (by positivity)
     _ = (g / (4 * j)) ^ 2 := by field_simp; ring
 
-/-- The target levels of the proof of Lemma 3.4 (BCNPT16, Appendix B, with the corrections of
-`PROGRESS-MAJ-12.md`): `max(n/j − m (1 + 1/(4j))^s, (n/(2j)) (1 − 1/(4j))^(s − s_A), K)`. The
+/-- The target levels of the proof of Lemma 3.4 (BCNPT16, Appendix B, with the corrections listed
+in `FORMALIZATION_DIFFERENCES.md`):
+`max(n/j − m (1 + 1/(4j))^s, (n/(2j)) (1 − 1/(4j))^(s − s_A), K)`. The
 first term is the gap-growth block (until `c_a ≤ n/(2j)`), the second the geometric decrease
 from `n/(2j)` (after round `s_A`), and `K` the floor. -/
 noncomputable def stage1Level (n j : ℕ) (m K : ℝ) (sA s : ℕ) : ℝ :=
