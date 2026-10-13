@@ -2,7 +2,7 @@
 
 A Lean formalization of the Birth–death Moran process on a finite graph and of the
 "if" direction of the isothermal theorem (Lieberman, Hauert and Nowak, *Evolutionary dynamics
-on graphs*, Nature 433, 2005), with Moran's formula (1958) as a corollary.
+on graphs*, Nature 433, 2005), with Moran's formula (Moran 1959) as a corollary.
 
 **Model.** Mutants have fitness `r > 0`, residents fitness `1`. In each step a parent is chosen
 with probability proportional to its fitness, and its offspring replaces a uniformly random
