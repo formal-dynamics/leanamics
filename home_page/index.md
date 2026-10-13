@@ -144,15 +144,15 @@ If you use Leanamics, please cite it. Every release is archived on [Zenodo](http
 with its own DOI, and [10.5281/zenodo.23265329](https://doi.org/10.5281/zenodo.23265329) always resolves to the latest release; the
 metadata are in
 [CITATION.cff](https://github.com/formal-dynamics/leanamics/blob/main/CITATION.cff). Please cite
-the version you used (here v0.1.0):
+the version you used (here v0.2.0):
 
 ```bibtex
 @software{leanamics,
   author  = {Kumar, Aakash and Bucarelli, Maria Sofia and D'Archivio, Niccol{\`o} and Natale, Emanuele},
   title   = {Leanamics: {Lean} 4 formalizations of opinion dynamics and related distributed processes},
   year    = {2026},
-  version = {0.1.0},
-  doi     = {10.5281/zenodo.23265330},
+  version = {0.2.0},
+  doi     = {10.5281/zenodo.23265329},
   url     = {https://github.com/formal-dynamics/leanamics}
 }
 ```

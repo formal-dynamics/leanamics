@@ -2,8 +2,8 @@ cff-version: 1.2.0
 message: "If you use Leanamics, please cite it as below."
 title: "Leanamics: Lean 4 formalizations of opinion dynamics and related distributed processes"
 type: software
-version: 0.1.0
-date-released: 2026-10-09
+version: 0.2.0
+date-released: 2026-10-13
 doi: 10.5281/zenodo.23265329
 identifiers:
   - type: doi
