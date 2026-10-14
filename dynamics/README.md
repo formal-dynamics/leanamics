@@ -6,9 +6,10 @@ uses Lean 4.32.0 and Mathlib revision
 
 | Module | API |
 | --- | --- |
-| `Uniform` | Finite averages, recursive uniform trajectory expectations, independence, reindexing; extracted from 3-majority |
+| `Uniform` | Finite averages, recursive uniform trajectory expectations, independence over finite dependent products (`avg_pi_prod`, `avg_pi_eval`) and of disjoint blocks of coordinates (`avg_pi_split`), reindexing; extracted from 3-majority |
 | `Equivalence` | `expList_eq_avg_ofFn`, the recursive `expList` is the uniform average over `Fin T → α` |
 | `Distribution` | Normalized nonnegative real weights, expectations, event probabilities, uniform distributions, point masses, independent products, pushforward |
+| `Independent` | Independent products `Distribution.independent`: resampling and conditioning on one coordinate (`independent_expect_update`, `independent_expect_eq_sum_update`, `independent_expect_fin_succ`), pairwise and block independence (`independent_expect_pair`, `expect_mul_of_dep`), second and third moments of centred sums, coordinatewise combination of independent families (`expect_expect_coord`) |
 | `Bridge` | The three expectation APIs agree: `avg` is Mathlib's `𝔼 a, f a` (`avg_eq_expect`), the product of uniform laws is uniform (`Distribution.independent_uniform_expect`), and `expList` is the expectation over `T` i.i.d. draws in Mathlib's and in the distribution form (`expList_eq_expect`, `expList_eq_independent_expect`) |
 | `Kernel` | Finite stochastic kernels, finite-time expectations, events, stationarity, harmonic observables |
 | `Trajectory` | Weighted history/endpoint expectations and agreement with kernel iteration |

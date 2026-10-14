@@ -71,7 +71,8 @@ theorem expect_prob_swg_eq {p q : ℝ} (hp0 : 0 ≤ p) (hp1 : p ≤ 1) (hq0 : 0 
         (fun ω => E (perc ⊤ ω)) := by
   classical
   simp_rw [Distribution.prob_eq_expect, perc_swg_eq]
-  refine expect_expect_coord (fun _ => bernoulli q hq0 hq1) (fun _ => bernoulli p hp0 hp1) _
+  refine Distribution.expect_expect_coord (fun _ => bernoulli q hq0 hq1)
+    (fun _ => bernoulli p hp0 hp1) _
     (swgCoin n) (fun e c => ?_) (fun z => if E (perc ⊤ z) then 1 else 0)
   simp only [Distribution.bernoulli, bernoulli, swgRate, swgCoin, Fintype.sum_bool]
   by_cases he : e ∈ (cycleGraph n).edgeSet <;> cases c <;> simp [he] <;> ring

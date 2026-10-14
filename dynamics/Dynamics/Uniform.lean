@@ -3,7 +3,9 @@ import Mathlib
 /-!
 # Finite uniform expectations
 
-Shared finite averages, trajectory expectations, independence, and reindexing.
+Shared finite averages, trajectory expectations, independence (over any finite dependent
+product, `avg_pi_prod`, `avg_pi_eval`, and of disjoint blocks of coordinates, `avg_pi_split`),
+and reindexing.
 The average on an empty type is zero.
 -/
 
@@ -160,57 +162,39 @@ lemma avg_equiv {β : Type*} [Fintype β] (e : α ≃ β) (F : β → ℝ) :
   unfold avg
   rw [Equiv.sum_comp e F, Fintype.card_congr e]
 
+/-- **Independence over a dependent product**: under the uniform distribution on a finite
+product `∀ i, β i`, the coordinates are independent, so the average of a product
+`∏ i, g i (x i)` is the product of the averages `avg (g i)`. -/
+lemma avg_pi_prod {ι : Type*} [Fintype ι] [DecidableEq ι] {β : ι → Type*}
+    [∀ i, Fintype (β i)] (g : ∀ i, β i → ℝ) :
+    avg (fun x : (∀ i, β i) => ∏ i, g i (x i)) = ∏ i, avg (g i) := by
+  unfold avg
+  rw [← Fintype.prod_sum, Fintype.card_pi, Nat.cast_prod, ← prod_div_distrib]
+
+/-- **Marginal over a dependent product**: the average of a function of one coordinate, over
+the whole product space, is its average over that coordinate alone. -/
+lemma avg_pi_eval {ι : Type*} [Fintype ι] [DecidableEq ι] {β : ι → Type*}
+    [∀ i, Fintype (β i)] [∀ i, Nonempty (β i)] (i : ι) (g : β i → ℝ) :
+    avg (fun x : (∀ j, β j) => g (x i)) = avg g := by
+  rw [← avg_fst_mul (δ := (j : {j // j ≠ i}) → β j) g]
+  exact avg_equiv (Equiv.piSplitAt i β) (fun p => g p.1)
+
 /-- **Independence over a `Fin n`-indexed product**: the average of a product
 `∏ i, f i (x i)` over the product Fintype `Fin n → γ` (uniform measure)
 equals the product of the individual averages `avg (f i)`. This is the
 discrete, measure-theory-free form of "coordinate projections on a product
-space are independent." -/
+space are independent", the non-dependent case of `avg_pi_prod`. -/
 lemma avg_prod_pi {γ : Type*} [Fintype γ] :
     ∀ (n : ℕ) (f : Fin n → γ → ℝ),
-      avg (fun x : Fin n → γ => ∏ i, f i (x i)) = ∏ i, avg (f i)
-  | 0, f => by
-      have h1 : (fun x : Fin 0 → γ => ∏ i : Fin 0, f i (x i)) = fun _ => (1 : ℝ) := by
-        funext x; simp
-      have h2 : Nonempty (Fin 0 → γ) := ⟨Fin.elim0⟩
-      rw [h1]
-      haveI := h2
-      rw [avg_const, Finset.prod_of_isEmpty]
-  | n + 1, f => by
-      have hfun : (fun x : Fin (n + 1) → γ => ∏ i, f i (x i))
-          = (fun x : Fin (n + 1) → γ =>
-              (fun p : γ × (Fin n → γ) => f 0 p.1 * ∏ i : Fin n, f i.succ (p.2 i))
-                ((Fin.consEquiv (fun _ : Fin (n + 1) => γ)).symm x)) := by
-        funext x
-        simp only [Fin.prod_univ_succ]
-        congr 1
-      rw [hfun,
-        avg_equiv (Fin.consEquiv (fun _ : Fin (n + 1) => γ)).symm
-          (fun p : γ × (Fin n → γ) => f 0 p.1 * ∏ i : Fin n, f i.succ (p.2 i)),
-        avg_mul_prod (f 0) (fun x : Fin n → γ => ∏ i : Fin n, f i.succ (x i)),
-        avg_prod_pi n (fun i => f i.succ), Fin.prod_univ_succ]
+      avg (fun x : Fin n → γ => ∏ i, f i (x i)) = ∏ i, avg (f i) :=
+  fun _ f => avg_pi_prod f
 
 /-- **Marginal for `Fin n`-indexed Pi types**: the average of a function of
 a single fixed coordinate, over the whole product space, equals its average
-over that one factor alone. -/
+over that one factor alone (the non-dependent case of `avg_pi_eval`). -/
 lemma avg_eval {γ : Type*} [Fintype γ] [Nonempty γ] (n : ℕ) (v : Fin n) (G : γ → ℝ) :
-    avg (fun x : Fin n → γ => G (x v)) = avg G := by
-  have hval : (fun x : Fin n → γ => G (x v))
-      = fun x : Fin n → γ =>
-          ∏ i : Fin n, (if i = v then G else (fun _ : γ => (1 : ℝ))) (x i) := by
-    funext x
-    rw [Finset.prod_eq_single v]
-    · simp
-    · intro i _ hiv
-      simp [hiv]
-    · intro h
-      exact absurd (mem_univ v) h
-  rw [hval, avg_prod_pi n (fun i => if i = v then G else (fun _ : γ => (1 : ℝ)))]
-  rw [Finset.prod_eq_single v]
-  · simp
-  · intro i _ hiv
-    simp [hiv, avg_const]
-  · intro h
-    exact absurd (mem_univ v) h
+    avg (fun x : Fin n → γ => G (x v)) = avg G :=
+  avg_pi_eval (β := fun _ : Fin n => γ) v G
 
 /-- Finite uniform averages over a product of index sets commute. -/
 lemma avg_avg_swap {β : Type*} [Fintype β] (F : α → β → ℝ) :
@@ -218,6 +202,24 @@ lemma avg_avg_swap {β : Type*} [Fintype β] (F : α → β → ℝ) :
   unfold avg
   dsimp only
   rw [← Finset.sum_div, div_div, sum_comm, mul_comm, ← div_div, Finset.sum_div]
+
+/-- The average over a product type is the iterated average. -/
+lemma avg_prod_eq_avg_avg {β δ : Type*} [Fintype β] [Fintype δ] (G : β × δ → ℝ) :
+    avg G = avg (fun b => avg (fun d => G (b, d))) := by
+  unfold avg
+  dsimp only
+  rw [Fintype.sum_prod_type, Fintype.card_prod, Nat.cast_mul, sum_div, sum_div]
+  exact sum_congr rfl fun b _ => by rw [div_div, mul_comm]
+
+/-- **Independence of disjoint blocks of coordinates**: under the uniform distribution on
+`I → γ`, the coordinates in `{i // p i}` and those in its complement are independent, so the
+average of a function of the two restrictions is the iterated average. -/
+lemma avg_pi_split {I γ : Type*} [Fintype I] [DecidableEq I] [Fintype γ] (p : I → Prop)
+    [DecidablePred p] (F : ({i // p i} → γ) → ({i // ¬ p i} → γ) → ℝ) :
+    avg (fun τ : I → γ => F (fun i => τ i) (fun i => τ i)) =
+      avg (fun τ₁ : {i // p i} → γ => avg (fun τ₂ : {i // ¬ p i} → γ => F τ₁ τ₂)) := by
+  rw [← avg_prod_eq_avg_avg fun q => F q.1 q.2]
+  exact avg_equiv (Equiv.piEquivPiSubtypeProd p fun _ : I => γ) fun q => F q.1 q.2
 
 /-- `expList` is an iterated average, so it commutes with an outer uniform average. -/
 lemma expList_avg_comm {β : Type*} [Fintype β] (T : ℕ) (G : α → List β → ℝ) :

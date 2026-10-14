@@ -11,9 +11,10 @@ For a finite type $A$, set $\operatorname{avg}(f)=\sum_{a\in A}f(a)/|A|$.
 When $A$ is empty this is zero, following Lean's division convention.
 \end{definition}
 \begin{lemma}[Product independence]\label{lem:uniform-product}
-\lean{Dynamics.avg_prod_pi,Dynamics.avg_equiv}\leanok\uses{def:avg}
-Uniform averages factor over independent coordinates and are invariant under
-bijections of the sample space.
+\lean{Dynamics.avg_pi_prod,Dynamics.avg_pi_eval,Dynamics.avg_prod_pi,Dynamics.avg_equiv,Dynamics.avg_prod_eq_avg_avg,Dynamics.avg_pi_split}\leanok\uses{def:avg}
+Uniform averages over a finite (dependent) product factor over its coordinates, each
+coordinate is uniform on its factor, disjoint blocks of coordinates are independent,
+and averages are invariant under bijections of the sample space.
 \end{lemma}
 \begin{lemma}[Finite trajectories]\label{lem:uniform-trajectory}
 \lean{Dynamics.expList,Dynamics.expList_eq_avg_ofFn}\leanok\uses{def:avg}
@@ -54,6 +55,19 @@ observables factor, and transporting weights along a function commutes with expe
 \begin{proof}\leanok
 Distribute products over finite sums; for pushforward interchange the two sums
 and evaluate each fiber indicator.
+\end{proof}
+\begin{lemma}[Independent coordinates]\label{lem:independent}
+\lean{Dynamics.Distribution.independent_expect_update,Dynamics.Distribution.independent_expect_eq_sum_update,Dynamics.Distribution.independent_expect_fin_succ,Dynamics.Distribution.independent_prob_fin_succ,Dynamics.Distribution.independent_expect_mul_of_update,Dynamics.Distribution.independent_expect_pair,Dynamics.Distribution.independent_expect_sum_sq,Dynamics.Distribution.independent_expect_sum_cube,Dynamics.Distribution.expect_expect_coord,Dynamics.Distribution.expect_mul_of_dep}\leanok\uses{lem:weighted-product}
+Under an independent product, resampling one coordinate does not change the law, so the
+expectation can be conditioned on the value of one coordinate. Two distinct coordinates are
+independent, and so are functions of disjoint sets of coordinates; centred coordinate functions
+have additive second and third moments. If $x$ and $y$ are independent families, the family
+$(\varphi_i(x_i,y_i))_i$ is independent, with the coordinatewise laws.
+\end{lemma}
+\begin{proof}\leanok
+Resampling: the bijection $(x,a)\mapsto(x[i\mapsto a],x_i)$ moves the weight of coordinate $i$.
+Moments: expand the power of the sum and factor the mixed terms. Combination: expand the product
+weights of $(\varphi_i(x_i,y_i))_i$ as sums over the preimages.
 \end{proof}
 \begin{lemma}[Bridges between the expectation APIs]\label{lem:bridge}
 \lean{Dynamics.avg_eq_expect,Dynamics.expList_eq_expect,Dynamics.Distribution.independent_uniform_expect,Dynamics.expList_eq_independent_expect}\leanok\uses{lem:uniform-trajectory,lem:uniform-agreement,lem:weighted-product}

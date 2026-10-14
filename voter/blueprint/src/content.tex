@@ -262,7 +262,7 @@ otherwise a uniformly random neighbour. Rounds can also be composed on the left,
 $W\mapsto r\circ W$.
 \end{definition}
 \begin{lemma}[Duality for every kernel]\label{lem:duality-general}
-\lean{Voter.independent_expect_pair,Voter.iterate_transition_eq_leftRounds,Voter.iterate_leftRounds_pair,Voter.iterate_disagreement_le_pairWalk}\leanok\uses{def:pairwalk,lem:duality}
+\lean{Dynamics.Distribution.independent_expect_pair,Voter.iterate_transition_eq_leftRounds,Voter.iterate_leftRounds_pair,Voter.iterate_disagreement_le_pairWalk}\leanok\uses{def:pairwalk,lem:duality}
 For every sampling kernel, the probability that no consensus is reached after $T$ rounds
 is at most the sum over $v\neq u_0$ of the probability that the tokens started at $v$ and
 $u_0$ are apart after $T$ steps.
@@ -437,7 +437,7 @@ number of neighbours of $u$ with another opinion; for two opinions $s_t$ is the 
 volume and $\Psi=\sqrt{\mathrm{vol}(s_t)}$.
 \end{definition}
 \begin{lemma}[Independent coordinates]\label{lem:indep}
-\lean{Voter.independent_expect_update,Voter.independent_expect_mul_of_update,Voter.independent_expect_sum_sq,Voter.independent_expect_sum_cube,Voter.independent_expect_comp_sum_le}\leanok
+\lean{Dynamics.Distribution.independent_expect_update,Dynamics.Distribution.independent_expect_mul_of_update,Dynamics.Distribution.independent_expect_sum_sq,Dynamics.Distribution.independent_expect_sum_cube,Voter.independent_expect_comp_sum_le}\leanok
 Resampling one coordinate of an independent point does not change its law. Consequently
 centred coordinate functions have additive second and third moments, and if replacing each
 coordinate function improves $\mathbb{E}f(z+\cdot)$ for all admissible $z$, then the replacement of

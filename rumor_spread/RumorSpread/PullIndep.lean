@@ -4,12 +4,11 @@ import RumorSpread.OneRound
 # Independence of the calls in a uniform round
 
 A uniform round `r : Tgt n` is a uniform element of the product `∀ v, {u // u ≠ v}`, so the calls
-`r v` of different nodes are independent. `avg_pi_prod` states this for any finite product
-(Fubini for products of functions of the coordinates, via `Fintype.prod_sum`), and
-`avg_tgt_mul_prod` specializes it to a function of one call `r v` times a product over calls
-`r w`, `w ∈ S`, with `v ∉ S`. (`avg_pi_prod` is the dependent-product version of
-`Dynamics.avg_prod_pi`, which covers only non-dependent products `Fin n → γ` and so does not
-apply to `Tgt n`.) This covers all the probabilities needed for PULL and PUSH–PULL:
+`r v` of different nodes are independent. The core's `Dynamics.avg_pi_prod` states this for any
+finite dependent product (Fubini for products of functions of the coordinates, via
+`Fintype.prod_sum`), and `avg_tgt_mul_prod` specializes it to a function of one call `r v` times
+a product over calls `r w`, `w ∈ S`, with `v ∉ S`. This covers all the probabilities needed for
+PULL and PUSH–PULL:
 
 * `avg_tgt_coord` — a single call is uniform among the other `n - 1` nodes;
 * `avg_call_mem`, `avg_call_not_mem` — a caller `v ∉ I` calls into `I` with probability
@@ -22,14 +21,6 @@ namespace RumorPush
 open Finset Dynamics
 
 variable {n : ℕ}
-
-/-- **Independent coordinates**: under the uniform distribution on a finite product, the
-expectation of a product of functions of the coordinates is the product of the expectations. -/
-lemma avg_pi_prod {ι : Type*} [Fintype ι] [DecidableEq ι] {β : ι → Type*}
-    [∀ i, Fintype (β i)] (g : ∀ i, β i → ℝ) :
-    avg (fun x : (∀ i, β i) => ∏ i, g i (x i)) = ∏ i, avg (g i) := by
-  unfold avg
-  rw [← Fintype.prod_sum, Fintype.card_pi, Nat.cast_prod, ← prod_div_distrib]
 
 /-- The calls of a uniform round are independent (`avg_pi_prod` for `Tgt n`). -/
 lemma avg_tgt_prod (g : Fin n → Fin n → ℝ) :

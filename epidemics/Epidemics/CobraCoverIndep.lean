@@ -3,31 +3,19 @@ import Epidemics.CobraCoverRound
 /-! # Independent coordinates of a uniform round (EPI-4, Corollary 1 and Theorem 3)
 
 Under the uniform distribution on a finite dependent product `(u : V) → Ω u`, the coordinates
-are independent: averages of products factor (`avg_pi_prod`), and an observable of one
-coordinate has the same average as on that coordinate alone (`avg_pi_eval`). Consequently, the
-number `N` of coordinates `u` whose value satisfies an event `X u` has the moment generating
-function bound `E e^{-φ N} ≤ exp(-(1 - e^{-φ}) E N)` (`pi_count_mgf_le`), the computation (12) of
-the paper, and `E N = ∑_u P(X u)` (`avg_pi_count`). `Choices G k` is the case
-`Ω u = Fin k → G.neighborSet u` (`avg_choices_prod`, `bips_mgf_le`).
+are independent: averages of products factor, and an observable of one coordinate has the same
+average as on that coordinate alone (the core's `Dynamics.avg_pi_prod` and
+`Dynamics.avg_pi_eval`, in `Dynamics.Uniform`). Consequently, the number `N` of coordinates `u`
+whose value satisfies an event `X u` has the moment generating function bound
+`E e^{-φ N} ≤ exp(-(1 - e^{-φ}) E N)` (`pi_count_mgf_le`), the computation (12) of the paper,
+and `E N = ∑_u P(X u)` (`avg_pi_count`). `Choices G k` is the case `Ω u = Fin k → G.neighborSet u`
+(`avg_choices_prod`, `bips_mgf_le`).
 -/
 
 namespace Epidemics
 open Finset Dynamics Real
 
 variable {V : Type*} [Fintype V] [DecidableEq V] {Ω : V → Type*} [∀ u, Fintype (Ω u)]
-
-/-- **Independence over coordinates**: the average of a product of one-coordinate observables
-is the product of their averages. -/
-lemma avg_pi_prod (f : (u : V) → Ω u → ℝ) :
-    avg (fun ω : (u : V) → Ω u => ∏ u, f u (ω u)) = ∏ u, avg (f u) := by
-  unfold avg
-  rw [← Fintype.prod_sum, Fintype.card_pi, Nat.cast_prod, ← Finset.prod_div_distrib]
-
-/-- **Marginal of one coordinate.** -/
-lemma avg_pi_eval [∀ u, Nonempty (Ω u)] (u : V) (g : Ω u → ℝ) :
-    avg (fun ω : (w : V) → Ω w => g (ω u)) = avg g := by
-  rw [← avg_fst_mul (δ := (i : {j // j ≠ u}) → Ω i) g]
-  exact avg_equiv (Equiv.piSplitAt u Ω) (fun p => g p.1)
 
 omit [DecidableEq V] [∀ u, Fintype (Ω u)] in
 /-- The number of coordinates whose value satisfies its event, as a sum of indicators. -/

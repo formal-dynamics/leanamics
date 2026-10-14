@@ -39,21 +39,12 @@ lemma card_filter_cons {m : ℕ} (b : Bool) (r : Fin m → Bool) :
   rw [card_filter, card_filter, Fin.sum_univ_succ]
   simp
 
-/-- Probabilities under an i.i.d. product over `Fin (m + 1)`, conditioned on the first trial. -/
-lemma independent_prob_fin_succ {β : Type*} [Fintype β] {m : ℕ} (q : Distribution β)
-    (s : (Fin (m + 1) → β) → Prop) :
-    (Distribution.independent fun _ : Fin (m + 1) => q).prob s =
-      ∑ b, q.weight b *
-        (Distribution.independent fun _ : Fin m => q).prob (fun r => s (Fin.cons b r)) := by
-  unfold Distribution.prob
-  exact independent_expect_fin_succ q _
-
 /-- **One-step recursion of the binomial tail**: condition on the first trial. -/
 lemma binTail_succ_succ (m k : ℕ) :
     binTail p h0 h1 (m + 1) (k + 1) =
       p * binTail p h0 h1 m k + (1 - p) * binTail p h0 h1 m (k + 1) := by
   unfold binTail
-  rw [independent_prob_fin_succ, Fintype.sum_bool]
+  rw [Distribution.independent_prob_fin_succ, Fintype.sum_bool]
   simp only [card_filter_cons, if_true, Bool.false_eq_true, if_false, zero_add]
   have ht : ∀ c : ℕ, k + 1 ≤ 1 + c ↔ k ≤ c := fun c => by omega
   simp only [ht]

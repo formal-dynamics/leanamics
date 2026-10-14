@@ -1,4 +1,5 @@
 import Epidemics.SmallWorldDefs
+import Dynamics.Independent
 
 /-! # Adaptive observations: a finite supermartingale lemma (EPI-6, tools)
 
@@ -13,9 +14,10 @@ Tools for the exploration argument of [BCDPTZ22] (Appendix C), in finite probabi
   process has expectation at most `1`. With Markov's inequality this gives the tail bound of the
   exploration (`Epidemics.SmallWorldExplore`), in the role of the Galton–Watson comparison of the
   paper.
-* **Coordinatewise combination of independent families** (`expect_expect_coord`): if `x` and `y`
-  are independent families, `fun i => φ i (x i) (y i)` is an independent family. This gives the
-  independence of disjoint sets of coordinates (`expect_mul_of_dep`) and, in
+* **Coordinatewise combination of independent families** (the core's
+  `Distribution.expect_expect_coord`, in `Dynamics.Independent`): if `x` and `y` are independent
+  families, `fun i => φ i (x i) (y i)` is an independent family. This gives the independence of
+  disjoint sets of coordinates (`Distribution.expect_mul_of_dep`) and, in
   `Epidemics.SmallWorldCollapse`, the law of the percolated `SWG(n, q)`.
 * **Fresh observations of independent coordinates** (`expect_prod_hist_le_one_of_fresh`): if each
   observation reads coordinates not read before, the conditional expectation is the unconditional
@@ -167,92 +169,6 @@ lemma prob_le_expect_div {α : Type*} [Fintype α] (P : Distribution α) (X : α
   · linarith
   · linarith [hX ω]
 
-/-! ### Coordinatewise combination of independent families -/
-
-section Coord
-
-variable {ι α β γ : Type*} [Fintype ι] [DecidableEq ι] [Fintype α] [Fintype β] [Fintype γ]
-
-/-- **Coordinatewise combination**: if `x ~ independent P` and `y ~ independent Q` are
-independent, and `R i` is the law of `φ i a b` for `a ~ P i`, `b ~ Q i`, then
-`fun i => φ i (x i) (y i)` has law `independent R`. -/
-theorem expect_expect_coord (P : ι → Distribution α) (Q : ι → Distribution β)
-    (R : ι → Distribution γ) (φ : ι → α → β → γ) [DecidableEq γ]
-    (hR : ∀ i c, (R i).weight c =
-      ∑ a, ∑ b, if φ i a b = c then (P i).weight a * (Q i).weight b else 0)
-    (H : (ι → γ) → ℝ) :
-    (Distribution.independent P).expect (fun x =>
-        (Distribution.independent Q).expect fun y => H fun i => φ i (x i) (y i)) =
-      (Distribution.independent R).expect H := by
-  classical
-  set g : ι → γ → α → β → ℝ := fun i c a b =>
-    if φ i a b = c then (P i).weight a * (Q i).weight b else 0 with hg
-  have key (z : ι → γ) : (∏ i, (R i).weight (z i)) =
-      ∑ x : ι → α, ∑ y : ι → β, ∏ i, g i (z i) (x i) (y i) := by
-    have h1 : ∀ i, (R i).weight (z i) = ∑ ab : α × β, g i (z i) ab.1 ab.2 := fun i => by
-      rw [hR, Fintype.sum_prod_type']
-    simp_rw [h1]
-    rw [Fintype.prod_sum, ← Fintype.sum_prod_type']
-    exact Fintype.sum_equiv (Equiv.arrowProdEquivProdArrow ι (fun _ => α) (fun _ => β)) _ _
-      fun w => rfl
-  have hpt (x : ι → α) (y : ι → β) (z : ι → γ) : (∏ i, g i (z i) (x i) (y i)) =
-      if (fun i => φ i (x i) (y i)) = z then
-        (∏ i, (P i).weight (x i)) * ∏ i, (Q i).weight (y i) else 0 := by
-    split_ifs with hz
-    · subst hz
-      simp [hg, prod_mul_distrib]
-    · obtain ⟨i, hi⟩ := Function.ne_iff.mp hz
-      exact prod_eq_zero (mem_univ i) (by simp [hg, hi])
-  simp only [Distribution.expect, Distribution.independent]
-  symm
-  calc ∑ z : ι → γ, (∏ i, (R i).weight (z i)) * H z
-      = ∑ z : ι → γ, ∑ x : ι → α, ∑ y : ι → β, (∏ i, g i (z i) (x i) (y i)) * H z := by
-        simp_rw [key, sum_mul]
-    _ = ∑ x : ι → α, ∑ y : ι → β, ∑ z : ι → γ, (∏ i, g i (z i) (x i) (y i)) * H z := by
-        rw [sum_comm]
-        exact sum_congr rfl fun x _ => sum_comm
-    _ = ∑ x : ι → α, ∑ y : ι → β, (∏ i, (P i).weight (x i)) *
-          ((∏ i, (Q i).weight (y i)) * H fun i => φ i (x i) (y i)) := by
-        refine sum_congr rfl fun x _ => sum_congr rfl fun y _ => ?_
-        simp_rw [hpt, ite_mul, zero_mul]
-        rw [sum_ite_eq]
-        simp [mul_assoc]
-    _ = _ := by simp_rw [mul_sum]
-
-/-- **Independence of disjoint sets of coordinates**: under an independent product, a function
-of the coordinates in `S` and a function of the coordinates outside `S` are uncorrelated. -/
-theorem expect_mul_of_dep (P : ι → Distribution α) (S : Finset ι) {F G : (ι → α) → ℝ}
-    (hF : ∀ ω ω', (∀ i ∈ S, ω i = ω' i) → F ω = F ω')
-    (hG : ∀ ω ω', (∀ i ∉ S, ω i = ω' i) → G ω = G ω') :
-    (Distribution.independent P).expect (fun ω => F ω * G ω) =
-      (Distribution.independent P).expect F * (Distribution.independent P).expect G := by
-  classical
-  set φ : ι → α → α → α := fun i a b => if i ∈ S then a else b with hφ
-  have hR : ∀ i c, (P i).weight c =
-      ∑ a, ∑ b, if φ i a b = c then (P i).weight a * (P i).weight b else 0 := by
-    intro i c
-    by_cases hi : i ∈ S
-    · simp only [hφ, if_pos hi]
-      rw [sum_eq_single c (fun a _ ha => sum_eq_zero fun b _ => if_neg ha) (by simp)]
-      simp [← mul_sum, (P i).sum_one]
-    · simp only [hφ, if_neg hi]
-      rw [sum_comm, sum_eq_single c (fun b _ hb => sum_eq_zero fun a _ => if_neg hb)
-        (by simp)]
-      simp [← sum_mul, (P i).sum_one]
-  have hmerge := expect_expect_coord P P P φ hR (fun ω => F ω * G ω)
-  have hFm (x y : ι → α) : F (fun i => φ i (x i) (y i)) = F x :=
-    hF _ _ fun i hi => by simp [hφ, hi]
-  have hGm (x y : ι → α) : G (fun i => φ i (x i) (y i)) = G y :=
-    hG _ _ fun i hi => by simp [hφ, hi]
-  rw [← hmerge]
-  simp_rw [hFm, hGm, Distribution.expect_mul]
-  rw [mul_comm, ← Distribution.expect_mul]
-  congr 1
-  funext x
-  ring
-
-end Coord
-
 /-! ### Fresh observations of independent coordinates (deferred decisions) -/
 
 section Fresh
@@ -301,7 +217,7 @@ theorem expect_prod_hist_le_one_of_fresh (P : ι → Distribution α)
     (Distribution.independent P).expect (fun ω => histProd obs f ω 0 m) ≤ 1 := by
   classical
   refine expect_prod_hist_le_one _ obs f hf0 (fun h => ?_) m
-  have hind := expect_mul_of_dep P (readSet supp h)
+  have hind := Distribution.expect_mul_of_dep P (readSet supp h)
     (F := fun ω => if hist obs ω h.length = h then (1 : ℝ) else 0)
     (G := fun ω => f h (obs h ω))
     (fun ω ω' hag => by

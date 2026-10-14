@@ -67,19 +67,14 @@ theorem card_neighborRound : Fintype.card (NeighborRound G) = ∏ v, G.degree v 
 independently, so averages of products over the vertices factor. -/
 theorem avg_neighborRound_prod (f : V → V → ℝ) :
     avg (fun r : NeighborRound G => ∏ v, f v (r v))
-      = ∏ v, avg (fun u : G.neighborSet v => f v u) := by
-  unfold avg
-  rw [← Fintype.prod_sum (fun v (u : G.neighborSet v) => f v u), Fintype.card_pi,
-    Nat.cast_prod, ← Finset.prod_div_distrib]
+      = ∏ v, avg (fun u : G.neighborSet v => f v u) :=
+  avg_pi_prod fun v (u : G.neighborSet v) => f v u
 
 /-- **Marginal**: in a uniform synchronous round each vertex samples a uniform neighbour. -/
 theorem avg_neighborRound_eval (hd : ∀ v, 0 < G.degree v) (v : V) (g : V → ℝ) :
     avg (fun r : NeighborRound G => g (r v)) = avg (fun u : G.neighborSet v => g u) := by
   have := nonempty_neighborSet G hd
-  have key := avg_neighborRound_prod G (fun w u => if w = v then g u else 1)
-  simp only [Fintype.prod_ite_eq'] at key
-  rw [key, Finset.prod_eq_single v (fun w _ hw => by simp [hw, avg_const]) (by simp)]
-  simp
+  exact avg_pi_eval (β := fun w => G.neighborSet w) v fun u => g u
 
 /-- **Pairwise independence**: in a uniform synchronous round two distinct vertices sample
 their neighbours independently. -/
