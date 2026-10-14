@@ -297,9 +297,16 @@ rows:
         voter "asks a randomly chosen neighbor, and copies his/her opinion" (Swart).
       refs: [CliffordSudbury1973, HolleyLiggett1975, Swart2017, DurrettMoseley2015]
     social:
-      none: >-
-        No separate counterpart: the voter model is named after a reading as opinion formation,
-        but it was introduced and is studied in probability and statistical physics.
+      name: 'On $K_n$: Kirman''s ant (recruitment) model with $\varepsilon = \delta = 0$'
+      description: >-
+        In economics, $N$ ants (or traders) feed at a black or a white source: "Two ants meet at
+        random ... The first is converted to the second's color with probability $(1 - \delta)$",
+        and with probability $\varepsilon$ the first "will change his own color independently
+        before meeting anyone"; the count of ants at the black source goes up with probability
+        $(1 - k/N)(\varepsilon + (1-\delta)\,k/(N-1))$. Kirman names the special case
+        $\varepsilon = \delta = 0$, in which "the first person always moves with certainty to the
+        second's group", a martingale absorbed in $N$ with probability $k_0/N$.
+      refs: [Kirman1993]
     relation:
       kinds: [same-chain, jump-chain, same-ctmc]
       statement: >-
@@ -316,6 +323,11 @@ rows:
       conditions:
         - Neutral; uniform choice among the neighbours (with edge weights, the same weights on both sides).
         - The CRN counterpart exists only on $K_n$.
+        - >-
+          Kirman's model is the same chain (on counts) only when $\varepsilon = \delta = 0$; with
+          $0 < \delta < 1$ and $\varepsilon = 0$ it is a lazy version with the same jump chain. With
+          $\varepsilon > 0$, the case Kirman studies, spontaneous switching prevents absorption and
+          the object of interest is the stationary distribution, which this row does not cover.
         - >-
           On regular graphs, $K_n$ in particular, this row coincides with the next one: neutral push
           and pull are then the same chain.
@@ -347,12 +359,13 @@ rows:
       epi: '--'
       crn: 'on $K_n$: $X{+}Y\to 2X$, $X{+}Y\to 2Y$'
       physics: 'voter model / invasion process'
-      social: '--'
+      social: 'on $K_n$: Kirman''s ants, $\varepsilon{=}\delta{=}0$'
       relation: 'same chain; CRN: jump chain'
       cite:
         dc: [BecchettiClementiNatale2020]
         popgen: [HindersinTraulsen2015]
         physics: [HolleyLiggett1975, Castellano2005]
+        social: [Kirman1993]
 
   # ---------------------------------------------------------------------------------------------
   - id: moran-birth-death
@@ -2209,6 +2222,22 @@ references:
       pages: 118--121
       year: '1974'
       doi: 10.1080/01621459.1974.10480137
+  Kirman1993:
+    authors: A. Kirman
+    year: 1993
+    title: Ants, rationality, and recruitment
+    venue: The Quarterly Journal of Economics 108(1):137–156
+    doi: 10.2307/2118498
+    bibtex:
+      type: article
+      author: Alan Kirman
+      title: 'Ants, Rationality, and Recruitment'
+      journal: The Quarterly Journal of Economics
+      volume: '108'
+      number: '1'
+      pages: 137--156
+      year: '1993'
+      doi: 10.2307/2118498
   DemersEtAl1987:
     authors: A. Demers, D. Greene, C. Hauser, W. Irish, J. Larson, S. Shenker, H. Sturgis, D. Swinehart, D. Terry
     year: 1987
