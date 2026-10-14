@@ -108,15 +108,6 @@ end Generic
 section Lists
 variable {α : Type*} [Fintype α]
 
-/-- `expList α T` only evaluates its argument on lists of length `T`. -/
-lemma expList_le_expList_of_length {T : ℕ} {F G : List α → ℝ}
-    (h : ∀ l : List α, l.length = T → F l ≤ G l) : expList α T F ≤ expList α T G := by
-  induction T generalizing F G with
-  | zero => exact h [] rfl
-  | succ T ih =>
-    rw [expList_succ, expList_succ]
-    exact avg_le_avg fun a => ih fun l hl => h (a :: l) (by simp [hl])
-
 /-- The complementary event has the complementary probability. -/
 lemma expList_one_sub [Nonempty α] (T : ℕ) (G : List α → ℝ) :
     expList α T (fun l => 1 - G l) = 1 - expList α T G := by

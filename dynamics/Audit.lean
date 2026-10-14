@@ -13,6 +13,7 @@ import Dynamics
 #print axioms Dynamics.Kernel.iterate_ofStep
 #print axioms Dynamics.avg_hoeffding
 #print axioms Dynamics.avg_bernstein
+#print axioms Dynamics.expList_azuma
 #print axioms Dynamics.Kernel.nested_phases
 #print axioms Dynamics.expList_escape
 #print axioms Dynamics.Distribution.chernoff_upper_ratio

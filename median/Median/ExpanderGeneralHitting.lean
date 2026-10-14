@@ -14,14 +14,6 @@ open Finset Dynamics Real
 
 variable {V : Type*} [Fintype V] [DecidableEq V] {G : SimpleGraph V} [DecidableRel G.Adj]
 
-/-- `expList` is monotone in the functional, compared on the lists of length `T` only. -/
-private theorem expList_le_expList_of_length {β : Type*} [Fintype β] {T : ℕ}
-    {F₁ F₂ : List β → ℝ} (h : ∀ l : List β, l.length = T → F₁ l ≤ F₂ l) :
-    expList β T F₁ ≤ expList β T F₂ := by
-  induction T generalizing F₁ F₂ with
-  | zero => exact h [] rfl
-  | succ T ih => exact avg_le_avg fun b => ih fun l hl => h (b :: l) (by simp [hl])
-
 /-- A lower bound `1 − F₁ ≤ F₂` on the lists of length `T` passes to the expectations. -/
 private theorem one_sub_expList_le {β : Type*} [Fintype β] [Nonempty β] {T : ℕ}
     {F₁ F₂ : List β → ℝ} (h : ∀ l : List β, l.length = T → 1 - F₁ l ≤ F₂ l) :

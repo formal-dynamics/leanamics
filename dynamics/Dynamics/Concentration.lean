@@ -185,13 +185,11 @@ lemma one_sub_add_mul_exp_le {p : ℝ} (hp0 : 0 ≤ p) (hp1 : p ≤ 1) (t : ℝ)
 
 variable {n : ℕ} {γ : Type*} [Fintype γ]
 
-/-- The average of an indicator is at most `1`, also on an empty type. -/
+/-- The average of an indicator is at most `1`, also on an empty type (an instance of
+`avg_le_one`). -/
 lemma avg_ite_le_one {α : Type*} [Fintype α] (P : α → Prop) [DecidablePred P] :
-    avg (fun a => if P a then (1 : ℝ) else 0) ≤ 1 := by
-  rcases isEmpty_or_nonempty α with hα | hα
-  · simp [avg]
-  · calc _ ≤ avg (fun _ : α => (1 : ℝ)) := avg_le_avg fun a => by split <;> norm_num
-      _ = 1 := avg_const 1
+    avg (fun a => if P a then (1 : ℝ) else 0) ≤ 1 :=
+  avg_le_one fun a => by split <;> norm_num
 
 /-- Markov's inequality applied to `exp (t (X - k))`: an exponential-moment
 bound turns into a tail bound. -/

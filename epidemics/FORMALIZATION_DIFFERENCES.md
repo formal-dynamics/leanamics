@@ -95,14 +95,15 @@ on Approximation and Randomized Algorithms (1999) 73–155, Theorem 5.1; K. Azum
    distances on `ℝ × ℝ × ℝ` (`Prod.dist_eq`), Wormald's "for each `l`".
 8. **Convergence in probability** is `Tendsto (N ↦ deviationProb …) atTop (𝓝 0)` for every
    `ε > 0`, along all `N` (with the configuration `x₀ N` of `N` agents).
-9. **Azuma–Hoeffding is proved in this package** (`expList_azuma`): Mathlib's version
+9. **Azuma–Hoeffding is proved in the core library** (`Dynamics.expList_azuma` in
+   `dynamics/Dynamics/Azuma.lean`, with Ville's inequality `Dynamics.expList_ville`;
+   `expList_azuma` is its CRN-2 name): Mathlib's version
    (`ProbabilityTheory.measure_sum_ge_le_of_hasCondSubgaussianMGF`) is measure-theoretic and not
    maximal, and `Dynamics.Concentration` has Hoeffding/Bernstein only for independent sums. It
    is stated for martingales `∑ D(X_j, ρ_j)` of a process driven by i.i.d. uniform rounds, with
    an arbitrary state type (hence for all martingales of the rounds' filtration, taking
    histories as states), in maximal form (`∃ k ≤ n`), with the classical constant
-   `exp(-λ²/(2 n c²))`. Moving it (with Ville's inequality) to `dynamics/` is tracked in issue
-   #51.
+   `exp(-λ²/(2 n c²))`.
 10. **Additions:** the kernel `chain` and `iterate_chain` (link between the
     `Dynamics.Kernel.ofStep` kernel and the `expList` path averages), and the corollary
     `tendsto_deviationProb` (the "convergence in probability" phrasing).
