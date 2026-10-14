@@ -294,6 +294,25 @@ probability $\deg v/(2|E|)$.
 Group the darts by tail (the darts with tail $v$ are the neighbours of $v$)
 or by edge (each edge carries two darts).
 \end{proof}
+\begin{lemma}[Sums over darts]\label{lem:dartsums}
+\lean{Dynamics.dartEquiv,Dynamics.sum_dart,Dynamics.walk_sum_darts,Dynamics.sum_darts_sq_le}\leanok
+A sum over the darts of $G$ is the sum over the adjacent ordered pairs; along a walk from
+$u$ to $v$ the differences $\psi(d_1)-\psi(d_2)$ telescope to $\psi(u)-\psi(v)$; and over
+any set of distinct darts $\sum_d(\psi(d_1)-\psi(d_2))^2\le\sum_{i\sim j}(\psi(i)-\psi(j))^2$.
+\end{lemma}
+\begin{proof}\leanok
+Darts are the adjacent ordered pairs; induction on the walk; distinct darts are distinct
+ordered pairs and the summands are nonnegative.
+\end{proof}
+\begin{definition}[Lazy kernels and random walks on graphs]\label{def:randomwalk}
+\lean{Dynamics.Kernel.lazy,Dynamics.Kernel.lazy_weight,Dynamics.Kernel.lazy_expect,Dynamics.Kernel.lazy_stationary_iff,Dynamics.Kernel.lazy_weight_self_ge_half,Dynamics.Kernel.lazy_selfLoop_pos,Dynamics.Kernel.lazy_weight_pos,Dynamics.Kernel.uniformNeighbor,Dynamics.Kernel.uniformNeighbor_support,Dynamics.Kernel.uniformNeighbor_expect,Dynamics.Kernel.uniformNeighbor_expect_eq_avg,Dynamics.Kernel.lazyNeighbor,Dynamics.Kernel.lazyNeighbor_weight,Dynamics.Kernel.lazyNeighbor_expect}\leanok
+\uses{def:kernel,lem:neighborround}
+The lazy version of a kernel $K$ is $(I+K)/2$: it puts weight at least $1/2$ on every
+self-loop, charges everything $K$ charges, and has the same stationary distributions as $K$.
+On a graph without isolated vertices the simple random walk $D^{-1}A$ moves to a uniform
+neighbour, so its expectations are neighbour averages, and the lazy random walk is
+$(I+D^{-1}A)/2$.
+\end{definition}
 \section{Hitting times}\label{sec:dgmss-hitting}
 This section formalizes Claim~2.9 of Doerr, Goldberg, Minder, Sauerwald and Scheideler,
 \emph{Stabilizing consensus with the power of two choices} (SPAA 2011), as

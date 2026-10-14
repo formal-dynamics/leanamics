@@ -1,3 +1,4 @@
+import Dynamics.GraphRounds
 import Averaging.SequentialDefs
 import Averaging.RateMatrix
 
@@ -105,23 +106,6 @@ lemma sum_mul_edgeMatrix_apply (Q : V → V → ℝ) (a b : V) :
   ring
 
 variable (G : SimpleGraph V) [DecidableRel G.Adj]
-
-omit [DecidableEq V] in
-/-- The darts of `G` are the adjacent ordered pairs. -/
-def dartEquiv : G.Dart ≃ {p : V × V // G.Adj p.1 p.2} where
-  toFun d := ⟨d.toProd, d.adj⟩
-  invFun p := ⟨p.1, p.2⟩
-  left_inv _ := rfl
-  right_inv _ := rfl
-
-omit [DecidableEq V] in
-/-- A sum over the darts of `G` is a sum over the adjacent ordered pairs. -/
-lemma sum_dart (f : V → V → ℝ) :
-    ∑ d : G.Dart, f d.fst d.snd = ∑ a, ∑ b, if G.Adj a b then f a b else 0 := by
-  rw [← Fintype.sum_prod_type' (f := fun a b => if G.Adj a b then f a b else 0),
-    ← Finset.sum_filter,
-    Finset.sum_subtype (p := fun p : V × V => G.Adj p.1 p.2) _ (by simp)]
-  exact Fintype.sum_equiv (dartEquiv G) _ _ fun _ => rfl
 
 /-- `∑_{darts} W(d)`, entrywise: `2m I - L`. -/
 lemma sum_dart_edgeMatrix_apply (a b : V) :

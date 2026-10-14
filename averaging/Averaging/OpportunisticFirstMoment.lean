@@ -1,3 +1,4 @@
+import Dynamics.GraphRounds
 import Averaging.OpportunisticModel
 
 /-! # Averaging whenever you meet: the expected matrix and the first moment
@@ -29,16 +30,6 @@ noncomputable def meanStepMatrix : Matrix V V ℝ :=
   1 - (2 * (#G.edgeFinset : ℝ))⁻¹ • G.lapMatrix ℝ
 
 /-! ### Sums over darts -/
-
-omit [DecidableEq V] in
-/-- A sum over the darts is a double sum over the ordered adjacent pairs. -/
-lemma sum_dart (f : V → V → ℝ) :
-    ∑ d : G.Dart, f d.fst d.snd = ∑ u, ∑ v, if G.Adj u v then f u v else 0 := by
-  rw [← Fintype.sum_prod_type' (f := fun u v => if G.Adj u v then f u v else 0),
-    ← Finset.sum_filter]
-  refine Finset.sum_bij (fun d _ => d.toProd) (fun d _ => by simp [d.adj])
-    (fun d _ d' _ h => SimpleGraph.Dart.ext _ _ h) (fun p hp => ?_) (fun _ _ => rfl)
-  exact ⟨⟨p, (Finset.mem_filter.mp hp).2⟩, Finset.mem_univ _, rfl⟩
 
 omit [DecidableEq V] in
 lemma card_dart_eq : (Fintype.card G.Dart : ℝ) = 2 * #G.edgeFinset := by
