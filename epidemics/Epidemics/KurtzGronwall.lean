@@ -2,10 +2,11 @@ import Mathlib
 
 /-! # Kurtz's law of large numbers for SIR: discrete stability (CRN-2, helpers)
 
-The deterministic half of the law of large numbers. A sequence `X k` in `ℝ × ℝ × ℝ` that follows
-the Euler scheme `X (k+1) ≈ X k + h F (X k)` up to a martingale part bounded by `δ`
-(`‖X k - X 0 - h ∑_{j<k} F (X j)‖ ≤ δ`) stays close to a sequence `y k` with one-step Euler error
-at most `η`, provided `F` is `Lip`-Lipschitz along the two sequences:
+The deterministic half of the law of large numbers. A sequence `X k` in a real normed space
+(`ℝ × ℝ × ℝ` for SIR) that follows the Euler scheme `X (k+1) ≈ X k + h F (X k)` up to a
+martingale part bounded by `δ` (`‖X k - X 0 - h ∑_{j<k} F (X j)‖ ≤ δ`) stays close to a sequence
+`y k` with one-step Euler error at most `η`, provided `F` is `Lip`-Lipschitz along the two
+sequences:
 
   `‖X k - y k‖ ≤ (‖X 0 - y 0‖ + δ + n η) · exp(h Lip k)`  for `k ≤ n`.
 
@@ -54,9 +55,11 @@ lemma le_mul_exp_of_le_add_sum {u : ℕ → ℝ} {A b : ℝ} {n : ℕ} (hA : 0 �
     _ ≤ B 0 * exp (k * b) := hk'
     _ = A * exp (b * k) := by rw [hB00, mul_comm (k : ℝ) b]
 
+variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+
 /-- The Euler errors accumulate linearly:
 `‖y k - y 0 - h ∑_{j<k} F (y j)‖ ≤ k η` when every step errs by at most `η`. -/
-lemma norm_sub_sum_le {F : ℝ × ℝ × ℝ → ℝ × ℝ × ℝ} {y : ℕ → ℝ × ℝ × ℝ} {h η : ℝ} {n : ℕ}
+lemma norm_sub_sum_le {F : E → E} {y : ℕ → E} {h η : ℝ} {n : ℕ}
     (hy : ∀ j < n, ‖y (j + 1) - y j - h • F (y j)‖ ≤ η) :
     ∀ k ≤ n, ‖y k - y 0 - h • ∑ j ∈ range k, F (y j)‖ ≤ k * η := by
   intro k hk
@@ -74,8 +77,8 @@ lemma norm_sub_sum_le {F : ℝ × ℝ × ℝ → ℝ × ℝ × ℝ} {y : ℕ →
 martingale part bounded by `δ`, `y` follows it up to one-step errors `η`, and `F` is
 `Lip`-Lipschitz between `X j` and `y j`, then `‖X k - y k‖ ≤ (‖X 0 - y 0‖ + δ + n η) exp(h Lip k)`
 for `k ≤ n`. -/
-lemma norm_sub_le_of_euler {F : ℝ × ℝ × ℝ → ℝ × ℝ × ℝ} {X y : ℕ → ℝ × ℝ × ℝ}
-    {Lip h δ η : ℝ} {n : ℕ} (hLip0 : 0 ≤ Lip) (hh : 0 ≤ h) (hδ : 0 ≤ δ) (hη : 0 ≤ η)
+lemma norm_sub_le_of_euler {F : E → E} {X y : ℕ → E} {Lip h δ η : ℝ} {n : ℕ} (hLip0 : 0 ≤ Lip)
+    (hh : 0 ≤ h) (hδ : 0 ≤ δ) (hη : 0 ≤ η)
     (hLip : ∀ j < n, ‖F (X j) - F (y j)‖ ≤ Lip * ‖X j - y j‖)
     (hX : ∀ k ≤ n, ‖X k - X 0 - h • ∑ j ∈ range k, F (X j)‖ ≤ δ)
     (hy : ∀ j < n, ‖y (j + 1) - y j - h • F (y j)‖ ≤ η) :
