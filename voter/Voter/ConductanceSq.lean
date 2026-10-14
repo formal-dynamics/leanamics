@@ -155,7 +155,7 @@ theorem dynamic_consensus_conductance_sq_many [Nonempty V] {C : Type*} [Fintype 
     intro x
     have hnn : ∀ i ∈ (univ : Finset C), (0 : ℝ) ≤ if 0 < f i x then 1 else 0 :=
       fun i _ => by split_ifs <;> norm_num
-    unfold disagreement
+    unfold disagreement nonConsensus
     split_ifs with hc
     · exact sum_nonneg hnn
     · obtain ⟨v⟩ := ‹Nonempty V›

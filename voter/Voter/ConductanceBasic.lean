@@ -153,7 +153,7 @@ potential. -/
 lemma disagreement_eq_potential (hd : ∀ v, 0 < G.degree v) (s : Config V Bool) :
     disagreement s = 1 - if potential G s = 0 then 1 else 0 := by
   classical
-  unfold disagreement
+  unfold disagreement nonConsensus
   by_cases h : ∃ c, s = fun _ => c
   · rw [if_pos h, if_pos ((potential_eq_zero_iff G hd s).mpr h)]
     norm_num

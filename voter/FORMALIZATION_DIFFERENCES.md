@@ -19,7 +19,7 @@ and its Lean 4 formalization in the `voter` package (`leanamics/voter`).
 | **Preamble to Lemma 2.2** | Stationary distribution existence | [`Dynamics.Kernel.exists_stationary`](../dynamics/Dynamics/Stationary.lean#L53) | [Dynamics/Stationary.lean](../dynamics/Dynamics/Stationary.lean) |
 | **Lemma 2.1** | Monochromatic edge in nonbipartite graph | [`Voter.monochromatic_edge`](Voter/Graph.lean#L18) | [Voter/Graph.lean](Voter/Graph.lean) |
 | **Lemma 2.1** | Monochromatic region propagation | [`Voter.propagate_region`](Voter/Graph.lean#L46), [`Voter.possible_consensus`](Voter/Graph.lean#L90) | [Voter/Graph.lean](Voter/Graph.lean) |
-| **Lemma 2.1** | Consensus states absorbing & nonconsensus survival vanishes | [`Voter.transition_constant`](Voter/Absorption.lean#L52), [`Voter.consensus_tendsto`](Voter/Absorption.lean#L109) | [Voter/Absorption.lean](Voter/Absorption.lean) |
+| **Lemma 2.1** | Consensus states absorbing & nonconsensus survival vanishes | [`Voter.transition_constant`](Voter/Absorption.lean#L25), [`Voter.consensus_tendsto`](Voter/Absorption.lean#L41) | [Voter/Absorption.lean](Voter/Absorption.lean) |
 | **Lemma 2.3** | Expected stationary weight invariance (martingale) | [`Voter.round_mass`](Voter/Model.lean#L101), [`Voter.iterate_mass`](Voter/Model.lean#L115) | [Voter/Model.lean](Voter/Model.lean) |
 | **Lemma 2.2** | Finite-time discrepancy bound & limit of white probability | [`Voter.whiteMass_bounds`](Voter/Main.lean#L117), [`Voter.whiteProbability_error`](Voter/Main.lean#L133), [`Voter.whiteProbability_tendsto`](Voter/Main.lean#L150) | [Voter/Main.lean](Voter/Main.lean) |
 | **Theorem 2.1** | Eventual all-white absorption probability $\rho_{s1} = \sum_{i \in W_s} \pi_H(i)$ | [`Voter.consensus_probability`](Voter/Main.lean#L162) | [Voter/Main.lean](Voter/Main.lean) |
@@ -90,7 +90,7 @@ The following portions of the paper were not formalized:
   ```lean
   ∃ c, Relation.ReflTransGen (Possible G) s (fun _ => c)
   ```
-  that is, consensus is reachable in **some** color $c \in \{\text{true}, \text{false}\}$ (the color of the monochromatic edge found by [`Nonemonochromatic_edge`](Voter/Graph.lean#L18)). This is what the proof that the probability of staying in non-consensus states decays to 0 ([`Noneconsensus_tendsto`](Voter/Absorption.lean#L109)) uses.
+  that is, consensus is reachable in **some** color $c \in \{\text{true}, \text{false}\}$ (the color of the monochromatic edge found by [`Nonemonochromatic_edge`](Voter/Graph.lean#L18)). This is what the proof that the probability of staying in non-consensus states decays to 0 ([`Noneconsensus_tendsto`](Voter/Absorption.lean#L41)) uses.
 
 ---
 
@@ -108,7 +108,7 @@ The following portions of the paper were not formalized:
   noncomputable def eventualColor [Fintype C] (H : Kernel V) (c : C)
       (s : Config V C) : ℝ := ⨆ n, colorProbability H c n s
   ```
-  Since consensus states are absorbing fixed points ([`Nonetransition_constant`](Voter/Absorption.lean#L52)), $n \mapsto \text{colorProbability } H\ c\ n\ s$ is monotone increasing ([`NonecolorProbability_mono`](Voter/Main.lean#L47)) and converges to its supremum ([`NonecolorProbability_tendsto`](Voter/Main.lean#L66)). This gives a fully constructive and rigorous definition using only standard real analysis.
+  Since consensus states are absorbing fixed points ([`Nonetransition_constant`](Voter/Absorption.lean#L25)), $n \mapsto \text{colorProbability } H\ c\ n\ s$ is monotone increasing ([`NonecolorProbability_mono`](Voter/Main.lean#L47)) and converges to its supremum ([`NonecolorProbability_tendsto`](Voter/Main.lean#L66)). This gives a fully constructive and rigorous definition using only standard real analysis.
 
 ---
 
@@ -129,7 +129,7 @@ The following portions of the paper were not formalized:
        `Dynamics.Kernel.event_error_of_invariant` (roadmap FND-4): the targets are the two
        consensus configurations, the invariant is the white mass, and `whiteMass_bounds`
        bounds it between `0` and `1` off the targets.
-     - [`NonewhiteProbability_tendsto`](Voter/Main.lean#L150): by squeezing with [`Noneconsensus_tendsto`](Voter/Absorption.lean#L109), $\text{colorProbability } n \to \text{whiteMass}$.
+     - [`NonewhiteProbability_tendsto`](Voter/Main.lean#L150): by squeezing with [`Noneconsensus_tendsto`](Voter/Absorption.lean#L41), $\text{colorProbability } n \to \text{whiteMass}$.
   3. **Theorem 2.1** ([`Noneconsensus_probability`](Voter/Main.lean#L162)) identifies the limit with `eventualColor`.
 * **Rationale**:
   This rearrangement avoids summing over the exponential state space $\mathcal{S}$ and avoids having to classify recurrent/transient states in full generality.

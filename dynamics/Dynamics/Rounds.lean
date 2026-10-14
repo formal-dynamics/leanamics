@@ -22,6 +22,11 @@ lemma apply_ofStep (step : S → R → S) (f : S → ℝ) (s : S) :
     (ofStep step).apply f s = avg (fun r => f (step s r)) := by
   simp only [apply, ofStep, Distribution.map_expect, Distribution.uniform_expect]
 
+/-- Every outcome of one round has positive probability. -/
+lemma ofStep_weight_pos (step : S → R → S) (s : S) (r : R) :
+    0 < (ofStep step s).weight (step s r) :=
+  (Distribution.uniform R).map_weight_pos (step s) r (inv_pos.mpr card_cast_pos)
+
 lemma prob_ofStep (step : S → R → S) (P : S → Prop) (s : S) :
     (ofStep step s).prob P = avg (fun r => by classical exact if P (step s r) then 1 else 0) := by
   classical

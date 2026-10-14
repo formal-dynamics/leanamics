@@ -48,10 +48,6 @@ lemma outside_le_one (B : Set α) (b : α) : outside B b ≤ 1 := by
   unfold outside
   split <;> norm_num
 
-lemma iterate_le_one (K : Dynamics.Kernel α) (n : ℕ) {f : α → ℝ} (h : ∀ a, f a ≤ 1) (a : α) :
-    K.iterate n f a ≤ 1 := by
-  simpa [iterate_const] using K.iterate_mono n h a
-
 /-- One step leaves `B` with probability `1 - P(stay in B)`. -/
 lemma apply_outside (K : Dynamics.Kernel α) (B : Set α) (a : α) :
     K.apply (outside B) a = 1 - (K a).prob (· ∈ B) := by

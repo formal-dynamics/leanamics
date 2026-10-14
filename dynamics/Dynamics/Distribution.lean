@@ -39,6 +39,15 @@ lemma expect_mono (p : Distribution α) {f g : α → ℝ} (h : ∀ a, f a ≤ g
     p.expect f ≤ p.expect g :=
   sum_le_sum fun a _ => mul_le_mul_of_nonneg_left (h a) (p.nonneg a)
 
+/-- An observable bounded by `1` that is strictly below `1` at a point of positive weight has
+expectation strictly below `1` (it replaces `Moran.expect_lt_one` and `Voter.expect_lt_one`). -/
+theorem expect_lt_one (p : Distribution α) (f : α → ℝ) (hf : ∀ a, f a ≤ 1) (b : α)
+    (hb : 0 < p.weight b) (hfb : f b < 1) : p.expect f < 1 := by
+  calc p.expect f < p.expect (fun _ => 1) :=
+        sum_lt_sum (fun a _ => mul_le_mul_of_nonneg_left (hf a) (p.nonneg a))
+          ⟨b, mem_univ b, mul_lt_mul_of_pos_left hfb hb⟩
+    _ = 1 := p.expect_const 1
+
 lemma expect_add (p : Distribution α) (f g : α → ℝ) :
     p.expect (fun a => f a + g a) = p.expect f + p.expect g := by
   simp [expect, mul_add, sum_add_distrib]
@@ -120,6 +129,19 @@ lemma map_expect (p : Distribution α) (f : α → β) (g : β → ℝ) :
   apply sum_congr rfl
   intro a _
   simp
+
+/-- A point of positive weight is carried to its image with positive weight (it replaces
+`Moran.map_weight_pos`). -/
+lemma map_weight_pos (p : Distribution α) (f : α → β) (a : α) (ha : 0 < p.weight a) :
+    0 < (p.map f).weight (f a) := by
+  classical
+  dsimp only [map]
+  refine lt_of_lt_of_le ?_ (single_le_sum (fun x _ => ?_) (mem_univ a))
+  · rw [if_pos rfl]
+    exact ha
+  · split
+    · exact p.nonneg x
+    · exact le_rfl
 
 variable [DecidableEq ι]
 

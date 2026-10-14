@@ -10,6 +10,7 @@ import Dynamics
 #print axioms Dynamics.Kernel.exists_stationary
 #print axioms Dynamics.Kernel.exists_uniform_block
 #print axioms Dynamics.Kernel.finite_absorption
+#print axioms Dynamics.Kernel.exists_iterate_lt_one_of_reachable
 #print axioms Dynamics.Kernel.iterate_ofStep
 #print axioms Dynamics.avg_hoeffding
 #print axioms Dynamics.avg_bernstein
@@ -30,6 +31,7 @@ import Dynamics
 #print axioms Dynamics.Kernel.event_error_of_invariant
 #print axioms Dynamics.Kernel.tendsto_event_of_invariant
 #print axioms Dynamics.Kernel.iSup_event_of_invariant
+#print axioms Dynamics.Kernel.iSup_consensus_of_invariant
 #print axioms Dynamics.expList_comp_reverse
 #print axioms Dynamics.Kernel.iterate_ofStep_foldr
 #print axioms Dynamics.Kernel.drift_absorption_seq

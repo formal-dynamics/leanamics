@@ -30,10 +30,8 @@ def runRounds (s : Config V C) : List (V → V) → Config V C
 /-- The backward map `r₁ ∘ r₂ ∘ ⋯ ∘ r_T` of the rounds `[r₁, …, r_T]`. -/
 def backward (l : List (V → V)) : V → V := l.foldr (fun r g => r ∘ g) id
 
-/-- Nonconsensus indicator for an arbitrary colour type. -/
-noncomputable def disagreement (s : Config V C) : ℝ := by
-  classical
-  exact if ∃ c, s = fun _ => c then 0 else 1
+/-- Nonconsensus indicator for an arbitrary colour type (`Dynamics.nonConsensus`). -/
+noncomputable abbrev disagreement (s : Config V C) : ℝ := nonConsensus s
 
 /-- Wright–Fisher sampling: every vertex picks a uniformly random vertex, itself included. -/
 noncomputable def wfKernel (V : Type*) [Fintype V] [Nonempty V] : Kernel V :=
@@ -49,7 +47,7 @@ lemma backward_cons (r : V → V) (l : List (V → V)) :
 omit [Fintype V] [DecidableEq V] in
 lemma disagreement_le_one (s : Config V C) : disagreement s ≤ 1 := by
   classical
-  unfold disagreement
+  unfold disagreement nonConsensus
   split <;> norm_num
 
 /-- Probability that two distinct coordinates of a uniform random map `V → V` agree. -/
@@ -183,16 +181,12 @@ theorem disagreement_runRounds_eq_zero [Nonempty V] (s : Config V C) (l : List (
   classical
   rw [runRounds_eq_comp]
   obtain ⟨u₀⟩ := ‹Nonempty V›
-  unfold disagreement
+  unfold disagreement nonConsensus
   exact if_pos ⟨s (backward l u₀), funext fun v => congrArg s (h v u₀)⟩
 
-omit [DecidableEq V] in
+omit [Fintype V] [DecidableEq V] in
 /-- For Boolean colours, `disagreement` is the survival indicator of `Voter.Absorption`. -/
-theorem disagreement_eq_survival (s : Config V Bool) : disagreement s = survival s := by
-  unfold disagreement survival
-  by_cases h : ∃ c, s = fun _ => c
-  · rw [if_pos h, if_pos h]
-  · rw [if_neg h, if_neg h]
+theorem disagreement_eq_survival (s : Config V Bool) : disagreement s = survival s := rfl
 
 /-- The configuration kernel of Wright–Fisher sampling is the average over `T` i.i.d.
 uniform rounds. -/

@@ -217,7 +217,7 @@ aliases, and the package blueprints tag the `Dynamics` names).
 9. **Mathlib instead of new lemmas** where Mathlib states the fact: `xᵏ/k! ≤ eˣ` is
    `Real.pow_div_factorial_le_exp` and `(q - 1)/q ≤ log q` is `Real.one_sub_inv_le_log_of_pos`.
    The conversions `exp_neg_two_log` and `one_le_of_log_pos` (for `n : ℕ`) are new.
-10. **Copies left in other packages**: `Moran.expect_lt_one` and `Voter.expect_lt_one` have the
-    statement of `Distribution.expect_lt_one`, `Undecided.avg_lt_one` that of `avg_lt_one`, and
-    `Voter.colorProbability_mono` re-proves `Kernel.iterate_monotone` for its indicator; they
-    can be replaced by the shared versions.
+10. **Copies left in other packages**: `Voter.colorProbability_mono` re-proves
+    `Kernel.iterate_monotone` for its indicator; it can be replaced by the shared version. The
+    former copies `Moran.expect_lt_one` and `Voter.expect_lt_one` are gone, and
+    `Distribution.expect_lt_one` now lives in `Distribution`, so that `Absorption` can use it.

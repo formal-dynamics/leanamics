@@ -135,7 +135,7 @@ omit [Fintype V] [DecidableEq V] [Fintype C] in
 /-- Disagreement is `0` or `1`. -/
 lemma disagreement_zero_or_one (s : Config V C) : disagreement s = 0 ∨ disagreement s = 1 := by
   classical
-  unfold disagreement
+  unfold disagreement nonConsensus
   split <;> simp
 
 /-- Disagreement cannot reappear: `K disagreement ≤ disagreement`. -/
@@ -146,7 +146,7 @@ lemma transition_disagreement_le (H : Kernel V) (s : Config V C) :
   · obtain ⟨c, rfl⟩ := hs
     rw [transition_constant]
   · have h1 : disagreement s = 1 := by
-      unfold disagreement
+      unfold disagreement nonConsensus
       rw [if_neg hs]
     rw [h1]
     calc (transition H).apply disagreement s ≤ (transition H s).expect (fun _ => 1) :=

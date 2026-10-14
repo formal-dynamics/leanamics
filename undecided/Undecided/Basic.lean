@@ -291,25 +291,16 @@ lemma notMono_step (x : Config n) : (kernel n).apply notMono x ≤ notMono x := 
           avg_le_avg fun r => notMono_le_one _
       _ = 1 := avg_const 1
 
-lemma kernel_iterate_two (f : Config n → ℝ) (x : Config n) :
-    (kernel n).iterate 2 f x =
-      avg (fun r₁ : Fin n → Fin n => avg (fun r₂ => f (step (step x r₁) r₂))) := by
-  rw [kernel, Kernel.iterate_ofStep]
-  simp only [expList_succ, expList_zero]
-  refine congrArg avg (funext fun r₁ => congrArg avg (funext fun r₂ => ?_))
-  dsimp [List.foldl]
-
 lemma access_from_decided (x : Config n) (w : Fin n) (hw : x w = .a ∨ x w = .b) :
     (kernel n).iterate 2 notMono x < 1 := by
-  rw [kernel_iterate_two]
-  refine avg_lt_one (b := fun _ => w) ?_ ?_
-  · intro r₁
-    calc avg (fun r₂ => notMono (step (step x r₁) r₂))
-        ≤ avg (fun _ : Fin n → Fin n => (1 : ℝ)) := avg_le_avg fun _ => notMono_le_one _
-      _ = 1 := avg_const 1
-  · refine avg_lt_one (b := fun _ => w) (fun _ => notMono_le_one _) ?_
-    rw [two_const_mono x hw, notMono_const]
-    exact zero_lt_one
+  -- two rounds in which every node samples `w` reach the monochromatic `fun _ => x w`
+  have h₂ := Kernel.ofStep_weight_pos step (step x (fun _ => w)) (fun _ => w)
+  rw [two_const_mono x hw] at h₂
+  refine (kernel n).iterate_succ_lt_one notMono_le_one
+    (Kernel.ofStep_weight_pos step x (fun _ => w))
+    ((kernel n).iterate_succ_lt_one (n := 0) notMono_le_one h₂ ?_)
+  rw [Kernel.iterate_zero, notMono_const]
+  exact zero_lt_one
 
 theorem absorbed (x : Config n) :
     Tendsto (fun t => (kernel n).iterate t notMono x) atTop (𝓝 0) := by

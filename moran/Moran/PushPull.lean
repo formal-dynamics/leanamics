@@ -344,21 +344,14 @@ lemma pull_constant [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] (c : B
   exact (pullDist G).expect_const _
 
 lemma pull_unfixed_step [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] (s : Config V) :
-    (pullKernel G).apply unfixed s ≤ unfixed s := by
-  by_cases hs : ∃ c, s = fun _ => c
-  · obtain ⟨c, rfl⟩ := hs
-    rw [pull_constant G c unfixed]
-  · rw [unfixed_of_mixed s hs, Kernel.apply]
-    calc
-      (pullKernel G s).expect unfixed ≤ (pullKernel G s).expect (fun _ => 1) :=
-        (pullKernel G s).expect_mono unfixed_le_one
-      _ = 1 := (pullKernel G s).expect_const 1
+    (pullKernel G).apply unfixed s ≤ unfixed s :=
+  (pullKernel G).nonConsensus_step (fun c => pull_constant G c) s
 
 lemma pull_move_weight_pos [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj]
     (s : Config V) {u w : V} (hadj : G.Adj u w) :
     0 < (pullKernel G s).weight (Function.update s u (s w)) := by
   unfold pullKernel
-  refine map_weight_pos (pullDist G) (fun p => Function.update s p.1 (s p.2)) (u, w) ?_
+  refine (pullDist G).map_weight_pos (fun p => Function.update s p.1 (s p.2)) (u, w) ?_
   have hweight : (pullDist G).weight (u, w) = pullWeight G (u, w) := rfl
   rw [hweight]
   unfold pullWeight
@@ -369,71 +362,10 @@ lemma pull_move_weight_pos [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj]
 lemma pull_unfixed_access [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj]
     (hc : G.Connected) (s : Config V) :
     ∃ n, (pullKernel G).iterate n unfixed s < 1 := by
-  classical
-  suffices ∀ k, ∀ s : Config V, Fintype.card V - mutants s = k →
-      ∃ n, (pullKernel G).iterate n unfixed s < 1 from this _ s rfl
-  intro k
-  induction k using Nat.strongRecOn with
-  | ind k ih =>
-    intro s hk
-    by_cases hconst : ∃ c, s = fun _ => c
-    · obtain ⟨c, rfl⟩ := hconst
-      refine ⟨0, ?_⟩
-      rw [Kernel.iterate_zero, unfixed_const]
-      norm_num
-    · have htrue : ∃ u, s u = true := by
-        by_contra h
-        push Not at h
-        apply hconst
-        refine ⟨false, ?_⟩
-        funext v
-        cases hv : s v
-        · rfl
-        · exact (h v hv).elim
-      have hfalse : ∃ w, s w = false := by
-        by_contra h
-        push Not at h
-        apply hconst
-        refine ⟨true, ?_⟩
-        funext v
-        cases hv : s v
-        · exact (h v hv).elim
-        · rfl
-      obtain ⟨u, hu⟩ := htrue
-      obtain ⟨w0, hw0⟩ := hfalse
-      obtain ⟨walk⟩ := hc u w0
-      obtain ⟨d, _, hfst, hsnd⟩ := walk.exists_boundary_dart {i | s i = true} hu
-        (by simpa using hw0)
-      have hdu : s d.fst = true := by simpa using hfst
-      have hdw : s d.snd = false := by
-        cases hsd : s d.snd
-        · rfl
-        · exact (hsnd (by simp [hsd])).elim
-      let t := Function.update s d.snd true
-      have hgain : mutants t = mutants s + 1 := mutants_update_gain s hdw
-      have hsm : mutants s < Fintype.card V := by
-        refine lt_of_le_of_ne (mutants_le_card s) ?_
-        intro heq
-        rw [config_of_mutants_eq_card heq] at hdw
-        simp at hdw
-      have hlt : Fintype.card V - mutants t < k := by
-        rw [hgain, ← hk]
-        omega
-      obtain ⟨n, hn⟩ := ih (Fintype.card V - mutants t) hlt t rfl
-      refine ⟨n + 1, ?_⟩
-      rw [Kernel.iterate_succ]
-      exact expect_lt_one (pullKernel G s) ((pullKernel G).iterate n unfixed)
-        (fun a => by
-          have hle := (pullKernel G).iterate_mono n unfixed_le_one a
-          simp [Kernel.iterate_const] at hle
-          exact hle)
-        t (by
-          have hEq : Function.update s d.snd (s d.fst) = t := by
-            unfold t
-            rw [hdu]
-          rw [← hEq]
-          exact pull_move_weight_pos G s d.adj.symm)
-        hn
+  obtain ⟨c, hpath⟩ := reaches_consensus G hc (pullKernel G) (fun s u w hadj hu _ => by
+    simpa [hu] using pull_move_weight_pos G s hadj.symm) s
+  exact (pullKernel G).exists_iterate_lt_one_of_reachable nonConsensus_le_one hpath
+    (nonConsensus_const c)
 
 lemma pull_allMutant_step [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] (s : Config V) :
     allMutant s ≤ (pullKernel G).apply allMutant s := by
@@ -448,7 +380,7 @@ tends to zero. -/
 theorem pull_unfixed_tendsto [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj]
     (hc : G.Connected) (s : Config V) :
     Tendsto (fun t => (pullKernel G).iterate t unfixed s) atTop (𝓝 0) :=
-  (pullKernel G).finite_absorption unfixed unfixed_binary (pull_unfixed_step G)
+  (pullKernel G).finite_absorption unfixed nonConsensus_binary (pull_unfixed_step G)
     (pull_unfixed_access G hc) s
 
 omit [DecidableEq V] in

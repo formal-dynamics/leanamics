@@ -101,6 +101,15 @@ Take one plus the maximum of the finitely many access times. Antitonicity of
 survival probabilities puts every state below one at that time. Their finite
 maximum supplies $q$. At states with $f=0$, absorption keeps the expectation zero.
 \end{proof}
+\begin{lemma}[Access from reachability]\label{lem:reachable-access}
+\lean{Dynamics.Kernel.iterate_succ_lt_one,Dynamics.Kernel.exists_iterate_lt_one_of_reachable}\leanok\uses{def:kernel}
+Let $f\le1$. If $t_0$ is reachable from $s$ along transitions $a\to b$ with
+$K(a,b)>0$ and $f(t_0)=0$, then $(K^n f)(s)<1$ for some $n$.
+\end{lemma}
+\begin{proof}\leanok
+Induct on the chain. If $K(s,t)>0$ and $(K^n f)(t)<1$, then $(K^{n+1}f)(s)$ is an average of
+values at most one with weight $K(s,t)>0$ on a value below one.
+\end{proof}
 \begin{theorem}[Geometric decay and convergence]\label{thm:absorption}
 \lean{Dynamics.Kernel.geometric_blocks,Dynamics.Kernel.finite_absorption}\leanok\uses{lem:block}
 Under these hypotheses, $K^{nm}f\le q^n f$, and $K^t f(a)\to0$ for every state $a$.

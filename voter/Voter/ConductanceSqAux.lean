@@ -151,7 +151,7 @@ lemma disagreement_eq_zero_of_card_le_one [Fintype V] (hV : Fintype.card V ≤ 1
     · obtain ⟨v⟩ := hne
       exact ⟨x v, funext fun u => by rw [Subsingleton.elim u v]⟩
     · exact ⟨c, funext fun u => (hne ⟨u⟩).elim⟩
-  unfold disagreement
+  unfold disagreement nonConsensus
   rw [if_pos h]
 
 end Voter
