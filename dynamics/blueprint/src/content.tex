@@ -68,6 +68,21 @@ and under the product distribution.
 Mathlib's finite expectation is a sum divided by a cardinality. Every point of $A^I$ has
 product weight $|A|^{-|I|}=|A^I|^{-1}$. Combine both with Lemma~\ref{lem:uniform-trajectory}.
 \end{proof}
+\begin{lemma}[Bridge to Mathlib's probability mass functions and measures]\label{lem:bridge-pmf}
+\lean{Dynamics.Distribution.toPMF,Dynamics.Distribution.toPMF_uniform,Dynamics.Distribution.toPMF_point,Dynamics.Distribution.toPMF_map,Dynamics.Distribution.expect_eq_integral,Dynamics.Distribution.prob_eq_toMeasure,Dynamics.Distribution.toMeasure_independent,Dynamics.Distribution.iIndepFun_independent}\leanok\uses{def:distribution,lem:weighted-product}
+A distribution $p$ on a finite type is a probability mass function (Mathlib's \texttt{PMF}); the
+uniform distribution, point masses and pushforward are \texttt{PMF.uniformOfFintype},
+\texttt{PMF.pure} and \texttt{PMF.map}. Equip the type with a $\sigma$-algebra containing the
+singletons (hence every set). Under the induced measure $\mu_p$, the expectation of $f$ is
+$\int f\,d\mu_p$ and the probability of an event $S$ is $\mu_p(S)$. The measure of an independent
+product is the product measure $\bigotimes_i\mu_{p_i}$, so the coordinates
+$x\mapsto Y_i(x_i)$ are independent random variables in Mathlib's sense (\texttt{iIndepFun}).
+\end{lemma}
+\begin{proof}\leanok
+All integrals are finite sums of weights. Two measures on a finite type agree when they agree on
+singletons, and a singleton of the product space has product weight on both sides; Mathlib's
+\texttt{iIndepFun\_pi} gives independence under the product measure.
+\end{proof}
 \begin{definition}[Transition kernel]\label{def:kernel}
 \lean{Dynamics.Kernel,Dynamics.Kernel.iterate,Dynamics.Kernel.trajectory}\leanok\uses{def:distribution}
 A finite kernel assigns a distribution to every state. Its operator iterates
@@ -159,6 +174,20 @@ Markov's inequality applied to $e^{tX}$, which factors over the coordinates.
 Hoeffding's lemma bounds each Bernoulli factor; for Bernstein,
 $e^y\le1+y+y^2/(2(1-u/3))$ for $y\le u<3$ bounds each factor, and $t$ is
 chosen as $\lambda/(\sigma^2+b\lambda/3)$.
+\end{proof}
+\begin{theorem}[Hoeffding's inequality, derived from Mathlib]\label{thm:hoeffding-pmf}
+\lean{Dynamics.Distribution.hoeffding}\leanok\uses{lem:bridge-pmf}
+Let $X=\sum_{i\in I}Y_i(x_i)$ under the independent product of distributions $p_i$, where
+$Y_i$ takes values in $[a_i,b_i]$. Then
+$\Pr(X\ge\sum_i\E_{p_i}Y_i+\lambda)\le\exp\bigl(-2\lambda^2/\sum_i(b_i-a_i)^2\bigr)$ for
+$\lambda\ge0$. The case of uniform $p_i$ and $\{0,1\}$-valued $Y_i$ is the Hoeffding bound of
+Theorem~\ref{thm:concentration}.
+\end{theorem}
+\begin{proof}\leanok
+Transport the statement to the induced measure by Lemma~\ref{lem:bridge-pmf}. Each centred
+coordinate is sub-Gaussian with parameter $(b_i-a_i)^2/4$ by Mathlib's Hoeffding lemma, and the
+coordinates are independent, so Mathlib's Hoeffding inequality for sums of independent
+sub-Gaussian variables applies.
 \end{proof}
 \begin{theorem}[Chernoff bounds for independent Bernoulli trials]\label{thm:chernoff}
 \lean{Dynamics.Distribution.bernoulli,Dynamics.Distribution.chernoff_upper_ratio,Dynamics.Distribution.chernoff_upper,Dynamics.Distribution.chernoff_lower_ratio,Dynamics.Distribution.chernoff_lower,Dynamics.Distribution.bernoulli_chernoff_upper_ratio,Dynamics.Distribution.bernoulli_chernoff_upper,Dynamics.Distribution.bernoulli_chernoff_lower_ratio,Dynamics.Distribution.bernoulli_chernoff_lower,Dynamics.avg_chernoff_upper_ratio,Dynamics.avg_chernoff_upper,Dynamics.avg_chernoff_lower_ratio,Dynamics.avg_chernoff_lower}\leanok\uses{def:distribution,def:avg}

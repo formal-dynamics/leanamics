@@ -10,6 +10,7 @@ uses Lean 4.32.0 and Mathlib revision
 | `Equivalence` | `expList_eq_avg_ofFn`, the recursive `expList` is the uniform average over `Fin T → α` |
 | `Distribution` | Normalized nonnegative real weights, expectations, event probabilities, uniform distributions, point masses, independent products, pushforward |
 | `Bridge` | The three expectation APIs agree: `avg` is Mathlib's `𝔼 a, f a` (`avg_eq_expect`), the product of uniform laws is uniform (`Distribution.independent_uniform_expect`), and `expList` is the expectation over `T` i.i.d. draws in Mathlib's and in the distribution form (`expList_eq_expect`, `expList_eq_independent_expect`) |
+| `BridgePMF` | `Distribution` as Mathlib's `PMF` (`Distribution.toPMF`, compatible with `PMF.uniformOfFintype`, `PMF.pure`, `PMF.map`): `expect` is the integral and `prob` the measure under `toPMF.toMeasure` (`expect_eq_integral`, `prob_eq_toMeasure`), `independent` is `Measure.pi` (`toMeasure_independent`) with `iIndepFun` coordinates (`iIndepFun_independent`), and Hoeffding's inequality for bounded, non-identical independent coordinates derived from Mathlib's (`Distribution.hoeffding`) |
 | `Kernel` | Finite stochastic kernels, finite-time expectations, events, stationarity, harmonic observables |
 | `Trajectory` | Weighted history/endpoint expectations and agreement with kernel iteration |
 | `Stationary` | Stationary-distribution existence by Cesàro averages and compactness of the finite simplex |
@@ -54,7 +55,7 @@ resolved separately to preserve the main project's dependency pins.
 
 This is the only finite-probability layer of the repository: `rumor_spread/`,
 `3-majority/` and `plurality/` use `avg` and `expList` from here, and `Bridge` connects them to
-Mathlib's `Finset.expect`. Where the statements deviate from their sources, see
+Mathlib's `Finset.expect`; `BridgePMF` connects `Distribution` to Mathlib's `PMF` and measures. Where the statements deviate from their sources, see
 [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 3-majority retains its `ThreeMajority` probability names and blueprint links
 through compatibility declarations: `ThreeMajority.avg` is a reducible alias of `avg`.

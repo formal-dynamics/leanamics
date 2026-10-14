@@ -5,6 +5,14 @@ import Dynamics
 #print axioms Dynamics.expList_eq_expect
 #print axioms Dynamics.Distribution.independent_uniform_expect
 #print axioms Dynamics.expList_eq_independent_expect
+#print axioms Dynamics.Distribution.toPMF_uniform
+#print axioms Dynamics.Distribution.toPMF_point
+#print axioms Dynamics.Distribution.toPMF_map
+#print axioms Dynamics.Distribution.expect_eq_integral
+#print axioms Dynamics.Distribution.prob_eq_toMeasure
+#print axioms Dynamics.Distribution.toMeasure_independent
+#print axioms Dynamics.Distribution.iIndepFun_independent
+#print axioms Dynamics.Distribution.hoeffding
 #print axioms Dynamics.Distribution.independent_expect_prod
 #print axioms Dynamics.Kernel.trajectory_endpoint
 #print axioms Dynamics.Kernel.exists_stationary
