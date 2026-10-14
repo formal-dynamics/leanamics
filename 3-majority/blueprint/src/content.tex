@@ -886,7 +886,7 @@ Cauchy--Schwarz bound $\sum_b c_b^2\ge n^2/\kappa(c)$.
 \end{proof}
 
 \begin{lemma}[One-round tails and anti-concentration]\label{lem:mo-tails}
-\lean{ThreeMajority.avg_colourCount_stepCol_ge,ThreeMajority.avg_colourCount_stepCol_le_tail,ThreeMajority.avg_pz_zero_one,ThreeMajority.avg_abs_colourCount_stepCol_sub_ge,ThreeMajority.sum_variance_adoptInd_ge}\leanok
+\lean{ThreeMajority.avg_colourCount_stepCol_ge,ThreeMajority.avg_colourCount_stepCol_le_tail,Dynamics.avg_pz_zero_one,ThreeMajority.avg_abs_colourCount_stepCol_sub_ge,ThreeMajority.sum_variance_adoptInd_ge}\leanok
 \uses{lem:mo-expect,lem:chernoff,lem:indep}
 Let $\sigma_a^2$ be the sum of the variances of the agents' indicators of adopting $a$.
 \begin{enumerate}
@@ -1135,9 +1135,10 @@ the shared \texttt{Dynamics/Chernoff.lean} (Section~\ref{sec:chernoff}),
 \texttt{AnyStartAsymptotics} and \texttt{AnyStartMain} formalize
 Section~\ref{sec:bcekmn-any-start}, on the shared finite \texttt{Distribution} and
 \texttt{Kernel} layer of \texttt{dynamics}; the files \texttt{ManyOpinionsExpect},
-\texttt{ManyOpinionsMoments}, \texttt{ManyOpinionsDrift}, \texttt{ManyOpinionsTails},
+\texttt{ManyOpinionsDrift}, \texttt{ManyOpinionsTails},
 \texttt{ManyOpinionsBreaking}, \texttt{ManyOpinionsDropping} and \texttt{ManyOpinionsMain}
-formalize Section~\ref{sec:bcnpt16-many-opinions}. Design constraint
+formalize Section~\ref{sec:bcnpt16-many-opinions}, with the moment bounds of
+\texttt{Moments} in \texttt{dynamics}. Design constraint
 preserved from \texttt{rumor\_spread}: no measure theory, no
 \texttt{PMF}/\texttt{ENNReal}, no Mathlib \texttt{ProbabilityTheory}
 kernels --- everything is finite sums, plus \texttt{Real.exp}/\texttt{Real.log}

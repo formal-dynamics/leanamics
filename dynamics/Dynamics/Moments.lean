@@ -1,38 +1,41 @@
+import Dynamics.Bridge
 import Dynamics.Concentration
 
-/-! # Moments of sums of independent coordinates
+/-!
+# Moments of sums of independent coordinates
 
 For `S = ∑ i, f i (ω i)` with independent uniform coordinates `ω i` (the setting of
-`Dynamics.Concentration`), with centered summands bounded by `1`: the second moment is the sum
-of the variances `σ²` (`avg_sum_sq`), the fourth moment is at most `σ² + 3σ⁴`
-(`avg_sum_fourth_le`), and the two-sided Paley-Zygmund inequality (`avg_pz`) turns them into the
-anti-concentration bound `P(σ² ≤ 4 S²) ≥ 9/64` whenever `σ² ≥ 1` (`avg_pz_sum`, and
-`avg_pz_zero_one` for centered `{0,1}`-valued coordinates, whose variance is `p (1 - p)` by
-`variance_of_zero_one`).
+`Dynamics.Concentration`):
 
-These lemmas are those of `median/Median/AnyStartMoments.lean` (the symmetry breaking of the
-binary median dynamics), repeated here since packages do not depend on each other; they are
-candidates for the shared core. For 3-Majority, anti-concentration gives the `√n` jump of the
-gap near balance (`Plurality.jump_near_balance`).
+* `avg_cauchy`: Cauchy-Schwarz for uniform averages (Mathlib's
+  `Finset.expect_mul_sq_le_sq_mul_sq` through `avg_eq_expect`);
+* centered summands bounded by `1`: the second moment is the sum of the variances `σ²`
+  (`avg_sum_sq`), the fourth moment is at most `σ² + 3σ⁴` (`avg_sum_fourth_le`), and the
+  two-sided Paley-Zygmund inequality (`avg_pz`) turns them into the anti-concentration bound
+  `P(σ² ≤ 4 S²) ≥ 9/64` whenever `σ² ≥ 1` (`avg_pz_sum`, and `avg_pz_zero_one` for centered
+  `{0,1}`-valued coordinates);
+* `{0,1}`-valued summands: mean in `[0, 1]`, variance `p (1 - p)` (`variance_of_zero_one`), and
+  Hoeffding's exponential-moment bound `𝔼 e^{tS} ≤ e^{t 𝔼S + n t²/8}` for every real `t`
+  (`avg_exp_sum_le`).
+
+These lemmas were proved, identically, in `median/` (symmetry breaking of the binary median
+dynamics), `plurality/` (the `√n` jump of binary 3-Majority near balance) and `3-majority/`
+(symmetry breaking of 3-Majority with many colours).
 -/
 
-namespace Plurality
-open Finset Real Dynamics
+namespace Dynamics
+
+open Finset Real
 
 variable {n : ℕ} {γ : Type*} [Fintype γ]
 
 /-! ### Averages on product spaces -/
 
-/-- **Cauchy-Schwarz** for uniform averages. -/
+/-- **Cauchy-Schwarz** for uniform averages: Mathlib's `Finset.expect_mul_sq_le_sq_mul_sq`
+through `avg_eq_expect`. -/
 lemma avg_cauchy (f g : γ → ℝ) :
     avg (fun y => f y * g y) ^ 2 ≤ avg (fun y => f y ^ 2) * avg (fun y => g y ^ 2) := by
-  unfold avg
-  have h := Finset.sum_mul_sq_le_sq_mul_sq univ f g
-  calc ((∑ y, f y * g y) / (Fintype.card γ : ℝ)) ^ 2
-      = (∑ y, f y * g y) ^ 2 / (Fintype.card γ : ℝ) ^ 2 := by rw [div_pow]
-    _ ≤ ((∑ y, f y ^ 2) * ∑ y, g y ^ 2) / (Fintype.card γ : ℝ) ^ 2 := by gcongr
-    _ = (∑ y, f y ^ 2) / (Fintype.card γ : ℝ) * ((∑ y, g y ^ 2) / (Fintype.card γ : ℝ)) := by
-        rw [div_mul_div_comm, sq]
+  simpa only [avg_eq_expect] using expect_mul_sq_le_sq_mul_sq univ f g
 
 /-- **Independence of the head and the tail**: on `Fin (n + 1) → γ`, a product of a
 function of `ω 0` and a function of `Fin.tail ω` averages to the product of averages. -/
@@ -55,7 +58,7 @@ lemma avg_tail (G : (Fin n → γ) → ℝ) :
 
 omit [Fintype γ] [Nonempty γ] in
 /-- The sum over `Fin (n + 1)` splits into the head and the tail sum. -/
-lemma sum_head_tail (f : Fin (n + 1) → γ → ℝ) (ω : Fin (n + 1) → γ) :
+private lemma sum_head_tail (f : Fin (n + 1) → γ → ℝ) (ω : Fin (n + 1) → γ) :
     ∑ i, f i (ω i) = f 0 (ω 0) + ∑ i : Fin n, f i.succ (Fin.tail ω i) :=
   Fin.sum_univ_succ _
 
@@ -261,6 +264,29 @@ lemma avg_pz_zero_one (Y : Fin n → γ → ℝ) (hY : ∀ i y, Y i y = 0 ∨ Y 
     (fun i => by rw [avg_sub, avg_const, sub_self])
     (fun i y => abs_sub_avg_le_one_of_zero_one (hY i) y) hσ
 
+/-- **Hoeffding's exponential-moment bound** for independent `{0,1}`-valued coordinates: for
+every real `t`, `𝔼 exp (t ∑ᵢ Yᵢ) ≤ exp (t ∑ᵢ 𝔼Yᵢ + n t²/8)` (Hoeffding's lemma
+`one_sub_add_mul_exp_le` for each coordinate). -/
+lemma avg_exp_sum_le (Y : Fin n → γ → ℝ) (hY : ∀ i y, Y i y = 0 ∨ Y i y = 1) (t : ℝ) :
+    avg (fun ω : Fin n → γ => exp (t * ∑ i, Y i (ω i)))
+      ≤ exp (t * ∑ i, avg (Y i) + n * (t ^ 2 / 8)) := by
+  rw [avg_exp_sum]
+  have hone (i : Fin n) : avg (fun y => exp (t * Y i y)) ≤ exp (t * avg (Y i) + t ^ 2 / 8) := by
+    have hpt (y : γ) : exp (t * Y i y) = 1 + (exp t - 1) * Y i y := by
+      rcases hY i y with h | h <;> simp [h]
+    simp_rw [hpt]
+    rw [avg_add, avg_const, avg_const_mul]
+    have := one_sub_add_mul_exp_le (avg_nonneg_of_zero_one (hY i))
+      (avg_le_one_of_zero_one (hY i)) t
+    rw [mul_comm t (avg (Y i))]
+    linarith
+  calc ∏ i, avg (fun y => exp (t * Y i y))
+      ≤ ∏ i : Fin n, exp (t * avg (Y i) + t ^ 2 / 8) :=
+        prod_le_prod (fun i _ => avg_nonneg fun y => (exp_pos _).le) (fun i _ => hone i)
+    _ = exp (t * ∑ i, avg (Y i) + n * (t ^ 2 / 8)) := by
+        rw [← exp_sum, sum_add_distrib, ← mul_sum, sum_const, card_univ, Fintype.card_fin,
+          nsmul_eq_mul]
+
 end ZeroOne
 
-end Plurality
+end Dynamics
