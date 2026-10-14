@@ -15,8 +15,9 @@ endpoints replace their values by their average (`Averaging(δ)` of Definition 3
   `(i, j)` (equation (2));
 * `seqRun`: the state `x⁽ᵗ⁾ = W(t) ⋯ W(1) x⁽⁰⁾` after a sequence of selected oriented edges
   (equation (3));
-* `kernelMatrix`, `gossipMeanMatrix`: the stochastic matrix `P` of a transition kernel and the
-  right-hand side `I - D̄/(2n) + (P + Pᵀ)/(2n)` of equation (4);
+* `kernelMatrix`, `gossipMeanMatrix`: the stochastic matrix `P` of a transition kernel (the core's
+  `Dynamics.Kernel.toMatrix`) and the right-hand side `I - D̄/(2n) + (P + Pᵀ)/(2n)` of
+  equation (4);
 * `meanMatrix`: the expected step matrix `W̄ = I - L/(2m)` when one oriented edge is selected
   uniformly at random (the random sequential model of the Survey, Section 2).
 -/
@@ -31,9 +32,9 @@ which the edge `(i, j)` is selected, `e_h` the `h`-th canonical vector. -/
 noncomputable def edgeMatrix (i j : V) : Matrix V V ℝ :=
   1 - (1 / 2 : ℝ) • vecMulVec (Pi.single i 1 - Pi.single j 1) (Pi.single i 1 - Pi.single j 1)
 
-/-- The stochastic matrix `Pᵢⱼ = (K i).weight j` of a transition kernel `K`. -/
-noncomputable def kernelMatrix (K : Kernel V) : Matrix V V ℝ :=
-  of fun i j => (K i).weight j
+/-- The stochastic matrix `Pᵢⱼ = (K i).weight j` of a transition kernel `K`: the core's
+`Dynamics.Kernel.toMatrix`. -/
+noncomputable abbrev kernelMatrix (K : Kernel V) : Matrix V V ℝ := K.toMatrix
 
 /-- The right-hand side of equation (4), `I - D̄/(2n) + (P + Pᵀ)/(2n)`, for the stochastic
 matrix `P` of the kernel `K`, with `n = |V|` and `D̄` the diagonal matrix with

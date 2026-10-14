@@ -321,9 +321,13 @@ approximate majority*, Distributed Computing 21(2):87–102, 2008 [AAE08]. Journ
 
 * `Interaction n`: ordered pairs `(initiator, responder)` of distinct agents (a subtype of
   `Fin n × Fin n`), drawn uniformly and independently by `Dynamics.expList (Interaction n) T`.
+  These are the oriented edges of the complete graph, the core's `Dynamics.EdgeRound ⊤`
+  (`interactionEquiv`); their number `n (n - 1)` and sums over them come from the core
+  (`card_edgeRound_top`, `sum_edgeRound_top`).
 * `step s p`: the responder `p.1.2` takes `update (s p.1.2) (s p.1.1)`; the other agents are
   unchanged. This is exactly the transition table of [AAE08, §3] under `x ↦ .a`, `y ↦ .b`,
-  blank `↦ .u`.
+  blank `↦ .u`. It is the core's one-way protocol step `Dynamics.oneWayStep` on the complete
+  graph (`step_eq_oneWayStep`).
 * `run s l := l.foldl step s` (the form used by `Dynamics.Kernel.iterate_ofStep`).
 
 `Undecided/SequentialMain.lean` states:

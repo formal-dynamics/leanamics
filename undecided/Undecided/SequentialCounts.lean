@@ -51,15 +51,12 @@ lemma count_eq_n {s : Config n} {o : Op} (h : count s o = n) (j : Fin n) : s j =
 
 /-! ### Averages over interactions -/
 
+/-- A sum over the interactions is a sum over all ordered pairs minus the diagonal: the core's
+`Dynamics.sum_edgeRound_top` on the complete graph. -/
 lemma sum_offDiag (f : Fin n × Fin n → ℝ) :
     ∑ p : Interaction n, f p.1 = ∑ p, f p - ∑ j, f (j, j) := by
-  rw [← Finset.sum_subtype (univ.filter fun p : Fin n × Fin n => p.1 ≠ p.2) (by simp) f]
-  rw [eq_sub_iff_add_eq,
-    ← Finset.sum_filter_add_sum_filter_not univ (fun p : Fin n × Fin n => p.1 ≠ p.2) f]
-  congr 1
-  simp only [not_not, Finset.sum_filter]
-  rw [Fintype.sum_prod_type]
-  simp
+  rw [Fintype.sum_prod_type, ← sum_edgeRound_top (fun i j => f (i, j))]
+  exact Fintype.sum_equiv interactionEquiv _ _ fun _ => rfl
 
 /-- Number of interactions with initiator in state `i` and responder in state `r`. -/
 noncomputable def pairCount (s : Config n) (i r : Op) : ℝ :=
@@ -80,14 +77,13 @@ lemma sum_interaction (s : Config n) (G : Op → Op → ℝ) :
   simp only [pairCount, sub_mul, sum_sub_distrib, ite_mul, zero_mul, Finset.sum_ite_eq,
     mem_univ, if_true]
 
+/-- There are `n (n - 1)` interactions, the oriented edges of the complete graph (from Mathlib's
+`dart_card_eq_twice_card_edges` and `card_edgeFinset_top_eq_card_choose_two`). -/
 lemma card_interaction : (Fintype.card (Interaction n) : ℝ) = n * (n - 1) := by
-  let s : Config n := fun _ => .u
-  have hs := sum_interaction s (fun _ _ => (1 : ℝ))
-  simp only [mul_one, sum_const, card_univ, nsmul_eq_mul] at hs
-  rw [hs]
-  simp only [pairCount, sum_op, if_true, reduceCtorEq, if_false]
-  rw [← count_add s]
-  ring
+  rw [Fintype.card_congr interactionEquiv, card_edgeRound_top, Fintype.card_fin]
+  cases n with
+  | zero => simp
+  | succ n => push_cast; ring
 
 /-- An interaction is *idle* when its responder cannot change: equal states or a blank
 initiator. -/
