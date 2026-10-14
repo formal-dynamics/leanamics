@@ -395,12 +395,12 @@ paper mentions but omits after Theorem 2.5; its shape follows claim 2 of Theorem
 10. **Erdős–Rényi corollary** (an addition): `G(n, c/n)` is `perc ⊤ ω` with `coins (c/n)`; the
     hypotheses `0 ≤ c/n ≤ 1` are needed to form the coins.
 11. **Local lemmas.** The binomial tail `binTail` with its recursion, the scalar inequality
-    `(1 - ε) e^ε ≤ 1 - ε²/2` (`one_sub_mul_exp_le`), `prob_eq_one`, `prob_eq_zero` and the two
-    conditioning lemmas for independent products (`independent_expect_update`,
-    `independent_expect_fin_succ`, `coins_prob_split`) are not in `dynamics/` yet; their move is
-    tracked in issues #42, #44 and #46. Monotonicity, Markov's inequality on `exp (t X)` and the
-    moment-generating-function bound are the core's; congruence, complement and the union bound
-    are shared with EPI-3 (`GiantCoins.lean`).
+    `(1 - ε) e^ε ≤ 1 - ε²/2` (`one_sub_mul_exp_le`) and the two conditioning lemmas for
+    independent products (`independent_expect_update`, `independent_expect_fin_succ`,
+    `coins_prob_split`) are not in `dynamics/` yet; their move is tracked in issues #44 and #46.
+    The event lemmas (monotonicity, congruence, sure and impossible events, complement, union
+    bound), Markov's inequality on `exp (t X)` and the moment-generating-function bound are the
+    core's (`Dynamics.Distribution`).
 
 ## Small-world networks below the percolation threshold (`SmallWorld*`, EPI-6)
 
@@ -469,11 +469,12 @@ Source: L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccar
 12. **Local lemmas.** The supermartingale lemma for adaptive observations
     (`expect_prod_hist_le_one`) and its deferred-decisions form for fresh coordinates
     (`expect_prod_hist_le_one_of_fresh`), the coordinatewise combination of independent families
-    (`expect_expect_coord`, `expect_mul_of_dep`), Markov's inequality `prob_le_expect_div`, the
-    moment-generating function of a weighted block of coins (`expect_exp_sum_open`) and the union
-    bound over components for an arbitrary random graph (`prob_components_le_of_tail'`, the
-    form of EPI-2's `prob_components_le_of_tail` for any distribution) are not in `dynamics/`
-    yet; their move is tracked in issues #42, #46 and #49.
+    (`expect_expect_coord`, `expect_mul_of_dep`), the moment-generating function of a weighted
+    block of coins (`expect_exp_sum_open`) and the union bound over components for an arbitrary
+    random graph (`prob_components_le_of_tail'`, the form of EPI-2's
+    `prob_components_le_of_tail` for any distribution) are not in `dynamics/` yet; their move is
+    tracked in issues #42, #46 and #49. Markov's inequality is the core's
+    `Distribution.prob_le_expect_div`.
 
 ## The supercritical giant component (`Giant*`, EPI-3)
 
@@ -523,10 +524,9 @@ Lemma 1, Theorem 1, Theorem 2 in Discussion item 3).
     number of secondary infections caused by the first case is `p (n - 1)`).
 12. **Not formalized**: Theorem 1(1) and Lemma 1(1) (the subcritical regime), Theorems 3–6
     (digraphs, minimum-degree hosts, pseudo-random hosts, Maker–Breaker).
-13. **Local probability lemmas.** `prob_congr`, `prob_not`, `prob_or_le`, `prob_exists_le_sum`
-    and `one_sub_le_prob` (`GiantCoins.lean`) are elementary event bounds not yet in
-    `dynamics/`; their move to the core is tracked in issue #42. Monotonicity and the
-    expectation form of `prob` are the core's.
+13. **Probability lemmas.** The elementary event bounds (monotonicity, congruence, complement,
+    union bounds) and the expectation form of `prob` are the core's (`Dynamics.Distribution`);
+    only the complement bound `one_sub_le_prob` (`GiantCoins.lean`) is local.
 
 ## COBRA ⇔ BIPS duality and the COBRA cover time (`Cobra*`, EPI-4)
 

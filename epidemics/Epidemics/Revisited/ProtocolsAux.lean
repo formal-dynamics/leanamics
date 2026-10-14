@@ -35,36 +35,18 @@ lemma prob_calls_forall (A : Fin n → Finset (Fin n)) :
   push_cast
   rfl
 
-lemma prob_map {α β : Type*} [Fintype α] [Fintype β] (D : Distribution α) (f : α → β)
-    (s : β → Prop) : (D.map f).prob s = D.prob (fun a => s (f a)) := by
-  classical
-  rw [Distribution.prob_eq_expect, Distribution.prob_eq_expect, Distribution.map_expect]
-
-/-- Inclusion–exclusion for two events. -/
-lemma prob_and_eq {α : Type*} [Fintype α] (D : Distribution α) (A B : α → Prop) :
-    D.prob (fun a => A a ∧ B a) =
-      1 - D.prob (fun a => ¬ A a) - D.prob (fun a => ¬ B a) +
-        D.prob (fun a => ¬ A a ∧ ¬ B a) := by
-  classical
-  rw [D.prob_eq_expect, D.prob_eq_expect, D.prob_eq_expect, D.prob_eq_expect,
-    ← D.expect_const 1, ← Distribution.expect_sub, ← Distribution.expect_sub,
-    ← Distribution.expect_add]
-  congr 1
-  funext a
-  by_cases hA : A a <;> by_cases hB : B a <;> simp [hA, hB]
-
 /-- The covariance of the "informed" indicators equals that of the "uninformed" ones. -/
 lemma cov_eq (P : RumorProcess n) (S : Finset (Fin n)) (x y : Fin n) :
     P.cov S x y = (P.K S).prob (fun T => x ∉ T ∧ y ∉ T) -
       (P.K S).prob (fun T => x ∉ T) * (P.K S).prob (fun T => y ∉ T) := by
   unfold RumorProcess.cov RumorProcess.informProb
-  rw [prob_and_eq, Epidemics.prob_not, Epidemics.prob_not]
+  rw [Distribution.prob_and_eq, Distribution.prob_not, Distribution.prob_not]
   ring
 
 lemma informProb_eq (P : RumorProcess n) (S : Finset (Fin n)) (x : Fin n) :
     P.informProb S x = 1 - (P.K S).prob (fun T => x ∉ T) := by
   unfold RumorProcess.informProb
-  rw [Epidemics.prob_not]
+  rw [Distribution.prob_not]
   ring
 
 
@@ -147,7 +129,8 @@ lemma push_prob_not_mem {S : Finset (Fin n)} {x : Fin n} (hx : x ∉ S) :
   classical
   have hn := n_pos_of_mem x
   show ((calls n).map (pushRound S)).prob _ = _
-  rw [prob_map, prob_congr _ (fun c => not_mem_pushRound hx c), prob_calls_forall]
+  rw [Distribution.prob_map,
+    Distribution.prob_congr _ (fun c => not_mem_pushRound hx c), prob_calls_forall]
   rw [← prod_ite_mem_const]
   refine prod_congr rfl fun v _ => ?_
   split_ifs
@@ -162,7 +145,8 @@ lemma push_prob_not_mem₂ {S : Finset (Fin n)} {x y : Fin n} (hx : x ∉ S) (hy
   classical
   have hn := n_pos_of_mem x
   show ((calls n).map (pushRound S)).prob _ = _
-  rw [prob_map, prob_congr _ (fun c => not_mem_pushRound₂ hx hy c), prob_calls_forall]
+  rw [Distribution.prob_map,
+    Distribution.prob_congr _ (fun c => not_mem_pushRound₂ hx hy c), prob_calls_forall]
   rw [← prod_ite_mem_const]
   refine prod_congr rfl fun v _ => ?_
   split_ifs
@@ -206,7 +190,8 @@ lemma pull_prob_not_mem {S : Finset (Fin n)} {x : Fin n} (hx : x ∉ S) :
   classical
   have hn := n_pos_of_mem x
   show ((calls n).map (pullRound S)).prob _ = _
-  rw [prob_map, prob_congr _ (fun c => not_mem_pullRound hx c), prob_calls_forall]
+  rw [Distribution.prob_map,
+    Distribution.prob_congr _ (fun c => not_mem_pullRound hx c), prob_calls_forall]
   rw [← prod_ite_eq_const x (1 - S.card / (n : ℝ))]
   refine prod_congr rfl fun v _ => ?_
   split_ifs
@@ -220,8 +205,9 @@ lemma pull_prob_not_mem₂ {S : Finset (Fin n)} {x y : Fin n} (hx : x ∉ S) (hy
   classical
   have hn := n_pos_of_mem x
   show ((calls n).map (pullRound S)).prob _ = _
-  rw [prob_map, prob_congr _ (fun c => (and_congr (not_mem_pullRound hx c)
-    (not_mem_pullRound hy c)).trans (forall_and_mem _ _ c)), prob_calls_forall]
+  rw [Distribution.prob_map,
+    Distribution.prob_congr _ (fun c => (and_congr (not_mem_pullRound hx c)
+      (not_mem_pullRound hy c)).trans (forall_and_mem _ _ c)), prob_calls_forall]
   have hrhs : (1 - S.card / (n : ℝ)) ^ 2 =
       ∏ v, ((if v = x then 1 - S.card / (n : ℝ) else 1) *
         (if v = y then 1 - S.card / (n : ℝ) else 1)) := by
@@ -256,9 +242,10 @@ lemma pushPull_prob_not_mem {S : Finset (Fin n)} {x : Fin n} (hx : x ∉ S) :
   classical
   have hn := n_pos_of_mem x
   show ((calls n).map (pushPullRound S)).prob _ = _
-  rw [prob_map, prob_congr _ (fun c => (not_mem_pushPullRound S x c).trans
-    ((and_congr (not_mem_pushRound hx c) (not_mem_pullRound hx c)).trans
-      (forall_and_mem _ _ c))), prob_calls_forall]
+  rw [Distribution.prob_map,
+    Distribution.prob_congr _ (fun c => (not_mem_pushPullRound S x c).trans
+      ((and_congr (not_mem_pushRound hx c) (not_mem_pullRound hx c)).trans
+        (forall_and_mem _ _ c))), prob_calls_forall]
   rw [← prod_ite_mem_const, ← prod_ite_eq_const x (1 - S.card / (n : ℝ)), ← prod_mul_distrib]
   refine prod_congr rfl fun v _ => ?_
   by_cases hvS : v ∈ S
@@ -289,7 +276,8 @@ lemma pushPull_prob_not_mem₂ {S : Finset (Fin n)} {x y : Fin n} (hx : x ∉ S)
     rw [not_mem_pushPullRound, not_mem_pushPullRound, ← not_mem_pushRound₂ hx hy,
       ← forall_and_mem, ← not_mem_pullRound hx, ← not_mem_pullRound hy]
     tauto
-  rw [prob_map, prob_congr _ (fun c => (hev c).trans (forall_and_mem _ _ c)),
+  rw [Distribution.prob_map,
+    Distribution.prob_congr _ (fun c => (hev c).trans (forall_and_mem _ _ c)),
     prob_calls_forall]
   have hrhs : (1 - 2 / (n : ℝ)) ^ S.card * (1 - S.card / (n : ℝ)) ^ 2 =
       ∏ v, ((if v ∈ S then 1 - 2 / (n : ℝ) else 1) *

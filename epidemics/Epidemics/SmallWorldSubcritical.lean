@@ -50,10 +50,10 @@ theorem prob_components_le_of_tail' (P : Distribution Ω) (H : Ω → SimpleGrap
           obtain ⟨s, rfl⟩ := K.exists_rep
           exact ⟨s, mem_univ s, (Nat.floor_lt hL).mpr hK⟩
       _ ≤ ∑ s : V, P.prob (fun ω => ⌊L⌋₊ < ((H ω).connectedComponentMk s).supp.ncard) :=
-          prob_exists_le_sum _ _ _
+          Distribution.prob_exists_le_sum _ _ _
       _ ≤ ∑ _s : V, β := sum_le_sum fun s _ => htail s
       _ = Fintype.card V * β := by rw [sum_const, card_univ, nsmul_eq_mul]
-  linarith [prob_not P (fun ω => ∀ K : (H ω).ConnectedComponent, (K.supp.ncard : ℝ) ≤ L)]
+  linarith [P.prob_not (fun ω => ∀ K : (H ω).ConnectedComponent, (K.supp.ncard : ℝ) ≤ L)]
 
 end Union
 
