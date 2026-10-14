@@ -184,7 +184,7 @@ $\log\frac{1+x}{1-x}$ at $x=\delta/(2+\delta)$) and
 $(1-\delta)\log(1-\delta)\ge-\delta+\delta^2/2$.
 \end{proof}
 \begin{theorem}[Lower tails, MGF and parametric Chernoff bounds]\label{thm:chernoffmgf}
-\lean{Dynamics.avg_lower_tail_le_of_mgf,Dynamics.avg_hoeffding_lower,Dynamics.variance_le_avg_of_zero_one,Dynamics.avg_chernoff_mgf,Dynamics.avg_chernoff_upper_of_mgf,Dynamics.avg_chernoff_lower_of_mgf,Dynamics.avg_chernoff_upper_log,Dynamics.avg_chernoff_lower_log,Dynamics.avg_chernoff_lower_mul}\leanok\uses{thm:concentration,thm:chernoff}
+\lean{Dynamics.avg_lower_tail_le_of_mgf,Dynamics.avg_hoeffding_lower,Dynamics.variance_le_avg_of_zero_one,Dynamics.avg_chernoff_mgf,Dynamics.avg_chernoff_upper_of_mgf,Dynamics.avg_chernoff_lower_of_mgf,Dynamics.avg_chernoff_upper_log,Dynamics.avg_chernoff_lower_log,Dynamics.avg_chernoff_lower_mul,Dynamics.avg_bernstein_lower,Dynamics.avg_bernstein_of_zero_one,Dynamics.avg_bernstein_lower_of_zero_one,Dynamics.Distribution.prob_ge_le_exp_tilt}\leanok\uses{thm:concentration,thm:chernoff}
 Let $X=\sum_{i<n}Y_i(\omega_i)$ with independent uniform $\{0,1\}$-valued
 coordinates and $\mu=\E X$. Then $\Pr(X\le\E X-\lambda)\le e^{-2\lambda^2/n}$, and a
 $\{0,1\}$ coordinate has variance at most its mean. For every real $t$,
@@ -193,6 +193,12 @@ $t\ge0$ and $\Pr(X\le k)\le\exp(\mu(e^t-1)-tk)$ for $t\le0$. If $\E X\le\mu\le k
 with $\mu>0$, then $\Pr(X\ge k)\le\exp(k-\mu-k\log(k/\mu))$; if $0<k\le\mu\le\E X$,
 then $\Pr(X\le k)\le\exp(k-\mu-k\log(k/\mu))$. Finally
 $\Pr(X\le(1-\delta)\E X)\le\exp(-\delta^2\E X/2)$ for $0\le\delta<1$.
+Bernstein's bound also holds for the lower tail $\Pr(X\le\E X-\lambda)$ (when
+$\E Y_i-Y_i\le b$); for $\{0,1\}$-valued coordinates and $\ell>0$, each of
+$\Pr(X\ge\mu+\sqrt{3\ell(\mu+2\ell)})$ and $\Pr(X\le\mu-\sqrt{3\ell(\mu+2\ell)})$ is at
+most $e^{-\ell}$. For independent (not necessarily uniform) $\{0,1\}$ trials with
+$\E X\le(1-\varepsilon)c$, $0\le\varepsilon<1$ and $c\ge0$,
+$\Pr(X\ge k)\le\exp(c(\varepsilon-\varepsilon^2/2)-\varepsilon k)$ for every $k$.
 \end{theorem}
 \begin{proof}\leanok
 The lower Hoeffding tail is the upper one for $1-Y_i$. For the MGF bound,
@@ -200,6 +206,9 @@ $e^{tY}=1+(e^t-1)Y$ on $\{0,1\}$ and $1+y\le e^y$, factor by factor; Markov's
 inequality applied to $e^{tX}$ gives the tails, and $t=\log(k/\mu)$ the closed forms
 (the exponent is monotone in $\mu$ in the right direction). The last bound is the
 lower bound of Theorem~\ref{thm:chernoff} with $\mu_L=\E X$ (trivial for $\delta=0$).
+The lower Bernstein tail is the upper one for $-Y_i$; the $\{0,1\}$ forms take $b=1$,
+$\sigma^2=\mu+2\ell$ and $\lambda=\sqrt{3\ell\sigma^2}$. The last bound is Markov's
+inequality on $e^{\varepsilon X}$ with $(1-\varepsilon)e^{\varepsilon}\le1-\varepsilon^2/2$.
 \end{proof}
 \begin{theorem}[Moments and anti-concentration]\label{thm:moments}
 \lean{Dynamics.avg_cauchy,Dynamics.avg_sum_sq,Dynamics.avg_sum_fourth_le,Dynamics.avg_pz,Dynamics.avg_pz_sum,Dynamics.variance_of_zero_one,Dynamics.avg_pz_zero_one,Dynamics.avg_exp_sum_le,Dynamics.avg_sq_sum_le_of_pairwise}\leanok\uses{lem:uniform-product,lem:bridge}

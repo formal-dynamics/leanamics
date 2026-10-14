@@ -217,11 +217,9 @@ theorem final_recovered_iff (G : SimpleGraph V) [DecidableRel G.Adj] (ω : Sym2 
   · intro hr
     exact setDist_lt_card (perc G ω) I₀ ((setDist_ne_top_iff (perc G ω) I₀).mpr hr)
 
-/-- A biased coin: `true` with probability `p`. -/
-noncomputable def bernoulli (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) : Distribution Bool where
-  weight b := if b then p else 1 - p
-  nonneg b := by cases b <;> simp [h0, h1]
-  sum_one := by simp
+/-- A biased coin: `true` with probability `p` (the core coin `Distribution.bernoulli`). -/
+noncomputable abbrev bernoulli (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) : Distribution Bool :=
+  Distribution.bernoulli p h0 h1
 
 /-- Independent Bernoulli(`p`) coins, one per unordered pair of nodes. -/
 noncomputable def coins (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) : Distribution (Sym2 V → Bool) :=
@@ -246,7 +244,7 @@ theorem coins_prob_open (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) (e : Sym2 V) :
     _ = (bernoulli p h0 h1).expect (fun b => if b = true then (1 : ℝ) else 0) := h
     _ = p := by
       rw [Distribution.expect, Fintype.sum_bool]
-      simp [bernoulli]
+      simp [bernoulli, Distribution.bernoulli]
 
 /-- Reed–Frost ⇔ bond percolation: the probability that `v` is eventually infected equals the
 probability that `v` is connected to `I₀` in the percolated graph. -/

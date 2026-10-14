@@ -228,15 +228,9 @@ section ZeroOne
 
 variable {f : γ → ℝ}
 
+-- `avg_nonneg_of_zero_one` and `avg_le_one_of_zero_one` are in `Dynamics.Concentration`.
+
 omit [Nonempty γ] in
-/-- The mean of a `{0,1}`-valued function is nonnegative. -/
-lemma avg_nonneg_of_zero_one (hf : ∀ y, f y = 0 ∨ f y = 1) : 0 ≤ avg f :=
-  avg_nonneg fun y => by rcases hf y with h | h <;> simp [h]
-
-/-- The mean of a `{0,1}`-valued function is at most `1`. -/
-lemma avg_le_one_of_zero_one (hf : ∀ y, f y = 0 ∨ f y = 1) : avg f ≤ 1 :=
-  (avg_le_avg fun y => (by rcases hf y with h | h <;> simp [h] : f y ≤ 1)).trans_eq (avg_const 1)
-
 /-- A `{0,1}`-valued function deviates from its mean by at most `1`. -/
 lemma abs_sub_avg_le_one_of_zero_one (hf : ∀ y, f y = 0 ∨ f y = 1) (y : γ) :
     |f y - avg f| ≤ 1 := by

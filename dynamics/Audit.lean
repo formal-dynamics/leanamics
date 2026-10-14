@@ -50,6 +50,10 @@ import Dynamics
 #print axioms Dynamics.avg_pz_zero_one
 #print axioms Dynamics.avg_exp_sum_le
 #print axioms Dynamics.avg_sq_sum_le_of_pairwise
+#print axioms Dynamics.avg_bernstein_lower
+#print axioms Dynamics.avg_bernstein_of_zero_one
+#print axioms Dynamics.avg_bernstein_lower_of_zero_one
+#print axioms Dynamics.Distribution.prob_ge_le_exp_tilt
 #print axioms Dynamics.avg_chernoff_mgf
 #print axioms Dynamics.avg_chernoff_upper_of_mgf
 #print axioms Dynamics.avg_chernoff_lower_of_mgf
