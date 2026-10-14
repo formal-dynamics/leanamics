@@ -104,8 +104,8 @@ Theorem numbers of Doerr et al. 2011 follow its 2009 version (Dagstuhl Seminar P
 
 | Result | Source | Main theorems | Roadmap |
 | --- | --- | --- | --- |
-| Birth–death Moran process on a connected regular graph: `k` mutants of fitness `r` fix w.p. `(1 − r^{−k})/(1 − r^{−n})` (`k/n` if `r = 1`), the "if" direction of the isothermal theorem; Moran's formula on the complete graph. | Lieberman, Hauert, Nowak, Nature 2005; Moran 1958 | `Moran.isothermal`, `isothermal_neutral`, `moran_formula` | MOR-1, MOR-2 |
-| Neutral push (Birth–death) and pull (death–Birth) on any connected graph: a mutant set `S` fixes w.p. `∑_{v∈S} 1/deg v / ∑_v 1/deg v` (push) and `∑_{v∈S} deg v / 2m` (pull). | Antal, Redner, Sood, PRL 2006 (by approximation there) | `Moran.push_fixation`, `pull_fixation` | VOT-4 |
+| Birth–death Moran process on a connected regular graph: `k` mutants of fitness `r` fix w.p. `(1 − r^{−k})/(1 − r^{−n})` (`k/n` if `r = 1`), the "if" direction of the isothermal theorem; Moran's formula on the complete graph. | Lieberman, Hauert, Nowak, Nature 2005; Moran 1959 (complete graph) | `Moran.isothermal`, `isothermal_neutral`, `moran_formula` | MOR-1, MOR-2 |
+| Neutral push (Birth–death) and pull (death–Birth) on any connected graph: a mutant set `S` fixes w.p. `∑_{v∈S} 1/deg v / ∑_v 1/deg v` (push) and `∑_{v∈S} deg v / 2m` (pull). | Antal, Redner, Sood, PRL 2006 (as conservation laws of the neutral dynamics; their mean-field approximation concerns selection) | `Moran.push_fixation`, `pull_fixation` | VOT-4 |
 | The star: exact fixation probability from every configuration, amplification of selection for every `n ≥ 2`, and uniform-start fixation tending to `1 − 1/r²`. | Broom, Rychtář, Proc. R. Soc. A 2008; Lieberman, Hauert, Nowak 2005 | `Moran.star_fixation`, `star_fixation_uniform_sum`, `star_amplifier`, `star_amplifier_deleterious`, `star_fixation_uniform_tendsto` | MOR-3 (the star) |
 
 ## Epidemics and rumor spreading (`epidemics/`, `rumor_spread/`)

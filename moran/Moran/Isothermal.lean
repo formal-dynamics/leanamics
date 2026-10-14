@@ -13,7 +13,7 @@ exactly `r` times the probability that it decreases it. Hence `(1/r)^(#mutants)`
 in expectation, and on a connected regular graph the fixation probability from `k` mutants is
 Moran's formula `(1 - r^{-k}) / (1 - r^{-n})` (for `r ≠ 1`), or `k/n` in the neutral case.
 This is the "if" direction of the isothermal theorem of Lieberman, Hauert and Nowak (2005);
-the complete graph gives Moran's classical formula (1958).
+the complete graph gives Moran's formula (Moran 1959).
 -/
 
 namespace Moran
@@ -750,7 +750,7 @@ theorem isothermal_neutral [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj]
   exact fixation_eq_of_invariant (moranKernel G 1 one_pos) neutralPsi hinv neutralPsi_all
     neutralPsi_none (allMutant_step G one_pos) s (moran_unfixed_tendsto G hc one_pos s)
 
-/-- **Moran's formula (1958).** On the complete graph, the fixation probability from `k`
+/-- **Moran's formula (Moran 1959).** On the complete graph, the fixation probability from `k`
 mutants is `(1 - r^{-k}) / (1 - r^{-n})`. -/
 theorem moran_formula [Nonempty V] {r : ℝ} (hr : 0 < r) (hr1 : r ≠ 1) (s : Config V) :
     fixation (moranKernel (⊤ : SimpleGraph V) r hr) s =

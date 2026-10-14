@@ -1,0 +1,20 @@
+{%- comment -%}
+  Sets dict_roadmap_href to the track of ROADMAP.md that contains the roadmap ID include.id
+  (the entries are table rows without anchors of their own; the anchors below are GitHub's
+  ids of the track headings).
+  Usage: {% include dictionary-roadmap.html id="VOT-1" %}{{ dict_roadmap_href }}
+{%- endcomment -%}
+{%- assign dict_roadmap_track = include.id | split: "-" | first -%}
+{%- case dict_roadmap_track -%}
+{%- when "FND" -%}{%- assign dict_roadmap_anchor = "fnd-foundations" -%}
+{%- when "VOT" -%}{%- assign dict_roadmap_anchor = "vot-voter-model-wrightfisher-coalescence" -%}
+{%- when "MOR" -%}{%- assign dict_roadmap_anchor = "mor-moran-process" -%}
+{%- when "EPI" -%}{%- assign dict_roadmap_anchor = "epi-epidemics-percolation-information-spreading" -%}
+{%- when "MAJ" -%}{%- assign dict_roadmap_anchor = "maj-majority-type-dynamics" -%}
+{%- when "UND" -%}{%- assign dict_roadmap_anchor = "und-undecided-state-dynamics" -%}
+{%- when "CRN" -%}{%- assign dict_roadmap_anchor = "crn-chemical-reaction-networks" -%}
+{%- when "AVG" -%}{%- assign dict_roadmap_anchor = "avg-averaging-dynamics-and-community-detection" -%}
+{%- else -%}{%- assign dict_roadmap_anchor = "" -%}
+{%- endcase -%}
+{%- assign dict_roadmap_href = "https://github.com/" | append: site.repository | append: "/blob/main/ROADMAP.md" -%}
+{%- if dict_roadmap_anchor != "" -%}{%- assign dict_roadmap_href = dict_roadmap_href | append: "#" | append: dict_roadmap_anchor -%}{%- endif -%}

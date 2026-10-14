@@ -12,8 +12,9 @@ opinions) and `B` (blank, or undecided) and four reactions with a common rate co
 From counts `x` with `D = 2·#X·#Y + #B·(#X + #Y) > 0`, its jump chain fires each of the two
 `X + Y` reactions with probability `#X·#Y / D`, `B + X → X + X` with probability `#B·#X / D` and
 `B + Y → Y + Y` with probability `#B·#Y / D` (`network_jump_expect`). By CRN-1 this is the
-sequential undecided-state dynamics on `n` agents, conditioned on the drawn pair reacting
-(`network_jumpKernel_eq_ppKernel`); a drawn pair reacts with probability `D / (4·C(n, 2))`
+population protocol that draws a uniformly random pair and reaction, conditioned on the pair
+reacting (`network_jumpKernel_eq_ppKernel`); on counts it is also the sequential undecided-state
+dynamics of `undecided/`, which is not formalized; a drawn pair reacts with probability `D / (4·C(n, 2))`
 (`network_reactProb_eq`).
 -/
 

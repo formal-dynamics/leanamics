@@ -3,14 +3,15 @@ We formalize the Birth--death Moran process on a finite graph and the ``if'' dir
 isothermal theorem of Lieberman, Hauert and Nowak (2005): on a connected regular graph, a
 mutant population of size $k$ with fitness $r\neq 1$ takes over the whole population with
 probability $(1-r^{-k})/(1-r^{-n})$, and with probability $k/n$ when $r=1$. The complete graph
-gives Moran's formula (1958). As in the voter project, eventual probabilities are suprema of
+gives Moran's formula (Moran, \emph{The survival of a mutant gene under selection}, J.\ Austral.\
+Math.\ Soc.\ 1, 1959). As in the voter project, eventual probabilities are suprema of
 increasing finite-time probabilities; no path-space measure is used.
 \end{abstract}
 
 \section{The model}\label{sec:lhn-isothermal}
 This section and the three following ones formalize the ``if'' direction of the isothermal
 theorem of Lieberman, Hauert and Nowak, \emph{Evolutionary dynamics on graphs} (Nature 2005),
-with Moran's formula (1958) on the complete graph; the main theorem is in the section on fixation
+with Moran's formula (1959) on the complete graph; the main theorem is in the section on fixation
 probabilities.
 \begin{definition}[Birth--death Moran kernel]\label{def:moran}
 \lean{Moran.Config,Moran.mutants,Moran.fitness,Moran.totalFitness,Moran.target,Moran.pairDist,Moran.moranKernel}\leanok
@@ -105,8 +106,9 @@ On the complete graph the neutral push and pull voter processes coincide; on an 
 they fix a mutant set with different probabilities, weighted by $1/\deg$ and by $\deg$
 respectively. In population genetics this is the difference between Birth--death and
 death--Birth updating. Antal, Redner and Sood, \emph{Evolutionary dynamics on
-degree-heterogeneous graphs} (Phys.\ Rev.\ Lett.\ 96, 2006), derive these weights by a
-mean-field approximation; here they are proved exactly, on every connected graph.
+degree-heterogeneous graphs} (Phys.\ Rev.\ Lett.\ 96, 2006), obtain these weights from
+quantities conserved by the neutral dynamics (their results with selection use a mean-field
+approximation); here they are proved formally, on every connected graph.
 \begin{definition}[Death--Birth kernel]\label{def:pull}
 \lean{Moran.pullWeight,Moran.pullDist,Moran.pullKernel,Moran.pull_weight_nonneg,Moran.pull_weight_sum_one}\leanok\uses{def:moran}
 In one pull (death--Birth) step, a uniformly random vertex $u$ adopts the type of a uniformly

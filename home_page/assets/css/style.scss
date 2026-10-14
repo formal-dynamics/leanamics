@@ -7,3 +7,310 @@
 @import "{{ site.theme }}";
 
 /* Put your rules below this line */
+
+/* Cross-field dictionary (_includes/dictionary.html). On large screens the dictionary is wider
+   than the text column: it takes the width of the window less 2rem on each side, up to 84rem,
+   centred, so that it never scrolls the page sideways. From 72em it is a grid with the title and
+   one column per field (about 150px or more each); on medium screens the title spans the row above
+   the fields, three per line, each with its label; below 700px every row is a card. */
+$dict-small: 43.75em;
+$dict-grid: 72em;
+$dict-wide: 84rem;
+$dict-muted: #8a979e;
+
+.dict {
+  margin: 2rem 0 2.5rem;
+
+  code {
+    overflow-wrap: anywhere;
+  }
+
+  details > summary {
+    cursor: pointer;
+    color: $body-link-color;
+  }
+}
+
+.dict-notes {
+  margin: 0 0 1.5rem;
+  padding: 0.25rem 0 0.25rem 1rem;
+  border-left: 0.3rem solid $border-color;
+  font-size: 0.9rem;
+
+  p {
+    margin: 0.6rem 0;
+  }
+}
+
+.main-content .dict-relations {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 0.3rem 0.6rem;
+  margin: 0.75rem 0;
+
+  dt,
+  dd {
+    margin: 0;
+    font-size: inherit;
+    font-weight: normal;
+  }
+}
+
+.dict-table {
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.dict-head,
+.dict-cells {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) repeat(6, minmax(0, 1fr));
+}
+
+@media screen and (min-width: $large-breakpoint) {
+  .dict-table {
+    margin: 0 calc(50% - 50vw + 2rem);
+  }
+}
+
+@media screen and (min-width: $dict-wide + 4rem) {
+  .dict-table {
+    margin: 0 calc(50% - #{$dict-wide / 2});
+  }
+}
+
+.dict-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #fff;
+  border-bottom: 2px solid $border-color;
+  color: $section-headings-color;
+  font-weight: bold;
+}
+
+.dict-head > div,
+.dict-cell {
+  min-width: 0;
+  padding: 0.5rem 0.6rem;
+  overflow-wrap: break-word;
+}
+
+.dict-cell {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.main-content .dict-group {
+  margin: 1.5rem 0 0;
+  padding: 0.3rem 0.6rem;
+  background: $code-bg-color;
+  font-size: 1rem;
+}
+
+.dict-row {
+  border-bottom: 1px solid $table-border-color;
+  scroll-margin-top: 3rem;
+}
+
+.dict-title {
+  font-weight: bold;
+}
+
+.dict-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: 0.35rem 0 0;
+}
+
+.dict-kind,
+.dict-status {
+  display: inline-block;
+  padding: 0 0.45rem;
+  border: 1px solid $border-color;
+  border-radius: 0.7rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.dict-kind {
+  background: $code-bg-color;
+  color: $code-text-color;
+}
+
+a.dict-status:hover {
+  text-decoration: none;
+  filter: brightness(0.95);
+}
+
+.dict-status-proved {
+  background: #e3f4ea;
+  border-color: #9fd8b6;
+  color: #11613a;
+}
+
+.dict-status-partial {
+  background: #fff3d6;
+  border-color: #efcd78;
+  color: #6f4b00;
+}
+
+.dict-status-definitional {
+  background: #e6f0fb;
+  border-color: #a9c8ec;
+  color: #1a5596;
+}
+
+.dict-status-results {
+  background: #eef0f3;
+  border-color: #c8cfd6;
+  color: #3f4a54;
+}
+
+.dict-status-roadmap {
+  background: #fff;
+  border-style: dashed;
+  border-color: #b3bec7;
+  color: #5a666c;
+}
+
+.dict-status-not-formalized {
+  background: #fbefe9;
+  border-color: #e8c0ae;
+  color: #8a4127;
+}
+
+.dict-label {
+  display: none;
+}
+
+.dict-none {
+  cursor: help;
+}
+
+.dict-none-text {
+  color: $dict-muted;
+  font-style: italic;
+}
+
+.dict-cite {
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+
+.dict-more {
+  padding: 0 0.6rem 0.5rem;
+
+  > summary {
+    font-size: 0.8rem;
+  }
+}
+
+.dict-more-body {
+  max-width: 48rem;
+  font-size: 0.9rem;
+
+  h4 {
+    margin: 1rem 0 0.25rem;
+    color: $section-headings-color;
+    font-size: 0.95rem;
+  }
+
+  p,
+  ul,
+  ol {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  p {
+    margin: 0.3rem 0 0.5rem;
+  }
+
+  ul,
+  ol {
+    margin: 0.3rem 0 0.5rem;
+    padding-left: 1.4rem;
+  }
+
+  .dict-subhead {
+    margin-bottom: 0;
+    font-weight: bold;
+  }
+}
+
+.dict-refs {
+  font-size: 0.85rem;
+
+  li:target {
+    background: #fff8d6;
+  }
+}
+
+@media screen and (max-width: $dict-grid) {
+  .dict-head {
+    display: none;
+  }
+
+  .dict-label {
+    display: block;
+    color: $section-headings-color;
+    font-size: 0.7rem;
+    font-weight: bold;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .dict-none .dict-label {
+    display: inline;
+    margin-right: 0.4rem;
+  }
+}
+
+@media screen and (min-width: $dict-small) and (max-width: $dict-grid) {
+  .dict-cells {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .dict-title-cell {
+    grid-column: 1 / -1;
+    padding-bottom: 0;
+  }
+}
+
+@media screen and (max-width: $dict-small) {
+  .dict-cells {
+    display: block;
+  }
+
+  .main-content .dict-group {
+    margin-top: 1.25rem;
+  }
+
+  .dict-row {
+    margin: 0.6rem 0;
+    border: 1px solid $border-color;
+    border-radius: 0.4rem;
+  }
+
+  .dict-cell {
+    padding: 0.35rem 0.75rem;
+    border-top: 1px solid $table-border-color;
+  }
+
+  .dict-title-cell {
+    border-top: 0;
+  }
+
+  .dict-none {
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+  }
+
+  .dict-more {
+    padding: 0.4rem 0.75rem 0.5rem;
+    border-top: 1px solid $table-border-color;
+  }
+}

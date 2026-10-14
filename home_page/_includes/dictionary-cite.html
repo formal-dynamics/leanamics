@@ -1,0 +1,17 @@
+{%- comment -%}
+  Numbered citations of the dictionary: the keys in `include.keys`, numbered by their
+  position in `include.all` (the references of the row), linked to the row's reference list.
+  Usage: {% include dictionary-cite.html keys=cell.refs all=row_refs row=row.id %}
+{%- endcomment -%}
+{%- if include.keys and include.keys.size > 0 -%}
+<span class="dict-cite">[
+{%- for dict_cite_key in include.keys -%}
+{%- for dict_cite_ref in include.all -%}
+{%- if dict_cite_ref == dict_cite_key -%}
+<a href="#dict-{{ include.row }}-ref-{{ dict_cite_key }}" title="{{ dict_cite_key }}">{{ forloop.index }}</a>
+{%- endif -%}
+{%- endfor -%}
+{%- unless forloop.last -%}, {% endunless -%}
+{%- endfor -%}
+]</span>
+{%- endif -%}
