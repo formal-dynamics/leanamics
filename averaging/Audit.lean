@@ -20,7 +20,7 @@ import Averaging
 #print axioms Averaging.Sequential.avg_transpose_edgeMatrix_mul_self
 #print axioms Averaging.Sequential.avg_sum_sq_edgeMatrix_mulVec
 #print axioms Averaging.Sequential.expList_seqRun
-#print axioms Averaging.transitionMatrix_isHermitian
+#print axioms Dynamics.transitionMatrix_isHermitian
 #print axioms Averaging.avgIter_eq_transitionMatrix_pow_mulVec
 #print axioms Averaging.transitionMatrix_mulVec_clusterIndicator
 #print axioms Averaging.abs_avgIter_sub_le
@@ -61,3 +61,6 @@ import Averaging
 #print axioms Averaging.Opportunistic.IsClusteredRegular.avg_restSq_edgeAvg_le
 #print axioms Averaging.Opportunistic.IsClusteredRegular.avg_cutDev_edgeAvg_le
 #print axioms Averaging.Opportunistic.IsClusteredRegular.expList_secondMoment_le
+#print axioms Averaging.transitionMatrix_eq_walkMatrix
+#print axioms Averaging.walkLambda_eq_lambdaG
+#print axioms Averaging.maxAbsOtherEigenvalue_le_lambdaG

@@ -11,7 +11,7 @@ eigenvalue but the largest has absolute value `< 1`.
 -/
 
 namespace Averaging
-open Finset Matrix Filter Topology
+open Finset Matrix Filter Topology Dynamics
 
 variable {V : Type*} [Fintype V] [DecidableEq V] (G : SimpleGraph V) [DecidableRel G.Adj]
 

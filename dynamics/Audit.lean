@@ -62,3 +62,5 @@ import Dynamics
 #print axioms Dynamics.Kernel.event_monotone
 #print axioms Dynamics.exp_neg_two_log
 #print axioms Dynamics.one_le_of_log_pos
+#print axioms Dynamics.pow_mulVec_dotProduct_self_le
+#print axioms Dynamics.exists_top_eigenvectorBasis

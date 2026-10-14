@@ -93,7 +93,8 @@ Lemma numbers follow the arXiv version.
    median of the own opinion and the two samples, which for two opinions is the 2-Choices rule
    (`graphStep_bool`). Opinions are Booleans and the majority opinion is any `a : Bool`; the
    minority `B` is the set of vertices whose opinion differs from `a`.
-2. **The spectral quantity.** `lambdaG G d = max {λ₂, |λₙ|}`, where `λ₁ ≥ ⋯ ≥ λₙ` are Mathlib's
+2. **The spectral quantity.** `lambdaG G d = max {λ₂, |λₙ|}` (`Dynamics.lambdaG`, in the core's
+   `Dynamics/Spectral.lean`), where `λ₁ ≥ ⋯ ≥ λₙ` are Mathlib's
    sorted eigenvalues (`Matrix.IsHermitian.eigenvalues₀`) of the transition matrix
    `(1/d) A`; it is set to `0` on graphs with fewer than two vertices, which cannot be
    `d`-regular with `d > 0`. The expander mixing lemma is stated with this quantity, which equals
@@ -141,10 +142,11 @@ Lemma numbers follow the arXiv version.
    the region `|B| ≤ (ε/5) n`, so the argument extends to such an adversary, but this is not
    formalized.
 8. **Generic lemmas not yet in the shared core.** `expList_le_of_contract`
-   (`ExpanderDrift.lean`) only uses `avg` and `expList`. The spectral lemmas of
-   `ExpanderMixing.lean` (Parseval for Mathlib's eigenbasis, the spectral expansion of a
-   bilinear form, and the expander mixing lemma itself) are candidates for the spectral toolkit
-   of the core.
+   (`ExpanderDrift.lean`) only uses `avg` and `expList`. The spectral lemmas behind the
+   expander mixing lemma (Parseval for Mathlib's eigenbasis, the spectral expansion of a bilinear
+   form, the top eigenvector when `λ_G < 1`), the transition matrix, `walkEigenvalues`, `lambdaG`
+   and `indVec` are in the core (`Dynamics/Spectral.lean`); the expander mixing lemma itself and
+   the edge counts stay in `ExpanderMixing.lean`.
 
 ## Two-sample voting on expanders from a small imbalance (`ExpanderGeneral*`, roadmap MAJ-5 (b))
 
