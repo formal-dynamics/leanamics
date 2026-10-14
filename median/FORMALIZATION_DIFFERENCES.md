@@ -43,8 +43,9 @@ are numbered differently.
    `⌈128 log n⌉` rounds except with probability `128/n` (`finish_bound`).
 5. **Generic lemmas not yet in `dynamics/`.** Several lemmas proved in namespace `Median` only
    use notions of the shared layer (`avg`, `expList`, `variance`, `Kernel`) or plain real
-   inequalities: the fixed-time drift lemmas `iterate_le_of_drift`, `iterate_add_le`,
-   `expList_le_of_drift`, `expList_add_le`; the moment bounds `avg_exp_sum_le` (Hoeffding's
+   inequalities: the phase composition lemmas `iterate_add_le`, `expList_add_le` (the
+   fixed-time drift lemmas used with them are now `Dynamics.Kernel.iterate_le_of_drift` and
+   `Dynamics.expList_le_of_drift`); the moment bounds `avg_exp_sum_le` (Hoeffding's
    mgf bound for any real `t`), `avg_sum_sq`, `avg_sum_fourth_le`, `avg_pz`, `avg_pz_sum`,
    `avg_pz_zero_one`, `variance_of_zero_one`; and `ceil_add_ceil_le`, `mul_ceil_le_ceil`,
    `pow_three_le_of_log`, `log_pow_four_div_le`. They are candidates for the shared core.

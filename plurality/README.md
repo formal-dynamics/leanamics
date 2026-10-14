@@ -80,7 +80,6 @@ proofs in both versions of the paper have gaps. Both are recorded in
 | `Corollaries` | Corollaries 3.10, 3.11, 3.12 |
 | `Binary` | The `k = 2` case via the `three_majority` package |
 | `AnyStartMoments` | Second and fourth moments of independent sums, Paley-Zygmund |
-| `AnyStartKernel` | Hitting a set then reaching an absorbing event; amplification |
 | `AnyStart` | `k = 2` from any configuration: symmetry breaking, then the vanishing bias |
 | `Lower` | Lemma 4.1 and Theorem 4.2 |
 | `Rules` | 3-input rules, `Δ`, `δ`, solvers, consensus needs survival |
