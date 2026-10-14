@@ -202,21 +202,24 @@ inequality applied to $e^{tX}$ gives the tails, and $t=\log(k/\mu)$ the closed f
 lower bound of Theorem~\ref{thm:chernoff} with $\mu_L=\E X$ (trivial for $\delta=0$).
 \end{proof}
 \begin{theorem}[Moments and anti-concentration]\label{thm:moments}
-\lean{Dynamics.avg_cauchy,Dynamics.avg_sum_sq,Dynamics.avg_sum_fourth_le,Dynamics.avg_pz,Dynamics.avg_pz_sum,Dynamics.variance_of_zero_one,Dynamics.avg_pz_zero_one,Dynamics.avg_exp_sum_le}\leanok\uses{lem:uniform-product,lem:bridge}
+\lean{Dynamics.avg_cauchy,Dynamics.avg_sum_sq,Dynamics.avg_sum_fourth_le,Dynamics.avg_pz,Dynamics.avg_pz_sum,Dynamics.variance_of_zero_one,Dynamics.avg_pz_zero_one,Dynamics.avg_exp_sum_le,Dynamics.avg_sq_sum_le_of_pairwise}\leanok\uses{lem:uniform-product,lem:bridge}
 Let $S=\sum_{i<n}f_i(\omega_i)$ with independent uniform coordinates, each $f_i$
 centered and bounded by $1$ in absolute value, and $\sigma^2=\sum_i\E f_i^2$. Then
 $\E S^2=\sigma^2$ and $\E S^4\le\sigma^2+3\sigma^4$. If $\E Z^2=s>0$ and
 $\E Z^4\le4s^2$, then $\Pr(s\le4Z^2)\ge9/64$ (two-sided Paley--Zygmund); hence
 $\Pr(\sigma^2\le4S^2)\ge9/64$ whenever $\sigma^2\ge1$, in particular for centered
 $\{0,1\}$-valued coordinates, whose variance is $p(1-p)$. For $\{0,1\}$-valued
-coordinates and every real $t$, $\E e^{tS}\le\exp(t\,\E S+nt^2/8)$.
+coordinates and every real $t$, $\E e^{tS}\le\exp(t\,\E S+nt^2/8)$. Finally, a sum
+$X$ of pairwise uncorrelated $\{0,1\}$-valued variables with mean $\mu$ has
+$\E X^2\le\mu+\mu^2$.
 \end{theorem}
 \begin{proof}\leanok
 The moments by induction on $n$, splitting off the first coordinate, which is
 independent of the others. For Paley--Zygmund, $Z^2\le s/4+Z^2\,1[s\le4Z^2]$
 pointwise, and Cauchy--Schwarz (Mathlib's, through $\operatorname{avg}=\E$) gives
 $(\E[Z^2 1_A])^2\le\E Z^4\,\Pr(A)$. The exponential moment factors over the
-coordinates, and Hoeffding's lemma bounds each factor.
+coordinates, and Hoeffding's lemma bounds each factor. For the last bound, expand
+$X^2$: the diagonal terms are $\E X_i^2=\E X_i$ and the others $\E X_i\,\E X_j$.
 \end{proof}
 \begin{lemma}[Elementary tail bounds and monotonicity]\label{lem:tail}
 \lean{Dynamics.Distribution.prob_mono,Dynamics.Distribution.expect_lt_one,Dynamics.avg_lt_one,Dynamics.avg_markov,Dynamics.avg_markov_one,Dynamics.Kernel.one_sub_avg_le_prob_ofStep,Dynamics.Kernel.iterate_monotone,Dynamics.Kernel.event_monotone,Dynamics.exp_neg_two_log,Dynamics.one_le_of_log_pos}\leanok\uses{def:distribution,def:ofstep}

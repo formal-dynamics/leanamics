@@ -49,6 +49,7 @@ import Dynamics
 #print axioms Dynamics.avg_pz_sum
 #print axioms Dynamics.avg_pz_zero_one
 #print axioms Dynamics.avg_exp_sum_le
+#print axioms Dynamics.avg_sq_sum_le_of_pairwise
 #print axioms Dynamics.avg_chernoff_mgf
 #print axioms Dynamics.avg_chernoff_upper_of_mgf
 #print axioms Dynamics.avg_chernoff_lower_of_mgf

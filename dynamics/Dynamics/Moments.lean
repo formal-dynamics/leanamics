@@ -16,11 +16,14 @@ For `S = ∑ i, f i (ω i)` with independent uniform coordinates `ω i` (the set
   `{0,1}`-valued coordinates);
 * `{0,1}`-valued summands: mean in `[0, 1]`, variance `p (1 - p)` (`variance_of_zero_one`), and
   Hoeffding's exponential-moment bound `𝔼 e^{tS} ≤ e^{t 𝔼S + n t²/8}` for every real `t`
-  (`avg_exp_sum_le`).
+  (`avg_exp_sum_le`);
+* pairwise independent `{0,1}`-valued summands: `𝔼S² ≤ μ + μ²` with `μ = 𝔼S`, i.e. the variance
+  of the sum is at most its mean (`avg_sq_sum_le_of_pairwise`).
 
-These lemmas were proved, identically, in `median/` (symmetry breaking of the binary median
-dynamics), `plurality/` (the `√n` jump of binary 3-Majority near balance) and `3-majority/`
-(symmetry breaking of 3-Majority with many colours).
+The lemmas on independent coordinates were proved, identically, in `median/` (symmetry breaking
+of the binary median dynamics), `plurality/` (the `√n` jump of binary 3-Majority near balance) and
+`3-majority/` (symmetry breaking of 3-Majority with many colours); the pairwise bound is the
+second-moment step of the PULL analysis of `rumor_spread/` (`RumorPush.pull_avg_new_sq_le`).
 -/
 
 namespace Dynamics
@@ -288,5 +291,37 @@ lemma avg_exp_sum_le (Y : Fin n → γ → ℝ) (hY : ∀ i y, Y i y = 0 ∨ Y i
           nsmul_eq_mul]
 
 end ZeroOne
+
+/-! ### Pairwise independent indicators -/
+
+/-- **Second moment of a sum of pairwise independent indicators**: if the `{0,1}`-valued
+`X i` (`i ∈ s`) are pairwise uncorrelated, then `𝔼(∑ᵢ Xᵢ)² ≤ μ + μ²` with `μ = ∑ᵢ 𝔼Xᵢ`, i.e. the
+variance of the sum is at most its mean. -/
+theorem avg_sq_sum_le_of_pairwise {Ω ι : Type*} [Fintype Ω] (s : Finset ι) (X : ι → Ω → ℝ)
+    (hX : ∀ i ω, X i ω = 0 ∨ X i ω = 1)
+    (hind : ∀ i ∈ s, ∀ j ∈ s, i ≠ j → avg (fun ω => X i ω * X j ω) = avg (X i) * avg (X j)) :
+    avg (fun ω => (∑ i ∈ s, X i ω) ^ 2) ≤ ∑ i ∈ s, avg (X i) + (∑ i ∈ s, avg (X i)) ^ 2 := by
+  classical
+  have hpair : ∀ i ∈ s, ∀ j ∈ s, avg (fun ω => X i ω * X j ω)
+      ≤ (if i = j then avg (X i) else 0) + avg (X i) * avg (X j) := by
+    intro i hi j hj
+    by_cases hij : i = j
+    · subst hij
+      have hsq : (fun ω => X i ω * X i ω) = X i :=
+        funext fun ω => by rcases hX i ω with h | h <;> simp [h]
+      rw [if_pos rfl, hsq]
+      nlinarith [avg_nonneg_of_zero_one (hX i)]
+    · rw [if_neg hij, zero_add, hind i hi j hj hij]
+  simp_rw [sq, sum_mul_sum]
+  rw [avg_sum]
+  calc ∑ i ∈ s, avg (fun ω => ∑ j ∈ s, X i ω * X j ω)
+      = ∑ i ∈ s, ∑ j ∈ s, avg (fun ω => X i ω * X j ω) :=
+        sum_congr rfl fun i _ => avg_sum _ _
+    _ ≤ ∑ i ∈ s, ∑ j ∈ s, ((if i = j then avg (X i) else 0) + avg (X i) * avg (X j)) :=
+        sum_le_sum fun i hi => sum_le_sum fun j hj => hpair i hi j hj
+    _ = _ := by
+        simp_rw [sum_add_distrib, sum_ite_eq, ← sum_mul_sum]
+        refine congrArg (· + _) (sum_congr rfl fun i hi => ?_)
+        rw [if_pos hi]
 
 end Dynamics
