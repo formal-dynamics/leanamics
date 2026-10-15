@@ -5,7 +5,8 @@ import Averaging.OpportunisticModel
 Elementary facts about `S = ∑ i, σ i` for a uniform sign vector `σ : I → ℤˣ`: the law of `S` is
 the binomial pushforward `k ↦ m - 2 k` (`avg_fun_sum_signVec`), every binomial weight is at most
 `1 / √(m + 1)` (`choose_div_le`), hence anti-concentration bounds, the second moment of weighted
-sums, the symmetry `S ↦ -S`, and the independence of disjoint blocks of signs (`avg_split`).
+sums, and the symmetry `S ↦ -S`. The independence of disjoint blocks of signs is the core's
+`Dynamics.avg_pi_split`.
 -/
 
 namespace Averaging.Opportunistic
@@ -320,23 +321,5 @@ theorem avg_sum_signVec_pos :
     · simp [h]
     · simp [h, h.ne', not_lt.mpr h.le]
   linarith
-
-/-! ### Independence of disjoint blocks of signs -/
-
-/-- The average over a product type is the iterated average. -/
-lemma avg_prod_eq {β δ : Type*} [Fintype β] [Fintype δ] (G : β × δ → ℝ) :
-    avg G = avg (fun b => avg (fun d => G (b, d))) := by
-  unfold avg
-  dsimp only
-  rw [Fintype.sum_prod_type, Fintype.card_prod, Nat.cast_mul, sum_div, sum_div]
-  exact sum_congr rfl fun b _ => by rw [div_div, mul_comm]
-
-/-- (T3) Independence of the signs on a set of indices and on its complement. -/
-theorem avg_split (p : I → Prop) [DecidablePred p]
-    (F : ({i // p i} → ℤˣ) → ({i // ¬ p i} → ℤˣ) → ℝ) :
-    avg (fun τ : I → ℤˣ => F (fun i => τ i) (fun i => τ i)) =
-      avg (fun τ₁ : {i // p i} → ℤˣ => avg (fun τ₂ : {i // ¬ p i} → ℤˣ => F τ₁ τ₂)) := by
-  rw [← avg_prod_eq fun q => F q.1 q.2]
-  exact avg_equiv (Equiv.piEquivPiSubtypeProd p fun _ : I => ℤˣ) fun q => F q.1 q.2
 
 end Averaging.Opportunistic

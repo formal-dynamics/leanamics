@@ -162,34 +162,6 @@ lemma hitting_symm (x y : V) :
 
 /-! ### The commute bound -/
 
-omit [Fintype V] [DecidableEq V] [DecidableRel G.Adj] in
-/-- Differences along a walk telescope. -/
-lemma walk_sum_darts (ψ : V → ℝ) {u v : V} (p : G.Walk u v) :
-    (p.darts.map fun d => ψ d.fst - ψ d.snd).sum = ψ u - ψ v := by
-  induction p with
-  | nil => simp
-  | cons h p ih =>
-    rw [SimpleGraph.Walk.darts_cons, List.map_cons, List.sum_cons, ih]
-    ring
-
-/-- Squared differences over distinct darts are bounded by the Dirichlet energy. -/
-lemma sum_darts_sq_le (ψ : V → ℝ) (S : Finset G.Dart) :
-    ∑ d ∈ S, (ψ d.fst - ψ d.snd) ^ 2 ≤
-      ∑ i, ∑ j, if G.Adj i j then (ψ i - ψ j) ^ 2 else 0 := by
-  have hinj : Set.InjOn (fun d : G.Dart => d.toProd) S :=
-    fun d₁ _ d₂ _ h => SimpleGraph.Dart.ext d₁ d₂ h
-  calc ∑ d ∈ S, (ψ d.fst - ψ d.snd) ^ 2
-      = ∑ q ∈ S.image (fun d : G.Dart => d.toProd), (ψ q.1 - ψ q.2) ^ 2 := by
-        rw [Finset.sum_image hinj]
-    _ ≤ ∑ q ∈ univ.filter (fun q : V × V => G.Adj q.1 q.2), (ψ q.1 - ψ q.2) ^ 2 := by
-        apply Finset.sum_le_sum_of_subset_of_nonneg
-        · intro q hq
-          obtain ⟨d, -, rfl⟩ := mem_image.mp hq
-          simp [d.adj]
-        · intros
-          positivity
-    _ = _ := by rw [Finset.sum_filter, Fintype.sum_prod_type]
-
 /-- **Commute bound** (Hassin–Peleg Fact 2.3, lazy uniform case):
 `h_y x + h_x y ≤ 4 vol (n − 1)`. -/
 lemma hitting_add_hitting_le (hd : ∀ i, 0 < G.degree i) (x y : V) :
@@ -219,14 +191,14 @@ lemma hitting_add_hitting_le (hd : ∀ i, 0 < G.degree i) (x y : V) :
     have : (p.length : ℝ) + 1 ≤ Fintype.card V := by exact_mod_cast this
     linarith
   have htel : ∑ d ∈ p.darts.toFinset, (ψ d.fst - ψ d.snd) = c := by
-    rw [List.sum_toFinset _ hnodup, walk_sum_darts]
+    rw [List.sum_toFinset _ hnodup, Dynamics.walk_sum_darts]
     simp [hψ, hc_def]
   have hcard : (p.darts.toFinset.card : ℝ) = p.length := by
     rw [List.toFinset_card_of_nodup hnodup, SimpleGraph.Walk.length_darts]
   have hcs := sq_sum_le_card_mul_sum_sq (s := p.darts.toFinset)
     (f := fun d : G.Dart => ψ d.fst - ψ d.snd)
   rw [htel, hcard] at hcs
-  have hsq := sum_darts_sq_le ψ p.darts.toFinset
+  have hsq := Dynamics.sum_darts_sq_le ψ p.darts.toFinset
   have hcc : c * c ≤ c * (4 * volume G * p.length) := by
     have hlen0 : (0 : ℝ) ≤ p.length := by positivity
     calc c * c = c ^ 2 := by ring

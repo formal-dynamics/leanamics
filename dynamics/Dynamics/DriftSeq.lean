@@ -89,6 +89,20 @@ lemma iterateSeq_nonneg (K : ℕ → Dynamics.Kernel α) (n : ℕ) {f : α → �
     (h : ∀ a, 0 ≤ f a) (a : α) : 0 ≤ iterateSeq K n f a := by
   simpa [iterateSeq_const_fun] using iterateSeq_mono K n (f := fun _ => 0) h a
 
+/-- Expectations are additive over finite sums of observables. -/
+lemma iterateSeq_finset_sum {ι : Type*} (K : ℕ → Dynamics.Kernel α) (n : ℕ) (s : Finset ι)
+    (F : ι → α → ℝ) (x : α) :
+    iterateSeq K n (fun y => ∑ i ∈ s, F i y) x = ∑ i ∈ s, iterateSeq K n (F i) x := by
+  classical
+  induction s using Finset.induction_on with
+  | empty =>
+    simp only [Finset.sum_empty]
+    exact congrFun (iterateSeq_const_fun K n 0) x
+  | insert a s ha ih =>
+    simp only [Finset.sum_insert ha]
+    rw [iterateSeq_add]
+    exact congrArg _ ih
+
 /-- `iterateSeq` of a linear combination of two observables. -/
 lemma iterateSeq_lin (K : ℕ → Dynamics.Kernel α) (n : ℕ) (u v : ℝ) (f g : α → ℝ) (a : α) :
     iterateSeq K n (fun x => u * f x + v * g x) a =

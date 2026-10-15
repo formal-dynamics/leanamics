@@ -5,7 +5,6 @@ import Epidemics.KurtzGronwall
 
 /-! # Kurtz's law of large numbers for SIR: the martingale and the good event (CRN-2, helpers)
 
-* `incrementSum` telescopes (`incrementSum_telescope`, `incrementSum_take`);
 * the coordinates `coord j` of `ℝ × ℝ × ℝ` and the martingale increments
   `mgIncr β γ j y ρ = Δ coord_j (scaled) - coord_j (F (scaled y)) / ((β + γ) N)`, centred by the
   drift identity and bounded by `2 / N`;
@@ -20,53 +19,6 @@ import Epidemics.KurtzGronwall
 namespace Epidemics.Kurtz
 
 open Dynamics KermackMcKendrick Finset Real
-
-/-! ### Telescoping `incrementSum` -/
-
-section Telescope
-
-variable {σ R : Type*}
-
-/-- Increments of the form `φ (step y a) - φ y - ψ y` telescope. -/
-lemma incrementSum_telescope (step : σ → R → σ) (φ ψ : σ → ℝ) (x : σ) (l : List R) :
-    incrementSum step (fun y a ↦ φ (step y a) - φ y - ψ y) x l
-      = φ (l.foldl step x) - φ x - incrementSum step (fun y _ ↦ ψ y) x l := by
-  induction l generalizing x with
-  | nil => simp [incrementSum]
-  | cons a l ih =>
-    simp only [incrementSum, ih, List.foldl_cons]
-    ring
-
-/-- The sum of a state function along the first `k` rounds. -/
-lemma incrementSum_take (step : σ → R → σ) (ψ : σ → ℝ) (x : σ) (l : List R) (k : ℕ)
-    (hk : k ≤ l.length) :
-    incrementSum step (fun y _ ↦ ψ y) x (l.take k)
-      = ∑ j ∈ range k, ψ ((l.take j).foldl step x) := by
-  induction l generalizing x k with
-  | nil =>
-    simp only [List.length_nil, Nat.le_zero] at hk
-    subst hk
-    simp [incrementSum]
-  | cons a l ih =>
-    cases k with
-    | zero => simp [incrementSum]
-    | succ k =>
-      rw [List.take_succ_cons, sum_range_succ']
-      simp only [incrementSum, List.take_succ_cons, List.foldl_cons, List.take_zero,
-        List.foldl_nil]
-      rw [ih (step x a) k (by simpa using hk)]
-      ring
-
-/-- Negated increments. -/
-lemma incrementSum_neg (step : σ → R → σ) (D : σ → R → ℝ) (x : σ) (l : List R) :
-    incrementSum step (fun y a ↦ -D y a) x l = -incrementSum step D x l := by
-  induction l generalizing x with
-  | nil => simp [incrementSum]
-  | cons a l ih =>
-    simp only [incrementSum, ih]
-    ring
-
-end Telescope
 
 /-! ### Coordinates -/
 

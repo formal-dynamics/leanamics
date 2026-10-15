@@ -43,32 +43,11 @@ lemma expect_div (D : Distribution α) (W : α → ℝ) (d : ℝ) :
     rw [div_eq_mul_inv, mul_comm]
   rw [hfun, D.expect_mul, div_eq_mul_inv, mul_comm]
 
-/-- Markov on the square: `P[|Z| ≥ c] ≤ E[Z²] / c²`. -/
-lemma markov_sq (D : Distribution α) (Z : α → ℝ) {c : ℝ} (hc : 0 < c) :
-    D.prob (fun a => c ≤ |Z a|) ≤ D.expect (fun a => Z a ^ 2) / c ^ 2 := by
-  classical
-  have hc2 : 0 < c ^ 2 := pow_pos hc 2
-  have hpt : ∀ a, (if c ≤ |Z a| then (1 : ℝ) else 0) ≤ Z a ^ 2 / c ^ 2 := by
-    intro a
-    by_cases h : c ≤ |Z a|
-    · rw [if_pos h, le_div_iff₀ hc2]
-      have hsq : c ^ 2 ≤ |Z a| ^ 2 := pow_le_pow_left₀ hc.le h 2
-      simpa [one_mul, sq_abs] using hsq
-    · rw [if_neg h]
-      exact div_nonneg (sq_nonneg _) hc2.le
-  have hE := D.expect_mono hpt
-  rw [expect_div D _] at hE
-  have hp : D.prob (fun a => c ≤ |Z a|) =
-      D.expect (fun a => if c ≤ |Z a| then (1 : ℝ) else 0) :=
-    prob_indicator_eq D _ _ (fun a h => by simp [h]) (fun a h => by simp [h])
-  rw [← hp] at hE
-  exact hE
-
 /-- Chebyshev: `P[|X - EX| ≥ lam] ≤ Var(X) / lam²`. -/
 lemma chebyshev (D : Distribution α) (X : α → ℝ) {lam : ℝ} (hlam : 0 < lam) :
     D.prob (fun a => lam ≤ |X a - D.expect X|) ≤
       D.expect (fun a => (X a - D.expect X) ^ 2) / lam ^ 2 :=
-  markov_sq D (fun a => X a - D.expect X) hlam
+  Distribution.markov_sq D (fun a => X a - D.expect X) hlam
 
 /-- One-sided Chebyshev (Cantelli), lower tail: `P[X ≤ EX - lam] ≤ Var / (Var + lam²)`. -/
 lemma cantelli_lower (D : Distribution α) (X : α → ℝ) {lam : ℝ} (hlam : 0 < lam) :

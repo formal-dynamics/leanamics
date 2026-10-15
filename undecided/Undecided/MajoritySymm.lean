@@ -56,15 +56,6 @@ lemma swap_eq_const (y : Config n) (o : Op) :
     funext v
     rw [Function.comp_apply, h, swapOp_swapOp]
 
-/-- `exp x ≥ x³/6` at `x = log n`. -/
-lemma log_cube_le {n : ℕ} (hn : 1 ≤ n) : log (n : ℝ) ^ 3 / 6 ≤ n := by
-  have hn0 : (0 : ℝ) < n := by exact_mod_cast hn
-  have hL0 : (0 : ℝ) ≤ log n := log_nonneg (by exact_mod_cast hn)
-  have h1 := pow_div_factorial_le_exp (log (n : ℝ)) hL0 3
-  rw [exp_log hn0] at h1
-  norm_num [Nat.factorial] at h1
-  linarith
-
 /-- **`a`-majority, probability form**: `1 - 2/n ≤ P(all nodes hold a after ⌈10⁴ log n⌉
 rounds)`. -/
 lemma prob_a_ge (hL : (10000 : ℝ) ≤ log n) (x : Config n)

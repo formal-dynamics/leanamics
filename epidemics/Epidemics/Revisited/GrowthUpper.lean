@@ -37,20 +37,6 @@ lemma card_lt_fn {a f : ℝ} {n : ℕ} {k : ℝ} (hf0 : 0 < f) (hn : 0 < (n : �
     exact mul_lt_mul_of_pos_right hf hn
   exact lt_of_le_of_lt (le_trans hk hhalf) hlt
 
-lemma prob_mono {α : Type*} [Fintype α] (D : Distribution α) {p q : α → Prop}
-    (h : ∀ a, p a → q a) : D.prob p ≤ D.prob q := by
-  classical
-  have hfun : ∀ a, (if p a then (1 : ℝ) else 0) ≤ (if q a then 1 else 0) := by
-    intro a
-    by_cases hp : p a
-    · have hq : q a := h a hp
-      rw [if_pos hp, if_pos hq]
-    · by_cases hq : q a
-      · rw [if_neg hp, if_pos hq]
-        norm_num
-      · rw [if_neg hp, if_neg hq]
-  simpa [Distribution.prob] using D.expect_mono hfun
-
 lemma expect_new_eq (P : RumorProcess n) (S : Finset (Fin n)) :
     (P.K S).expect (fun T => (T.card : ℝ) - (S.card : ℝ)) =
       ∑ x ∈ (univ : Finset (Fin n)) \ S, P.informProb S x := by
@@ -261,7 +247,7 @@ lemma fail_prob_le {γlo γ a b c f : ℝ} (P : RumorProcess n) (hγlo : 0 < γl
     exact shift_le hEpos hμE hAt
   have hsub : D.prob (fun T => X T ≤ growthE0 γ a b A n k) ≤
       D.prob (fun T => X T ≤ D.expect X - lam) :=
-    prob_mono D (fun T hT => le_trans hT (by simpa [k, A] using hshift))
+    Distribution.prob_mono D (fun T hT => le_trans hT (by simpa [k, A] using hshift))
   have hcant := cantelli_lower D X hlam
   have hvar_eq : D.expect (fun T => (X T - D.expect X) ^ 2) =
       D.expect (fun T => ((T.card : ℝ) - D.expect (fun U => (U.card : ℝ))) ^ 2) := by
@@ -697,7 +683,7 @@ lemma short_prob_le {γlo γ a b c f : ℝ} (P : RumorProcess n) (hγlo : 0 < γ
         kSeq γ a b (growthA γlo b) n (j + 1)) ≤
       (P.K S).prob (fun T => (T.card : ℝ) - (S.card : ℝ) ≤
         growthE0 γ a b (growthA γlo b) n (S.card : ℝ)) := by
-    refine prob_mono (P.K S) ?_
+    refine Distribution.prob_mono (P.K S) ?_
     intro T hT
     have hlt : (T.card : ℝ) - (S.card : ℝ) <
         kSeq γ a b (growthA γlo b) n (j + 1) - (S.card : ℝ) := by linarith only [hT]

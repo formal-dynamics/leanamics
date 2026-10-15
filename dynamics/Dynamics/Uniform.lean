@@ -3,7 +3,9 @@ import Mathlib
 /-!
 # Finite uniform expectations
 
-Shared finite averages, trajectory expectations, independence, and reindexing.
+Shared finite averages, trajectory expectations, independence (over any finite dependent
+product, `avg_pi_prod`, `avg_pi_eval`, and of disjoint blocks of coordinates, `avg_pi_split`),
+and reindexing.
 The average on an empty type is zero.
 -/
 
@@ -56,6 +58,12 @@ lemma avg_const [Nonempty α] (c : ℝ) : avg (fun _ : α => c) = c := by
   rw [sum_const, card_univ, nsmul_eq_mul, mul_comm, mul_div_assoc,
     div_self (ne_of_gt (card_cast_pos (α := α))), mul_one]
 
+/-- A uniform average of values at most one is at most one (also on an empty type). -/
+lemma avg_le_one {f : α → ℝ} (h : ∀ a, f a ≤ 1) : avg f ≤ 1 := by
+  rcases isEmpty_or_nonempty α with hα | hα
+  · simp [avg]
+  · simpa [avg_const] using avg_le_avg h
+
 /-- Expectation of a functional of `T` i.i.d. uniform draws from `α`,
 in transition-operator form: the head draw is averaged out first. -/
 noncomputable def expList (α : Type*) [Fintype α] : ℕ → (List α → ℝ) → ℝ
@@ -74,11 +82,23 @@ lemma expList_nonneg {T : ℕ} {F : List α → ℝ} (h : ∀ l, 0 ≤ F l) :
   | zero => exact h []
   | succ T ih => exact avg_nonneg fun a => ih fun l => h (a :: l)
 
-lemma expList_le_expList {T : ℕ} {F G : List α → ℝ} (h : ∀ l, F l ≤ G l) :
-    expList α T F ≤ expList α T G := by
+/-- `expList α T` only evaluates its argument on lists of length `T`, so it is monotone as soon
+as the comparison holds on those lists. -/
+lemma expList_le_expList_of_length {T : ℕ} {F G : List α → ℝ}
+    (h : ∀ l : List α, l.length = T → F l ≤ G l) : expList α T F ≤ expList α T G := by
   induction T generalizing F G with
+  | zero => exact h [] rfl
+  | succ T ih => exact avg_le_avg fun a => ih fun l hl => h (a :: l) (by simp [hl])
+
+lemma expList_le_expList {T : ℕ} {F G : List α → ℝ} (h : ∀ l, F l ≤ G l) :
+    expList α T F ≤ expList α T G :=
+  expList_le_expList_of_length fun l _ => h l
+
+/-- An `expList` average of values at most one is at most one (also on an empty type). -/
+lemma expList_le_one {T : ℕ} {F : List α → ℝ} (h : ∀ l, F l ≤ 1) : expList α T F ≤ 1 := by
+  induction T generalizing F with
   | zero => exact h []
-  | succ T ih => exact avg_le_avg fun a => ih fun l => h (a :: l)
+  | succ T ih => exact avg_le_one fun a => ih fun l => h (a :: l)
 
 lemma expList_add (T : ℕ) (F G : List α → ℝ) :
     expList α T (fun l => F l + G l) = expList α T F + expList α T G := by
@@ -104,6 +124,14 @@ lemma expList_const [Nonempty α] (T : ℕ) (c : ℝ) :
     rw [expList_succ]
     simpa [ih] using avg_const (α := α) c
 
+/-- Expectation of a complement: `𝔼[1 - F] = 1 - 𝔼[F]` (the `expList` form of
+`Kernel.iterateSeq_one_sub`). -/
+lemma expList_one_sub [Nonempty α] (T : ℕ) (F : List α → ℝ) :
+    expList α T (fun l => 1 - F l) = 1 - expList α T F := by
+  have h := expList_add T (fun l => 1 - F l) F
+  simp only [sub_add_cancel, expList_const] at h
+  linarith
+
 lemma expList_sum {ι : Type*} (s : Finset ι) (T : ℕ) (F : ι → List α → ℝ) :
     expList α T (fun l => ∑ i ∈ s, F i l) = ∑ i ∈ s, expList α T (F i) := by
   induction T generalizing F with
@@ -122,6 +150,48 @@ lemma expList_append (T₁ T₂ : ℕ) (F : List α → ℝ) :
     rw [Nat.succ_add, expList_succ, expList_succ
       (F := fun l₁ => expList α T₂ fun l₂ => F (l₁ ++ l₂))]
     exact congrArg avg (funext fun a => by rw [ih]; simp)
+
+/-! ### Lengths and prefixes: `expList α T` only evaluates lists of length `T` -/
+
+/-- `expList α T` only evaluates its argument on lists of length `T`, so a comparison on those
+lists is enough. -/
+lemma expList_le_of_length {T : ℕ} {F G : List α → ℝ}
+    (h : ∀ l : List α, l.length = T → F l ≤ G l) : expList α T F ≤ expList α T G := by
+  induction T generalizing F G with
+  | zero => exact h [] rfl
+  | succ T ih =>
+    rw [expList_succ, expList_succ]
+    exact avg_le_avg fun a => ih fun l hl => h (a :: l) (by simp [hl])
+
+/-- `expList α T` only evaluates its argument on lists of length `T`. -/
+lemma expList_congr_length {T : ℕ} {F G : List α → ℝ}
+    (h : ∀ l : List α, l.length = T → F l = G l) : expList α T F = expList α T G :=
+  le_antisymm (expList_le_of_length fun l hl => (h l hl).le)
+    (expList_le_of_length fun l hl => (h l hl).ge)
+
+/-- A function of the first `k` of `T ≥ k` draws only sees `k` draws. -/
+lemma expList_take [Nonempty α] {k T : ℕ} (hk : k ≤ T) (F : List α → ℝ) :
+    expList α T (fun l => F (l.take k)) = expList α k F := by
+  obtain ⟨m, rfl⟩ := Nat.exists_eq_add_of_le hk
+  rw [expList_append]
+  refine expList_congr_length fun l hl => ?_
+  simp_rw [List.take_left' hl]
+  exact expList_const (α := α) m _
+
+/-- A function of the first `k` of `T > k` draws and of the next one: the next draw is a fresh
+uniform sample. -/
+lemma expList_take_getElem? [Nonempty α] {k T : ℕ} (hk : k < T) (F : List α → Option α → ℝ) :
+    expList α T (fun l => F (l.take k) l[k]?) = expList α k fun p => avg fun a => F p (some a) := by
+  obtain ⟨m, rfl⟩ := Nat.exists_eq_add_of_lt hk
+  rw [show k + m + 1 = k + (m + 1) by ring, expList_append]
+  refine expList_congr_length fun p hp => ?_
+  have h1 : ∀ l : List α, (p ++ l).take k = p := fun l => List.take_left' hp
+  have h2 : ∀ l : List α, (p ++ l)[k]? = l.head? := fun l => by
+    rw [List.getElem?_append_right (by omega), hp, Nat.sub_self, List.head?_eq_getElem?]
+  simp_rw [h1, h2, expList_succ, List.head?_cons]
+  congr 1
+  funext a
+  exact expList_const (α := α) m _
 
 /-! ### Independence: average of a product over a product space -/
 
@@ -160,57 +230,39 @@ lemma avg_equiv {β : Type*} [Fintype β] (e : α ≃ β) (F : β → ℝ) :
   unfold avg
   rw [Equiv.sum_comp e F, Fintype.card_congr e]
 
+/-- **Independence over a dependent product**: under the uniform distribution on a finite
+product `∀ i, β i`, the coordinates are independent, so the average of a product
+`∏ i, g i (x i)` is the product of the averages `avg (g i)`. -/
+lemma avg_pi_prod {ι : Type*} [Fintype ι] [DecidableEq ι] {β : ι → Type*}
+    [∀ i, Fintype (β i)] (g : ∀ i, β i → ℝ) :
+    avg (fun x : (∀ i, β i) => ∏ i, g i (x i)) = ∏ i, avg (g i) := by
+  unfold avg
+  rw [← Fintype.prod_sum, Fintype.card_pi, Nat.cast_prod, ← prod_div_distrib]
+
+/-- **Marginal over a dependent product**: the average of a function of one coordinate, over
+the whole product space, is its average over that coordinate alone. -/
+lemma avg_pi_eval {ι : Type*} [Fintype ι] [DecidableEq ι] {β : ι → Type*}
+    [∀ i, Fintype (β i)] [∀ i, Nonempty (β i)] (i : ι) (g : β i → ℝ) :
+    avg (fun x : (∀ j, β j) => g (x i)) = avg g := by
+  rw [← avg_fst_mul (δ := (j : {j // j ≠ i}) → β j) g]
+  exact avg_equiv (Equiv.piSplitAt i β) (fun p => g p.1)
+
 /-- **Independence over a `Fin n`-indexed product**: the average of a product
 `∏ i, f i (x i)` over the product Fintype `Fin n → γ` (uniform measure)
 equals the product of the individual averages `avg (f i)`. This is the
 discrete, measure-theory-free form of "coordinate projections on a product
-space are independent." -/
+space are independent", the non-dependent case of `avg_pi_prod`. -/
 lemma avg_prod_pi {γ : Type*} [Fintype γ] :
     ∀ (n : ℕ) (f : Fin n → γ → ℝ),
-      avg (fun x : Fin n → γ => ∏ i, f i (x i)) = ∏ i, avg (f i)
-  | 0, f => by
-      have h1 : (fun x : Fin 0 → γ => ∏ i : Fin 0, f i (x i)) = fun _ => (1 : ℝ) := by
-        funext x; simp
-      have h2 : Nonempty (Fin 0 → γ) := ⟨Fin.elim0⟩
-      rw [h1]
-      haveI := h2
-      rw [avg_const, Finset.prod_of_isEmpty]
-  | n + 1, f => by
-      have hfun : (fun x : Fin (n + 1) → γ => ∏ i, f i (x i))
-          = (fun x : Fin (n + 1) → γ =>
-              (fun p : γ × (Fin n → γ) => f 0 p.1 * ∏ i : Fin n, f i.succ (p.2 i))
-                ((Fin.consEquiv (fun _ : Fin (n + 1) => γ)).symm x)) := by
-        funext x
-        simp only [Fin.prod_univ_succ]
-        congr 1
-      rw [hfun,
-        avg_equiv (Fin.consEquiv (fun _ : Fin (n + 1) => γ)).symm
-          (fun p : γ × (Fin n → γ) => f 0 p.1 * ∏ i : Fin n, f i.succ (p.2 i)),
-        avg_mul_prod (f 0) (fun x : Fin n → γ => ∏ i : Fin n, f i.succ (x i)),
-        avg_prod_pi n (fun i => f i.succ), Fin.prod_univ_succ]
+      avg (fun x : Fin n → γ => ∏ i, f i (x i)) = ∏ i, avg (f i) :=
+  fun _ f => avg_pi_prod f
 
 /-- **Marginal for `Fin n`-indexed Pi types**: the average of a function of
 a single fixed coordinate, over the whole product space, equals its average
-over that one factor alone. -/
+over that one factor alone (the non-dependent case of `avg_pi_eval`). -/
 lemma avg_eval {γ : Type*} [Fintype γ] [Nonempty γ] (n : ℕ) (v : Fin n) (G : γ → ℝ) :
-    avg (fun x : Fin n → γ => G (x v)) = avg G := by
-  have hval : (fun x : Fin n → γ => G (x v))
-      = fun x : Fin n → γ =>
-          ∏ i : Fin n, (if i = v then G else (fun _ : γ => (1 : ℝ))) (x i) := by
-    funext x
-    rw [Finset.prod_eq_single v]
-    · simp
-    · intro i _ hiv
-      simp [hiv]
-    · intro h
-      exact absurd (mem_univ v) h
-  rw [hval, avg_prod_pi n (fun i => if i = v then G else (fun _ : γ => (1 : ℝ)))]
-  rw [Finset.prod_eq_single v]
-  · simp
-  · intro i _ hiv
-    simp [hiv, avg_const]
-  · intro h
-    exact absurd (mem_univ v) h
+    avg (fun x : Fin n → γ => G (x v)) = avg G :=
+  avg_pi_eval (β := fun _ : Fin n => γ) v G
 
 /-- Finite uniform averages over a product of index sets commute. -/
 lemma avg_avg_swap {β : Type*} [Fintype β] (F : α → β → ℝ) :
@@ -218,6 +270,24 @@ lemma avg_avg_swap {β : Type*} [Fintype β] (F : α → β → ℝ) :
   unfold avg
   dsimp only
   rw [← Finset.sum_div, div_div, sum_comm, mul_comm, ← div_div, Finset.sum_div]
+
+/-- The average over a product type is the iterated average. -/
+lemma avg_prod_eq_avg_avg {β δ : Type*} [Fintype β] [Fintype δ] (G : β × δ → ℝ) :
+    avg G = avg (fun b => avg (fun d => G (b, d))) := by
+  unfold avg
+  dsimp only
+  rw [Fintype.sum_prod_type, Fintype.card_prod, Nat.cast_mul, sum_div, sum_div]
+  exact sum_congr rfl fun b _ => by rw [div_div, mul_comm]
+
+/-- **Independence of disjoint blocks of coordinates**: under the uniform distribution on
+`I → γ`, the coordinates in `{i // p i}` and those in its complement are independent, so the
+average of a function of the two restrictions is the iterated average. -/
+lemma avg_pi_split {I γ : Type*} [Fintype I] [DecidableEq I] [Fintype γ] (p : I → Prop)
+    [DecidablePred p] (F : ({i // p i} → γ) → ({i // ¬ p i} → γ) → ℝ) :
+    avg (fun τ : I → γ => F (fun i => τ i) (fun i => τ i)) =
+      avg (fun τ₁ : {i // p i} → γ => avg (fun τ₂ : {i // ¬ p i} → γ => F τ₁ τ₂)) := by
+  rw [← avg_prod_eq_avg_avg fun q => F q.1 q.2]
+  exact avg_equiv (Equiv.piEquivPiSubtypeProd p fun _ : I => γ) fun q => F q.1 q.2
 
 /-- `expList` is an iterated average, so it commutes with an outer uniform average. -/
 lemma expList_avg_comm {β : Type*} [Fintype β] (T : ℕ) (G : α → List β → ℝ) :

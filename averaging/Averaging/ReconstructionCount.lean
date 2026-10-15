@@ -178,21 +178,6 @@ theorem reconstructionTime_le_aux (hn : 2 ≤ n) {δ : ℝ} (hδ : 0 < δ) (hδ1
   rw [← hL] at this
   linarith
 
-/-- If `s'` holds wherever `s` fails, then `P(s') ≥ 1 - P(s)`. -/
-lemma one_sub_prob_le_prob {α : Type*} [Fintype α] (p : Distribution α) {s s' : α → Prop}
-    (h : ∀ a, ¬ s a → s' a) : 1 - p.prob s ≤ p.prob s' := by
-  classical
-  have key (a : α) : (1 : ℝ) - (if s a then 1 else 0) ≤ if s' a then 1 else 0 := by
-    by_cases hs : s a
-    · simp only [hs, if_true, sub_self]
-      split_ifs <;> norm_num
-    · simp [hs, h a hs]
-  calc 1 - p.prob s = p.expect (fun a => 1 - if s a then 1 else 0) := by
-        rw [Distribution.expect_sub, Distribution.expect_const]
-        rfl
-    _ ≤ p.expect (fun a => if s' a then 1 else 0) := p.expect_mono key
-    _ = p.prob s' := rfl
-
 /-- **Theorem 3.2** (Strong reconstruction), probabilistic form. -/
 theorem strong_reconstruction_aux {G : SimpleGraph V} [DecidableRel G.Adj] {d b : ℕ}
     (hG : IsClusteredRegular G V₁ V₂ n d b) (hconn : G.Connected) {δ : ℝ} (hδ : 0 < δ)
@@ -210,7 +195,7 @@ theorem strong_reconstruction_aux {G : SimpleGraph V} [DecidableRel G.Adj] {d b 
     _ = 1 - (Distribution.uniform (V → ℤˣ)).prob
           (fun σ => (fun v => ((σ v : ℤ) : ℝ)) ⬝ᵥ clusterIndicator V₁ V₂ = 0) := by
         rw [prob_dotProduct_clusterIndicator_eq_zero_aux hP]
-    _ ≤ _ := one_sub_prob_le_prob _ fun σ hσ t ht =>
+    _ ≤ _ := Distribution.one_sub_prob_le_prob _ fun σ hσ t ht =>
         isStrongReconstruction_color_aux hG hconn hδ hgap
           (fun v => cast_units_eq_one_or (σ v)) hσ ht
 

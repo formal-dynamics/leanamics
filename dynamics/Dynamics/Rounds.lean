@@ -99,4 +99,100 @@ theorem expList_escape (step : S → R → S) {p : ℝ} (hp : 0 ≤ p) :
       _ ≤ T * p + p := by linarith [hG 0 (by omega) x hx]
       _ = ((T + 1 : ℕ) : ℝ) * p := by push_cast; ring
 
+/-! ### Missing a target after i.i.d. rounds -/
+
+omit [Nonempty R] in
+/-- Probability that the process driven by `T` i.i.d. uniform rounds of `step`, started at `s`,
+is outside `B` after `T` rounds. -/
+noncomputable def missProb (step : S → R → S) (B : Set S) (T : ℕ) (s : S) : ℝ := by
+  classical
+  exact expList R T (fun l => if l.foldl step s ∈ B then 0 else 1)
+
+omit [Nonempty R] in
+/-- With no round, the process misses `B` exactly when it starts outside `B`. -/
+lemma missProb_zero (step : S → R → S) (B : Set S) (s : S) :
+    missProb step B 0 s = by classical exact if s ∈ B then 0 else 1 := rfl
+
+omit [Nonempty R] in
+/-- The first round is averaged out first. -/
+lemma missProb_succ (step : S → R → S) (B : Set S) (T : ℕ) (s : S) :
+    missProb step B (T + 1) s = avg (fun r => missProb step B T (step s r)) := rfl
+
+omit [Nonempty R] in
+/-- A missing probability is nonnegative. -/
+lemma missProb_nonneg (step : S → R → S) (B : Set S) (T : ℕ) (s : S) :
+    0 ≤ missProb step B T s := by
+  classical
+  unfold missProb
+  exact expList_nonneg fun l => by split <;> norm_num
+
+/-- A missing probability is at most `1`. -/
+lemma missProb_le_one (step : S → R → S) (B : Set S) (T : ℕ) (s : S) :
+    missProb step B T s ≤ 1 := by
+  classical
+  unfold missProb
+  calc _ ≤ expList R T (fun _ => (1 : ℝ)) := expList_le_expList fun l => by split <;> norm_num
+    _ = 1 := expList_const T 1
+
+omit [Nonempty R] in
+/-- Missing a smaller set is more likely. -/
+lemma missProb_mono (step : S → R → S) {B B' : Set S} (h : B ⊆ B') (T : ℕ) (s : S) :
+    missProb step B' T s ≤ missProb step B T s := by
+  classical
+  unfold missProb
+  refine expList_le_expList fun l => ?_
+  by_cases hB : l.foldl step s ∈ B
+  · simp [hB, h hB]
+  · rw [if_neg hB]
+    split <;> norm_num
+
+/-- **Composition of stages** (Markov property): if from every state of `B` the process misses
+`D` after `T₂` rounds with probability at most `e`, then from `s` it misses `D` after `T₁ + T₂`
+rounds with probability at most `missProb step B T₁ s + e`. -/
+lemma missProb_comp (step : S → R → S) {B D : Set S} {T₁ T₂ : ℕ} {e : ℝ} (he : 0 ≤ e)
+    (hD : ∀ y ∈ B, missProb step D T₂ y ≤ e) (s : S) :
+    missProb step D (T₁ + T₂) s ≤ missProb step B T₁ s + e := by
+  classical
+  have key (l₁ : List R) :
+      expList R T₂ (fun l₂ => if (l₁ ++ l₂).foldl step s ∈ D then (0 : ℝ) else 1)
+        = missProb step D T₂ (l₁.foldl step s) := by
+    simp only [missProb, List.foldl_append]
+  have hpt (l₁ : List R) : missProb step D T₂ (l₁.foldl step s)
+      ≤ (if l₁.foldl step s ∈ B then (0 : ℝ) else 1) + e := by
+    by_cases hB : l₁.foldl step s ∈ B
+    · rw [if_pos hB, zero_add]
+      exact hD _ hB
+    · rw [if_neg hB]
+      linarith [missProb_le_one step D T₂ (l₁.foldl step s)]
+  calc missProb step D (T₁ + T₂) s
+      = expList R T₁ (fun l₁ => missProb step D T₂ (l₁.foldl step s)) := by
+        rw [← funext key]
+        exact expList_append T₁ T₂ _
+    _ ≤ expList R T₁ (fun l₁ => (if l₁.foldl step s ∈ B then (0 : ℝ) else 1) + e) :=
+        expList_le_expList hpt
+    _ = missProb step B T₁ s + e := by
+        rw [expList_add, expList_const]
+        rfl
+
+omit [Nonempty R] in
+/-- A target closed under every round is never left. -/
+lemma missProb_of_closed (step : S → R → S) {B : Set S} (hB : ∀ y ∈ B, ∀ r, step y r ∈ B)
+    {y : S} (hy : y ∈ B) (T : ℕ) : missProb step B T y = 0 := by
+  classical
+  have hfold (l : List R) : ∀ z ∈ B, l.foldl step z ∈ B := by
+    induction l with
+    | nil => exact fun z hz => hz
+    | cons r l ih => exact fun z hz => ih _ (hB z hz r)
+  unfold missProb
+  simp_rw [if_pos (hfold _ y hy)]
+  exact expList_zero_fun T
+
+/-- The probability of missing a target closed under every round does not increase with time. -/
+lemma missProb_antitone (step : S → R → S) {B : Set S} (hB : ∀ y ∈ B, ∀ r, step y r ∈ B) (s : S)
+    {T T' : ℕ} (h : T ≤ T') : missProb step B T' s ≤ missProb step B T s := by
+  obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le h
+  have := missProb_comp step (B := B) (D := B) (T₁ := T) (T₂ := k) le_rfl
+    (fun y hy => (missProb_of_closed step hB hy k).le) s
+  linarith
+
 end Dynamics

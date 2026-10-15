@@ -207,7 +207,7 @@ lemma overshoot_round_proof {f p c f' : ℝ} (hp0 : 0 ≤ p) (hp1 : p ≤ 1) (hc
       rw [hδ]
       linarith only [hT, hμeq, hsum, hkf]
     exact le_trans hdev (le_abs_self _)
-  have hmono := prob_mono D hsub
+  have hmono := Distribution.prob_mono D hsub
   have hcheb := chebyshev D (fun T => (T.card : ℝ)) (mul_pos hn hδ0)
   have hfin : D.expect (fun T => ((T.card : ℝ) - μ) ^ 2) / (n * δ) ^ 2 ≤ (p + c) / δ ^ 2 / n := by
     have hpos : 0 < (n * δ) ^ 2 := pow_pos (mul_pos hn hδ0) 2

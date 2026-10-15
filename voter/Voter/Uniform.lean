@@ -1,20 +1,16 @@
+import Dynamics.RandomWalk
 import Voter.Model
 
-/-! # Uniform neighbor sampling and degree weights (Corollary 2.2) -/
+/-! # Uniform neighbor sampling and degree weights (Corollary 2.2)
+
+Uniform neighbour sampling is the core kernel `Dynamics.Kernel.uniformNeighbor`, exported here
+as `Voter.uniformNeighbor`. -/
 namespace Voter
 open Finset Dynamics
-variable {V : Type*} [Fintype V] [Nonempty V]
 
-/-- Uniform sampling among adjacent vertices. -/
-noncomputable def uniformNeighbor (G : SimpleGraph V) [DecidableRel G.Adj]
-    (hd : ∀ i, 0 < G.degree i) : Kernel V := fun i => {
-  weight := fun j => if G.Adj i j then (G.degree i : ℝ)⁻¹ else 0
-  nonneg := fun j => by split <;> positivity
-  sum_one := by
-    rw [← Finset.sum_filter]
-    have he : univ.filter (G.Adj i) = G.neighborFinset i := by ext j; simp
-    rw [he]
-    simp [ne_of_gt (hd i)] }
+export Dynamics.Kernel (uniformNeighbor)
+
+variable {V : Type*} [Fintype V] [Nonempty V]
 
 /-- Total degree, equal to twice the number of undirected edges. -/
 noncomputable def volume (G : SimpleGraph V) [DecidableRel G.Adj] : ℝ := ∑ i, (G.degree i : ℝ)

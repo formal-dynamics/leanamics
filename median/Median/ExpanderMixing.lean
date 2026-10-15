@@ -8,7 +8,8 @@ the transition matrix `P = A / d`:
 
   `|E(S, T) − d |S| |T| / n| ≤ λ_G d √(|S| |T|)`.
 
-Proof. With an orthonormal eigenbasis `b₁, …, bₙ` of `P` (Mathlib's `eigenvectorBasis`) and the
+Proof. With an orthonormal eigenbasis `b₁, …, bₙ` of `P` (Mathlib's `eigenvectorBasis`, on plain
+vectors through `Dynamics/Spectral.lean`) and the
 coefficients `sₖ = bₖ ⬝ 1_S`, `tₖ = bₖ ⬝ 1_T`, Parseval gives
 `1_S ⬝ P 1_T = ∑ₖ μₖ sₖ tₖ`. The all-ones vector satisfies `P 1 = 1`; when `λ_G < 1`, every
 eigenvector other than the top one `b_{k₀}` has an eigenvalue `≤ λ₂ < 1`, hence is orthogonal to
@@ -19,75 +20,11 @@ trivial (`0 ≤ E(S, T) ≤ d min (|S|, |T|)`).
 -/
 
 namespace Median
-open Finset Matrix
+open Finset Matrix Dynamics
 
 variable {V : Type*} [Fintype V] [DecidableEq V]
 
-/-! ### Spectral facts for a real symmetric matrix -/
-
-section Spectral
-variable {A : Matrix V V ℝ} (hA : A.IsHermitian)
-
-omit [DecidableEq V] in
-/-- Completeness of the eigenbasis: `∑ₖ bₖ(u) bₖ(v) = δᵤᵥ`. -/
-private lemma sum_eigvec_mul_eigvec [DecidableEq V] (u v : V) :
-    ∑ k, hA.eigenvectorBasis k u * hA.eigenvectorBasis k v = if u = v then 1 else 0 := by
-  have h := congrFun (congrFun (Matrix.mem_unitaryGroup_iff.mp hA.eigenvectorUnitary.2) u) v
-  simpa [Matrix.mul_apply, one_apply] using h
-
-/-- Parseval: `y ⬝ z = ∑ₖ (bₖ ⬝ y)(bₖ ⬝ z)`. -/
-lemma dotProduct_eq_sum_eigvec (y z : V → ℝ) :
-    y ⬝ᵥ z = ∑ k, (⇑(hA.eigenvectorBasis k) ⬝ᵥ y) * (⇑(hA.eigenvectorBasis k) ⬝ᵥ z) := by
-  calc y ⬝ᵥ z = ∑ u, ∑ v, y u * z v * (if u = v then 1 else 0) := by
-        simp [dotProduct]
-    _ = ∑ u, ∑ v, y u * z v *
-          ∑ k, hA.eigenvectorBasis k u * hA.eigenvectorBasis k v := by
-        simp_rw [sum_eigvec_mul_eigvec]
-    _ = ∑ u, ∑ v, ∑ k, (hA.eigenvectorBasis k u * y u) *
-          (hA.eigenvectorBasis k v * z v) := by
-        refine Finset.sum_congr rfl fun u _ => Finset.sum_congr rfl fun v _ => ?_
-        rw [Finset.mul_sum]
-        refine Finset.sum_congr rfl fun k _ => ?_
-        ring
-    _ = ∑ u, ∑ k, ∑ v, (hA.eigenvectorBasis k u * y u) *
-          (hA.eigenvectorBasis k v * z v) :=
-        Finset.sum_congr rfl fun u _ => Finset.sum_comm
-    _ = ∑ k, ∑ u, ∑ v, (hA.eigenvectorBasis k u * y u) *
-          (hA.eigenvectorBasis k v * z v) := Finset.sum_comm
-    _ = _ := by
-        simp only [dotProduct, Finset.sum_mul, Finset.mul_sum]
-        exact Finset.sum_congr rfl fun k _ => Finset.sum_comm
-
-/-- The coefficients of `A z`: `bₖ ⬝ (A z) = μₖ (bₖ ⬝ z)`. -/
-lemma eigvec_dotProduct_mulVec (k : V) (z : V → ℝ) :
-    ⇑(hA.eigenvectorBasis k) ⬝ᵥ (A *ᵥ z) =
-      hA.eigenvalues k * (⇑(hA.eigenvectorBasis k) ⬝ᵥ z) := by
-  rw [dotProduct_mulVec, ← mulVec_transpose, ← conjTranspose_eq_transpose_of_trivial, hA.eq,
-    hA.mulVec_eigenvectorBasis, smul_dotProduct, smul_eq_mul]
-
-/-- Spectral expansion of the bilinear form: `y ⬝ A z = ∑ₖ μₖ (bₖ ⬝ y)(bₖ ⬝ z)`. -/
-lemma dotProduct_mulVec_eq_sum_eigvec (y z : V → ℝ) :
-    y ⬝ᵥ (A *ᵥ z) = ∑ k, hA.eigenvalues k *
-      ((⇑(hA.eigenvectorBasis k) ⬝ᵥ y) * (⇑(hA.eigenvectorBasis k) ⬝ᵥ z)) := by
-  rw [dotProduct_eq_sum_eigvec hA]
-  refine Finset.sum_congr rfl fun k _ => ?_
-  rw [eigvec_dotProduct_mulVec hA]
-  ring
-
-end Spectral
-
-/-! ### Indicator vectors and edge counts -/
-
-/-- The indicator vector `1_S`. -/
-def indVec (S : Finset V) : V → ℝ := fun v => if v ∈ S then 1 else 0
-
-lemma indVec_dotProduct_self (S : Finset V) : indVec S ⬝ᵥ indVec S = S.card := by
-  simp only [dotProduct, indVec, mul_ite, mul_one, mul_zero]
-  rw [Finset.sum_ite_mem, univ_inter]
-  simp
-
-lemma one_dotProduct_indVec (S : Finset V) : (fun _ => (1 : ℝ)) ⬝ᵥ indVec S = S.card := by
-  simp [dotProduct, indVec]
+/-! ### Edge counts -/
 
 variable (G : SimpleGraph V) [DecidableRel G.Adj]
 
@@ -131,127 +68,34 @@ lemma edgeCount_comm (S T : Finset V) : edgeCount G S T = edgeCount G T S := by
   simp_rw [G.adj_comm] at this
   exact_mod_cast this.trans (h T S).symm
 
-omit [DecidableEq V] in
-/-- `P 1 = 1` on a `d`-regular graph, `d > 0`. -/
-lemma transitionMatrix_mulVec_one {d : ℕ} (hd : 0 < d) (hreg : G.IsRegularOfDegree d) :
-    transitionMatrix G d *ᵥ (fun _ => (1 : ℝ)) = fun _ => 1 := by
-  funext v
-  rw [transitionMatrix, smul_mulVec, Pi.smul_apply, SimpleGraph.adjMatrix_mulVec_apply,
-    Finset.sum_const, G.card_neighborFinset_eq_degree, hreg v, smul_eq_mul, nsmul_eq_mul,
-    mul_one, inv_mul_cancel₀ (by exact_mod_cast hd.ne')]
-
-omit [DecidableEq V] in
-lemma lambdaG_nonneg (d : ℕ) [DecidableEq V] : 0 ≤ lambdaG G d := by
-  unfold lambdaG
-  split_ifs
-  · exact (abs_nonneg _).trans (le_max_right _ _)
-  · exact le_rfl
-
-/-- Every eigenvalue of `P` other than the top one (index `0` in the sorted order) has absolute
-value at most `λ_G`. -/
-lemma abs_eigenvalues_le_lambdaG (d : ℕ) (k : V)
-    (hk : (Fintype.equivOfCardEq (Fintype.card_fin _)).symm k ≠
-      ⟨0, Fintype.card_pos_iff.mpr ⟨k⟩⟩) :
-    |(transitionMatrix_isHermitian G d).eigenvalues k| ≤ lambdaG G d := by
-  set j := (Fintype.equivOfCardEq (Fintype.card_fin (Fintype.card V))).symm k
-  have hj : 1 ≤ j.val := by
-    rcases Nat.eq_zero_or_pos j.val with h | h
-    · exact absurd (Fin.ext h) hk
-    · exact h
-  have hlt := j.isLt
-  have h2 : 2 ≤ Fintype.card V := by omega
-  have hμ : (transitionMatrix_isHermitian G d).eigenvalues k = walkEigenvalues G d j := rfl
-  have anti : Antitone (walkEigenvalues G d) :=
-    (transitionMatrix_isHermitian G d).eigenvalues₀_antitone
-  have h1 : walkEigenvalues G d j ≤ walkEigenvalues G d ⟨1, by omega⟩ :=
-    anti (Fin.mk_le_mk.mpr hj)
-  have h3 : walkEigenvalues G d ⟨Fintype.card V - 1, by omega⟩ ≤ walkEigenvalues G d j :=
-    anti (Fin.mk_le_mk.mpr (by omega))
-  rw [hμ, lambdaG, dif_pos h2, abs_le]
-  constructor
-  · have := neg_abs_le (walkEigenvalues G d ⟨Fintype.card V - 1, by omega⟩)
-    have := le_max_right (walkEigenvalues G d ⟨1, by omega⟩)
-      |walkEigenvalues G d ⟨Fintype.card V - 1, by omega⟩|
-    linarith
-  · exact h1.trans (le_max_left _ _)
-
 /-- The spectral core of the mixing lemma: if `λ_G < 1`, then
 `|1_S ⬝ P 1_T − |S| |T| / n| ≤ λ_G √(|S| |T|)`. -/
 lemma mixing_transition [Nonempty V] {d : ℕ} (hd : 0 < d) (hreg : G.IsRegularOfDegree d)
     (hL : lambdaG G d < 1) (S T : Finset V) :
     |indVec S ⬝ᵥ (transitionMatrix G d *ᵥ indVec T) - S.card * T.card / Fintype.card V|
       ≤ lambdaG G d * √((S.card : ℝ) * T.card) := by
+  obtain ⟨k₀, hμ0, hsmall, htop⟩ := exists_top_eigenvectorBasis G hd hreg hL
   have hP := transitionMatrix_isHermitian G d
   set P := transitionMatrix G d with hPdef
   set b : V → V → ℝ := fun k => ⇑(hP.eigenvectorBasis k) with hb
   set μ : V → ℝ := hP.eigenvalues with hμ
-  set one : V → ℝ := fun _ => 1 with hone
-  have hn : 0 < Fintype.card V := Fintype.card_pos
-  set e := Fintype.equivOfCardEq (Fintype.card_fin (Fintype.card V)) with he
-  set k₀ : V := e ⟨0, hn⟩ with hk₀
-  have hsmall : ∀ k, k ≠ k₀ → |μ k| ≤ lambdaG G d := by
-    intro k hk
-    refine abs_eigenvalues_le_lambdaG G d k ?_
-    intro h
-    apply hk
-    rw [hk₀, ← h, Equiv.apply_symm_apply]
-  have hP1 : P *ᵥ one = one := transitionMatrix_mulVec_one G hd hreg
-  -- the eigenvectors other than the top one are orthogonal to `1`
-  have horth : ∀ k, k ≠ k₀ → b k ⬝ᵥ one = 0 := by
-    intro k hk
-    have h := eigvec_dotProduct_mulVec hP k one
-    rw [hP1] at h
-    have hμk : μ k < 1 := lt_of_le_of_lt ((le_abs_self _).trans (hsmall k hk)) hL
-    have : (1 - μ k) * (b k ⬝ᵥ one) = 0 := by
-      simp only [hb, hμ] at h ⊢
-      linarith
-    rcases mul_eq_zero.mp this with h0 | h0
-    · linarith
-    · exact h0
-  set c := b k₀ ⬝ᵥ one with hc
-  have hsum_single (f : V → ℝ) : ∑ k, (b k ⬝ᵥ one) * f k = c * f k₀ := by
-    rw [Finset.sum_eq_single k₀ (fun k _ hk => by rw [horth k hk, zero_mul]) (by simp)]
-  -- `c² = n`
-  have hc2 : c * c = Fintype.card V := by
-    have h := dotProduct_eq_sum_eigvec hP one one
-    rw [hsum_single] at h
-    rw [← h]
-    simp [dotProduct, hone]
-  have hc0 : c ≠ 0 := by
-    intro h
-    rw [h, mul_zero] at hc2
-    exact (Nat.cast_pos.mpr hn).ne' hc2.symm
-  -- `c sₖ₀ = |S|`
-  have hcs (S : Finset V) : c * (b k₀ ⬝ᵥ indVec S) = S.card := by
-    have h := dotProduct_eq_sum_eigvec hP one (indVec S)
-    rw [hsum_single, one_dotProduct_indVec] at h
-    exact h.symm
-  -- the top eigenvalue is `1`
-  have hμ0 : μ k₀ = 1 := by
-    have h := eigvec_dotProduct_mulVec hP k₀ one
-    rw [hP1] at h
-    have : (μ k₀ - 1) * c = 0 := by
-      simp only [hb, hμ, hc] at h ⊢
-      linarith
-    rcases mul_eq_zero.mp this with h0 | h0
-    · linarith
-    · exact absurd h0 hc0
   set s : V → ℝ := fun k => b k ⬝ᵥ indVec S with hs
   set t : V → ℝ := fun k => b k ⬝ᵥ indVec T with ht
-  have hexp := dotProduct_mulVec_eq_sum_eigvec hP (indVec S) (indVec T)
+  have hexp := dotProduct_mulVec_eq_sum_eigenvectorBasis hP (indVec S) (indVec T)
   rw [← Finset.add_sum_erase _ _ (Finset.mem_univ k₀)] at hexp
-  have htop : μ k₀ * (s k₀ * t k₀) = S.card * T.card / Fintype.card V := by
-    rw [hμ0, one_mul, ← hc2, ← hcs S, ← hcs T]
-    field_simp
-    rfl
+  have htop' : μ k₀ * (s k₀ * t k₀) = S.card * T.card / Fintype.card V := by
+    have h := htop (indVec S) (indVec T)
+    rw [sum_indVec, sum_indVec] at h
+    rw [hμ0, one_mul]
+    exact h
   have hS2 : ∑ k, s k ^ 2 = S.card := by
-    have h := dotProduct_eq_sum_eigvec hP (indVec S) (indVec S)
+    have h := dotProduct_eq_sum_eigenvectorBasis hP (indVec S) (indVec S)
     rw [indVec_dotProduct_self] at h
     rw [h]
     simp only [hs, sq]
     rfl
   have hT2 : ∑ k, t k ^ 2 = T.card := by
-    have h := dotProduct_eq_sum_eigvec hP (indVec T) (indVec T)
+    have h := dotProduct_eq_sum_eigenvectorBasis hP (indVec T) (indVec T)
     rw [indVec_dotProduct_self] at h
     rw [h]
     simp only [ht, sq]
@@ -283,7 +127,7 @@ lemma mixing_transition [Nonempty V] {d : ℕ} (hd : 0 < d) (hreg : G.IsRegularO
           rw [hS2, hT2, ← Real.sqrt_mul (Nat.cast_nonneg _)]
   have hexp' : indVec S ⬝ᵥ (P *ᵥ indVec T)
       = S.card * T.card / Fintype.card V + ∑ k ∈ univ.erase k₀, μ k * (s k * t k) := by
-    rw [hexp, ← htop]
+    rw [hexp, ← htop']
   rw [hexp', add_sub_cancel_left]
   exact hrest
 
