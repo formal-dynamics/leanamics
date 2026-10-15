@@ -42,8 +42,8 @@ lemma prob_eq_one_sub_miss [NeZero n] (T : ℕ) (x : Config n k) (P : Config n k
     expList (Fin n → Fin n) T (fun l => if P (l.foldl step x) then (1 : ℝ) else 0)
       = 1 - miss {z | P z} T x := by
   classical
-  unfold miss
-  rw [← Undecided.Sequential.expList_one_sub]
+  unfold miss missProb
+  rw [← Dynamics.expList_one_sub]
   congr 1
   funext l
   by_cases hl : P (l.foldl step x)
@@ -143,7 +143,7 @@ theorem lower_bound_whp : ∃ C : ℝ, 0 < C ∧ ∀ n : ℕ, C ≤ Real.log n �
       have hM : (0 : ℝ) ≤ maxCount x := Nat.cast_nonneg _
       nlinarith
     have : miss S 0 x = 0 := by
-      unfold miss
+      unfold miss missProb
       simp [hx]
     rw [this]
     positivity
@@ -160,7 +160,7 @@ theorem lower_bound_whp : ∃ C : ℝ, 0 < C ∧ ∀ n : ℕ, C ≤ Real.log n �
         h6 n (by linarith) k hk6 x hq (by linarith) y hy2 hy3 hy4
       rcases le_or_gt T t with hTt | hTt
       · calc miss S T y ≤ miss {z | (maxCount z : ℝ) ≤ γ * n / md x} T y :=
-              miss_mono (hsub (by linarith)) T y
+              missProb_mono step (hsub (by linarith)) T y
           _ ≤ C6 / n := hall T hTt
           _ ≤ (C6 + C7) / n := by gcongr; linarith
       · obtain ⟨j, rfl⟩ : ∃ j, T = t + j := ⟨T - t, by omega⟩
@@ -178,14 +178,14 @@ theorem lower_bound_whp : ∃ C : ℝ, 0 < C ∧ ∀ n : ℕ, C ≤ Real.log n �
             nlinarith
           calc miss S j z ≤ miss {z | (maxCount z : ℝ) ≤ 2 * γ * n / md x ∧
                 |und z - n / 2| ≤ 2 * γ ^ 2 * n / md x} j z :=
-                miss_mono (fun w hw => hsub (a := 2 * γ) (by linarith) hw.1) j z
+                missProb_mono step (fun w hw => hsub (a := 2 * γ) (by linarith) hw.1) j z
             _ ≤ C7 / n :=
                 h7 n (by linarith) k hk4 (md x) (by linarith) (md_le_card x) z hz2 hz1 j hj
-        have := miss_comp (T₁ := t) (T₂ := j) (by positivity) hpl y
+        have := missProb_comp step (T₁ := t) (T₂ := j) (by positivity) hpl y
         calc miss S (t + j) y ≤ _ := this
           _ ≤ C6 / n + C7 / n := by linarith [hwin]
           _ = (C6 + C7) / n := by ring
-    have h1 := miss_comp (T₁ := 1) (T₂ := T) (by positivity) hstage x
+    have h1 := missProb_comp step (T₁ := 1) (T₂ := T) (by positivity) hstage x
     have h3' := h3 n (by linarith) k hk2 x m hq hm
     calc miss S (1 + T) x ≤ miss S3 1 x + (C6 + C7) / n := h1
       _ ≤ C3 / n + (C6 + C7) / n := by linarith
@@ -243,7 +243,7 @@ theorem lower_bound_consensus : ∃ C : ℝ, 0 < C ∧ ∀ n : ℕ, C ≤ Real.l
         expList_le_expList hpt
     _ = 1 - expList (Fin n → Fin n) T (fun l =>
           if (maxCount (l.foldl step x) : ℝ) ≤ C * n / md x then (1 : ℝ) else 0) :=
-        Undecided.Sequential.expList_one_sub T _
+        Dynamics.expList_one_sub T _
     _ ≤ C / n := by linarith
     _ ≤ 2 * C / n := div_le_div_of_nonneg_right (by linarith) hn0.le
 

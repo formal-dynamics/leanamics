@@ -280,7 +280,7 @@ theorem stage_bound [NeZero n] {ℓ θ B φ ε : ℝ} (H : Hyp n ℓ θ B φ) {m
     have : (3 / 4 : ℝ) ^ T₃ * psi y m ≤ (3 / 4) ^ T₃ * (n / 10) :=
       mul_le_mul_of_nonneg_left hψ (by positivity)
     linarith
-  have hcomp := miss_comp (T₁ := T₂ + 1) (T₂ := T₃) (by positivity) hE x
+  have hcomp := missProb_comp step (T₁ := T₂ + 1) (T₂ := T₃) (by positivity) hE x
   calc miss (allM m) (T₂ + 1 + T₃) x
       ≤ miss (Gset ℓ θ B φ (1 + ε) m T₂) (T₂ + 1) x + (1 / n + T₃ * p) := hcomp
     _ ≤ ((T₂ + 1 : ℕ) : ℝ) * p + (1 / n + T₃ * p) := by linarith
@@ -446,7 +446,7 @@ lemma prob_allM_eq [NeZero n] (T : ℕ) (x : Config n k) (m : Fin k) :
     · rw [if_neg hl, if_neg (show l.foldl step x ∉ allM m from hl)]
       norm_num
   simp_rw [h]
-  rw [Undecided.Sequential.expList_one_sub]
+  rw [Dynamics.expList_one_sub]
   rfl
 
 /-- From `C k ≤ (n / log n)^{1/3}` to `(C k)³ log n ≤ n`. -/

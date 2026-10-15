@@ -55,7 +55,7 @@ lemma prob_allA_eq [NeZero n] (T : ℕ) (x : Config n) :
     · rw [if_neg hl, if_neg (show l.foldl step x ∉ allA n from hl)]
       norm_num
   simp_rw [h]
-  rw [Sequential.expList_one_sub]
+  rw [Dynamics.expList_one_sub]
   rfl
 
 /-- **UND-1, explicit form.** If `log n ≥ 10⁴` and the `a`-nodes outnumber the `b`-nodes by at
@@ -110,7 +110,7 @@ theorem majority_explicit (hL : (10000 : ℝ) ≤ log n) (x : Config n)
     · have : (n : ℝ) ≤ Λ * (201 / 200) ^ T₁ := by nlinarith
       linarith
   have hA : missP {y | 7 * n / 10 ≤ bias y} (T₁ + 1) x ≤ ((T₁ + 1 : ℕ) : ℝ) * p :=
-    le_trans (missP_mono (fun y hy => le_trans hθ hy.1) _ x)
+    le_trans (missProb_mono step (fun y hy => le_trans hθ hy.1) _ x)
       (growth_stage hn0 hΛ0 hΛn T₁ x (by unfold bias; linarith))
   -- bridge: `18` more rounds
   have hB : missP (finSet n) (T₁ + 1 + 18) x ≤ ((T₁ + 1 : ℕ) : ℝ) * p + ((18 : ℕ) : ℝ) * p := by

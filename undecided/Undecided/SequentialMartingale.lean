@@ -117,14 +117,6 @@ lemma expList_le_expList_of_length {T : ℕ} {F G : List α → ℝ}
     rw [expList_succ, expList_succ]
     exact avg_le_avg fun a => ih fun l hl => h (a :: l) (by simp [hl])
 
-/-- The complementary event has the complementary probability. -/
-lemma expList_one_sub [Nonempty α] (T : ℕ) (G : List α → ℝ) :
-    expList α T (fun l => 1 - G l) = 1 - expList α T G := by
-  have h := expList_add (α := α) T (fun _ => 1) (fun l => (-1) * G l)
-  simp only [expList_const, expList_const_mul] at h
-  rw [show (fun l => 1 - G l) = fun l => 1 + (-1) * G l by funext l; ring, h]
-  ring
-
 end Lists
 
 end Undecided.Sequential

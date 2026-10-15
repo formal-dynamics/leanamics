@@ -1379,7 +1379,7 @@ theorem growth_phase : ∃ z C : ℝ, 0 < z ∧ 0 < C ∧ ∀ (n : ℕ) [NeZero 
       if 3 * (n : ℝ) / 4 ≤ count (run x l) i then (1 : ℝ) else 0)
       = 1 - expList (Round n) T (fun l =>
         if 3 * (n : ℝ) / 4 ≤ count (run x l) i then (0 : ℝ) else 1) := by
-    have h := expList_one_sub (R := Round n) T (fun l =>
+    have h := expList_one_sub (α := Round n) T (fun l =>
       if 3 * (n : ℝ) / 4 ≤ count (run x l) i then (0 : ℝ) else 1)
     have hfun : (fun l => (1 : ℝ) -
         (if 3 * (n : ℝ) / 4 ≤ count (run x l) i then 0 else 1))

@@ -77,7 +77,7 @@ potential `Ψ = 12 count b + q` (`MajorityStages.lean`):
    not being all-`a` is at most `(5/6)^{T₃} n/3 + T₃ · 4/n²`; here `Ψ < 1` if and only if all nodes
    hold `a`. This linear potential replaces the analysis of [CGGNPS18] in the last phase.
 
-The stages are composed by the Markov property (`missP_comp`, through `Dynamics.expList_append`),
+The stages are composed by the Markov property (`missP_comp`, that is `Dynamics.missProb_comp`),
 the moving targets of the growth phase by `Dynamics.expList_escape`, and the total failure
 probability is at most `⌈10⁴ log n⌉ · 4/n² + 1/(3n) ≤ 2/n`. The `b`-majority case follows by
 exchanging the two opinions (`swapOp`, `MajoritySymm.lean`). Simulations (`n = 10⁵`, bias
@@ -306,8 +306,9 @@ targets (`Dynamics.expList_escape`). In `descent` (`LowerBoundDescentCore.lean`)
 envelope is the recursion `descentGrowth`: in a first phase the colours stay at most `8n/D`, in a
 second at most `γ n/D` with `γ = 24`, while the number of undecided nodes tracks
 `max((1 - 1/Λ)^{2^s}, 4γ²/D)` until this quantity reaches the window `4γ²/D`. `lower_bound_whp`
-composes `first_round`, `descent` and `plateau` by the Markov property (`miss_comp`); a round `T`
-up to the descent round `t` is covered by the bound at every round `s ≤ t` of `descent`.
+composes `first_round`, `descent` and `plateau` by the Markov property
+(`Dynamics.missProb_comp`); a round `T` up to the descent round `t` is covered by the bound at
+every round `s ≤ t` of `descent`.
 
 ## Sequential approximate majority (`Sequential*`, roadmap UND-2)
 

@@ -43,6 +43,9 @@ import Dynamics
 #print axioms Dynamics.Kernel.one_sub_hitProb_le_of_drift
 #print axioms Dynamics.Kernel.drift_hitting
 #print axioms Dynamics.Kernel.drift_hitting_log
+#print axioms Dynamics.Kernel.hitProb_sub_le_event
+#print axioms Dynamics.Kernel.event_amplify
+#print axioms Dynamics.missProb_comp
 #print axioms Dynamics.avg_lower_tail_le_of_mgf
 #print axioms Dynamics.avg_hoeffding_lower
 #print axioms Dynamics.variance_le_avg_of_zero_one

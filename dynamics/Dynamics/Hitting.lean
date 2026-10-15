@@ -1,31 +1,42 @@
-import Dynamics.DriftHitting
-import Dynamics.Tail
+import Dynamics.DriftHittingStop
 import Dynamics.Phases
+import Dynamics.Tail
 
 /-!
-# Hitting a set, then reaching an absorbing event
+# Facts about hitting probabilities
 
-Facts about an arbitrary finite Markov kernel `K`, used to compose the two stages of binary
-3-Majority from any configuration (`Plurality.majority3_any_start`):
+General facts about `K.hitProb B t a = P_a(T_B ≤ t)` for an arbitrary finite Markov kernel `K`,
+proved by induction on `t` through the recursion of `hitProb` (`hitProb_of_mem`,
+`hitProb_zero_of_not_mem`, `hitProb_succ_of_not_mem`), without stopping times:
 
-* `hitProb_le_one`, `hitProb_mono`: the probability of hitting `B` within `t` steps is at most `1`
-  and grows with `B`;
+* `hitProb_nonneg`, `hitProb_le_one`: hitting probabilities are probabilities;
+* `hitProb_mono`, `hitProb_mono_time`: they grow with the target set and with the time horizon;
 * `hitProb_sub_le_event` (**hit, then absorb**): if from every state of `B` the chain is in an
   absorbing event `P` after `T` steps with probability at least `1 - ε`, and `B` is hit within `t`
   steps with probability `h`, then the chain is in `P` at time `t + T` with probability at least
-  `h - ε`. This is the strong Markov property at the hitting time of `B`, proved by induction on
-  `t` through the recursion of `hitProb`, without stopping times;
+  `h - ε`. This is the strong Markov property at the hitting time of `B`;
 * `event_amplify` (**amplification**): if an absorbing event is reached within `T₁` steps with
   probability at least `1 - ε` from every state, then a first block of `T₀` steps that fails with
   probability at most `δ` is followed by a block that fails with probability at most `ε`, so both
   fail with probability at most `δ ε`.
 -/
 
-namespace Plurality
-
-open Dynamics Dynamics.Kernel
+namespace Dynamics.Kernel
 
 variable {α : Type*} [Fintype α]
+
+/-- A hitting probability is nonnegative. -/
+lemma hitProb_nonneg (K : Kernel α) (B : α → Prop) (t : ℕ) (a : α) : 0 ≤ K.hitProb B t a := by
+  induction t generalizing a with
+  | zero =>
+    by_cases h : B a
+    · rw [hitProb_of_mem K h]; norm_num
+    · rw [hitProb_zero_of_not_mem K h]
+  | succ t ih =>
+    by_cases h : B a
+    · rw [hitProb_of_mem K h]; norm_num
+    · rw [hitProb_succ_of_not_mem K h]
+      exact (K a).expect_nonneg ih
 
 /-- A hitting probability is at most `1`. -/
 lemma hitProb_le_one (K : Kernel α) (B : α → Prop) (t : ℕ) (a : α) : K.hitProb B t a ≤ 1 := by
@@ -40,19 +51,6 @@ lemma hitProb_le_one (K : Kernel α) (B : α → Prop) (t : ℕ) (a : α) : K.hi
     · rw [hitProb_succ_of_not_mem K h]
       calc (K a).expect (K.hitProb B t) ≤ (K a).expect (fun _ => 1) := (K a).expect_mono ih
         _ = 1 := Distribution.expect_const _ 1
-
-/-- A hitting probability is nonnegative. -/
-lemma hitProb_nonneg (K : Kernel α) (B : α → Prop) (t : ℕ) (a : α) : 0 ≤ K.hitProb B t a := by
-  induction t generalizing a with
-  | zero =>
-    by_cases h : B a
-    · rw [hitProb_of_mem K h]; norm_num
-    · rw [hitProb_zero_of_not_mem K h]
-  | succ t ih =>
-    by_cases h : B a
-    · rw [hitProb_of_mem K h]; norm_num
-    · rw [hitProb_succ_of_not_mem K h]
-      exact (K a).expect_nonneg ih
 
 /-- Hitting a larger set is more likely. -/
 lemma hitProb_mono (K : Kernel α) {B B' : α → Prop} (hB : ∀ a, B a → B' a) (t : ℕ) (a : α) :
@@ -70,6 +68,26 @@ lemma hitProb_mono (K : Kernel α) {B B' : α → Prop} (hB : ∀ a, B a → B' 
     · have h : ¬ B a := fun h => h' (hB a h)
       rw [hitProb_succ_of_not_mem K h, hitProb_succ_of_not_mem K h']
       exact (K a).expect_mono ih
+
+/-- Hitting probabilities grow with the time horizon (one step). -/
+lemma hitProb_le_hitProb_succ (K : Kernel α) (B : α → Prop) (s : ℕ) (a : α) :
+    K.hitProb B s a ≤ K.hitProb B (s + 1) a := by
+  induction s generalizing a with
+  | zero =>
+    by_cases h : B a
+    · rw [hitProb_of_mem K h, hitProb_of_mem K h]
+    · rw [hitProb_zero_of_not_mem K h]
+      exact hitProb_nonneg K B 1 a
+  | succ s ih =>
+    by_cases h : B a
+    · rw [hitProb_of_mem K h, hitProb_of_mem K h]
+    · rw [hitProb_succ_of_not_mem K h, hitProb_succ_of_not_mem K h]
+      exact (K a).expect_mono ih
+
+/-- Hitting probabilities grow with the time horizon. -/
+lemma hitProb_mono_time (K : Kernel α) (B : α → Prop) {s t : ℕ} (h : s ≤ t) (a : α) :
+    K.hitProb B s a ≤ K.hitProb B t a :=
+  monotone_nat_of_le_succ (fun s => hitProb_le_hitProb_succ K B s a) h
 
 /-- **Hit, then absorb.** Let `P` be absorbing for `K`. If from every state of `B` the chain is in
 `P` after `T` steps with probability at least `1 - ε` (`ε ≥ 0`), then from any state `a` it is in
@@ -136,4 +154,4 @@ theorem event_amplify (K : Kernel α) {P : α → Prop} (habs : ∀ a, P a → (
         linarith [K.iterate_mono T₀ hpt a]
     _ = 1 - K.iterate (T₀ + T₁) (outside {b | P b}) a := by rw [iterate_add_time]
 
-end Plurality
+end Dynamics.Kernel

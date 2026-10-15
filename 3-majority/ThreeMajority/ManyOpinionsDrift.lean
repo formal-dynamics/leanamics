@@ -1,5 +1,4 @@
-import Dynamics.DriftHittingStop
-import Dynamics.Tail
+import Dynamics.Hitting
 
 /-!
 # Hitting times under an additive drift (BCNPT16, Lemma 3.2; roadmap MAJ-12 (a))
@@ -15,13 +14,14 @@ many opinions*, SODA 2016, arXiv:1508.06782, BCNPT16 below).
   `𝔼[T_B] ≤ 2 α m / λ` (`β = α m`, with the overshoot controlled at the hitting time, its
   Hypothesis 2 and Lemma B.1) and then applies Markov's inequality; here the overshoot is
   controlled one step at a time and no infinite-horizon expectation is needed.
-* `hitProb_nonneg`, `hitProb_le_one`: hitting probabilities are probabilities (as in
-  `Plurality.hitProb_le_one`, repeated here since packages do not depend on each other).
 * `hitProb_mul_le_event` (**hit, then absorb**, multiplicative form): if from every state of `B`
   the chain is in an absorbing event `P` after `s` steps with probability at least `q`, then it is
   in `P` at time `t + s` with probability at least `q P(T_B ≤ t)` (the strong Markov property at
-  the hitting time of `B`, by induction on `t`; `Plurality.hitProb_sub_le_event` is the additive
-  form `P(T_B ≤ t) − ε`).
+  the hitting time of `B`, by induction on `t`; `Dynamics.Kernel.hitProb_sub_le_event` is the
+  additive form `P(T_B ≤ t) − ε`).
+
+The general facts on hitting probabilities used here (`hitProb_le_one`, `hitProb_mono_time`) are
+in `Dynamics.Hitting`.
 -/
 
 namespace ThreeMajority
@@ -29,33 +29,6 @@ namespace ThreeMajority
 open Dynamics Dynamics.Kernel
 
 variable {α : Type*} [Fintype α]
-
-/-- A hitting probability is nonnegative. -/
-lemma hitProb_nonneg (K : Kernel α) (B : α → Prop) (t : ℕ) (a : α) : 0 ≤ K.hitProb B t a := by
-  induction t generalizing a with
-  | zero =>
-    by_cases h : B a
-    · rw [hitProb_of_mem K h]; norm_num
-    · rw [hitProb_zero_of_not_mem K h]
-  | succ t ih =>
-    by_cases h : B a
-    · rw [hitProb_of_mem K h]; norm_num
-    · rw [hitProb_succ_of_not_mem K h]
-      exact (K a).expect_nonneg ih
-
-/-- A hitting probability is at most `1`. -/
-lemma hitProb_le_one (K : Kernel α) (B : α → Prop) (t : ℕ) (a : α) : K.hitProb B t a ≤ 1 := by
-  induction t generalizing a with
-  | zero =>
-    by_cases h : B a
-    · rw [hitProb_of_mem K h]
-    · rw [hitProb_zero_of_not_mem K h]; norm_num
-  | succ t ih =>
-    by_cases h : B a
-    · rw [hitProb_of_mem K h]
-    · rw [hitProb_succ_of_not_mem K h]
-      calc (K a).expect (K.hitProb B t) ≤ (K a).expect (fun _ => 1) := (K a).expect_mono ih
-        _ = 1 := Distribution.expect_const _ 1
 
 /-- **Hit, then absorb** (multiplicative form). Let `P` be absorbing for `K`. If from every state
 of `B` the chain is in `P` after `s` steps with probability at least `q`, then from any state
@@ -81,26 +54,6 @@ theorem hitProb_mul_le_event (K : Kernel α) {B P : α → Prop}
         simp only [event_eq_iterate]
       rw [hitProb_succ_of_not_mem K h, e, ← Distribution.expect_mul]
       exact (K a).expect_mono ih
-
-/-- Hitting probabilities grow with the time horizon (one step). -/
-lemma hitProb_le_hitProb_succ (K : Kernel α) (B : α → Prop) (s : ℕ) (a : α) :
-    K.hitProb B s a ≤ K.hitProb B (s + 1) a := by
-  induction s generalizing a with
-  | zero =>
-    by_cases h : B a
-    · rw [hitProb_of_mem K h, hitProb_of_mem K h]
-    · rw [hitProb_zero_of_not_mem K h]
-      exact hitProb_nonneg K B 1 a
-  | succ s ih =>
-    by_cases h : B a
-    · rw [hitProb_of_mem K h, hitProb_of_mem K h]
-    · rw [hitProb_succ_of_not_mem K h, hitProb_succ_of_not_mem K h]
-      exact (K a).expect_mono ih
-
-/-- Hitting probabilities grow with the time horizon. -/
-lemma hitProb_mono_time (K : Kernel α) (B : α → Prop) {s t : ℕ} (h : s ≤ t) (a : α) :
-    K.hitProb B s a ≤ K.hitProb B t a :=
-  monotone_nat_of_le_succ (fun s => hitProb_le_hitProb_succ K B s a) h
 
 /-- A distribution giving probability one to `I` has expectations monotone on `I`. -/
 lemma expect_le_expect_of_prob_eq_one (p : Distribution α) {I : α → Prop} (hp : p.prob I = 1)

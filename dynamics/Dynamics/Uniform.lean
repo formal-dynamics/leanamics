@@ -104,6 +104,14 @@ lemma expList_const [Nonempty α] (T : ℕ) (c : ℝ) :
     rw [expList_succ]
     simpa [ih] using avg_const (α := α) c
 
+/-- Expectation of a complement: `𝔼[1 - F] = 1 - 𝔼[F]` (the `expList` form of
+`Kernel.iterateSeq_one_sub`). -/
+lemma expList_one_sub [Nonempty α] (T : ℕ) (F : List α → ℝ) :
+    expList α T (fun l => 1 - F l) = 1 - expList α T F := by
+  have h := expList_add T (fun l => 1 - F l) F
+  simp only [sub_add_cancel, expList_const] at h
+  linarith
+
 lemma expList_sum {ι : Type*} (s : Finset ι) (T : ℕ) (F : ι → List α → ℝ) :
     expList α T (fun l => ∑ i ∈ s, F i l) = ∑ i ∈ s, expList α T (F i) := by
   induction T generalizing F with

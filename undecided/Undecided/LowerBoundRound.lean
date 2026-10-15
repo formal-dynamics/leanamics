@@ -73,7 +73,7 @@ lemma miss_round_le [NeZero n] {ℓ : ℝ} (hℓ : 0 < ℓ) (m : Fin k) (x : Con
     (S : Set (Config n k)) (hS : ∀ y, Good ℓ m x y → y ∈ S) :
     miss S 1 x ≤ ((k : ℝ) + 4) * exp (-ℓ) := by
   classical
-  unfold miss
+  unfold miss missProb
   rw [expList_succ (T := 0)]
   simp only [expList_zero, List.foldl_cons, List.foldl_nil]
   exact round_le hℓ m x S hS
