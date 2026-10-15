@@ -72,7 +72,7 @@ neighbors. Factor its equality indicator into a product over vertices.
 
 \section{Section 2.2: absorption and consensus probability}
 \begin{lemma}[Monochromatic-edge propagation]\label{lem:propagation}
-\lean{Voter.monochromatic_edge,Voter.propagate_region,Voter.possible_consensus}\leanok\uses{def:step}
+\lean{Voter.monochromatic_edge,Voter.propagate_region_of_rel,Voter.propagate_region,Voter.possible_consensus}\leanok\uses{def:step}
 On a connected nonbipartite graph every Boolean configuration has a possible
 finite path to a constant configuration.
 \end{lemma}
@@ -81,18 +81,22 @@ A coloring without a monochromatic edge would be a proper two-coloring.
 Starting with a monochromatic edge, each vertex of its region can keep that
 color by sampling an internal neighbor. Connectedness supplies an edge leaving
 every proper region. One more vertex can copy across that edge. Induction on
-the number of vertices outside the region gives consensus.
+the number of vertices outside the region gives consensus. The induction only uses that
+every vertex may copy some vertex and that copying along edges is allowed, so it is proved
+once for any such copying relation; graph rounds and rounds in the support of a kernel
+(Lemma~\ref{lem:kernel-propagation}) are its two instances.
 \end{proof}
 \begin{lemma}[Lemma 2.1: absorption]\label{lem:21}
-\lean{Voter.transition_constant,Voter.possible_positive,Voter.consensus_tendsto}\leanok\uses{lem:propagation,thm:generic-absorption,lem:product}
+\lean{Voter.transition_constant,Voter.KernelPossible,Voter.kernelPossible_of_possible,Voter.kernelPossible_positive,Voter.possible_positive,Voter.reachable_success_of_kernelPossible,Voter.consensus_tendsto_of_kernelPossible,Voter.consensus_tendsto}\leanok\uses{lem:propagation,thm:generic-absorption,lem:product}
 Assume $H_{ij}>0$ whenever $i,j$ are adjacent; extra support, such as
 self-loops, is allowed. Both constant configurations
 are absorbing, and the probability of remaining nonconstant tends to zero.
 This is the finite-time survival formulation of the paper's transience claim.
 \end{lemma}
 \begin{proof}\leanok
-Every possible copying round has positive probability. Thus graph propagation
-gives accessibility. Apply the shared finite-chain absorption theorem.
+Every possible copying round is a round in the support of $H$, hence has positive
+probability. Thus graph propagation gives accessibility. Apply the shared finite-chain
+absorption theorem.
 \end{proof}
 \begin{lemma}[Lemma 2.3: invariant stationary weight]\label{lem:23}
 \lean{Voter.round_mass,Voter.iterate_mass}\leanok\uses{def:step,thm:stationary}
@@ -202,7 +206,7 @@ $(1-1/n)^T\le e^{-T/n}\le n^{-2}$ for $T\ge 2n\log n$.
 
 \section{Self-loops, the lazy voter and Wright--Fisher (VOT-2)}
 \begin{lemma}[Propagation through the kernel support]\label{lem:kernel-propagation}
-\lean{Voter.KernelPossible,Voter.exists_weight_pos,Voter.kernelPossible_positive,Voter.reachable_success_of_kernelPossible,Voter.propagate_kernel_region,Voter.kernelPossible_consensus_of_selfLoop,Voter.consensus_tendsto_of_selfLoop}\leanok\uses{lem:propagation,lem:21,thm:generic-absorption}
+\lean{Voter.exists_weight_pos,Voter.propagate_kernel_region,Voter.kernelPossible_consensus_of_selfLoop,Voter.consensus_tendsto_of_selfLoop}\leanok\uses{lem:propagation,lem:21,thm:generic-absorption}
 Call a round possible for $H$ when every vertex samples a vertex of positive weight in its
 row. On a connected graph whose edges are charged by $H$, a monochromatic region in which
 every vertex charges a vertex of the region grows to consensus through possible rounds.

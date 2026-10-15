@@ -18,8 +18,8 @@ and its Lean 4 formalization in the `voter` package (`leanamics/voter`).
 | **Section 2.1** | Transition probability formula ($P_{ab}$) | [`Voter.transition_product`](Voter/Model.lean#L52), [`Voter.transition_product_bool`](Voter/Model.lean#L72) | [Voter/Model.lean](Voter/Model.lean) |
 | **Preamble to Lemma 2.2** | Stationary distribution existence | [`Dynamics.Kernel.exists_stationary`](../dynamics/Dynamics/Stationary.lean#L53) | [Dynamics/Stationary.lean](../dynamics/Dynamics/Stationary.lean) |
 | **Lemma 2.1** | Monochromatic edge in nonbipartite graph | [`Voter.monochromatic_edge`](Voter/Graph.lean#L18) | [Voter/Graph.lean](Voter/Graph.lean) |
-| **Lemma 2.1** | Monochromatic region propagation | [`Voter.propagate_region`](Voter/Graph.lean#L46), [`Voter.possible_consensus`](Voter/Graph.lean#L90) | [Voter/Graph.lean](Voter/Graph.lean) |
-| **Lemma 2.1** | Consensus states absorbing & nonconsensus survival vanishes | [`Voter.transition_constant`](Voter/Absorption.lean#L25), [`Voter.consensus_tendsto`](Voter/Absorption.lean#L41) | [Voter/Absorption.lean](Voter/Absorption.lean) |
+| **Lemma 2.1** | Monochromatic region propagation | [`Voter.propagate_region_of_rel`](Voter/Graph.lean#L50), [`Voter.propagate_region`](Voter/Graph.lean#L96), [`Voter.possible_consensus`](Voter/Graph.lean#L104) | [Voter/Graph.lean](Voter/Graph.lean) |
+| **Lemma 2.1** | Consensus states absorbing & nonconsensus survival vanishes | [`Voter.transition_constant`](Voter/Absorption.lean#L25), [`Voter.consensus_tendsto`](Voter/Absorption.lean#L81) | [Voter/Absorption.lean](Voter/Absorption.lean) |
 | **Lemma 2.3** | Expected stationary weight invariance (martingale) | [`Voter.round_mass`](Voter/Model.lean#L101), [`Voter.iterate_mass`](Voter/Model.lean#L115) | [Voter/Model.lean](Voter/Model.lean) |
 | **Lemma 2.2** | Finite-time discrepancy bound & limit of white probability | [`Voter.whiteMass_bounds`](Voter/Main.lean#L117), [`Voter.whiteProbability_error`](Voter/Main.lean#L133), [`Voter.whiteProbability_tendsto`](Voter/Main.lean#L150) | [Voter/Main.lean](Voter/Main.lean) |
 | **Theorem 2.1** | Eventual all-white absorption probability $\rho_{s1} = \sum_{i \in W_s} \pi_H(i)$ | [`Voter.consensus_probability`](Voter/Main.lean#L162) | [Voter/Main.lean](Voter/Main.lean) |
@@ -86,11 +86,11 @@ The following portions of the paper were not formalized:
   monochromatic black edge the same propagation argument reaches the all-black state. The formal
   statement makes the colour explicit.
 * **Formal statement**:
-  [`Voter.possible_consensus`](Voter/Graph.lean#L90) proves
+  [`Voter.possible_consensus`](Voter/Graph.lean#L104) proves
   ```lean
   ∃ c, Relation.ReflTransGen (Possible G) s (fun _ => c)
   ```
-  that is, consensus is reachable in **some** color $c \in \{\text{true}, \text{false}\}$ (the color of the monochromatic edge found by [`Nonemonochromatic_edge`](Voter/Graph.lean#L18)). This is what the proof that the probability of staying in non-consensus states decays to 0 ([`Noneconsensus_tendsto`](Voter/Absorption.lean#L41)) uses.
+  that is, consensus is reachable in **some** color $c \in \{\text{true}, \text{false}\}$ (the color of the monochromatic edge found by [`Nonemonochromatic_edge`](Voter/Graph.lean#L18)). This is what the proof that the probability of staying in non-consensus states decays to 0 ([`Noneconsensus_tendsto`](Voter/Absorption.lean#L81)) uses.
 
 ---
 
@@ -129,7 +129,7 @@ The following portions of the paper were not formalized:
        `Dynamics.Kernel.event_error_of_invariant` (roadmap FND-4): the targets are the two
        consensus configurations, the invariant is the white mass, and `whiteMass_bounds`
        bounds it between `0` and `1` off the targets.
-     - [`NonewhiteProbability_tendsto`](Voter/Main.lean#L150): by squeezing with [`Noneconsensus_tendsto`](Voter/Absorption.lean#L41), $\text{colorProbability } n \to \text{whiteMass}$.
+     - [`NonewhiteProbability_tendsto`](Voter/Main.lean#L150): by squeezing with [`Noneconsensus_tendsto`](Voter/Absorption.lean#L81), $\text{colorProbability } n \to \text{whiteMass}$.
   3. **Theorem 2.1** ([`Noneconsensus_probability`](Voter/Main.lean#L162)) identifies the limit with `eventualColor`.
 * **Rationale**:
   This rearrangement avoids summing over the exponential state space $\mathcal{S}$ and avoids having to classify recurrent/transient states in full generality.
@@ -164,7 +164,7 @@ The following portions of the paper were not formalized:
   - $G$ is modeled as a Mathlib `SimpleGraph V`, which is irreflexive by definition ($\neg G.\text{Adj } i\ i$).
   - The support condition is `hsupport : ∀ i j, G.Adj i j → 0 < (H i).weight j`: every edge has positive weight, and `H` may put additional weight elsewhere, in particular on self-loops ($(H i).\text{weight } i > 0$). This covers lazy chains and Wright–Fisher sampling ([`wrightFisher_one_third`](Voter/Examples.lean)).
   - The main theorem `consensus_probability` keeps the nonbipartite hypothesis, because its propagation argument starts from a monochromatic *edge* of `G`.
-  - The Remark itself is formalized (VOT-2) as [`consensus_probability_of_selfLoop`](Voter/LazyLoop.lean) and [`color_consensus_probability_of_selfLoop`](Voter/LazyLoop.lean): on any connected `G`, bipartite or not, it suffices that `H` charges every edge and that `0 < (H v).weight v` for a single vertex `v`. The propagation ([`propagate_kernel_region`](Voter/LazyPropagation.lean)) takes rounds in the support of `H`, so the region `{v}` is monochromatic with `v` as its own internal neighbour. As in the main theorem, `H` may also charge non-edges, which is slightly more general than the Remark. Corollaries: the lazy voter `(I + D⁻¹A)/2` on any connected graph ([`lazyNeighbor_consensus_probability`](Voter/Lazy.lean)) and Wright–Fisher fixation `c_a / n` for every population size ([`wrightFisher_fixation`](Voter/WrightFisher.lean)).
+  - The Remark itself is formalized (VOT-2) as [`consensus_probability_of_selfLoop`](Voter/LazyLoop.lean) and [`color_consensus_probability_of_selfLoop`](Voter/LazyLoop.lean): on any connected `G`, bipartite or not, it suffices that `H` charges every edge and that `0 < (H v).weight v` for a single vertex `v`. The propagation ([`propagate_kernel_region`](Voter/LazyPropagation.lean)) takes rounds in the support of `H` (it and the graph propagation `propagate_region` are the two instances of [`propagate_region_of_rel`](Voter/Graph.lean#L50), and both absorption theorems go through [`consensus_tendsto_of_kernelPossible`](Voter/Absorption.lean#L70)), so the region `{v}` is monochromatic with `v` as its own internal neighbour. As in the main theorem, `H` may also charge non-edges, which is slightly more general than the Remark. Corollaries: the lazy voter `(I + D⁻¹A)/2` on any connected graph ([`lazyNeighbor_consensus_probability`](Voter/Lazy.lean)) and Wright–Fisher fixation `c_a / n` for every population size ([`wrightFisher_fixation`](Voter/WrightFisher.lean)).
 
 ---
 
