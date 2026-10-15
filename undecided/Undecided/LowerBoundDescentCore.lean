@@ -16,7 +16,7 @@ lemma descent_miss_one_eq [NeZero n] (S : Set (Config n k)) (x : Config n k) :
     miss S 1 x =
       avg (fun r : Fin n → Fin n => by classical exact if step x r ∈ S then (0 : ℝ) else 1) := by
   classical
-  unfold miss
+  unfold miss missProb
   rw [expList_succ (T := 0)]
   simp only [expList_zero, List.foldl_cons, List.foldl_nil]
   rfl

@@ -184,7 +184,7 @@ open bridge; these combined coins are independent across pairs, with the stated 
 \end{proof}
 
 \begin{lemma}[Supermartingale for adaptive observations]\label{lem:swg-mart}
-\lean{Epidemics.hist,Epidemics.histProd,Epidemics.expect_prod_hist_le_one,Epidemics.expect_prod_hist_le_one_of_fresh,Epidemics.prob_le_expect_div}\leanok
+\lean{Epidemics.hist,Epidemics.histProd,Epidemics.expect_prod_hist_le_one,Epidemics.expect_prod_hist_le_one_of_fresh,Dynamics.Distribution.prob_le_expect_div}\leanok
 If an adaptive process reads, at each step, coordinates of an independent family not read before,
 and every factor $f_h \ge 0$ satisfies $\mathbb E[f_h(\mathrm{obs}_h)] \le 1$ for every history $h$,
 then the product of the factors along the process has expectation at most $1$.
@@ -417,7 +417,7 @@ one from $I$ to $R$; a round changes the compartment of at most one agent.
 \end{proof}
 
 \begin{lemma}[Maximal Azuma--Hoeffding]\label{lem:azuma}
-\lean{Epidemics.Kurtz.incrementSum,Epidemics.Kurtz.expList_azuma}\leanok
+\lean{Dynamics.incrementSum,Dynamics.expList_azuma}\leanok
 If increments $D(X_j,\rho_j)$ along i.i.d.\ uniform rounds have zero conditional mean and
 $|D|\le c$, their partial sums $M_k$ satisfy
 $\mathbb P(\exists k\le n,\ M_k\ge\lambda)\le e^{-\lambda^2/(2nc^2)}$.
@@ -793,7 +793,7 @@ $k\ge2$, and $d_A(x)=|N(x)\cap A|$. Expectations of unbounded times $\tau$ are w
 sums: every partial sum $\sum_{s<H}\Pr(\tau>s)$ is bounded uniformly in $H$.
 
 \begin{definition}[Second eigenvalue]\label{def:lambda}
-\lean{Epidemics.transitionMatrix,Epidemics.walkEigenvalues,Epidemics.lambdaG}\leanok
+\lean{Dynamics.transitionMatrix,Dynamics.walkEigenvalues,Dynamics.lambdaG}\leanok
 $\lambda=\max(\lambda_2,|\lambda_n|)$ for the sorted eigenvalues of $P$ ($0$ if $n<2$).
 \end{definition}
 

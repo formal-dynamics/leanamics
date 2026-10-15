@@ -58,6 +58,12 @@ lemma avg_const [Nonempty α] (c : ℝ) : avg (fun _ : α => c) = c := by
   rw [sum_const, card_univ, nsmul_eq_mul, mul_comm, mul_div_assoc,
     div_self (ne_of_gt (card_cast_pos (α := α))), mul_one]
 
+/-- A uniform average of values at most one is at most one (also on an empty type). -/
+lemma avg_le_one {f : α → ℝ} (h : ∀ a, f a ≤ 1) : avg f ≤ 1 := by
+  rcases isEmpty_or_nonempty α with hα | hα
+  · simp [avg]
+  · simpa [avg_const] using avg_le_avg h
+
 /-- Expectation of a functional of `T` i.i.d. uniform draws from `α`,
 in transition-operator form: the head draw is averaged out first. -/
 noncomputable def expList (α : Type*) [Fintype α] : ℕ → (List α → ℝ) → ℝ
@@ -76,11 +82,23 @@ lemma expList_nonneg {T : ℕ} {F : List α → ℝ} (h : ∀ l, 0 ≤ F l) :
   | zero => exact h []
   | succ T ih => exact avg_nonneg fun a => ih fun l => h (a :: l)
 
-lemma expList_le_expList {T : ℕ} {F G : List α → ℝ} (h : ∀ l, F l ≤ G l) :
-    expList α T F ≤ expList α T G := by
+/-- `expList α T` only evaluates its argument on lists of length `T`, so it is monotone as soon
+as the comparison holds on those lists. -/
+lemma expList_le_expList_of_length {T : ℕ} {F G : List α → ℝ}
+    (h : ∀ l : List α, l.length = T → F l ≤ G l) : expList α T F ≤ expList α T G := by
   induction T generalizing F G with
+  | zero => exact h [] rfl
+  | succ T ih => exact avg_le_avg fun a => ih fun l hl => h (a :: l) (by simp [hl])
+
+lemma expList_le_expList {T : ℕ} {F G : List α → ℝ} (h : ∀ l, F l ≤ G l) :
+    expList α T F ≤ expList α T G :=
+  expList_le_expList_of_length fun l _ => h l
+
+/-- An `expList` average of values at most one is at most one (also on an empty type). -/
+lemma expList_le_one {T : ℕ} {F : List α → ℝ} (h : ∀ l, F l ≤ 1) : expList α T F ≤ 1 := by
+  induction T generalizing F with
   | zero => exact h []
-  | succ T ih => exact avg_le_avg fun a => ih fun l => h (a :: l)
+  | succ T ih => exact avg_le_one fun a => ih fun l => h (a :: l)
 
 lemma expList_add (T : ℕ) (F G : List α → ℝ) :
     expList α T (fun l => F l + G l) = expList α T F + expList α T G := by
@@ -106,6 +124,14 @@ lemma expList_const [Nonempty α] (T : ℕ) (c : ℝ) :
     rw [expList_succ]
     simpa [ih] using avg_const (α := α) c
 
+/-- Expectation of a complement: `𝔼[1 - F] = 1 - 𝔼[F]` (the `expList` form of
+`Kernel.iterateSeq_one_sub`). -/
+lemma expList_one_sub [Nonempty α] (T : ℕ) (F : List α → ℝ) :
+    expList α T (fun l => 1 - F l) = 1 - expList α T F := by
+  have h := expList_add T (fun l => 1 - F l) F
+  simp only [sub_add_cancel, expList_const] at h
+  linarith
+
 lemma expList_sum {ι : Type*} (s : Finset ι) (T : ℕ) (F : ι → List α → ℝ) :
     expList α T (fun l => ∑ i ∈ s, F i l) = ∑ i ∈ s, expList α T (F i) := by
   induction T generalizing F with
@@ -124,6 +150,48 @@ lemma expList_append (T₁ T₂ : ℕ) (F : List α → ℝ) :
     rw [Nat.succ_add, expList_succ, expList_succ
       (F := fun l₁ => expList α T₂ fun l₂ => F (l₁ ++ l₂))]
     exact congrArg avg (funext fun a => by rw [ih]; simp)
+
+/-! ### Lengths and prefixes: `expList α T` only evaluates lists of length `T` -/
+
+/-- `expList α T` only evaluates its argument on lists of length `T`, so a comparison on those
+lists is enough. -/
+lemma expList_le_of_length {T : ℕ} {F G : List α → ℝ}
+    (h : ∀ l : List α, l.length = T → F l ≤ G l) : expList α T F ≤ expList α T G := by
+  induction T generalizing F G with
+  | zero => exact h [] rfl
+  | succ T ih =>
+    rw [expList_succ, expList_succ]
+    exact avg_le_avg fun a => ih fun l hl => h (a :: l) (by simp [hl])
+
+/-- `expList α T` only evaluates its argument on lists of length `T`. -/
+lemma expList_congr_length {T : ℕ} {F G : List α → ℝ}
+    (h : ∀ l : List α, l.length = T → F l = G l) : expList α T F = expList α T G :=
+  le_antisymm (expList_le_of_length fun l hl => (h l hl).le)
+    (expList_le_of_length fun l hl => (h l hl).ge)
+
+/-- A function of the first `k` of `T ≥ k` draws only sees `k` draws. -/
+lemma expList_take [Nonempty α] {k T : ℕ} (hk : k ≤ T) (F : List α → ℝ) :
+    expList α T (fun l => F (l.take k)) = expList α k F := by
+  obtain ⟨m, rfl⟩ := Nat.exists_eq_add_of_le hk
+  rw [expList_append]
+  refine expList_congr_length fun l hl => ?_
+  simp_rw [List.take_left' hl]
+  exact expList_const (α := α) m _
+
+/-- A function of the first `k` of `T > k` draws and of the next one: the next draw is a fresh
+uniform sample. -/
+lemma expList_take_getElem? [Nonempty α] {k T : ℕ} (hk : k < T) (F : List α → Option α → ℝ) :
+    expList α T (fun l => F (l.take k) l[k]?) = expList α k fun p => avg fun a => F p (some a) := by
+  obtain ⟨m, rfl⟩ := Nat.exists_eq_add_of_lt hk
+  rw [show k + m + 1 = k + (m + 1) by ring, expList_append]
+  refine expList_congr_length fun p hp => ?_
+  have h1 : ∀ l : List α, (p ++ l).take k = p := fun l => List.take_left' hp
+  have h2 : ∀ l : List α, (p ++ l)[k]? = l.head? := fun l => by
+    rw [List.getElem?_append_right (by omega), hp, Nat.sub_self, List.head?_eq_getElem?]
+  simp_rw [h1, h2, expList_succ, List.head?_cons]
+  congr 1
+  funext a
+  exact expList_const (α := α) m _
 
 /-! ### Independence: average of a product over a product space -/
 

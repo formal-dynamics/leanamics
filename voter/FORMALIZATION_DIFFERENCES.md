@@ -23,8 +23,8 @@ and its Lean 4 formalization in the `voter` package (`leanamics/voter`).
 | **Lemma 2.3** | Expected stationary weight invariance (martingale) | [`Voter.round_mass`](Voter/Model.lean#L101), [`Voter.iterate_mass`](Voter/Model.lean#L115) | [Voter/Model.lean](Voter/Model.lean) |
 | **Lemma 2.2** | Finite-time discrepancy bound & limit of white probability | [`Voter.whiteMass_bounds`](Voter/Main.lean#L117), [`Voter.whiteProbability_error`](Voter/Main.lean#L133), [`Voter.whiteProbability_tendsto`](Voter/Main.lean#L150) | [Voter/Main.lean](Voter/Main.lean) |
 | **Theorem 2.1** | Eventual all-white absorption probability $\rho_{s1} = \sum_{i \in W_s} \pi_H(i)$ | [`Voter.consensus_probability`](Voter/Main.lean#L162) | [Voter/Main.lean](Voter/Main.lean) |
-| **Corollary 2.2** | Degree weights are stationary; uniform consensus probability $\sum_{i \in W_s} \frac{d_i}{2m}$ | [`Voter.degree_stationary`](Voter/Uniform.lean#L43), [`Voter.uniform_consensus_probability`](Voter/Corollaries.lean#L26) | [Voter/Uniform.lean](Voter/Uniform.lean), [Voter/Corollaries.lean](Voter/Corollaries.lean) |
-| **Section 4.3.1** | Consensus on $d$-regular graph equals initial white fraction $x/n$ | [`Voter.regular_consensus_probability`](Voter/Corollaries.lean#L36) | [Voter/Corollaries.lean](Voter/Corollaries.lean) |
+| **Corollary 2.2** | Degree weights are stationary; uniform consensus probability $\sum_{i \in W_s} \frac{d_i}{2m}$ | [`Voter.degree_stationary`](Voter/Uniform.lean#L39), [`Voter.uniform_consensus_probability`](Voter/Corollaries.lean#L17) | [Voter/Uniform.lean](Voter/Uniform.lean), [Voter/Corollaries.lean](Voter/Corollaries.lean) |
+| **Section 4.3.1** | Consensus on $d$-regular graph equals initial white fraction $x/n$ | [`Voter.regular_consensus_probability`](Voter/Corollaries.lean#L28) | [Voter/Corollaries.lean](Voter/Corollaries.lean) |
 | **Section 2.3** | Many colors: projections commute with dynamics | [`Voter.step_project`](Voter/Model.lean#L24), [`Voter.iterate_project`](Voter/Colors.lean#L10), [`Voter.colorProbability_project`](Voter/Colors.lean#L37) | [Voter/Model.lean](Voter/Model.lean), [Voter/Colors.lean](Voter/Colors.lean) |
 | **Section 2.3** | Many colors: consensus probability $\rho_{sc} = \sum_{i \in A_c^s} \pi_H(i)$ | [`Voter.color_consensus_probability`](Voter/Colors.lean#L51), [`Voter.sum_color_consensus_probability`](Voter/Colors.lean#L61) | [Voter/Colors.lean](Voter/Colors.lean) |
 | **Figure 1** | Bipartite 2-cycle alternating coloring flips and cycles without consensus | [`Voter.Examples.twoVertex_flip`](Voter/Examples.lean#L65), [`Voter.Examples.twoVertex_cycle`](Voter/Examples.lean#L68), [`Voter.Examples.twoVertex_never_consensus`](Voter/Examples.lean#L72) | [Voter/Examples.lean](Voter/Examples.lean) |
@@ -220,10 +220,12 @@ fixation. Files: [`LazyPropagation.lean`](Voter/LazyPropagation.lean),
   the eventual white probability equals the stationary white mass.
 
 ### 3.3 Lazy voter hypotheses and forms
-* [`lazyNeighbor`](Voter/Lazy.lean) needs `hd : ∀ i, 0 < G.degree i` (every vertex has a
+* [`lazyNeighbor`](../dynamics/Dynamics/RandomWalk.lean) needs `hd : ∀ i, 0 < G.degree i` (every vertex has a
   neighbour to sample), as `uniformNeighbor` does. For a connected graph this only excludes
   the one-vertex graph, where the statement is trivial. The holding probability is fixed at
-  `1/2`.
+  `1/2`. The kernels `uniformNeighbor`, `lazy` and `lazyNeighbor` are the core ones
+  `Dynamics.Kernel.*` of [`Dynamics/Lazy.lean`](../dynamics/Dynamics/Lazy.lean) and
+  [`Dynamics/RandomWalk.lean`](../dynamics/Dynamics/RandomWalk.lean), exported into `Voter`.
 * Only the many-colour forms are stated for the lazy voter
   ([`lazy_consensus_probability`](Voter/Lazy.lean),
   [`lazyNeighbor_consensus_probability`](Voter/Lazy.lean), with consensus probability
@@ -257,7 +259,7 @@ SODA 2019 (arXiv:1611.02460); Cooper, Elsässer, Ono, Radzik, SIAM J. Discrete M
   `H_ij = 1/d_i`.
 * We formalize the **lazy** version, which makes "every connected graph" true: every vertex
   keeps its colour with probability `1/2` and otherwise copies a uniformly random neighbour,
-  i.e. the kernel [`lazyNeighbor`](Voter/Lazy.lean) `= (I + D⁻¹A)/2` of §3. This kernel lies
+  i.e. the kernel [`lazyNeighbor`](../dynamics/Dynamics/RandomWalk.lean) `= (I + D⁻¹A)/2` of §3. This kernel lies
   within Hassin and Peleg's weighted-polling framework with self-loops (the Remark on p. 254;
   it is also their PropCon weighting `H_ii = 1 − d_i/R̃_i` with `R̃_i = 2 d_i`, taking
   `H_ij = 1/R̃_i` on edges as the row sums require), and it is the setting of Cooper,
@@ -417,7 +419,7 @@ Source: Berenbrink, Giakkoupis, Kermarrec, Mallmann-Trenn, *Bounds on the voter 
 dynamic networks*, ICALP 2016, arXiv:1603.01895 (BGKM16). Numbering: Theorem 1.1 (upper
 bound), Lemma 2.1 (potential drop), Lemma 2.2 (drift implies time), Lemma 2.3 (phases for
 `κ` opinions), Lemma 2.4 (the bound `n log n / φ²`). Files: `Conductance*.lean`. The
-dynamics is the lazy voter [`lazyNeighbor`](Voter/Lazy.lean) `= (I + D⁻¹A)/2` of §3.
+dynamics is the lazy voter [`lazyNeighbor`](../dynamics/Dynamics/RandomWalk.lean) `= (I + D⁻¹A)/2` of §3.
 
 ### 5.1 Lemma 2.1 of BGKM16 needs a minor correction
 * The paper states

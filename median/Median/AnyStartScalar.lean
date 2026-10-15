@@ -1,54 +1,23 @@
-import Mathlib
+import Dynamics.Scalar
 
 /-! # Any start: scalar inequalities
 
 Real-number facts used by `Median/AnyStart.lean`, stated for arbitrary reals:
 
-* round budgets: ceilings add up (`ceil_add_ceil_le`, `mul_ceil_le_ceil`);
-* the union bound of the reduction to two values: `c³ ≤ x` once `3c ≤ log x`
-  (`pow_three_le_of_log`), hence `x (c/x)³ ≤ (3c + 3)/x` (`mul_div_pow_three_le`);
+* the union bound of the reduction to two values: `x (c/x)³ ≤ (3c + 3)/x` once `c³ ≤ x`
+  (`mul_div_pow_three_le`);
 * the constants of symmetry breaking near balance (`sq_mul_one_sub_sq_ge`,
   `le_abs_two_mul_add`, `near_const_le`);
-* the error of the escape phase (`escape_error_le`), from `log x ^ 4 / 24 ≤ x`
-  (`log_pow_four_div_le`).
+* the error of the escape phase (`escape_error_le`).
+
+The generic facts behind them (the round budgets `ceil_add_ceil_le` and `mul_ceil_le_ceil`,
+`pow_three_le_of_log`, `log_pow_four_div_le`) are in `Dynamics/Scalar.lean`.
 -/
 
 namespace Median
-open Real
-
-/-! ### Round budgets -/
-
-/-- Two ceilings fit under a third: `⌈a⌉₊ + ⌈b⌉₊ ≤ ⌈c⌉₊` when `a + b + 2 ≤ c`. -/
-lemma ceil_add_ceil_le {a b c : ℝ} (ha : 0 ≤ a) (hb : 0 ≤ b) (h : a + b + 2 ≤ c) :
-    ⌈a⌉₊ + ⌈b⌉₊ ≤ ⌈c⌉₊ := by
-  have ha' := Nat.ceil_lt_add_one ha
-  have hb' := Nat.ceil_lt_add_one hb
-  have hc := Nat.le_ceil c
-  have : ((⌈a⌉₊ + ⌈b⌉₊ : ℕ) : ℝ) ≤ ⌈c⌉₊ := by
-    push_cast
-    linarith
-  exact_mod_cast this
-
-/-- `k` copies of `⌈a⌉₊` fit under `⌈b⌉₊` when `k (a + 1) ≤ b`. -/
-lemma mul_ceil_le_ceil {k : ℕ} {a b : ℝ} (ha : 0 ≤ a) (h : k * (a + 1) ≤ b) :
-    k * ⌈a⌉₊ ≤ ⌈b⌉₊ := by
-  have ha' := mul_le_mul_of_nonneg_left (Nat.ceil_lt_add_one ha).le (Nat.cast_nonneg (α := ℝ) k)
-  have hb := Nat.le_ceil b
-  have : ((k * ⌈a⌉₊ : ℕ) : ℝ) ≤ ⌈b⌉₊ := by
-    push_cast
-    linarith
-  exact_mod_cast this
+open Real Dynamics
 
 /-! ### The union bound over values -/
-
-/-- `c³ ≤ x` as soon as `3c ≤ log x`, since `c ≤ eᶜ`. -/
-lemma pow_three_le_of_log {c x : ℝ} (hc : 0 ≤ c) (hx : 0 < x) (h : 3 * c ≤ log x) :
-    c ^ 3 ≤ x := by
-  have hce : c ≤ exp c := by linarith [add_one_le_exp c]
-  calc c ^ 3 ≤ exp c ^ 3 := pow_le_pow_left₀ hc hce 3
-    _ = exp (3 * c) := by rw [← exp_nat_mul]; norm_num
-    _ ≤ exp (log x) := exp_le_exp.mpr h
-    _ = x := exp_log hx
 
 /-- `x (c/x)³ ≤ (3c + 3)/x` when `c³ ≤ x`: three amplified blocks beat a union bound over `x`
 values. -/
@@ -94,13 +63,6 @@ lemma near_const_le : 1 - 9 / 64 * (1 - exp (-(1 / 1024))) ≤ exp (-(5 / 65536)
   linarith
 
 /-! ### The escape phase -/
-
-/-- `(log x)⁴ / 24 ≤ x` for `x > 0` with `log x ≥ 0`. -/
-lemma log_pow_four_div_le {x : ℝ} (hx : 0 < x) (hL : 0 ≤ log x) : log x ^ 4 / 24 ≤ x := by
-  have h := pow_div_factorial_le_exp (log x) hL 4
-  rw [exp_log hx] at h
-  norm_num [Nat.factorial] at h
-  linarith
 
 /-- **The error of the escape phase.** With `L = log x ≥ 8192` and `2¹⁷ L ≤ T ≤ 2¹⁷ L + 1`,
 for `p ≤ 1`: `e^{√L/2} (e^{-T/65536} p + T e^{1/131072 - √x/512}) ≤ 2/x`. The first term is

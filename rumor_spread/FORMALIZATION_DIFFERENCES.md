@@ -42,7 +42,8 @@ Appl. Math. 10 (1985) (PUSH, partner chosen among the other nodes).
    (`notAllOf_le_two_div`), and `PullGood.lean` proves the two inputs for PULL. Unlike PUSH, a
    PULL round can inform many more than `|I|` new nodes, so the reverse-Markov argument of
    `prob_goodRound` does not apply; we use a second moment instead (`𝔼X² ≤ μ + μ²` for the
-   number `X` of uninformed callers calling into `I`, by pairwise independence of the calls)
+   number `X` of uninformed callers calling into `I`, by pairwise independence of the calls and
+   the shared `Dynamics.avg_sq_sum_le_of_pairwise`)
    and a Paley–Zygmund bound obtained from the pointwise inequality
    `X ≤ μ/4 + X²/(2t) + (t/2)·1[good]` with `t = 4(1 + μ)/3`, so no Cauchy–Schwarz is needed.
    The argument actually gives probability at least `3/16`; `1/8` is what the PUSH constants

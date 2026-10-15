@@ -225,7 +225,7 @@ Lemma~2.2 only needs nonconsensus probability to vanish; then project colours as
 Section~2.3.
 \end{proof}
 \begin{theorem}[Lazy voter]\label{thm:lazy}
-\lean{Voter.lazy,Voter.lazyNeighbor,Voter.lazy_weight,Voter.lazyNeighbor_weight,Voter.lazy_stationary_iff,Voter.lazy_selfLoop_pos,Voter.lazy_weight_pos,Voter.lazy_consensus_probability,Voter.lazyNeighbor_consensus_probability}\leanok\uses{thm:selfloop,cor:22}
+\lean{Dynamics.Kernel.lazy,Dynamics.Kernel.lazyNeighbor,Dynamics.Kernel.lazy_weight,Dynamics.Kernel.lazyNeighbor_weight,Voter.lazy_stationary_iff,Dynamics.Kernel.lazy_selfLoop_pos,Dynamics.Kernel.lazy_weight_pos,Voter.lazy_consensus_probability,Voter.lazyNeighbor_consensus_probability}\leanok\uses{thm:selfloop,cor:22}
 The lazy kernel $(I+H)/2$ has the stationary distributions of $H$ and positive self-loops.
 On any connected graph the lazy voter $(I+D^{-1}A)/2$ reaches consensus in colour $c$ with
 probability $\sum_{i:s(i)=c} d_i/2m$.
@@ -358,7 +358,7 @@ Walks of $G$ lift to $\tilde G$, flipping the layer at every step. If $\tilde G$
 disconnected, ``$(w,0)$ is reachable from $(x_0,0)$'' would be a proper $2$-colouring of $G$.
 \end{proof}
 \begin{lemma}[Hitting times on the double cover]\label{lem:hitting-flip}
-\lean{Voter.hitting_unique,Voter.hitting_doubleCover_flip,Voter.uniformNeighbor_expect,Voter.uniformNeighbor_expect_hitting,Voter.uniformNeighbor_doubleCover_expect}\leanok\uses{lem:hitting,def:double-cover,lem:double-cover-connected,cor:22}
+\lean{Voter.hitting_unique,Voter.hitting_doubleCover_flip,Dynamics.Kernel.uniformNeighbor_expect,Voter.uniformNeighbor_expect_hitting,Voter.uniformNeighbor_doubleCover_expect}\leanok\uses{lem:hitting,def:double-cover,lem:double-cover-connected,cor:22}
 The hitting-time system has a unique solution, so the hitting times of $\tilde G$ satisfy
 $\tilde h_{(y,1-j)}(x,1-i)=\tilde h_{(y,j)}(x,i)$. A plain step away from $y$ lowers $h_y$ by $2$
 in expectation, and a plain step of $\tilde G$ from $(x,i)$ is a plain step of $G$ from $x$

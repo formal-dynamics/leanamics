@@ -56,7 +56,7 @@ theorem avg_expect_edgeMatrix (K : Kernel V) (a b : V) :
   simp only [avg, Distribution.expect]
   rw [h]
   simp only [gossipMeanMatrix, kernelMatrix, Matrix.add_apply, Matrix.sub_apply, one_apply,
-    Matrix.smul_apply, diagonal_apply, transpose_apply, of_apply, smul_eq_mul]
+    Matrix.smul_apply, diagonal_apply, transpose_apply, Kernel.toMatrix_apply, smul_eq_mul]
   by_cases hab : a = b
   · subst hab
     simp only [if_true]

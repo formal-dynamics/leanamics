@@ -156,18 +156,6 @@ theorem expect_prod_hist_le_one (P : Distribution Ω) (obs : List β → Ω → 
 
 end History
 
-/-! ### Markov's inequality for a nonnegative product -/
-
-/-- **Markov's inequality**: `P(a ≤ X) ≤ E[X] / a` for `X ≥ 0` and `a > 0`. -/
-lemma prob_le_expect_div {α : Type*} [Fintype α] (P : Distribution α) (X : α → ℝ)
-    (hX : ∀ ω, 0 ≤ X ω) {a : ℝ} (ha : 0 < a) :
-    P.prob (fun ω => a ≤ X ω) ≤ P.expect X / a := by
-  classical
-  rw [Distribution.prob_eq_expect, le_div_iff₀ ha, mul_comm, ← Distribution.expect_mul]
-  refine P.expect_mono fun ω => ?_
-  split_ifs with h
-  · linarith
-  · linarith [hX ω]
 
 /-! ### Fresh observations of independent coordinates (deferred decisions) -/
 
