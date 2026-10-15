@@ -65,6 +65,7 @@ import Dynamics
 #print axioms Dynamics.avg_lower_tail_le_of_mgf
 #print axioms Dynamics.avg_hoeffding_lower
 #print axioms Dynamics.variance_le_avg_of_zero_one
+#print axioms Dynamics.avg_pz_one_sided
 #print axioms Dynamics.avg_pz_sum
 #print axioms Dynamics.avg_pz_zero_one
 #print axioms Dynamics.avg_exp_sum_le
@@ -73,6 +74,8 @@ import Dynamics
 #print axioms Dynamics.avg_bernstein_of_zero_one
 #print axioms Dynamics.avg_bernstein_lower_of_zero_one
 #print axioms Dynamics.Distribution.prob_ge_le_exp_tilt
+#print axioms Dynamics.Distribution.binTail_succ_succ
+#print axioms Dynamics.Distribution.independent_bernoulli_prob_split
 #print axioms Dynamics.avg_chernoff_mgf
 #print axioms Dynamics.avg_chernoff_upper_of_mgf
 #print axioms Dynamics.avg_chernoff_lower_of_mgf

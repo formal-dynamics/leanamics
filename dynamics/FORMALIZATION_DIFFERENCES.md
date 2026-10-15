@@ -96,6 +96,11 @@ Where the statements of `dynamics/` deviate from their sources, and why.
 9. **Proof route** is the textbook one (Markov on `e^{tX}`, `1 + x ≤ eˣ` per trial,
    `t = log (1 ± δ)`); the only non-textbook step is the series proof of
    `log (1+δ) ≥ 2δ/(2+δ)`.
+10. **Binomial tail and conditioning on one coin** (from EPI-2, issue #44): for identical coins,
+    `Distribution.binTail p m k` (at least `k` heads among `m` Bernoulli(`p`) coins, the former
+    `Epidemics.binTail`) with `binTail_succ_succ` (condition on the first coin), and
+    `independent_bernoulli_prob_split` (the former `Epidemics.coins_prob_split`, for coins indexed
+    by any finite type). The coins are identical because that is all EPI-2 needs.
 
 ## Optional stopping and time reversal (`OptionalStopping`, `Reverse`, FND-4, FND-6)
 
