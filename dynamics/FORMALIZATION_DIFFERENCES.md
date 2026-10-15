@@ -215,6 +215,9 @@ aliases, and the package blueprints tag the `Dynamics` names).
    same monotonicity for its own use.
 9. **Mathlib instead of new lemmas** where Mathlib states the fact: `xᵏ/k! ≤ eˣ` is
    `Real.pow_div_factorial_le_exp` and `(q - 1)/q ≤ log q` is `Real.one_sub_inv_le_log_of_pos`.
+   The conversions `exp_neg_two_log`, `exp_neg_three_log` and `one_le_of_log_pos` (for `n : ℕ`)
+   are new.
+10. **Copies left in other packages**: `Moran.expect_lt_one` and `Voter.expect_lt_one` have the
    The conversions `exp_neg_two_log` and `one_le_of_log_pos` (for `n : ℕ`) are new.
 10. **Bernstein corollaries for `{0,1}` coordinates.** `avg_bernstein_lower` is `avg_bernstein`
     applied to `-Y`. `avg_bernstein_of_zero_one` and `avg_bernstein_lower_of_zero_one` fix
@@ -231,3 +234,19 @@ aliases, and the package blueprints tag the `Dynamics` names).
     statement of `Distribution.expect_lt_one`, `Undecided.avg_lt_one` that of `avg_lt_one`, and
     `Voter.colorProbability_mono` re-proves `Kernel.iterate_monotone` for its indicator; they
     can be replaced by the shared versions.
+
+## Scalar facts shared by the packages (`Scalar`)
+
+Real and natural-number inequalities that `median/`, `plurality/` and `undecided/` proved
+locally (round budgets, phase counts, powers of `log`) are stated once in `Dynamics/Scalar.lean`,
+with the statements and names of the package lemmas they replace; the package copies are
+removed rather than kept as aliases.
+
+1. **Mathlib instead of new lemmas**: `1/2 ≤ log 2 ≤ 1` (formerly `Median.log_two_ge`,
+   `Median.log_two_le_one`) follows from `Real.log_two_gt_d9` and `Real.log_two_lt_d9`, and
+   `√(ℓ x) ≤ √(ℓ y)` (formerly `Undecided.Plurality.sqrt_mul_le_of_le`) is
+   `Real.sqrt_le_sqrt` applied to `mul_le_mul_of_nonneg_left`.
+2. **Two forms of the phase count**: `le_pow_ceil_real` (for `w : ℝ`, `w ≥ 1`) and
+   `le_pow_ceil` (for `n : ℕ`, `n ≥ 1`, the form of the three package copies).
+3. **Constants of a single paper stay local**, e.g. `Undecided.Plurality.three_quarters_pow_le`
+   (`(3/4)^T ≤ e^{-T/4}`) and `Undecided.one_le_of_log` (`10⁴ ≤ log n → 1 ≤ n`).

@@ -4,11 +4,13 @@ import Averaging.ReconstructionDefs
 
 Elementary facts behind Section 3 of Becchetti et al. (arXiv:1511.03927): the partition identities
 `⟨𝟙, 𝟙⟩ = ⟨χ, χ⟩ = 2n`, `⟨𝟙, χ⟩ = 0`, the matrix form `x⁽ᵗ⁾ = Pᵗ x` of the averaging dynamics,
-`P 𝟙 = 𝟙`, Observation A.3 (`P χ = (1 - 2b/d) χ`) and its powers, and basic properties of `λ`.
+Observation A.3 (`P χ = (1 - 2b/d) χ`) and basic properties of `λ`, including `λ ≤ λ_G`
+(`maxAbsOtherEigenvalue_le_lambdaG`). `P 𝟙 = 𝟙` and the powers of eigenvectors are the core's
+`Dynamics.transitionMatrix_mulVec_one` and `Dynamics.pow_mulVec_of_mulVec_eq_smul`.
 -/
 
 namespace Averaging
-open Finset Matrix SimpleGraph
+open Finset Matrix SimpleGraph Dynamics
 
 variable {V : Type*} [Fintype V] [DecidableEq V]
 
@@ -89,18 +91,6 @@ lemma avgIter_eq_pow_mulVec (hreg : G.IsRegularOfDegree d) (t : ℕ) (x : V → 
     rw [show avgIter G (t + 1) x = avgStep G (avgIter G t x) from rfl, ih,
       avgStep_eq_transitionMatrix_mulVec hreg, mulVec_mulVec, ← pow_succ']
 
-omit [DecidableEq V] in
-/-- `P 𝟙 = 𝟙`: the transition matrix is stochastic. -/
-lemma transitionMatrix_mulVec_one (hreg : G.IsRegularOfDegree d) (hd : 0 < d) :
-    transitionMatrix G d *ᵥ 1 = 1 := by
-  have hdR : (d : ℝ) ≠ 0 := by exact_mod_cast hd.ne'
-  ext v
-  rw [transitionMatrix, smul_mulVec, Pi.smul_apply, adjMatrix_mulVec_apply]
-  simp only [Pi.one_apply, sum_const, card_neighborFinset_eq_degree, nsmul_eq_mul,
-    mul_one, smul_eq_mul]
-  rw [hreg v]
-  exact inv_mul_cancel₀ hdR
-
 /-- **Observation A.3**: `P χ = (1 - 2b/d) χ`. -/
 lemma transitionMatrix_mulVec_clusterIndicator_aux (hG : IsClusteredRegular G V₁ V₂ n d b)
     (hd : 0 < d) :
@@ -125,12 +115,6 @@ lemma transitionMatrix_mulVec_clusterIndicator_aux (hG : IsClusteredRegular G V�
     field_simp
     linarith
 
-lemma pow_mulVec_of_mulVec_eq_smul {M : Matrix V V ℝ} {u : V → ℝ} {c : ℝ}
-    (hu : M *ᵥ u = c • u) (t : ℕ) : (M ^ t) *ᵥ u = c ^ t • u := by
-  induction t with
-  | zero => simp
-  | succ t ih => rw [pow_succ', ← mulVec_mulVec, ih, mulVec_smul, hu, smul_smul, pow_succ]
-
 /-! ### The parameter `λ` -/
 
 lemma maxAbsOtherEigenvalue_nonneg (G : SimpleGraph V) [DecidableRel G.Adj] (d : ℕ) :
@@ -143,5 +127,27 @@ lemma abs_eigenvalues₀_le_maxAbsOtherEigenvalue (G : SimpleGraph V) [Decidable
     |(transitionMatrix_isHermitian G d).eigenvalues₀ i| ≤ maxAbsOtherEigenvalue G d :=
   le_ciSup (f := fun j : {j : Fin (Fintype.card V) // 2 ≤ j.val} =>
     |(transitionMatrix_isHermitian G d).eigenvalues₀ j.1|) (Set.finite_range _).bddAbove ⟨i, hi⟩
+
+/-- `λ ≤ λ_G`: the largest absolute value among all but the two largest eigenvalues of `P` is at
+most `λ_G = max {λ₂, |λₙ|}` (`Dynamics.lambdaG`), the largest among all but the top one. -/
+lemma maxAbsOtherEigenvalue_le_lambdaG (G : SimpleGraph V) [DecidableRel G.Adj] (d : ℕ) :
+    maxAbsOtherEigenvalue G d ≤ lambdaG G d := by
+  refine Real.iSup_le (fun i => ?_) (lambdaG_nonneg G d)
+  obtain ⟨i, hi⟩ := i
+  have hlt := i.isLt
+  have h2 : 2 ≤ Fintype.card V := by omega
+  have anti : Antitone (walkEigenvalues G d) :=
+    (transitionMatrix_isHermitian G d).eigenvalues₀_antitone
+  have h1 : walkEigenvalues G d i ≤ walkEigenvalues G d ⟨1, by omega⟩ :=
+    anti (Fin.le_iff_val_le_val.mpr (by simp only; omega))
+  have h3 : walkEigenvalues G d ⟨Fintype.card V - 1, by omega⟩ ≤ walkEigenvalues G d i :=
+    anti (Fin.le_iff_val_le_val.mpr (by simp only; omega))
+  change |walkEigenvalues G d i| ≤ lambdaG G d
+  rw [lambdaG, dif_pos h2, abs_le]
+  constructor
+  · linarith [neg_abs_le (walkEigenvalues G d ⟨Fintype.card V - 1, by omega⟩),
+      le_max_right (walkEigenvalues G d ⟨1, by omega⟩)
+        |walkEigenvalues G d ⟨Fintype.card V - 1, by omega⟩|]
+  · exact h1.trans (le_max_left _ _)
 
 end Averaging

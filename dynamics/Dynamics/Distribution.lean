@@ -84,6 +84,90 @@ lemma prob_eq_expect (p : Distribution α) (s : α → Prop) [DecidablePred s] :
   funext a
   congr
 
+/-! ### Events -/
+
+/-- Events that agree pointwise have the same probability. -/
+lemma prob_congr (p : Distribution α) {s t : α → Prop} (h : ∀ a, s a ↔ t a) :
+    p.prob s = p.prob t :=
+  le_antisymm (p.prob_mono fun a => (h a).1) (p.prob_mono fun a => (h a).2)
+
+/-- A sure event has probability one. -/
+lemma prob_eq_one (p : Distribution α) {s : α → Prop} (h : ∀ a, s a) : p.prob s = 1 := by
+  classical
+  simp [p.prob_eq_expect, h]
+
+/-- An impossible event has probability zero. -/
+lemma prob_eq_zero (p : Distribution α) {s : α → Prop} (h : ∀ a, ¬s a) : p.prob s = 0 := by
+  classical
+  simp [p.prob_eq_expect, h, expect]
+
+/-- **Complement rule**: `P(¬s) = 1 - P(s)`. -/
+lemma prob_not (p : Distribution α) (s : α → Prop) :
+    p.prob (fun a => ¬s a) = 1 - p.prob s := by
+  classical
+  rw [p.prob_eq_expect, p.prob_eq_expect, ← p.expect_const 1, ← expect_sub]
+  congr 1
+  funext a
+  by_cases hs : s a <;> simp [hs]
+
+/-- If `t` holds wherever `s` fails, then `1 - P(s) ≤ P(t)`. -/
+lemma one_sub_prob_le_prob (p : Distribution α) {s t : α → Prop} (h : ∀ a, ¬s a → t a) :
+    1 - p.prob s ≤ p.prob t := by
+  rw [← prob_not]
+  exact p.prob_mono h
+
+/-- **Union bound** for two events. -/
+lemma prob_or_le (p : Distribution α) (s t : α → Prop) :
+    p.prob (fun a => s a ∨ t a) ≤ p.prob s + p.prob t := by
+  classical
+  rw [p.prob_eq_expect, p.prob_eq_expect, p.prob_eq_expect, ← expect_add]
+  refine p.expect_mono fun a => ?_
+  by_cases hs : s a <;> by_cases ht : t a <;> simp [hs, ht]
+
+/-- **Union bound** over a finite family of events. -/
+lemma prob_exists_le_sum {κ : Type*} (p : Distribution α) (I : Finset κ) (s : κ → α → Prop) :
+    p.prob (fun a => ∃ i ∈ I, s i a) ≤ ∑ i ∈ I, p.prob (s i) := by
+  classical
+  induction I using Finset.induction_on with
+  | empty => simp [p.prob_eq_zero]
+  | insert i I hi ih =>
+    rw [sum_insert hi]
+    calc p.prob (fun a => ∃ j ∈ insert i I, s j a)
+        = p.prob (fun a => s i a ∨ ∃ j ∈ I, s j a) := p.prob_congr fun a => by simp
+      _ ≤ p.prob (s i) + p.prob (fun a => ∃ j ∈ I, s j a) := p.prob_or_le _ _
+      _ ≤ p.prob (s i) + ∑ j ∈ I, p.prob (s j) := by linarith
+
+/-- **Inclusion–exclusion** for two events, through their complements. -/
+lemma prob_and_eq (p : Distribution α) (s t : α → Prop) :
+    p.prob (fun a => s a ∧ t a) =
+      1 - p.prob (fun a => ¬s a) - p.prob (fun a => ¬t a) +
+        p.prob (fun a => ¬s a ∧ ¬t a) := by
+  classical
+  rw [p.prob_eq_expect, p.prob_eq_expect, p.prob_eq_expect, p.prob_eq_expect,
+    ← p.expect_const 1, ← expect_sub, ← expect_sub, ← expect_add]
+  congr 1
+  funext a
+  by_cases hs : s a <;> by_cases ht : t a <;> simp [hs, ht]
+
+/-- **Markov's inequality**: `P(c ≤ X) ≤ 𝔼X / c` for `X ≥ 0` and `c > 0`. The uniform case is
+`avg_markov`. -/
+lemma prob_le_expect_div (p : Distribution α) (X : α → ℝ) (hX : ∀ a, 0 ≤ X a) {c : ℝ}
+    (hc : 0 < c) : p.prob (fun a => c ≤ X a) ≤ p.expect X / c := by
+  classical
+  rw [p.prob_eq_expect, le_div_iff₀ hc, mul_comm, ← expect_mul]
+  refine p.expect_mono fun a => ?_
+  split_ifs with h
+  · linarith
+  · linarith [hX a]
+
+/-- **Markov's inequality on the square** (the core of Chebyshev's inequality):
+`P(c ≤ |Z|) ≤ 𝔼[Z²] / c²` for `c > 0`. -/
+lemma markov_sq (p : Distribution α) (Z : α → ℝ) {c : ℝ} (hc : 0 < c) :
+    p.prob (fun a => c ≤ |Z a|) ≤ p.expect (fun a => Z a ^ 2) / c ^ 2 :=
+  calc p.prob (fun a => c ≤ |Z a|) = p.prob (fun a => c ^ 2 ≤ Z a ^ 2) :=
+        p.prob_congr fun a => by rw [sq_le_sq, abs_of_pos hc]
+    _ ≤ _ := p.prob_le_expect_div _ (fun a => sq_nonneg (Z a)) (pow_pos hc 2)
+
 /-- Uniform distribution, available precisely when the sample type is nonempty. -/
 noncomputable def uniform (α : Type*) [Fintype α] [Nonempty α] : Distribution α where
   weight _ := (Fintype.card α : ℝ)⁻¹
@@ -126,6 +210,12 @@ lemma map_expect (p : Distribution α) (f : α → β) (g : β → ℝ) :
   apply sum_congr rfl
   intro a _
   simp
+
+/-- The probability of an event under `p.map f` is that of its preimage under `p`. -/
+lemma prob_map (p : Distribution α) (f : α → β) (s : β → Prop) :
+    (p.map f).prob s = p.prob (fun a => s (f a)) := by
+  classical
+  rw [prob_eq_expect, prob_eq_expect, map_expect]
 
 variable [DecidableEq ι]
 

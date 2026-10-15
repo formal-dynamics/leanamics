@@ -99,7 +99,7 @@ lemma push_target_round {q : ℝ} (hq : 40 ≤ q) (a : Finset (Fin n))
   have hmono : ((push n).K a).prob (fun b => (n : ℝ) - b.card < pushTarget (q / exp (1 / 4))) ≤
       ((push n).K a).prob (fun b => (n : ℝ) - b.card <
         pushTarget q / exp 1 - pushTarget q ^ (3 / 4 : ℝ)) :=
-    prob_mono _ fun b hb => lt_of_lt_of_le hb (pushTarget_step (by linarith))
+    Distribution.prob_mono _ fun b hb => lt_of_lt_of_le hb (pushTarget_step (by linarith))
   have hfin := rpow_neg_half_le (by linarith : (0 : ℝ) < q)
     (show q ^ 4 / 4 ≤ pushTarget q by linarith [pow_nonneg (by linarith : (0 : ℝ) ≤ q) 4])
   linarith
