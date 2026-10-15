@@ -269,7 +269,7 @@ lemma pull_step {n : ℕ} (hn : 0 < n) (i : ℕ) (a : Finset (Fin n))
         ((pull n).K a).prob (fun b => (n : ℝ) - (b.card : ℝ) < pullTarget n (i + 1)) ≤
           ((pull n).K a).prob (fun b => (n : ℝ) - (b.card : ℝ) <
             ((n : ℝ) - (a.card : ℝ)) ^ 2 / (2 * (n : ℝ))) :=
-      prob_mono _ fun _ hb => lt_of_lt_of_le hb hle
+      Distribution.prob_mono _ fun _ hb => lt_of_lt_of_le hb hle
     have hround := pull_round_lower_proof a
     have hfrac : 4 * (n : ℝ) ^ 2 / ((n : ℝ) - (a.card : ℝ)) ^ 3 ≤
         4 * (n : ℝ) ^ (-(5 / 8 : ℝ)) := by
@@ -414,7 +414,7 @@ lemma pushPull_step {n : ℕ} (hn : 0 < n) (i : ℕ) (a : Finset (Fin n))
             (fun b => (n : ℝ) - (b.card : ℝ) < pushPullTarget n (i + 1)) ≤
           ((pushPull n).K a).prob (fun b => (n : ℝ) - (b.card : ℝ) <
             ((n : ℝ) - (a.card : ℝ)) ^ 2 / (2 * exp 1 * (n : ℝ))) :=
-      prob_mono _ fun _ hb => lt_of_lt_of_le hb hle
+      Distribution.prob_mono _ fun _ hb => lt_of_lt_of_le hb hle
     have hround := pushPull_round_lower_proof a
     have hfrac : 4 * exp 1 ^ 2 * (n : ℝ) ^ 2 / ((n : ℝ) - (a.card : ℝ)) ^ 3 ≤
         4 * exp 1 ^ 2 * (n : ℝ) ^ (-(5 / 8 : ℝ)) := by

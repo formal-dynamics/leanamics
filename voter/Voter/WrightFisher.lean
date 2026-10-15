@@ -34,9 +34,8 @@ omit [DecidableEq V] in
 /-- Under the uniform distribution an event has probability its count over `n`. -/
 lemma uniform_prob_eq_card [Nonempty V] (P : V → Prop) [DecidablePred P] :
     (Distribution.uniform V).prob P = ((univ.filter P).card : ℝ) / Fintype.card V := by
-  unfold Distribution.prob
-  rw [Distribution.uniform_expect]
-  convert avg_indicator P
+  rw [Distribution.prob_eq_expect, Distribution.uniform_expect]
+  exact avg_indicator P
 
 omit [DecidableEq V] in
 /-- The complete graph on at least three vertices is not bipartite. -/

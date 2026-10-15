@@ -478,7 +478,7 @@ $\{0,1\}$-valued $Y_v$ with mean $p = 3x^2 - 2x^3$, $x = |I|/n$, so
 $\mathbb{E}s' = s\,(3/2 - s^2/(2n^2))$.
 
 \begin{lemma}[Jump near balance]\label{lem:jump_near_balance}
-  \lean{Plurality.gap, Plurality.binKernel, Plurality.avg_pz_zero_one, Plurality.jump_near_balance}
+  \lean{Plurality.gap, Plurality.binKernel, Dynamics.avg_pz_zero_one, Plurality.jump_near_balance}
   \leanok
   \uses{thm:binary}
   If $n \ge 5$ and $|s| \le 4\sqrt n/25$, then $|s'| \ge \sqrt n/5$ with probability at
@@ -506,7 +506,7 @@ $\mathbb{E}s' = s\,(3/2 - s^2/(2n^2))$.
 \end{proof}
 
 \begin{theorem}[Symmetry breaking]\label{thm:symmetry_breaking}
-  \lean{Plurality.gapUnits, Plurality.units_near, Plurality.units_far, Plurality.units_grow, Plurality.hitProb_mono, Plurality.majority3_symmetry_breaking}
+  \lean{Plurality.gapUnits, Plurality.units_near, Plurality.units_far, Plurality.units_grow, Dynamics.Kernel.hitProb_mono, Plurality.majority3_symmetry_breaking}
   \leanok
   \uses{lem:jump_near_balance, lem:growth_far}
   There is $C > 0$ such that, for $\log n \ge 40$, from any configuration the gap reaches
@@ -528,7 +528,7 @@ $\mathbb{E}s' = s\,(3/2 - s^2/(2n^2))$.
 \end{proof}
 
 \begin{lemma}[Hit, then absorb]\label{lem:hit_absorb}
-  \lean{Plurality.hitProb_le_one, Plurality.hitProb_nonneg, Plurality.hitProb_sub_le_event, Plurality.event_amplify}
+  \lean{Dynamics.Kernel.hitProb_le_one, Dynamics.Kernel.hitProb_nonneg, Dynamics.Kernel.hitProb_sub_le_event, Dynamics.Kernel.event_amplify}
   \leanok
   Let $P$ be an absorbing event of a finite Markov chain. If from every state of $B$ the chain is
   in $P$ after $T$ steps with probability at least $1 - \varepsilon$, then from any state it is in

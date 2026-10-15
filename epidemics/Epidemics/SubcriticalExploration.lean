@@ -201,7 +201,7 @@ lemma prob_reachSet_eq_zero {D : Finset V} {X : Finset (Sym2 V)} (hF : frontier 
     (k : ℕ) :
     (coins p h0 h1).prob
       (fun ω => D.card + (k + 1) ≤ (reachSet (perc G (closeOff X ω)) D).card) = 0 :=
-  prob_eq_zero _ fun ω hω => by
+  Distribution.prob_eq_zero _ fun ω hω => by
     rw [reachSet_closeOff_eq_self hF] at hω
     omega
 
@@ -250,7 +250,7 @@ theorem prob_reachSet_le_binTail (hdeg : ∀ v, G.degree v ≤ d) (m : ℕ) :
             (reachSet (perc G (closeOff (insert s(w, x) X) ω)) (insert x D)).card := by
         rw [reachSet_update_true hw hadj hX, card_insert_of_notMem hx]
         constructor <;> intro h <;> omega
-      rw [prob_congr _ hev]
+      rw [Distribution.prob_congr _ hev]
       rcases k with _ | k
       · rw [binTail_zero_right]
         exact Distribution.prob_le_one _ _
@@ -275,7 +275,7 @@ theorem prob_cluster_gt_le_binTail (hdeg : ∀ v, G.degree v ≤ d) (s : V) (t :
       ({s} : Finset V).card + (t + 1) ≤ (reachSet (perc G (closeOff ∅ ω)) {s}).card := by
     rw [ncard_supp_eq_card_reachSet, closeOff_empty, card_singleton]
     constructor <;> intro h <;> omega
-  rw [prob_congr _ hev]
+  rw [Distribution.prob_congr _ hev]
   refine prob_reachSet_le_binTail h0 h1 hdeg _ {s} ∅ (t + 1) ?_
   have := frontier_singleton_le hdeg s
   simp only [add_tsub_cancel_right]

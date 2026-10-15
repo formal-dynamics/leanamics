@@ -186,7 +186,7 @@ lemma sampleDist_expect_reacts (N : Network S) {k : ℝ} (hk : 0 < k) (hn : 2 �
   have h1 (r : N.reactions) :
       ((pairDist hn).expect fun p => if Reacts N c (p, r) then g (p, r).2 else 0) =
         g r * ((r : Reaction S).propensity k (counts c) / (k * n.choose 2)) := by
-    rw [← pair_prob_eq_propensity hk hn c r, prob_eq_expect, ← Distribution.expect_mul]
+    rw [← pair_prob_eq_propensity hk hn c r, Distribution.prob_eq_expect, ← Distribution.expect_mul]
     congr 1
     funext p
     simp only [Reacts]
@@ -200,7 +200,7 @@ theorem reactProb_eq (N : Network S) {k : ℝ} (hk : 0 < k) (hn : 2 ≤ n) (c : 
       N.totalPropensity k (counts c) / (k * N.reactions.card * n.choose 2) := by
   have h := sampleDist_expect_reacts N hk hn c fun _ => 1
   simp only [mul_one] at h
-  rw [prob_eq_expect, h, Network.totalPropensity,
+  rw [Distribution.prob_eq_expect, h, Network.totalPropensity,
     sum_coe_sort N.reactions fun r => r.propensity k (counts c)]
 
 /-- One interaction of the population protocol is a step of the mass-action jump chain with

@@ -35,8 +35,11 @@ and [`Averaging/Sequential.lean`](Averaging/Sequential.lean) (definitions in `Ra
 
 Proof files: `RateMatrix.lean`, `RateSpectral.lean`, `RateGap.lean`, `RateBound.lean`,
 `SequentialMatrix.lean`. The Survey's Theorem 33 prints `√(d(v)/d(v))`, a typo for `√(d(v)/d(u))`.
-`transitionMatrix` (AVG-2) and `walkMatrix` coincide on regular graphs and the two parts prove
-similar spectral lemmas; their unification is tracked in issue #53.
+On a `d`-regular graph, `walkMatrix` and `normAdjMatrix` are the core's `Dynamics.transitionMatrix`
+used by AVG-2 (`transitionMatrix_eq_walkMatrix`, `normAdjMatrix_eq_transitionMatrix`) and
+`walkLambda` is the core's `Dynamics.lambdaG` (`walkLambda_eq_lambdaG`). The eigenbasis lemmas
+(Parseval, the coefficients of `Aᵗ z`, the spectral bound for powers) are shared with AVG-2 and
+the median and epidemics packages through `Dynamics/Spectral.lean`.
 
 ## Strong reconstruction (roadmap AVG-2)
 
@@ -51,7 +54,7 @@ graph with `1 - 2b/d > (1 + δ) λ`, the Averaging protocol from a uniformly ran
 
 | Paper | Lean |
 | --- | --- |
-| Definition 3.1, `χ`, `P`, `λ`, coloring rule, strong reconstruction | `IsClusteredRegular`, `clusterIndicator`, `transitionMatrix`, `maxAbsOtherEigenvalue`, `color`, `IsStrongReconstruction` |
+| Definition 3.1, `χ`, `P`, `λ`, coloring rule, strong reconstruction | `IsClusteredRegular`, `clusterIndicator`, `Dynamics.transitionMatrix`, `maxAbsOtherEigenvalue`, `color`, `IsStrongReconstruction` |
 | `x⁽ᵗ⁾ = Pᵗ x` (Section 2) | `avgIter_eq_transitionMatrix_pow_mulVec` |
 | Observation A.3 | `transitionMatrix_mulVec_clusterIndicator` |
 | Lemma C.1 | `abs_avgIter_sub_le` |
@@ -59,8 +62,9 @@ graph with `1 - 2b/d > (1 + δ) λ`, the Averaging protocol from a uniformly ran
 | Lemma B.1 (exact form), `C(2n,n)/4ⁿ ≤ 1/√(πn)` | `prob_dotProduct_clusterIndicator_eq_zero`, `choose_div_four_pow_le` |
 | Theorem 3.2 | `strong_reconstruction` |
 
-Proof files: `ReconstructionSpectral.lean` (eigenbasis of a real symmetric matrix on plain vectors,
-Parseval, contraction off two eigenvectors), `ReconstructionMatrix.lean`,
+Proof files: `ReconstructionSpectral.lean` (contraction off two eigenvectors, on top of the core's
+eigenbasis API in `Dynamics/Spectral.lean`), `ReconstructionMatrix.lean` (including
+`maxAbsOtherEigenvalue_le_lambdaG`: `λ ≤ λ_G = max {λ₂, |λₙ|}`),
 `ReconstructionDecomp.lean` (Lemma C.1), `ReconstructionSign.lean` (deterministic core),
 `ReconstructionCount.lean` (counting and Wallis). Deviations from the paper are listed in
 [`FORMALIZATION_DIFFERENCES.md`](FORMALIZATION_DIFFERENCES.md).

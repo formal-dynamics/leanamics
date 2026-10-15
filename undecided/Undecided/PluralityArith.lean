@@ -21,9 +21,6 @@ open Real
 
 /-! ### Square roots -/
 
-lemma sqrt_mul_le_of_le {ℓ x y : ℝ} (hℓ : 0 ≤ ℓ) (h : x ≤ y) : √(ℓ * x) ≤ √(ℓ * y) :=
-  sqrt_le_sqrt (mul_le_mul_of_nonneg_left h hℓ)
-
 /-- `√(ℓμ) ≤ μ / s` as soon as `s² ℓ ≤ μ`. -/
 lemma sqrt_le_div {ℓ μ s : ℝ} (hℓ : 0 ≤ ℓ) (hs : 0 < s) (h : s ^ 2 * ℓ ≤ μ) :
     √(ℓ * μ) ≤ μ / s := by
@@ -72,7 +69,8 @@ lemma thr_step {ℓ t σ μ C' X' : ℝ} (hℓ : 0 ≤ ℓ) (ht : 0 < t) (hσ : 
     have : 2 * t ^ 2 * μ ≤ 4 * t ^ 2 * cm := by nlinarith [sq_nonneg t]
     linarith
   have h1 := thr_mono hℓ ht hσ (by linarith) hC' hmono'
-  have h2 : √(ℓ * cm) ≤ √(ℓ * μ) := sqrt_mul_le_of_le hℓ (by linarith)
+  have h2 : √(ℓ * cm) ≤ √(ℓ * μ) :=
+    sqrt_le_sqrt (mul_le_mul_of_nonneg_left (by linarith) hℓ)
   have h3 : σ * √(ℓ * cm) ≤ σ * √(ℓ * μ) := mul_le_mul_of_nonneg_left h2 hσ
   nlinarith
 
@@ -136,7 +134,8 @@ lemma phi_next {n ℓ μ μq C' Q' η a b : ℝ} (hn : 0 < n) (hℓ : 0 ≤ ℓ)
     (hsum : n * (1 + η) ≤ μ + 2 * μq) (ha : 2 * √(ℓ * μ) ≤ a * μ) (hb : 6 * √(ℓ * n) ≤ b * n)
     (ha1 : a ≤ 1) (hηb : b ≤ 1 + η) :
     (1 - a) * (1 + η - b) * μ ≤ C' * (C' + 2 * Q') / n := by
-  have hs : √(ℓ * μ) ≤ √(ℓ * n) := sqrt_mul_le_of_le hℓ hμn
+  have hs : √(ℓ * μ) ≤ √(ℓ * n) :=
+    sqrt_le_sqrt (mul_le_mul_of_nonneg_left hμn hℓ)
   have hC1 : (1 - a) * μ ≤ C' := by nlinarith
   have hC0 : 0 ≤ (1 - a) * μ := mul_nonneg (by linarith) hμ
   have hS1 : n * (1 + η - b) ≤ C' + 2 * Q' := by nlinarith

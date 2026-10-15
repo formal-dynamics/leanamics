@@ -154,7 +154,7 @@ compared with the Kermack–McKendrick solution at time `k / ((β + γ) N)`, in 
 | Drift identity: expected one-step change of `(S, I, R)/N` is `sirField β γ / ((β + γ) N)` | `drift_susceptible`, `drift_infected`, `drift_recovered` |
 | Bounded increments: one step moves `(S, I, R)/N` by at most `1/N` | `dist_scaled_step_le` |
 | The kernel `Kernel.ofStep` iterates as `expList` over i.i.d. rounds | `iterate_chain` |
-| Maximal Azuma–Hoeffding: `P(∃ k ≤ n, M_k ≥ λ) ≤ exp(-λ²/(2 n c²))` | `expList_azuma` |
+| Maximal Azuma–Hoeffding: `P(∃ k ≤ n, M_k ≥ λ) ≤ exp(-λ²/(2 n c²))` | `expList_azuma` (the core `Dynamics.expList_azuma`) |
 | LLN with exponential bound: `P(∃ k ≤ T(β+γ)N, dist > L·dist(initial points) + ε) ≤ C exp(-c ε² N)` | `law_of_large_numbers` |
 | Convergence in probability, uniformly on `[0, T]`, to a fixed solution | `tendsto_deviationProb` |
 
@@ -259,7 +259,7 @@ checks of the provenance note below.
 **Cover time** (in [`Epidemics/CobraCover.lean`](Epidemics/CobraCover.lean),
 [`Epidemics/CobraCoverBranching.lean`](Epidemics/CobraCoverBranching.lean) and the lemma files
 `CobraCover*.lean`). Here `G` is `r`-regular (`r > 0`) on `n` vertices, `λ` is the absolute second
-eigenvalue of the random walk (`lambdaG G r`) and `k ≥ 2`.
+eigenvalue of the random walk (the core's `Dynamics.lambdaG G r`) and `k ≥ 2`.
 
 | Result | Lean declaration |
 | --- | --- |

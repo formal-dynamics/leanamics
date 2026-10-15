@@ -201,7 +201,7 @@ $\log\frac{1+x}{1-x}$ at $x=\delta/(2+\delta)$) and
 $(1-\delta)\log(1-\delta)\ge-\delta+\delta^2/2$.
 \end{proof}
 \begin{theorem}[Lower tails, MGF and parametric Chernoff bounds]\label{thm:chernoffmgf}
-\lean{Dynamics.avg_lower_tail_le_of_mgf,Dynamics.avg_hoeffding_lower,Dynamics.variance_le_avg_of_zero_one,Dynamics.avg_chernoff_mgf,Dynamics.avg_chernoff_upper_of_mgf,Dynamics.avg_chernoff_lower_of_mgf,Dynamics.avg_chernoff_upper_log,Dynamics.avg_chernoff_lower_log,Dynamics.avg_chernoff_lower_mul}\leanok\uses{thm:concentration,thm:chernoff}
+\lean{Dynamics.avg_lower_tail_le_of_mgf,Dynamics.avg_hoeffding_lower,Dynamics.variance_le_avg_of_zero_one,Dynamics.avg_chernoff_mgf,Dynamics.avg_chernoff_upper_of_mgf,Dynamics.avg_chernoff_lower_of_mgf,Dynamics.avg_chernoff_upper_log,Dynamics.avg_chernoff_lower_log,Dynamics.avg_chernoff_lower_mul,Dynamics.avg_bernstein_lower,Dynamics.avg_bernstein_of_zero_one,Dynamics.avg_bernstein_lower_of_zero_one,Dynamics.Distribution.prob_ge_le_exp_tilt}\leanok\uses{thm:concentration,thm:chernoff}
 Let $X=\sum_{i<n}Y_i(\omega_i)$ with independent uniform $\{0,1\}$-valued
 coordinates and $\mu=\E X$. Then $\Pr(X\le\E X-\lambda)\le e^{-2\lambda^2/n}$, and a
 $\{0,1\}$ coordinate has variance at most its mean. For every real $t$,
@@ -210,6 +210,12 @@ $t\ge0$ and $\Pr(X\le k)\le\exp(\mu(e^t-1)-tk)$ for $t\le0$. If $\E X\le\mu\le k
 with $\mu>0$, then $\Pr(X\ge k)\le\exp(k-\mu-k\log(k/\mu))$; if $0<k\le\mu\le\E X$,
 then $\Pr(X\le k)\le\exp(k-\mu-k\log(k/\mu))$. Finally
 $\Pr(X\le(1-\delta)\E X)\le\exp(-\delta^2\E X/2)$ for $0\le\delta<1$.
+Bernstein's bound also holds for the lower tail $\Pr(X\le\E X-\lambda)$ (when
+$\E Y_i-Y_i\le b$); for $\{0,1\}$-valued coordinates and $\ell>0$, each of
+$\Pr(X\ge\mu+\sqrt{3\ell(\mu+2\ell)})$ and $\Pr(X\le\mu-\sqrt{3\ell(\mu+2\ell)})$ is at
+most $e^{-\ell}$. For independent (not necessarily uniform) $\{0,1\}$ trials with
+$\E X\le(1-\varepsilon)c$, $0\le\varepsilon<1$ and $c\ge0$,
+$\Pr(X\ge k)\le\exp(c(\varepsilon-\varepsilon^2/2)-\varepsilon k)$ for every $k$.
 \end{theorem}
 \begin{proof}\leanok
 The lower Hoeffding tail is the upper one for $1-Y_i$. For the MGF bound,
@@ -217,9 +223,32 @@ $e^{tY}=1+(e^t-1)Y$ on $\{0,1\}$ and $1+y\le e^y$, factor by factor; Markov's
 inequality applied to $e^{tX}$ gives the tails, and $t=\log(k/\mu)$ the closed forms
 (the exponent is monotone in $\mu$ in the right direction). The last bound is the
 lower bound of Theorem~\ref{thm:chernoff} with $\mu_L=\E X$ (trivial for $\delta=0$).
+The lower Bernstein tail is the upper one for $-Y_i$; the $\{0,1\}$ forms take $b=1$,
+$\sigma^2=\mu+2\ell$ and $\lambda=\sqrt{3\ell\sigma^2}$. The last bound is Markov's
+inequality on $e^{\varepsilon X}$ with $(1-\varepsilon)e^{\varepsilon}\le1-\varepsilon^2/2$.
+\end{proof}
+\begin{theorem}[Moments and anti-concentration]\label{thm:moments}
+\lean{Dynamics.avg_cauchy,Dynamics.avg_sum_sq,Dynamics.avg_sum_fourth_le,Dynamics.avg_pz,Dynamics.avg_pz_sum,Dynamics.variance_of_zero_one,Dynamics.avg_pz_zero_one,Dynamics.avg_exp_sum_le,Dynamics.avg_sq_sum_le_of_pairwise}\leanok\uses{lem:uniform-product,lem:bridge}
+Let $S=\sum_{i<n}f_i(\omega_i)$ with independent uniform coordinates, each $f_i$
+centered and bounded by $1$ in absolute value, and $\sigma^2=\sum_i\E f_i^2$. Then
+$\E S^2=\sigma^2$ and $\E S^4\le\sigma^2+3\sigma^4$. If $\E Z^2=s>0$ and
+$\E Z^4\le4s^2$, then $\Pr(s\le4Z^2)\ge9/64$ (two-sided Paley--Zygmund); hence
+$\Pr(\sigma^2\le4S^2)\ge9/64$ whenever $\sigma^2\ge1$, in particular for centered
+$\{0,1\}$-valued coordinates, whose variance is $p(1-p)$. For $\{0,1\}$-valued
+coordinates and every real $t$, $\E e^{tS}\le\exp(t\,\E S+nt^2/8)$. Finally, a sum
+$X$ of pairwise uncorrelated $\{0,1\}$-valued variables with mean $\mu$ has
+$\E X^2\le\mu+\mu^2$.
+\end{theorem}
+\begin{proof}\leanok
+The moments by induction on $n$, splitting off the first coordinate, which is
+independent of the others. For Paley--Zygmund, $Z^2\le s/4+Z^2\,1[s\le4Z^2]$
+pointwise, and Cauchy--Schwarz (Mathlib's, through $\operatorname{avg}=\E$) gives
+$(\E[Z^2 1_A])^2\le\E Z^4\,\Pr(A)$. The exponential moment factors over the
+coordinates, and Hoeffding's lemma bounds each factor. For the last bound, expand
+$X^2$: the diagonal terms are $\E X_i^2=\E X_i$ and the others $\E X_i\,\E X_j$.
 \end{proof}
 \begin{lemma}[Elementary tail bounds and monotonicity]\label{lem:tail}
-\lean{Dynamics.Distribution.prob_mono,Dynamics.Distribution.expect_lt_one,Dynamics.avg_lt_one,Dynamics.avg_markov,Dynamics.avg_markov_one,Dynamics.Kernel.one_sub_avg_le_prob_ofStep,Dynamics.Kernel.iterate_monotone,Dynamics.Kernel.event_monotone,Dynamics.exp_neg_two_log,Dynamics.one_le_of_log_pos}\leanok\uses{def:distribution,def:ofstep}
+\lean{Dynamics.Distribution.prob_mono,Dynamics.Distribution.expect_lt_one,Dynamics.avg_lt_one,Dynamics.avg_markov,Dynamics.avg_markov_one,Dynamics.Kernel.one_sub_avg_le_prob_ofStep,Dynamics.Kernel.iterate_monotone,Dynamics.Kernel.event_monotone,Dynamics.exp_neg_two_log,Dynamics.exp_neg_three_log,Dynamics.one_le_of_log_pos}\leanok\uses{def:distribution,def:ofstep}
 Probability is monotone in the event. An observable $f\le1$ with $f(b)<1$ at a
 point of positive weight has expectation $<1$. Markov's inequality
 $\Pr(X\ge c)\le\E X/c$ for $X\ge0$, $c>0$; in particular
@@ -228,11 +257,27 @@ round of $\mathrm{step}$ lands in an event with probability at least
 $1-\E[\mathrm{bad}]$ when $\mathrm{bad}\ge0$ is at least $1$ on every miss. If
 $f\le Kf$, then $n\mapsto K^nf(a)$ is nondecreasing; in particular the occupation
 probability of an absorbing event is nondecreasing in time. Finally
-$e^{-2\log n}=1/n^2$ for $n\ge1$, and $\log n>0$ forces $n\ge1$.
+$e^{-2\log n}=1/n^2$ for $n\ge1$, $e^{-3\log n}=1/n^3$ for $n>0$, and $\log n>0$
+forces $n\ge1$.
 \end{lemma}
 \begin{proof}\leanok
 Pointwise comparisons of indicators, integrated by monotonicity of the expectation;
 for the kernel statements, induction on time with $K^{n+1}f=K^n(Kf)$.
+\end{proof}
+\begin{lemma}[Scalar facts for round counts]\label{lem:scalar}
+\lean{Dynamics.ceil_add_ceil_le,Dynamics.mul_ceil_le_ceil,Dynamics.nat_ceil_mul_le_of_le,Dynamics.le_pow_ceil_real,Dynamics.le_pow_ceil,Dynamics.exists_lt_pow_mul,Dynamics.exists_le_two_pow_two_pow,Dynamics.pow_three_le_of_log,Dynamics.log_cube_le,Dynamics.log_pow_four_div_le,Dynamics.half_le_log_one_add,Dynamics.mul_one_div_sq_le}\leanok
+For $a,b\ge0$: $\lceil a\rceil+\lceil b\rceil\le\lceil c\rceil$ if $a+b+2\le c$, and
+$k\lceil a\rceil\le\lceil b\rceil$ if $k(a+1)\le b$; $\lceil ay\rceil\le\lceil by\rceil$ if
+$0\le a\le b$. For $w\ge1$ and $q>1$,
+$w\le q^{\lceil\log w/\log q\rceil}$; growth by a factor $q$ from $\Delta>0$ passes
+$N\ge\Delta$ within $\log(N/\Delta)/\log q+2$ steps, and $2^{2^T}\ge N\ge2$ for some
+$T\le2\log\log N+3$. Moreover $c^3\le x$ if $3c\le\log x$; $(\log x)^3/6\le x$ and
+$(\log x)^4/24\le x$ if $\log x\ge0$; $\varepsilon/2\le\log(1+\varepsilon)$ on $[0,1]$;
+and $S/N^2\le C/N$ if $S\le CN$, $N>0$.
+\end{lemma}
+\begin{proof}\leanok
+$\lceil a\rceil<a+1$; $w\le q^t$ iff $\log w\le t\log q$; $y^k/k!\le e^y$ at $y=\log x$; and
+$1-1/x\le\log x$.
 \end{proof}
 \begin{theorem}[Nested phases]\label{thm:phases}
 \lean{Dynamics.Kernel.nested_phases}\leanok\uses{def:kernel}
