@@ -1,4 +1,4 @@
-import Dynamics.Uniform
+import Dynamics.Azuma
 
 /-! # Weighted supermartingales along finite paths
 
@@ -6,7 +6,9 @@ A round-based process `l.foldl step s`, driven by i.i.d. uniform rounds, togethe
 weight `φ` and a potential `F`. If one round never increases `exp (φ s r) * F (step s r)` in
 expectation, then `exp (∑_path φ) * F (state)` is a supermartingale, so its expectation after `T`
 rounds is at most `F s` (`expList_exp_pathSum_le`). Markov's inequality then bounds the
-probability that the path sum of `φ` is large (`expList_ind_le_of_weight`).
+probability that the path sum of `φ` is large (`expList_ind_le_of_weight`). The path sum
+`pathSum` is the core `Dynamics.incrementSum` (with its algebra: `incrementSum_add`,
+`incrementSum_mono`, ...).
 
 This replaces the stopping-time arguments of Angluin, Aspnes and Eisenstat [AAE08, §4.2] by a
 fixed horizon: the counters of [AAE08, Table 1] are path sums of indicators.
@@ -18,50 +20,11 @@ open Dynamics
 section Generic
 variable {S R : Type*} (step : S → R → S)
 
-/-- The sum of `φ` along the path from `s` driven by the rounds of `l`. -/
-def pathSum (φ : S → R → ℝ) : S → List R → ℝ
-  | _, [] => 0
-  | s, r :: l => φ s r + pathSum φ (step s r) l
+/-- The sum of `φ` along the path from `s` driven by the rounds of `l`: the core
+`Dynamics.incrementSum`, under the name used in the statements below. -/
+noncomputable abbrev pathSum (φ : S → R → ℝ) (s : S) (l : List R) : ℝ := incrementSum step φ s l
 
 variable {step}
-
-@[simp] lemma pathSum_nil (φ : S → R → ℝ) (s : S) : pathSum step φ s [] = 0 := rfl
-
-@[simp] lemma pathSum_cons (φ : S → R → ℝ) (s : S) (r : R) (l : List R) :
-    pathSum step φ s (r :: l) = φ s r + pathSum step φ (step s r) l := rfl
-
-lemma pathSum_add (φ ψ : S → R → ℝ) (s : S) (l : List R) :
-    pathSum step (fun s r => φ s r + ψ s r) s l = pathSum step φ s l + pathSum step ψ s l := by
-  induction l generalizing s with
-  | nil => simp
-  | cons r l ih => simp only [pathSum_cons, ih]; ring
-
-lemma pathSum_sub (φ ψ : S → R → ℝ) (s : S) (l : List R) :
-    pathSum step (fun s r => φ s r - ψ s r) s l = pathSum step φ s l - pathSum step ψ s l := by
-  induction l generalizing s with
-  | nil => simp
-  | cons r l ih => simp only [pathSum_cons, ih]; ring
-
-lemma pathSum_const_mul (c : ℝ) (φ : S → R → ℝ) (s : S) (l : List R) :
-    pathSum step (fun s r => c * φ s r) s l = c * pathSum step φ s l := by
-  induction l generalizing s with
-  | nil => simp
-  | cons r l ih => simp only [pathSum_cons, ih]; ring
-
-lemma pathSum_mono {φ ψ : S → R → ℝ} (h : ∀ s r, φ s r ≤ ψ s r) (s : S) (l : List R) :
-    pathSum step φ s l ≤ pathSum step ψ s l := by
-  induction l generalizing s with
-  | nil => simp
-  | cons r l ih => simp only [pathSum_cons]; exact add_le_add (h s r) (ih _)
-
-@[simp] lemma pathSum_zero (s : S) (l : List R) : pathSum step (fun _ _ => 0) s l = 0 := by
-  induction l generalizing s with
-  | nil => simp
-  | cons r l ih => simp [ih]
-
-lemma pathSum_nonneg {φ : S → R → ℝ} (h : ∀ s r, 0 ≤ φ s r) (s : S) (l : List R) :
-    0 ≤ pathSum step φ s l := by
-  simpa using pathSum_mono (step := step) (φ := fun _ _ => 0) h s l
 
 /-- **Finite-horizon supermartingale.** If one round never increases `exp φ · F` in expectation,
 then `exp (∑_path φ) · F (state)` has expectation at most `F s` after any number of rounds. -/
@@ -77,7 +40,7 @@ theorem expList_exp_pathSum_le [Fintype R] {φ : S → R → ℝ} {F : S → ℝ
         fun l => Real.exp (φ s r) *
           (Real.exp (pathSum step φ (step s r) l) * F (l.foldl step (step s r))) := by
       funext l
-      rw [pathSum_cons, Real.exp_add, List.foldl_cons, mul_assoc]
+      rw [pathSum, incrementSum_cons, Real.exp_add, List.foldl_cons, mul_assoc]
     rw [he, expList_const_mul]
     exact mul_le_mul_of_nonneg_left (ih _) (Real.exp_pos _).le
 

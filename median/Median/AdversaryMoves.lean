@@ -1,5 +1,5 @@
 import Median.AdversaryDefs
-import Median.AdversaryPerturbed
+import Dynamics.Perturbed
 import Median.AnyStartPhases
 
 /-! # Adversary: one-round moves of 2-Choices under recolourings
