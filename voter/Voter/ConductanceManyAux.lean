@@ -22,22 +22,6 @@ networks*, ICALP 2016 (BGKM16). With `ℓ ≥ 2` opinions present and a threshol
 namespace Voter
 open Dynamics Finset
 
-/-! ### Expectation of a complement -/
-
-section Support
-variable {α : Type*} [Fintype α]
-
-/-- `𝔼[c - F] = c - 𝔼[F]` at every finite time. -/
-lemma iterate_const_sub (K : Kernel α) (n : ℕ) (c : ℝ) (F : α → ℝ) (x : α) :
-    K.iterate n (fun y => c - F y) x = c - K.iterate n F x := by
-  have h : (fun y => c - F y) = fun y => (fun _ => c) y + (fun y => (-1) * F y) y := by
-    funext y
-    ring
-  rw [h, K.iterate_add, K.iterate_mul, K.iterate_const]
-  ring
-
-end Support
-
 variable {V C : Type*} [Fintype V] [DecidableEq V] [Fintype C]
 
 /-! ### The opinions present -/
@@ -171,7 +155,7 @@ lemma half_le_iterate_resolved (hd : ∀ v, 0 < G.degree v) (x : Config V C) (i 
   have hfun : (fun y : Config V C => if (∀ u, y u = i) ∨ (∀ u, y u ≠ i) then (1 : ℝ) else 0) =
       fun y => 1 - disagreement (colorIndicator i ∘ y) :=
     funext fun y => (one_sub_disagreement_project i y).symm
-  rw [hfun, iterate_const_sub, ← iterate_project]
+  rw [hfun, Kernel.iterate_const_sub, ← iterate_project]
   -- the projection has minority volume at most `vol(i)`
   have hvol : (vol G (minority G (colorIndicator i ∘ x)) : ℝ) ≤
       vol G (univ.filter fun u => x u = i) := by
@@ -299,7 +283,7 @@ theorem phase_step [Nonempty V] (hd : ∀ v, 0 < G.degree v) (x : Config V C) {�
     (F' := fun y : Config V C => S.card - ∑ i ∈ S,
       (if (∀ u, y u = i) ∨ (∀ u, y u ≠ i) then (1 : ℝ) else 0))
     (fun y hy => phase_count x y S (filter_subset _ _) h2 hθ hSθ hy) B x subset_rfl
-  rw [K.iterate_mul, iterate_const_sub] at hcmp
+  rw [K.iterate_mul, K.iterate_const_sub] at hcmp
   set E := K.iterate B
     (fun y : Config V C => if θ * (5 / 6) < (opinions y).card then (1 : ℝ) else 0) x
   rcases Nat.eq_zero_or_pos S.card with hS0 | hS0

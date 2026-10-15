@@ -477,10 +477,11 @@ Source: L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccar
     `hist`, the products `histProd` and the read sets `readSet`), as are the coordinatewise
     combination of independent families (`Distribution.expect_expect_coord`,
     `Distribution.expect_mul_of_dep`, in `Dynamics.Independent`) and Markov's inequality
-    `Distribution.prob_le_expect_div`. The moment-generating function of a weighted block of
-    coins (`expect_exp_sum_open`) and the union bound over components for an arbitrary random
+    `Distribution.prob_le_expect_div`, and the moment-generating function of a weighted block of
+    coins (`Distribution.independent_bernoulli_expect_exp_sum`, in `Dynamics.Chernoff`, formerly
+    the local `expect_exp_sum_open`). The union bound over components for an arbitrary random
     graph (`prob_components_le_of_tail'`, the form of EPI-2's `prob_components_le_of_tail` for
-    any distribution) are not in `dynamics/` yet; their move is tracked in issues #42 and #49.
+    any distribution) is not in `dynamics/` yet; its move is tracked in issue #42.
 
 ## The supercritical giant component (`Giant*`, EPI-3)
 

@@ -21,8 +21,8 @@ and its Lean 4 formalization in the `voter` package (`leanamics/voter`).
 | **Lemma 2.1** | Monochromatic region propagation | [`Voter.propagate_region_of_rel`](Voter/Graph.lean#L50), [`Voter.propagate_region`](Voter/Graph.lean#L96), [`Voter.possible_consensus`](Voter/Graph.lean#L104) | [Voter/Graph.lean](Voter/Graph.lean) |
 | **Lemma 2.1** | Consensus states absorbing & nonconsensus survival vanishes | [`Voter.transition_constant`](Voter/Absorption.lean#L25), [`Voter.consensus_tendsto`](Voter/Absorption.lean#L81) | [Voter/Absorption.lean](Voter/Absorption.lean) |
 | **Lemma 2.3** | Expected stationary weight invariance (martingale) | [`Voter.round_mass`](Voter/Model.lean#L101), [`Voter.iterate_mass`](Voter/Model.lean#L115) | [Voter/Model.lean](Voter/Model.lean) |
-| **Lemma 2.2** | Finite-time discrepancy bound & limit of white probability | [`Voter.whiteMass_bounds`](Voter/Main.lean#L117), [`Voter.whiteProbability_error`](Voter/Main.lean#L133), [`Voter.whiteProbability_tendsto`](Voter/Main.lean#L150) | [Voter/Main.lean](Voter/Main.lean) |
-| **Theorem 2.1** | Eventual all-white absorption probability $\rho_{s1} = \sum_{i \in W_s} \pi_H(i)$ | [`Voter.consensus_probability`](Voter/Main.lean#L162) | [Voter/Main.lean](Voter/Main.lean) |
+| **Lemma 2.2** | Finite-time discrepancy bound & limit of white probability | [`Voter.whiteMass_bounds`](Voter/Main.lean#L114), [`Voter.whiteProbability_error`](Voter/Main.lean#L130), [`Voter.whiteProbability_tendsto`](Voter/Main.lean#L147) | [Voter/Main.lean](Voter/Main.lean) |
+| **Theorem 2.1** | Eventual all-white absorption probability $\rho_{s1} = \sum_{i \in W_s} \pi_H(i)$ | [`Voter.consensus_probability`](Voter/Main.lean#L159) | [Voter/Main.lean](Voter/Main.lean) |
 | **Corollary 2.2** | Degree weights are stationary; uniform consensus probability $\sum_{i \in W_s} \frac{d_i}{2m}$ | [`Voter.degree_stationary`](Voter/Uniform.lean#L39), [`Voter.uniform_consensus_probability`](Voter/Corollaries.lean#L17) | [Voter/Uniform.lean](Voter/Uniform.lean), [Voter/Corollaries.lean](Voter/Corollaries.lean) |
 | **Section 4.3.1** | Consensus on $d$-regular graph equals initial white fraction $x/n$ | [`Voter.regular_consensus_probability`](Voter/Corollaries.lean#L28) | [Voter/Corollaries.lean](Voter/Corollaries.lean) |
 | **Section 2.3** | Many colors: projections commute with dynamics | [`Voter.step_project`](Voter/Model.lean#L24), [`Voter.iterate_project`](Voter/Colors.lean#L10), [`Voter.colorProbability_project`](Voter/Colors.lean#L37) | [Voter/Model.lean](Voter/Model.lean), [Voter/Colors.lean](Voter/Colors.lean) |
@@ -90,7 +90,7 @@ The following portions of the paper were not formalized:
   ```lean
   ∃ c, Relation.ReflTransGen (Possible G) s (fun _ => c)
   ```
-  that is, consensus is reachable in **some** color $c \in \{\text{true}, \text{false}\}$ (the color of the monochromatic edge found by [`Nonemonochromatic_edge`](Voter/Graph.lean#L18)). This is what the proof that the probability of staying in non-consensus states decays to 0 ([`Noneconsensus_tendsto`](Voter/Absorption.lean#L81)) uses.
+  that is, consensus is reachable in **some** color $c \in \{\text{true}, \text{false}\}$ (the color of the monochromatic edge found by [`monochromatic_edge`](Voter/Graph.lean#L18)). This is what the proof that the probability of staying in non-consensus states decays to 0 ([`consensus_tendsto`](Voter/Absorption.lean#L81)) uses.
 
 ---
 
@@ -108,7 +108,7 @@ The following portions of the paper were not formalized:
   noncomputable def eventualColor [Fintype C] (H : Kernel V) (c : C)
       (s : Config V C) : ℝ := ⨆ n, colorProbability H c n s
   ```
-  Since consensus states are absorbing fixed points ([`Nonetransition_constant`](Voter/Absorption.lean#L25)), $n \mapsto \text{colorProbability } H\ c\ n\ s$ is monotone increasing ([`NonecolorProbability_mono`](Voter/Main.lean#L47)) and converges to its supremum ([`NonecolorProbability_tendsto`](Voter/Main.lean#L66)). This gives a fully constructive and rigorous definition using only standard real analysis.
+  Since consensus states are absorbing fixed points ([`transition_constant`](Voter/Absorption.lean#L25)), $n \mapsto \text{colorProbability } H\ c\ n\ s$ is monotone increasing ([`colorProbability_mono`](Voter/Main.lean#L48)) and converges to its supremum ([`colorProbability_tendsto`](Voter/Main.lean#L63)). This gives a fully constructive and rigorous definition using only standard real analysis.
 
 ---
 
@@ -120,17 +120,17 @@ The following portions of the paper were not formalized:
   2. **Lemma 2.3** is proved second: $\forall t \ge 0, \mathbb{E}_s(\pi_H(S_t)) = \sum_{i \in W_s} \pi_H(i)$ (martingale property).
   3. **Theorem 2.1** equates the two limits.
 * **Lean structure**:
-  1. **Lemma 2.3** ([`Noneround_mass`](Voter/Model.lean#L101), [`Noneiterate_mass`](Voter/Model.lean#L115)) is proved **first** in `Model.lean`.
+  1. **Lemma 2.3** ([`round_mass`](Voter/Model.lean#L101), [`iterate_mass`](Voter/Model.lean#L115)) is proved **first** in `Model.lean`.
   2. **Lemma 2.2** is then formalized in `Main.lean` through explicit error bounds:
-     - [`NonewhiteMass_bounds`](Voter/Main.lean#L117): $\mathbf{1}_{\{s=\mathbf{1}\}} \le \text{whiteMass } p\ s \le \mathbf{1}_{\{s=\mathbf{1}\}} + \text{survival } s$.
-     - [`NonewhiteProbability_error`](Voter/Main.lean#L133): sandwiching the difference:
+     - [`whiteMass_bounds`](Voter/Main.lean#L114): $\mathbf{1}_{\{s=\mathbf{1}\}} \le \text{whiteMass } p\ s \le \mathbf{1}_{\{s=\mathbf{1}\}} + \text{survival } s$.
+     - [`whiteProbability_error`](Voter/Main.lean#L130): sandwiching the difference:
        $$0 \le \text{whiteMass } p\ s - \text{colorProbability } H\ \text{true } n\ s \le (transition\ H)^n (\text{survival})(s)$$
        This is an instance of the shared finite-horizon optional stopping theorem
        `Dynamics.Kernel.event_error_of_invariant` (roadmap FND-4): the targets are the two
        consensus configurations, the invariant is the white mass, and `whiteMass_bounds`
        bounds it between `0` and `1` off the targets.
-     - [`NonewhiteProbability_tendsto`](Voter/Main.lean#L150): by squeezing with [`Noneconsensus_tendsto`](Voter/Absorption.lean#L81), $\text{colorProbability } n \to \text{whiteMass}$.
-  3. **Theorem 2.1** ([`Noneconsensus_probability`](Voter/Main.lean#L162)) identifies the limit with `eventualColor`.
+     - [`whiteProbability_tendsto`](Voter/Main.lean#L147): by squeezing with [`consensus_tendsto`](Voter/Absorption.lean#L81), $\text{colorProbability } n \to \text{whiteMass}$.
+  3. **Theorem 2.1** ([`consensus_probability`](Voter/Main.lean#L159)) identifies the limit with `eventualColor`.
 * **Rationale**:
   This rearrangement avoids summing over the exponential state space $\mathcal{S}$ and avoids having to classify recurrent/transient states in full generality.
 
@@ -140,7 +140,7 @@ The following portions of the paper were not formalized:
 * **In the paper**:
   Lemma 2.3 is stated under the standing hypotheses of Section 2.1 (connected, nonbipartite, undirected graph).
 * **In Lean**:
-  [`Noneround_mass`](Voter/Model.lean#L101) and [`Noneiterate_mass`](Voter/Model.lean#L115) are generalized:
+  [`round_mass`](Voter/Model.lean#L101) and [`iterate_mass`](Voter/Model.lean#L115) are generalized:
   - They require **no graph structure** at all, holding for any stochastic transition kernel `H : Kernel V`.
   - They require no connectivity, nonbipartiteness, or symmetry.
   - They hold for any real-valued observable $f : C \to \mathbb{R}$ on any finite color palette $C$, not just Boolean indicators.
@@ -151,7 +151,7 @@ The following portions of the paper were not formalized:
 * **In the paper (page 253)**:
   The authors cite Motwani & Raghavan [MR95] asserting that for a strongly connected graph, there exists a *unique* stationary distribution $\pi_H$.
 * **In Lean**:
-  - **Uniqueness is not needed**: Theorem 2.1 ([`Noneconsensus_probability`](Voter/Main.lean#L162)) is parameterized by *any* stationary distribution `p` (`hp : H.Stationary p`). Because the LHS (`eventualColor`) does not depend on `p`, any stationary distribution must yield identical mass on Boolean indicators.
+  - **Uniqueness is not needed**: Theorem 2.1 ([`consensus_probability`](Voter/Main.lean#L159)) is parameterized by *any* stationary distribution `p` (`hp : H.Stationary p`). Because the LHS (`eventualColor`) does not depend on `p`, any stationary distribution must yield identical mass on Boolean indicators.
   - **Constructive existence**: Existence is proved from scratch in the generic library ([`Dynamics.Kernel.exists_stationary`](../dynamics/Dynamics/Stationary.lean#L53)) using Cesàro averages of iterated distributions and compactness of the probability simplex in $\mathbb{R}^{|V|}$, requiring no black-box citations.
 
 ---

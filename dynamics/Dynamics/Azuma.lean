@@ -26,6 +26,9 @@ maximal form obtained from Ville's (Doob's) maximal inequality for the exponenti
   `exp (M x l)` with `M x (a :: l) = E x a + M (step x a) l` and `avg (exp (E y ·)) ≤ 1` (a
   nonnegative supermartingale started at `1`): it reaches `μ > 0` within `n` rounds with
   probability at most `1 / μ`. Proved by induction on `n`, peeling off the first round;
+* `expList_exp_incrementSum_le`: the **exponential supermartingale** bound
+  `𝔼[exp (incrementSum step D x l) · F (state)] ≤ F x` when one round does not increase
+  `exp D · F` in expectation;
 * `expList_azuma`: the maximal Azuma–Hoeffding inequality.
 
 The state type `σ` is arbitrary (not necessarily finite), so this covers every martingale with
@@ -256,6 +259,27 @@ lemma expList_ville (step : σ → R → σ) (E : σ → R → ℝ) (M : σ → 
       _ = avg (fun a => exp (E x a)) / μ := by
           simp only [div_eq_mul_inv, mul_comm _ μ⁻¹, avg_const_mul]
       _ ≤ 1 / μ := div_le_div_of_nonneg_right (hE x) hμ.le
+
+/-- **Exponential supermartingale along i.i.d. uniform rounds** (finite horizon). If one round
+never increases `exp (D y ·) · F (step y ·)` in expectation, `avg (exp (D y a) F (step y a)) ≤ F y`,
+then `exp (incrementSum step D x l) · F (l.foldl step x)` has expectation at most `F x` after any
+number `n` of rounds. With `F = 1` it is the fixed-time bound for the supermartingale of
+`expList_ville`. -/
+theorem expList_exp_incrementSum_le (step : σ → R → σ) {D : σ → R → ℝ} {F : σ → ℝ}
+    (h : ∀ y, avg (fun a => exp (D y a) * F (step y a)) ≤ F y) (n : ℕ) (x : σ) :
+    expList R n (fun l => exp (incrementSum step D x l) * F (l.foldl step x)) ≤ F x := by
+  induction n generalizing x with
+  | zero => simp
+  | succ n ih =>
+    rw [expList_succ]
+    refine le_trans (avg_le_avg fun a => ?_) (h x)
+    have he : (fun l => exp (incrementSum step D x (a :: l)) * F ((a :: l).foldl step x)) =
+        fun l => exp (D x a) *
+          (exp (incrementSum step D (step x a) l) * F (l.foldl step (step x a))) := by
+      funext l
+      rw [incrementSum_cons, exp_add, List.foldl_cons, mul_assoc]
+    rw [he, expList_const_mul]
+    exact mul_le_mul_of_nonneg_left (ih _) (exp_pos _).le
 
 /-- **Maximal Azuma–Hoeffding inequality** (Azuma 1967; Hoeffding 1963, Theorem 2, for independent
 summands). If the increments have zero mean over a uniform round, `avg (D y) = 0`, and are bounded,

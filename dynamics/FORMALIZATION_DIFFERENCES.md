@@ -101,6 +101,9 @@ Where the statements of `dynamics/` deviate from their sources, and why.
     `Epidemics.binTail`) with `binTail_succ_succ` (condition on the first coin), and
     `independent_bernoulli_prob_split` (the former `Epidemics.coins_prob_split`, for coins indexed
     by any finite type). The coins are identical because that is all EPI-2 needs.
+11. **MGF of a weighted count of heads** (from EPI-6): `independent_bernoulli_expect_exp_sum`,
+    `𝔼[exp (∑_{i ∈ S, ω i} a i)] = ∏_{i ∈ S} (1 - pᵢ + pᵢ e^{a i})` for non-identical coins, an
+    exact product (no `1 + x ≤ eˣ` step); it is the former `Epidemics.expect_exp_sum_open`.
 
 ## Optional stopping and time reversal (`OptionalStopping`, `Reverse`, FND-4, FND-6)
 
@@ -263,8 +266,8 @@ aliases, and the package blueprints tag the `Dynamics` names).
     with the mean bound `(1 - ε) c`, through `(1 - ε) e^ε ≤ 1 - ε²/2`
     (`one_sub_mul_exp_le_one_sub_sq_div_two`). It allows thresholds below the mean bound, which the
     optimized forms do not; EPI-2's `Epidemics.binomial_tail_le` is a corollary.
-12. **Copy left in another package**: `Voter.colorProbability_mono` re-proves
-    `Kernel.iterate_monotone` for its indicator; it can be replaced by the shared version.
+12. **No copy left in other packages**: `Voter.colorProbability_mono` (whose statement is frozen
+    by the voter blueprint) is now proved from `Kernel.iterate_monotone`.
 
 ## Scalar facts shared by the packages (`Scalar`)
 
@@ -281,7 +284,7 @@ removed rather than kept as aliases.
    `le_pow_ceil` (for `n : ℕ`, `n ≥ 1`, the form of the three package copies).
 3. **Constants of a single paper stay local**, e.g. `Undecided.Plurality.three_quarters_pow_le`
    (`(3/4)^T ≤ e^{-T/4}`) and `Undecided.one_le_of_log` (`10⁴ ≤ log n → 1 ≤ n`).
-10. **Copies left in other packages**: `Voter.colorProbability_mono` re-proves
-    `Kernel.iterate_monotone` for its indicator; it can be replaced by the shared version. The
-    former copies `Moran.expect_lt_one` and `Voter.expect_lt_one` are gone, and
-    `Distribution.expect_lt_one` now lives in `Distribution`, so that `Absorption` can use it.
+10. **No copies left in other packages**: `Voter.colorProbability_mono` is proved from
+    `Kernel.iterate_monotone`, the former copies `Moran.expect_lt_one` and `Voter.expect_lt_one`
+    are gone, and `Distribution.expect_lt_one` now lives in `Distribution`, so that `Absorption`
+    can use it.

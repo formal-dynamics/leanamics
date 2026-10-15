@@ -24,9 +24,9 @@ Tools for the exploration argument of [BCDPTZ22] (Appendix C), in finite probabi
   the core): if each observation reads coordinates not read before, the conditional expectation
   is the unconditional one, so it suffices that `E[f h (obs h ω)] ≤ 1` for every history `h`
   (principle of deferred decisions).
-* **Blocks of coins**: the moment-generating function of the open coordinates of a block
-  (`expect_exp_sum_open`) and the bound `1 - r + r eˣ ≤ exp (κ r x)`
-  (`one_sub_add_mul_exp_le`).
+* **Blocks of coins**: the moment-generating function of the open coordinates of a block (the
+  core's `Distribution.independent_bernoulli_expect_exp_sum`, in `Dynamics.Chernoff`) and the
+  bound `1 - r + r eˣ ≤ exp (κ r x)` (`one_sub_add_mul_exp_le`).
 -/
 
 namespace Epidemics
@@ -71,30 +71,6 @@ theorem expect_prod_hist_le_one_of_fresh (P : ι → Distribution α)
     (m : ℕ) :
     (Distribution.independent P).expect (fun ω => histProd obs f ω 0 m) ≤ 1 :=
   Distribution.expect_prod_hist_le_one_of_fresh P obs supp hobs hfresh f hf0 hf m
-
-/-- The moment-generating function of the total weight of the open coordinates of a block:
-`E[exp (∑_{e ∈ B open} a e)] = ∏_{e ∈ B} (1 - r e + r e · exp (a e))`. -/
-lemma expect_exp_sum_open {ι : Type*} [Fintype ι] [DecidableEq ι] (r : ι → ℝ)
-    (hr0 : ∀ e, 0 ≤ r e) (hr1 : ∀ e, r e ≤ 1) (B : Finset ι) (a : ι → ℝ) :
-    (Distribution.independent fun e => Distribution.bernoulli (r e) (hr0 e) (hr1 e)).expect
-      (fun ω => Real.exp (∑ e ∈ B.filter fun e => ω e = true, a e)) =
-      ∏ e ∈ B, (1 - r e + r e * Real.exp (a e)) := by
-  classical
-  set g : ι → Bool → ℝ := fun e b =>
-    if e ∈ B then (if b = true then Real.exp (a e) else 1) else 1 with hg
-  have hpt (ω : ι → Bool) : Real.exp (∑ e ∈ B.filter fun e => ω e = true, a e) =
-      ∏ e, g e (ω e) := by
-    rw [Real.exp_sum, Finset.prod_filter, hg]
-    simp only
-    rw [Finset.prod_ite_mem, Finset.univ_inter]
-  rw [show (fun ω : ι → Bool => Real.exp (∑ e ∈ B.filter fun e => ω e = true, a e)) =
-    fun ω => ∏ e, g e (ω e) from funext hpt, Distribution.independent_expect_prod, hg]
-  simp only
-  rw [← Finset.prod_subset (Finset.subset_univ B) (fun e _ he => by simp [he])]
-  refine Finset.prod_congr rfl fun e he => ?_
-  simp only [he, if_true, Distribution.bernoulli_expect]
-  simp
-  ring
 
 /-- For `0 ≤ x ≤ κ - 1 ≤ 1`: `1 - r + r eˣ ≤ exp (κ r x)`. -/
 lemma one_sub_add_mul_exp_le {r x κ : ℝ} (hr : 0 ≤ r) (hx0 : 0 ≤ x) (hxκ : x ≤ κ - 1)
