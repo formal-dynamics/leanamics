@@ -23,7 +23,7 @@ arXiv:1201.6529).
   values of `L`, a cylinder event.
 * **Symmetry**: relabelling the vertices does not change the law of the coins (`coins_prob_perm`).
 
-`coins` is built from `Epidemics.bernoulli`, which coincides with the coin
+`coins` is built from `Epidemics.bernoulli`, an abbreviation of the coin
 `Dynamics.Distribution.bernoulli` of the Chernoff bounds (FND-3): `coins_eq_independent`.
 -/
 

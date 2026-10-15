@@ -40,12 +40,6 @@ open Finset Real
 
 namespace Distribution
 
-/-- A biased coin: `true` with probability `p`. -/
-noncomputable def bernoulli (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) : Distribution Bool where
-  weight b := if b then p else 1 - p
-  nonneg b := by cases b <;> simp [h0, h1]
-  sum_one := by simp
-
 /-! ### Independent `{0,1}`-valued observables on a product distribution -/
 
 /-- **Chernoff upper tail**, ratio form (Mitzenmacher–Upfal, Theorem 4.4, bound (4.1), with

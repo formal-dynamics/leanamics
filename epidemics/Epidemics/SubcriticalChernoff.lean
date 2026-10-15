@@ -9,9 +9,10 @@ Becchetti, Clementi, Denni, Pasquale, Trevisan, Ziccardi, *Percolation and epide
 one-dimensional small-world networks* (arXiv:2103.16398).
 
 The paper tilts by `ε` rather than by the optimal `log (1 + δ)`, which gives its closed form
-`exp (ε - ε² t / 2)`. Markov's inequality on `exp (ε X)` and the bound on the moment-generating
-function are the core's `Distribution.prob_ge_le_exp` (`Dynamics.ChernoffAux`, FND-3); only the
-scalar inequality `(1 - ε) e^ε ≤ 1 - ε² / 2` and the arithmetic of the paper's constants are local.
+`exp (ε - ε² t / 2)`. Markov's inequality on `exp (ε X)`, the bound on the moment-generating
+function and the scalar inequality `(1 - ε) e^ε ≤ 1 - ε² / 2` are the core's fixed-tilt tail
+`Distribution.prob_ge_le_exp_tilt` (`Dynamics.ChernoffAux`, FND-3); only the arithmetic of the
+paper's constants is local.
 -/
 
 namespace Epidemics
@@ -62,19 +63,11 @@ lemma binTail_succ_succ (m k : ℕ) :
 
 end BinTail
 
-/-- The key scalar inequality `(1 - ε) e^ε ≤ 1 - ε² / 2` for `0 ≤ ε < 1`. -/
+/-- The key scalar inequality `(1 - ε) e^ε ≤ 1 - ε² / 2` for `0 ≤ ε < 1` (the core
+`Dynamics.one_sub_mul_exp_le_one_sub_sq_div_two`). -/
 lemma one_sub_mul_exp_le {ε : ℝ} (hε : 0 ≤ ε) (hε1 : ε < 1) :
-    (1 - ε) * Real.exp ε ≤ 1 - ε ^ 2 / 2 := by
-  have hexp := exp_le_one_add_add_sq_div (x := ε) (by linarith)
-  have hden : 0 < 2 * (1 - ε / 3) := by linarith
-  have hq : ε ^ 2 / (2 * (1 - ε / 3)) * (1 - ε) ≤ ε ^ 2 / 2 := by
-    rw [div_mul_eq_mul_div, div_le_div_iff₀ hden (by norm_num)]
-    nlinarith [sq_nonneg ε]
-  calc (1 - ε) * Real.exp ε
-      ≤ (1 - ε) * (1 + ε + ε ^ 2 / (2 * (1 - ε / 3))) :=
-        mul_le_mul_of_nonneg_left hexp (by linarith)
-    _ = 1 - ε ^ 2 + ε ^ 2 / (2 * (1 - ε / 3)) * (1 - ε) := by ring
-    _ ≤ 1 - ε ^ 2 / 2 := by linarith
+    (1 - ε) * Real.exp ε ≤ 1 - ε ^ 2 / 2 :=
+  one_sub_mul_exp_le_one_sub_sq_div_two hε hε1
 
 /-- **Chernoff bound** for the proof of Theorem E.1: if `p (d - 1) ≤ 1 - ε` with `0 < ε < 1`, then
 at least `t` successes among `t (d - 1) + 1` independent Bernoulli(`p`) trials occur with
@@ -102,7 +95,7 @@ theorem binomial_tail_le {d : ℕ} {p ε : ℝ} (h0 : 0 ≤ p) (h1 : p ≤ 1) (h
         rw [card_univ, Fintype.card_fin] at hle
         have h1' : (univ.filter fun i => ξ i = true).card ≤ 1 := hle.trans hm.le
         omega
-  · -- `d ≥ 2`: Markov's inequality on `exp (ε X)` (core `prob_ge_le_exp`, tilt `ε`)
+  · -- `d ≥ 2`: Markov's inequality on `exp (ε X)` (core `prob_ge_le_exp_tilt`, tilt `ε`)
     have hd1 : (1 : ℝ) ≤ (d : ℝ) - 1 := by
       have : (2 : ℝ) ≤ d := by exact_mod_cast hd
       linarith
@@ -121,25 +114,19 @@ theorem binomial_tail_le {d : ℕ} {p ε : ℝ} (h0 : 0 ≤ p) (h1 : p ≤ 1) (h
       norm_num
       rw [hmR]
       nlinarith
-    have hcore := Distribution.prob_ge_le_exp (fun _ : Fin m => Distribution.bernoulli p h0 h1)
-      (fun _ b => if b = true then (1 : ℝ) else 0) (fun _ b => by cases b <;> simp) hε.le
-      hmean (t : ℝ)
+    have hcore := Distribution.prob_ge_le_exp_tilt
+      (fun _ : Fin m => Distribution.bernoulli p h0 h1)
+      (fun _ b => if b = true then (1 : ℝ) else 0) (fun _ b => by cases b <;> simp) hε.le hε1
+      (by positivity) hmean (t : ℝ)
     simp only [sum_boole] at hcore
-    have ha : 0 ≤ Real.exp ε - 1 := by linarith [Real.add_one_le_exp ε]
-    -- `(1 - ε) (e^ε - 1) ≤ ε - ε² / 2`
-    have hb : (1 - ε) * (Real.exp ε - 1) ≤ ε - ε ^ 2 / 2 := by
-      linarith [one_sub_mul_exp_le hε.le hε1]
     calc (Distribution.independent fun _ : Fin m => Distribution.bernoulli p h0 h1).prob
             (fun ξ => t ≤ (univ.filter fun i => ξ i = true).card)
         = (Distribution.independent fun _ : Fin m => Distribution.bernoulli p h0 h1).prob
             (fun ξ => (t : ℝ) ≤ ((univ.filter fun i => ξ i = true).card : ℝ)) :=
           Distribution.prob_congr _ fun ξ => Nat.cast_le.symm
-      _ ≤ Real.exp ((1 - ε) * (t + 1) * (Real.exp ε - 1) - ε * t) := hcore
+      _ ≤ Real.exp ((t + 1) * (ε - ε ^ 2 / 2) - ε * t) := hcore
       _ ≤ Real.exp (ε - ε ^ 2 * t / 2) := by
           apply Real.exp_le_exp.mpr
-          calc (1 - ε) * (t + 1) * (Real.exp ε - 1) - ε * t
-              = (t + 1) * ((1 - ε) * (Real.exp ε - 1)) - ε * t := by ring
-            _ ≤ (t + 1) * (ε - ε ^ 2 / 2) - ε * t := by gcongr
-            _ ≤ ε - ε ^ 2 * t / 2 := by nlinarith [sq_nonneg ε]
+          nlinarith [sq_nonneg ε]
 
 end Epidemics

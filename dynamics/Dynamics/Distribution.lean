@@ -187,6 +187,12 @@ noncomputable def point (a : α) : Distribution α := by
   classical
   simp [point, expect]
 
+/-- A biased coin: `true` with probability `p`. -/
+noncomputable def bernoulli (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) : Distribution Bool where
+  weight b := if b then p else 1 - p
+  nonneg b := by cases b <;> simp [h0, h1]
+  sum_one := by simp
+
 /-- Transport a distribution along a function, summing over its fibers. -/
 noncomputable def map (p : Distribution α) (f : α → β) : Distribution β := by
   classical

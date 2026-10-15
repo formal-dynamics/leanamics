@@ -11,15 +11,17 @@ coordinates, each `{0,1}`-valued factor is `1 + pᵢ (eᵗ - 1) ≤ exp (pᵢ (e
 `t = log (1 + δ)` (upper tail) or `t = log (1 - δ)` (lower tail).
 
 * Scalar inequalities: `two_mul_div_two_add_le_log_one_add` (`2δ/(2+δ) ≤ log (1+δ)`),
-  `neg_add_sq_div_two_le_one_sub_mul_log` (`-δ + δ²/2 ≤ (1-δ) log (1-δ)`), and the identity
+  `neg_add_sq_div_two_le_one_sub_mul_log` (`-δ + δ²/2 ≤ (1-δ) log (1-δ)`),
+  `one_sub_mul_exp_le_one_sub_sq_div_two` (`(1-ε) e^ε ≤ 1 - ε²/2`), and the identity
   `exp_div_rpow_self_rpow` rewriting the ratio forms as exponentials.
 * `Distribution.prob_le_expect_exp`: Markov's inequality for `exp (t X)`.
 * `Distribution.independent_expect_exp_sum_le`: `𝔼 exp (t X) ≤ exp (μ (eᵗ - 1))`.
 * `Distribution.prob_ge_le_exp`, `Distribution.prob_le_le_exp`: the tails before optimizing
-  `t`, with an upper (resp. lower) bound on the mean.
+  `t`, with an upper (resp. lower) bound on the mean; `Distribution.prob_ge_le_exp_tilt`: the
+  upper tail at a fixed tilt `t = ε`, `exp (c (ε - ε²/2) - ε k)` for a mean at most `(1 - ε) c`.
 * `Distribution.sum_ite_mem_ite_eq_card`: the number of heads among the coins of `S` as a
-  sum of `{0,1}` coordinates (the coin `Distribution.bernoulli` and its expectations are in
-  `Dynamics.Chernoff`, next to the pinned definition).
+  sum of `{0,1}` coordinates (the coin `Distribution.bernoulli` is defined in
+  `Dynamics.Distribution`; its expectations are in `Dynamics.Chernoff`).
 * Uniform rounds: `Distribution.independent_expect_eq_avg` and
   `avg_indicator_le_of_independent`, which transfer a bound on `independent` products to
   `avg` over `ι → γ`.
@@ -106,6 +108,21 @@ lemma neg_sub_one_sub_mul_log_le {δ : ℝ} (hδ0 : 0 ≤ δ) (hδ1 : δ < 1) :
     -δ - (1 - δ) * log (1 - δ) ≤ -(δ ^ 2 / 2) := by
   linarith [neg_add_sq_div_two_le_one_sub_mul_log hδ0 hδ1]
 
+/-- `(1 - ε) e^ε ≤ 1 - ε² / 2` for `0 ≤ ε < 1`: the scalar step of the upper tail at the fixed
+tilt `ε` (`Distribution.prob_ge_le_exp_tilt`). -/
+lemma one_sub_mul_exp_le_one_sub_sq_div_two {ε : ℝ} (hε : 0 ≤ ε) (hε1 : ε < 1) :
+    (1 - ε) * exp ε ≤ 1 - ε ^ 2 / 2 := by
+  have hexp := exp_le_one_add_add_sq_div (x := ε) (by linarith)
+  have hden : 0 < 2 * (1 - ε / 3) := by linarith
+  have hq : ε ^ 2 / (2 * (1 - ε / 3)) * (1 - ε) ≤ ε ^ 2 / 2 := by
+    rw [div_mul_eq_mul_div, div_le_div_iff₀ hden (by norm_num)]
+    nlinarith [sq_nonneg ε]
+  calc (1 - ε) * exp ε
+      ≤ (1 - ε) * (1 + ε + ε ^ 2 / (2 * (1 - ε / 3))) :=
+        mul_le_mul_of_nonneg_left hexp (by linarith)
+    _ = 1 - ε ^ 2 + ε ^ 2 / (2 * (1 - ε / 3)) * (1 - ε) := by ring
+    _ ≤ 1 - ε ^ 2 / 2 := by linarith
+
 /-- The ratio forms as exponentials: `(e^c / a^a)^μ = exp (μ (c - a log a))` for `a > 0`. -/
 lemma exp_div_rpow_self_rpow {a : ℝ} (ha : 0 < a) (c μ : ℝ) :
     (exp c / a ^ a) ^ μ = exp (μ * (c - a * log a)) := by
@@ -191,6 +208,17 @@ lemma prob_ge_le_exp (P : ι → Distribution α) (Y : ι → α → ℝ)
         mul_le_mul_of_nonneg_right ((independent_expect_exp_sum_le P Y hY t).trans h2)
           (exp_pos _).le
     _ = _ := by rw [← exp_add]; ring_nf
+
+/-- **Upper tail at the fixed tilt `ε`**: if the mean is at most `(1 - ε) c` with `0 ≤ ε < 1`
+and `c ≥ 0`, then `P(X ≥ k) ≤ exp (c (ε - ε²/2) - ε k)` (`prob_ge_le_exp` with `t = ε`). Unlike
+the optimized forms, the threshold `k` may lie below the mean bound. -/
+lemma prob_ge_le_exp_tilt (P : ι → Distribution α) (Y : ι → α → ℝ)
+    (hY : ∀ i a, Y i a = 0 ∨ Y i a = 1) {ε c : ℝ} (hε : 0 ≤ ε) (hε1 : ε < 1) (hc : 0 ≤ c)
+    (hμ : ∑ i, (P i).expect (Y i) ≤ (1 - ε) * c) (k : ℝ) :
+    (independent P).prob (fun ω => k ≤ ∑ i, Y i (ω i))
+      ≤ exp (c * (ε - ε ^ 2 / 2) - ε * k) := by
+  refine (prob_ge_le_exp P Y hY hε hμ k).trans (exp_le_exp.mpr ?_)
+  nlinarith [mul_le_mul_of_nonneg_left (one_sub_mul_exp_le_one_sub_sq_div_two hε hε1) hc]
 
 /-- **Lower tail before optimizing `t`**: for `t ≤ 0` and a lower bound `μL` on the mean,
 `P(X ≤ k) ≤ exp (μL (eᵗ - 1) - t k)`. -/

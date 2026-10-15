@@ -8,7 +8,7 @@ uses Lean 4.32.0 and Mathlib revision
 | --- | --- |
 | `Uniform` | Finite averages, recursive uniform trajectory expectations, independence, reindexing; extracted from 3-majority |
 | `Equivalence` | `expList_eq_avg_ofFn`, the recursive `expList` is the uniform average over `Fin T → α` |
-| `Distribution` | Normalized nonnegative real weights, expectations, event probabilities and their elementary bounds (monotonicity, complement, union bounds, inclusion–exclusion, Markov's inequality), uniform distributions, point masses, independent products, pushforward |
+| `Distribution` | Normalized nonnegative real weights, expectations, event probabilities and their elementary bounds (monotonicity, complement, union bounds, inclusion–exclusion, Markov's inequality), uniform distributions, point masses, biased coins `bernoulli`, independent products, pushforward |
 | `Bridge` | The three expectation APIs agree: `avg` is Mathlib's `𝔼 a, f a` (`avg_eq_expect`), the product of uniform laws is uniform (`Distribution.independent_uniform_expect`), and `expList` is the expectation over `T` i.i.d. draws in Mathlib's and in the distribution form (`expList_eq_expect`, `expList_eq_independent_expect`) |
 | `Kernel` | Finite stochastic kernels, finite-time expectations, events, stationarity, harmonic observables |
 | `Trajectory` | Weighted history/endpoint expectations and agreement with kernel iteration |
@@ -17,9 +17,9 @@ uses Lean 4.32.0 and Mathlib revision
 | `OptionalStopping` | Finite-horizon optional stopping (roadmap FND-4): a conserved observable, constant on two target events, gives the finite-time error bound `event_error_of_invariant`, the limit `tendsto_event_of_invariant` and the absorption probability `iSup_event_of_invariant` = `(φ(x₀) − φB)/(φA − φB)` |
 | `Rounds` | The kernel `ofStep` of a process driven by i.i.d. uniform rounds, its agreement with `expList`, and `expList_escape` (union bound over rounds for a moving target) |
 | `Reverse` | Time reversal of i.i.d. rounds (roadmap FND-6): `expList_comp_reverse`, and `iterate_ofStep_foldr` (round-based kernels applied last round first) |
-| `Concentration` | Hoeffding's (both tails) and Bernstein's inequalities for sums of independent coordinates, and the variance bound `p(1 - p) ≤ p` of a `{0,1}` coordinate |
+| `Concentration` | Hoeffding's and Bernstein's inequalities (both tails) for sums of independent coordinates, for `{0,1}` coordinates each Bernstein tail beyond `√(3ℓ(μ + 2ℓ))` at most `e^{-ℓ}` (`avg_bernstein_of_zero_one`, `avg_bernstein_lower_of_zero_one`), and the bounds `0 ≤ p ≤ 1`, `p(1 - p) ≤ p` for a `{0,1}` coordinate |
 | `Moments` | Moments of sums of independent coordinates: Cauchy-Schwarz for `avg` (Mathlib's `Finset.expect_mul_sq_le_sq_mul_sq`), second and fourth moments, two-sided Paley-Zygmund and the anti-concentration bound `P(σ² ≤ 4S²) ≥ 9/64` (`avg_pz_sum`, `avg_pz_zero_one`), the variance `p(1 - p)` of a `{0,1}` coordinate, Hoeffding's mgf bound `avg_exp_sum_le`, and `𝔼S² ≤ μ + μ²` for pairwise independent indicators (`avg_sq_sum_le_of_pairwise`) |
-| `Chernoff` | Multiplicative Chernoff bounds (ratio and closed forms, mean replaced by any upper/lower bound) for independent, non-identical Bernoulli trials: on `independent` products, for biased coins `Distribution.bernoulli`, and for one uniform round (roadmap FND-3); for uniform rounds also the MGF bound, the tails for a free parameter `t` (`avg_chernoff_upper_of_mgf`, `avg_chernoff_lower_of_mgf`) and the forms `exp(k - μ - k log(k/μ))` |
+| `Chernoff` | Multiplicative Chernoff bounds (ratio and closed forms, mean replaced by any upper/lower bound) for independent, non-identical Bernoulli trials: on `independent` products, for biased coins `Distribution.bernoulli`, and for one uniform round (roadmap FND-3); for uniform rounds also the MGF bound, the tails for a free parameter `t` (`avg_chernoff_upper_of_mgf`, `avg_chernoff_lower_of_mgf`) and the forms `exp(k - μ - k log(k/μ))`; on `independent` products also the upper tail at a fixed tilt `ε` (`Distribution.prob_ge_le_exp_tilt`, in `ChernoffAux`) |
 | `Tail` | Markov's inequality, the one-round bound `1 - 𝔼[bad]` for `ofStep`, monotone occupation of absorbing events, strict bounds `𝔼f < 1`, the `log n` conversions |
 | `Scalar` | Real and natural-number facts for round and phase counts: ceilings add up (`ceil_add_ceil_le`, `mul_ceil_le_ceil`, `nat_ceil_mul_le_of_le`), `n ≤ q ^ ⌈log n / log q⌉₊` (`le_pow_ceil`, `le_pow_ceil_real`), geometric and doubly exponential growth (`exists_lt_pow_mul`, `exists_le_two_pow_two_pow`), powers of `log` (`pow_three_le_of_log`, `log_cube_le`, `log_pow_four_div_le`, `half_le_log_one_add`), the failure budget `mul_one_div_sq_le` |
 | `Phases` | Progress through nested phases (`nested_phases`, Lemma A.4 of Becchetti et al., SPAA 2014) |
@@ -61,10 +61,12 @@ Mathlib's `Finset.expect`. Where the statements deviate from their sources, see
 [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 3-majority retains its `ThreeMajority` probability names and blueprint links
 through compatibility declarations: `ThreeMajority.avg` is a reducible alias of `avg`.
-All concentration, tail and moment bounds of `median/`, `plurality/` and `3-majority/` live in
-`Concentration`, `Chernoff`, `Tail` and `Moments`; the packages no longer keep local copies.
+All concentration and tail bounds of `median/`, `plurality/` and `3-majority/` live in
+`Concentration`, `Chernoff` and `Tail`; the packages no longer keep local copies.
 The scalar facts on ceilings, phase counts and logarithms that `median/`, `plurality/` and
 `undecided/` proved locally live in `Scalar`.
+All concentration, tail and moment bounds of `median/`, `plurality/` and `3-majority/` live in
+`Concentration`, `Chernoff`, `Tail` and `Moments`; the packages no longer keep local copies.
 
 ## How to cite
 

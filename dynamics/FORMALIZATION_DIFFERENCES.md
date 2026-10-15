@@ -61,9 +61,8 @@ Where the statements of `dynamics/` deviate from their sources, and why.
    so that packages can apply the bounds to one round (`Kernel.prob_ofStep`) and as a
    drop-in for `ThreeMajority.avg_tail_*` / `Plurality.chernoff_lower` (the latter also
    allows `δ = 0`, trivially). The `avg` forms need no `Nonempty γ`.
-7. **New definition `Distribution.bernoulli`** duplicates `Epidemics.bernoulli` (identical
-   signature and body, so the two are interchangeable); switching `epidemics/` to the shared
-   one is left to a follow-up. No other definition is introduced
+7. **New definition `Distribution.bernoulli`** (in `Distribution`, next to `uniform` and
+   `point`); `Epidemics.bernoulli` is an abbreviation of it. No other definition is introduced
    (expectation, probability, product and averages are the existing `dynamics/` API).
 8. `δ` ranges are the source's: `δ > 0` (upper), `0 < δ < 1` (lower).
 9. **Proof route** is the textbook one (Markov on `e^{tX}`, `1 + x ≤ eˣ` per trial,
@@ -219,6 +218,19 @@ aliases, and the package blueprints tag the `Dynamics` names).
    The conversions `exp_neg_two_log`, `exp_neg_three_log` and `one_le_of_log_pos` (for `n : ℕ`)
    are new.
 10. **Copies left in other packages**: `Moran.expect_lt_one` and `Voter.expect_lt_one` have the
+   The conversions `exp_neg_two_log` and `one_le_of_log_pos` (for `n : ℕ`) are new.
+10. **Bernstein corollaries for `{0,1}` coordinates.** `avg_bernstein_lower` is `avg_bernstein`
+    applied to `-Y`. `avg_bernstein_of_zero_one` and `avg_bernstein_lower_of_zero_one` fix
+    `b = 1`, the variance bound `μ + 2ℓ` and the deviation `√(3ℓ(μ + 2ℓ))`, which gives the
+    probability `e^{-ℓ}` (`bernstein_exponent_le`); they replace the proofs of
+    `Undecided.Plurality.tail_up` / `tail_down`, whose statements (through `Undecided.Plurality.dev`)
+    are unchanged. The lower tails are stated as `X + λ ≤ 𝔼X`, as in `avg_hoeffding_lower`.
+    `avg_le_one_of_zero_one` needs no `[Nonempty γ]` (the average vanishes on an empty type).
+11. **Fixed-tilt upper tail** `Distribution.prob_ge_le_exp_tilt`: `prob_ge_le_exp` at `t = ε`
+    with the mean bound `(1 - ε) c`, through `(1 - ε) e^ε ≤ 1 - ε²/2`
+    (`one_sub_mul_exp_le_one_sub_sq_div_two`). It allows thresholds below the mean bound, which the
+    optimized forms do not; EPI-2's `Epidemics.binomial_tail_le` is a corollary.
+12. **Copies left in other packages**: `Moran.expect_lt_one` and `Voter.expect_lt_one` have the
     statement of `Distribution.expect_lt_one`, `Undecided.avg_lt_one` that of `avg_lt_one`, and
     `Voter.colorProbability_mono` re-proves `Kernel.iterate_monotone` for its indicator; they
     can be replaced by the shared versions.

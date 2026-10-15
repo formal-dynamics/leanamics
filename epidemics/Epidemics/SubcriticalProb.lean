@@ -80,7 +80,7 @@ lemma coins_prob_split [DecidableEq α] (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) 
   classical
   simp only [Distribution.prob_eq_expect]
   rw [independent_expect_update _ e, Fintype.sum_bool]
-  simp [bernoulli]
+  simp [bernoulli, Distribution.bernoulli]
 
 end Independent
 
