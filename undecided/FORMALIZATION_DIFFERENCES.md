@@ -77,7 +77,7 @@ potential `Ψ = 12 count b + q` (`MajorityStages.lean`):
    not being all-`a` is at most `(5/6)^{T₃} n/3 + T₃ · 4/n²`; here `Ψ < 1` if and only if all nodes
    hold `a`. This linear potential replaces the analysis of [CGGNPS18] in the last phase.
 
-The stages are composed by the Markov property (`missP_comp`, through `Dynamics.expList_append`),
+The stages are composed by the Markov property (`missP_comp`, that is `Dynamics.missProb_comp`),
 the moving targets of the growth phase by `Dynamics.expList_escape`, and the total failure
 probability is at most `⌈10⁴ log n⌉ · 4/n² + 1/(3n) ≤ 2/n`. The `b`-majority case follows by
 exchanging the two opinions (`swapOp`, `MajoritySymm.lean`). Simulations (`n = 10⁵`, bias
@@ -154,9 +154,10 @@ state-dependent slack replaces the accumulated errors of Lemma 2, and the potent
 of undecided nodes, `S = n - q - c = ∑_{j≠m} cⱼ`, `µᵢ = cᵢ(cᵢ + 2q)/n`, `ℓ = 3 log n`,
 `dev µ = √(3ℓ(µ + 2ℓ))`, `θ = 1/(1 + α)`, `κ = 1 - θ`, `K = 1/(θκ) = (1 + α)²/α`, `B = 2 md(x₀)`.
 
-1. **Concentration** (`PluralityConc.lean`, from `Dynamics.avg_bernstein`): for a sum of
-   independent `{0, 1}` coordinates with mean `µ`, each tail beyond `dev µ` has probability at
-   most `e^{-ℓ}` (`tail_up`, `tail_down`). A round is *good* if every `cᵢ` stays below
+1. **Concentration** (`PluralityConc.lean`, from the core corollaries
+   `Dynamics.avg_bernstein_of_zero_one` and `avg_bernstein_lower_of_zero_one` of
+   `avg_bernstein`): for a sum of independent `{0, 1}` coordinates with mean `µ`, each tail
+   beyond `dev µ` has probability at most `e^{-ℓ}` (`tail_up`, `tail_down`). A round is *good* if every `cᵢ` stays below
    `µᵢ + dev`, `c_m` above `µ_m - dev`, `S` below its mean plus `dev`, and `q` within `dev` of its
    mean; a bad round has probability at most `(k + 4)/n³` (`bad_le`).
 2. **Invariant** (`PluralitySteps.lean`): `cᵢ + 12√(ℓc) ≤ θc` for all `i ≠ m` and
@@ -305,8 +306,9 @@ targets (`Dynamics.expList_escape`). In `descent` (`LowerBoundDescentCore.lean`)
 envelope is the recursion `descentGrowth`: in a first phase the colours stay at most `8n/D`, in a
 second at most `γ n/D` with `γ = 24`, while the number of undecided nodes tracks
 `max((1 - 1/Λ)^{2^s}, 4γ²/D)` until this quantity reaches the window `4γ²/D`. `lower_bound_whp`
-composes `first_round`, `descent` and `plateau` by the Markov property (`miss_comp`); a round `T`
-up to the descent round `t` is covered by the bound at every round `s ≤ t` of `descent`.
+composes `first_round`, `descent` and `plateau` by the Markov property
+(`Dynamics.missProb_comp`); a round `T` up to the descent round `t` is covered by the bound at
+every round `s ≤ t` of `descent`.
 
 ## Sequential approximate majority (`Sequential*`, roadmap UND-2)
 
@@ -321,9 +323,13 @@ approximate majority*, Distributed Computing 21(2):87–102, 2008 [AAE08]. Journ
 
 * `Interaction n`: ordered pairs `(initiator, responder)` of distinct agents (a subtype of
   `Fin n × Fin n`), drawn uniformly and independently by `Dynamics.expList (Interaction n) T`.
+  These are the oriented edges of the complete graph, the core's `Dynamics.EdgeRound ⊤`
+  (`interactionEquiv`); their number `n (n - 1)` and sums over them come from the core
+  (`card_edgeRound_top`, `sum_edgeRound_top`).
 * `step s p`: the responder `p.1.2` takes `update (s p.1.2) (s p.1.1)`; the other agents are
   unchanged. This is exactly the transition table of [AAE08, §3] under `x ↦ .a`, `y ↦ .b`,
-  blank `↦ .u`.
+  blank `↦ .u`. It is the core's one-way protocol step `Dynamics.oneWayStep` on the complete
+  graph (`step_eq_oneWayStep`).
 * `run s l := l.foldl step s` (the form used by `Dynamics.Kernel.iterate_ofStep`).
 
 `Undecided/SequentialMain.lean` states:

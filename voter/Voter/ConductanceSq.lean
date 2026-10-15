@@ -155,7 +155,7 @@ theorem dynamic_consensus_conductance_sq_many [Nonempty V] {C : Type*} [Fintype 
     intro x
     have hnn : ∀ i ∈ (univ : Finset C), (0 : ℝ) ≤ if 0 < f i x then 1 else 0 :=
       fun i _ => by split_ifs <;> norm_num
-    unfold disagreement
+    unfold disagreement nonConsensus
     split_ifs with hc
     · exact sum_nonneg hnn
     · obtain ⟨v⟩ := ‹Nonempty V›
@@ -193,7 +193,7 @@ theorem dynamic_consensus_conductance_sq_many [Nonempty V] {C : Type*} [Fintype 
           (fun x => ∑ i, if 0 < f i x then (1 : ℝ) else 0) s :=
         Kernel.iterateSeq_mono _ T hpt s
     _ = ∑ i, Kernel.iterateSeq (dynamicLazy G hd) T (fun x => if 0 < f i x then 1 else 0) s :=
-        iterateSeq_finset_sum _ T univ _ s
+        Kernel.iterateSeq_finset_sum _ T univ _ s
     _ ≤ ∑ i, f i s / n ^ 3 := sum_le_sum fun i _ => hbound i
     _ = (∑ i, f i s) / n ^ 3 := by rw [sum_div]
     _ ≤ n ^ 2 / n ^ 3 := div_le_div_of_nonneg_right hsum (by positivity)

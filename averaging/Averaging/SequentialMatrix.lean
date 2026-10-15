@@ -1,12 +1,14 @@
+import Dynamics.GraphRounds
 import Averaging.SequentialDefs
 import Averaging.RateMatrix
+import Dynamics.GraphRounds
 
 /-! # The step matrix of sequential averaging: entries and weighted sums
 
 Helpers for `Averaging.Sequential`: the entries of `W(i, j) = I - (eᵢ - eⱼ)(eᵢ - eⱼ)ᵀ / 2`
 (Survey, equation (2)), its action on a state, its symmetry and idempotence, the weighted sum
 `∑ᵢⱼ Qᵢⱼ W(i, j)` for an arbitrary weight matrix `Q` (the common computation behind equation (4)
-and the uniform-edge identity), and sums over the darts of a graph as sums over adjacent pairs.
+and the uniform-edge identity), and the sum of `W` over the darts of a graph.
 -/
 
 namespace Averaging.Sequential
@@ -105,23 +107,6 @@ lemma sum_mul_edgeMatrix_apply (Q : V → V → ℝ) (a b : V) :
   ring
 
 variable (G : SimpleGraph V) [DecidableRel G.Adj]
-
-omit [DecidableEq V] in
-/-- The darts of `G` are the adjacent ordered pairs. -/
-def dartEquiv : G.Dart ≃ {p : V × V // G.Adj p.1 p.2} where
-  toFun d := ⟨d.toProd, d.adj⟩
-  invFun p := ⟨p.1, p.2⟩
-  left_inv _ := rfl
-  right_inv _ := rfl
-
-omit [DecidableEq V] in
-/-- A sum over the darts of `G` is a sum over the adjacent ordered pairs. -/
-lemma sum_dart (f : V → V → ℝ) :
-    ∑ d : G.Dart, f d.fst d.snd = ∑ a, ∑ b, if G.Adj a b then f a b else 0 := by
-  rw [← Fintype.sum_prod_type' (f := fun a b => if G.Adj a b then f a b else 0),
-    ← Finset.sum_filter,
-    Finset.sum_subtype (p := fun p : V × V => G.Adj p.1 p.2) _ (by simp)]
-  exact Fintype.sum_equiv (dartEquiv G) _ _ fun _ => rfl
 
 /-- `∑_{darts} W(d)`, entrywise: `2m I - L`. -/
 lemma sum_dart_edgeMatrix_apply (a b : V) :

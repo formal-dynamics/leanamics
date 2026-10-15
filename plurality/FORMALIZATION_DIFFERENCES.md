@@ -166,10 +166,11 @@ for the binary median dynamics. The formal version differs as follows.
 * **Large `n`.** As for the other theorems of this package, the statements apply only to
   astronomically large `n` (`log n ≥ 40`, or `log n ≥ C`).
 * **The two stages.** The survey passes from the hitting time back to its Case 2 informally.
-  Here the composition is `hitProb_sub_le_event`: if from every state with a large gap consensus
-  holds after `T` more rounds with probability `1 - ε`, then consensus holds at time `t + T` with
-  probability at least `P(gap is large by time t) - ε`. It is proved by induction on `t` from the
-  recursion of the hitting probability, and uses that consensus on either opinion is absorbing.
+  Here the composition is `Dynamics.Kernel.hitProb_sub_le_event`: if from every state with a
+  large gap consensus holds after `T` more rounds with probability `1 - ε`, then consensus holds
+  at time `t + T` with probability at least `P(gap is large by time t) - ε`. It is proved by
+  induction on `t` from the recursion of the hitting probability, and uses that consensus on
+  either opinion is absorbing.
 
 ## 5. Not formalized
 

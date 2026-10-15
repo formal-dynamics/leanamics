@@ -13,8 +13,8 @@ voter model in dynamic networks*, ICALP 2016 (BGKM16):
   side (`card_interedges_class`, `card_interedges_class_compl`);
 * the conductance is a lower bound for the cut ratios (`conductance_mul_vol_le`), nonnegative,
   at most one;
-* one lazy step (from `lazyNeighbor_expect` in `Lazy.lean`): the probability `1/2` of moving
-  and the probability `λ_u / (2 d_u)` of adopting another opinion;
+* one lazy step (from `Kernel.lazyNeighbor_expect` in `Dynamics/RandomWalk.lean`): the
+  probability `1/2` of moving and the probability `λ_u / (2 d_u)` of adopting another opinion;
 * two real inequalities: the third-order Taylor bound of `√` and a chord bound.
 -/
 
@@ -153,7 +153,7 @@ potential. -/
 lemma disagreement_eq_potential (hd : ∀ v, 0 < G.degree v) (s : Config V Bool) :
     disagreement s = 1 - if potential G s = 0 then 1 else 0 := by
   classical
-  unfold disagreement
+  unfold disagreement nonConsensus
   by_cases h : ∃ c, s = fun _ => c
   · rw [if_pos h, if_pos ((potential_eq_zero_iff G hd s).mpr h)]
     norm_num
@@ -273,7 +273,7 @@ lemma conductance_le_one : conductance G ≤ 1 := by
 /-- The lazy voter moves with probability exactly `1/2` (a simple graph has no loops). -/
 lemma lazyNeighbor_expect_ne_self (hd : ∀ v, 0 < G.degree v) (u : V) :
     (lazyNeighbor G hd u).expect (fun a => if a ≠ u then 1 else 0) = 1 / 2 := by
-  rw [lazyNeighbor_expect]
+  rw [Kernel.lazyNeighbor_expect]
   have h : ∑ a ∈ G.neighborFinset u, (if a ≠ u then (1 : ℝ) else 0) = G.degree u := by
     rw [sum_congr rfl fun a ha => if_pos (G.ne_of_adj ((G.mem_neighborFinset u a).mp ha)).symm]
     simp
@@ -287,7 +287,7 @@ lemma lazyNeighbor_expect_discordant [DecidableEq C] (hd : ∀ v, 0 < G.degree v
     (s : Config V C) (u : V) :
     (lazyNeighbor G hd u).expect (fun a => if s a ≠ s u then 1 else 0) =
       discordant G s u / (2 * G.degree u) := by
-  rw [lazyNeighbor_expect, if_neg (not_not.mpr rfl), ← sum_filter, sum_const, nsmul_one]
+  rw [Kernel.lazyNeighbor_expect, if_neg (not_not.mpr rfl), ← sum_filter, sum_const, nsmul_one]
   unfold discordant
   ring
 

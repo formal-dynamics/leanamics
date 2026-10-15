@@ -1,6 +1,10 @@
 import Dynamics.Distribution
 
-/-! # Finite transition kernels and expectations at finite times -/
+/-! # Finite transition kernels and expectations at finite times
+
+A kernel `K` is also its row-stochastic transition matrix `K.toMatrix` (a member of Mathlib's
+`Matrix.rowStochastic`), and `K.iterate n f = K.toMatrix ^ n *ᵥ f`.
+-/
 
 namespace Dynamics
 open Finset
@@ -38,6 +42,10 @@ lemma iterate_mono (K : Kernel α) (n : ℕ) {f g : α → ℝ} (h : ∀ a, f a 
 lemma iterate_nonneg (K : Kernel α) (n : ℕ) {f : α → ℝ} (h : ∀ a, 0 ≤ f a) :
     ∀ a, 0 ≤ K.iterate n f a := by
   simpa [iterate_const] using K.iterate_mono n h
+
+lemma iterate_le_one (K : Kernel α) (n : ℕ) {f : α → ℝ} (h : ∀ a, f a ≤ 1) (a : α) :
+    K.iterate n f a ≤ 1 := by
+  simpa [iterate_const] using K.iterate_mono n h a
 
 lemma iterate_mul (K : Kernel α) (n : ℕ) (c : ℝ) (f : α → ℝ) :
     K.iterate n (fun a => c * f a) = fun a => c * K.iterate n f a := by
@@ -99,6 +107,36 @@ lemma stationary_expect (K : Kernel α) (p : Distribution α) (h : K.Stationary 
   simp only [apply, Distribution.expect, mul_sum]
   rw [sum_comm]
   simp_rw [← mul_assoc, ← sum_mul, h]
+
+/-! ### The transition matrix -/
+
+section TransitionMatrix
+open Matrix
+
+/-- The row-stochastic transition matrix `P a b = (K a).weight b` of the kernel `K`. -/
+noncomputable def toMatrix (K : Kernel α) : Matrix α α ℝ := of fun a b => (K a).weight b
+
+@[simp] lemma toMatrix_apply (K : Kernel α) (a b : α) : K.toMatrix a b = (K a).weight b := rfl
+
+/-- The transition operator is multiplication by the transition matrix: `K f = P f`. -/
+lemma apply_eq_toMatrix_mulVec (K : Kernel α) (f : α → ℝ) : K.apply f = K.toMatrix *ᵥ f := by
+  funext a
+  simp [apply, Distribution.expect, mulVec, dotProduct]
+
+/-- Expectations after `n` steps are given by the `n`-th power of the transition matrix:
+`Kⁿ f = Pⁿ f`. -/
+lemma iterate_eq_toMatrix_pow_mulVec [DecidableEq α] (K : Kernel α) (n : ℕ) (f : α → ℝ) :
+    K.iterate n f = K.toMatrix ^ n *ᵥ f := by
+  induction n with
+  | zero => simp
+  | succ n ih => rw [iterate_succ, ih, apply_eq_toMatrix_mulVec, mulVec_mulVec, pow_succ']
+
+/-- The transition matrix is row stochastic, in the sense of Mathlib's `Matrix.rowStochastic`. -/
+lemma toMatrix_mem_rowStochastic [DecidableEq α] (K : Kernel α) :
+    K.toMatrix ∈ rowStochastic ℝ α :=
+  mem_rowStochastic_iff_sum.2 ⟨fun a b => (K a).nonneg b, fun a => (K a).sum_one⟩
+
+end TransitionMatrix
 
 end Kernel
 end Dynamics

@@ -2,6 +2,7 @@ import Voter.Coalescence
 import Voter.MeetingRounds
 import Voter.Colors
 import Dynamics.Phases
+import Dynamics.Independent
 
 /-! # Coalescing random walks for an arbitrary sampling kernel (VOT-6)
 
@@ -69,7 +70,7 @@ lemma pairWalk_apply_diag (H : Kernel V) (f : V × V → ℝ) (z : V) :
 lemma pairWalk_apply_of_ne (H : Kernel V) (f : V × V → ℝ) {x y : V} (hxy : x ≠ y) :
     (pairWalk H).apply f (x, y) = (H x).expect fun a => (H y).expect fun b => f (a, b) := by
   simp only [Kernel.apply, pairWalk, Distribution.map_expect]
-  exact independent_expect_pair H hxy (fun a b => f (a, b))
+  exact Distribution.independent_expect_pair H hxy (fun a b => f (a, b))
 
 /-- Observables vanishing on the diagonal keep vanishing there: the diagonal is absorbing. -/
 lemma pairWalk_iterate_diag (H : Kernel V) {f : V × V → ℝ} (hf : ∀ z, f (z, z) = 0)

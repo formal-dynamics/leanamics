@@ -9,7 +9,6 @@ Helpers for Part 2 of Theorem 1.1 of Berenbrink, Giakkoupis, Kermarrec, Mallmann
 * `iterateSeq_pos_le_of_mul_drift`: the multiplicative drift lemma
   `Dynamics.Kernel.multiplicative_drift_seq` with this rate, for a potential whose nonzero values
   are at least `1`;
-* `iterateSeq_finset_sum`: expectations of a time-dependent chain are additive over finite sums;
 * the potential is at least `1` before consensus (`one_le_potential`) and at most `n`
   (`potential_le_card`), since `vol(s_t) ≤ m ≤ n²`;
 * `sq_conductance_mul_vol_le`: `(φ vol(s_t))² ≤ n ∑_{u ∈ s_t} λ_u d_u` (Cauchy–Schwarz);
@@ -71,21 +70,6 @@ lemma iterateSeq_pos_le_of_mul_drift (K : ℕ → Kernel α) (Ψ : α → ℝ) (
     _ ≤ 1 / n ^ 3 * Ψ x₀ :=
         mul_le_mul_of_nonneg_right (prod_one_sub_le hn φ hφ0 hφ1 T hT) (hΨ x₀)
     _ = Ψ x₀ / n ^ 3 := by ring
-
-/-- Expectations of a time-dependent chain are additive over finite sums of observables. -/
-lemma iterateSeq_finset_sum {ι : Type*} (K : ℕ → Kernel α) (n : ℕ) (s : Finset ι)
-    (F : ι → α → ℝ) (x : α) :
-    Kernel.iterateSeq K n (fun y => ∑ i ∈ s, F i y) x =
-      ∑ i ∈ s, Kernel.iterateSeq K n (F i) x := by
-  classical
-  induction s using Finset.induction_on with
-  | empty =>
-    simp only [sum_empty]
-    exact congrFun (Kernel.iterateSeq_const_fun K n 0) x
-  | insert a s ha ih =>
-    simp only [sum_insert ha]
-    rw [Kernel.iterateSeq_add]
-    exact congrArg _ ih
 
 end Generic
 
@@ -151,7 +135,7 @@ lemma disagreement_eq_zero_of_card_le_one [Fintype V] (hV : Fintype.card V ≤ 1
     · obtain ⟨v⟩ := hne
       exact ⟨x v, funext fun u => by rw [Subsingleton.elim u v]⟩
     · exact ⟨c, funext fun u => (hne ⟨u⟩).elim⟩
-  unfold disagreement
+  unfold disagreement nonConsensus
   rw [if_pos h]
 
 end Voter

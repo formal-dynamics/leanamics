@@ -30,7 +30,7 @@ PULL and PUSH–PULL (roadmap EPI-5; Karp–Schindelhauer–Shenker–Vöcking, 
 
 - `PullFoldl.lean` — `List.foldl` of an inflationary monotone step: persistence and pathwise domination.
 - `PullModel.lean` — `pullStep`, `pushPullStep` (= `step ∪ pullStep`, same calls), `pullRun`/`pushPullRun` (`List.foldl`), the failure probabilities, and pathwise domination of PUSH and PULL by PUSH–PULL.
-- `PullIndep.lean` — independence of the calls of a uniform round (`avg_pi_prod`, the dependent-product form of `Dynamics.avg_prod_pi`; `avg_tgt_mul_prod`) and per-call probabilities.
+- `PullIndep.lean` — independence of the calls of a uniform round (through the core's dependent-product `Dynamics.avg_pi_prod`; `avg_tgt_mul_prod`) and per-call probabilities.
 - `PullOneRound.lean` — exact one-round expectations (startup stall, expected growth, quadratic shrinking `u(u-1)/(n-1) ≤ u²/n`, the PUSH–PULL formula).
 - `PullPhases.lean` — the PUSH two-phase argument for an arbitrary inflationary step, given P(good round) ≥ 1/8 and a 2/3 contraction above half (`notAllOf_le_two_div`).
 - `PullGood.lean` — those two inputs for PULL (second-moment / Paley–Zygmund via pointwise bounds).

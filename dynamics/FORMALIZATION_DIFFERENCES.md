@@ -89,9 +89,8 @@ Where the statements of `dynamics/` deviate from their sources, and why.
    so that packages can apply the bounds to one round (`Kernel.prob_ofStep`) and as a
    drop-in for `ThreeMajority.avg_tail_*` / `Plurality.chernoff_lower` (the latter also
    allows `δ = 0`, trivially). The `avg` forms need no `Nonempty γ`.
-7. **New definition `Distribution.bernoulli`** duplicates `Epidemics.bernoulli` (identical
-   signature and body, so the two are interchangeable); switching `epidemics/` to the shared
-   one is left to a follow-up. No other definition is introduced
+7. **New definition `Distribution.bernoulli`** (in `Distribution`, next to `uniform` and
+   `point`); `Epidemics.bernoulli` is an abbreviation of it. No other definition is introduced
    (expectation, probability, product and averages are the existing `dynamics/` API).
 8. `δ` ranges are the source's: `δ > 0` (upper), `0 < δ < 1` (lower).
 9. **Proof route** is the textbook one (Markov on `e^{tX}`, `1 + x ≤ eˣ` per trial,
@@ -162,9 +161,11 @@ FND-7:
    `V × NeighborRound G` read at `(v, r v)` (`avg_vertex_neighborRound`).
 9. `NeighborRound G` is empty when `G` has an isolated vertex (then `avg` over it is `0` by
    convention), so the marginal lemmas assume `∀ v, 0 < G.degree v`; the product lemma
-   (`avg_neighborRound_prod`) holds unconditionally. Its relation to `RumorPush.Tgt n`
-   (complete graph on `Fin n`) is only documented, since `dynamics/` does not import
-   `rumor_spread/`.
+   (`avg_neighborRound_prod`) holds unconditionally. Both are the dependent-product lemmas
+   `avg_pi_prod` and `avg_pi_eval` (`Uniform`) for the factors `G.neighborSet v`. The relation
+   of `NeighborRound G` to `RumorPush.Tgt n` (complete graph on `Fin n`) is only documented,
+   since `dynamics/` does not import `rumor_spread/`; `rumor_spread/` uses `avg_pi_prod`
+   directly.
 
 ## Hitting-time lemma (`DriftHitting`, MAJ-8, Doerr et al. SPAA 2011 Claim 2.9)
 
@@ -244,8 +245,42 @@ aliases, and the package blueprints tag the `Dynamics` names).
    same monotonicity for its own use.
 9. **Mathlib instead of new lemmas** where Mathlib states the fact: `xᵏ/k! ≤ eˣ` is
    `Real.pow_div_factorial_le_exp` and `(q - 1)/q ≤ log q` is `Real.one_sub_inv_le_log_of_pos`.
-   The conversions `exp_neg_two_log` and `one_le_of_log_pos` (for `n : ℕ`) are new.
+   The conversions `exp_neg_two_log`, `exp_neg_three_log` and `one_le_of_log_pos` (for `n : ℕ`)
+   are new.
 10. **Copies left in other packages**: `Moran.expect_lt_one` and `Voter.expect_lt_one` have the
+   The conversions `exp_neg_two_log` and `one_le_of_log_pos` (for `n : ℕ`) are new.
+10. **Bernstein corollaries for `{0,1}` coordinates.** `avg_bernstein_lower` is `avg_bernstein`
+    applied to `-Y`. `avg_bernstein_of_zero_one` and `avg_bernstein_lower_of_zero_one` fix
+    `b = 1`, the variance bound `μ + 2ℓ` and the deviation `√(3ℓ(μ + 2ℓ))`, which gives the
+    probability `e^{-ℓ}` (`bernstein_exponent_le`); they replace the proofs of
+    `Undecided.Plurality.tail_up` / `tail_down`, whose statements (through `Undecided.Plurality.dev`)
+    are unchanged. The lower tails are stated as `X + λ ≤ 𝔼X`, as in `avg_hoeffding_lower`.
+    `avg_le_one_of_zero_one` needs no `[Nonempty γ]` (the average vanishes on an empty type).
+11. **Fixed-tilt upper tail** `Distribution.prob_ge_le_exp_tilt`: `prob_ge_le_exp` at `t = ε`
+    with the mean bound `(1 - ε) c`, through `(1 - ε) e^ε ≤ 1 - ε²/2`
+    (`one_sub_mul_exp_le_one_sub_sq_div_two`). It allows thresholds below the mean bound, which the
+    optimized forms do not; EPI-2's `Epidemics.binomial_tail_le` is a corollary.
+12. **Copies left in other packages**: `Moran.expect_lt_one` and `Voter.expect_lt_one` have the
     statement of `Distribution.expect_lt_one`, `Undecided.avg_lt_one` that of `avg_lt_one`, and
     `Voter.colorProbability_mono` re-proves `Kernel.iterate_monotone` for its indicator; they
     can be replaced by the shared versions.
+
+## Scalar facts shared by the packages (`Scalar`)
+
+Real and natural-number inequalities that `median/`, `plurality/` and `undecided/` proved
+locally (round budgets, phase counts, powers of `log`) are stated once in `Dynamics/Scalar.lean`,
+with the statements and names of the package lemmas they replace; the package copies are
+removed rather than kept as aliases.
+
+1. **Mathlib instead of new lemmas**: `1/2 ≤ log 2 ≤ 1` (formerly `Median.log_two_ge`,
+   `Median.log_two_le_one`) follows from `Real.log_two_gt_d9` and `Real.log_two_lt_d9`, and
+   `√(ℓ x) ≤ √(ℓ y)` (formerly `Undecided.Plurality.sqrt_mul_le_of_le`) is
+   `Real.sqrt_le_sqrt` applied to `mul_le_mul_of_nonneg_left`.
+2. **Two forms of the phase count**: `le_pow_ceil_real` (for `w : ℝ`, `w ≥ 1`) and
+   `le_pow_ceil` (for `n : ℕ`, `n ≥ 1`, the form of the three package copies).
+3. **Constants of a single paper stay local**, e.g. `Undecided.Plurality.three_quarters_pow_le`
+   (`(3/4)^T ≤ e^{-T/4}`) and `Undecided.one_le_of_log` (`10⁴ ≤ log n → 1 ≤ n`).
+10. **Copies left in other packages**: `Voter.colorProbability_mono` re-proves
+    `Kernel.iterate_monotone` for its indicator; it can be replaced by the shared version. The
+    former copies `Moran.expect_lt_one` and `Voter.expect_lt_one` are gone, and
+    `Distribution.expect_lt_one` now lives in `Distribution`, so that `Absorption` can use it.

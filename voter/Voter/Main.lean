@@ -125,7 +125,7 @@ lemma whiteMass_bounds (p : Distribution V) (s : Config V Bool) :
   · by_cases hs : ∃ c, s = fun _ => c
     · obtain ⟨c, rfl⟩ := hs
       cases c <;> simp [allColor, whiteMass, mass, funext_iff]
-    · have hz : survival s = 1 := by simp [survival, hs]
+    · have hz : survival s = 1 := nonConsensus_of_not s hs
       rw [hz]
       linarith [whiteMass_le_one p s, allColor_nonneg true s]
 

@@ -1,5 +1,6 @@
 import Dynamics.GraphRounds
 import Dynamics.Rounds
+import Dynamics.Spectral
 import Median.Defs
 
 /-! # Two-sample voting on a graph: definitions
@@ -13,8 +14,10 @@ median rule of `Median.step` with the two samples restricted to the neighbourhoo
 
 The spectral quantity of the paper is `λ_G = max {λ₂, |λₙ|}`, where `1 = λ₁ ≥ λ₂ ≥ ⋯ ≥ λₙ` are
 the eigenvalues of the transition matrix `P = A / d` of the random walk on a `d`-regular graph
-(`lambdaG`), and `E(S, T)` is the number of ordered pairs `(u, v) ∈ S × T` of adjacent vertices
-(`edgeCount`), so that `E(S, S) = 2 |E(S)|` counts every edge inside `S` twice.
+(`Dynamics.lambdaG`, with `Dynamics.transitionMatrix` and `Dynamics.walkEigenvalues`, in
+`Dynamics/Spectral.lean`), and `E(S, T)` is the number of ordered pairs `(u, v) ∈ S × T` of
+adjacent vertices (`edgeCount`), so that `E(S, S) = 2 |E(S)|` counts every edge inside `S`
+twice.
 -/
 
 namespace Median
@@ -51,24 +54,5 @@ def minority (a : Bool) (x : V → Bool) : ℕ := (univ.filter fun v => x v ≠ 
 /-- `E(S, T)`: the number of ordered pairs `(u, v) ∈ S × T` with `u` adjacent to `v`. Edges
 with both endpoints in `S ∩ T` are counted twice; in particular `E(S, S) = 2 |E(S)|`. -/
 def edgeCount (S T : Finset V) : ℕ := ∑ u ∈ S, (G.neighborFinset u ∩ T).card
-
-/-- The transition matrix `P = A / d` of the random walk on a `d`-regular graph. -/
-noncomputable def transitionMatrix (d : ℕ) : Matrix V V ℝ := (d : ℝ)⁻¹ • G.adjMatrix ℝ
-
-omit [Fintype V] [DecidableEq V] in
-theorem transitionMatrix_isHermitian (d : ℕ) : (transitionMatrix G d).IsHermitian := by
-  ext i j
-  simp [transitionMatrix, Matrix.conjTranspose_apply, SimpleGraph.adjMatrix_apply, G.adj_comm]
-
-/-- The eigenvalues `λ₁ ≥ λ₂ ≥ ⋯ ≥ λₙ` of the transition matrix, in non-increasing order
-(`Matrix.IsHermitian.eigenvalues₀_antitone`). -/
-noncomputable def walkEigenvalues (d : ℕ) : Fin (Fintype.card V) → ℝ :=
-  (transitionMatrix_isHermitian G d).eigenvalues₀
-
-/-- `λ_G = max {λ₂, |λₙ|}` (set to `0` on graphs with fewer than two vertices). -/
-noncomputable def lambdaG (d : ℕ) : ℝ :=
-  if h : 2 ≤ Fintype.card V then
-    max (walkEigenvalues G d ⟨1, by omega⟩) |walkEigenvalues G d ⟨Fintype.card V - 1, by omega⟩|
-  else 0
 
 end Median

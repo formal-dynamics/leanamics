@@ -49,7 +49,7 @@ neighbours independently and uniformly at random (with replacement) and adopts t
 the two samples agree. With two opinions this is the median rule with the samples restricted to
 the neighbourhood (`graphStep`, `graphStep_bool`); rounds are pairs of the core's
 `Dynamics.NeighborRound`. On a `d`-regular graph, `λ_G = max {λ₂, |λₙ|}` is computed from
-Mathlib's sorted eigenvalues of the transition matrix `P = A/d` (`lambdaG`), and `E(S, T)` counts
+Mathlib's sorted eigenvalues of the transition matrix `P = A/d` (the core's `Dynamics.lambdaG`), and `E(S, T)` counts
 ordered adjacent pairs (`edgeCount`). In [`Median/Expander.lean`](Median/Expander.lean):
 
 | Result | Lean declaration |

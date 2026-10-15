@@ -12,55 +12,10 @@ average and `β₁ χ` the cut component of `x₁`; `v` is *bad* (`badSet`) if `
   `α + β₁ χ` is constant on each community (proof of Lemma 4.2, Appendix C.3, sets `A_t`).
 * `card_filter_touched_le`: the nodes for which this fails number at most `|B| + 2 Z`, with `B`
   the bad set at `t₁` and `Z` the number of bad rounds.
-
-We also collect the facts on i.i.d. lists used to compute expectations of functions of prefixes.
 -/
 
 namespace Averaging.Opportunistic
 open Finset Dynamics
-
-/-! ### Functions of prefixes of i.i.d. lists -/
-
-section Lists
-variable {α : Type*} [Fintype α]
-
-lemma expList_le_of_length {T : ℕ} {F G : List α → ℝ}
-    (h : ∀ l : List α, l.length = T → F l ≤ G l) : expList α T F ≤ expList α T G := by
-  induction T generalizing F G with
-  | zero => exact h [] rfl
-  | succ T ih =>
-    rw [expList_succ, expList_succ]
-    exact avg_le_avg fun a => ih fun l hl => h (a :: l) (by simp [hl])
-
-lemma expList_congr_length {T : ℕ} {F G : List α → ℝ}
-    (h : ∀ l : List α, l.length = T → F l = G l) : expList α T F = expList α T G :=
-  le_antisymm (expList_le_of_length fun l hl => (h l hl).le)
-    (expList_le_of_length fun l hl => (h l hl).ge)
-
-/-- A function of the first `k` of `T ≥ k` draws only sees `k` draws. -/
-lemma expList_take [Nonempty α] {k T : ℕ} (hk : k ≤ T) (F : List α → ℝ) :
-    expList α T (fun l => F (l.take k)) = expList α k F := by
-  obtain ⟨m, rfl⟩ := Nat.exists_eq_add_of_le hk
-  rw [expList_append]
-  refine expList_congr_length fun l hl => ?_
-  simp_rw [List.take_left' hl]
-  exact expList_const (α := α) m _
-
-/-- A function of the first `k` draws and of the next one. -/
-lemma expList_take_getElem? [Nonempty α] {k T : ℕ} (hk : k < T) (F : List α → Option α → ℝ) :
-    expList α T (fun l => F (l.take k) l[k]?) = expList α k fun p => avg fun a => F p (some a) := by
-  obtain ⟨m, rfl⟩ := Nat.exists_eq_add_of_lt hk
-  rw [show k + m + 1 = k + (m + 1) by ring, expList_append]
-  refine expList_congr_length fun p hp => ?_
-  have h1 : ∀ l : List α, (p ++ l).take k = p := fun l => List.take_left' hp
-  have h2 : ∀ l : List α, (p ++ l)[k]? = l.head? := fun l => by
-    rw [List.getElem?_append_right (by omega), hp, Nat.sub_self, List.head?_eq_getElem?]
-  simp_rw [h1, h2, expList_succ, List.head?_cons]
-  congr 1
-  funext a
-  exact expList_const (α := α) m _
-
-end Lists
 
 variable {V : Type*} [Fintype V] [DecidableEq V] {G : SimpleGraph V} [DecidableRel G.Adj]
   {V₁ : Finset V} {d b : ℕ}

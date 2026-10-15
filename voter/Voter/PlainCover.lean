@@ -238,25 +238,6 @@ lemma hitting_doubleCover_flip (hc' : (doubleCover G).Connected) (x y : V) (i j 
   have := congr_fun huniq (x, !i)
   simpa [hσ, σ] using this.symm
 
-omit [DecidableEq V] in
-/-- Expectation under uniform neighbour sampling is the average over the neighbours. -/
-lemma uniformNeighbor_expect (hd : ∀ i, 0 < G.degree i) (x : V) (f : V → ℝ) :
-    (uniformNeighbor G hd x).expect f =
-      (∑ w ∈ G.neighborFinset x, f w) / G.degree x := by
-  simp only [Distribution.expect, uniformNeighbor]
-  have h (j : V) :
-      (if G.Adj x j then (G.degree x : ℝ)⁻¹ else 0) * f j =
-        if G.Adj x j then f j / G.degree x else 0 := by
-    by_cases hj : G.Adj x j
-    · simp [hj, div_eq_mul_inv, mul_comm]
-    · simp [hj]
-  simp_rw [h]
-  rw [← Finset.sum_filter]
-  have he : Finset.univ.filter (G.Adj x) = G.neighborFinset x := by
-    ext j
-    simp
-  rw [he, ← Finset.sum_div]
-
 /-- A plain uniform-neighbour step away from the target lowers the (lazy-normalised) hitting
 time by `2` in expectation: `hitting` is twice the hitting time of the plain walk. -/
 lemma uniformNeighbor_expect_hitting (hd : ∀ i, 0 < G.degree i) (hc : G.Connected) {x y : V}
@@ -267,7 +248,7 @@ lemma uniformNeighbor_expect_hitting (hd : ∀ i, 0 < G.degree i) (hc : G.Connec
   have hS : ∑ w ∈ G.neighborFinset x, hitting G hc y w =
       G.degree x * hitting G hc y x - 2 * G.degree x := by linarith
   have hdx : (G.degree x : ℝ) ≠ 0 := by exact_mod_cast (hd x).ne'
-  rw [uniformNeighbor_expect hd, hS]
+  rw [Kernel.uniformNeighbor_expect hd, hS]
   field_simp
 
 omit [DecidableEq V] in
@@ -277,7 +258,8 @@ lemma uniformNeighbor_doubleCover_expect (hd : ∀ i, 0 < G.degree i)
     (hd' : ∀ p, 0 < (doubleCover G).degree p) (x : V) (i : Bool) (f : V × Bool → ℝ) :
     (uniformNeighbor (doubleCover G) hd' (x, i)).expect f =
       (uniformNeighbor G hd x).expect fun a => f (a, !i) := by
-  rw [uniformNeighbor_expect hd' (x, i), uniformNeighbor_expect hd x, doubleCover_degree]
+  rw [Kernel.uniformNeighbor_expect hd' (x, i), Kernel.uniformNeighbor_expect hd x,
+    doubleCover_degree]
   refine congrArg (fun s : ℝ => s / (G.degree x : ℝ)) ?_
   refine Finset.sum_nbij' (fun q : V × Bool => q.1) (fun a => (a, !i)) ?_ ?_ ?_ ?_ ?_
   · intro q hq

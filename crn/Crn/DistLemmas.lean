@@ -32,17 +32,7 @@ lemma dist_ext_expect {p q : Distribution α} (h : ∀ f, p.expect f = q.expect 
 /-- The probability of an event, as a sum of weights, for any decidability instance. -/
 lemma prob_eq_sum (p : Distribution α) (E : α → Prop) [DecidablePred E] :
     p.prob E = ∑ a, if E a then p.weight a else 0 := by
-  unfold Distribution.prob Distribution.expect
-  refine sum_congr rfl fun a _ => ?_
-  by_cases h : E a <;> simp [h]
-
-/-- The probability of an event is the expectation of its indicator, for any decidability
-instance. -/
-lemma prob_eq_expect (p : Distribution α) (E : α → Prop) [DecidablePred E] :
-    p.prob E = p.expect fun a => if E a then 1 else 0 := by
-  unfold Distribution.prob Distribution.expect
-  refine sum_congr rfl fun a _ => ?_
-  by_cases h : E a <;> simp [h]
+  simp [p.prob_eq_expect, Distribution.expect]
 
 /-- Expectation of an observable vanishing off `E`, for any decidability instance. -/
 lemma expect_ite (p : Distribution α) (E : α → Prop) [DecidablePred E] (f : α → ℝ) :
@@ -62,8 +52,8 @@ lemma condition_expect (p : Distribution α) (E : α → Prop) [DecidablePred E]
     (h : p.prob E ≠ 0) (f : α → ℝ) :
     (condition p E h).expect f = p.expect (fun a => if E a then f a else 0) / p.prob E := by
   unfold condition
-  rw [normalize_expect]
-  simp only [Distribution.prob, Distribution.expect]
+  rw [normalize_expect, p.prob_eq_expect]
+  simp only [Distribution.expect]
   congr 1 <;> refine sum_congr rfl fun a _ => ?_ <;> by_cases hE : E a <;> simp [hE]
 
 /-- Uniform expectation as a sum divided by the cardinality. -/

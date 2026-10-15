@@ -23,12 +23,13 @@ theorem eventualColor_eq_whiteMass_of_tendsto [Nonempty V] (H : Kernel V) (p : D
     (hp : H.Stationary p) (s : Config V Bool)
     (hsurv : Tendsto (fun n => (transition H).iterate n survival s) atTop (𝓝 0)) :
     eventualColor H true s = whiteMass p s := by
-  have hz : Tendsto (fun n => whiteMass p s - colorProbability H true n s) atTop (𝓝 0) :=
-    squeeze_zero (fun n => (whiteProbability_error H p hp n s).1)
-      (fun n => (whiteProbability_error H p hp n s).2) hsurv
-  have hcst : Tendsto (fun _ : ℕ => whiteMass p s) atTop (𝓝 (whiteMass p s)) :=
-    tendsto_const_nhds
-  exact tendsto_nhds_unique (colorProbability_tendsto H true s) (by simpa using hcst.sub hz)
+  have h := (transition H).tendsto_event_of_invariant (whiteMass p) (· = fun _ => true)
+    (· = fun _ => false) 1 0 (fun _ ha => by simp [ha, whiteMass_const])
+    (fun _ hb => by simp [hb, whiteMass_const]) one_ne_zero s
+    (fun T => iterate_mass H p hp (fun b : Bool => if b then 1 else 0) T s)
+    (by simpa only [iterate_survival] using hsurv)
+  simp only [← colorProbability_eq_event, sub_zero, div_one] at h
+  exact tendsto_nhds_unique (colorProbability_tendsto H true s) h
 
 /-- **Hassin–Peleg Theorem 2.1 with the Remark on p. 254.** On a connected graph, bipartite or
 not, if the kernel charges every edge and some vertex keeps its own colour with positive

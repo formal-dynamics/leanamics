@@ -1,4 +1,5 @@
 import Undecided.Basic
+import Dynamics.GraphRounds
 
 /-! # The sequential undecided-state dynamics (approximate majority)
 
@@ -20,7 +21,9 @@ dictionary `x ↦ Op.a`, `y ↦ Op.b` and blank `b ↦ Op.u`.
 
 The state after `T` interactions is `run s l` for a list `l` of `T` interactions, and probabilities
 over `T` i.i.d. uniform interactions are `Dynamics.expList (Interaction n) T`. When `2 ≤ n` this is
-the kernel `Dynamics.Kernel.ofStep step`, by `Dynamics.Kernel.iterate_ofStep`.
+the kernel `Dynamics.Kernel.ofStep step`, by `Dynamics.Kernel.iterate_ofStep`. An interaction is
+an oriented edge of the complete graph (`interactionEquiv`), so a uniform interaction is the core's
+uniform `Dynamics.EdgeRound ⊤`.
 -/
 
 namespace Undecided.Sequential
@@ -31,6 +34,11 @@ variable {n : ℕ}
 i.e. an arc of the complete directed graph without self-loops. -/
 abbrev Interaction (n : ℕ) := {p : Fin n × Fin n // p.1 ≠ p.2}
 
+/-- The interactions are the oriented edges of the complete graph on the agents: `Interaction n`
+is the core's round type `Dynamics.EdgeRound ⊤` (`Dynamics.edgeRoundTopEquiv`). -/
+def interactionEquiv : Interaction n ≃ Dynamics.EdgeRound (⊤ : SimpleGraph (Fin n)) :=
+  Dynamics.edgeRoundTopEquiv.symm
+
 /-- The configuration after the interaction `p` [AAE08, §3]: the responder `p.1.2` updates its
 state against the initiator `p.1.1` by `Undecided.update`; all other agents keep their states. -/
 def step (s : Config n) (p : Interaction n) : Config n :=
@@ -39,5 +47,10 @@ def step (s : Config n) (p : Interaction n) : Config n :=
 /-- The configuration after performing the interactions of `l` in order. For a list of `T` i.i.d.
 uniform interactions, this is the configuration `(x_T, y_T, b_T)` of [AAE08, §4.1]. -/
 def run (s : Config n) (l : List (Interaction n)) : Config n := l.foldl step s
+
+/-- The interaction step is the core's one-way protocol step `Dynamics.oneWayStep` with the rule
+`Undecided.update`, on the complete graph. -/
+lemma step_eq_oneWayStep (s : Config n) (p : Interaction n) :
+    step s p = Dynamics.oneWayStep update s (interactionEquiv p) := rfl
 
 end Undecided.Sequential

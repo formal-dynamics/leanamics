@@ -28,30 +28,17 @@ lemma exists_weight_pos {α : Type*} [Fintype α] (p : Distribution α) : ∃ a,
 /-- Every round in the kernel support has positive probability. -/
 lemma kernelPossible_positive (H : Kernel V) {s t : Config V Bool}
     (h : KernelPossible H s t) : 0 < (transition H s).weight t := by
-  classical
   obtain ⟨r, hr, rfl⟩ := h
-  dsimp only [transition, Distribution.map]
-  apply lt_of_lt_of_le ?_ (single_le_sum (fun a _ => ?_) (mem_univ r))
-  · simp only
-    exact prod_pos fun i _ => hr i
-  · split
-    · exact (Distribution.independent H).nonneg _
-    · rfl
+  exact (Distribution.independent H).map_weight_pos (step s) r (prod_pos fun i _ => hr i)
 
 /-- A chain of rounds in the kernel support reaching consensus makes the nonconsensus
 probability drop below one at some finite time. -/
 lemma reachable_success_of_kernelPossible (H : Kernel V) {s : Config V Bool} {c : Bool}
     (h : Relation.ReflTransGen (KernelPossible H) s (fun _ => c)) :
-    ∃ n, (transition H).iterate n survival s < 1 := by
-  induction h using Relation.ReflTransGen.head_induction_on with
-  | refl => exact ⟨0, by simp⟩
-  | @head s t hst htail ih =>
-    obtain ⟨n, hn⟩ := ih
-    refine ⟨n + 1, expect_lt_one (transition H s) ((transition H).iterate n survival) ?_ t
-      (kernelPossible_positive H hst) hn⟩
-    intro u
-    simpa [Kernel.iterate_const] using
-      (transition H).iterate_mono n survival_le_one u
+    ∃ n, (transition H).iterate n survival s < 1 :=
+  (transition H).exists_iterate_lt_one_of_reachable nonConsensus_le_one
+    (Relation.ReflTransGen.mono (fun _ _ => kernelPossible_positive H) _ _ h)
+    (nonConsensus_const c)
 
 /-- **Lemma 2.1, propagation through the kernel support.** On a connected graph whose edges are
 charged by `H`, a monochromatic region in which every vertex charges a vertex of the region
@@ -121,7 +108,8 @@ theorem consensus_tendsto_of_selfLoop (G : SimpleGraph V) (hc : G.Connected)
     (hloop : ∃ v, 0 < (H v).weight v) (s : Config V Bool) :
     Tendsto (fun n => (transition H).iterate n survival s) atTop (𝓝 0) := by
   obtain ⟨v, hv⟩ := hloop
-  apply (transition H).finite_absorption survival survival_binary (survival_step H)
+  apply (transition H).finite_absorption survival nonConsensus_binary
+    ((transition H).nonConsensus_step (transition_constant H))
   intro t
   exact reachable_success_of_kernelPossible H
     (kernelPossible_consensus_of_selfLoop G hc H hsupport hv t)

@@ -37,7 +37,7 @@ lemma avg_split_block (U : Finset V) (F : ℝ → ℝ → ℝ) :
     avg (fun σ : V → ℤˣ => F (blockSum U σ) (blockSum Uᶜ σ)) =
       avg (fun τ₁ : {v // v ∈ U} → ℤˣ => avg (fun τ₂ : {v // ¬ v ∈ U} → ℤˣ =>
         F (∑ i, signVec τ₁ i) (∑ j, signVec τ₂ j))) := by
-  have h := avg_split (I := V) (fun v => v ∈ U)
+  have h := avg_pi_split (I := V) (fun v => v ∈ U)
     (fun τ₁ τ₂ => F (∑ i, signVec τ₁ i) (∑ j, signVec τ₂ j))
   convert h using 3 with σ
   rw [sum_subtype_eq, sum_subtype_compl_eq]

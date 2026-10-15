@@ -1,15 +1,19 @@
 import Averaging.RateDefs
+import Dynamics.Spectral
 
 /-! # The random-walk matrix and its symmetrization: entries and similarity
 
 Helpers for the rate bound (Survey, Section 7.2, Theorem 33): the entries of `P = D⁻¹A`, the
 identification of `Pᵗ` with the `t`-step transition probabilities `transW` and of the averaging
 dynamics with `Pᵗ x`, and the similarity `P = D^{-1/2} N D^{1/2}` with
-`N = D^{-1/2} A D^{-1/2}` when every degree is positive.
+`N = D^{-1/2} A D^{-1/2}` when every degree is positive. On a `d`-regular graph both `P` and `N`
+are the transition matrix `A / d` of the core (`Dynamics.transitionMatrix`, used by the
+strong-reconstruction part, AVG-2), and `λ` is the core's `λ_G = max {λ₂, |λₙ|}`
+(`walkLambda_eq_lambdaG`).
 -/
 
 namespace Averaging
-open Finset Matrix
+open Finset Matrix Dynamics
 
 variable {V : Type*} [Fintype V] [DecidableEq V] (G : SimpleGraph V) [DecidableRel G.Adj]
 
@@ -96,5 +100,48 @@ lemma charpoly_walkMatrix_eq (hdeg : ∀ v, 0 < G.degree v) :
     (walkMatrix G).charpoly = (normAdjMatrix G).charpoly := by
   rw [walkMatrix_eq_conj G hdeg, Matrix.mul_assoc, charpoly_mul_comm, Matrix.mul_assoc,
     diagonal_sqrt_mul_inv G hdeg, Matrix.mul_one]
+
+/-! ### Regular graphs -/
+
+/-- On a `d`-regular graph, the transition matrix `A / d` is `P = D⁻¹A`. -/
+lemma transitionMatrix_eq_walkMatrix {d : ℕ} (hreg : G.IsRegularOfDegree d) :
+    transitionMatrix G d = walkMatrix G := by
+  ext u v
+  rw [walkMatrix_apply, transitionMatrix, Matrix.smul_apply, SimpleGraph.adjMatrix_apply, hreg u,
+    smul_eq_mul]
+  split_ifs <;> simp
+
+/-- On a `d`-regular graph, `N = D^{-1/2} A D^{-1/2}` is the transition matrix `A / d`. -/
+lemma normAdjMatrix_eq_transitionMatrix {d : ℕ} (hreg : G.IsRegularOfDegree d) :
+    normAdjMatrix G = transitionMatrix G d := by
+  ext u v
+  rw [normAdjMatrix_apply, transitionMatrix, Matrix.smul_apply, SimpleGraph.adjMatrix_apply, hreg u,
+    hreg v, smul_eq_mul]
+  split_ifs
+  · rw [← mul_inv, Real.mul_self_sqrt (Nat.cast_nonneg _), mul_one]
+  · simp
+
+/-- On a `d`-regular graph, `λ = max {|λ₂|, |λₙ|}` of Theorem 33 is `λ_G = max {λ₂, |λₙ|}`
+(`Dynamics.lambdaG`): both are read off the sorted spectrum of `N = A / d`, and the two maxima
+agree since `λₙ ≤ λ₂`. -/
+lemma walkLambda_eq_lambdaG {d : ℕ} (hreg : G.IsRegularOfDegree d) :
+    walkLambda G = lambdaG G d := by
+  have hcongr : ∀ {M M' : Matrix V V ℝ} (_ : M = M') (hM : M.IsHermitian)
+      (hM' : M'.IsHermitian), hM.eigenvalues₀ = hM'.eigenvalues₀ := by
+    rintro M M' rfl hM hM'
+    rfl
+  have he : (normAdjMatrix_isHermitian G).eigenvalues₀ = walkEigenvalues G d :=
+    hcongr (normAdjMatrix_eq_transitionMatrix G hreg) _ _
+  have hmax (a b : ℝ) (hba : b ≤ a) : max |a| |b| = max a |b| := by
+    rcases le_or_gt 0 a with ha | ha
+    · rw [abs_of_nonneg ha]
+    · have hb : b < 0 := lt_of_le_of_lt hba ha
+      rw [abs_of_neg ha, abs_of_neg hb, max_eq_right (by linarith), max_eq_right (by linarith)]
+  unfold walkLambda lambdaG
+  split_ifs with h2
+  · rw [he]
+    exact hmax _ _ ((transitionMatrix_isHermitian G d).eigenvalues₀_antitone
+      (Fin.mk_le_mk.mpr (by omega)))
+  · rfl
 
 end Averaging
