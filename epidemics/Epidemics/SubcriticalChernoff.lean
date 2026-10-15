@@ -27,7 +27,7 @@ section BinTail
 variable {p : ℝ} (h0 : 0 ≤ p) (h1 : p ≤ 1)
 
 lemma binTail_zero_right (m : ℕ) : binTail p h0 h1 m 0 = 1 :=
-  prob_eq_one _ fun _ => Nat.zero_le _
+  Distribution.prob_eq_one _ fun _ => Nat.zero_le _
 
 lemma binTail_nonneg (m k : ℕ) : 0 ≤ binTail p h0 h1 m k :=
   Distribution.prob_nonneg _ _
@@ -45,7 +45,8 @@ lemma independent_prob_fin_succ {β : Type*} [Fintype β] {m : ℕ} (q : Distrib
     (Distribution.independent fun _ : Fin (m + 1) => q).prob s =
       ∑ b, q.weight b *
         (Distribution.independent fun _ : Fin m => q).prob (fun r => s (Fin.cons b r)) := by
-  unfold Distribution.prob
+  classical
+  simp only [Distribution.prob_eq_expect]
   exact independent_expect_fin_succ q _
 
 /-- **One-step recursion of the binomial tail**: condition on the first trial. -/
@@ -94,7 +95,7 @@ theorem binomial_tail_le {d : ℕ} {p ε : ℝ} (h0 : 0 ≤ p) (h1 : p ≤ 1) (h
           apply Real.one_le_exp
           have ht' : (t : ℝ) ≤ 1 := by exact_mod_cast Nat.lt_succ_iff.mp ht
           nlinarith [sq_nonneg ε]
-    · rw [prob_eq_zero]
+    · rw [Distribution.prob_eq_zero]
       · exact (Real.exp_pos _).le
       · intro ξ hξ
         have hle := card_filter_le (univ : Finset (Fin (t * (d - 1) + 1))) fun i => ξ i = true
@@ -132,7 +133,7 @@ theorem binomial_tail_le {d : ℕ} {p ε : ℝ} (h0 : 0 ≤ p) (h1 : p ≤ 1) (h
             (fun ξ => t ≤ (univ.filter fun i => ξ i = true).card)
         = (Distribution.independent fun _ : Fin m => Distribution.bernoulli p h0 h1).prob
             (fun ξ => (t : ℝ) ≤ ((univ.filter fun i => ξ i = true).card : ℝ)) :=
-          prob_congr _ fun ξ => Nat.cast_le.symm
+          Distribution.prob_congr _ fun ξ => Nat.cast_le.symm
       _ ≤ Real.exp ((1 - ε) * (t + 1) * (Real.exp ε - 1) - ε * t) := hcore
       _ ≤ Real.exp (ε - ε ^ 2 * t / 2) := by
           apply Real.exp_le_exp.mpr

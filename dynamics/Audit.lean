@@ -64,3 +64,16 @@ import Dynamics
 #print axioms Dynamics.one_le_of_log_pos
 #print axioms Dynamics.pow_mulVec_dotProduct_self_le
 #print axioms Dynamics.exists_top_eigenvectorBasis
+#print axioms Dynamics.exp_neg_three_log
+#print axioms Dynamics.ceil_add_ceil_le
+#print axioms Dynamics.mul_ceil_le_ceil
+#print axioms Dynamics.nat_ceil_mul_le_of_le
+#print axioms Dynamics.le_pow_ceil_real
+#print axioms Dynamics.le_pow_ceil
+#print axioms Dynamics.exists_lt_pow_mul
+#print axioms Dynamics.exists_le_two_pow_two_pow
+#print axioms Dynamics.pow_three_le_of_log
+#print axioms Dynamics.log_cube_le
+#print axioms Dynamics.log_pow_four_div_le
+#print axioms Dynamics.half_le_log_one_add
+#print axioms Dynamics.mul_one_div_sq_le

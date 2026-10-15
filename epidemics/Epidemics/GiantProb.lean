@@ -89,7 +89,7 @@ theorem prob_count_take_far {m N₀ : ℕ} (hN₀ : N₀ ≤ m) {δ : ℝ} (hδ0
         rcases le_abs'.mp hx with h | h
         · left; linarith
         · right; linarith
-    _ ≤ _ := (prob_or_le _ _ _).trans
+    _ ≤ _ := (Distribution.prob_or_le _ _ _).trans
         (add_le_add (prob_count_take_le p h0 h1 hN₀ hδ0 hδ1)
           (prob_count_take_ge p h0 h1 hN₀ hδ0 hδ1))
     _ ≤ _ := by linarith
@@ -135,9 +135,9 @@ theorem prob_not_good_le {N₀ t₁ : ℕ} (ht₁ : t₁ ≤ N₀) {δ : ℝ} (h
         simp only [Good, not_and_or, not_forall, exists_prop] at hx
         exact hx
     _ ≤ E + (E + ∑ t ∈ Icc t₁ N₀, E) := by
-        refine (prob_or_le _ _ _).trans (add_le_add (hhigh ht₁ le_rfl)
-          ((prob_or_le _ _ _).trans (add_le_add (hhigh le_rfl ht₁) ?_)))
-        refine (prob_exists_le_sum _ _ _).trans (sum_le_sum fun t ht => ?_)
+        refine (Distribution.prob_or_le _ _ _).trans (add_le_add (hhigh ht₁ le_rfl)
+          ((Distribution.prob_or_le _ _ _).trans (add_le_add (hhigh le_rfl ht₁) ?_)))
+        refine (Distribution.prob_exists_le_sum _ _ _).trans (sum_le_sum fun t ht => ?_)
         obtain ⟨h₁, h₂⟩ := mem_Icc.mp ht
         exact hlow h₁ h₂
     _ ≤ (N₀ + 3) * E := by

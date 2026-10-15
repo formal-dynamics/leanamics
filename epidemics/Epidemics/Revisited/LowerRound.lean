@@ -28,7 +28,7 @@ lemma prob_deficit_lt_cheb (P : RumorProcess n) (S : Finset (Fin n)) {c₀ μ z 
   have hEXle : D.expect X ≤ (n : ℝ) - μ := by linarith
   have hsub : D.prob (fun T => (n : ℝ) - T.card < z) ≤
       D.prob (fun T => μ - z ≤ |X T - D.expect X|) := by
-    refine prob_mono D (fun T hT => ?_)
+    refine Distribution.prob_mono D (fun T hT => ?_)
     have hlow : μ - z < X T - D.expect X := by
       have hXT : (n : ℝ) - z < X T := by simp only [X]; linarith
       linarith

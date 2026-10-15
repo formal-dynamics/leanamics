@@ -9,7 +9,8 @@ Facts about finite distributions and the i.i.d. Bernoulli(`p`) coins `coins p` o
 *The phase transition in random graphs: a simple proof*, Random Structures & Algorithms 43 (2013),
 arXiv:1201.6529).
 
-* **Elementary bounds** on `Distribution.prob`: monotonicity, complement, union bounds.
+* **A complement bound** on `Distribution.prob` (`one_sub_le_prob`); the other event bounds
+  (monotonicity, complement, union bounds) are in the core `Dynamics.Distribution`.
 * **Cylinders**: the probability that the independent coordinates `c 0, …, c (m-1)` (distinct)
   take prescribed values is the product of their weights (`prob_forall_eval_eq`).
 * **Principle of deferred decisions.** Krivelevich and Sudakov run the depth-first search "fed with
@@ -35,52 +36,20 @@ lemma coins_eq_independent {V : Type*} [Fintype V] [DecidableEq V] (p : ℝ) (h0
     coins (V := V) p h0 h1 = Distribution.independent fun _ => Distribution.bernoulli p h0 h1 :=
   rfl
 
-/-! ### Elementary bounds on probabilities
+/-! ### A complement bound
 
-Monotonicity and the expectation form of `prob` are the core's `Distribution.prob_mono` and
-`Distribution.prob_eq_expect`. The bounds below are not in `dynamics/` yet (their move there is
-tracked in issue #42). -/
+Monotonicity, congruence, the complement rule and the union bounds are the core's
+`Distribution.prob_mono`, `prob_congr`, `prob_not`, `prob_or_le` and `prob_exists_le_sum`. -/
 
 section Prob
 
 variable {α : Type*} [Fintype α]
 
-lemma prob_congr (P : Distribution α) {A B : α → Prop} (h : ∀ a, A a ↔ B a) :
-    P.prob A = P.prob B :=
-  le_antisymm (P.prob_mono fun a => (h a).1) (P.prob_mono fun a => (h a).2)
-
-lemma prob_not (P : Distribution α) (A : α → Prop) :
-    P.prob (fun a => ¬A a) = 1 - P.prob A := by
-  classical
-  rw [P.prob_eq_expect, P.prob_eq_expect, ← P.expect_const 1, ← Distribution.expect_sub]
-  congr 1
-  funext a
-  by_cases hA : A a <;> simp [hA]
-
-lemma prob_or_le (P : Distribution α) (A B : α → Prop) :
-    P.prob (fun a => A a ∨ B a) ≤ P.prob A + P.prob B := by
-  classical
-  rw [P.prob_eq_expect, P.prob_eq_expect, P.prob_eq_expect, ← Distribution.expect_add]
-  refine P.expect_mono fun a => ?_
-  by_cases hA : A a <;> by_cases hB : B a <;> simp [hA, hB]
-
-lemma prob_exists_le_sum {ι : Type*} (P : Distribution α) (s : Finset ι) (A : ι → α → Prop) :
-    P.prob (fun a => ∃ i ∈ s, A i a) ≤ ∑ i ∈ s, P.prob (A i) := by
-  classical
-  induction s using Finset.induction_on with
-  | empty => simp [Distribution.prob]
-  | insert i s hi ih =>
-    rw [sum_insert hi]
-    calc P.prob (fun a => ∃ j ∈ insert i s, A j a)
-        = P.prob (fun a => A i a ∨ ∃ j ∈ s, A j a) := prob_congr P fun a => by simp
-      _ ≤ P.prob (A i) + P.prob (fun a => ∃ j ∈ s, A j a) := prob_or_le P _ _
-      _ ≤ P.prob (A i) + ∑ j ∈ s, P.prob (A j) := by linarith
-
 /-- If `B` fails with probability at most `ε` and implies `A`, then `A` has probability at least
 `1 - ε`. -/
 lemma one_sub_le_prob (P : Distribution α) {A B : α → Prop} (h : ∀ a, B a → A a) {ε : ℝ}
     (hB : P.prob (fun a => ¬B a) ≤ ε) : 1 - ε ≤ P.prob A := by
-  rw [prob_not] at hB
+  rw [Distribution.prob_not] at hB
   linarith [Distribution.prob_mono P h]
 
 end Prob
@@ -210,7 +179,7 @@ lemma prob_queryAnswers_eq (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) (next : List 
       rw [List.take_take, min_eq_left h.le]
       exact hjk.symm
   rw [← prob_forall_eval_eq (fun _ => Distribution.bernoulli p h0 h1) hinj x]
-  refine prob_congr _ fun ω => ?_
+  refine Distribution.prob_congr _ fun ω => ?_
   have := queryAnswers_eq_iff next ω (List.ofFn x)
   rw [List.length_ofFn] at this
   rw [this]

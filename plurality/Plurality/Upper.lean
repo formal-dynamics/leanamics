@@ -1,5 +1,6 @@
 import Plurality.Saturation
 import Dynamics.Phases
+import Dynamics.Scalar
 
 /-!
 # The general upper bound (Theorem 3.8)
@@ -418,15 +419,6 @@ noncomputable def satPhases (n : ℕ) : ℕ := ⌈Real.log n / Real.log (18 / 17
 
 /-- The total number of phases, `T = T₁ + T₂ + 1`; the process runs for `10 T` rounds. -/
 noncomputable def phases (n : ℕ) (lam : ℝ) : ℕ := growthPhases n lam + satPhases n + 1
-
-/-- `n ≤ q ^ ⌈log n / log q⌉₊` for `q > 1`. -/
-lemma le_pow_ceil (hn : 1 ≤ n) {q : ℝ} (hq : 1 < q) :
-    (n : ℝ) ≤ q ^ ⌈Real.log n / Real.log q⌉₊ := by
-  have hlq : 0 < Real.log q := Real.log_pos hq
-  have hn0 : (0 : ℝ) < n := by exact_mod_cast hn
-  rw [← Real.log_le_log_iff hn0 (by positivity), Real.log_pow]
-  have := Nat.le_ceil (Real.log n / Real.log q)
-  rwa [div_le_iff₀ hlq] at this
 
 /-- `log q ≥ (q - 1)/q` for `q > 0`. -/
 lemma sub_one_div_le_log {q : ℝ} (hq : 0 < q) : (q - 1) / q ≤ Real.log q := by
