@@ -44,11 +44,12 @@ are numbered differently.
 5. **Generic lemmas not yet in `dynamics/`.** Several lemmas proved in namespace `Median` only
    use notions of the shared layer (`avg`, `expList`, `variance`, `Kernel`) or plain real
    inequalities: the fixed-time drift lemmas `iterate_le_of_drift`, `iterate_add_le`,
-   `expList_le_of_drift`, `expList_add_le`; and `ceil_add_ceil_le`, `mul_ceil_le_ceil`,
-   `pow_three_le_of_log`, `log_pow_four_div_le`. They are candidates for the shared core. The
+   `expList_le_of_drift`, `expList_add_le`. They are candidates for the shared core. The
    moment bounds of the symmetry breaking (`avg_exp_sum_le`, Hoeffding's mgf bound for any real
    `t`; `avg_sum_sq`, `avg_sum_fourth_le`, `avg_pz`, `avg_pz_sum`, `avg_pz_zero_one`,
-   `variance_of_zero_one`) are now in the shared layer (`dynamics/Dynamics/Moments.lean`).
+   `variance_of_zero_one`) are now in the shared layer (`dynamics/Dynamics/Moments.lean`), and
+   the scalar facts `ceil_add_ceil_le`, `mul_ceil_le_ceil`, `pow_three_le_of_log` and
+   `log_pow_four_div_le` live in `dynamics/Dynamics/Scalar.lean` (namespace `Dynamics`).
 
 ## Many values: the middle one wins fast (`ManyValues`)
 
@@ -75,11 +76,11 @@ are numbered differently.
    consensus of both on `true` forces consensus on `v`; a union bound gives `1 - 2C/n`.
 4. **Generic lemmas not yet in `dynamics/`.** The kernel and round lemmas
    `kernel_event_mono_set`, `kernel_event_chain`, `kernel_event_comp`, `expList_ge_of_and` and
-   `expList_foldl_mono` (`ManyValuesKernel.lean`) do not mention the median rule, and the scalar
-   facts `exists_lt_pow_mul`, `exists_le_two_pow_two_pow`, `le_pow_ceil_real`,
-   `mul_one_div_sq_le`, `nat_ceil_mul_le_of_le`, `log_two_ge`, `log_two_le_one`
-   (`ManyValuesScalar.lean`) are plain real inequalities. They live in namespace `Median` until
-   the shared core provides them.
+   `expList_foldl_mono` (`ManyValuesKernel.lean`) do not mention the median rule; they live in
+   namespace `Median` until the shared core provides them. The scalar facts
+   `exists_lt_pow_mul`, `exists_le_two_pow_two_pow`, `le_pow_ceil_real`, `le_pow_ceil`,
+   `mul_one_div_sq_le` and `nat_ceil_mul_le_of_le` are in `dynamics/Dynamics/Scalar.lean`, and
+   the bounds on `log 2` are Mathlib's `Real.log_two_gt_d9` and `Real.log_two_lt_d9`.
 
 ## Two-sample voting on expanders (`Expander`)
 
@@ -94,7 +95,8 @@ Lemma numbers follow the arXiv version.
    median of the own opinion and the two samples, which for two opinions is the 2-Choices rule
    (`graphStep_bool`). Opinions are Booleans and the majority opinion is any `a : Bool`; the
    minority `B` is the set of vertices whose opinion differs from `a`.
-2. **The spectral quantity.** `lambdaG G d = max {λ₂, |λₙ|}`, where `λ₁ ≥ ⋯ ≥ λₙ` are Mathlib's
+2. **The spectral quantity.** `lambdaG G d = max {λ₂, |λₙ|}` (`Dynamics.lambdaG`, in the core's
+   `Dynamics/Spectral.lean`), where `λ₁ ≥ ⋯ ≥ λₙ` are Mathlib's
    sorted eigenvalues (`Matrix.IsHermitian.eigenvalues₀`) of the transition matrix
    `(1/d) A`; it is set to `0` on graphs with fewer than two vertices, which cannot be
    `d`-regular with `d > 0`. The expander mixing lemma is stated with this quantity, which equals
@@ -142,10 +144,11 @@ Lemma numbers follow the arXiv version.
    the region `|B| ≤ (ε/5) n`, so the argument extends to such an adversary, but this is not
    formalized.
 8. **Generic lemmas not yet in the shared core.** `expList_le_of_contract`
-   (`ExpanderDrift.lean`) only uses `avg` and `expList`. The spectral lemmas of
-   `ExpanderMixing.lean` (Parseval for Mathlib's eigenbasis, the spectral expansion of a
-   bilinear form, and the expander mixing lemma itself) are candidates for the spectral toolkit
-   of the core.
+   (`ExpanderDrift.lean`) only uses `avg` and `expList`. The spectral lemmas behind the
+   expander mixing lemma (Parseval for Mathlib's eigenbasis, the spectral expansion of a bilinear
+   form, the top eigenvector when `λ_G < 1`), the transition matrix, `walkEigenvalues`, `lambdaG`
+   and `indVec` are in the core (`Dynamics/Spectral.lean`); the expander mixing lemma itself and
+   the edge counts stay in `ExpanderMixing.lean`.
 
 ## Two-sample voting on expanders from a small imbalance (`ExpanderGeneral*`, roadmap MAJ-5 (b))
 

@@ -83,7 +83,8 @@ lemma thr_cases {ℓ t σ E κ c μ nn q X μX X' C' : ℝ} (hℓ : 0 ≤ ℓ) (
 lemma drift_big {ℓ θ κ c μ nn : ℝ} (hℓ : 0 ≤ ℓ) (hθ : 0 ≤ θ) (hκ : 0 ≤ κ) (hc : 0 < c)
     (hnn : 0 < nn) (hμ : μ ≤ 2 * c) (h : 2048 * nn ^ 2 * ℓ ≤ θ ^ 2 * κ ^ 2 * c ^ 3) :
     16 * √(ℓ * μ) ≤ θ * κ * c ^ 2 / (2 * nn) := by
-  have h1 : √(ℓ * μ) ≤ √(ℓ * (2 * c)) := sqrt_mul_le_of_le hℓ hμ
+  have h1 : √(ℓ * μ) ≤ √(ℓ * (2 * c)) :=
+    sqrt_le_sqrt (mul_le_mul_of_nonneg_left hμ hℓ)
   have h2 : 16 * √(ℓ * (2 * c)) ≤ θ * κ * c ^ 2 / (2 * nn) := by
     apply (sq_le_sq₀ (by positivity) (by positivity)).mp
     rw [mul_pow, sq_sqrt (by positivity), div_pow, le_div_iff₀ (by positivity)]
