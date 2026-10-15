@@ -1,6 +1,7 @@
 import Dynamics.Absorption
 import Dynamics.Azuma
 import Dynamics.Bridge
+import Dynamics.BridgePMF
 import Dynamics.Chernoff
 import Dynamics.Concentration
 import Dynamics.Consensus

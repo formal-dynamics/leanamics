@@ -12,6 +12,7 @@ uses Lean 4.32.0 and Mathlib revision
 | `Independent` | Independent products `Distribution.independent`: resampling and conditioning on one coordinate (`independent_expect_update`, `independent_expect_eq_sum_update`, `independent_expect_fin_succ`), pairwise and block independence (`independent_expect_pair`, `expect_mul_of_dep`), second and third moments of centred sums, coordinatewise combination of independent families (`expect_expect_coord`) |
 | `Bridge` | The three expectation APIs agree: `avg` is Mathlib's `𝔼 a, f a` (`avg_eq_expect`), the product of uniform laws is uniform (`Distribution.independent_uniform_expect`), and `expList` is the expectation over `T` i.i.d. draws in Mathlib's and in the distribution form (`expList_eq_expect`, `expList_eq_independent_expect`) |
 | `Kernel` | Finite stochastic kernels, finite-time expectations, events, stationarity, harmonic observables; the transition matrix `toMatrix` (row stochastic, `iterate n f = toMatrix ^ n *ᵥ f`) |
+| `BridgePMF` | `Distribution` as Mathlib's `PMF` (`Distribution.toPMF`, compatible with `PMF.uniformOfFintype`, `PMF.pure`, `PMF.map`): `expect` is the integral and `prob` the measure under `toPMF.toMeasure` (`expect_eq_integral`, `prob_eq_toMeasure`), `independent` is `Measure.pi` (`toMeasure_independent`) with `iIndepFun` coordinates (`iIndepFun_independent`), and Hoeffding's inequality for bounded, non-identical independent coordinates derived from Mathlib's (`Distribution.hoeffding`) |
 | `Trajectory` | Weighted history/endpoint expectations and agreement with kernel iteration |
 | `Stationary` | Stationary-distribution existence by Cesàro averages and compactness of the finite simplex |
 | `Absorption` | Uniform absorption blocks, geometric survival bounds, convergence to zero; access from reachability along transitions of positive probability (`exists_iterate_lt_one_of_reachable`) |
@@ -65,7 +66,7 @@ resolved separately to preserve the main project's dependency pins.
 
 This is the only finite-probability layer of the repository: `rumor_spread/`,
 `3-majority/` and `plurality/` use `avg` and `expList` from here, and `Bridge` connects them to
-Mathlib's `Finset.expect`. Where the statements deviate from their sources, see
+Mathlib's `Finset.expect`; `BridgePMF` connects `Distribution` to Mathlib's `PMF` and measures. Where the statements deviate from their sources, see
 [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 3-majority retains its `ThreeMajority` probability names and blueprint links
 through compatibility declarations: `ThreeMajority.avg` is a reducible alias of `avg`.

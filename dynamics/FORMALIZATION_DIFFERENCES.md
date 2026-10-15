@@ -35,6 +35,34 @@ Where the statements of `dynamics/` deviate from their sources, and why.
    (see the section on tail bounds below), and the single-copy independence lemmas
    `Plurality.avg_prod_iter`, `Plurality.avg_eval_two`.
 
+## The bridge to Mathlib's measures (`BridgePMF`)
+
+1. **The finite layer is bridged, not replaced.** `Distribution` keeps real weights and finite
+   sums; `Distribution.toPMF` and the induced measure `p.toPMF.toMeasure` let Mathlib's
+   measure-theoretic results apply to it. No existing core proof is rewritten through the bridge.
+2. **Measurable structure.** The bridge lemmas assume `[MeasurableSpace α]
+   [MeasurableSingletonClass α]` rather than fixing `⊤`; on a finite type every set is then
+   measurable, and the product space `ι → α` gets Mathlib's `MeasurableSpace.pi` with no extra
+   work. `Distribution.hoeffding` does not mention measures and uses `⊤` internally.
+3. **Probability as a real number.** `prob_eq_toMeasure` gives `(μ {a | s a}).toReal`, which is
+   Mathlib's `μ.real {a | s a}` (`measureReal_def`), the form returned by Mathlib's tail bounds.
+4. **What applies through the bridge.** Any statement about a probability measure on a finite
+   type with independent coordinates: `ProbabilityTheory.iIndepFun` holds for the coordinates of
+   `independent p` (`iIndepFun_independent`). Used here: Hoeffding's lemma
+   `ProbabilityTheory.hasSubgaussianMGF_of_mem_Icc` and Hoeffding's inequality
+   `ProbabilityTheory.HasSubgaussianMGF.measure_sum_ge_le_of_iIndepFun`, giving
+   `Distribution.hoeffding` (bounded, non-identical coordinates; `avg_hoeffding` is its uniform
+   `{0,1}` case, checked by an `example` in `BridgePMF.lean`). The Chernoff bound
+   `ProbabilityTheory.measure_ge_le_exp_mul_mgf` (and `measure_le_le_exp_mul_mgf`) applies in the
+   same way.
+5. **What does not apply directly.** The Azuma-type bound
+   `ProbabilityTheory.measure_sum_ge_le_of_hasCondSubgaussianMGF` needs a `StandardBorelSpace`
+   sample space and a filtration; the optional stopping and maximal inequalities
+   (`MeasureTheory.Submartingale.expected_stoppedValue_mono`, `MeasureTheory.maximal_ineq`) need
+   a filtration and an adapted process on a path space. The kernels of `dynamics/`
+   (`Kernel`, `trajectory`) have no path-space measure, so these results are not connected yet;
+   the core keeps its finite optional stopping (`OptionalStopping`) and drift theorems.
+
 ## Chernoff bounds for independent Bernoulli trials (`Chernoff`, FND-3)
 
 1. **`≤` instead of `<` in (4.1).** M&U state the ratio upper tail with strict `<`; it fails
