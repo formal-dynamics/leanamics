@@ -429,32 +429,16 @@ lemma pushRatio_invariant [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] 
     (moranKernel G 1 one_pos).apply
         (fun t => pushValue G t / pushValue G (fun _ => true)) s =
       pushValue G s / pushValue G (fun _ => true) := by
-  rw [Kernel.apply]
-  have hcomm : ∀ t : Config V,
-      pushValue G t / pushValue G (fun _ => true) =
-        (pushValue G (fun _ => true))⁻¹ * pushValue G t := by
-    intro t
-    rw [div_eq_mul_inv, mul_comm]
-  simp_rw [hcomm, Distribution.expect_mul]
-  have hexp : (moranKernel G 1 one_pos s).expect (pushValue G) = pushValue G s := by
-    rw [← Kernel.apply]
-    exact push_value_invariant G s
-  rw [hexp]
+  have h := congrFun ((moranKernel G 1 one_pos).harmonic_affine
+    (funext (push_value_invariant G)) (pushValue G (fun _ => true))⁻¹ 0) s
+  simpa only [add_zero, ← div_eq_inv_mul] using h
 
 lemma pullRatio_invariant [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] (s : Config V) :
     (pullKernel G).apply (fun t => pullValue G t / pullValue G (fun _ => true)) s =
       pullValue G s / pullValue G (fun _ => true) := by
-  rw [Kernel.apply]
-  have hcomm : ∀ t : Config V,
-      pullValue G t / pullValue G (fun _ => true) =
-        (pullValue G (fun _ => true))⁻¹ * pullValue G t := by
-    intro t
-    rw [div_eq_mul_inv, mul_comm]
-  simp_rw [hcomm, Distribution.expect_mul]
-  have hexp : (pullKernel G s).expect (pullValue G) = pullValue G s := by
-    rw [← Kernel.apply]
-    exact pull_value_invariant G s
-  rw [hexp]
+  have h := congrFun ((pullKernel G).harmonic_affine
+    (funext (pull_value_invariant G)) (pullValue G (fun _ => true))⁻¹ 0) s
+  simpa only [add_zero, ← div_eq_inv_mul] using h
 
 /-- **Push fixation.** On a connected graph with at least two vertices, neutral Birth–death
 fixes with probability `∑_{v ∈ S} 1/deg v / ∑_v 1/deg v`. -/

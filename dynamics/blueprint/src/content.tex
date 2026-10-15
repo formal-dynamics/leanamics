@@ -181,6 +181,19 @@ $A\cap B$ both sides vanish). Take expectations at time $T$ and bound the last t
 monotonicity. For the limit, take $M=-m=\sum_a|\varphi(a)-\varphi_B|$ and squeeze. If $A$
 is absorbing, the finite-time probabilities increase, so their limit is their supremum.
 \end{proof}
+\begin{lemma}[Gambler's ruin for two consensus configurations]\label{lem:gamblers-ruin}
+\lean{Dynamics.Kernel.harmonic_affine,Dynamics.Kernel.iSup_consensus_of_harmonic,Dynamics.Kernel.iSup_consensus_of_invariant}\leanok\uses{thm:optional-stopping}
+Let $K$ be a kernel on configurations $V\to\{0,1\}$ for which the all-one configuration
+$\mathbf 1$ is absorbing and the non-consensus probability tends to zero from $s$. If
+$K\varphi=\varphi$ and $\varphi(\mathbf 1)\ne\varphi(\mathbf 0)$, the probability of fixation
+in $\mathbf 1$ from $s$ is $(\varphi(s)-\varphi(\mathbf 0))/(\varphi(\mathbf 1)-\varphi(\mathbf 0))$.
+For instance, a harmonic $q^{k}$, with $k$ the number of ones out of $n$, gives
+$(1-q^k)/(1-q^n)$. Affine images $u\varphi+v$ of harmonic observables are harmonic.
+\end{lemma}
+\begin{proof}\leanok
+Apply the previous theorem with $A=\{\mathbf 1\}$, $B=\{\mathbf 0\}$; the event of lying in
+neither is non-consensus. Affine images are harmonic by linearity of expectation.
+\end{proof}
 
 \section{Rounds, concentration and phases}
 \begin{definition}[Kernel of a round-based process]\label{def:ofstep}

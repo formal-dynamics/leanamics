@@ -72,6 +72,15 @@ lemma iterate_invariant (K : Kernel α) {f : α → ℝ} (h : K.apply f = f) (n 
   | zero => rfl
   | succ n ih => rw [iterate_succ, ih, h]
 
+/-- An affine image `u φ + v` of a harmonic observable `φ` is harmonic. This normalizes an
+invariant potential into a candidate absorption probability, `1` on one target and `0` on the
+other (for instance `(1 - q^k) / (1 - q^n)` from `q^k`). -/
+lemma harmonic_affine (K : Kernel α) {φ : α → ℝ} (h : K.apply φ = φ) (u v : ℝ) :
+    K.apply (fun a => u * φ a + v) = fun a => u * φ a + v := by
+  funext a
+  rw [apply, Distribution.expect_add, Distribution.expect_mul, Distribution.expect_const, ← apply,
+    h]
+
 /-- Probability of occupying an event at a finite time. -/
 noncomputable def event (K : Kernel α) (s : α → Prop) (n : ℕ) (a : α) : ℝ := by
   classical

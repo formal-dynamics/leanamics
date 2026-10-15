@@ -75,14 +75,11 @@ lemma star_fixation_eq [Nonempty V] (c : V) {n : ℕ} (hn : Fintype.card V = n +
   set D := 1 - starPotential c n r (fun _ => true) with hDdef
   have hinv : (moranKernel (starGraph c) r hr).apply
       (fun t => (1 - starPotential c n r t) / D) = fun t => (1 - starPotential c n r t) / D := by
-    funext t
-    rw [Kernel.apply]
-    have hcomm : ∀ t' : Config V,
-        (1 - starPotential c n r t') / D = D⁻¹ * (1 - starPotential c n r t') := fun t' => by
-      rw [div_eq_mul_inv, mul_comm]
-    simp_rw [hcomm]
-    rw [Distribution.expect_mul, Distribution.expect_sub, Distribution.expect_const,
-      ← Kernel.apply, starPotential_apply c hn hr t]
+    have hψ : (fun t => (1 - starPotential c n r t) / D) =
+        fun t => -D⁻¹ * starPotential c n r t + D⁻¹ := funext fun t => by ring
+    rw [hψ]
+    exact (moranKernel (starGraph c) r hr).harmonic_affine (funext (starPotential_apply c hn hr))
+      _ _
   refine fixation_eq_of_invariant _ _ hinv ?_ ?_ (allMutant_step _ hr) s
     (moran_unfixed_tendsto _ (connected_starGraph c) hr s)
   · exact div_self hD

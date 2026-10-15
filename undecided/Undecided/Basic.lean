@@ -1,5 +1,5 @@
 import Dynamics.Rounds
-import Dynamics.Absorption
+import Dynamics.Consensus
 import Dynamics.Tail
 import Mathlib
 
@@ -49,10 +49,8 @@ def count (x : Config n) (o : Op) : ℕ := (univ.filter fun v => x v = o).card
 /-- All nodes are in the same state. -/
 def Mono (x : Config n) : Prop := ∃ o, ∀ v, x v = o
 
-/-- Indicator of not yet being monochromatic. -/
-noncomputable def notMono (x : Config n) : ℝ := by
-  classical
-  exact if Mono x then 0 else 1
+/-- Indicator of not yet being monochromatic (`Dynamics.nonConsensus`). -/
+noncomputable abbrev notMono (x : Config n) : ℝ := nonConsensus x
 
 /-- A node holding `s` that samples `t` is `a` exactly when it was `a` and avoided `b`,
 or it was undecided and sampled `a`. -/
@@ -127,21 +125,10 @@ lemma node_prob_u (x : Config n) (v : Fin n) :
   rw [avg_add, avg_add, avg_const_mul, avg_const_mul, avg_const_mul]
   rw [avg_indicator_eq, avg_indicator_eq, avg_indicator_eq]
 
-lemma notMono_binary (x : Config n) : notMono x = 0 ∨ notMono x = 1 := by
-  unfold notMono
-  split <;> simp
-
-lemma notMono_le_one (x : Config n) : notMono x ≤ 1 := by
-  unfold notMono
-  split <;> norm_num
-
 lemma notMono_of_mono (x : Config n) (h : Mono x) : notMono x = 0 := by
-  unfold notMono
-  exact if_pos h
-
-lemma notMono_const (o : Op) : notMono (fun _ : Fin n => o) = 0 := by
-  unfold notMono
-  exact if_pos ⟨o, fun _ => rfl⟩
+  obtain ⟨o, ho⟩ := h
+  rw [show x = fun _ => o from funext ho]
+  exact nonConsensus_const o
 
 lemma exists_decided (x : Config n) (hx : ¬ Mono x) : ∃ w, x w = .a ∨ x w = .b := by
   by_contra h
@@ -277,35 +264,26 @@ theorem step_of_mono (x : Config n) (h : Mono x) (r : Fin n → Fin n) : step x 
 
 /-- Almost-sure absorption: the probability of not being monochromatic after `t` rounds tends
 to zero, from every configuration. -/
-lemma notMono_step (x : Config n) : (kernel n).apply notMono x ≤ notMono x := by
-  rw [kernel, Kernel.apply_ofStep]
-  by_cases h : Mono x
-  · have hs : ∀ r : Fin n → Fin n, step x r = x := fun r => step_of_mono x h r
-    simp only [hs, avg_const]
-    exact le_rfl
-  · have hx : notMono x = 1 := by
-      unfold notMono
-      exact if_neg h
-    rw [hx]
-    calc avg (fun r => notMono (step x r)) ≤ avg (fun _ : Fin n → Fin n => (1 : ℝ)) :=
-          avg_le_avg fun r => notMono_le_one _
-      _ = 1 := avg_const 1
+lemma notMono_step (x : Config n) : (kernel n).apply notMono x ≤ notMono x :=
+  (kernel n).nonConsensus_step (fun o f => by
+    rw [kernel, Kernel.apply_ofStep]
+    simp only [step_of_mono _ ⟨o, fun _ => rfl⟩, avg_const]) x
 
 lemma access_from_decided (x : Config n) (w : Fin n) (hw : x w = .a ∨ x w = .b) :
     (kernel n).iterate 2 notMono x < 1 := by
   -- two rounds in which every node samples `w` reach the monochromatic `fun _ => x w`
   have h₂ := Kernel.ofStep_weight_pos step (step x (fun _ => w)) (fun _ => w)
   rw [two_const_mono x hw] at h₂
-  refine (kernel n).iterate_succ_lt_one notMono_le_one
+  refine (kernel n).iterate_succ_lt_one nonConsensus_le_one
     (Kernel.ofStep_weight_pos step x (fun _ => w))
-    ((kernel n).iterate_succ_lt_one (n := 0) notMono_le_one h₂ ?_)
-  rw [Kernel.iterate_zero, notMono_const]
+    ((kernel n).iterate_succ_lt_one (n := 0) nonConsensus_le_one h₂ ?_)
+  rw [Kernel.iterate_zero, nonConsensus_const]
   exact zero_lt_one
 
 theorem absorbed (x : Config n) :
     Tendsto (fun t => (kernel n).iterate t notMono x) atTop (𝓝 0) := by
   haveI : Nonempty (Config n) := ⟨fun _ => .u⟩
-  refine (kernel n).finite_absorption notMono notMono_binary notMono_step ?_ x
+  refine (kernel n).finite_absorption notMono nonConsensus_binary notMono_step ?_ x
   intro y
   by_cases hy : Mono y
   · refine ⟨0, ?_⟩

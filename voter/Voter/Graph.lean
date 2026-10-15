@@ -41,13 +41,18 @@ lemma boundary_edge (G : SimpleGraph V) (hc : G.Connected) (S : Finset V)
   | nil => exact hi
   | @cons u v w huv tail ih => exact ih (hclosed hi huv)
 
-/-- A monochromatic region with an internal neighbor at each vertex can grow to
-consensus along a finite sequence of possible rounds. -/
-lemma propagate_region (G : SimpleGraph V) (hc : G.Connected)
-    (neighbors : ∀ i, ∃ j, G.Adj i j) (s : Config V C) (S : Finset V) (c : C)
-    (hne : S.Nonempty) (hcolor : ∀ i ∈ S, s i = c)
-    (hinternal : ∀ i ∈ S, ∃ j ∈ S, G.Adj i j) :
-    Relation.ReflTransGen (Possible G) s (fun _ => c) := by
+/-- **Propagation, for any copying relation.** Let a round be possible when every vertex `i`
+copies a vertex `j` with `R i j`. If `R` contains the edges of a connected graph and every vertex
+has an `R`-successor, a monochromatic region in which every vertex has an `R`-successor in the
+region grows to consensus along a finite sequence of possible rounds. Graph rounds
+(`propagate_region`, `R = G.Adj`) and rounds in the support of a kernel
+(`propagate_kernel_region`) are the two instances. -/
+lemma propagate_region_of_rel (G : SimpleGraph V) (hc : G.Connected) (R : V → V → Prop)
+    (hadj : ∀ i j, G.Adj i j → R i j) (hsucc : ∀ i, ∃ j, R i j) (s : Config V C)
+    (S : Finset V) (c : C) (hne : S.Nonempty) (hcolor : ∀ i ∈ S, s i = c)
+    (hinternal : ∀ i ∈ S, ∃ j ∈ S, R i j) :
+    Relation.ReflTransGen (fun s t : Config V C => ∃ r : V → V, (∀ i, R i (r i)) ∧ step s r = t)
+      s (fun _ => c) := by
   classical
   generalize hd : (univ \ S).card = d
   induction d using Nat.strong_induction_on generalizing s S with
@@ -56,15 +61,15 @@ lemma propagate_region (G : SimpleGraph V) (hc : G.Connected)
     · have hs : s = fun _ => c := funext fun i => hcolor i (hfull ▸ mem_univ i)
       rw [hs]
     · obtain ⟨i, hi, j, hj, hij⟩ := boundary_edge G hc S hne hfull
-      have hr : ∀ v, ∃ u, G.Adj v u ∧ (v ∈ insert j S → u ∈ S) := by
+      have hr : ∀ v, ∃ u, R v u ∧ (v ∈ insert j S → u ∈ S) := by
         intro v
         by_cases hv : v ∈ S
         · obtain ⟨u, hu, hvu⟩ := hinternal v hv
           exact ⟨u, hvu, fun _ => hu⟩
         · by_cases hvj : v = j
           · subst v
-            exact ⟨i, hij.symm, fun _ => hi⟩
-          · obtain ⟨u, hu⟩ := neighbors v
+            exact ⟨i, hadj j i hij.symm, fun _ => hi⟩
+          · obtain ⟨u, hu⟩ := hsucc v
             exact ⟨u, hu, fun habs => False.elim (by simp [hv, hvj] at habs)⟩
       choose r hr using hr
       have hsmaller : (univ \ insert j S).card < d := by
@@ -81,10 +86,19 @@ lemma propagate_region (G : SimpleGraph V) (hc : G.Connected)
         (by
           intro v hv
           rcases mem_insert.mp hv with rfl | hv
-          · exact ⟨i, mem_insert_of_mem hi, hij.symm⟩
+          · exact ⟨i, mem_insert_of_mem hi, hadj _ i hij.symm⟩
           · obtain ⟨u, hu, hvu⟩ := hinternal v hv
             exact ⟨u, mem_insert_of_mem hu, hvu⟩) rfl
       exact (Relation.ReflTransGen.single ⟨r, fun v => (hr v).1, rfl⟩).trans hnext
+
+/-- A monochromatic region with an internal neighbor at each vertex can grow to
+consensus along a finite sequence of possible rounds. -/
+lemma propagate_region (G : SimpleGraph V) (hc : G.Connected)
+    (neighbors : ∀ i, ∃ j, G.Adj i j) (s : Config V C) (S : Finset V) (c : C)
+    (hne : S.Nonempty) (hcolor : ∀ i ∈ S, s i = c)
+    (hinternal : ∀ i ∈ S, ∃ j ∈ S, G.Adj i j) :
+    Relation.ReflTransGen (Possible G) s (fun _ => c) :=
+  propagate_region_of_rel G hc G.Adj (fun _ _ h => h) neighbors s S c hne hcolor hinternal
 
 /-- Every Boolean configuration can reach consensus on a connected nonbipartite graph. -/
 theorem possible_consensus (G : SimpleGraph V) (hc : G.Connected)
