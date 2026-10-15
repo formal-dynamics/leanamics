@@ -135,6 +135,29 @@ lemma sum_bernoulli_expect {ι : Type*} [Fintype ι] [DecidableEq ι] (p : ι �
   rw [bernoulli_expect]
   by_cases hi : i ∈ S <;> simp [hi]
 
+/-- The moment-generating function of a weighted count of heads: for independent coins
+`ω i ~ bernoulli (p i)`, a finite set `S` of coins and weights `a`,
+`𝔼[exp (∑_{i ∈ S, ω i} a i)] = ∏_{i ∈ S} (1 - pᵢ + pᵢ e^{a i})`. -/
+lemma independent_bernoulli_expect_exp_sum {ι : Type*} [Fintype ι] [DecidableEq ι] (p : ι → ℝ)
+    (hp0 : ∀ i, 0 ≤ p i) (hp1 : ∀ i, p i ≤ 1) (S : Finset ι) (a : ι → ℝ) :
+    (independent fun i => bernoulli (p i) (hp0 i) (hp1 i)).expect
+      (fun ω => exp (∑ i ∈ S.filter fun i => ω i = true, a i)) =
+      ∏ i ∈ S, (1 - p i + p i * exp (a i)) := by
+  set g : ι → Bool → ℝ := fun i b =>
+    if i ∈ S then (if b = true then exp (a i) else 1) else 1 with hg
+  have hpt (ω : ι → Bool) : exp (∑ i ∈ S.filter fun i => ω i = true, a i) = ∏ i, g i (ω i) := by
+    rw [exp_sum, prod_filter, hg]
+    simp only
+    rw [prod_ite_mem, univ_inter]
+  rw [show (fun ω : ι → Bool => exp (∑ i ∈ S.filter fun i => ω i = true, a i)) =
+    fun ω => ∏ i, g i (ω i) from funext hpt, independent_expect_prod, hg]
+  simp only
+  rw [← prod_subset (subset_univ S) (fun i _ hi => by simp [hi])]
+  refine prod_congr rfl fun i hi => ?_
+  simp only [hi, if_true, bernoulli_expect]
+  simp
+  ring
+
 /-- **Chernoff upper tail for Bernoulli(`pᵢ`) coins**, ratio form (Mitzenmacher–Upfal,
 Theorem 4.4, bound (4.1), and Exercise 4.7): for independent coins `ω i ~ bernoulli (p i)`,
 a finite set `S` of coins with `∑_{i ∈ S} pᵢ ≤ μH` and `δ > 0`, the number of heads in `S`

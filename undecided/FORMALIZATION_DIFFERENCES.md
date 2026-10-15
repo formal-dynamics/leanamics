@@ -393,7 +393,8 @@ The explicit forms behind them (`SequentialConsensus.lean`): for `n ≥ 16`, any
 
 The statements do not depend on these. Only some constants are needed, so the four-region
 bookkeeping of [AAE08, §4] is replaced by six weighted supermartingales, all instances of one
-generic lemma (`SequentialMartingale.lean`, `expList_exp_pathSum_le`): if
+generic lemma (`SequentialMartingale.lean`, `expList_exp_pathSum_le`, a restatement of the
+core `Dynamics.expList_exp_incrementSum_le` in `Dynamics/Azuma.lean`): if
 `avg_p exp(φ s p) · F(step s p) ≤ F s` for all `s`, then `E[exp(∑_path φ) · F(X_T)] ≤ F(X_0)`,
 hence (Markov) `P[∑_path φ ≥ L] ≤ F(X_0) e^{-L} / min F`.
 

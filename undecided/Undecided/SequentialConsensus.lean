@@ -212,12 +212,6 @@ end Core
 
 /-! ### Probabilities -/
 
-lemma ind_le_of_imp {P Q : Prop} [Decidable P] [Decidable Q] (h : P → Q) :
-    (if P then (1 : ℝ) else 0) ≤ if Q then 1 else 0 := by
-  by_cases hp : P
-  · simp [hp, h hp]
-  · simp only [hp, if_false]; split <;> norm_num
-
 lemma ind_nonneg (P : Prop) [Decidable P] : (0 : ℝ) ≤ if P then 1 else 0 := by
   split <;> norm_num
 

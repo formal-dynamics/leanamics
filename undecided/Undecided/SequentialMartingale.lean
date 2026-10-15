@@ -5,7 +5,8 @@ import Dynamics.Azuma
 A round-based process `l.foldl step s`, driven by i.i.d. uniform rounds, together with a per-step
 weight `φ` and a potential `F`. If one round never increases `exp (φ s r) * F (step s r)` in
 expectation, then `exp (∑_path φ) * F (state)` is a supermartingale, so its expectation after `T`
-rounds is at most `F s` (`expList_exp_pathSum_le`). Markov's inequality then bounds the
+rounds is at most `F s` (`expList_exp_pathSum_le`, from the core
+`Dynamics.expList_exp_incrementSum_le`). Markov's inequality then bounds the
 probability that the path sum of `φ` is large (`expList_ind_le_of_weight`). The path sum
 `pathSum` is the core `Dynamics.incrementSum` (with its algebra: `incrementSum_add`,
 `incrementSum_mono`, ...).
@@ -27,22 +28,12 @@ noncomputable abbrev pathSum (φ : S → R → ℝ) (s : S) (l : List R) : ℝ :
 variable {step}
 
 /-- **Finite-horizon supermartingale.** If one round never increases `exp φ · F` in expectation,
-then `exp (∑_path φ) · F (state)` has expectation at most `F s` after any number of rounds. -/
+then `exp (∑_path φ) · F (state)` has expectation at most `F s` after any number of rounds
+(the core's `Dynamics.expList_exp_incrementSum_le`). -/
 theorem expList_exp_pathSum_le [Fintype R] {φ : S → R → ℝ} {F : S → ℝ}
     (h : ∀ s, avg (fun r => Real.exp (φ s r) * F (step s r)) ≤ F s) (T : ℕ) (s : S) :
-    expList R T (fun l => Real.exp (pathSum step φ s l) * F (l.foldl step s)) ≤ F s := by
-  induction T generalizing s with
-  | zero => simp
-  | succ T ih =>
-    rw [expList_succ]
-    refine le_trans (avg_le_avg fun r => ?_) (h s)
-    have he : (fun l => Real.exp (pathSum step φ s (r :: l)) * F ((r :: l).foldl step s)) =
-        fun l => Real.exp (φ s r) *
-          (Real.exp (pathSum step φ (step s r) l) * F (l.foldl step (step s r))) := by
-      funext l
-      rw [pathSum, incrementSum_cons, Real.exp_add, List.foldl_cons, mul_assoc]
-    rw [he, expList_const_mul]
-    exact mul_le_mul_of_nonneg_left (ih _) (Real.exp_pos _).le
+    expList R T (fun l => Real.exp (pathSum step φ s l) * F (l.foldl step s)) ≤ F s :=
+  expList_exp_incrementSum_le step h T s
 
 /-- **Markov's inequality** for the supermartingale of `expList_exp_pathSum_le`: an event on which
 `exp (∑_path φ) · F (state) ≥ m > 0` has probability at most `F s / m`. -/

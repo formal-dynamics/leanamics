@@ -520,7 +520,7 @@ lemma expect_fac_le_one (r : Sym2 V → ℝ) (hr0 : ∀ e, 0 ≤ r e) (hr1 : ∀
       simp only [obs]
       ring
     simp_rw [hfac, Distribution.expect_mul]
-    rw [expect_exp_sum_open r hr0 hr1 (block G σ) fun e => θ * h e]
+    rw [Distribution.independent_bernoulli_expect_exp_sum r hr0 hr1 (block G σ) fun e => θ * h e]
     have hprod : ∏ e ∈ block G σ, (1 - r e + r e * Real.exp (θ * h e)) ≤
         Real.exp (κ * θ * ∑ y ∈ fresh G σ v, r s(v, y) * h s(v, y)) := by
       calc ∏ e ∈ block G σ, (1 - r e + r e * Real.exp (θ * h e))

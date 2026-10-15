@@ -29,19 +29,10 @@ Throughout, `1 - P.notYet m t S` is the probability that at least `m` nodes are 
 namespace Epidemics.Revisited
 open Finset Dynamics
 
-/-! ### Complements of iterated observables -/
+/-! ### Deterministic lower envelopes -/
 
 section Kernel
 variable {α : Type*} [Fintype α]
-
-/-- `1 - E[g(X_t)] = E[1 - g(X_t)]`. -/
-lemma one_sub_iterate (K : Kernel α) (t : ℕ) (g : α → ℝ) (a : α) :
-    1 - K.iterate t g a = K.iterate t (fun b => 1 - g b) a := by
-  have h : (fun b => 1 - g b) = fun b => (fun _ => (1 : ℝ)) b + (-1) * g b := by
-    funext b
-    ring
-  rw [h, K.iterate_add, K.iterate_mul, K.iterate_const]
-  ring
 
 /-- **Deterministic lower envelope.** Suppose that from every state `a` with `v ≤ V a`, the
 observable `V` falls below `f v` in one round with probability at most `δ v ≥ 0`. Then, started
@@ -136,7 +127,7 @@ variable {n : ℕ}
 least `m` informed nodes. -/
 lemma one_sub_notYet_eq (P : RumorProcess n) (m : ℝ) (t : ℕ) (S : Finset (Fin n)) :
     1 - P.notYet m t S = P.K.iterate t (fun T => 1 - below m T) S := by
-  rw [notYet_below, one_sub_iterate]
+  rw [notYet_below, ← Kernel.iterate_const_sub]
 
 lemma iterate_card_le (P : RumorProcess n) {μ : ℝ} (hμ : 0 ≤ μ)
     (h : ∀ S : Finset (Fin n), (P.K S).expect (fun T => (T.card : ℝ)) ≤ μ * S.card)
@@ -239,7 +230,7 @@ theorem reach_add_le (P : RumorProcess n) {m m' B : ℝ} (hB : 0 ≤ B) (s t : �
     · have hb : below m' T = 0 := by simp [below, h]
       have := notYet_nonneg P m t T
       linarith only [this, hb, hB]
-  rw [notYet_below, P.K.iterate_add_time, one_sub_iterate, one_sub_notYet_eq]
+  rw [notYet_below, P.K.iterate_add_time, ← Kernel.iterate_const_sub, one_sub_notYet_eq]
   calc P.K.iterate s (fun T => 1 - P.K.iterate t (below m) T) S
       ≤ P.K.iterate s (fun T => (1 - below m' T) + B) S := P.K.iterate_mono s hpt S
     _ = P.K.iterate s (fun T => 1 - below m' T) S + B := by

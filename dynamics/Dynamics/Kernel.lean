@@ -59,6 +59,15 @@ lemma iterate_add (K : Kernel α) (n : ℕ) (f g : α → ℝ) :
   | zero => rfl
   | succ n ih => funext a; simp [iterate, ih, apply, Distribution.expect_add]
 
+/-- `𝔼[c - F] = c - 𝔼[F]` at every finite time (for `c = 1`, the complement of an event). -/
+lemma iterate_const_sub (K : Kernel α) (n : ℕ) (c : ℝ) (F : α → ℝ) (x : α) :
+    K.iterate n (fun y => c - F y) x = c - K.iterate n F x := by
+  have h : (fun y => c - F y) = fun y => (fun _ => c) y + (fun y => (-1) * F y) y := by
+    funext y
+    ring
+  rw [h, K.iterate_add, K.iterate_mul, K.iterate_const]
+  ring
+
 lemma iterate_add_time (K : Kernel α) (m n : ℕ) (f : α → ℝ) :
     K.iterate (m + n) f = K.iterate m (K.iterate n f) := by
   induction m with

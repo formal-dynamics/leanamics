@@ -1,6 +1,7 @@
 import Voter.Absorption
 import Dynamics.OptionalStopping
 import Dynamics.Stationary
+import Dynamics.Tail
 
 /-! # Consensus probability (Theorem 2.1)
 
@@ -56,11 +57,7 @@ lemma colorProbability_mono [Fintype C] (H : Kernel V) (c : C) (s : Config V C) 
       rw [Distribution.expect_const]
     · rw [allColor, if_neg ht]
       exact (transition H t).expect_nonneg (allColor_nonneg c)
-  apply monotone_nat_of_le_succ
-  intro n
-  change (transition H).iterate n (allColor c) s ≤ (transition H).iterate (n + 1) (allColor c) s
-  rw [Kernel.iterate_add_time]
-  exact (transition H).iterate_mono n hstep s
+  exact (transition H).iterate_monotone _ hstep s
 
 omit [Nonempty V] in
 lemma colorProbability_tendsto [Fintype C] (H : Kernel V) (c : C) (s : Config V C) :
