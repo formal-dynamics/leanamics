@@ -133,9 +133,11 @@ FND-7:
    `V × NeighborRound G` read at `(v, r v)` (`avg_vertex_neighborRound`).
 9. `NeighborRound G` is empty when `G` has an isolated vertex (then `avg` over it is `0` by
    convention), so the marginal lemmas assume `∀ v, 0 < G.degree v`; the product lemma
-   (`avg_neighborRound_prod`) holds unconditionally. Its relation to `RumorPush.Tgt n`
-   (complete graph on `Fin n`) is only documented, since `dynamics/` does not import
-   `rumor_spread/`.
+   (`avg_neighborRound_prod`) holds unconditionally. Both are the dependent-product lemmas
+   `avg_pi_prod` and `avg_pi_eval` (`Uniform`) for the factors `G.neighborSet v`. The relation
+   of `NeighborRound G` to `RumorPush.Tgt n` (complete graph on `Fin n`) is only documented,
+   since `dynamics/` does not import `rumor_spread/`; `rumor_spread/` uses `avg_pi_prod`
+   directly.
 
 ## Hitting-time lemma (`DriftHitting`, MAJ-8, Doerr et al. SPAA 2011 Claim 2.9)
 

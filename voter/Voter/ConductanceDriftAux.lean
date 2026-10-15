@@ -227,7 +227,7 @@ lemma expect_compSum_sq_ge (hd : ∀ v, 0 < G.degree v) (s : Config V Bool) (b :
       (Distribution.independent (lazyNeighbor G hd)).expect
         (fun r => (∑ u, compVar G s b u (r u)) ^ 2) := by
   simp_rw [sum_compVar_eq_centred G hd s b]
-  rw [independent_expect_sum_sq _ _ (compCentred_mean G hd s b), sum_filter, sum_div]
+  rw [Distribution.independent_expect_sum_sq _ _ (compCentred_mean G hd s b), sum_filter, sum_div]
   refine sum_le_sum fun u _ => ?_
   rw [show (fun a => compCentred G hd s b u a ^ 2) = fun a =>
       ((if (s u = b ∧ s a ≠ b) ∨ (s u ≠ b ∧ a ≠ u) then compVal G s b u else 0) -
@@ -250,7 +250,7 @@ lemma expect_compSum_cube_le (hd : ∀ v, 0 < G.degree v) (s : Config V Bool) (b
     (Distribution.independent (lazyNeighbor G hd)).expect
         (fun r => (∑ u, compVar G s b u (r u)) ^ 3) ≤ 0 := by
   simp_rw [sum_compVar_eq_centred G hd s b]
-  rw [independent_expect_sum_cube _ _ (compCentred_mean G hd s b)]
+  rw [Distribution.independent_expect_sum_cube _ _ (compCentred_mean G hd s b)]
   refine sum_nonpos fun u _ => ?_
   rw [show (fun a => compCentred G hd s b u a ^ 3) = fun a =>
       ((if (s u = b ∧ s a ≠ b) ∨ (s u ≠ b ∧ a ≠ u) then compVal G s b u else 0) -

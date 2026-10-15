@@ -410,6 +410,13 @@ paper mentions but omits after Theorem 2.5; its shape follows claim 2 of Theorem
     `(1 - ε) e^ε ≤ 1 - ε²/2` are the core's (`one_sub_mul_exp_le` restates
     `one_sub_mul_exp_le_one_sub_sq_div_two` under its blueprint name); congruence, complement
     and the union bound are shared with EPI-3 (`GiantCoins.lean`).
+    `(1 - ε) e^ε ≤ 1 - ε²/2` (`one_sub_mul_exp_le`), `prob_eq_one`, `prob_eq_zero` and the
+    conditioning of the coins on one pair (`coins_prob_split`) are not in `dynamics/` yet; their
+    move is tracked in issues #42 and #44. The conditioning lemmas for independent products
+    (`Distribution.independent_expect_eq_sum_update`, `Distribution.independent_expect_fin_succ`,
+    `Distribution.independent_prob_fin_succ`) are the core's (`Dynamics.Independent`). Monotonicity, Markov's inequality on `exp (t X)` and the
+    moment-generating-function bound are the core's; congruence, complement and the union bound
+    are shared with EPI-3 (`GiantCoins.lean`).
 
 ## Small-world networks below the percolation threshold (`SmallWorld*`, EPI-6)
 
@@ -484,6 +491,13 @@ Source: L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccar
     `prob_components_le_of_tail` for any distribution) are not in `dynamics/` yet; their move is
     tracked in issues #42, #46 and #49. Markov's inequality is the core's
     `Distribution.prob_le_expect_div`.
+    (`expect_prod_hist_le_one_of_fresh`), Markov's inequality `prob_le_expect_div`, the
+    moment-generating function of a weighted block of coins (`expect_exp_sum_open`) and the union
+    bound over components for an arbitrary random graph (`prob_components_le_of_tail'`, the
+    form of EPI-2's `prob_components_le_of_tail` for any distribution) are not in `dynamics/`
+    yet; their move is tracked in issues #42 and #49. The coordinatewise combination of
+    independent families (`Distribution.expect_expect_coord`, `Distribution.expect_mul_of_dep`)
+    is the core's (`Dynamics.Independent`).
 
 ## The supercritical giant component (`Giant*`, EPI-3)
 
@@ -718,6 +732,18 @@ the eigenbasis lemmas (Parseval `dotProduct_eq_sum_eigenvectorBasis`,
 `Median.mixing_transition` (`exists_top_eigenvectorBasis`) are in the core
 (`Dynamics/Spectral.lean`), shared with the median and averaging packages. Inside the package,
 `avg_pi_prod`, `avg_pi_eval`, `pi_count_mgf_le` (any dependent product) and
+`transitionMatrix`, `transitionMatrix_isHermitian`, `walkEigenvalues`, `lambdaG`, `lambdaG_nonneg`
+are copies of the `Median` declarations of the same names (`Median/ExpanderDefs.lean`,
+`Median/ExpanderMixing.lean`), and the eigenbasis lemmas of `CobraCoverSpectral.lean`
+(`sum_eigvec_mul_eigvec` (private), `dotProduct_eq_sum_eigvec`, `eigvec_dotProduct_mulVec`,
+`dotProduct_mulVec_eq_sum_eigvec`, `indVec`, `indVec_dotProduct_self`, `one_dotProduct_indVec`,
+`transitionMatrix_mulVec_one`, `abs_eigenvalues_le_lambdaG`) are copies of
+`Median.mixing_transition` and its helpers, renamed into the `Epidemics` namespace; the spectral
+part of `sum_sq_neighbor_le` reuses the eigenbasis argument of `Median.mixing_transition` and of
+`Averaging.mulVec_dotProduct_mulVec_le`. The epidemics package depends only on `dynamics`, so
+these are restated here; they should move to `dynamics/` and be shared. The core's
+`Dynamics.avg_pi_prod`, `Dynamics.avg_pi_eval` and, inside the package, `pi_count_mgf_le` (any
+dependent product) and
 `avg_lower_tail_of_mgf` (any observable) generalize `avg_choices_prod`, `avg_choices_depends`,
 `bips_mgf_le` and `bips_chernoff_lower`; the generic round lemmas (`roundRun`, `round_first_hit`,
 `sum_range_shift_le`, `GrowthProcess`) are candidates for `dynamics/` as well.

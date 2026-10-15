@@ -6,7 +6,7 @@ Generic facts behind the duality of `Voter/Meeting.lean`, for an arbitrary sampl
 
 * finite expectations and finite sums commute with `Kernel.iterate`;
 * under `Distribution.independent H`, two distinct coordinates of a round are independent
-  (`independent_expect_pair`);
+  (`Distribution.independent_expect_pair`, in `Dynamics.Independent`);
 * running the voter dynamics on maps from `id` composes the rounds on the right,
   `B ↦ B ∘ r`; composing them on the left, `W ↦ r ∘ W` (kernel `leftRounds H`), gives the same
   expectations at every finite time (`iterate_transition_eq_leftRounds`). This is the time
@@ -47,50 +47,6 @@ lemma kernel_iterate_finset_sum {ι : Type*} (K : Kernel α) (s : Finset ι) (g 
     simp only [ih]
 
 end Kernel
-
-section Independent
-variable {ι α : Type*} [Fintype ι] [DecidableEq ι] [Fintype α]
-
-/-- Two distinct coordinates of an independent product are independent. -/
-lemma independent_expect_pair (p : ι → Distribution α) {i j : ι} (hij : i ≠ j)
-    (f : α → α → ℝ) :
-    (Distribution.independent p).expect (fun x => f (x i) (x j)) =
-      (p i).expect fun a => (p j).expect fun b => f a b := by
-  classical
-  -- factor of coordinate `k` selecting the values `a` at `i` and `b` at `j`
-  let φ : α → α → ι → α → ℝ := fun a b k c =>
-    (if k = i then (if c = a then 1 else 0) else 1) *
-      (if k = j then (if c = b then 1 else 0) else 1)
-  have hprod (a b : α) (x : ι → α) :
-      ∏ k, φ a b k (x k) = (if x i = a then 1 else 0) * (if x j = b then 1 else 0) := by
-    simp only [φ, Finset.prod_mul_distrib, Finset.prod_ite_eq', Finset.mem_univ, if_true]
-  have hfactor (a b : α) (k : ι) :
-      (p k).expect (φ a b k) =
-        (if k = i then (p i).weight a else 1) * (if k = j then (p j).weight b else 1) := by
-    by_cases hki : k = i
-    · subst hki
-      simp [φ, hij, Distribution.expect]
-    · by_cases hkj : k = j
-      · subst hkj
-        simp [φ, hki, Distribution.expect]
-      · simp [φ, hki, hkj]
-  have hdecomp (x : ι → α) :
-      f (x i) (x j) = ∑ a, ∑ b, f a b * ∏ k, φ a b k (x k) := by
-    simp only [hprod, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
-  calc
-    (Distribution.independent p).expect (fun x => f (x i) (x j))
-        = ∑ a, ∑ b, f a b * (Distribution.independent p).expect (fun x => ∏ k, φ a b k (x k)) := by
-          simp_rw [hdecomp, Distribution.expect_sum, Distribution.expect_mul]
-    _ = ∑ a, ∑ b, f a b * ((p i).weight a * (p j).weight b) := by
-          refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
-          rw [Distribution.independent_expect_prod]
-          simp only [hfactor, Finset.prod_mul_distrib, Finset.prod_ite_eq', Finset.mem_univ,
-            if_true]
-    _ = (p i).expect fun a => (p j).expect fun b => f a b := by
-          simp only [Distribution.expect, Finset.mul_sum]
-          exact Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => by ring
-
-end Independent
 
 section Rounds
 variable {V : Type*} [Fintype V] [DecidableEq V]
