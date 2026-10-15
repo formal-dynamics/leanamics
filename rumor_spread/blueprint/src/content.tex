@@ -524,10 +524,9 @@ $\log_3 n + O(\log\log n)$ of \cite[Thm.~2.1]{KSSV00}.
   that call into $I$, so $|I'| = |I| + X$. By Lemma~\ref{lem:pull-indep},
   $\mu = \E X = \frac{(n-m)m}{n-1} \ge \max(m/2, 1/2)$ for $m \le n/2$ and,
   the calls being pairwise independent, $\E X^2 \le \mu + \mu^2$. A round
-  that is not good has $X < m/8 \le \mu/4$, so pointwise
-  $X \le \mu/4 + X^2/(2t) + (t/2)\,\mathbf 1[\text{good}]$ with
-  $t = 4(1+\mu)/3$; taking expectations gives
-  $\Pr[\text{good}] \ge \frac{3\mu}{4t} \ge 3/16$ (a Paley--Zygmund bound).
+  with $X > \mu/4 \ge m/8$ is good, and the one-sided Paley--Zygmund
+  inequality gives
+  $\Pr[X > \mu/4] \ge \frac{(3/4)^2\mu^2}{\E X^2} \ge \frac{9\mu}{16(1+\mu)} \ge 3/16$.
   Unlike PUSH, the reverse Markov argument of Lemma~\ref{lem:goodround} does
   not apply, since a PULL round can inform many more than $|I|$ new nodes.
 \end{proof}

@@ -70,7 +70,6 @@ import Epidemics.GiantAnalysis
 import Epidemics.GiantProb
 import Epidemics.Giant
 import Epidemics.GiantEpidemic
-import Epidemics.SubcriticalProb
 import Epidemics.SubcriticalChernoff
 import Epidemics.SubcriticalCluster
 import Epidemics.SubcriticalExploration

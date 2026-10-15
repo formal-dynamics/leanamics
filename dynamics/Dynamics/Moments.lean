@@ -9,9 +9,11 @@ For `S = ∑ i, f i (ω i)` with independent uniform coordinates `ω i` (the set
 
 * `avg_cauchy`: Cauchy-Schwarz for uniform averages (Mathlib's
   `Finset.expect_mul_sq_le_sq_mul_sq` through `avg_eq_expect`);
+* Paley-Zygmund: one-sided, `P(X > θ 𝔼X) ≥ (1 - θ)² (𝔼X)² / 𝔼X²` for `𝔼X ≥ 0` and
+  `0 ≤ θ ≤ 1` (`avg_pz_one_sided`, in multiplied form), and two-sided for `Z²` (`avg_pz`);
 * centered summands bounded by `1`: the second moment is the sum of the variances `σ²`
   (`avg_sum_sq`), the fourth moment is at most `σ² + 3σ⁴` (`avg_sum_fourth_le`), and the
-  two-sided Paley-Zygmund inequality (`avg_pz`) turns them into the anti-concentration bound
+  two-sided Paley-Zygmund inequality turns them into the anti-concentration bound
   `P(σ² ≤ 4 S²) ≥ 9/64` whenever `σ² ≥ 1` (`avg_pz_sum`, and `avg_pz_zero_one` for centered
   `{0,1}`-valued coordinates);
 * `{0,1}`-valued summands: mean in `[0, 1]`, variance `p (1 - p)` (`variance_of_zero_one`), and
@@ -23,7 +25,8 @@ For `S = ∑ i, f i (ω i)` with independent uniform coordinates `ω i` (the set
 The lemmas on independent coordinates were proved, identically, in `median/` (symmetry breaking
 of the binary median dynamics), `plurality/` (the `√n` jump of binary 3-Majority near balance) and
 `3-majority/` (symmetry breaking of 3-Majority with many colours); the pairwise bound is the
-second-moment step of the PULL analysis of `rumor_spread/` (`RumorPush.pull_avg_new_sq_le`).
+second-moment step of the PULL analysis of `rumor_spread/` (`RumorPush.pull_avg_new_sq_le`),
+which then applies the one-sided Paley-Zygmund bound (`RumorPush.pull_prob_goodRound`).
 -/
 
 namespace Dynamics
@@ -166,46 +169,59 @@ lemma avg_sum_fourth_le (f : Fin n → γ → ℝ) (hf0 : ∀ i, avg (f i) = 0)
       exact avg_nonneg fun y => sq_nonneg _
     nlinarith [sq_nonneg a]
 
-/-- **Paley-Zygmund, two-sided.** If `𝔼Z² = s > 0` and `𝔼Z⁴ ≤ 4 s²`, then `s ≤ 4 Z²`
-with probability at least `9/64`. -/
-lemma avg_pz (Z : γ → ℝ) {s : ℝ} (hs : 0 < s)
-    (h2 : avg (fun y => Z y ^ 2) = s) (h4 : avg (fun y => Z y ^ 4) ≤ 4 * s ^ 2) :
-    9 / 64 ≤ avg (fun y => if s ≤ 4 * Z y ^ 2 then (1 : ℝ) else 0) := by
-  -- pointwise, `Z² ≤ s/4 + Z² 1[s ≤ 4Z²]`
-  have hpt : ∀ y, Z y ^ 2
-      ≤ s / 4 + Z y ^ 2 * (if s ≤ 4 * Z y ^ 2 then (1 : ℝ) else 0) := by
+/-- **Paley-Zygmund, one-sided.** If `𝔼X ≥ 0` (e.g. `X ≥ 0`) and `0 ≤ θ ≤ 1`, then
+`(1 - θ)² (𝔼X)² ≤ 𝔼X² P(X > θ 𝔼X)`, i.e. `P(X > θ 𝔼X) ≥ (1 - θ)² (𝔼X)² / 𝔼X²`. -/
+lemma avg_pz_one_sided (X : γ → ℝ) (hX : 0 ≤ avg X) {θ : ℝ} (hθ0 : 0 ≤ θ) (hθ1 : θ ≤ 1) :
+    (1 - θ) ^ 2 * avg X ^ 2
+      ≤ avg (fun y => X y ^ 2) * avg (fun y => if θ * avg X < X y then (1 : ℝ) else 0) := by
+  set A : γ → ℝ := fun y => if θ * avg X < X y then (1 : ℝ) else 0 with hA
+  -- pointwise, `X ≤ θ 𝔼X + X 1[X > θ 𝔼X]`
+  have hpt : ∀ y, X y ≤ θ * avg X + X y * A y := by
     intro y
+    have := mul_nonneg hθ0 hX
+    simp only [hA]
     split_ifs with h
     · linarith
     · push Not at h
       linarith
-  have h1 : s ≤ s / 4
-      + avg (fun y => Z y ^ 2 * (if s ≤ 4 * Z y ^ 2 then (1 : ℝ) else 0)) := by
+  have h1 : (1 - θ) * avg X ≤ avg (fun y => X y * A y) := by
     have := avg_le_avg hpt
-    rw [avg_add, avg_const, h2] at this
-    exact this
-  -- Cauchy-Schwarz: `(𝔼[Z² 1_A])² ≤ 𝔼Z⁴ P(A)`
-  have hcs := avg_cauchy (fun y => Z y ^ 2) (fun y => if s ≤ 4 * Z y ^ 2 then (1 : ℝ) else 0)
-  have hind : (fun y => (if s ≤ 4 * Z y ^ 2 then (1 : ℝ) else 0) ^ 2)
-      = fun y => if s ≤ 4 * Z y ^ 2 then (1 : ℝ) else 0 := by
+    rw [avg_add, avg_const] at this
+    linarith
+  -- Cauchy-Schwarz: `(𝔼[X 1_A])² ≤ 𝔼X² P(A)`
+  have hcs := avg_cauchy X A
+  have hA2 : (fun y => A y ^ 2) = A := by
     funext y
+    simp only [hA]
     split_ifs <;> norm_num
+  rw [hA2] at hcs
+  calc (1 - θ) ^ 2 * avg X ^ 2 = ((1 - θ) * avg X) ^ 2 := by ring
+    _ ≤ avg (fun y => X y * A y) ^ 2 :=
+        pow_le_pow_left₀ (mul_nonneg (by linarith) hX) h1 2
+    _ ≤ _ := hcs
+
+/-- **Paley-Zygmund, two-sided.** If `𝔼Z² = s > 0` and `𝔼Z⁴ ≤ 4 s²`, then `s ≤ 4 Z²`
+with probability at least `9/64` (`avg_pz_one_sided` for `Z²` at `θ = 1/4`). -/
+lemma avg_pz (Z : γ → ℝ) {s : ℝ} (hs : 0 < s)
+    (h2 : avg (fun y => Z y ^ 2) = s) (h4 : avg (fun y => Z y ^ 4) ≤ 4 * s ^ 2) :
+    9 / 64 ≤ avg (fun y => if s ≤ 4 * Z y ^ 2 then (1 : ℝ) else 0) := by
+  have h := avg_pz_one_sided (fun y => Z y ^ 2) (avg_nonneg fun y => sq_nonneg (Z y))
+    (θ := 1 / 4) (by norm_num) (by norm_num)
   have hz4 : (fun y => (Z y ^ 2) ^ 2) = fun y => Z y ^ 4 := by
     funext y
     ring
-  rw [hind, hz4] at hcs
-  obtain ⟨B, hB⟩ : ∃ B, B = avg (fun y => Z y ^ 2 * (if s ≤ 4 * Z y ^ 2 then (1 : ℝ) else 0)) :=
-    ⟨_, rfl⟩
-  obtain ⟨P, hP⟩ : ∃ P, P = avg (fun y => if s ≤ 4 * Z y ^ 2 then (1 : ℝ) else 0) := ⟨_, rfl⟩
-  rw [← hB, ← hP] at hcs
-  rw [← hB] at h1
-  rw [← hP]
-  have hP0 : 0 ≤ P := by
-    rw [hP]
-    exact avg_nonneg fun y => by split_ifs <;> norm_num
-  have hB34 : 3 / 4 * s ≤ B := by linarith
-  have hsq : (3 / 4 * s) ^ 2 ≤ B ^ 2 := pow_le_pow_left₀ (by positivity) hB34 2
-  have h4P : avg (fun y => Z y ^ 4) * P ≤ 4 * s ^ 2 * P := mul_le_mul_of_nonneg_right h4 hP0
+  simp only [hz4, h2] at h
+  set P := avg (fun y => if 1 / 4 * s < Z y ^ 2 then (1 : ℝ) else 0)
+  have hP0 : 0 ≤ P := avg_nonneg fun y => by split_ifs <;> norm_num
+  have hmono : P ≤ avg (fun y => if s ≤ 4 * Z y ^ 2 then (1 : ℝ) else 0) :=
+    avg_le_avg fun y => by
+      split_ifs with ha hb
+      · exact le_rfl
+      · exact absurd (by linarith) hb
+      · norm_num
+      · exact le_rfl
+  have h' : (1 - 1 / 4) ^ 2 * s ^ 2 ≤ 4 * s ^ 2 * P :=
+    h.trans (mul_le_mul_of_nonneg_right h4 hP0)
   have hs2 : 0 < s ^ 2 := by positivity
   nlinarith
 
