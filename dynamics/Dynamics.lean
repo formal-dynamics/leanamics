@@ -6,10 +6,12 @@ import Dynamics.Concentration
 import Dynamics.Drift
 import Dynamics.DriftHitting
 import Dynamics.GraphRounds
-import Dynamics.Moments
 import Dynamics.Hitting
+import Dynamics.Lazy
+import Dynamics.Moments
 import Dynamics.OptionalStopping
 import Dynamics.Phases
+import Dynamics.RandomWalk
 import Dynamics.Reverse
 import Dynamics.Rounds
 import Dynamics.Scalar

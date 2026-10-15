@@ -34,10 +34,6 @@ variable {V : Type*} [Fintype V] [DecidableEq V]
 section Lazy
 variable {G : SimpleGraph V} [DecidableRel G.Adj] (hd : ∀ i, 0 < G.degree i)
 
-/-- The lazy walk stays put with probability `1/2`. -/
-lemma lazyNeighbor_weight_self (y : V) : (lazyNeighbor G hd y).weight y = 1 / 2 := by
-  simp [lazyNeighbor_weight]
-
 /-- Hitting times drop by one in expectation under a lazy step away from the target. -/
 lemma lazyNeighbor_expect_hitting (hc : G.Connected) {x y : V} (hxy : x ≠ y) :
     (lazyNeighbor G hd x).expect (hitting G hc y) = hitting G hc y x - 1 := by
@@ -46,7 +42,7 @@ lemma lazyNeighbor_expect_hitting (hc : G.Connected) {x y : V} (hxy : x ≠ y) :
   have hS : ∑ w ∈ G.neighborFinset x, hitting G hc y w =
       G.degree x * hitting G hc y x - 2 * G.degree x := by linarith
   have hdx : (G.degree x : ℝ) ≠ 0 := by exact_mod_cast (hd x).ne'
-  rw [lazyNeighbor_expect, hS]
+  rw [Kernel.lazyNeighbor_expect, hS]
   field_simp
   ring
 
@@ -154,7 +150,7 @@ lemma lazy_meeting_core {G : SimpleGraph V} [DecidableRel G.Adj] (hd : ∀ i, 0 
       (pairWalk (lazyNeighbor G hd)).iterate (16 * Fintype.card V ^ 3 + 1)
         (Kernel.outside (Set.diagonal V)) q ≤ 3 / 4 := by
     refine iterate_outside_le_three_quarters (lazyNeighbor G hd)
-      (fun y => (lazyNeighbor_weight_self hd y).ge) (meetingPotential hc (4 * n ^ 3))
+      (Kernel.lazy_weight_self_ge_half _) (meetingPotential hc (4 * n ^ 3))
       (meetingPotential_nonneg hd hc hB) (fun x y hxy => (meetingPotential_expect_fst hd hc hxy).le)
       (fun x y hxy => (meetingPotential_expect_snd hd hc hxy).le)
       (meetingPotential_le hd hc hB) ?_ ?_ q

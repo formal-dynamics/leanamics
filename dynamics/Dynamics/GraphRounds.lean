@@ -17,6 +17,10 @@ Round types for dynamics on a finite simple graph `G`, to be averaged with `avg`
   activated. A uniform oriented edge is a uniform edge (`avg_edgeRound_edge`) with a uniform
   orientation (`avg_edgeRound_symm`); averages over it are sums over adjacent ordered pairs
   divided by `2 |E|` (`avg_edgeRound`), and its tail is degree-biased (`avg_edgeRound_fst`).
+  Plain sums over the darts are double sums over the adjacent ordered pairs (`sum_dart`, via
+  `dartEquiv`); differences along a walk telescope over its darts (`walk_sum_darts`), and
+  squared differences over distinct darts are bounded by the Dirichlet energy
+  (`sum_darts_sq_le`).
 
 Uniform averages over the neighbours of `v` are written `avg (fun u : G.neighborSet v => g u)`,
 equal to `(∑ u ∈ G.neighborFinset v, g u) / G.degree v` (`avg_neighborSet`).
@@ -129,7 +133,31 @@ theorem edgeRound_nonempty (G : SimpleGraph V) {u v : V} (h : G.Adj u v) :
     Nonempty (EdgeRound G) := by
   exact ⟨⟨(u, v), h⟩⟩
 
+/-- The darts of `G` are the adjacent ordered pairs. -/
+def dartEquiv (G : SimpleGraph V) : G.Dart ≃ {p : V × V // G.Adj p.1 p.2} where
+  toFun d := ⟨d.toProd, d.adj⟩
+  invFun p := ⟨p.1, p.2⟩
+  left_inv _ := rfl
+  right_inv _ := rfl
+
+/-- Differences along a walk telescope. -/
+theorem walk_sum_darts {G : SimpleGraph V} (ψ : V → ℝ) {u v : V} (p : G.Walk u v) :
+    (p.darts.map fun d => ψ d.fst - ψ d.snd).sum = ψ u - ψ v := by
+  induction p with
+  | nil => simp
+  | cons h p ih =>
+    rw [SimpleGraph.Walk.darts_cons, List.map_cons, List.sum_cons, ih]
+    ring
+
 variable [Fintype V] (G : SimpleGraph V) [DecidableRel G.Adj]
+
+/-- A sum over the darts of `G` is a sum over the adjacent ordered pairs. -/
+theorem sum_dart (f : V → V → ℝ) :
+    ∑ d : G.Dart, f d.fst d.snd = ∑ a, ∑ b, if G.Adj a b then f a b else 0 := by
+  rw [← Fintype.sum_prod_type' (f := fun a b => if G.Adj a b then f a b else 0),
+    ← Finset.sum_filter,
+    Finset.sum_subtype (p := fun p : V × V => G.Adj p.1 p.2) _ (by simp)]
+  exact Fintype.sum_equiv (dartEquiv G) _ _ fun _ => rfl
 
 /-- **Uniform orientation**: averages are invariant under reversing the activated edge. -/
 theorem avg_edgeRound_symm (F : V → V → ℝ) :
@@ -138,6 +166,26 @@ theorem avg_edgeRound_symm (F : V → V → ℝ) :
     (fun d : EdgeRound G => F d.fst d.snd)
 
 variable [DecidableEq V]
+
+variable {G} in
+/-- Squared differences over distinct darts are bounded by the Dirichlet energy
+`∑_{i ∼ j} (ψ i - ψ j)²` (each edge counted in both orientations). -/
+theorem sum_darts_sq_le (ψ : V → ℝ) (S : Finset G.Dart) :
+    ∑ d ∈ S, (ψ d.fst - ψ d.snd) ^ 2 ≤
+      ∑ i, ∑ j, if G.Adj i j then (ψ i - ψ j) ^ 2 else 0 := by
+  have hinj : Set.InjOn (fun d : G.Dart => d.toProd) S :=
+    fun d₁ _ d₂ _ h => SimpleGraph.Dart.ext d₁ d₂ h
+  calc ∑ d ∈ S, (ψ d.fst - ψ d.snd) ^ 2
+      = ∑ q ∈ S.image (fun d : G.Dart => d.toProd), (ψ q.1 - ψ q.2) ^ 2 := by
+        rw [Finset.sum_image hinj]
+    _ ≤ ∑ q ∈ univ.filter (fun q : V × V => G.Adj q.1 q.2), (ψ q.1 - ψ q.2) ^ 2 := by
+        apply Finset.sum_le_sum_of_subset_of_nonneg
+        · intro q hq
+          obtain ⟨d, -, rfl⟩ := mem_image.mp hq
+          simp [d.adj]
+        · intros
+          positivity
+    _ = _ := by rw [Finset.sum_filter, Fintype.sum_prod_type]
 
 /-- **Uniform oriented edge**: the average over the activated oriented edge is the sum over the
 adjacent ordered pairs divided by `2 |E|`. -/
