@@ -43,6 +43,10 @@ lemma iterate_nonneg (K : Kernel α) (n : ℕ) {f : α → ℝ} (h : ∀ a, 0 �
     ∀ a, 0 ≤ K.iterate n f a := by
   simpa [iterate_const] using K.iterate_mono n h
 
+lemma iterate_le_one (K : Kernel α) (n : ℕ) {f : α → ℝ} (h : ∀ a, f a ≤ 1) (a : α) :
+    K.iterate n f a ≤ 1 := by
+  simpa [iterate_const] using K.iterate_mono n h a
+
 lemma iterate_mul (K : Kernel α) (n : ℕ) (c : ℝ) (f : α → ℝ) :
     K.iterate n (fun a => c * f a) = fun a => c * K.iterate n f a := by
   induction n with

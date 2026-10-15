@@ -252,3 +252,7 @@ removed rather than kept as aliases.
    `le_pow_ceil` (for `n : ℕ`, `n ≥ 1`, the form of the three package copies).
 3. **Constants of a single paper stay local**, e.g. `Undecided.Plurality.three_quarters_pow_le`
    (`(3/4)^T ≤ e^{-T/4}`) and `Undecided.one_le_of_log` (`10⁴ ≤ log n → 1 ≤ n`).
+10. **Copies left in other packages**: `Voter.colorProbability_mono` re-proves
+    `Kernel.iterate_monotone` for its indicator; it can be replaced by the shared version. The
+    former copies `Moran.expect_lt_one` and `Voter.expect_lt_one` are gone, and
+    `Distribution.expect_lt_one` now lives in `Distribution`, so that `Absorption` can use it.

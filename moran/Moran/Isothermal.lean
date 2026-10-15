@@ -1,5 +1,4 @@
-import Dynamics.Absorption
-import Dynamics.OptionalStopping
+import Dynamics.Consensus
 
 /-! # The Moran process and the isothermal theorem (MOR-1, MOR-2)
 
@@ -122,10 +121,8 @@ noncomputable def moranKernel [Nonempty V] (G : SimpleGraph V) [DecidableRel G.A
 /-- Indicator of fixation (every vertex is a mutant). -/
 def allMutant (s : Config V) : ℝ := if s = fun _ => true then 1 else 0
 
-/-- Indicator that neither type has taken over yet. -/
-noncomputable def unfixed (s : Config V) : ℝ := by
-  classical
-  exact if ∃ c, s = fun _ => c then 0 else 1
+/-- Indicator that neither type has taken over yet (`Dynamics.nonConsensus`). -/
+noncomputable abbrev unfixed (s : Config V) : ℝ := nonConsensus s
 
 /-- Fixation probability: the supremum of the finite-time fixation probabilities. -/
 noncomputable def fixation (K : Kernel (Config V)) (s : Config V) : ℝ :=
@@ -446,25 +443,6 @@ theorem moran_mutants_invariant [Nonempty V] (G : SimpleGraph V) [DecidableRel G
   ring
 
 omit [DecidableEq V] in
-lemma unfixed_binary (s : Config V) : unfixed s = 0 ∨ unfixed s = 1 := by
-  unfold unfixed
-  split <;> simp
-
-omit [DecidableEq V] in
-lemma unfixed_const (c : Bool) : unfixed (fun _ : V => c) = 0 := by
-  unfold unfixed
-  exact if_pos ⟨c, rfl⟩
-
-omit [DecidableEq V] in
-lemma unfixed_of_mixed (s : Config V) (h : ¬ ∃ c, s = fun _ => c) : unfixed s = 1 := by
-  unfold unfixed
-  exact if_neg h
-
-omit [DecidableEq V] in
-lemma unfixed_le_one (s : Config V) : unfixed s ≤ 1 := by
-  rcases unfixed_binary s with h | h <;> simp [h]
-
-omit [DecidableEq V] in
 lemma allMutant_nonneg (s : Config V) : 0 ≤ allMutant s := by
   unfold allMutant
   split <;> norm_num
@@ -482,34 +460,13 @@ lemma moran_constant [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] {r : 
   simp_rw [this]
   exact (pairDist G r hr (fun _ => c)).expect_const _
 
-omit [Fintype V] [DecidableEq V] in
-lemma expect_lt_one {α : Type*} [Fintype α] (p : Distribution α) (f : α → ℝ)
-    (hf : ∀ a, f a ≤ 1) (b : α) (hb : 0 < p.weight b) (hfb : f b < 1) : p.expect f < 1 := by
-  calc
-    p.expect f < p.expect (fun _ => 1) :=
-      sum_lt_sum (fun a _ => mul_le_mul_of_nonneg_left (hf a) (p.nonneg a))
-        ⟨b, mem_univ b, mul_lt_mul_of_pos_left hfb hb⟩
-    _ = 1 := p.expect_const 1
-
-omit [Fintype V] [DecidableEq V] in
-lemma map_weight_pos {α β : Type*} [Fintype α] [Fintype β] (p : Distribution α) (f : α → β)
-    (a : α) (ha : 0 < p.weight a) : 0 < (p.map f).weight (f a) := by
-  classical
-  dsimp only [Distribution.map]
-  refine lt_of_lt_of_le ?_ (single_le_sum (fun x _ => ?_) (mem_univ a))
-  · rw [if_pos rfl]
-    exact ha
-  · split
-    · exact p.nonneg x
-    · exact le_rfl
-
 lemma moran_weight_pos [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] {r : ℝ} (hr : 0 < r)
     (s : Config V) {u w : V} (hadj : G.Adj u w) (hu : s u = true) :
     0 < (moranKernel G r hr s).weight (Function.update s w true) := by
   unfold moranKernel
   have hmap : Function.update s w (s u) = Function.update s w true := by simp [hu]
   rw [← hmap]
-  refine map_weight_pos (pairDist G r hr s) _ (u, w) ?_
+  refine (pairDist G r hr s).map_weight_pos _ (u, w) ?_
   rw [pairDist_weight]
   have hdeg : 0 < G.degree u := hadj.degree_pos_left
   rw [show fitness r s u = r by simp [fitness, hu]]
@@ -517,32 +474,28 @@ lemma moran_weight_pos [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] {r 
   exact mul_pos (div_pos hr (totalFitness_pos hr s)) (inv_pos.mpr (by exact_mod_cast hdeg))
 
 lemma unfixed_step [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] {r : ℝ} (hr : 0 < r)
-    (s : Config V) : (moranKernel G r hr).apply unfixed s ≤ unfixed s := by
-  by_cases hs : ∃ c, s = fun _ => c
-  · obtain ⟨c, rfl⟩ := hs
-    rw [moran_constant G hr c unfixed]
-  · rw [unfixed_of_mixed s hs]
-    rw [Kernel.apply]
-    calc
-      (moranKernel G r hr s).expect unfixed ≤ (moranKernel G r hr s).expect (fun _ => 1) :=
-        (moranKernel G r hr s).expect_mono unfixed_le_one
-      _ = 1 := (moranKernel G r hr s).expect_const 1
+    (s : Config V) : (moranKernel G r hr).apply unfixed s ≤ unfixed s :=
+  (moranKernel G r hr).nonConsensus_step (fun c => moran_constant G hr c) s
 
-lemma unfixed_access [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] (hc : G.Connected)
-    {r : ℝ} (hr : 0 < r) (s : Config V) :
-    ∃ n, (moranKernel G r hr).iterate n unfixed s < 1 := by
+/-- On a connected graph, if `K` lets a mutant invade a resident neighbour with positive
+probability, then every configuration reaches a consensus along transitions of positive
+probability (all-resident if there is no mutant, all-mutant otherwise). -/
+lemma reaches_consensus (G : SimpleGraph V) (hc : G.Connected) (K : Kernel (Config V))
+    (hK : ∀ s u w, G.Adj u w → s u = true → s w = false →
+      0 < (K s).weight (Function.update s w true))
+    (s : Config V) :
+    ∃ c, Relation.ReflTransGen (fun s t => 0 < (K s).weight t) s (fun _ => c) := by
   classical
   suffices ∀ k, ∀ s : Config V, Fintype.card V - mutants s = k →
-      ∃ n, (moranKernel G r hr).iterate n unfixed s < 1 from this _ s rfl
+      ∃ c, Relation.ReflTransGen (fun s t => 0 < (K s).weight t) s (fun _ => c) from
+    this _ s rfl
   intro k
   induction k using Nat.strongRecOn with
   | ind k ih =>
     intro s hk
     by_cases hconst : ∃ c, s = fun _ => c
     · obtain ⟨c, rfl⟩ := hconst
-      refine ⟨0, ?_⟩
-      rw [Kernel.iterate_zero, unfixed_const]
-      norm_num
+      exact ⟨c, Relation.ReflTransGen.refl⟩
     · have htrue : ∃ u, s u = true := by
         by_contra h
         push Not at h
@@ -581,22 +534,23 @@ lemma unfixed_access [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] (hc :
       have hlt : Fintype.card V - mutants t < k := by
         rw [hgain, ← hk]
         omega
-      obtain ⟨n, hn⟩ := ih (Fintype.card V - mutants t) hlt t rfl
-      refine ⟨n + 1, ?_⟩
-      rw [Kernel.iterate_succ]
-      exact expect_lt_one (moranKernel G r hr s) ((moranKernel G r hr).iterate n unfixed)
-        (fun a => by
-          have hle := (moranKernel G r hr).iterate_mono n unfixed_le_one a
-          simp [Kernel.iterate_const] at hle
-          exact hle)
-        t (moran_weight_pos G hr s d.adj hdu) hn
+      obtain ⟨c, hc⟩ := ih (Fintype.card V - mutants t) hlt t rfl
+      exact ⟨c, Relation.ReflTransGen.head (hK s d.fst d.snd d.adj hdu hdw) hc⟩
+
+lemma unfixed_access [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] (hc : G.Connected)
+    {r : ℝ} (hr : 0 < r) (s : Config V) :
+    ∃ n, (moranKernel G r hr).iterate n unfixed s < 1 := by
+  obtain ⟨c, hpath⟩ := reaches_consensus G hc (moranKernel G r hr)
+    (fun s _ _ hadj hu _ => moran_weight_pos G hr s hadj hu) s
+  exact (moranKernel G r hr).exists_iterate_lt_one_of_reachable nonConsensus_le_one hpath
+    (nonConsensus_const c)
 
 /-- **Absorption.** On a connected graph, the probability that neither type has fixed tends to
 zero. -/
 theorem moran_unfixed_tendsto [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj]
     (hc : G.Connected) {r : ℝ} (hr : 0 < r) (s : Config V) :
     Tendsto (fun t => (moranKernel G r hr).iterate t unfixed s) atTop (𝓝 0) :=
-  (moranKernel G r hr).finite_absorption unfixed unfixed_binary (unfixed_step G hr)
+  (moranKernel G r hr).finite_absorption unfixed nonConsensus_binary (unfixed_step G hr)
     (unfixed_access G hc hr) s
 
 lemma allMutant_step [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] {r : ℝ} (hr : 0 < r)
@@ -616,42 +570,34 @@ lemma iterate_allMutant (K : Kernel (Config V)) (n : ℕ) (s : Config V) :
 omit [DecidableEq V] in
 /-- `unfixed` indicates the configurations that are neither all-mutant nor all-resident. -/
 lemma unfixed_eq (s : Config V) :
-    unfixed s = if ¬ s = (fun _ => true) ∧ ¬ s = (fun _ => false) then 1 else 0 := by
-  by_cases h : ∃ c, s = fun _ => c
-  · obtain ⟨c, rfl⟩ := h
-    rw [unfixed_const]
-    cases c <;> simp
-  · rw [unfixed_of_mixed s h, if_pos ⟨fun h' => h ⟨true, h'⟩, fun h' => h ⟨false, h'⟩⟩]
+    unfixed s = if ¬ s = (fun _ => true) ∧ ¬ s = (fun _ => false) then 1 else 0 :=
+  nonConsensus_bool s
 
 /-- Finite-time survival (no fixation yet) as an event. -/
 lemma iterate_unfixed (K : Kernel (Config V)) (n : ℕ) (s : Config V) :
     K.iterate n unfixed s =
-      K.event (fun t => ¬ t = (fun _ => true) ∧ ¬ t = (fun _ => false)) n s := by
-  rw [K.event_eq_iterate]
-  exact congrFun (congrArg (K.iterate n) (funext unfixed_eq)) s
+      K.event (fun t => ¬ t = (fun _ => true) ∧ ¬ t = (fun _ => false)) n s :=
+  K.iterate_nonConsensus_bool n s
 
 /-- **Fixation probability from an invariant** (finite-horizon optional stopping, roadmap
 FND-4). If `ψ` is harmonic for `K`, equals `1` on the all-mutant and `0` on the all-resident
 configuration, all-mutant is absorbing, and the probability that neither type has fixed tends
 to zero, then `ψ` is the fixation probability. This is
-`Dynamics.Kernel.iSup_event_of_invariant` for the two consensus configurations. -/
+`Dynamics.Kernel.iSup_consensus_of_invariant`, with absorption at all-mutant stated through
+`allMutant`. -/
 lemma fixation_eq_of_invariant (K : Kernel (Config V)) (ψ : Config V → ℝ)
     (hinv : K.apply ψ = ψ) (hone : ψ (fun _ => true) = 1) (hzero : ψ (fun _ => false) = 0)
     (habs : ∀ t, allMutant t ≤ K.apply allMutant t) (s : Config V)
     (hsurv : Tendsto (fun n => K.iterate n unfixed s) atTop (𝓝 0)) :
     fixation K s = ψ s := by
-  have habsA : ∀ t : Config V, t = (fun _ => true) → (K t).prob (· = fun _ => true) = 1 := by
-    rintro _ rfl
+  have habsA : (K fun _ => true).prob (· = fun _ => true) = 1 := by
     refine le_antisymm (Distribution.prob_le_one _ _) ?_
     have h := habs fun _ => true
     rw [allMutant_true] at h
     rw [Distribution.prob_eq_expect]
     exact h
-  have h := K.iSup_event_of_invariant ψ (· = fun _ => true) (· = fun _ => false) 1 0
-    (fun _ ha => ha ▸ hone) (fun _ hb => hb ▸ hzero) one_ne_zero habsA s
-    (fun T => congrFun (K.iterate_invariant hinv T) s)
-    (by simpa only [iterate_unfixed] using hsurv)
-  simpa [fixation, iterate_allMutant] using h
+  simpa [fixation, iterate_allMutant] using
+    K.iSup_consensus_of_invariant ψ hinv hone hzero habsA s hsurv
 
 omit [Fintype V] [DecidableEq V] in
 lemma one_div_pow_ne_one {r : ℝ} (hr : 0 < r) (hr1 : r ≠ 1) {n : ℕ} (hn : n ≠ 0) :

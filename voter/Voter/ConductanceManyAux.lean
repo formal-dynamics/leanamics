@@ -96,7 +96,7 @@ omit [Fintype C] [DecidableEq V] in
 lemma disagreement_eq_opinions [Nonempty V] (x : Config V C) :
     disagreement x = if 2 ≤ (opinions x).card then 1 else 0 := by
   classical
-  unfold disagreement
+  unfold disagreement nonConsensus
   obtain ⟨v⟩ := ‹Nonempty V›
   have hiff : (∃ c, x = fun _ => c) ↔ ¬ 2 ≤ (opinions x).card := by
     rw [not_le, Nat.lt_succ_iff, card_le_one]
@@ -153,7 +153,7 @@ lemma one_sub_disagreement_project (i : C) (y : Config V C) :
     1 - disagreement (colorIndicator i ∘ y) =
       if (∀ u, y u = i) ∨ (∀ u, y u ≠ i) then 1 else 0 := by
   classical
-  unfold disagreement
+  unfold disagreement nonConsensus
   have hiff : (∃ c, colorIndicator i ∘ y = fun _ => c) ↔
       (∀ u, y u = i) ∨ (∀ u, y u ≠ i) := by
     constructor

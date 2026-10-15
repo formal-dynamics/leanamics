@@ -3,6 +3,7 @@ import Dynamics.Azuma
 import Dynamics.Bridge
 import Dynamics.Chernoff
 import Dynamics.Concentration
+import Dynamics.Consensus
 import Dynamics.Drift
 import Dynamics.DriftHitting
 import Dynamics.GraphRounds

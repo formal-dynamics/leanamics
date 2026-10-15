@@ -1,6 +1,11 @@
 import Dynamics.Kernel
 
-/-! # Geometric convergence from a uniform absorption block -/
+/-! # Geometric convergence from a uniform absorption block
+
+The access hypothesis of `finite_absorption` (`∀ a, ∃ n, K.iterate n f a < 1`) follows from
+reachability: `exists_iterate_lt_one_of_reachable` turns a chain of transitions of positive
+probability ending where `f` vanishes into a finite time at which `f` is below one in
+expectation. -/
 namespace Dynamics.Kernel
 open Filter Finset Topology
 variable {α : Type*} [Fintype α]
@@ -41,6 +46,29 @@ lemma iterate_antitone (K : Dynamics.Kernel α) (f : α → ℝ)
     rfl
   rw [he]
   exact K.iterate_mono n h a
+
+/-- One transition of positive probability, from `s` to a state `t` where an observable
+bounded by `1` is below one in expectation after `n` steps, puts it below one after `n + 1`
+steps from `s`. -/
+lemma iterate_succ_lt_one (K : Dynamics.Kernel α) {f : α → ℝ} (hf : ∀ a, f a ≤ 1) {s t : α}
+    (hst : 0 < (K s).weight t) {n : ℕ} (ht : K.iterate n f t < 1) :
+    K.iterate (n + 1) f s < 1 := by
+  rw [iterate_succ]
+  exact (K s).expect_lt_one _ (K.iterate_le_one n hf) t hst ht
+
+/-- **Reachability gives access.** If `t₀` is reachable from `s` along transitions of positive
+probability and an observable `f ≤ 1` vanishes at `t₀`, then the expectation of `f` drops
+below one at some finite time from `s`. This is the access hypothesis of `finite_absorption`
+for a survival indicator `f`. -/
+theorem exists_iterate_lt_one_of_reachable (K : Dynamics.Kernel α) {f : α → ℝ}
+    (hf : ∀ a, f a ≤ 1) {s t₀ : α}
+    (h : Relation.ReflTransGen (fun s t => 0 < (K s).weight t) s t₀) (h₀ : f t₀ = 0) :
+    ∃ n, K.iterate n f s < 1 := by
+  induction h using Relation.ReflTransGen.head_induction_on with
+  | refl => exact ⟨0, by simp [h₀]⟩
+  | head hst _ ih =>
+    obtain ⟨n, hn⟩ := ih
+    exact ⟨n + 1, K.iterate_succ_lt_one hf hst hn⟩
 
 /-- Finiteness turns state-dependent access into a uniform contraction block. -/
 lemma exists_uniform_block [Nonempty α] (K : Dynamics.Kernel α) (f : α → ℝ)

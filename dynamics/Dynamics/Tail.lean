@@ -7,8 +7,9 @@ import Dynamics.Rounds
 Probability facts that several model packages used to prove locally, stated once for the
 shared finite layer (monotonicity of probability in the event is `Distribution.prob_mono`).
 
-* `Distribution.expect_lt_one`, `avg_lt_one`: an observable bounded by `1` that is strictly
-  below `1` at a point of positive weight has expectation strictly below `1`.
+* `avg_lt_one`: an observable bounded by `1` that is strictly below `1` somewhere has
+  average strictly below `1` (the uniform case of `Distribution.expect_lt_one`, which is in
+  `Distribution`).
 * `avg_markov`: **Markov's inequality** `P(X ≥ c) ≤ 𝔼X / c` for uniform averages (for any
   distribution it is `Distribution.prob_le_expect_div`), and
   `avg_markov_one`: its form `P(X ≥ 1) ≤ 𝔼X` for a sum of independent nonnegative
@@ -28,23 +29,6 @@ package lemmas that the statement replaces.
 namespace Dynamics
 
 open Finset
-
-/-! ### Distributions -/
-
-namespace Distribution
-variable {α : Type*} [Fintype α]
-
-/-- An observable bounded by `1` that is strictly below `1` at a point of positive weight has
-expectation strictly below `1` (the statement of `Moran.expect_lt_one` and
-`Voter.expect_lt_one`). -/
-theorem expect_lt_one (p : Distribution α) (f : α → ℝ) (hf : ∀ a, f a ≤ 1) (b : α)
-    (hb : 0 < p.weight b) (hfb : f b < 1) : p.expect f < 1 := by
-  calc p.expect f < p.expect (fun _ => 1) :=
-        sum_lt_sum (fun a _ => mul_le_mul_of_nonneg_left (hf a) (p.nonneg a))
-          ⟨b, mem_univ b, mul_lt_mul_of_pos_left hfb hb⟩
-    _ = 1 := p.expect_const 1
-
-end Distribution
 
 /-! ### Uniform averages: strict bound and Markov's inequality -/
 

@@ -14,7 +14,8 @@ uses Lean 4.32.0 and Mathlib revision
 | `Kernel` | Finite stochastic kernels, finite-time expectations, events, stationarity, harmonic observables; the transition matrix `toMatrix` (row stochastic, `iterate n f = toMatrix ^ n *ᵥ f`) |
 | `Trajectory` | Weighted history/endpoint expectations and agreement with kernel iteration |
 | `Stationary` | Stationary-distribution existence by Cesàro averages and compactness of the finite simplex |
-| `Absorption` | Uniform absorption blocks, geometric survival bounds, convergence to zero |
+| `Absorption` | Uniform absorption blocks, geometric survival bounds, convergence to zero; access from reachability along transitions of positive probability (`exists_iterate_lt_one_of_reachable`) |
+| `Consensus` | The non-consensus indicator `nonConsensus` on configurations `V → C` (the survival indicator of the voter and Moran packages), its one-step bound when consensus is absorbing (`Kernel.nonConsensus_step`), its event form for two colours, and fixation in all-`true` from an invariant (`Kernel.iSup_consensus_of_invariant`) |
 | `OptionalStopping` | Finite-horizon optional stopping (roadmap FND-4): a conserved observable, constant on two target events, gives the finite-time error bound `event_error_of_invariant`, the limit `tendsto_event_of_invariant` and the absorption probability `iSup_event_of_invariant` = `(φ(x₀) − φB)/(φA − φB)` |
 | `Rounds` | The kernel `ofStep` of a process driven by i.i.d. uniform rounds, its agreement with `expList`, `expList_escape` (union bound over rounds for a moving target), and the probability `missProb step B T s` of being outside `B` after `T` rounds (monotone in `B`, composition of stages `missProb_comp` by the Markov property, antitone in `T` for a closed target) |
 | `Reverse` | Time reversal of i.i.d. rounds (roadmap FND-6): `expList_comp_reverse`, and `iterate_ofStep_foldr` (round-based kernels applied last round first) |
@@ -42,7 +43,9 @@ mass one and therefore cannot inhabit an empty sample space; `uniform` requires
 
 The absorption API uses a zero-one survival indicator `f`. Its hypothesis
 `K.apply f ≤ f` expresses absorption of the target `f = 0`, and
-`∀ a, ∃ n, K.iterate n f a < 1` expresses positive-probability access.
+`∀ a, ∃ n, K.iterate n f a < 1` expresses positive-probability access; it follows from
+a chain of transitions of positive probability to a state where `f` vanishes
+(`exists_iterate_lt_one_of_reachable`, one step at a time by `iterate_succ_lt_one`).
 `exists_uniform_block` produces a positive block length and contraction factor
 strictly below one; `geometric_blocks` and `finite_absorption` give the decay
 bound and full-time limit. No measure-theoretic path space is used.
