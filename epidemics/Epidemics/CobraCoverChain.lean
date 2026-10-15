@@ -13,17 +13,6 @@ open Finset Dynamics
 
 variable {S R : Type*} [Fintype R] [Nonempty R]
 
-omit [Nonempty R] in
-/-- `expList` only evaluates lists of length `T`, so a comparison on those lists is enough. -/
-lemma expList_le_of_length {T : ℕ} {F G : List R → ℝ}
-    (h : ∀ l, l.length = T → F l ≤ G l) : expList R T F ≤ expList R T G := by
-  induction T generalizing F G with
-  | zero => exact h [] rfl
-  | succ T ih =>
-    rw [expList_succ, expList_succ]
-    refine avg_le_avg fun a => ?_
-    exact ih fun l hl => h (a :: l) (by simp [hl])
-
 lemma expList_fail_le_one (T : ℕ) (P : List R → Prop) [DecidablePred P] :
     expList R T (fun l => if P l then (0 : ℝ) else 1) ≤ 1 := by
   refine (expList_le_expList (G := fun _ => (1 : ℝ)) fun l => ?_).trans_eq (expList_const T 1)

@@ -22,7 +22,7 @@ private theorem one_sub_expList_le {β : Type*} [Fintype β] [Nonempty β] {T : 
     rw [← expList_add]
     simp only [sub_add_cancel]
     exact expList_const T 1
-  have h2 := expList_le_expList_of_length h
+  have h2 := expList_le_of_length h
   linarith
 
 /-- An indicator of failure below the complement of an event of probability at least `1 − q`

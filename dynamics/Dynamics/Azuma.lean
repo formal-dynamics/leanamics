@@ -15,9 +15,10 @@ W. Hoeffding, J. Amer. Statist. Assoc. 58, 1963, Theorem 2 for the independent c
 maximal form obtained from Ville's (Doob's) maximal inequality for the exponential supermartingale
 `exp(θ M_k - k θ² c² / 2)`.
 
-* `incrementSum`: the partial sums, with `incrementSum_mul_sub`, `incrementSum_neg`,
-  `incrementSum_telescope` (increments `φ (step y a) - φ y - ψ y` telescope) and
-  `incrementSum_take` (the sum of a state function along the first `k` rounds);
+* `incrementSum`: the partial sums, linear and monotone in the increments (`incrementSum_add`,
+  `incrementSum_sub`, `incrementSum_const_mul`, `incrementSum_mono`), with `incrementSum_mul_sub`,
+  `incrementSum_neg`, `incrementSum_telescope` (increments `φ (step y a) - φ y - ψ y` telescope)
+  and `incrementSum_take` (the sum of a state function along the first `k` rounds);
 * `avg_exp_mul_le`: **Hoeffding's lemma** for a centred variable bounded by `c` under a uniform
   draw, `avg (exp (θ f)) ≤ exp (θ² c² / 2)` (convexity of `exp`, then
   `Real.cosh_le_exp_half_sq`);
@@ -66,6 +67,53 @@ noncomputable def incrementSum (step : σ → R → σ) (D : σ → R → ℝ) (
   | [] => 0
   | a :: l => D x a + incrementSum step D (step x a) l
 
+@[simp] lemma incrementSum_nil (step : σ → R → σ) (D : σ → R → ℝ) (x : σ) :
+    incrementSum step D x [] = 0 := rfl
+
+@[simp] lemma incrementSum_cons (step : σ → R → σ) (D : σ → R → ℝ) (x : σ) (a : R) (l : List R) :
+    incrementSum step D x (a :: l) = D x a + incrementSum step D (step x a) l := rfl
+
+/-- Sums of increments are additive in the increments. -/
+lemma incrementSum_add (step : σ → R → σ) (D E : σ → R → ℝ) (x : σ) (l : List R) :
+    incrementSum step (fun y a => D y a + E y a) x l
+      = incrementSum step D x l + incrementSum step E x l := by
+  induction l generalizing x with
+  | nil => simp
+  | cons a l ih => simp only [incrementSum_cons, ih]; ring
+
+/-- Sums of differences of increments. -/
+lemma incrementSum_sub (step : σ → R → σ) (D E : σ → R → ℝ) (x : σ) (l : List R) :
+    incrementSum step (fun y a => D y a - E y a) x l
+      = incrementSum step D x l - incrementSum step E x l := by
+  induction l generalizing x with
+  | nil => simp
+  | cons a l ih => simp only [incrementSum_cons, ih]; ring
+
+/-- Scaling the increments scales their sum. -/
+lemma incrementSum_const_mul (step : σ → R → σ) (c : ℝ) (D : σ → R → ℝ) (x : σ) (l : List R) :
+    incrementSum step (fun y a => c * D y a) x l = c * incrementSum step D x l := by
+  induction l generalizing x with
+  | nil => simp
+  | cons a l ih => simp only [incrementSum_cons, ih]; ring
+
+/-- Larger increments have a larger sum. -/
+lemma incrementSum_mono (step : σ → R → σ) {D E : σ → R → ℝ} (h : ∀ y a, D y a ≤ E y a)
+    (x : σ) (l : List R) : incrementSum step D x l ≤ incrementSum step E x l := by
+  induction l generalizing x with
+  | nil => simp
+  | cons a l ih => simp only [incrementSum_cons]; exact add_le_add (h x a) (ih _)
+
+@[simp] lemma incrementSum_zero (step : σ → R → σ) (x : σ) (l : List R) :
+    incrementSum step (fun _ _ => 0) x l = 0 := by
+  induction l generalizing x with
+  | nil => simp
+  | cons a l ih => simp [ih]
+
+/-- Nonnegative increments have a nonnegative sum. -/
+lemma incrementSum_nonneg (step : σ → R → σ) {D : σ → R → ℝ} (h : ∀ y a, 0 ≤ D y a) (x : σ)
+    (l : List R) : 0 ≤ incrementSum step D x l := by
+  simpa using incrementSum_mono step (D := fun _ _ => 0) h x l
+
 /-- `incrementSum` of the affine increments `θ D - b` (the exponent of the exponential
 supermartingale). -/
 lemma incrementSum_mul_sub (step : σ → R → σ) (D : σ → R → ℝ) (θ b : ℝ) (x : σ) (l : List R) :
@@ -106,10 +154,10 @@ lemma incrementSum_take (step : σ → R → σ) (ψ : σ → ℝ) (x : σ) (l :
   | nil =>
     simp only [List.length_nil, Nat.le_zero] at hk
     subst hk
-    simp [incrementSum]
+    simp
   | cons a l ih =>
     cases k with
-    | zero => simp [incrementSum]
+    | zero => simp
     | succ k =>
       rw [List.take_succ_cons, Finset.sum_range_succ']
       simp only [incrementSum, List.take_succ_cons, List.foldl_cons, List.take_zero,

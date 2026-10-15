@@ -11,13 +11,10 @@ length `T`.
 namespace Epidemics
 open Dynamics
 
-/-- `expList α T` only evaluates its functional on lists of length `T`. -/
+/-- `expList α T` only evaluates its functional on lists of length `T` (the core
+`Dynamics.expList_congr_length`, with the horizon explicit). -/
 lemma expList_congr_length {α : Type*} [Fintype α] (T : ℕ) {F G : List α → ℝ}
-    (h : ∀ l, l.length = T → F l = G l) : expList α T F = expList α T G := by
-  induction T generalizing F G with
-  | zero => exact h [] rfl
-  | succ T ih =>
-    rw [expList_succ, expList_succ]
-    exact congrArg avg (funext fun a => ih fun l hl => h (a :: l) (by simp [hl]))
+    (h : ∀ l, l.length = T → F l = G l) : expList α T F = expList α T G :=
+  Dynamics.expList_congr_length h
 
 end Epidemics

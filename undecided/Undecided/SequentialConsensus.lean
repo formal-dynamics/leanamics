@@ -36,70 +36,70 @@ section PathSums
 variable (s : Config n) (l : List (Interaction n))
 
 /-- Number of `xb`/`yb` interactions along the path. -/
-noncomputable abbrev Svb : ℝ := pathSum step (onPair vbI) s l
+noncomputable abbrev Svb : ℝ := incrementSum step (onPair vbI) s l
 /-- Number of `xy`/`yx` interactions along the path. -/
-noncomputable abbrev Sxy : ℝ := pathSum step (onPair xyI) s l
+noncomputable abbrev Sxy : ℝ := incrementSum step (onPair xyI) s l
 
-lemma ps_wSC : pathSum step (fun s p => wSC n (s p.1.1) (s p.1.2)) s l =
+lemma ps_wSC : incrementSum step (fun s p => wSC n (s p.1.1) (s p.1.2)) s l =
     (Svb s l / 5 - Sxy s l / 6) / n := by
   induction l generalizing s with
   | nil => simp
   | cons p l ih =>
-    rw [pathSum_cons, ih]
-    simp only [Svb, Sxy, pathSum_cons, wSC, onPair]
+    rw [incrementSum_cons, ih]
+    simp only [Svb, Sxy, incrementSum_cons, wSC, onPair]
     ring
 
-lemma ps_wC : pathSum step (fun s p => wC s (s p.1.1) (s p.1.2)) s l =
-    (pathSum step (onState CentralR) s l - 256 * (Svb s l + Sxy s l)) / 256 := by
+lemma ps_wC : incrementSum step (fun s p => wC s (s p.1.1) (s p.1.2)) s l =
+    (incrementSum step (onState CentralR) s l - 256 * (Svb s l + Sxy s l)) / 256 := by
   induction l generalizing s with
   | nil => simp
   | cons p l ih =>
-    rw [pathSum_cons, ih]
-    simp only [Svb, Sxy, pathSum_cons, wC, onPair, onState]
+    rw [incrementSum_cons, ih]
+    simp only [Svb, Sxy, incrementSum_cons, wC, onPair, onState]
     ring
 
-lemma ps_wB : pathSum step (fun s p => wB n s (s p.1.1) (s p.1.2)) s l =
-    5 / (16 * n) * (pathSum step (onState BlankR) s l - 64 * Sxy s l) := by
+lemma ps_wB : incrementSum step (fun s p => wB n s (s p.1.1) (s p.1.2)) s l =
+    5 / (16 * n) * (incrementSum step (onState BlankR) s l - 64 * Sxy s l) := by
   induction l generalizing s with
   | nil => simp
   | cons p l ih =>
-    rw [pathSum_cons, ih]
-    simp only [Sxy, pathSum_cons, wB, onPair, onState]
+    rw [incrementSum_cons, ih]
+    simp only [Sxy, incrementSum_cons, wB, onPair, onState]
     ring
 
-lemma ps_wX : pathSum step (fun s p => wX n s (s p.1.1) (s p.1.2)) s l =
-    5 / (32 * n) * (pathSum step (onState XR) s l - 128 * (Svb s l + Sxy s l)) := by
+lemma ps_wX : incrementSum step (fun s p => wX n s (s p.1.1) (s p.1.2)) s l =
+    5 / (32 * n) * (incrementSum step (onState XR) s l - 128 * (Svb s l + Sxy s l)) := by
   induction l generalizing s with
   | nil => simp
   | cons p l ih =>
-    rw [pathSum_cons, ih]
-    simp only [Svb, Sxy, pathSum_cons, wX, onPair, onState]
+    rw [incrementSum_cons, ih]
+    simp only [Svb, Sxy, incrementSum_cons, wX, onPair, onState]
     ring
 
-lemma ps_wY : pathSum step (fun s p => wY n s (s p.1.1) (s p.1.2)) s l =
-    5 / (32 * n) * (pathSum step (onState YR) s l - 128 * (Svb s l + Sxy s l)) := by
+lemma ps_wY : incrementSum step (fun s p => wY n s (s p.1.1) (s p.1.2)) s l =
+    5 / (32 * n) * (incrementSum step (onState YR) s l - 128 * (Svb s l + Sxy s l)) := by
   induction l generalizing s with
   | nil => simp
   | cons p l ih =>
-    rw [pathSum_cons, ih]
-    simp only [Svb, Sxy, pathSum_cons, wY, onPair, onState]
+    rw [incrementSum_cons, ih]
+    simp only [Svb, Sxy, incrementSum_cons, wY, onPair, onState]
     ring
 
-lemma ps_wM (t : ℝ) : pathSum step (fun s p => wM t (s p.1.1) (s p.1.2)) s l =
+lemma ps_wM (t : ℝ) : incrementSum step (fun s p => wM t (s p.1.1) (s p.1.2)) s l =
     -(t ^ 2 / 2) * (Svb s l + Sxy s l) := by
   induction l generalizing s with
   | nil => simp
   | cons p l ih =>
-    rw [pathSum_cons, ih]
-    simp only [Svb, Sxy, pathSum_cons, wM, onPair]
+    rw [incrementSum_cons, ih]
+    simp only [Svb, Sxy, incrementSum_cons, wM, onPair]
     ring
 
-lemma Svb_nonneg : 0 ≤ Svb s l := pathSum_nonneg (fun _ _ => vbI_nonneg _ _) s l
-lemma Sxy_nonneg : 0 ≤ Sxy s l := pathSum_nonneg (fun _ _ => xyI_nonneg _ _) s l
+lemma Svb_nonneg : 0 ≤ Svb s l := incrementSum_nonneg step (fun _ _ => vbI_nonneg _ _) s l
+lemma Sxy_nonneg : 0 ≤ Sxy s l := incrementSum_nonneg step (fun _ _ => xyI_nonneg _ _) s l
 
 lemma ps_onState_nonneg (P : Config n → Prop) [DecidablePred P] :
-    0 ≤ pathSum step (onState P) s l :=
-  pathSum_nonneg (fun s _ => by unfold onState; split <;> norm_num) s l
+    0 ≤ incrementSum step (onState P) s l :=
+  incrementSum_nonneg step (fun s _ => by unfold onState; split <;> norm_num) s l
 
 /-- The blank count moves by `S_xy - S_vb` ([AAE08, §4.4]). -/
 lemma count_run_u : (count (run s l) .u : ℝ) = count s .u + Sxy s l - Svb s l := by
@@ -107,7 +107,7 @@ lemma count_run_u : (count (run s l) .u : ℝ) = count s .u + Sxy s l - Svb s l 
   | nil => simp [run]
   | cons p l ih =>
     rw [run_cons, ih, count_step_u]
-    simp only [Svb, Sxy, pathSum_cons, onPair]
+    simp only [Svb, Sxy, incrementSum_cons, onPair]
     ring
 
 /-- Every blank consumed was created or initially present: `S_xy ≤ S_vb + n`. -/
@@ -119,13 +119,13 @@ lemma Sxy_le : Sxy s l ≤ Svb s l + n := by
 
 /-- A run that ends outside consensus never visited a consensus configuration. -/
 lemma ps_notCons (h : ¬ Cons (run s l)) :
-    pathSum step (onState fun s => ¬ Cons s) s l = l.length := by
+    incrementSum step (onState fun s => ¬ Cons s) s l = l.length := by
   induction l generalizing s with
   | nil => simp
   | cons p l ih =>
     rw [run_cons] at h
     have hs : ¬ Cons s := fun hc => h (cons_run (cons_of_step_cons (p := p) hc) l)
-    rw [pathSum_cons, ih _ h]
+    rw [incrementSum_cons, ih _ h]
     simp [onState, hs, add_comm]
 
 end PathSums
@@ -165,7 +165,7 @@ variable (s : Config n) (l : List (Interaction n))
 
 /-- Off the event of P1, few interactions change the state. -/
 lemma sch_lt (hn : 0 < n) {L : ℝ}
-    (h1 : pathSum step (fun s p => wSC n (s p.1.1) (s p.1.2)) s l < L) :
+    (h1 : incrementSum step (fun s p => wSC n (s p.1.1) (s p.1.2)) s l < L) :
     Svb s l + Sxy s l < 60 * n * L + 11 * n := by
   have hn0 : (0 : ℝ) < n := by exact_mod_cast hn
   rw [ps_wSC, div_lt_iff₀ hn0] at h1
@@ -176,11 +176,11 @@ lemma sch_lt (hn : 0 < n) {L : ℝ}
 /-- **Deterministic core.** Off the five events, a long enough run ends in consensus. -/
 lemma cons_of_small (hn : 0 < n) {L : ℝ}
     (hT : 256 * L + 34576 * n * L + 6336 * n ≤ l.length)
-    (h1 : pathSum step (fun s p => wSC n (s p.1.1) (s p.1.2)) s l < L)
-    (hC : pathSum step (fun s p => wC s (s p.1.1) (s p.1.2)) s l < L)
-    (hB : pathSum step (fun s p => wB n s (s p.1.1) (s p.1.2)) s l < L)
-    (hX : pathSum step (fun s p => wX n s (s p.1.1) (s p.1.2)) s l < L)
-    (hY : pathSum step (fun s p => wY n s (s p.1.1) (s p.1.2)) s l < L) :
+    (h1 : incrementSum step (fun s p => wSC n (s p.1.1) (s p.1.2)) s l < L)
+    (hC : incrementSum step (fun s p => wC s (s p.1.1) (s p.1.2)) s l < L)
+    (hB : incrementSum step (fun s p => wB n s (s p.1.1) (s p.1.2)) s l < L)
+    (hX : incrementSum step (fun s p => wX n s (s p.1.1) (s p.1.2)) s l < L)
+    (hY : incrementSum step (fun s p => wY n s (s p.1.1) (s p.1.2)) s l < L) :
     Cons (run s l) := by
   by_contra hnc
   have hn0 : (0 : ℝ) < n := by exact_mod_cast hn
@@ -197,11 +197,11 @@ lemma cons_of_small (hn : 0 < n) {L : ℝ}
   rw [eX] at hX hY
   -- the number of non-consensus interactions is the length of the run
   have hN := ps_notCons s l hnc
-  have hle : pathSum step (onState fun s => ¬ Cons s) s l ≤
-      pathSum step (onState CentralR) s l + pathSum step (onState BlankR) s l +
-        pathSum step (onState XR) s l + pathSum step (onState YR) s l := by
-    rw [← pathSum_add, ← pathSum_add, ← pathSum_add]
-    exact pathSum_mono (fun s _ => notCons_le_regions s) s l
+  have hle : incrementSum step (onState fun s => ¬ Cons s) s l ≤
+      incrementSum step (onState CentralR) s l + incrementSum step (onState BlankR) s l +
+        incrementSum step (onState XR) s l + incrementSum step (onState YR) s l := by
+    rw [← incrementSum_add, ← incrementSum_add, ← incrementSum_add]
+    exact incrementSum_mono step (fun s _ => notCons_le_regions s) s l
   have hnl : 0 ≤ (n : ℝ) * L := by
     rcases le_or_gt 0 L with hL | hL
     · positivity
@@ -225,11 +225,11 @@ lemma ind_nonneg (P : Prop) [Decidable P] : (0 : ℝ) ≤ if P then 1 else 0 := 
 lemma event_le {φ : Config n → Interaction n → ℝ} {F : Config n → ℝ} (hF : ∀ s, 0 ≤ F s)
     (h : ∀ s, avg (fun p => exp (φ s p) * F (step s p)) ≤ F s) (T : ℕ) (s : Config n) (L : ℝ)
     {m A : ℝ} (hm : 0 < m) (hFm : ∀ l, m ≤ F (run s l)) (hA : F s ≤ A) :
-    expList (Interaction n) T (fun l => if L ≤ pathSum step φ s l then 1 else 0) ≤
+    expList (Interaction n) T (fun l => if L ≤ incrementSum step φ s l then 1 else 0) ≤
       A / m * exp (-L) := by
-  have hb := expList_ind_le_of_weight hF h T s (fun l => L ≤ pathSum step φ s l)
+  have hb := expList_ind_le_of_weight hF h T s (fun l => L ≤ incrementSum step φ s l)
     (m := exp L * m) (by positivity) (fun l hl => by
-      have h1 : exp L ≤ exp (pathSum step φ s l) := exp_le_exp.mpr hl
+      have h1 : exp L ≤ exp (incrementSum step φ s l) := exp_le_exp.mpr hl
       exact mul_le_mul h1 (hFm l) hm.le (exp_pos _).le)
   calc _ ≤ F s / (exp L * m) := hb
     _ ≤ A / (exp L * m) := by gcongr
@@ -237,15 +237,15 @@ lemma event_le {φ : Config n → Interaction n → ℝ} {F : Config n → ℝ} 
 
 lemma five_events (hn : 16 ≤ n) (s : Config n) (hs : 1 ≤ count s .a + count s .b) (T : ℕ)
     (L : ℝ) :
-    expList (Interaction n) T (fun l => if L ≤ pathSum step (fun s p => wSC n (s p.1.1) (s p.1.2))
-        s l then 1 else 0) +
-      expList (Interaction n) T (fun l => if L ≤ pathSum step (fun s p => wC s (s p.1.1) (s p.1.2))
-        s l then 1 else 0) +
-      expList (Interaction n) T (fun l => if L ≤ pathSum step (fun s p => wB n s (s p.1.1)
+    expList (Interaction n) T (fun l => if L ≤ incrementSum step (fun s p => wSC n (s p.1.1)
         (s p.1.2)) s l then 1 else 0) +
-      expList (Interaction n) T (fun l => if L ≤ pathSum step (fun s p => wX n s (s p.1.1)
+      expList (Interaction n) T (fun l => if L ≤ incrementSum step (fun s p => wC s (s p.1.1)
         (s p.1.2)) s l then 1 else 0) +
-      expList (Interaction n) T (fun l => if L ≤ pathSum step (fun s p => wY n s (s p.1.1)
+      expList (Interaction n) T (fun l => if L ≤ incrementSum step (fun s p => wB n s (s p.1.1)
+        (s p.1.2)) s l then 1 else 0) +
+      expList (Interaction n) T (fun l => if L ≤ incrementSum step (fun s p => wX n s (s p.1.1)
+        (s p.1.2)) s l then 1 else 0) +
+      expList (Interaction n) T (fun l => if L ≤ incrementSum step (fun s p => wY n s (s p.1.1)
         (s p.1.2)) s l then 1 else 0) ≤ 9 * n * exp (-L) := by
   have hm : (16 : ℝ) ≤ n := by exact_mod_cast hn
   have hn2 : 2 ≤ n := by omega
@@ -316,28 +316,28 @@ lemma five_events (hn : 16 ≤ n) (s : Config n) (hs : 1 ≤ count s .a + count 
 lemma notCons_le_events (hn : 0 < n) (s : Config n) (L : ℝ) (l : List (Interaction n))
     (hT : 256 * L + 34576 * n * L + 6336 * n ≤ l.length) :
     (if Cons (run s l) then (0 : ℝ) else 1) ≤
-      (if L ≤ pathSum step (fun s p => wSC n (s p.1.1) (s p.1.2)) s l then 1 else 0) +
-      (if L ≤ pathSum step (fun s p => wC s (s p.1.1) (s p.1.2)) s l then 1 else 0) +
-      (if L ≤ pathSum step (fun s p => wB n s (s p.1.1) (s p.1.2)) s l then 1 else 0) +
-      (if L ≤ pathSum step (fun s p => wX n s (s p.1.1) (s p.1.2)) s l then 1 else 0) +
-      (if L ≤ pathSum step (fun s p => wY n s (s p.1.1) (s p.1.2)) s l then 1 else 0) := by
-  have h0 := ind_nonneg (L ≤ pathSum step (fun s p => wSC n (s p.1.1) (s p.1.2)) s l)
-  have h1 := ind_nonneg (L ≤ pathSum step (fun s p => wC s (s p.1.1) (s p.1.2)) s l)
-  have h2 := ind_nonneg (L ≤ pathSum step (fun s p => wB n s (s p.1.1) (s p.1.2)) s l)
-  have h3 := ind_nonneg (L ≤ pathSum step (fun s p => wX n s (s p.1.1) (s p.1.2)) s l)
-  have h4 := ind_nonneg (L ≤ pathSum step (fun s p => wY n s (s p.1.1) (s p.1.2)) s l)
+      (if L ≤ incrementSum step (fun s p => wSC n (s p.1.1) (s p.1.2)) s l then 1 else 0) +
+      (if L ≤ incrementSum step (fun s p => wC s (s p.1.1) (s p.1.2)) s l then 1 else 0) +
+      (if L ≤ incrementSum step (fun s p => wB n s (s p.1.1) (s p.1.2)) s l then 1 else 0) +
+      (if L ≤ incrementSum step (fun s p => wX n s (s p.1.1) (s p.1.2)) s l then 1 else 0) +
+      (if L ≤ incrementSum step (fun s p => wY n s (s p.1.1) (s p.1.2)) s l then 1 else 0) := by
+  have h0 := ind_nonneg (L ≤ incrementSum step (fun s p => wSC n (s p.1.1) (s p.1.2)) s l)
+  have h1 := ind_nonneg (L ≤ incrementSum step (fun s p => wC s (s p.1.1) (s p.1.2)) s l)
+  have h2 := ind_nonneg (L ≤ incrementSum step (fun s p => wB n s (s p.1.1) (s p.1.2)) s l)
+  have h3 := ind_nonneg (L ≤ incrementSum step (fun s p => wX n s (s p.1.1) (s p.1.2)) s l)
+  have h4 := ind_nonneg (L ≤ incrementSum step (fun s p => wY n s (s p.1.1) (s p.1.2)) s l)
   by_cases hc : Cons (run s l)
   · simp only [hc, if_true]; linarith
   simp only [hc, if_false]
-  by_cases e1 : L ≤ pathSum step (fun s p => wSC n (s p.1.1) (s p.1.2)) s l
+  by_cases e1 : L ≤ incrementSum step (fun s p => wSC n (s p.1.1) (s p.1.2)) s l
   · simp only [e1, if_true]; linarith
-  by_cases eC : L ≤ pathSum step (fun s p => wC s (s p.1.1) (s p.1.2)) s l
+  by_cases eC : L ≤ incrementSum step (fun s p => wC s (s p.1.1) (s p.1.2)) s l
   · simp only [eC, if_true]; linarith
-  by_cases eB : L ≤ pathSum step (fun s p => wB n s (s p.1.1) (s p.1.2)) s l
+  by_cases eB : L ≤ incrementSum step (fun s p => wB n s (s p.1.1) (s p.1.2)) s l
   · simp only [eB, if_true]; linarith
-  by_cases eX : L ≤ pathSum step (fun s p => wX n s (s p.1.1) (s p.1.2)) s l
+  by_cases eX : L ≤ incrementSum step (fun s p => wX n s (s p.1.1) (s p.1.2)) s l
   · simp only [eX, if_true]; linarith
-  by_cases eY : L ≤ pathSum step (fun s p => wY n s (s p.1.1) (s p.1.2)) s l
+  by_cases eY : L ≤ incrementSum step (fun s p => wY n s (s p.1.1) (s p.1.2)) s l
   · simp only [eY, if_true]; linarith
   exact absurd (cons_of_small s l hn hT (not_le.mp e1) (not_le.mp eC) (not_le.mp eB)
     (not_le.mp eX) (not_le.mp eY)) hc
@@ -348,7 +348,7 @@ probability at most `9 n e^{-L}`. -/
 theorem prob_notCons_le (hn : 16 ≤ n) (s : Config n) (hs : 1 ≤ count s .a + count s .b) (L : ℝ)
     (T : ℕ) (hT : 256 * L + 34576 * n * L + 6336 * n ≤ T) :
     expList (Interaction n) T (fun l => if Cons (run s l) then 0 else 1) ≤ 9 * n * exp (-L) := by
-  refine le_trans (expList_le_expList_of_length fun l hl =>
+  refine le_trans (expList_le_of_length fun l hl =>
     notCons_le_events (by omega) s L l (by rw [hl]; exact hT)) ?_
   rw [expList_add, expList_add, expList_add, expList_add]
   exact five_events hn s hs T L
@@ -368,7 +368,7 @@ lemma gap_event_le (hn : 2 ≤ n) (s : Config n) (T : ℕ) {N : ℝ} (hN : 0 < N
     (fun l => count (run s l) .a ≤ count (run s l) .b ∧ Svb s l + Sxy s l ≤ N)
     (m := exp (-(t ^ 2 / 2 * N))) (exp_pos _) (fun l hl => by
       have hrun : l.foldl step s = run s l := rfl
-      rw [ps_wM, hrun]
+      rw [pathSum, ps_wM, hrun]
       have hxy : (count (run s l) .a : ℝ) ≤ count (run s l) .b := by exact_mod_cast hl.1
       have hF1 : cpot (fM t) (run s l) = 1 := by
         unfold cpot fM
@@ -404,22 +404,22 @@ theorem prob_notAllX_le (hn : 16 ≤ n) (s : Config n) (hu : count s .b < count 
     linarith
   have hpt : ∀ l : List (Interaction n), l.length = T →
       (if count (run s l) .a = n then (0 : ℝ) else 1) ≤
-        ((if L ≤ pathSum step (fun s p => wSC n (s p.1.1) (s p.1.2)) s l then 1 else 0) +
-        (if L ≤ pathSum step (fun s p => wC s (s p.1.1) (s p.1.2)) s l then 1 else 0) +
-        (if L ≤ pathSum step (fun s p => wB n s (s p.1.1) (s p.1.2)) s l then 1 else 0) +
-        (if L ≤ pathSum step (fun s p => wX n s (s p.1.1) (s p.1.2)) s l then 1 else 0) +
-        (if L ≤ pathSum step (fun s p => wY n s (s p.1.1) (s p.1.2)) s l then 1 else 0)) +
+        ((if L ≤ incrementSum step (fun s p => wSC n (s p.1.1) (s p.1.2)) s l then 1 else 0) +
+        (if L ≤ incrementSum step (fun s p => wC s (s p.1.1) (s p.1.2)) s l then 1 else 0) +
+        (if L ≤ incrementSum step (fun s p => wB n s (s p.1.1) (s p.1.2)) s l then 1 else 0) +
+        (if L ≤ incrementSum step (fun s p => wX n s (s p.1.1) (s p.1.2)) s l then 1 else 0) +
+        (if L ≤ incrementSum step (fun s p => wY n s (s p.1.1) (s p.1.2)) s l then 1 else 0)) +
         (if count (run s l) .a ≤ count (run s l) .b ∧
           Svb s l + Sxy s l ≤ 60 * n * L + 11 * n then 1 else 0) := by
     intro l hl
     have hev := notCons_le_events (by omega) s L l (by rw [hl]; exact hT)
     have hM := ind_nonneg (count (run s l) .a ≤ count (run s l) .b ∧
       Svb s l + Sxy s l ≤ 60 * n * L + 11 * n)
-    have h1 := ind_nonneg (L ≤ pathSum step (fun s p => wSC n (s p.1.1) (s p.1.2)) s l)
-    have h2 := ind_nonneg (L ≤ pathSum step (fun s p => wC s (s p.1.1) (s p.1.2)) s l)
-    have h3 := ind_nonneg (L ≤ pathSum step (fun s p => wB n s (s p.1.1) (s p.1.2)) s l)
-    have h4 := ind_nonneg (L ≤ pathSum step (fun s p => wX n s (s p.1.1) (s p.1.2)) s l)
-    have h5 := ind_nonneg (L ≤ pathSum step (fun s p => wY n s (s p.1.1) (s p.1.2)) s l)
+    have h1 := ind_nonneg (L ≤ incrementSum step (fun s p => wSC n (s p.1.1) (s p.1.2)) s l)
+    have h2 := ind_nonneg (L ≤ incrementSum step (fun s p => wC s (s p.1.1) (s p.1.2)) s l)
+    have h3 := ind_nonneg (L ≤ incrementSum step (fun s p => wB n s (s p.1.1) (s p.1.2)) s l)
+    have h4 := ind_nonneg (L ≤ incrementSum step (fun s p => wX n s (s p.1.1) (s p.1.2)) s l)
+    have h5 := ind_nonneg (L ≤ incrementSum step (fun s p => wY n s (s p.1.1) (s p.1.2)) s l)
     by_cases ha : count (run s l) .a = n
     · rw [if_pos ha]
       linarith
@@ -432,14 +432,14 @@ theorem prob_notAllX_le (hn : 16 ≤ n) (s : Config n) (hu : count s .b < count 
       · rw [if_pos (show count (run s l) .a ≤ count (run s l) .b ∧
           Svb s l + Sxy s l ≤ 60 * n * L + 11 * n from ⟨hxy, hS⟩)]
         linarith
-      · have e1 : L ≤ pathSum step (fun s p => wSC n (s p.1.1) (s p.1.2)) s l := by
+      · have e1 : L ≤ incrementSum step (fun s p => wSC n (s p.1.1) (s p.1.2)) s l := by
           by_contra h
           exact hS (sch_lt s l (by omega) (not_le.mp h)).le
         rw [if_pos e1]
         linarith
     · rw [if_neg hc] at hev
       linarith
-  refine le_trans (expList_le_expList_of_length hpt) ?_
+  refine le_trans (expList_le_of_length hpt) ?_
   rw [expList_add, expList_add, expList_add, expList_add, expList_add]
   have h5 := five_events hn s hs T L
   have hg := gap_event_le (by omega) s T hN hu'

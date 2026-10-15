@@ -9,6 +9,9 @@ with expectations computed by `expList`. `ofStep step` is the corresponding
 finite Markov kernel, and `iterate_ofStep` identifies its iterates with the
 `expList` expectations, so results about kernels (for instance
 `Dynamics.Kernel.nested_phases`) apply to such round-based processes.
+The probability `missProb` of missing a target after `T` rounds composes over stages
+(`missProb_comp`) and, for a target closed under every round, amplifies over consecutive blocks
+(`missProb_amplify`).
 -/
 
 namespace Dynamics.Kernel
@@ -194,5 +197,43 @@ lemma missProb_antitone (step : S → R → S) {B : Set S} (hB : ∀ y ∈ B, �
   have := missProb_comp step (B := B) (D := B) (T₁ := T) (T₂ := k) le_rfl
     (fun y hy => (missProb_of_closed step hB hy k).le) s
   linarith
+
+omit [Nonempty R] in
+/-- **Amplification** (the `expList` form of `Dynamics.Kernel.event_amplify`): if a target closed
+under every round is missed after `T` rounds with probability at most `p` from every state, then
+it is missed after `k T` rounds with probability at most `p ^ k`, since each block of `T` rounds
+fails independently of the previous ones. -/
+lemma missProb_amplify (step : S → R → S) {B : Set S} (hB : ∀ y ∈ B, ∀ r, step y r ∈ B)
+    {T : ℕ} {p : ℝ} (hp : ∀ y, missProb step B T y ≤ p) (k : ℕ) (s : S) :
+    missProb step B (k * T) s ≤ p ^ k := by
+  classical
+  have hp0 : 0 ≤ p := (missProb_nonneg step B T s).trans (hp s)
+  induction k with
+  | zero =>
+    rw [Nat.zero_mul, missProb_zero, pow_zero]
+    split <;> norm_num
+  | succ k ih =>
+    -- the last block fails only if the first `k` blocks have failed, then w.p. at most `p`
+    have hpt (l₁ : List R) : missProb step B T (l₁.foldl step s)
+        ≤ p * (if l₁.foldl step s ∈ B then (0 : ℝ) else 1) := by
+      by_cases hl : l₁.foldl step s ∈ B
+      · rw [missProb_of_closed step hB hl, if_pos hl, mul_zero]
+      · rw [if_neg hl, mul_one]
+        exact hp _
+    calc missProb step B ((k + 1) * T) s
+        = expList R (k * T) (fun l₁ => missProb step B T (l₁.foldl step s)) := by
+          have key (l₁ : List R) :
+              expList R T (fun l₂ => if (l₁ ++ l₂).foldl step s ∈ B then (0 : ℝ) else 1)
+                = missProb step B T (l₁.foldl step s) := by
+            simp only [missProb, List.foldl_append]
+          rw [Nat.succ_mul, ← funext key]
+          exact expList_append _ _ _
+      _ ≤ expList R (k * T) (fun l₁ => p * (if l₁.foldl step s ∈ B then (0 : ℝ) else 1)) :=
+          expList_le_expList hpt
+      _ = p * missProb step B (k * T) s := by
+          rw [expList_const_mul]
+          rfl
+      _ ≤ p * p ^ k := mul_le_mul_of_nonneg_left ih hp0
+      _ = p ^ (k + 1) := by ring
 
 end Dynamics

@@ -82,9 +82,9 @@ lemma expList_nonneg {T : ℕ} {F : List α → ℝ} (h : ∀ l, 0 ≤ F l) :
   | zero => exact h []
   | succ T ih => exact avg_nonneg fun a => ih fun l => h (a :: l)
 
-/-- `expList α T` only evaluates its argument on lists of length `T`, so it is monotone as soon
-as the comparison holds on those lists. -/
-lemma expList_le_expList_of_length {T : ℕ} {F G : List α → ℝ}
+/-- `expList α T` only evaluates its argument on lists of length `T`, so a comparison on those
+lists is enough. -/
+lemma expList_le_of_length {T : ℕ} {F G : List α → ℝ}
     (h : ∀ l : List α, l.length = T → F l ≤ G l) : expList α T F ≤ expList α T G := by
   induction T generalizing F G with
   | zero => exact h [] rfl
@@ -92,7 +92,7 @@ lemma expList_le_expList_of_length {T : ℕ} {F G : List α → ℝ}
 
 lemma expList_le_expList {T : ℕ} {F G : List α → ℝ} (h : ∀ l, F l ≤ G l) :
     expList α T F ≤ expList α T G :=
-  expList_le_expList_of_length fun l _ => h l
+  expList_le_of_length fun l _ => h l
 
 /-- An `expList` average of values at most one is at most one (also on an empty type). -/
 lemma expList_le_one {T : ℕ} {F : List α → ℝ} (h : ∀ l, F l ≤ 1) : expList α T F ≤ 1 := by
@@ -151,23 +151,25 @@ lemma expList_append (T₁ T₂ : ℕ) (F : List α → ℝ) :
       (F := fun l₁ => expList α T₂ fun l₂ => F (l₁ ++ l₂))]
     exact congrArg avg (funext fun a => by rw [ih]; simp)
 
-/-! ### Lengths and prefixes: `expList α T` only evaluates lists of length `T` -/
+/-! ### Lengths and prefixes: `expList α T` only evaluates lists of length `T`
 
-/-- `expList α T` only evaluates its argument on lists of length `T`, so a comparison on those
-lists is enough. -/
-lemma expList_le_of_length {T : ℕ} {F G : List α → ℝ}
-    (h : ∀ l : List α, l.length = T → F l ≤ G l) : expList α T F ≤ expList α T G := by
-  induction T generalizing F G with
-  | zero => exact h [] rfl
-  | succ T ih =>
-    rw [expList_succ, expList_succ]
-    exact avg_le_avg fun a => ih fun l hl => h (a :: l) (by simp [hl])
+The comparison form `expList_le_of_length` is stated above, with the monotonicity lemmas. -/
 
 /-- `expList α T` only evaluates its argument on lists of length `T`. -/
 lemma expList_congr_length {T : ℕ} {F G : List α → ℝ}
     (h : ∀ l : List α, l.length = T → F l = G l) : expList α T F = expList α T G :=
   le_antisymm (expList_le_of_length fun l hl => (h l hl).le)
     (expList_le_of_length fun l hl => (h l hl).ge)
+
+/-- **Two phases.** If, after any first phase `l₁` of `T₁` rounds, the expectation of `Φ` over
+the second phase is at most `a + Ψ l₁`, then over both phases it is at most `a + 𝔼 Ψ`. -/
+lemma expList_le_of_split [Nonempty α] {T₁ T₂ : ℕ} {Φ Ψ : List α → ℝ} {a : ℝ}
+    (h : ∀ l₁ : List α, l₁.length = T₁ → expList α T₂ (fun l₂ => Φ (l₁ ++ l₂)) ≤ a + Ψ l₁) :
+    expList α (T₁ + T₂) Φ ≤ a + expList α T₁ Ψ := by
+  rw [expList_append]
+  calc expList α T₁ (fun l₁ => expList α T₂ fun l₂ => Φ (l₁ ++ l₂))
+      ≤ expList α T₁ (fun l₁ => a + Ψ l₁) := expList_le_of_length h
+    _ = a + expList α T₁ Ψ := by rw [expList_add, expList_const]
 
 /-- A function of the first `k` of `T ≥ k` draws only sees `k` draws. -/
 lemma expList_take [Nonempty α] {k T : ℕ} (hk : k ≤ T) (F : List α → ℝ) :
