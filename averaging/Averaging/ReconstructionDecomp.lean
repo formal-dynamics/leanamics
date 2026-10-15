@@ -11,7 +11,7 @@ two eigenvalues of `P` exceed `λ` in absolute value, `P` contracts the orthogon
 -/
 
 namespace Averaging
-open Finset Matrix
+open Finset Matrix Dynamics
 
 variable {V : Type*} [Fintype V] [DecidableEq V] {G : SimpleGraph V} [DecidableRel G.Adj]
   {V₁ V₂ : Finset V} {n d b : ℕ}
@@ -31,7 +31,7 @@ lemma transitionMatrix_pow_mulVec_dotProduct_self_le (hG : IsClusteredRegular G 
       (abs_eigenvalues₀_le_maxAbsOtherEigenvalue G d))
     (c₁ := 1) (c₂ := 1 - 2 * (b : ℝ) / d)
     (hc₁ := by rw [abs_one]; linarith) (hc₂ := lt_of_lt_of_le hlam (le_abs_self _))
-    (hu₁ := by rw [one_smul]; exact transitionMatrix_mulVec_one hG.regular hd)
+    (hu₁ := by rw [one_smul]; exact transitionMatrix_mulVec_one G hd hG.regular)
     (hu₂ := transitionMatrix_mulVec_clusterIndicator_aux hG hd)
     (m := 2 * n) (hm := by positivity) (h₁ := hP.one_dotProduct_one)
     (h₂ := hP.clusterIndicator_dotProduct_self) (h₁₂ := hP.one_dotProduct_clusterIndicator)
@@ -72,7 +72,7 @@ theorem abs_avgIter_sub_le_aux (hG : IsClusteredRegular G V₁ V₂ n d b) (hd :
     have : 0 ≤ ((x ⬝ᵥ 1) ^ 2 + (x ⬝ᵥ χ) ^ 2) / (2 * n) := by positivity
     linarith
   have hP1 : P *ᵥ (1 : V → ℝ) = (1 : ℝ) • (1 : V → ℝ) := by
-    rw [one_smul]; exact transitionMatrix_mulVec_one hG.regular hd
+    rw [one_smul]; exact transitionMatrix_mulVec_one G hd hG.regular
   have hPt : (P ^ t) *ᵥ x = (P ^ t) *ᵥ y + α₁ • (1 : V → ℝ) + (α₂ * μ ^ t) • χ := by
     have hx_eq : x = y + α₁ • (1 : V → ℝ) + α₂ • χ := by
       rw [hy]; abel

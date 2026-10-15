@@ -1,77 +1,19 @@
 import Averaging.ReconstructionDefs
 
-/-! # Spectral facts for real symmetric matrices, on plain vectors
+/-! # Contraction off two eigenvectors of a real symmetric matrix
 
-For a real symmetric matrix `A` on `V`, Mathlib's orthonormal eigenbasis
-`Matrix.IsHermitian.eigenvectorBasis` lives in `EuclideanSpace ℝ V`. Here its vectors are read as
-plain functions `V → ℝ` with the dot product `⬝ᵥ`: orthonormality, the expansion of a vector in
-the basis, Parseval's identity, and the contraction bound `‖Aᵗ y‖² ≤ λ²ᵗ ‖y‖²` for vectors `y`
-without components along eigenvectors whose eigenvalue exceeds `λ` in absolute value. These are
-the linear-algebra inputs of Lemma C.1 of Becchetti et al. (arXiv:1511.03927).
+The linear-algebra inputs of Lemma C.1 of Becchetti et al. (arXiv:1511.03927), on top of the
+plain-vector eigenbasis API of `Dynamics/Spectral.lean` (orthonormality, Parseval, the spectral
+bound `‖Aᵗ y‖² ≤ λ²ᵗ ‖y‖²` for vectors `y` without components along eigenvectors whose eigenvalue
+exceeds `λ` in absolute value): at most two eigenvalues exceed a bound on the rest of the sorted
+spectrum, Bessel's inequality for the projection on the span of two orthogonal vectors of equal
+norm, and the resulting contraction off two eigenvectors.
 -/
 
 namespace Averaging
-open Finset Matrix
+open Finset Matrix Dynamics
 
 variable {V : Type*} [Fintype V] [DecidableEq V] {A : Matrix V V ℝ} (hA : A.IsHermitian)
-
-/-- The `j`-th vector of the orthonormal eigenbasis of `A`, as a plain function. -/
-noncomputable def eigvec (j : V) : V → ℝ := ⇑(hA.eigenvectorBasis j)
-
-lemma eigvec_dotProduct_eigvec (i j : V) :
-    eigvec hA i ⬝ᵥ eigvec hA j = if i = j then 1 else 0 := by
-  have h := (orthonormal_iff_ite.mp hA.eigenvectorBasis.orthonormal) i j
-  rw [← h]
-  simp [eigvec, EuclideanSpace.inner_eq_star_dotProduct, dotProduct_comm]
-
-lemma mulVec_eigvec (j : V) : A *ᵥ eigvec hA j = hA.eigenvalues j • eigvec hA j :=
-  hA.mulVec_eigenvectorBasis j
-
-/-- Expansion of a vector in the orthonormal eigenbasis. -/
-lemma sum_dotProduct_smul_eigvec (u : V → ℝ) :
-    ∑ j, (eigvec hA j ⬝ᵥ u) • eigvec hA j = u := by
-  have h := congrArg WithLp.ofLp (hA.eigenvectorBasis.sum_repr' (WithLp.toLp 2 u))
-  simpa [eigvec, EuclideanSpace.inner_eq_star_dotProduct, dotProduct_comm] using h
-
-/-- Parseval's identity in the eigenbasis. -/
-lemma sum_dotProduct_mul_dotProduct (u v : V → ℝ) :
-    ∑ j, (eigvec hA j ⬝ᵥ u) * (eigvec hA j ⬝ᵥ v) = u ⬝ᵥ v := by
-  conv_rhs => rw [← sum_dotProduct_smul_eigvec hA u]
-  rw [sum_dotProduct]
-  simp [smul_dotProduct]
-
-lemma pow_mulVec_eigvec (t : ℕ) (j : V) :
-    (A ^ t) *ᵥ eigvec hA j = hA.eigenvalues j ^ t • eigvec hA j := by
-  induction t with
-  | zero => simp
-  | succ t ih =>
-    rw [pow_succ', ← mulVec_mulVec, ih, mulVec_smul, mulVec_eigvec, smul_smul, pow_succ]
-
-/-- The coefficient of `Aᵗ y` along an eigenvector is `νᵗ` times that of `y` (symmetry of `A`). -/
-lemma eigvec_dotProduct_pow_mulVec (t : ℕ) (j : V) (y : V → ℝ) :
-    eigvec hA j ⬝ᵥ ((A ^ t) *ᵥ y) = hA.eigenvalues j ^ t * (eigvec hA j ⬝ᵥ y) := by
-  have hs : Aᵀ = A := IsSymm.eq hA
-  have hT : (A ^ t)ᵀ = A ^ t := by rw [transpose_pow, hs]
-  rw [dotProduct_mulVec, ← mulVec_transpose, hT, pow_mulVec_eigvec, smul_dotProduct,
-    smul_eq_mul]
-
-/-- Contraction: if `y` has no component along eigenvectors with `|ν| > λ`, then
-`‖Aᵗ y‖² ≤ λ²ᵗ ‖y‖²`. -/
-lemma pow_mulVec_dotProduct_self_le {lam : ℝ} {y : V → ℝ}
-    (hy : ∀ j, lam < |hA.eigenvalues j| → eigvec hA j ⬝ᵥ y = 0) (t : ℕ) :
-    ((A ^ t) *ᵥ y) ⬝ᵥ ((A ^ t) *ᵥ y) ≤ (lam ^ t) ^ 2 * (y ⬝ᵥ y) := by
-  rw [← sum_dotProduct_mul_dotProduct hA, ← sum_dotProduct_mul_dotProduct hA, mul_sum]
-  refine sum_le_sum fun j _ => ?_
-  rw [eigvec_dotProduct_pow_mulVec]
-  by_cases hj : lam < |hA.eigenvalues j|
-  · simp [hy j hj]
-  · have hle : |hA.eigenvalues j ^ t| ≤ lam ^ t := by
-      rw [abs_pow]
-      exact pow_le_pow_left₀ (abs_nonneg _) (not_lt.mp hj) t
-    have hsq : (hA.eigenvalues j ^ t) ^ 2 ≤ (lam ^ t) ^ 2 := by
-      rw [← sq_abs]
-      exact pow_le_pow_left₀ (abs_nonneg _) hle 2
-    nlinarith [sq_nonneg (eigvec hA j ⬝ᵥ y)]
 
 /-- At most two eigenvalues exceed in absolute value a bound on all but the two largest ones of
 the decreasingly sorted spectrum `eigenvalues₀`. -/
@@ -91,16 +33,6 @@ lemma card_filter_lt_abs_eigenvalues_le_two {lam : ℝ}
         card_le_card_of_injOn (fun j => (e j).val) hmaps
           (fun a _ b _ hab => he (Fin.ext hab))
     _ = 2 := card_range 2
-
-/-- Eigenvectors for distinct eigenvalues of a symmetric matrix are orthogonal. -/
-lemma eigvec_dotProduct_eq_zero_of_mulVec_eq_smul {u : V → ℝ} {c : ℝ} (hu : A *ᵥ u = c • u)
-    {j : V} (hj : hA.eigenvalues j ≠ c) : eigvec hA j ⬝ᵥ u = 0 := by
-  have h := eigvec_dotProduct_pow_mulVec hA 1 j u
-  rw [pow_one, pow_one, hu, dotProduct_smul, smul_eq_mul] at h
-  have h' : (c - hA.eigenvalues j) * (eigvec hA j ⬝ᵥ u) = 0 := by linarith
-  rcases mul_eq_zero.mp h' with h1 | h1
-  · exact absurd (sub_eq_zero.mp h1).symm hj
-  · exact h1
 
 /-! ### Projection on the span of two orthogonal vectors of equal norm -/
 
@@ -171,22 +103,23 @@ theorem pow_mulVec_dotProduct_self_le_of_orthogonal {lam c₁ c₂ m : ℝ} {u�
     {y : V → ℝ} (hy₁ : u₁ ⬝ᵥ y = 0) (hy₂ : u₂ ⬝ᵥ y = 0) (t : ℕ) :
     ((A ^ t) *ᵥ y) ⬝ᵥ ((A ^ t) *ᵥ y) ≤ (lam ^ t) ^ 2 * (y ⬝ᵥ y) := by
   set K := univ.filter fun j => lam < |hA.eigenvalues j| with hKdef
-  set a : V → ℝ := fun j => eigvec hA j ⬝ᵥ u₁
-  set c : V → ℝ := fun j => eigvec hA j ⬝ᵥ u₂
-  have hw (j : V) : eigvec hA j ⬝ᵥ eigvec hA j = 1 := by simp [eigvec_dotProduct_eigvec]
+  set a : V → ℝ := fun j => ⇑(hA.eigenvectorBasis j) ⬝ᵥ u₁
+  set c : V → ℝ := fun j => ⇑(hA.eigenvectorBasis j) ⬝ᵥ u₂
+  have hw (j : V) : ⇑(hA.eigenvectorBasis j) ⬝ᵥ ⇑(hA.eigenvectorBasis j) = 1 := by
+    simp [eigenvectorBasis_dotProduct]
   -- outside `K`, the eigenvalue differs from `c₁` and `c₂`
   have hoff (j : V) (hj : j ∉ K) : a j = 0 ∧ c j = 0 := by
     have hj' : |hA.eigenvalues j| ≤ lam := by simpa [hKdef] using hj
-    refine ⟨eigvec_dotProduct_eq_zero_of_mulVec_eq_smul hA hu₁ fun h => ?_,
-      eigvec_dotProduct_eq_zero_of_mulVec_eq_smul hA hu₂ fun h => ?_⟩
+    refine ⟨eigenvectorBasis_dotProduct_eq_zero_of_mulVec_eq_smul hA hu₁ fun h => ?_,
+      eigenvectorBasis_dotProduct_eq_zero_of_mulVec_eq_smul hA hu₂ fun h => ?_⟩
     · rw [h] at hj'; linarith
     · rw [h] at hj'; linarith
   have hbessel (j : V) : a j ^ 2 + c j ^ 2 ≤ m := sq_add_sq_le hm h₁ h₂ h₁₂ (hw j)
   have hsum : ∑ j ∈ K, (a j ^ 2 + c j ^ 2) = 2 * m := by
     rw [sum_filter_of_ne fun j _ hne => ?_]
     · rw [sum_add_distrib]
-      have e₁ := sum_dotProduct_mul_dotProduct hA u₁ u₁
-      have e₂ := sum_dotProduct_mul_dotProduct hA u₂ u₂
+      have e₁ := (dotProduct_eq_sum_eigenvectorBasis hA u₁ u₁).symm
+      have e₂ := (dotProduct_eq_sum_eigenvectorBasis hA u₂ u₂).symm
       simp only [← sq] at e₁ e₂
       simp only [a, c, e₁, e₂, h₁, h₂]
       ring

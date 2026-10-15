@@ -28,6 +28,7 @@ uses Lean 4.32.0 and Mathlib revision
 | `DriftHittingDefs` | Hitting probabilities `K.hitProb B n a = P_a(T_B ≤ n)` (visit `B` at one of the times `0, …, n`), through `trajectory` |
 | `DriftHittingStop` | The stopped chain `K.stopped B`; `1 − hitProb` is its event `¬B`; geometric drift `K V ≤ ρ V` off `B` ⇒ `P(T_B > t) ≤ ρ^t V(a)/V_min` (`one_sub_hitProb_le_of_drift`, via `multiplicative_drift`) |
 | `DriftHitting` | Hitting-time bound of Doerr et al. (SPAA 2011, Claim 2.9): growth by `c₁` except with probability `e^{−c₂X}` and escape from `0` with probability `c₃` ⇒ `X ≥ c₄ log q` within `c₅ log q + log_{c₁}(c₄ log q)` steps with probability `≥ 1 − q^{−c₆}` (`drift_hitting`; `O(log q)` form `drift_hitting_log`); `DriftHittingAux` holds the potential |
+| `Spectral` | Mathlib's eigenbasis of a real symmetric matrix on plain vectors: orthonormality, expansion and Parseval (`dotProduct_eq_sum_eigenvectorBasis`), the coefficients of `Aᵗ z` (`eigenvectorBasis_dotProduct_pow_mulVec`), the spectral bound for powers (`pow_mulVec_dotProduct_self_le`); the random walk `transitionMatrix G d = A/d` of a `d`-regular graph, its sorted eigenvalues `walkEigenvalues` and `λ_G = max {λ₂, \|λₙ\|}` (`lambdaG`), the top eigenvector when `λ_G < 1` (`exists_top_eigenvectorBasis`), indicator vectors `indVec` |
 
 `avg` remains zero on an empty sample type. Normalized distributions require
 mass one and therefore cannot inhabit an empty sample space; `uniform` requires

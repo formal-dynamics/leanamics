@@ -584,7 +584,7 @@ indicators, `log` is the natural logarithm.
 
 | Declaration | File | Paper | Statement |
 | --- | --- | --- | --- |
-| `transitionMatrix`, `walkEigenvalues`, `lambdaG` | `CobraCoverSpectral` | Section 1 | `P = A/r`, its sorted eigenvalues, `λ = max {λ₂, \|λₙ\|}` (copies of the `Median` definitions) |
+| `transitionMatrix`, `walkEigenvalues`, `lambdaG` | `Dynamics.Spectral` (core) | Section 1 | `P = A/r`, its sorted eigenvalues, `λ = max {λ₂, \|λₙ\|}` (shared with the `median` package) |
 | `sum_sq_neighbor_le` | `CobraCoverSpectral` | proof of Lemma 1, (6)–(7) | `∑ₓ (d_A(x)/r)² ≤ λ² \|A\| + (1 - λ²) \|A\|²/n` |
 | `bips_expected_growth` | `CobraCoverGrowth` | Lemma 1 | `k ≥ 2`: `E\|A'\| ≥ \|A\| (1 + (1 - λ²)(1 - \|A\|/n))` for every set `A` |
 | `bips_mgf_le` | `CobraCoverGrowth` | (12) in Lemma 2 | `E e^{-φ\|A'\|} ≤ exp(-(1 - e^{-φ}) E\|A'\|)` for every real `φ` |
@@ -624,7 +624,8 @@ proof gives `3/n²`) and `C = 130000` (expectation). Theorem 3 and `bipsCoin_inf
    (`sum_sq_neighbor_le`) and the one-round bounds hold for every regular graph and every infected
    set (not only sets containing `v`).
 2. **`λ`.** The paper's `λ = max_{i ≥ 2} |λᵢ|` is written `max {λ₂, |λₙ|}` (equal since
-   `λₙ ≤ λ₂`), as in `Median.lambdaG`; on graphs with fewer than two vertices it is `0`.
+   `λₙ ≤ λ₂`), the core's `Dynamics.lambdaG`, shared with the `median` package; on graphs with
+   fewer than two vertices it is `0`.
 3. **Asymptotic notation.** "`1 - λ ≫ √(log n/n)`" is the paper's footnote form
    `1 - λ ≥ C₀ √(log n/n)` with `∃ C₀`; "`O(T)` w.h.p." is `∃ C`, with failure probability
    `≤ C n^{-3}` (Theorem 2) or `≤ C n^{-2}` (Theorem 1, as derived in the paper's proof) for every
@@ -688,7 +689,7 @@ proof gives `3/n²`) and `C = 130000` (expectation). Theorem 3 and `bipsCoin_inf
    most `2 (T₀ + 1)` (`cover_tail_sum_le_log`). For BIPS, the process from a state `A ∋ v`
    dominates the one from `{v}` (monotonicity, persistent source), so
    `P(A_{s+T₀} ≠ V) ≤ P(A_s ≠ V)/2` (`GrowthProcess.tail_sum_le_log`).
-4. **Files.** `CobraCoverSpectral` (definitions, eigenbasis lemmas, Lemma 1 (6)–(7)),
+4. **Files.** `CobraCoverSpectral` (Lemma 1 (6)–(7), on the core's `Dynamics.Spectral`),
    `CobraCoverRound` (one BIPS round: independence over `Choices G k`, infection probability
    `1 - (1 - P_u)^k`), `CobraCoverGrowth` (Lemma 1, MGF, Chernoff), `CobraCoverNumerics`
    (real-number estimates of Lemmas 2 to 4), `CobraCoverEngine`, `CobraCoverEngineLarge`,
@@ -701,16 +702,12 @@ proof gives `3/n²`) and `C = 130000` (expectation). Theorem 3 and `bipsCoin_inf
 
 #### Copies and candidates for `dynamics/`
 
-`transitionMatrix`, `transitionMatrix_isHermitian`, `walkEigenvalues`, `lambdaG`, `lambdaG_nonneg`
-are copies of the `Median` declarations of the same names (`Median/ExpanderDefs.lean`,
-`Median/ExpanderMixing.lean`), and the eigenbasis lemmas of `CobraCoverSpectral.lean`
-(`sum_eigvec_mul_eigvec` (private), `dotProduct_eq_sum_eigvec`, `eigvec_dotProduct_mulVec`,
-`dotProduct_mulVec_eq_sum_eigvec`, `indVec`, `indVec_dotProduct_self`, `one_dotProduct_indVec`,
-`transitionMatrix_mulVec_one`, `abs_eigenvalues_le_lambdaG`) are copies of
-`Median.mixing_transition` and its helpers, renamed into the `Epidemics` namespace; the spectral
-part of `sum_sq_neighbor_le` reuses the eigenbasis argument of `Median.mixing_transition` and of
-`Averaging.mulVec_dotProduct_mulVec_le`. The epidemics package depends only on `dynamics`, so
-these are restated here; they should move to `dynamics/` and be shared. Inside the package,
+`transitionMatrix`, `transitionMatrix_isHermitian`, `walkEigenvalues`, `lambdaG`, `lambdaG_nonneg`,
+the eigenbasis lemmas (Parseval `dotProduct_eq_sum_eigenvectorBasis`,
+`eigenvectorBasis_dotProduct_mulVec`), `indVec`, `transitionMatrix_mulVec_one`,
+`abs_eigenvalues_le_lambdaG` and the top-eigenvector argument shared with
+`Median.mixing_transition` (`exists_top_eigenvectorBasis`) are in the core
+(`Dynamics/Spectral.lean`), shared with the median and averaging packages. Inside the package,
 `avg_pi_prod`, `avg_pi_eval`, `pi_count_mgf_le` (any dependent product) and
 `avg_lower_tail_of_mgf` (any observable) generalize `avg_choices_prod`, `avg_choices_depends`,
 `bips_mgf_le` and `bips_chernoff_lower`; the generic round lemmas (`roundRun`, `round_first_hit`,

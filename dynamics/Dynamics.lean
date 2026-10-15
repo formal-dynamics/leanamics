@@ -10,6 +10,7 @@ import Dynamics.Phases
 import Dynamics.Reverse
 import Dynamics.Rounds
 import Dynamics.Scalar
+import Dynamics.Spectral
 import Dynamics.Stationary
 import Dynamics.Tail
 import Dynamics.Trajectory
