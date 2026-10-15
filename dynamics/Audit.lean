@@ -45,6 +45,7 @@ import Dynamics
 #print axioms Dynamics.Kernel.event_error_of_invariant
 #print axioms Dynamics.Kernel.tendsto_event_of_invariant
 #print axioms Dynamics.Kernel.iSup_event_of_invariant
+#print axioms Dynamics.Kernel.iSup_consensus_of_harmonic
 #print axioms Dynamics.Kernel.iSup_consensus_of_invariant
 #print axioms Dynamics.expList_comp_reverse
 #print axioms Dynamics.Kernel.iterate_ofStep_foldr

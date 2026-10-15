@@ -631,20 +631,13 @@ lemma moranPsi_none {r : ℝ} : moranPsi r (fun _ : V => false) = 0 := by
 lemma moranPsi_invariant [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] (d : ℕ)
     (hreg : ∀ i, G.degree i = d) {r : ℝ} (hr : 0 < r) (s : Config V) :
     (moranKernel G r hr).apply (moranPsi r) s = moranPsi r s := by
-  unfold moranPsi
-  rw [Kernel.apply]
-  have hcomm : ∀ t : Config V,
-      (1 - (1 / r) ^ mutants t) / (1 - (1 / r) ^ Fintype.card V) =
-        (1 - (1 / r) ^ Fintype.card V)⁻¹ * (1 - (1 / r) ^ mutants t) := by
-    intro t
-    rw [div_eq_mul_inv, mul_comm]
-  simp_rw [hcomm]
-  rw [Distribution.expect_mul, Distribution.expect_sub, Distribution.expect_const]
-  have hpot : (moranKernel G r hr s).expect (fun t => (1 / r) ^ mutants t) =
-      (1 / r) ^ mutants s := by
-    rw [← Kernel.apply]
-    exact moran_potential_invariant G d hreg hr s
-  rw [hpot, mul_comm]
+  have hψ : moranPsi r = fun t : Config V =>
+      -(1 - (1 / r) ^ Fintype.card V)⁻¹ * (1 / r) ^ mutants t +
+        (1 - (1 / r) ^ Fintype.card V)⁻¹ :=
+    funext fun t => by rw [moranPsi]; ring
+  rw [hψ]
+  exact congrFun ((moranKernel G r hr).harmonic_affine
+    (funext (moran_potential_invariant G d hreg hr)) _ _) s
 
 omit [DecidableEq V] in
 lemma neutralPsi_all [Nonempty V] : neutralPsi (fun _ : V => true) = 1 := by
@@ -660,18 +653,11 @@ lemma neutralPsi_none : neutralPsi (fun _ : V => false) = 0 := by
 lemma neutralPsi_invariant [Nonempty V] (G : SimpleGraph V) [DecidableRel G.Adj] (d : ℕ)
     (hreg : ∀ i, G.degree i = d) (s : Config V) :
     (moranKernel G 1 one_pos).apply neutralPsi s = neutralPsi s := by
-  unfold neutralPsi
-  rw [Kernel.apply]
-  have hcomm : ∀ t : Config V,
-      (mutants t : ℝ) / Fintype.card V = (Fintype.card V : ℝ)⁻¹ * (mutants t : ℝ) := by
-    intro t
-    rw [div_eq_mul_inv, mul_comm]
-  simp_rw [hcomm]
-  rw [Distribution.expect_mul]
-  have hmut : (moranKernel G 1 one_pos s).expect (fun t => (mutants t : ℝ)) = mutants s := by
-    rw [← Kernel.apply]
-    exact moran_mutants_invariant G d hreg s
-  rw [hmut, mul_comm]
+  have hψ : neutralPsi = fun t : Config V => (Fintype.card V : ℝ)⁻¹ * (mutants t : ℝ) + 0 :=
+    funext fun t => by rw [neutralPsi]; ring
+  rw [hψ]
+  exact congrFun ((moranKernel G 1 one_pos).harmonic_affine
+    (funext (moran_mutants_invariant G d hreg)) _ _) s
 
 /-- **Isothermal theorem ("if" direction).** On a connected regular graph, the fixation
 probability from `k` mutants is Moran's formula `(1 - r^{-k}) / (1 - r^{-n})`. -/
