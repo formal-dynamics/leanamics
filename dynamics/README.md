@@ -6,11 +6,11 @@ uses Lean 4.32.0 and Mathlib revision
 
 | Module | API |
 | --- | --- |
-| `Uniform` | Finite averages, recursive uniform trajectory expectations, independence, reindexing; extracted from 3-majority |
+| `Uniform` | Finite averages, recursive uniform trajectory expectations (and their prefixes: `expList_le_of_length`, `expList_take`), independence, reindexing; extracted from 3-majority |
 | `Equivalence` | `expList_eq_avg_ofFn`, the recursive `expList` is the uniform average over `Fin T → α` |
 | `Distribution` | Normalized nonnegative real weights, expectations, event probabilities and their elementary bounds (monotonicity, complement, union bounds, inclusion–exclusion, Markov's inequality), uniform distributions, point masses, biased coins `bernoulli`, independent products, pushforward |
 | `Bridge` | The three expectation APIs agree: `avg` is Mathlib's `𝔼 a, f a` (`avg_eq_expect`), the product of uniform laws is uniform (`Distribution.independent_uniform_expect`), and `expList` is the expectation over `T` i.i.d. draws in Mathlib's and in the distribution form (`expList_eq_expect`, `expList_eq_independent_expect`) |
-| `Kernel` | Finite stochastic kernels, finite-time expectations, events, stationarity, harmonic observables |
+| `Kernel` | Finite stochastic kernels, finite-time expectations, events, stationarity, harmonic observables; the transition matrix `toMatrix` (row stochastic, `iterate n f = toMatrix ^ n *ᵥ f`) |
 | `Trajectory` | Weighted history/endpoint expectations and agreement with kernel iteration |
 | `Stationary` | Stationary-distribution existence by Cesàro averages and compactness of the finite simplex |
 | `Absorption` | Uniform absorption blocks, geometric survival bounds, convergence to zero |
@@ -26,7 +26,7 @@ uses Lean 4.32.0 and Mathlib revision
 | `Phases` | Progress through nested phases (`nested_phases`, Lemma A.4 of Becchetti et al., SPAA 2014) |
 | `DriftSeq` | Time-dependent chains (`iterateSeq`: kernel `K t` for the step `t → t + 1`), linearity (also over finite sums) and monotonicity |
 | `Drift` | Drift theorems of Berenbrink et al. (ICALP 2016): drift `c/Ψ` ⇒ absorbed with probability `≥ 1/2` once `∑ c_t ≥ 4Ψ₀²` (`drift_absorption`, Lemma 2.2); multiplicative drift ⇒ survival `≤ ∏(1 − δ_t) Ψ₀/Ψ_min` (`multiplicative_drift`, Lemma 2.4); `_seq` forms for time-dependent chains; fixed-time drift with an additive error, `K φ ≤ ρ φ + ε` ⇒ `K^T φ ≤ ρ^T φ + T ε` (`iterate_le_of_drift`, `expList_le_of_drift`) |
-| `GraphRounds` | Graph-indexed round types: `NeighborRound G` (every vertex samples a neighbour; independence and marginals) and `EdgeRound G` (one uniform oriented edge; edge, orientation and degree-bias averages); sums over darts (`sum_dart`, `dartEquiv`, `walk_sum_darts`, `sum_darts_sq_le`) |
+| `GraphRounds` | Graph-indexed round types: `NeighborRound G` (every vertex samples a neighbour; independence and marginals) and `EdgeRound G` (one uniform oriented edge; edge, orientation and degree-bias averages; on the complete graph, a uniform ordered pair of distinct vertices; the one-way protocol step `oneWayStep`) |
 | `Lazy` | The lazy kernel `Kernel.lazy K = (I + K)/2`: entries and expectations, self-loop weight `≥ 1/2` (`lazy_weight_self_ge_half`), same support and same stationary distributions as `K` (`lazy_stationary_iff`) |
 | `RandomWalk` | Random walks on a graph without isolated vertices: `Kernel.uniformNeighbor G hd = D⁻¹A` (support, neighbour-average expectation, `uniformNeighbor_expect_eq_avg` in the `avg` form) and the lazy walk `Kernel.lazyNeighbor G hd = (I + D⁻¹A)/2` |
 | `DriftHittingDefs` | Hitting probabilities `K.hitProb B n a = P_a(T_B ≤ n)` (visit `B` at one of the times `0, …, n`), through `trajectory` |

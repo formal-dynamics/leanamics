@@ -33,6 +33,15 @@ commutes with finite sums and vanishes on the zero functional.
 \begin{proof}\leanok
 Exchange the order of finite summation; for $\mathrm{expList}$, induct on $T$.
 \end{proof}
+\begin{lemma}[Prefixes of trajectories]\label{lem:expList-prefix}
+\lean{Dynamics.expList_le_of_length,Dynamics.expList_congr_length,Dynamics.expList_take,Dynamics.expList_take_getElem?}\leanok\uses{lem:uniform-trajectory}
+The expectation over $T$ draws only evaluates its functional on lists of length $T$. For
+$k\le T$, a functional of the first $k$ draws has the same expectation over $T$ draws as over
+$k$ draws; for $k<T$, the draw after them is a fresh uniform sample.
+\end{lemma}
+\begin{proof}\leanok
+Induction on $T$; split $T=k+m$ and average out the last $m$ draws.
+\end{proof}
 
 \section{Weighted distributions and kernels}
 \begin{definition}[Normalized real weights]\label{def:distribution}
@@ -74,6 +83,14 @@ A finite kernel assigns a distribution to every state. Its operator iterates
 compute expectations at finite times; trajectory functionals additionally
 record the history.
 \end{definition}
+\begin{lemma}[Transition matrix]\label{lem:kernel-matrix}
+\lean{Dynamics.Kernel.toMatrix,Dynamics.Kernel.apply_eq_toMatrix_mulVec,Dynamics.Kernel.iterate_eq_toMatrix_pow_mulVec,Dynamics.Kernel.toMatrix_mem_rowStochastic}\leanok\uses{def:kernel}
+The matrix $P_{ab}=K(a)(b)$ of a kernel is row stochastic, the transition operator is $f\mapsto Pf$
+and the expectation after $n$ steps is $P^nf$.
+\end{lemma}
+\begin{proof}\leanok
+Unfold the expectation as a sum; induction on $n$.
+\end{proof}
 \begin{lemma}[Endpoint agreement]\label{lem:endpoint}
 \lean{Dynamics.Kernel.trajectory_endpoint}\leanok\uses{def:kernel}
 Ignoring history in a trajectory expectation recovers the iterated transition operator.
@@ -358,6 +375,18 @@ On a graph without isolated vertices the simple random walk $D^{-1}A$ moves to a
 neighbour, so its expectations are neighbour averages, and the lazy random walk is
 $(I+D^{-1}A)/2$.
 \end{definition}
+\begin{lemma}[Sequential pairwise scheduler]\label{lem:edgeround-top}
+\lean{Dynamics.oneWayStep,Dynamics.edgeRoundTopEquiv,Dynamics.card_edgeRound_top,Dynamics.sum_edgeRound_top}\leanok
+\uses{lem:edgeround,lem:dartsums}
+On the complete graph
+the darts are the ordered pairs of distinct vertices, $n(n-1)$ of them, and a sum over them is
+the sum over all ordered pairs minus the diagonal. A one-way protocol step on the dart $(u,v)$
+updates the state of the responder $v$ against the initiator $u$.
+\end{lemma}
+\begin{proof}\leanok
+A dart is an adjacent ordered pair; the complete graph has $\binom n2$ edges, each carrying two
+darts.
+\end{proof}
 \section{Hitting times}\label{sec:dgmss-hitting}
 This section formalizes Claim~2.9 of Doerr, Goldberg, Minder, Sauerwald and Scheideler,
 \emph{Stabilizing consensus with the power of two choices} (SPAA 2011), as

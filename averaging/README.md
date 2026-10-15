@@ -121,8 +121,10 @@ bounds, anti-concentration of `‖y⁽⁰⁾‖²`, Lemma 4.2), `OpportunisticSi
 `IsClusteredRegular.prob_good_window`, `prob_sign_window` and `prob_weakReconstruction_window`
 state the last three results on any finite vertex type. The proofs of Theorem 4.1 and Lemma 4.2
 follow the paper's strategy but not its bookkeeping; see
-[`FORMALIZATION_DIFFERENCES.md`](FORMALIZATION_DIFFERENCES.md). The step matrix of this part and
-`Sequential.edgeMatrix` (AVG-1) describe the same uniform-edge step.
+[`FORMALIZATION_DIFFERENCES.md`](FORMALIZATION_DIFFERENCES.md). The matrices of this part are
+those of AVG-1: `stepMatrix` and `meanStepMatrix` abbreviate `Sequential.edgeMatrix` and
+`Sequential.meanMatrix`, and the averaging process `avgRun` is `Sequential.seqRun`
+(`avgRun_eq_seqRun`), so equations (1), (2) and (15) are proved by the AVG-1 results.
 
 Provenance of AVG-3: the statements were fixed by a Claude agent before the proofs and reviewed
 by a second Claude agent against the paper (the review led to `±1` labels in Definition 2.3); the

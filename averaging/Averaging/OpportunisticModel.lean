@@ -1,5 +1,5 @@
 import Mathlib
-import Dynamics.Uniform
+import Dynamics.GraphRounds
 
 /-! # Averaging whenever you meet: the opportunistic protocol
 
@@ -46,28 +46,11 @@ noncomputable def oppStep (σ : V → ℤˣ) (s : V → Option ℝ) (d : G.Dart)
 noncomputable def oppRun (σ : V → ℤˣ) (l : List G.Dart) : V → Option ℝ :=
   l.foldl (oppStep G σ) fun _ => none
 
-/-- A uniformly random dart is a uniformly random edge: every edge carries two darts. -/
+/-- A uniformly random dart is a uniformly random edge: every edge carries two darts (the core's
+`Dynamics.avg_edgeRound_edge`). -/
 theorem avg_dart_edge (f : Sym2 V → ℝ) :
-    avg (fun d : G.Dart => f d.edge) = avg (fun e : G.edgeSet => f e) := by
-  have h1 : ∑ d : G.Dart, f d.edge = 2 * ∑ e ∈ G.edgeFinset, f e := by
-    rw [← Finset.sum_fiberwise_of_maps_to (s := univ) (t := G.edgeFinset)
-      (g := SimpleGraph.Dart.edge) (fun d _ => by simp), Finset.mul_sum]
-    refine Finset.sum_congr rfl fun e he => ?_
-    rw [Finset.sum_congr rfl (g := fun _ => f e) (fun d hd => by rw [(Finset.mem_filter.mp hd).2]),
-      Finset.sum_const, nsmul_eq_mul]
-    have := G.dart_edge_fiber_card e (by simpa using he)
-    rw [show (univ.filter fun d : G.Dart => d.edge = e) =
-      ({d : G.Dart | d.edge = e} : Finset _) from rfl, this]
-    norm_num
-  have h2 : ∑ e : G.edgeSet, f e = ∑ e ∈ G.edgeFinset, f e := by
-    rw [← Finset.sum_coe_sort G.edgeFinset]
-    exact Fintype.sum_equiv (Equiv.subtypeEquivRight fun e => by simp) _ _ fun _ => rfl
-  unfold avg
-  rw [h1, h2, G.dart_card_eq_twice_card_edges, ← G.edgeFinset_card]
-  push_cast
-  rcases eq_or_ne (#G.edgeFinset : ℝ) 0 with h | h
-  · simp [h]
-  · field_simp
+    avg (fun d : G.Dart => f d.edge) = avg (fun e : G.edgeSet => f e) :=
+  avg_edgeRound_edge G f
 
 omit [Fintype V] [DecidableRel G.Adj] in
 lemma oppStep_isSome (σ : V → ℤˣ) (s : V → Option ℝ) (d : G.Dart) (v : V) :

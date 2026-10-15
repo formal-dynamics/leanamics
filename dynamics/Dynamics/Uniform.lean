@@ -149,6 +149,48 @@ lemma expList_append (T₁ T₂ : ℕ) (F : List α → ℝ) :
       (F := fun l₁ => expList α T₂ fun l₂ => F (l₁ ++ l₂))]
     exact congrArg avg (funext fun a => by rw [ih]; simp)
 
+/-! ### Lengths and prefixes: `expList α T` only evaluates lists of length `T` -/
+
+/-- `expList α T` only evaluates its argument on lists of length `T`, so a comparison on those
+lists is enough. -/
+lemma expList_le_of_length {T : ℕ} {F G : List α → ℝ}
+    (h : ∀ l : List α, l.length = T → F l ≤ G l) : expList α T F ≤ expList α T G := by
+  induction T generalizing F G with
+  | zero => exact h [] rfl
+  | succ T ih =>
+    rw [expList_succ, expList_succ]
+    exact avg_le_avg fun a => ih fun l hl => h (a :: l) (by simp [hl])
+
+/-- `expList α T` only evaluates its argument on lists of length `T`. -/
+lemma expList_congr_length {T : ℕ} {F G : List α → ℝ}
+    (h : ∀ l : List α, l.length = T → F l = G l) : expList α T F = expList α T G :=
+  le_antisymm (expList_le_of_length fun l hl => (h l hl).le)
+    (expList_le_of_length fun l hl => (h l hl).ge)
+
+/-- A function of the first `k` of `T ≥ k` draws only sees `k` draws. -/
+lemma expList_take [Nonempty α] {k T : ℕ} (hk : k ≤ T) (F : List α → ℝ) :
+    expList α T (fun l => F (l.take k)) = expList α k F := by
+  obtain ⟨m, rfl⟩ := Nat.exists_eq_add_of_le hk
+  rw [expList_append]
+  refine expList_congr_length fun l hl => ?_
+  simp_rw [List.take_left' hl]
+  exact expList_const (α := α) m _
+
+/-- A function of the first `k` of `T > k` draws and of the next one: the next draw is a fresh
+uniform sample. -/
+lemma expList_take_getElem? [Nonempty α] {k T : ℕ} (hk : k < T) (F : List α → Option α → ℝ) :
+    expList α T (fun l => F (l.take k) l[k]?) = expList α k fun p => avg fun a => F p (some a) := by
+  obtain ⟨m, rfl⟩ := Nat.exists_eq_add_of_lt hk
+  rw [show k + m + 1 = k + (m + 1) by ring, expList_append]
+  refine expList_congr_length fun p hp => ?_
+  have h1 : ∀ l : List α, (p ++ l).take k = p := fun l => List.take_left' hp
+  have h2 : ∀ l : List α, (p ++ l)[k]? = l.head? := fun l => by
+    rw [List.getElem?_append_right (by omega), hp, Nat.sub_self, List.head?_eq_getElem?]
+  simp_rw [h1, h2, expList_succ, List.head?_cons]
+  congr 1
+  funext a
+  exact expList_const (α := α) m _
+
 /-! ### Independence: average of a product over a product space -/
 
 /-- **Independence for a pair of coordinates**: the average of a product

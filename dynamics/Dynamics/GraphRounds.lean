@@ -21,6 +21,10 @@ Round types for dynamics on a finite simple graph `G`, to be averaged with `avg`
   `dartEquiv`); differences along a walk telescope over its darts (`walk_sum_darts`), and
   squared differences over distinct darts are bounded by the Dirichlet energy
   (`sum_darts_sq_le`).
+  On the complete graph `⊤` it is a uniform ordered pair of distinct vertices
+  (`edgeRoundTopEquiv`, `card_edgeRound_top`, `sum_edgeRound_top`), the scheduler of population
+  protocols. A one-way protocol updates the responder `d.snd` against the initiator `d.fst`
+  (`oneWayStep`).
 
 Uniform averages over the neighbours of `v` are written `avg (fun u : G.neighborSet v => g u)`,
 equal to `(∑ u ∈ G.neighborFinset v, g u) / G.degree v` (`avg_neighborSet`).
@@ -38,6 +42,13 @@ abbrev NeighborRound (G : SimpleGraph V) := ∀ v : V, G.neighborSet v
 /-- A sequential step on `G`: one oriented edge `(d.fst, d.snd)` of `G` is activated. Under the
 uniform distribution this is a uniform edge with a uniform orientation. -/
 abbrev EdgeRound (G : SimpleGraph V) := G.Dart
+
+/-- One step of a one-way pairwise protocol with transition rule `δ` on the activated oriented
+edge `d`: the responder `d.snd` takes `δ (s d.snd) (s d.fst)` against the initiator `d.fst`, and
+every other vertex keeps its state. -/
+def oneWayStep [DecidableEq V] {G : SimpleGraph V} {S : Type*} (δ : S → S → S) (s : V → S)
+    (d : EdgeRound G) : V → S :=
+  Function.update s d.snd (δ (s d.snd) (s d.fst))
 
 /-! ### Uniform neighbours and synchronous rounds: every vertex samples a neighbour -/
 
@@ -233,5 +244,42 @@ theorem avg_edgeRound_fst (g : V → ℝ) :
   rfl
 
 end Edge
+
+/-! ### The complete graph: one uniformly random ordered pair of distinct vertices per step -/
+
+section Complete
+
+/-- On the complete graph, an oriented edge is an ordered pair of distinct vertices (the
+"random ordered pair" scheduler of population protocols). -/
+def edgeRoundTopEquiv : EdgeRound (⊤ : SimpleGraph V) ≃ {p : V × V // p.1 ≠ p.2} where
+  toFun d := ⟨d.toProd, (SimpleGraph.top_adj _ _).1 d.adj⟩
+  invFun p := ⟨p.1, (SimpleGraph.top_adj _ _).2 p.2⟩
+  left_inv _ := rfl
+  right_inv _ := rfl
+
+variable [Fintype V] [DecidableEq V]
+
+/-- The complete graph on `n` vertices has `n (n - 1)` oriented edges: twice its
+`n choose 2` edges. -/
+theorem card_edgeRound_top :
+    Fintype.card (EdgeRound (⊤ : SimpleGraph V)) = Fintype.card V * (Fintype.card V - 1) := by
+  rw [SimpleGraph.dart_card_eq_twice_card_edges,
+    SimpleGraph.card_edgeFinset_top_eq_card_choose_two, Nat.choose_two_right,
+    Nat.mul_div_cancel' (Nat.even_mul_pred_self _).two_dvd]
+
+/-- On the complete graph, a sum over the oriented edges is the sum over all ordered pairs minus
+the diagonal. -/
+theorem sum_edgeRound_top (F : V → V → ℝ) :
+    ∑ d : EdgeRound (⊤ : SimpleGraph V), F d.fst d.snd = ∑ u, ∑ v, F u v - ∑ v, F v v := by
+  rw [sum_dart, eq_sub_iff_add_eq, ← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl fun u _ => ?_
+  rw [← Finset.add_sum_erase _ _ (Finset.mem_univ u),
+    ← Finset.add_sum_erase _ _ (Finset.mem_univ u)]
+  simp only [SimpleGraph.top_adj, ne_eq, not_true_eq_false, if_false, zero_add]
+  rw [add_comm]
+  congr 1
+  exact Finset.sum_congr rfl fun v hv => if_pos (Ne.symm (Finset.ne_of_mem_erase hv))
+
+end Complete
 
 end Dynamics

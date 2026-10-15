@@ -1,13 +1,14 @@
 import Dynamics.GraphRounds
 import Averaging.SequentialDefs
 import Averaging.RateMatrix
+import Dynamics.GraphRounds
 
 /-! # The step matrix of sequential averaging: entries and weighted sums
 
 Helpers for `Averaging.Sequential`: the entries of `W(i, j) = I - (eᵢ - eⱼ)(eᵢ - eⱼ)ᵀ / 2`
 (Survey, equation (2)), its action on a state, its symmetry and idempotence, the weighted sum
 `∑ᵢⱼ Qᵢⱼ W(i, j)` for an arbitrary weight matrix `Q` (the common computation behind equation (4)
-and the uniform-edge identity), and sums over the darts of a graph as sums over adjacent pairs.
+and the uniform-edge identity), and the sum of `W` over the darts of a graph.
 -/
 
 namespace Averaging.Sequential
