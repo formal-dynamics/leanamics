@@ -87,7 +87,11 @@ theorem median_consensus_any : ∃ C : ℝ, 0 < C ∧ ∀ (n : ℕ) [NeZero n], 
   have hn : (0 : ℝ) < n := Nat.cast_pos.mpr (NeZero.pos n)
   have hL : (1 : ℝ) ≤ Real.log n := by linarith
   -- three blocks of `⌈C₀ log n⌉` rounds: a binary configuration fails w.p. at most `(C₀/n)³`
-  have hbin3 (y : Config n Bool) := expList_amplify (hbin n (by linarith)) 3 y
+  have hbin3 (y : Config n Bool) : expList (Round n) (3 * ⌈C₀ * Real.log n⌉₊)
+      (fun l => notConsensus (run y l)) ≤ (C₀ / n) ^ 3 :=
+    missProb_amplify step (B := {z | Consensus z})
+      (fun z hz r => by rw [Set.mem_setOf_eq, step_of_consensus z hz r]; exact hz)
+      (hbin n (by linarith)) 3 y
   calc expList (Round n) ⌈(3 * C₀ + 3) * Real.log n⌉₊ (fun l => notConsensus (run x l))
       ≤ expList (Round n) (3 * ⌈C₀ * Real.log n⌉₊) (fun l => notConsensus (run x l)) :=
         expList_run_mono x (mul_ceil_le_ceil (mul_nonneg hC₀.le (by linarith))

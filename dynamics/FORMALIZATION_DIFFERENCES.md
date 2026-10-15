@@ -252,8 +252,6 @@ aliases, and the package blueprints tag the `Dynamics` names).
    `Real.pow_div_factorial_le_exp` and `(q - 1)/q ≤ log q` is `Real.one_sub_inv_le_log_of_pos`.
    The conversions `exp_neg_two_log`, `exp_neg_three_log` and `one_le_of_log_pos` (for `n : ℕ`)
    are new.
-10. **Copies left in other packages**: `Moran.expect_lt_one` and `Voter.expect_lt_one` have the
-   The conversions `exp_neg_two_log` and `one_le_of_log_pos` (for `n : ℕ`) are new.
 10. **Bernstein corollaries for `{0,1}` coordinates.** `avg_bernstein_lower` is `avg_bernstein`
     applied to `-Y`. `avg_bernstein_of_zero_one` and `avg_bernstein_lower_of_zero_one` fix
     `b = 1`, the variance bound `μ + 2ℓ` and the deviation `√(3ℓ(μ + 2ℓ))`, which gives the
@@ -265,10 +263,8 @@ aliases, and the package blueprints tag the `Dynamics` names).
     with the mean bound `(1 - ε) c`, through `(1 - ε) e^ε ≤ 1 - ε²/2`
     (`one_sub_mul_exp_le_one_sub_sq_div_two`). It allows thresholds below the mean bound, which the
     optimized forms do not; EPI-2's `Epidemics.binomial_tail_le` is a corollary.
-12. **Copies left in other packages**: `Moran.expect_lt_one` and `Voter.expect_lt_one` have the
-    statement of `Distribution.expect_lt_one`, `Undecided.avg_lt_one` that of `avg_lt_one`, and
-    `Voter.colorProbability_mono` re-proves `Kernel.iterate_monotone` for its indicator; they
-    can be replaced by the shared versions.
+12. **Copy left in another package**: `Voter.colorProbability_mono` re-proves
+    `Kernel.iterate_monotone` for its indicator; it can be replaced by the shared version.
 
 ## Scalar facts shared by the packages (`Scalar`)
 

@@ -29,7 +29,7 @@ are numbered differently.
    threshold at `b` has not reached consensus either. A union bound over the at most `n - 1`
    thresholds (`consensus_of_binary`) then needs a binary failure bound of `o(1/n)`; it is
    obtained by running three blocks of `⌈C₀ log n⌉` rounds, which turns `C₀/n` into `(C₀/n)³`
-   because consensus is absorbing (`expList_amplify`).
+   because consensus is absorbing (the core `Dynamics.missProb_amplify`).
 4. **Symmetry breaking by a potential.** For 2-Choices from an arbitrary (possibly perfectly
    balanced) binary configuration, the paper's Lemmas 13 to 16 are replaced by a drift argument
    on `gapPot y = exp (-|g| / (256 √n))`, where `g` is the number of `true` nodes minus the
@@ -353,13 +353,12 @@ adversary is Theorem 1.1 of the SPAA 2011 proceedings.
    from `t` to `max (15t/16) K`, `K = max (16F) (1024 log n)` (`adv_sat_move`; Bernstein gives
    `max (7t/8) (512 log n)` before the recolouring), then stays below `K`. A negative gap is
    handled by the flip symmetry.
-9. **Generic lemmas not yet in `dynamics/`.** `Median/AdversaryPerturbed.lean` does not mention
-   the median rule: perturbed runs of a round-based process (`Perturbed`), fixed-time drift for
-   them (`expList_le_of_drift_perturbed`), chains of moves along a path
-   (`expList_path_perturbed`, a perturbed path form of `Dynamics.expList_escape`), and the
-   `expList` facts `expList_le_of_length`, `expList_le_of_split`. They are candidates for the
-   shared core, where they would give adversarial versions of the drift and phase lemmas of
-   other packages.
+9. **Generic lemmas in `dynamics/`.** The adversarial proofs use tools that do not mention the
+   median rule, in the core `Dynamics/Perturbed.lean`: perturbed runs of a round-based process
+   (`Dynamics.Perturbed`), fixed-time drift for them (`expList_le_of_drift_perturbed`) and chains
+   of moves along a path (`expList_path_perturbed`, a perturbed path form of
+   `Dynamics.expList_escape`), with the `expList` facts `expList_le_of_length` and
+   `expList_le_of_split` of `Dynamics/Uniform.lean`.
 
 ## Plurality consensus with `k` colours (`TwoChoices*`, roadmap MAJ-4)
 
