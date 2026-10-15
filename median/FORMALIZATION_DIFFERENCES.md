@@ -46,8 +46,9 @@ are numbered differently.
    inequalities: the fixed-time drift lemmas `iterate_le_of_drift`, `iterate_add_le`,
    `expList_le_of_drift`, `expList_add_le`; the moment bounds `avg_exp_sum_le` (Hoeffding's
    mgf bound for any real `t`), `avg_sum_sq`, `avg_sum_fourth_le`, `avg_pz`, `avg_pz_sum`,
-   `avg_pz_zero_one`, `variance_of_zero_one`; and `ceil_add_ceil_le`, `mul_ceil_le_ceil`,
-   `pow_three_le_of_log`, `log_pow_four_div_le`. They are candidates for the shared core.
+   `avg_pz_zero_one`, `variance_of_zero_one`. They are candidates for the shared core. The
+   scalar facts `ceil_add_ceil_le`, `mul_ceil_le_ceil`, `pow_three_le_of_log` and
+   `log_pow_four_div_le` now live in `dynamics/Dynamics/Scalar.lean` (namespace `Dynamics`).
 
 ## Many values: the middle one wins fast (`ManyValues`)
 
@@ -74,11 +75,11 @@ are numbered differently.
    consensus of both on `true` forces consensus on `v`; a union bound gives `1 - 2C/n`.
 4. **Generic lemmas not yet in `dynamics/`.** The kernel and round lemmas
    `kernel_event_mono_set`, `kernel_event_chain`, `kernel_event_comp`, `expList_ge_of_and` and
-   `expList_foldl_mono` (`ManyValuesKernel.lean`) do not mention the median rule, and the scalar
-   facts `exists_lt_pow_mul`, `exists_le_two_pow_two_pow`, `le_pow_ceil_real`,
-   `mul_one_div_sq_le`, `nat_ceil_mul_le_of_le`, `log_two_ge`, `log_two_le_one`
-   (`ManyValuesScalar.lean`) are plain real inequalities. They live in namespace `Median` until
-   the shared core provides them.
+   `expList_foldl_mono` (`ManyValuesKernel.lean`) do not mention the median rule; they live in
+   namespace `Median` until the shared core provides them. The scalar facts
+   `exists_lt_pow_mul`, `exists_le_two_pow_two_pow`, `le_pow_ceil_real`, `le_pow_ceil`,
+   `mul_one_div_sq_le` and `nat_ceil_mul_le_of_le` are in `dynamics/Dynamics/Scalar.lean`, and
+   the bounds on `log 2` are Mathlib's `Real.log_two_gt_d9` and `Real.log_two_lt_d9`.
 
 ## Two-sample voting on expanders (`Expander`)
 
