@@ -24,14 +24,6 @@ The failure probability is at most `T p + (3/4)^T₃ n/10 ≤ 5/n + 1/n`, and
 namespace Undecided.Plurality
 open Finset Dynamics Real
 
-/-- `ε/2 ≤ log(1 + ε)` for `0 ≤ ε ≤ 1`. -/
-lemma half_le_log_one_add {ε : ℝ} (h0 : 0 ≤ ε) (h1 : ε ≤ 1) : ε / 2 ≤ log (1 + ε) := by
-  have h := one_sub_inv_le_log_of_pos (x := 1 + ε) (by linarith)
-  have e : 1 - (1 + ε)⁻¹ = ε / (1 + ε) := by field_simp; ring
-  rw [e] at h
-  have : ε / 2 ≤ ε / (1 + ε) := div_le_div_of_nonneg_left h0 (by linarith) (by linarith)
-  linarith
-
 /-- `(3/4)^T ≤ e^{-T/4}`. -/
 lemma three_quarters_pow_le (T : ℕ) : (3 / 4 : ℝ) ^ T ≤ exp (-(T / 4)) := by
   have h : (3 / 4 : ℝ) ≤ exp (-(1 / 4)) := by
@@ -39,13 +31,6 @@ lemma three_quarters_pow_le (T : ℕ) : (3 / 4 : ℝ) ^ T ≤ exp (-(T / 4)) := 
     linarith
   calc (3 / 4 : ℝ) ^ T ≤ exp (-(1 / 4)) ^ T := pow_le_pow_left₀ (by norm_num) h T
     _ = exp (-(T / 4)) := by rw [← exp_nat_mul]; ring_nf
-
-/-- `e^{-3 log n} = 1/n³`. -/
-lemma exp_neg_three_log {n : ℕ} (hn : (0 : ℝ) < n) :
-    exp (-(3 * log (n : ℝ))) = 1 / (n : ℝ) ^ 3 := by
-  have h3 : exp (3 * log (n : ℝ)) = (n : ℝ) ^ 3 := by
-    rw [show (3 : ℝ) * log n = ((3 : ℕ) : ℝ) * log n by norm_num, exp_nat_mul, exp_log hn]
-  rw [exp_neg, h3, one_div]
 
 variable {n k : ℕ}
 
@@ -295,7 +280,7 @@ theorem stage_bound [NeZero n] {ℓ θ B φ ε : ℝ} (H : Hyp n ℓ θ B φ) {m
     have : (3 / 4 : ℝ) ^ T₃ * psi y m ≤ (3 / 4) ^ T₃ * (n / 10) :=
       mul_le_mul_of_nonneg_left hψ (by positivity)
     linarith
-  have hcomp := miss_comp (T₁ := T₂ + 1) (T₂ := T₃) (by positivity) hE x
+  have hcomp := missProb_comp step (T₁ := T₂ + 1) (T₂ := T₃) (by positivity) hE x
   calc miss (allM m) (T₂ + 1 + T₃) x
       ≤ miss (Gset ℓ θ B φ (1 + ε) m T₂) (T₂ + 1) x + (1 / n + T₃ * p) := hcomp
     _ ≤ ((T₂ + 1 : ℕ) : ℝ) * p + (1 / n + T₃ * p) := by linarith
@@ -408,7 +393,7 @@ theorem plurality_explicit {α : ℝ} (hα : 0 < α) (x : Config n k) (m : Fin k
   obtain ⟨T₂, hT₂⟩ : ∃ T₂, T₂ = ⌈log (4 * (k : ℝ) ^ 2) / log (1 + ε)⌉₊ := ⟨_, rfl⟩
   obtain ⟨T₃, hT₃⟩ : ∃ T₃, T₃ = ⌈8 * L⌉₊ := ⟨_, rfl⟩
   have hpow : 4 * (k : ℝ) ^ 2 ≤ (1 + ε) ^ T₂ := by
-    have h := Undecided.le_pow_ceil (n := 4 * k ^ 2)
+    have h := Dynamics.le_pow_ceil (n := 4 * k ^ 2)
       (Nat.succ_le_of_lt (by have := Fin.pos m; positivity)) (q := 1 + ε) (by linarith)
     rw [cast_four_sq] at h
     rw [hT₂]
@@ -461,7 +446,7 @@ lemma prob_allM_eq [NeZero n] (T : ℕ) (x : Config n k) (m : Fin k) :
     · rw [if_neg hl, if_neg (show l.foldl step x ∉ allM m from hl)]
       norm_num
   simp_rw [h]
-  rw [Undecided.Sequential.expList_one_sub]
+  rw [Dynamics.expList_one_sub]
   rfl
 
 /-- From `C k ≤ (n / log n)^{1/3}` to `(C k)³ log n ≤ n`. -/

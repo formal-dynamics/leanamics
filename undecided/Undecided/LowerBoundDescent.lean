@@ -72,7 +72,7 @@ theorem undecided_square : ∃ C : ℝ, 0 < C ∧ ∀ n : ℕ, C ≤ Real.log n 
     rw [hEq]
     have h0 : miss (Set.univ : Set (Config n k)) 1 y = 0 := by
       classical
-      unfold miss
+      unfold miss missProb
       simp only [Set.mem_univ, if_true]
       exact expList_zero_fun 1
     have hpos : (0 : ℝ) ≤ 8 / (n : ℝ) ^ 2 := by positivity
@@ -773,13 +773,13 @@ theorem descent : ∃ γ C : ℝ, 1 ≤ γ ∧ 0 < C ∧ ∀ n : ℕ, C ≤ Real
   refine ⟨t, ht_log, ?_, ?_⟩
   · intro s hs
     calc miss {z | (maxCount z : ℝ) ≤ γ * n / md x} s y
-        ≤ miss (G s) s y := by simpa [D] using miss_mono (hsub s hs) s y
+        ≤ miss (G s) s y := by simpa [D] using missProb_mono step (hsub s hs) s y
       _ ≤ (s : ℝ) * (5 / (n : ℝ) ^ 2) := hescape s hs
       _ ≤ (t : ℝ) * (5 / (n : ℝ) ^ 2) := mul_le_mul_of_nonneg_right (by exact_mod_cast hs) hfive
       _ ≤ C / n := hprob
   · calc miss {z | (maxCount z : ℝ) ≤ γ * n / md x ∧
           |und z - n / 2| ≤ 2 * γ ^ 2 * n / md x} t y
-        ≤ miss (G t) t y := by simpa [D] using miss_mono hsubT t y
+        ≤ miss (G t) t y := by simpa [D] using missProb_mono step hsubT t y
       _ ≤ (t : ℝ) * (5 / (n : ℝ) ^ 2) := hescape t le_rfl
       _ ≤ C / n := hprob
 

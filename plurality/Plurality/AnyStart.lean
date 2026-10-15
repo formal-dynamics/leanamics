@@ -1,6 +1,7 @@
 import Plurality.Corollaries
-import Plurality.AnyStartMoments
-import Plurality.AnyStartKernel
+import Dynamics.Moments
+import Dynamics.DriftHitting
+import Dynamics.Hitting
 
 /-!
 # Two opinions from any configuration
@@ -428,7 +429,7 @@ theorem majority3_symmetry_breaking : ∃ C : ℝ, 0 < C ∧ ∀ (n : ℕ) [NeZe
   have hq : 1000 * Real.log n ≤ (n : ℝ) := by nlinarith
   have key := hdrift (binKernel n) gapUnits n hX (units_grow hL) hzero hq I₀ t ht
   rw [Real.rpow_neg_one, ← one_div] at key
-  refine key.trans (hitProb_mono _ (fun I hI => ?_) t I₀)
+  refine key.trans (Kernel.hitProb_mono _ (fun I hI => ?_) t I₀)
   -- `|s| ≥ 1000 log n · √n/100 = 10 √n log n ≥ 22 √(3 n log n)`
   have h1 := gapUnits_mul_le I
   have h2 : 10 * Real.log n * √(n : ℝ) ≤ |gap I| := by nlinarith
@@ -517,7 +518,7 @@ theorem majority3_any_start : ∃ C : ℝ, 0 < C ∧ ∀ (n : ℕ), 40 ≤ Real.
   have ht₁le : C₀ * Real.log n ≤ t₁ := ht₁ ▸ Nat.le_ceil _
   have ht₁lt : (t₁ : ℝ) < C₀ * Real.log n + 1 := ht₁ ▸ Nat.ceil_lt_add_one (by positivity)
   -- hit the large-gap set, then absorb
-  have hcomp := hitProb_sub_le_event (binKernel n) (consensus_absorbing)
+  have hcomp := Kernel.hitProb_sub_le_event (binKernel n) (consensus_absorbing)
     (by positivity : (0 : ℝ) ≤ 429 * Real.log n / n) (event_consensus_of_gap hL) t₁ I₀
   have hsb' := hsb n hL I₀ t₁ ht₁le
   -- more rounds keep consensus
@@ -546,7 +547,7 @@ theorem majority3_any_start_whp : ∃ C : ℝ, 0 < C ∧ ∀ (n : ℕ), C ≤ Re
             if ThreeMajority.run I₀ l = univ ∨ ThreeMajority.run I₀ l = ∅ then (1 : ℝ) else 0) := by
   /- Two blocks of `majority3_any_start`, each failing with probability at most
   `ε = C₀ log n / n` from any configuration; consensus absorbs, so both fail with probability at
-  most `ε² ≤ 1/n` (`event_amplify`). -/
+  most `ε² ≤ 1/n` (`Dynamics.Kernel.event_amplify`). -/
   obtain ⟨C₀, hC₀, h⟩ := majority3_any_start
   refine ⟨7 * C₀ + 40, by positivity, fun n hL I₀ T hT => ?_⟩
   have hL40 : 40 ≤ Real.log n := by linarith
@@ -570,7 +571,7 @@ theorem majority3_any_start_whp : ∃ C : ℝ, 0 < C ∧ ∀ (n : ℕ), C ≤ Re
     rw [event_consensus]
     have := h n (hLdef ▸ hL40) b t (hLdef ▸ ht)
     rwa [← hLdef] at this
-  have hamp := event_amplify (binKernel n) consensus_absorbing (by positivity)
+  have hamp := Kernel.event_amplify (binKernel n) consensus_absorbing (by positivity)
     (fun b => hblock b (T - T₀) hT₁) I₀ (hblock I₀ T₀ hT₀le)
   rw [Nat.add_sub_cancel' hT₀T, event_consensus] at hamp
   refine le_trans ?_ hamp

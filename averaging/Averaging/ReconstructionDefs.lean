@@ -1,5 +1,6 @@
 import Averaging.Basic
 import Dynamics.Distribution
+import Dynamics.Spectral
 
 /-! # Strong reconstruction by averaging: definitions
 
@@ -10,7 +11,8 @@ for community detection*, SODA 2017; SIAM J. Comput. 49(4), 2020 (arXiv:1511.039
 * `IsBalancedPartition`, `IsClusteredRegular`: `(2n, d, b)`-clustered regular graphs with
   clusters `V₁`, `V₂` (Definition 3.1);
 * `clusterIndicator`: the partition indicator vector `χ = 𝟙_{V₁} - 𝟙_{V₂}` (Section 2);
-* `transitionMatrix`: the transition matrix `P = (1/d) A` of a `d`-regular graph (Section 3);
+* the transition matrix `P = (1/d) A` of a `d`-regular graph (Section 3) is the core's
+  `Dynamics.transitionMatrix` (`Dynamics/Spectral.lean`);
 * `maxAbsOtherEigenvalue`: `λ = max {|λᵢ| : i = 3, …, 2n}` for the eigenvalues
   `λ₁ ≥ λ₂ ≥ ⋯ ≥ λ_{2n}` of `P` (Section 2);
 * `color`, `IsStrongReconstruction`: the coloring rule of the Averaging protocol and strong
@@ -21,7 +23,7 @@ The values after `t` rounds are `x⁽ᵗ⁾ = avgIter G t x` (defined in `Averag
 -/
 
 namespace Averaging
-open Finset Matrix
+open Finset Matrix Dynamics
 
 variable {V : Type*} [Fintype V] [DecidableEq V]
 
@@ -47,16 +49,6 @@ noncomputable def clusterIndicator (V₁ V₂ : Finset V) : V → ℝ :=
   fun v => (if v ∈ V₁ then 1 else 0) - (if v ∈ V₂ then 1 else 0)
 
 variable (G : SimpleGraph V) [DecidableRel G.Adj]
-
-/-- The transition matrix `P = (1/d) A` of the random walk on a `d`-regular graph with adjacency
-matrix `A` (Section 3; it is `D⁻¹ A` of Section 2 when every degree is `d`). -/
-noncomputable def transitionMatrix (d : ℕ) : Matrix V V ℝ :=
-  (d : ℝ)⁻¹ • G.adjMatrix ℝ
-
-omit [Fintype V] [DecidableEq V] in
-/-- `P = (1/d) A` is real symmetric (Section 3). -/
-lemma transitionMatrix_isHermitian (d : ℕ) : (transitionMatrix G d).IsHermitian :=
-  (G.isHermitian_adjMatrix ℝ).smul (IsSelfAdjoint.all _)
 
 /-- `λ = max {|λᵢ| : i = 3, …, 2n}`: the largest absolute value among all but the two largest
 eigenvalues `λ₁ ≥ λ₂ ≥ ⋯` of the transition matrix (Section 2), with the eigenvalues listed in

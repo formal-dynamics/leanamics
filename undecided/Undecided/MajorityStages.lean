@@ -45,10 +45,9 @@ def finSet (n : ℕ) : Set (Config n) := {x | pot x ≤ (n : ℝ) / 3}
 /-- All nodes hold `a`. -/
 def allA (n : ℕ) : Set (Config n) := {x | x = fun _ => .a}
 
-/-- Probability of missing `B` after `T` rounds started from `x`. -/
-noncomputable def missP (B : Set (Config n)) (T : ℕ) (x : Config n) : ℝ := by
-  classical
-  exact expList (Fin n → Fin n) T (fun l => if l.foldl step x ∈ B then 0 else 1)
+/-- Probability of missing `B` after `T` rounds started from `x`: `Dynamics.missProb` for the
+round map `step`. -/
+noncomputable abbrev missP (B : Set (Config n)) (T : ℕ) (x : Config n) : ℝ := missProb step B T x
 
 /-- Probability of missing `B` after one round started from `x`. -/
 noncomputable def missOne (B : Set (Config n)) (x : Config n) : ℝ :=
@@ -87,82 +86,34 @@ lemma foldl_of_mono {x : Config n} (hx : Mono x) (l : List (Fin n → Fin n)) :
   | nil => rfl
   | cons r l ih => simp only [List.foldl_cons, step_of_mono x hx r, ih]
 
-/-! ### Missing probabilities -/
+/-! ### Missing probabilities
 
-lemma missP_zero (B : Set (Config n)) (x : Config n) :
-    missP B 0 x = by classical exact if x ∈ B then 0 else 1 := rfl
-
-lemma missP_succ (B : Set (Config n)) (T : ℕ) (x : Config n) :
-    missP B (T + 1) x = avg (fun r : Fin n → Fin n => missP B T (step x r)) := rfl
-
-lemma missP_nonneg (B : Set (Config n)) (T : ℕ) (x : Config n) : 0 ≤ missP B T x := by
-  classical
-  unfold missP
-  exact expList_nonneg fun l => by split <;> norm_num
-
-lemma missP_le_one [NeZero n] (B : Set (Config n)) (T : ℕ) (x : Config n) :
-    missP B T x ≤ 1 := by
-  classical
-  unfold missP
-  calc _ ≤ expList (Fin n → Fin n) T (fun _ => (1 : ℝ)) :=
-        expList_le_expList fun l => by split <;> norm_num
-    _ = 1 := expList_const T 1
-
-/-- Missing a smaller set is more likely. -/
-lemma missP_mono {B B' : Set (Config n)} (h : B ⊆ B') (T : ℕ) (x : Config n) :
-    missP B' T x ≤ missP B T x := by
-  classical
-  unfold missP
-  refine expList_le_expList fun l => ?_
-  by_cases hB : l.foldl step x ∈ B
-  · simp [hB, h hB]
-  · rw [if_neg hB]
-    split <;> norm_num
+The general facts (`Dynamics.missProb_succ`, `_nonneg`, `_le_one`, `_mono`, `_comp`) are stated
+for `missProb` in `Dynamics.Rounds`. -/
 
 /-- **Composition of stages** (Markov property): if from every state of `B` the chain misses
 `D` after `T₂` rounds with probability at most `e`, then from `x` it misses `D` after
 `T₁ + T₂` rounds with probability at most `missP B T₁ x + e`. -/
 lemma missP_comp [NeZero n] {B D : Set (Config n)} {T₁ T₂ : ℕ} {e : ℝ} (he : 0 ≤ e)
     (hD : ∀ y ∈ B, missP D T₂ y ≤ e) (x : Config n) :
-    missP D (T₁ + T₂) x ≤ missP B T₁ x + e := by
-  classical
-  have key (l₁ : List (Fin n → Fin n)) :
-      expList (Fin n → Fin n) T₂ (fun l₂ => if (l₁ ++ l₂).foldl step x ∈ D then (0 : ℝ) else 1)
-        = missP D T₂ (l₁.foldl step x) := by
-    simp only [missP, List.foldl_append]
-  have hpt (l₁ : List (Fin n → Fin n)) : missP D T₂ (l₁.foldl step x)
-      ≤ (if l₁.foldl step x ∈ B then (0 : ℝ) else 1) + e := by
-    by_cases hB : l₁.foldl step x ∈ B
-    · rw [if_pos hB, zero_add]
-      exact hD _ hB
-    · rw [if_neg hB]
-      linarith [missP_le_one D T₂ (l₁.foldl step x)]
-  calc missP D (T₁ + T₂) x
-      = expList (Fin n → Fin n) T₁ (fun l₁ => missP D T₂ (l₁.foldl step x)) := by
-        rw [← funext key]
-        exact expList_append T₁ T₂ _
-    _ ≤ expList (Fin n → Fin n) T₁
-          (fun l₁ => (if l₁.foldl step x ∈ B then (0 : ℝ) else 1) + e) :=
-        expList_le_expList hpt
-    _ = missP B T₁ x + e := by
-        rw [expList_add, expList_const]
-        rfl
+    missP D (T₁ + T₂) x ≤ missP B T₁ x + e :=
+  missProb_comp step he hD x
+
+/-- The all-`a` configurations are closed under rounds. -/
+lemma step_mem_allA {y : Config n} (hy : y ∈ allA n) (r : Fin n → Fin n) :
+    step y r ∈ allA n := by
+  have hm : Mono y := ⟨.a, fun v => by rw [show y = fun _ => .a from hy]⟩
+  rw [step_of_mono y hm r]
+  exact hy
 
 /-- Once all nodes hold `a`, they keep it. -/
-lemma missP_allA_of_mem {y : Config n} (hy : y ∈ allA n) (T : ℕ) : missP (allA n) T y = 0 := by
-  classical
-  have hm : Mono y := ⟨.a, fun v => by rw [show y = fun _ => .a from hy]⟩
-  unfold missP
-  simp_rw [foldl_of_mono hm, if_pos hy]
-  exact expList_zero_fun T
+lemma missP_allA_of_mem {y : Config n} (hy : y ∈ allA n) (T : ℕ) : missP (allA n) T y = 0 :=
+  missProb_of_closed step (fun _ hy r => step_mem_allA hy r) hy T
 
 /-- The probability of not being all-`a` does not increase with time. -/
 lemma missP_allA_antitone [NeZero n] (x : Config n) {T T' : ℕ} (h : T ≤ T') :
-    missP (allA n) T' x ≤ missP (allA n) T x := by
-  obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le h
-  have := missP_comp (B := allA n) (D := allA n) (T₁ := T) (T₂ := k) le_rfl
-    (fun y hy => (missP_allA_of_mem hy k).le) x
-  linarith
+    missP (allA n) T' x ≤ missP (allA n) T x :=
+  missProb_antitone step (fun _ hy r => step_mem_allA hy r) x h
 
 /-! ### One round in each phase -/
 
@@ -320,7 +271,7 @@ theorem bridge_stage (hn : (0 : ℝ) < n) (hΛ : 0 ≤ Λ) (hΛn : 2000 * Λ ≤
       have : (2 : ℝ) * (9 / 10) ^ 18 ≤ 1 / 3 := by norm_num
       nlinarith
     linarith
-  refine le_trans (missP_mono hsub 18 x) ?_
+  refine le_trans (missProb_mono step hsub 18 x) ?_
   refine expList_escape step hp 18 (bridgeTarget n Λ) x h0 ?_
   intro j hj y hy
   have hj' : (j : ℝ) ≤ 17 := by exact_mod_cast Nat.lt_succ_iff.mp hj
@@ -345,7 +296,7 @@ theorem fin_stage (hn : (0 : ℝ) < n) (hΛ : 0 ≤ Λ) (hΛn : 234 * Λ ≤ n) 
       missP (allA n) T x ≤ (5 / 6) ^ T * pot x + T * (4 * exp (-(2 * Λ ^ 2 / n)))
   | 0, x, _ => by
     classical
-    rw [missP_zero]
+    rw [missP, missProb_zero]
     simp only [pow_zero, one_mul, Nat.cast_zero, zero_mul, add_zero]
     by_cases h : x ∈ allA n
     · rw [if_pos h]
@@ -362,7 +313,7 @@ theorem fin_stage (hn : (0 : ℝ) < n) (hΛ : 0 ≤ Λ) (hΛn : 234 * Λ ≤ n) 
       · rw [if_pos h, add_zero]
         exact fin_stage hn hΛ hΛn T _ h
       · rw [if_neg h]
-        have h1 := missP_le_one (allA n) T (step x r)
+        have h1 := missProb_le_one step (allA n) T (step x r)
         have h2 : 0 ≤ (5 / 6 : ℝ) ^ T * pot (step x r) :=
           mul_nonneg (by positivity) (pot_nonneg _)
         have h3 : (0 : ℝ) ≤ T * p := by positivity
@@ -370,7 +321,7 @@ theorem fin_stage (hn : (0 : ℝ) < n) (hΛ : 0 ≤ Λ) (hΛn : 234 * Λ ≤ n) 
     have hround : avg (fun r : Fin n → Fin n => if step x r ∈ finSet n then (0 : ℝ) else 1)
         ≤ p := fin_round hn hΛ hΛn x hx
     have hexp := avg_pot_step hn x hx
-    rw [missP_succ]
+    rw [missP, missProb_succ]
     calc avg (fun r => missP (allA n) T (step x r))
         ≤ avg (fun r => (5 / 6) ^ T * pot (step x r) + T * p
             + (if step x r ∈ finSet n then (0 : ℝ) else 1)) := avg_le_avg hpt

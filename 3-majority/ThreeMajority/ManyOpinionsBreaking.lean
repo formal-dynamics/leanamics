@@ -1,5 +1,5 @@
 import ThreeMajority.ManyOpinionsExpect
-import ThreeMajority.ManyOpinionsMoments
+import Dynamics.Moments
 import ThreeMajority.ManyOpinionsDrift
 import ThreeMajority.ManyOpinionsTails
 import Dynamics.Rounds

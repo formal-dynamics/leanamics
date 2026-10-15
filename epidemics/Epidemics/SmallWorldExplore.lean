@@ -591,7 +591,7 @@ theorem prob_cluster_gt_le (r : Sym2 V → ℝ) (hr0 : ∀ e, 0 ≤ r e) (hr1 : 
           (pot_ge (inv_state s w₀ _) hh hw₀ hwmin hc1 hproc hlen) hθ)
     _ ≤ P.expect (fun ω => histProd (obs (G := G) (h := h) s w₀)
           (fac (G := G) (h := h) θ (κ * lam) s w₀) ω 0 t) / a :=
-        prob_le_expect_div P _ (fun ω => histProd_nonneg _ (fac_nonneg θ (κ * lam) s w₀) ω 0 t)
+        P.prob_le_expect_div _ (fun ω => histProd_nonneg _ (fac_nonneg θ (κ * lam) s w₀) ω 0 t)
           (Real.exp_pos _)
     _ ≤ 1 / a := div_le_div_of_nonneg_right hM (Real.exp_pos _).le
     _ = _ := by rw [one_div, ← Real.exp_neg]
