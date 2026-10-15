@@ -16,7 +16,8 @@ to count rounds and phases in high-probability statements. No probability is inv
   `log n ^ 3 / 6 ≤ n` (`log_cube_le`) and `log x ^ 4 / 24 ≤ x` (`log_pow_four_div_le`), all from
   Mathlib's `Real.pow_div_factorial_le_exp`; and `ε/2 ≤ log (1 + ε)` on `[0, 1]`
   (`half_le_log_one_add`).
-* The failure budget `S · N⁻² ≤ C/N` for `S ≤ C N` (`mul_one_div_sq_le`).
+* The failure budget `S · N⁻² ≤ C/N` for `S ≤ C N` (`mul_one_div_sq_le`), and products of
+  survival factors `∏ (1 - δ_t) ≤ exp (-∑ δ_t)` for `δ_t ≤ 1` (`prod_one_sub_le_exp_neg_sum`).
 
 The bounds `1/2 ≤ log 2 ≤ 1` and the monotonicity of `√(ℓ x)` in `x` are used directly from
 Mathlib (`Real.log_two_gt_d9`, `Real.log_two_lt_d9`, `Real.sqrt_le_sqrt`). Each docstring names
@@ -180,5 +181,12 @@ theorem mul_one_div_sq_le {N S C : ℝ} (hN : 0 < N) (hS : S ≤ C * N) :
   have p := mul_le_mul_of_nonneg_right hS hN.le
   calc S * N ≤ C * N * N := p
     _ = C * N ^ 2 := by ring
+
+/-- Products of survival factors: `∏ (1 - δ_t) ≤ exp (-∑ δ_t)` when every `δ_t ≤ 1`, factor by
+factor from `1 - x ≤ e^{-x}`. Replaces the product step of `Voter.prod_one_sub_le`. -/
+theorem prod_one_sub_le_exp_neg_sum {ι : Type*} (s : Finset ι) (δ : ι → ℝ)
+    (hδ : ∀ i ∈ s, δ i ≤ 1) : ∏ i ∈ s, (1 - δ i) ≤ exp (-∑ i ∈ s, δ i) := by
+  rw [← Finset.sum_neg_distrib, exp_sum]
+  exact Finset.prod_le_prod (fun i hi => by linarith [hδ i hi]) fun i _ => one_sub_le_exp_neg _
 
 end Dynamics

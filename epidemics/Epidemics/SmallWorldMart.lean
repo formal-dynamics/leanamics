@@ -1,147 +1,46 @@
 import Epidemics.SmallWorldDefs
-import Dynamics.Independent
+import Dynamics.Adaptive
 
 /-! # Adaptive observations: a finite supermartingale lemma (EPI-6, tools)
 
 Tools for the exploration argument of [BCDPTZ22] (Appendix C), in finite probability.
 
 * **Histories.** An adaptive process observes `obs h ω` after the history `h` of previous
-  observations (`hist obs ω k` is the history after `k` steps). This generalizes EPI-3's
-  `queryAnswers` (one coin per step) to arbitrary observations (blocks of coins, partners in a
+  observations (`hist obs ω k` is the history after `k` steps, in the core's
+  `Dynamics.Adaptive`). EPI-3's `queryAnswers` (one coin per step) is the special case
+  `obs h ω = ω (next h)`; here the observations are arbitrary (blocks of coins, partners in a
   matching, …).
-* **Supermartingale lemma** (`expect_prod_hist_le_one`): if every factor `f h b ≥ 0` has
-  conditional expectation at most `1` given the history `h`, the product of the factors along the
-  process has expectation at most `1`. With Markov's inequality this gives the tail bound of the
-  exploration (`Epidemics.SmallWorldExplore`), in the role of the Galton–Watson comparison of the
-  paper.
+* **Supermartingale lemma** (`expect_prod_hist_le_one`, from the core): if every factor
+  `f h b ≥ 0` has conditional expectation at most `1` given the history `h`, the product of the
+  factors along the process has expectation at most `1`. With Markov's inequality this gives the
+  tail bound of the exploration (`Epidemics.SmallWorldExplore`), in the role of the
+  Galton–Watson comparison of the paper.
 * **Coordinatewise combination of independent families** (the core's
   `Distribution.expect_expect_coord`, in `Dynamics.Independent`): if `x` and `y` are independent
   families, `fun i => φ i (x i) (y i)` is an independent family. This gives the independence of
   disjoint sets of coordinates (`Distribution.expect_mul_of_dep`) and, in
   `Epidemics.SmallWorldCollapse`, the law of the percolated `SWG(n, q)`.
-* **Fresh observations of independent coordinates** (`expect_prod_hist_le_one_of_fresh`): if each
-  observation reads coordinates not read before, the conditional expectation is the unconditional
-  one, so it suffices that `E[f h (obs h ω)] ≤ 1` for every history `h` (principle of deferred
-  decisions).
+* **Fresh observations of independent coordinates** (`expect_prod_hist_le_one_of_fresh`, from
+  the core): if each observation reads coordinates not read before, the conditional expectation
+  is the unconditional one, so it suffices that `E[f h (obs h ω)] ≤ 1` for every history `h`
+  (principle of deferred decisions).
+* **Blocks of coins**: the moment-generating function of the open coordinates of a block
+  (`expect_exp_sum_open`) and the bound `1 - r + r eˣ ≤ exp (κ r x)`
+  (`one_sub_add_mul_exp_le`).
 -/
 
 namespace Epidemics
 open Finset Dynamics
 
-/-! ### Histories of an adaptive observation process -/
+/-! ### The supermartingale lemma along adaptive histories
 
-section History
+The histories `hist`, the products `histProd` and the read sets `readSet` are the core's
+(`Dynamics.Adaptive`); the two lemmas below are the core's `Distribution.expect_prod_hist_le_one`
+and `Distribution.expect_prod_hist_le_one_of_fresh`. -/
 
-variable {Ω β : Type*}
+section Supermartingale
 
-/-- The history of an adaptive observation process after `k` steps: the list of the first `k`
-observations, the observation after the history `h` being `obs h ω`. -/
-def hist (obs : List β → Ω → β) (ω : Ω) : ℕ → List β
-  | 0 => []
-  | k + 1 => hist obs ω k ++ [obs (hist obs ω k) ω]
-
-@[simp] lemma length_hist (obs : List β → Ω → β) (ω : Ω) (k : ℕ) :
-    (hist obs ω k).length = k := by
-  induction k with
-  | zero => rfl
-  | succ k ih => simp [hist, ih]
-
-lemma hist_take (obs : List β → Ω → β) (ω : Ω) {j k : ℕ} (hjk : j ≤ k) :
-    (hist obs ω k).take j = hist obs ω j := by
-  induction k with
-  | zero => obtain rfl : j = 0 := Nat.le_zero.mp hjk; rfl
-  | succ k ih =>
-    rcases Nat.lt_or_ge j (k + 1) with h | h
-    · rw [hist, List.take_append_of_le_length (by simp; omega), ih (by omega)]
-    · obtain rfl : j = k + 1 := le_antisymm hjk h
-      exact List.take_of_length_le (by simp)
-
-lemma hist_succ_eq_iff (obs : List β → Ω → β) (ω : Ω) (k : ℕ) (h : List β) (b : β) :
-    hist obs ω (k + 1) = h ++ [b] ↔ hist obs ω k = h ∧ obs h ω = b := by
-  rw [hist]
-  constructor
-  · intro e
-    obtain ⟨e1, e2⟩ := List.append_inj' e rfl
-    refine ⟨e1, ?_⟩
-    rw [← e1]
-    simpa using e2
-  · rintro ⟨rfl, rfl⟩
-    rfl
-
-/-- The product of the factors `f` along the first `m` steps, from step `j` on. -/
-noncomputable def histProd (obs : List β → Ω → β) (f : List β → β → ℝ) (ω : Ω) (j m : ℕ) : ℝ :=
-  ∏ k ∈ Finset.Ico j (j + m), f (hist obs ω k) (obs (hist obs ω k) ω)
-
-lemma histProd_succ (obs : List β → Ω → β) (f : List β → β → ℝ) (ω : Ω) (j m : ℕ) :
-    histProd obs f ω j (m + 1) =
-      f (hist obs ω j) (obs (hist obs ω j) ω) * histProd obs f ω (j + 1) m := by
-  unfold histProd
-  rw [show j + (m + 1) = (j + 1) + m by omega, Finset.prod_eq_prod_Ico_succ_bot (by omega)]
-
-lemma histProd_zero_succ (obs : List β → Ω → β) (f : List β → β → ℝ) (ω : Ω) (k : ℕ) :
-    histProd obs f ω 0 (k + 1) =
-      histProd obs f ω 0 k * f (hist obs ω k) (obs (hist obs ω k) ω) := by
-  unfold histProd
-  rw [zero_add, zero_add, Finset.prod_Ico_succ_top (Nat.zero_le k)]
-
-lemma histProd_nonneg (obs : List β → Ω → β) {f : List β → β → ℝ} (hf0 : ∀ h b, 0 ≤ f h b)
-    (ω : Ω) (j m : ℕ) : 0 ≤ histProd obs f ω j m :=
-  prod_nonneg fun _ _ => hf0 _ _
-
-variable [Fintype Ω] [Fintype β] [DecidableEq β]
-
-/-- Conditioning step: from step `j` on, after the history `h₀`, the product of the factors has
-conditional expectation at most `1`. -/
-lemma expect_ind_histProd_le (P : Distribution Ω) (obs : List β → Ω → β)
-    (f : List β → β → ℝ) (hf0 : ∀ h b, 0 ≤ f h b)
-    (hf : ∀ h : List β, P.expect (fun ω => if hist obs ω h.length = h then f h (obs h ω) else 0)
-      ≤ P.expect (fun ω => if hist obs ω h.length = h then 1 else 0)) (m : ℕ) :
-    ∀ h₀ : List β, P.expect (fun ω => if hist obs ω h₀.length = h₀ then
-        histProd obs f ω h₀.length m else 0) ≤
-      P.expect (fun ω => if hist obs ω h₀.length = h₀ then 1 else 0) := by
-  classical
-  induction m with
-  | zero => intro h₀; simp [histProd]
-  | succ m ih =>
-    intro h₀
-    -- decompose along the next observation
-    have hdec (ω : Ω) : (if hist obs ω h₀.length = h₀ then
-        histProd obs f ω h₀.length (m + 1) else 0) =
-        ∑ b : β, f h₀ b * (if hist obs ω (h₀ ++ [b]).length = h₀ ++ [b] then
-          histProd obs f ω (h₀ ++ [b]).length m else 0) := by
-      simp only [List.length_append, List.length_singleton]
-      by_cases hh : hist obs ω h₀.length = h₀
-      · rw [if_pos hh, histProd_succ, hh, sum_eq_single (obs h₀ ω)]
-        · rw [if_pos ((hist_succ_eq_iff obs ω _ _ _).mpr ⟨hh, rfl⟩)]
-        · intro b _ hb
-          rw [if_neg (fun e => hb ((hist_succ_eq_iff obs ω _ _ _).mp e).2.symm), mul_zero]
-        · simp
-      · rw [if_neg hh]
-        refine (sum_eq_zero fun b _ => ?_).symm
-        rw [if_neg (fun e => hh ((hist_succ_eq_iff obs ω _ _ _).mp e).1), mul_zero]
-    have hdec1 (ω : Ω) : (if hist obs ω h₀.length = h₀ then f h₀ (obs h₀ ω) else 0) =
-        ∑ b : β, f h₀ b * (if hist obs ω (h₀ ++ [b]).length = h₀ ++ [b] then 1 else 0) := by
-      simp only [List.length_append, List.length_singleton]
-      by_cases hh : hist obs ω h₀.length = h₀
-      · rw [if_pos hh, sum_eq_single (obs h₀ ω)]
-        · rw [if_pos ((hist_succ_eq_iff obs ω _ _ _).mpr ⟨hh, rfl⟩), mul_one]
-        · intro b _ hb
-          rw [if_neg (fun e => hb ((hist_succ_eq_iff obs ω _ _ _).mp e).2.symm), mul_zero]
-        · simp
-      · rw [if_neg hh]
-        refine (sum_eq_zero fun b _ => ?_).symm
-        rw [if_neg (fun e => hh ((hist_succ_eq_iff obs ω _ _ _).mp e).1), mul_zero]
-    calc P.expect (fun ω => if hist obs ω h₀.length = h₀ then
-          histProd obs f ω h₀.length (m + 1) else 0)
-        = ∑ b : β, f h₀ b * P.expect (fun ω => if hist obs ω (h₀ ++ [b]).length = h₀ ++ [b]
-            then histProd obs f ω (h₀ ++ [b]).length m else 0) := by
-          simp_rw [hdec, Distribution.expect_sum, Distribution.expect_mul]
-      _ ≤ ∑ b : β, f h₀ b * P.expect (fun ω => if hist obs ω (h₀ ++ [b]).length = h₀ ++ [b]
-            then 1 else 0) :=
-          sum_le_sum fun b _ => mul_le_mul_of_nonneg_left (ih _) (hf0 _ _)
-      _ = P.expect (fun ω => if hist obs ω h₀.length = h₀ then f h₀ (obs h₀ ω) else 0) := by
-          simp_rw [hdec1, Distribution.expect_sum, Distribution.expect_mul]
-      _ ≤ _ := hf h₀
+variable {Ω β : Type*} [Fintype Ω] [Fintype β] [DecidableEq β]
 
 /-- **Supermartingale lemma.** If the factors `f h b ≥ 0` have conditional expectation at most
 `1` given every history `h`, then the product of the factors along the first `m` steps of the
@@ -150,46 +49,14 @@ theorem expect_prod_hist_le_one (P : Distribution Ω) (obs : List β → Ω → 
     (f : List β → β → ℝ) (hf0 : ∀ h b, 0 ≤ f h b)
     (hf : ∀ h : List β, P.expect (fun ω => if hist obs ω h.length = h then f h (obs h ω) else 0)
       ≤ P.expect (fun ω => if hist obs ω h.length = h then 1 else 0)) (m : ℕ) :
-    P.expect (fun ω => histProd obs f ω 0 m) ≤ 1 := by
-  have := expect_ind_histProd_le P obs f hf0 hf m []
-  simpa [hist] using this
+    P.expect (fun ω => histProd obs f ω 0 m) ≤ 1 :=
+  Distribution.expect_prod_hist_le_one P obs f hf0 hf m
 
-end History
-
-
-/-! ### Fresh observations of independent coordinates (deferred decisions) -/
+end Supermartingale
 
 section Fresh
 
-variable {ι α β : Type*} [Fintype ι] [DecidableEq ι] [Fintype α]
-
-/-- The coordinates read during the history `h`. -/
-def readSet (supp : List β → Finset ι) (h : List β) : Finset ι :=
-  (Finset.range h.length).biUnion fun j => supp (h.take j)
-
-omit [Fintype ι] [Fintype α] in
-/-- The event that the history is `h` depends only on the coordinates read along `h`. -/
-lemma hist_eq_iff_of_agree (obs : List β → (ι → α) → β) (supp : List β → Finset ι)
-    (hobs : ∀ h ω ω', (∀ i ∈ supp h, ω i = ω' i) → obs h ω = obs h ω') :
-    ∀ (h : List β) (ω ω' : ι → α), (∀ i ∈ readSet supp h, ω i = ω' i) →
-      (hist obs ω h.length = h ↔ hist obs ω' h.length = h) := by
-  intro h
-  induction h using List.reverseRecOn with
-  | nil => intros; simp [hist]
-  | append_singleton h b ih =>
-    intro ω ω' hag
-    have hag' : ∀ i ∈ readSet supp h, ω i = ω' i := fun i hi => hag i (by
-      simp only [readSet, mem_biUnion, mem_range, List.length_append,
-        List.length_singleton] at hi ⊢
-      obtain ⟨j, hj, hij⟩ := hi
-      exact ⟨j, by omega, by rwa [List.take_append_of_le_length (by omega)]⟩)
-    have hsupp : ∀ i ∈ supp h, ω i = ω' i := fun i hi => hag i (by
-      simp only [readSet, mem_biUnion, mem_range, List.length_append, List.length_singleton]
-      exact ⟨h.length, by omega, by simpa using hi⟩)
-    rw [List.length_append, List.length_singleton, hist_succ_eq_iff, hist_succ_eq_iff,
-      ih ω ω' hag', hobs h ω ω' hsupp]
-
-variable [Fintype β] [DecidableEq β]
+variable {ι α β : Type*} [Fintype ι] [DecidableEq ι] [Fintype α] [Fintype β] [DecidableEq β]
 
 /-- **Deferred decisions for adaptive observations of independent coordinates.** If every
 observation `obs h ω` reads only the coordinates `supp h`, which were not read before along `h`,
@@ -202,27 +69,8 @@ theorem expect_prod_hist_le_one_of_fresh (P : ι → Distribution α)
     (f : List β → β → ℝ) (hf0 : ∀ h b, 0 ≤ f h b)
     (hf : ∀ h : List β, (Distribution.independent P).expect (fun ω => f h (obs h ω)) ≤ 1)
     (m : ℕ) :
-    (Distribution.independent P).expect (fun ω => histProd obs f ω 0 m) ≤ 1 := by
-  classical
-  refine expect_prod_hist_le_one _ obs f hf0 (fun h => ?_) m
-  have hind := Distribution.expect_mul_of_dep P (readSet supp h)
-    (F := fun ω => if hist obs ω h.length = h then (1 : ℝ) else 0)
-    (G := fun ω => f h (obs h ω))
-    (fun ω ω' hag => by
-      simp only [hist_eq_iff_of_agree obs supp hobs h ω ω' hag])
-    (fun ω ω' hag => by
-      rw [hobs h ω ω' fun i hi => hag i (Finset.disjoint_left.mp (hfresh h) hi)])
-  calc (Distribution.independent P).expect
-        (fun ω => if hist obs ω h.length = h then f h (obs h ω) else 0)
-      = (Distribution.independent P).expect (fun ω =>
-          (if hist obs ω h.length = h then (1 : ℝ) else 0) * f h (obs h ω)) := by
-        congr 1; funext ω; split_ifs <;> simp
-    _ = _ * _ := hind
-    _ ≤ (Distribution.independent P).expect
-          (fun ω => if hist obs ω h.length = h then (1 : ℝ) else 0) * 1 :=
-        mul_le_mul_of_nonneg_left (hf h)
-          ((Distribution.independent P).expect_nonneg fun ω => by split_ifs <;> norm_num)
-    _ = _ := mul_one _
+    (Distribution.independent P).expect (fun ω => histProd obs f ω 0 m) ≤ 1 :=
+  Distribution.expect_prod_hist_le_one_of_fresh P obs supp hobs hfresh f hf0 hf m
 
 /-- The moment-generating function of the total weight of the open coordinates of a block:
 `E[exp (∑_{e ∈ B open} a e)] = ∏_{e ∈ B} (1 - r e + r e · exp (a e))`. -/

@@ -239,10 +239,11 @@ Source: the same paper, Definition 13, Theorem 43 (Appendix B.6) and Theorems 51
    the number of phases is `J = ⌊log_ℓ (β ln n / (2 D₀))⌋ ≤ log_ℓ ln n` with `β = min α (1/4)`,
    so that `n^{-β} ≤ ε_J ≤ n^{-β/(2ℓ)}`. Instead of the domination by geometric variables
    (Lemma 47), the phase potential `λ^{J - j}` with `λ = n^δ` contracts by `n^{-2δ} + n^{-δ}`
-   per round (`notYet_phase_le`); its factor `2^J` is a power of `n`. The last stage uses that
-   every uninformed node stays uninformed with probability at most `n^{-τ₃}` below `ε_J n`
-   uninformed nodes, and Markov's inequality. The degenerate cases `g = 0` (nothing to do) and
-   `α = 0` (fast finishing everywhere) are treated separately.
+   per round (`notYet_phase_le`, the core's phase calculus
+   `Dynamics.Kernel.iterate_outside_le_of_phases`); its factor `2^J` is a power of `n`. The last
+   stage uses that every uninformed node stays uninformed with probability at most `n^{-τ₃}`
+   below `ε_J n` uninformed nodes, and Markov's inequality. The degenerate cases `g = 0`
+   (nothing to do) and `α = 0` (fast finishing everywhere) are treated separately.
 6. **Total time with double exponential shrinking.** `spreading_upper_tail_double` and
    `spreading_upper_expect_double` compose Theorem 21, Lemma 19 and Theorem 43 as in the proofs
    of Theorems 52 and 53, like `spreading_upper_tail` for Theorem 31. They require `g > 0` (for
@@ -472,20 +473,14 @@ Source: L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccar
     (Appendices B and D), and the extensions of Appendix F.
 12. **Local lemmas.** The supermartingale lemma for adaptive observations
     (`expect_prod_hist_le_one`) and its deferred-decisions form for fresh coordinates
-    (`expect_prod_hist_le_one_of_fresh`), the coordinatewise combination of independent families
-    (`expect_expect_coord`, `expect_mul_of_dep`), the moment-generating function of a weighted
-    block of coins (`expect_exp_sum_open`) and the union bound over components for an arbitrary
-    random graph (`prob_components_le_of_tail'`, the form of EPI-2's
-    `prob_components_le_of_tail` for any distribution) are not in `dynamics/` yet; their move is
-    tracked in issues #42, #46 and #49. Markov's inequality is the core's
-    `Distribution.prob_le_expect_div`.
-    (`expect_prod_hist_le_one_of_fresh`), Markov's inequality `prob_le_expect_div`, the
-    moment-generating function of a weighted block of coins (`expect_exp_sum_open`) and the union
-    bound over components for an arbitrary random graph (`prob_components_le_of_tail'`, the
-    form of EPI-2's `prob_components_le_of_tail` for any distribution) are not in `dynamics/`
-    yet; their move is tracked in issues #42 and #49. The coordinatewise combination of
-    independent families (`Distribution.expect_expect_coord`, `Distribution.expect_mul_of_dep`)
-    is the core's (`Dynamics.Independent`).
+    (`expect_prod_hist_le_one_of_fresh`) are the core's (`Dynamics.Adaptive`, with the histories
+    `hist`, the products `histProd` and the read sets `readSet`), as are the coordinatewise
+    combination of independent families (`Distribution.expect_expect_coord`,
+    `Distribution.expect_mul_of_dep`, in `Dynamics.Independent`) and Markov's inequality
+    `Distribution.prob_le_expect_div`. The moment-generating function of a weighted block of
+    coins (`expect_exp_sum_open`) and the union bound over components for an arbitrary random
+    graph (`prob_components_le_of_tail'`, the form of EPI-2's `prob_components_le_of_tail` for
+    any distribution) are not in `dynamics/` yet; their move is tracked in issues #42 and #49.
 
 ## The supercritical giant component (`Giant*`, EPI-3)
 

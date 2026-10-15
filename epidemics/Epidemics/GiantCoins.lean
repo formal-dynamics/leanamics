@@ -1,6 +1,7 @@
 import Epidemics.ReedFrost
 import Dynamics.Chernoff
 import Dynamics.DriftHittingAux
+import Dynamics.Adaptive
 
 /-! # Independent edge coins: deferred decisions and symmetry (EPI-3)
 
@@ -20,7 +21,9 @@ arXiv:1201.6529).
   function of the answers so far. As long as no coordinate is queried twice, the answers are
   i.i.d. Bernoulli(`p`) (`expect_queryAnswers`, `prob_queryAnswers`). The proof: the answers equal
   a given list `L` iff the coordinates queried along `L`, which are determined by `L`, take the
-  values of `L`, a cylinder event.
+  values of `L`, a cylinder event. The answers are the history (`Dynamics.hist`, in the core's
+  `Dynamics.Adaptive`) of the adaptive observation process `l ↦ ω (next l)`, whose length,
+  prefix and answer-list lemmas they reuse.
 * **Symmetry**: relabelling the vertices does not change the law of the coins (`coins_prob_perm`).
 
 `coins` is built from `Epidemics.bernoulli`, an abbreviation of the coin
@@ -99,10 +102,10 @@ section Deferred
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- The answers to the first `t` queries of the adaptive strategy `next` on the coins `ω`, in
-order: after the answers `l`, the next query is the coordinate `next l`. -/
-def queryAnswers (next : List Bool → ι) (ω : ι → Bool) : ℕ → List Bool
-  | 0 => []
-  | t + 1 => queryAnswers next ω t ++ [ω (next (queryAnswers next ω t))]
+order: after the answers `l`, the next query is the coordinate `next l`. This is the history of
+the adaptive observation process `obs l ω = ω (next l)` (`Dynamics.hist`). -/
+def queryAnswers (next : List Bool → ι) (ω : ι → Bool) : ℕ → List Bool :=
+  hist (fun l ω => ω (next l)) ω
 
 /-- The strategy `next` never queries a coordinate twice among its first `m` queries: after any
 `k < m` answers, the next coordinate differs from the `k` coordinates queried before. -/
@@ -115,52 +118,30 @@ lemma FreshUpTo.mono {next : List Bool → ι} {m m' : ℕ} (h : FreshUpTo next 
   fun l hl => h l (lt_of_lt_of_le hl hm)
 
 omit [Fintype ι] [DecidableEq ι] in
+@[simp] lemma queryAnswers_zero (next : List Bool → ι) (ω : ι → Bool) :
+    queryAnswers next ω 0 = [] := rfl
+
+omit [Fintype ι] [DecidableEq ι] in
+lemma queryAnswers_succ (next : List Bool → ι) (ω : ι → Bool) (t : ℕ) :
+    queryAnswers next ω (t + 1) = queryAnswers next ω t ++ [ω (next (queryAnswers next ω t))] :=
+  rfl
+
+omit [Fintype ι] [DecidableEq ι] in
 lemma length_queryAnswers (next : List Bool → ι) (ω : ι → Bool) (t : ℕ) :
-    (queryAnswers next ω t).length = t := by
-  induction t with
-  | zero => rfl
-  | succ t ih => simp [queryAnswers, ih]
+    (queryAnswers next ω t).length = t :=
+  length_hist _ ω t
 
 omit [Fintype ι] [DecidableEq ι] in
 lemma take_queryAnswers (next : List Bool → ι) (ω : ι → Bool) {s t : ℕ} (hst : s ≤ t) :
-    (queryAnswers next ω t).take s = queryAnswers next ω s := by
-  induction t with
-  | zero => obtain rfl : s = 0 := Nat.le_zero.mp hst; rfl
-  | succ t ih =>
-    rcases Nat.lt_or_ge s (t + 1) with h | h
-    · rw [queryAnswers, List.take_append_of_le_length (by simp [length_queryAnswers]; omega),
-        ih (by omega)]
-    · obtain rfl : s = t + 1 := le_antisymm hst h
-      exact List.take_of_length_le (by simp [length_queryAnswers])
+    (queryAnswers next ω t).take s = queryAnswers next ω s :=
+  hist_take _ ω hst
 
 omit [Fintype ι] [DecidableEq ι] in
 /-- The answers are a given list `L` iff the coordinates queried along `L` take its values. -/
 lemma queryAnswers_eq_iff (next : List Bool → ι) (ω : ι → Bool) (L : List Bool) :
     queryAnswers next ω L.length = L ↔
-      ∀ k < L.length, some (ω (next (L.take k))) = L[k]? := by
-  induction L using List.reverseRecOn with
-  | nil => simp [queryAnswers]
-  | append_singleton L b ih =>
-    rw [List.length_append, List.length_singleton, queryAnswers]
-    constructor
-    · intro h
-      have hL : queryAnswers next ω L.length = L :=
-        (List.append_inj h (by simp [length_queryAnswers])).1
-      have hb : ω (next (queryAnswers next ω L.length)) = b := by
-        simpa using (List.append_inj h (by simp [length_queryAnswers])).2
-      rw [hL] at hb
-      intro k hk
-      rcases Nat.lt_or_ge k L.length with hkL | hkL
-      · rw [List.take_append_of_le_length hkL.le, List.getElem?_append_left hkL]
-        exact (ih.mp hL) k hkL
-      · obtain rfl : k = L.length := by omega
-        simp [hb]
-    · intro h
-      have hL : queryAnswers next ω L.length = L := ih.mpr fun k hk => by
-        have := h k (by omega)
-        rwa [List.take_append_of_le_length hk.le, List.getElem?_append_left hk] at this
-      have hb : ω (next L) = b := by simpa using h L.length (by simp)
-      rw [hL, hb]
+      ∀ k < L.length, some (ω (next (L.take k))) = L[k]? :=
+  hist_eq_iff _ ω L
 
 /-- The answers to a fresh strategy form a cylinder: they equal `L` with probability
 `∏ₖ w(Lₖ)`. -/

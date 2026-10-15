@@ -9,7 +9,7 @@ networks*, ICALP 2016 (BGKM16). With `ℓ ≥ 2` opinions present and a threshol
 
 * the voter only copies opinions, so the set of opinions present can only shrink
   (`opinions_step_subset`); expectations can be compared on the states reachable from the start
-  (`iterate_le_of_closed`);
+  (the core's `Dynamics.Kernel.iterate_le_of_closed`);
 * fewer than `θ/3` opinions have volume above `3 vol(V)/θ` (`card_big_le`); every other
   opinion `i` is resolved (vanished or prevailed) after `B` rounds with probability at least
   `1/2`, by Lemma 2.2 applied to the two-opinion process "`i` against the rest", which is the
@@ -22,26 +22,10 @@ networks*, ICALP 2016 (BGKM16). With `ℓ ≥ 2` opinions present and a threshol
 namespace Voter
 open Dynamics Finset
 
-/-! ### Comparing expectations on a closed set of states -/
+/-! ### Expectation of a complement -/
 
 section Support
 variable {α : Type*} [Fintype α]
-
-/-- If `Q` is closed under the transitions of `K` and `F ≤ F'` on `Q`, then
-`𝔼_x F(X_n) ≤ 𝔼_x F'(X_n)` from every state `x` of `Q`. -/
-lemma iterate_le_of_closed (K : Kernel α) (Q : α → Prop)
-    (hQ : ∀ y z, Q y → (K y).weight z ≠ 0 → Q z) {F F' : α → ℝ}
-    (hF : ∀ y, Q y → F y ≤ F' y) (n : ℕ) : ∀ x, Q x → K.iterate n F x ≤ K.iterate n F' x := by
-  induction n with
-  | zero => exact hF
-  | succ n ih =>
-    intro x hx
-    rw [Kernel.iterate_succ, Kernel.iterate_succ]
-    unfold Kernel.apply Distribution.expect
-    refine sum_le_sum fun z _ => ?_
-    by_cases hz : (K x).weight z = 0
-    · simp [hz]
-    · exact mul_le_mul_of_nonneg_left (ih z (hQ x z hx hz)) ((K x).nonneg z)
 
 /-- `𝔼[c - F] = c - 𝔼[F]` at every finite time. -/
 lemma iterate_const_sub (K : Kernel α) (n : ℕ) (c : ℝ) (F : α → ℝ) (x : α) :
@@ -308,7 +292,7 @@ theorem phase_step [Nonempty V] (hd : ∀ v, 0 < G.degree v) (x : Config V C) {�
           ring
       _ ≤ _ := sum_le_sum hres
   -- compare on the configurations whose opinions are opinions of `x`
-  have hcmp := iterate_le_of_closed K (fun y => opinions y ⊆ opinions x)
+  have hcmp := Kernel.iterate_le_of_closed K (fun y => opinions y ⊆ opinions x)
     (opinions_closed (lazyNeighbor G hd) (opinions x))
     (F := fun y : Config V C =>
       3 * S.card / 4 * (if θ * (5 / 6) < (opinions y).card then (1 : ℝ) else 0))
@@ -323,7 +307,7 @@ theorem phase_step [Nonempty V] (hd : ∀ v, 0 < G.degree v) (x : Config V C) {�
     have hle : ((opinions x).card : ℝ) ≤ θ / 3 := by
       rw [hS0, Nat.cast_zero] at hSθ
       linarith
-    have h0 := iterate_le_of_closed K (fun y => opinions y ⊆ opinions x)
+    have h0 := Kernel.iterate_le_of_closed K (fun y => opinions y ⊆ opinions x)
       (opinions_closed (lazyNeighbor G hd) (opinions x))
       (F := fun y : Config V C => if θ * (5 / 6) < (opinions y).card then (1 : ℝ) else 0)
       (F' := fun _ => 0)

@@ -107,3 +107,9 @@ import Dynamics
 #print axioms Dynamics.log_pow_four_div_le
 #print axioms Dynamics.half_le_log_one_add
 #print axioms Dynamics.mul_one_div_sq_le
+#print axioms Dynamics.prod_one_sub_le_exp_neg_sum
+#print axioms Dynamics.Kernel.multiplicative_drift_seq_exp
+#print axioms Dynamics.Kernel.iterate_le_pow_of_closed
+#print axioms Dynamics.Kernel.iterate_outside_le_of_phases
+#print axioms Dynamics.Distribution.expect_prod_hist_le_one
+#print axioms Dynamics.Distribution.expect_prod_hist_le_one_of_fresh
