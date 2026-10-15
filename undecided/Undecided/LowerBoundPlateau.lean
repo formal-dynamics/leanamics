@@ -31,7 +31,7 @@ lemma miss_one_eq [NeZero n] (S : Set (Config n k)) (x : Config n k) :
     miss S 1 x =
       avg (fun r : Fin n → Fin n => by classical exact if step x r ∈ S then (0 : ℝ) else 1) := by
   classical
-  unfold miss
+  unfold miss missProb
   rw [expList_succ (T := 0)]
   simp only [expList_zero, List.foldl_cons, List.foldl_nil]
   rfl
@@ -623,7 +623,7 @@ theorem plateau : ∀ γ : ℝ, 1 ≤ γ → ∃ C : ℝ, 0 < C ∧ ∀ n : ℕ,
     rw [← miss_one_eq]
     calc miss (G (t + 1)) 1 z ≤
           miss {w | (maxCount w : ℝ) ≤ (1 + a / D) * Bt ∧
-            |und w - n / 2| ≤ 2 * γ ^ 2 * n / D} 1 z := miss_mono hsub 1 z
+            |und w - n / 2| ≤ 2 * γ ^ 2 * n / D} 1 z := missProb_mono step hsub 1 z
       _ ≤ C0 / n ^ 2 :=
           hstep n hlog0 k hk0 D hC0D hDk z Bt hBlo_t hBhi_t hz.2 hz.1
   have hsubT : G T ⊆ {z | (maxCount z : ℝ) ≤ 2 * γ * n / D ∧
@@ -646,7 +646,7 @@ theorem plateau : ∀ γ : ℝ, 1 ≤ γ → ∃ C : ℝ, 0 < C ∧ ∀ n : ℕ,
       _ ≤ C / n := div_le_div_of_nonneg_right hC0le hnR.le
   calc miss {z | (maxCount z : ℝ) ≤ 2 * γ * n / D ∧
         |und z - n / 2| ≤ 2 * γ ^ 2 * n / D} T y
-      ≤ miss (G T) T y := miss_mono hsubT T y
+      ≤ miss (G T) T y := missProb_mono step hsubT T y
     _ ≤ T * (C0 / n ^ 2) := hescape
     _ ≤ C / n := hnum
 

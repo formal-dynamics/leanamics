@@ -410,8 +410,7 @@ Theorem 3.1 (`ManyOpinionsMain.lean`).
    independent adoption indicators `adoptInd`, and `sum_variance_adoptInd_ge`), and the minimum of
    numbers summing to `n` is at most `n/j − (1/(2j)) ∑_a |C_a' − n/j|` (`inf'_colourCount_le`).
    The intermediate claim with probability `1/2` is not formalized. The second and fourth moment
-   bounds (`ManyOpinionsMoments.lean`) are adapted from the `plurality` package, since packages do
-   not depend on each other.
+   bounds are those of the shared layer (`dynamics/Dynamics/Moments.lean`).
 3. **Equation (6).** Every colour of `x` has mean support at least `n/j − 2m` after one round
    (`le_avg_colourCount_stepCol_of_forall_lt`: Lemma 2.1 gives `𝔼[C_a'] ≥ c_a (1 + c_a/n − M/n)`
    with `M` the largest support, which is at most `n/j + (j − 1) m`, and the right-hand side is

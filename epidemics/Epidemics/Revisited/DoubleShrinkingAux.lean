@@ -235,7 +235,7 @@ lemma prob_deficit_gt_cheb (P : RumorProcess n) (S : Finset (Fin n)) {c₀ μ z 
   have hlam : 0 < z - μ := by linarith
   have hsub : D.prob (fun T => z < (n : ℝ) - T.card) ≤
       D.prob (fun T => z - μ ≤ |X T - D.expect X|) := by
-    refine prob_mono D (fun T hT => ?_)
+    refine Distribution.prob_mono D (fun T hT => ?_)
     have : z - μ ≤ D.expect X - X T := by simp only [X]; linarith
     exact le_trans this (by rw [abs_sub_comm]; exact le_abs_self _)
   have hcheb := chebyshev D X hlam

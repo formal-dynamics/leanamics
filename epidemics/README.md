@@ -259,7 +259,7 @@ checks of the provenance note below.
 **Cover time** (in [`Epidemics/CobraCover.lean`](Epidemics/CobraCover.lean),
 [`Epidemics/CobraCoverBranching.lean`](Epidemics/CobraCoverBranching.lean) and the lemma files
 `CobraCover*.lean`). Here `G` is `r`-regular (`r > 0`) on `n` vertices, `λ` is the absolute second
-eigenvalue of the random walk (`lambdaG G r`) and `k ≥ 2`.
+eigenvalue of the random walk (the core's `Dynamics.lambdaG G r`) and `k ≥ 2`.
 
 | Result | Lean declaration |
 | --- | --- |

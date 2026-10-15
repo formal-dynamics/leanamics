@@ -14,7 +14,7 @@ With `p = (k + 4) e^{-ℓ}` the probability of a bad round (`bad_le`):
   after `T` rounds is at most `(3/4)^T (4S + q) + T p` (`4S + q` contracts in expectation and
   `Fpsi` persists except with probability `p` per round; UND-1's `fin_stage` pattern).
 
-The stages are composed by `miss_comp` (Markov property), where `miss D T x` is the
+The stages are composed by `Dynamics.missProb_comp` (Markov property), where `miss D T x` is the
 probability of missing `D` after `T` rounds from `x`.
 -/
 
@@ -23,93 +23,35 @@ open Finset Dynamics Real
 
 variable {n k : ℕ}
 
-/-- Probability of missing `D` after `T` rounds started from `x`. -/
-noncomputable def miss (D : Set (Config n k)) (T : ℕ) (x : Config n k) : ℝ := by
-  classical
-  exact expList (Fin n → Fin n) T (fun l => if l.foldl step x ∈ D then 0 else 1)
+/-- Probability of missing `D` after `T` rounds started from `x`: `Dynamics.missProb` for the
+round map `step`. -/
+noncomputable abbrev miss (D : Set (Config n k)) (T : ℕ) (x : Config n k) : ℝ :=
+  missProb step D T x
 
 /-- All nodes hold colour `m`. -/
 def allM (m : Fin k) : Set (Config n k) := {x | x = fun _ => some m}
 
-/-! ### Missing probabilities -/
+/-! ### Missing probabilities
 
-lemma miss_succ (D : Set (Config n k)) (T : ℕ) (x : Config n k) :
-    miss D (T + 1) x = avg (fun r : Fin n → Fin n => miss D T (step x r)) := rfl
+The general facts (`Dynamics.missProb_succ`, `_nonneg`, `_le_one`, `_mono`, `_comp`) are stated
+for `missProb` in `Dynamics.Rounds`. -/
 
-lemma miss_nonneg (D : Set (Config n k)) (T : ℕ) (x : Config n k) : 0 ≤ miss D T x := by
-  classical
-  unfold miss
-  exact expList_nonneg fun l => by split <;> norm_num
-
-lemma miss_le_one [NeZero n] (D : Set (Config n k)) (T : ℕ) (x : Config n k) :
-    miss D T x ≤ 1 := by
-  classical
-  unfold miss
-  calc _ ≤ expList (Fin n → Fin n) T (fun _ => (1 : ℝ)) :=
-        expList_le_expList fun l => by split <;> norm_num
-    _ = 1 := expList_const T 1
-
-/-- Missing a smaller set is more likely. -/
-lemma miss_mono {D D' : Set (Config n k)} (h : D ⊆ D') (T : ℕ) (x : Config n k) :
-    miss D' T x ≤ miss D T x := by
-  classical
-  unfold miss
-  refine expList_le_expList fun l => ?_
-  by_cases hD : l.foldl step x ∈ D
-  · simp [hD, h hD]
-  · rw [if_neg hD]
-    split <;> norm_num
-
-/-- **Composition of stages** (Markov property). -/
-lemma miss_comp [NeZero n] {D E : Set (Config n k)} {T₁ T₂ : ℕ} {e : ℝ} (he : 0 ≤ e)
-    (hE : ∀ y ∈ D, miss E T₂ y ≤ e) (x : Config n k) :
-    miss E (T₁ + T₂) x ≤ miss D T₁ x + e := by
-  classical
-  have key (l₁ : List (Fin n → Fin n)) :
-      expList (Fin n → Fin n) T₂ (fun l₂ => if (l₁ ++ l₂).foldl step x ∈ E then (0 : ℝ) else 1)
-        = miss E T₂ (l₁.foldl step x) := by
-    simp only [miss, List.foldl_append]
-  have hpt (l₁ : List (Fin n → Fin n)) : miss E T₂ (l₁.foldl step x)
-      ≤ (if l₁.foldl step x ∈ D then (0 : ℝ) else 1) + e := by
-    by_cases hD : l₁.foldl step x ∈ D
-    · rw [if_pos hD, zero_add]
-      exact hE _ hD
-    · rw [if_neg hD]
-      linarith [miss_le_one E T₂ (l₁.foldl step x)]
-  calc miss E (T₁ + T₂) x
-      = expList (Fin n → Fin n) T₁ (fun l₁ => miss E T₂ (l₁.foldl step x)) := by
-        rw [← funext key]
-        exact expList_append T₁ T₂ _
-    _ ≤ expList (Fin n → Fin n) T₁
-          (fun l₁ => (if l₁.foldl step x ∈ D then (0 : ℝ) else 1) + e) :=
-        expList_le_expList hpt
-    _ = miss D T₁ x + e := by
-        rw [expList_add, expList_const]
-        rfl
-
-lemma foldl_const (o : Option (Fin k)) (l : List (Fin n → Fin n)) :
-    l.foldl step (fun _ : Fin n => o) = fun _ => o := by
-  induction l with
-  | nil => rfl
-  | cons r l ih => simp only [List.foldl_cons, step_const, ih]
+/-- Monochromatic configurations in `m` are closed under rounds. -/
+lemma step_mem_allM {y : Config n k} {m : Fin k} (hy : y ∈ allM m) (r : Fin n → Fin n) :
+    step y r ∈ allM m := by
+  have hy' : y = fun _ => some m := hy
+  rw [hy', step_const]
+  rfl
 
 /-- Once all nodes hold `m`, they keep it. -/
 lemma miss_allM_of_mem {y : Config n k} {m : Fin k} (hy : y ∈ allM m) (T : ℕ) :
-    miss (allM m) T y = 0 := by
-  classical
-  have hy' : y = fun _ => some m := hy
-  unfold miss
-  simp_rw [hy', foldl_const]
-  simp only [allM, Set.mem_setOf_eq, if_true]
-  exact expList_zero_fun T
+    miss (allM m) T y = 0 :=
+  missProb_of_closed step (fun _ hy r => step_mem_allM hy r) hy T
 
 /-- The probability of not being monochromatic in `m` does not increase with time. -/
 lemma miss_allM_antitone [NeZero n] (x : Config n k) (m : Fin k) {T T' : ℕ} (h : T ≤ T') :
-    miss (allM m) T' x ≤ miss (allM m) T x := by
-  obtain ⟨j, rfl⟩ := Nat.exists_eq_add_of_le h
-  have := miss_comp (D := allM m) (E := allM m) (T₁ := T) (T₂ := j) le_rfl
-    (fun y hy => (miss_allM_of_mem hy j).le) x
-  linarith
+    miss (allM m) T' x ≤ miss (allM m) T x :=
+  missProb_antitone step (fun _ hy r => step_mem_allM hy r) x h
 
 /-! ### One round -/
 
@@ -254,7 +196,7 @@ theorem fin_stage {ℓ : ℝ} (hℓ : 0 < ℓ) (h5 : 160000 * ℓ ≤ n) (m : Fi
   | 0, x, _ => by
     classical
     simp only [pow_zero, one_mul, Nat.cast_zero, zero_mul, add_zero]
-    unfold miss
+    unfold miss missProb
     simp only [expList, List.foldl_nil]
     by_cases h : x ∈ allM m
     · rw [if_pos h]
@@ -272,7 +214,7 @@ theorem fin_stage {ℓ : ℝ} (hℓ : 0 < ℓ) (h5 : 160000 * ℓ ≤ n) (m : Fi
       · rw [if_pos h, add_zero]
         exact fin_stage hℓ h5 m T _ h
       · rw [if_neg h]
-        have h1 := miss_le_one (allM m) T (step x r)
+        have h1 := missProb_le_one step (allM m) T (step x r)
         have h2 : 0 ≤ (3 / 4 : ℝ) ^ T * psi (step x r) m :=
           mul_nonneg (by positivity) (psi_nonneg _ m)
         have h3 : (0 : ℝ) ≤ T * p := by positivity
@@ -284,7 +226,7 @@ theorem fin_stage {ℓ : ℝ} (hℓ : 0 < ℓ) (h5 : 160000 * ℓ ≤ n) (m : Fi
       rw [avg_add, avg_const_mul, avg_oth_step, avg_und_step]
       exact fpsi_expect hn (cnt_le_n x m) (oth_nonneg x m) (und_nonneg x) (muS_le x m)
         (muU_le x m) hx
-    rw [miss_succ]
+    rw [miss, missProb_succ]
     calc avg (fun r => miss (allM m) T (step x r))
         ≤ avg (fun r => (3 / 4) ^ T * psi (step x r) m + T * p
             + (if step x r ∈ Fpsi m then (0 : ℝ) else 1)) := avg_le_avg hpt

@@ -13,7 +13,7 @@ largest) has `|μ| > λ`. The spectral lemmas of `Averaging.RateSpectral` then g
 -/
 
 namespace Averaging
-open Finset Matrix
+open Finset Matrix Dynamics
 
 variable {V : Type*} [Fintype V] [DecidableEq V] (G : SimpleGraph V) [DecidableRel G.Adj]
 
@@ -207,7 +207,7 @@ lemma abs_walkMatrix_pow_sub_walkStationary_le' (hdeg : ∀ v, 0 < G.degree v) (
   have hs := normAdjMatrix_mulVec_sqrtStationary G hdeg
   have hs1 := sqrtStationary_dotProduct_self G hdeg
   have hcore := abs_pow_apply_sub_le hN (sqrtStationary G) hs hs1 (walkLambda_nonneg G)
-    (fun y hy => mulVec_dotProduct_mulVec_le hN (sqrtStationary G) hs hs1
+    (fun y hy => eigenvectorBasis_dotProduct_eq_zero_of_orthogonal hN (sqrtStationary G) hs hs1
       (abs_eigenvalues_le_one hN (abs_dotProduct_normAdjMatrix_mulVec_le G hdeg))
       (eq_of_walkLambda_lt_abs G hdeg) y hy) t u v
   have hu : (0 : ℝ) < G.degree u := by exact_mod_cast hdeg u

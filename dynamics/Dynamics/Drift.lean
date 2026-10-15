@@ -1,4 +1,5 @@
 import Dynamics.DriftAux
+import Dynamics.Rounds
 
 /-!
 # Drift theorems: from an expected potential drop to absorption
@@ -24,6 +25,9 @@ the voter model in dynamic networks*, ICALP 2016, [arXiv:1603.01895]:
 The `_seq` versions allow a time-dependent chain (`iterateSeq`) and time-dependent drift, as for
 the dynamic graphs of the paper; the others are their time-homogeneous specializations, stated
 with `Kernel.event`.
+**Fixed-time drift with an additive error** (`iterate_le_of_drift`, and `expList_le_of_drift` for
+round-based processes): if one step maps `φ` to at most `ρ φ + ε` in expectation, with
+`0 ≤ ρ ≤ 1` and `ε ≥ 0`, then after `T` steps the expected potential is at most `ρ^T φ + T ε`.
 -/
 
 namespace Dynamics.Kernel
@@ -135,4 +139,44 @@ theorem multiplicative_drift (K : Dynamics.Kernel α) (Ψ : α → ℝ) {δ Ψmi
     (fun _ _ => hdrift) x₀
   rwa [prod_const, card_range] at h
 
+/-! ### Fixed-time drift with an additive error -/
+
+/-- **Fixed-time drift.** If one step of `K` maps the potential `φ` to at most `ρ φ + ε`, with
+`0 ≤ ρ ≤ 1` and `0 ≤ ε`, then after `T` steps the expected potential is at most
+`ρ ^ T φ + T ε`. -/
+lemma iterate_le_of_drift (K : Dynamics.Kernel α) (φ : α → ℝ) {ρ ε : ℝ} (hρ0 : 0 ≤ ρ)
+    (hρ1 : ρ ≤ 1) (hε : 0 ≤ ε) (hφ : ∀ a, K.apply φ a ≤ ρ * φ a + ε) (T : ℕ) (a : α) :
+    K.iterate T φ a ≤ ρ ^ T * φ a + T * ε := by
+  induction T with
+  | zero => simp
+  | succ T ih =>
+    -- the last step first: `K^{T+1} φ = K^T (K φ) ≤ K^T (ρ φ + ε) = ρ K^T φ + ε`
+    have hstep : K.iterate (T + 1) φ a ≤ ρ * K.iterate T φ a + ε := by
+      rw [K.iterate_add_time T 1]
+      calc K.iterate T (K.iterate 1 φ) a ≤ K.iterate T (fun b => ρ * φ b + ε) a :=
+            K.iterate_mono T hφ a
+        _ = ρ * K.iterate T φ a + ε := by rw [K.iterate_add, K.iterate_mul, K.iterate_const]
+    have hTε : ρ * (T * ε) ≤ T * ε := mul_le_of_le_one_left (by positivity) hρ1
+    calc K.iterate (T + 1) φ a ≤ ρ * (ρ ^ T * φ a + T * ε) + ε :=
+          hstep.trans (by gcongr)
+      _ ≤ ρ ^ (T + 1) * φ a + ((T + 1 : ℕ) : ℝ) * ε := by
+          push_cast
+          rw [pow_succ]
+          linarith
+
 end Dynamics.Kernel
+
+namespace Dynamics
+variable {S R : Type*} [Fintype S] [Fintype R] [Nonempty R]
+
+/-- **Fixed-time drift** for a round-based process: if one uniform round maps the potential `φ`
+to at most `ρ φ + ε` in expectation (`0 ≤ ρ ≤ 1`, `0 ≤ ε`), then after `T` rounds the expected
+potential is at most `ρ ^ T φ + T ε`. -/
+lemma expList_le_of_drift (step : S → R → S) (φ : S → ℝ) {ρ ε : ℝ} (hρ0 : 0 ≤ ρ) (hρ1 : ρ ≤ 1)
+    (hε : 0 ≤ ε) (hφ : ∀ s, avg (fun r => φ (step s r)) ≤ ρ * φ s + ε) (T : ℕ) (s : S) :
+    expList R T (fun l => φ (l.foldl step s)) ≤ ρ ^ T * φ s + T * ε := by
+  rw [← Kernel.iterate_ofStep step T φ s]
+  exact Kernel.iterate_le_of_drift _ φ hρ0 hρ1 hε
+    (fun s => (Kernel.apply_ofStep step φ s).trans_le (hφ s)) T s
+
+end Dynamics

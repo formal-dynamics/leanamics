@@ -72,7 +72,7 @@ lemma prob_component_ge_eq (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) (v w : V) (k 
       (coins (V := V) p h0 h1).prob
         (fun ω => k ≤ ((perc ⊤ ω).connectedComponentMk v).supp.ncard) := by
   rw [← coins_prob_perm p h0 h1 (Equiv.swap w v)]
-  refine prob_congr _ fun ω => ?_
+  refine Distribution.prob_congr _ fun ω => ?_
   rw [ncard_supp_perm, Equiv.swap_apply_left]
 
 /-- **Symmetry of `K_n`**: the vertex `v` lies in a component with at least `k` vertices with
@@ -156,7 +156,7 @@ theorem reedFrost_large_outbreak_explicit :
           ∃ K : (perc ⊤ ω).ConnectedComponent, ε * Fintype.card V / 2 ≤ K.supp.ncard) :=
         mul_le_mul_of_nonneg_left hcomp (by positivity)
     _ ≤ _ := key
-    _ = _ := prob_congr _ fun ω => by rw [card_final_recovered]
+    _ = _ := Distribution.prob_congr _ fun ω => by rw [card_final_recovered]
 
 /-- **Large outbreak** (EPI-3, epidemic reading of the supercritical giant component, via EPI-1):
 for every `R₀ > 1` there are `c > 0`, `q > 0` and `n₀` such that the Reed–Frost epidemic on the
@@ -192,6 +192,6 @@ theorem reedFrost_large_outbreak (R₀ : ℝ) (hR₀ : 1 < R₀) :
           ∃ K : (perc ⊤ ω).ConnectedComponent, c * Fintype.card V ≤ K.supp.ncard) :=
         mul_le_mul_of_nonneg_left hcomp hc.le
     _ ≤ _ := key
-    _ = _ := prob_congr _ fun ω => by rw [card_final_recovered]
+    _ = _ := Distribution.prob_congr _ fun ω => by rw [card_final_recovered]
 
 end Epidemics

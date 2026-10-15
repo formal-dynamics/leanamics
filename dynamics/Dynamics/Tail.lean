@@ -9,7 +9,8 @@ shared finite layer (monotonicity of probability in the event is `Distribution.p
 
 * `Distribution.expect_lt_one`, `avg_lt_one`: an observable bounded by `1` that is strictly
   below `1` at a point of positive weight has expectation strictly below `1`.
-* `avg_markov`: **Markov's inequality** `P(X ≥ c) ≤ 𝔼X / c` for uniform averages, and
+* `avg_markov`: **Markov's inequality** `P(X ≥ c) ≤ 𝔼X / c` for uniform averages (for any
+  distribution it is `Distribution.prob_le_expect_div`), and
   `avg_markov_one`: its form `P(X ≥ 1) ≤ 𝔼X` for a sum of independent nonnegative
   coordinates.
 * `Kernel.one_sub_avg_le_prob_ofStep`: one uniformly random round lands in an event with
@@ -17,8 +18,8 @@ shared finite layer (monotonicity of probability in the event is `Distribution.p
 * `Kernel.iterate_monotone`: a subharmonic observable (`f ≤ K f`) has nondecreasing
   finite-time expectations, and `Kernel.event_monotone`: the occupation probability of an
   absorbing event is nondecreasing in time.
-* `exp_neg_two_log`, `one_le_of_log_pos`: the scalar conversions used to state
-  high-probability bounds in regimes `C ≤ log n`.
+* `exp_neg_two_log`, `exp_neg_three_log`, `one_le_of_log_pos`: the scalar conversions used to
+  state high-probability bounds in regimes `C ≤ log n`.
 
 As everywhere in this library, the source has no paper numbering; each docstring names the
 package lemmas that the statement replaces.
@@ -156,6 +157,13 @@ theorem exp_neg_two_log {n : ℕ} (hn : 1 ≤ n) :
     Real.exp (-(2 * Real.log n)) = 1 / (n : ℝ) ^ 2 := by
   have hn0 : (0 : ℝ) < n := by exact_mod_cast hn
   rw [Real.exp_neg, show 2 * Real.log n = Real.log ((n : ℝ) ^ 2) by
+    rw [Real.log_pow]; norm_num, Real.exp_log (by positivity), one_div]
+
+/-- `exp (-3 log n) = 1/n³`, the conversion into a failure probability `1/n³`. Replaces
+`Undecided.Plurality.exp_neg_three_log`. -/
+theorem exp_neg_three_log {n : ℕ} (hn : (0 : ℝ) < n) :
+    Real.exp (-(3 * Real.log n)) = 1 / (n : ℝ) ^ 3 := by
+  rw [Real.exp_neg, show 3 * Real.log n = Real.log ((n : ℝ) ^ 3) by
     rw [Real.log_pow]; norm_num, Real.exp_log (by positivity), one_div]
 
 /-- A hypothesis `0 < log n`, as implied by the regimes `C ≤ log n` with `C > 0`, forces

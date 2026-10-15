@@ -21,6 +21,9 @@ probability of an event is the average of its indicator, and independence is
   `Yᵢ - 𝔼Yᵢ ≤ b` and `σ²` bounds the variance of `X`.
 * `avg_hoeffding_lower`: Hoeffding's lower tail, and `variance_le_avg_of_zero_one`:
   the variance of a `{0,1}` coordinate is at most its mean.
+* `avg_bernstein_lower`: Bernstein's lower tail; `avg_bernstein_of_zero_one` and
+  `avg_bernstein_lower_of_zero_one`: for `{0,1}` coordinates with mean `μ`, each tail beyond
+  `√(3ℓ(μ + 2ℓ))` has probability at most `e^{-ℓ}`.
 
 The multiplicative Chernoff bounds are in `Dynamics.Chernoff`.
 -/
@@ -417,5 +420,99 @@ theorem variance_le_avg_of_zero_one {f : γ → ℝ} (hf : ∀ y, f y = 0 ∨ f 
   · have hsq : (fun y => f y ^ 2) = f := funext fun y => by rcases hf y with h | h <;> simp [h]
     have h := variance_le_avg_sq f
     rwa [hsq] at h
+
+/-- The mean of a `{0,1}`-valued coordinate is nonnegative. -/
+lemma avg_nonneg_of_zero_one {f : γ → ℝ} (hf : ∀ y, f y = 0 ∨ f y = 1) : 0 ≤ avg f :=
+  avg_nonneg fun y => by rcases hf y with h | h <;> simp [h]
+
+/-- The mean of a `{0,1}`-valued coordinate is at most `1`, also on an empty type. -/
+lemma avg_le_one_of_zero_one {f : γ → ℝ} (hf : ∀ y, f y = 0 ∨ f y = 1) : avg f ≤ 1 := by
+  rcases isEmpty_or_nonempty γ with hγ | hγ
+  · simp [avg]
+  · exact (avg_le_avg fun y => (by rcases hf y with h | h <;> simp [h] : f y ≤ 1)).trans_eq
+      (avg_const 1)
+
+/-! ### Bernstein's lower tail and the two-sided bound for `{0,1}` coordinates -/
+
+/-- **Bernstein's inequality, lower tail**: if every coordinate satisfies `𝔼Yᵢ - Yᵢ ≤ b` and
+`σ²` is at least the variance of `X = ∑ᵢ Yᵢ`, then
+`P(X ≤ 𝔼X - λ) ≤ exp(-λ² / (2σ²(1 + bλ/(3σ²))))` (`avg_bernstein` applied to `-Y`). -/
+theorem avg_bernstein_lower [Nonempty γ] (Y : Fin n → γ → ℝ) {b σ2 lam : ℝ} (hb : 0 < b)
+    (hYb : ∀ i x, avg (Y i) - Y i x ≤ b) (hσ : ∑ i, variance (Y i) ≤ σ2) (hσ0 : 0 < σ2)
+    (hlam : 0 ≤ lam) :
+    avg (fun ω : Fin n → γ =>
+        if ∑ i, Y i (ω i) + lam ≤ ∑ i, avg (Y i) then (1 : ℝ) else 0)
+      ≤ exp (-(lam ^ 2 / (2 * σ2 * (1 + b * lam / (3 * σ2))))) := by
+  have havg (i : Fin n) : avg (fun x => -Y i x) = -avg (Y i) := by
+    simpa only [neg_one_mul] using avg_const_mul (-1) (Y i)
+  have hvar (i : Fin n) : variance (fun x => -Y i x) = variance (Y i) := by
+    unfold variance
+    rw [havg]
+    congr 1
+    funext x
+    ring
+  have key := avg_bernstein (fun i x => -Y i x) hb
+    (fun i x => by simp only [havg]; linarith [hYb i x]) (by simpa only [hvar] using hσ) hσ0 hlam
+  refine le_trans (le_of_eq ?_) key
+  congr 1
+  funext ω
+  simp only [havg, sum_neg_distrib]
+  congr 1
+  apply propext
+  constructor <;> intro h <;> linarith
+
+/-- The exponent of Bernstein's bound with `b = 1`, `σ² = M ≥ 2ℓ` and `λ = √(3ℓM)` is at
+least `ℓ`. -/
+lemma bernstein_exponent_le {ℓ M : ℝ} (hℓ : 0 < ℓ) (hM : 2 * ℓ ≤ M) :
+    exp (-(√(3 * ℓ * M) ^ 2 / (2 * M * (1 + 1 * √(3 * ℓ * M) / (3 * M))))) ≤ exp (-ℓ) := by
+  apply exp_le_exp.mpr
+  have hM0 : 0 < M := by linarith
+  have hl0 : 0 ≤ √(3 * ℓ * M) := sqrt_nonneg _
+  have hsq : √(3 * ℓ * M) ^ 2 = 3 * ℓ * M := sq_sqrt (by positivity)
+  -- `2λ ≤ 3M`, from `4λ² = 12ℓM ≤ 9M²`
+  have hlam : 2 * √(3 * ℓ * M) ≤ 3 * M := by nlinarith
+  have hden : 0 < 2 * M * (1 + 1 * √(3 * ℓ * M) / (3 * M)) := by positivity
+  rw [neg_le_neg_iff, le_div_iff₀ hden, hsq]
+  have e : 2 * M * (1 + 1 * √(3 * ℓ * M) / (3 * M)) = 2 * M + 2 * √(3 * ℓ * M) / 3 := by
+    field_simp
+  rw [e]
+  nlinarith
+
+/-- **Bernstein's inequality for `{0,1}` coordinates**, upper tail: with mean `μ = 𝔼X` and
+`ℓ > 0`, `P(X ≥ μ + √(3ℓ(μ + 2ℓ))) ≤ e^{-ℓ}` (`avg_bernstein` with `b = 1` and variance bound
+`μ + 2ℓ`). The deviation is `≈ √(3ℓμ)` for large means. -/
+theorem avg_bernstein_of_zero_one [Nonempty γ] (Y : Fin n → γ → ℝ)
+    (hY : ∀ i x, Y i x = 0 ∨ Y i x = 1) {ℓ : ℝ} (hℓ : 0 < ℓ) :
+    avg (fun ω : Fin n → γ =>
+        if (∑ i, avg (Y i)) + √(3 * ℓ * (∑ i, avg (Y i) + 2 * ℓ)) ≤ ∑ i, Y i (ω i)
+        then (1 : ℝ) else 0)
+      ≤ exp (-ℓ) := by
+  set μ := ∑ i, avg (Y i)
+  have hμ0 : 0 ≤ μ := sum_nonneg fun i _ => avg_nonneg_of_zero_one (hY i)
+  have hσ : ∑ i, variance (Y i) ≤ μ + 2 * ℓ :=
+    (sum_le_sum fun i _ => variance_le_avg_of_zero_one (hY i)).trans (by linarith)
+  have hb (i : Fin n) (x : γ) : Y i x - avg (Y i) ≤ 1 := by
+    have := avg_nonneg_of_zero_one (hY i)
+    rcases hY i x with h | h <;> rw [h] <;> linarith
+  exact (avg_bernstein Y one_pos hb hσ (by linarith) (sqrt_nonneg (3 * ℓ * (μ + 2 * ℓ)))).trans
+    (bernstein_exponent_le hℓ (by linarith))
+
+/-- **Bernstein's inequality for `{0,1}` coordinates**, lower tail: with mean `μ = 𝔼X` and
+`ℓ > 0`, `P(X ≤ μ - √(3ℓ(μ + 2ℓ))) ≤ e^{-ℓ}`. -/
+theorem avg_bernstein_lower_of_zero_one [Nonempty γ] (Y : Fin n → γ → ℝ)
+    (hY : ∀ i x, Y i x = 0 ∨ Y i x = 1) {ℓ : ℝ} (hℓ : 0 < ℓ) :
+    avg (fun ω : Fin n → γ =>
+        if ∑ i, Y i (ω i) + √(3 * ℓ * (∑ i, avg (Y i) + 2 * ℓ)) ≤ ∑ i, avg (Y i)
+        then (1 : ℝ) else 0)
+      ≤ exp (-ℓ) := by
+  set μ := ∑ i, avg (Y i)
+  have hμ0 : 0 ≤ μ := sum_nonneg fun i _ => avg_nonneg_of_zero_one (hY i)
+  have hσ : ∑ i, variance (Y i) ≤ μ + 2 * ℓ :=
+    (sum_le_sum fun i _ => variance_le_avg_of_zero_one (hY i)).trans (by linarith)
+  have hb (i : Fin n) (x : γ) : avg (Y i) - Y i x ≤ 1 := by
+    have := avg_le_one_of_zero_one (hY i)
+    rcases hY i x with h | h <;> rw [h] <;> linarith
+  exact (avg_bernstein_lower Y one_pos hb hσ (by linarith)
+    (sqrt_nonneg (3 * ℓ * (μ + 2 * ℓ)))).trans (bernstein_exponent_le hℓ (by linarith))
 
 end Dynamics

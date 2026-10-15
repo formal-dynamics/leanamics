@@ -82,16 +82,13 @@ lemma transition_product_bool (H : Kernel V) (s t : Config V Bool) :
     calc
       (H i).prob (fun j => s j = false) =
           (H i).expect (fun j => 1 - (if s j then 1 else 0)) := by
-        unfold Distribution.prob
+        rw [Distribution.prob_eq_expect]
         congr 1
         funext j
-        cases hsj : s j <;> simp [hsj]
+        cases s j <;> simp
       _ = _ := by rw [Distribution.expect_sub, Distribution.expect_const]
   · simp only [if_true]
-    unfold Distribution.prob
-    congr 1
-    funext j
-    cases hsj : s j <;> simp [hsj]
+    rw [Distribution.prob_eq_expect]
 
 /-- Weighted color mass for any real-valued color observable. -/
 noncomputable def mass (p : Distribution V) (f : C → ℝ) (s : Config V C) : ℝ :=

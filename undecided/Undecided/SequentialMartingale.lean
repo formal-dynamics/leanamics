@@ -105,17 +105,4 @@ theorem expList_ind_le_of_weight [Fintype R] {φ : S → R → ℝ} {F : S → �
 
 end Generic
 
-section Lists
-variable {α : Type*} [Fintype α]
-
-/-- The complementary event has the complementary probability. -/
-lemma expList_one_sub [Nonempty α] (T : ℕ) (G : List α → ℝ) :
-    expList α T (fun l => 1 - G l) = 1 - expList α T G := by
-  have h := expList_add (α := α) T (fun _ => 1) (fun l => (-1) * G l)
-  simp only [expList_const, expList_const_mul] at h
-  rw [show (fun l => 1 - G l) = fun l => 1 + (-1) * G l by funext l; ring, h]
-  ring
-
-end Lists
-
 end Undecided.Sequential
