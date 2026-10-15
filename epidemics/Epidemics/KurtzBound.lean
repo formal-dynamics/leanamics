@@ -114,7 +114,7 @@ lemma deviationProb_le_azuma (hβ : 0 < β) (hγ : 0 < γ) (hN : 0 < N) {x₀ : 
   calc expList (Round N β γ) n _
       ≤ expList (Round N β γ) n (fun l ↦ ∑ j : Fin 3,
           (mgEvent β γ x₀ δ n j false l + mgEvent β γ x₀ δ n j true l)) :=
-        expList_le_expList_of_length
+        expList_le_of_length
           (fail_indicator_le hβ hγ hN hx hs hi hr hsum hδ hnT hθ)
     _ = ∑ j : Fin 3, (expList (Round N β γ) n (mgEvent β γ x₀ δ n j false)
           + expList (Round N β γ) n (mgEvent β γ x₀ δ n j true)) := by

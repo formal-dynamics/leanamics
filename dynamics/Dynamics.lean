@@ -14,6 +14,7 @@ import Dynamics.Hitting
 import Dynamics.Lazy
 import Dynamics.Independent
 import Dynamics.OptionalStopping
+import Dynamics.Perturbed
 import Dynamics.Phases
 import Dynamics.RandomWalk
 import Dynamics.Reverse

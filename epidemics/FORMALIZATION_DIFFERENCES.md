@@ -396,28 +396,16 @@ paper mentions but omits after Theorem 2.5; its shape follows claim 2 of Theorem
    nodes is the final recovered set `(run G ω I₀ (Fintype.card V)).recovered`.
 10. **Erdős–Rényi corollary** (an addition): `G(n, c/n)` is `perc ⊤ ω` with `coins (c/n)`; the
     hypotheses `0 ≤ c/n ≤ 1` are needed to form the coins.
-11. **Local lemmas.** The binomial tail `binTail` with its recursion, the scalar inequality
-    `(1 - ε) e^ε ≤ 1 - ε²/2` (`one_sub_mul_exp_le`) and the two conditioning lemmas for
-    independent products (`independent_expect_update`, `independent_expect_fin_succ`,
-    `coins_prob_split`) are not in `dynamics/` yet; their move is tracked in issues #44 and #46.
-    The event lemmas (monotonicity, congruence, sure and impossible events, complement, union
-    bound), Markov's inequality on `exp (t X)` and the moment-generating-function bound are the
-    core's (`Dynamics.Distribution`).
-11. **Local lemmas.** The binomial tail `binTail` with its recursion, `prob_eq_one`,
-    `prob_eq_zero` and the two conditioning lemmas for independent products
-    (`independent_expect_update`, `independent_expect_fin_succ`, `coins_prob_split`) are not in
-    `dynamics/` yet; their move is tracked in issues #42, #44 and #46. Monotonicity, Markov's
-    inequality on `exp (t X)`, the moment-generating-function bound and the scalar inequality
-    `(1 - ε) e^ε ≤ 1 - ε²/2` are the core's (`one_sub_mul_exp_le` restates
-    `one_sub_mul_exp_le_one_sub_sq_div_two` under its blueprint name); congruence, complement
-    and the union bound are shared with EPI-3 (`GiantCoins.lean`).
-    `(1 - ε) e^ε ≤ 1 - ε²/2` (`one_sub_mul_exp_le`), `prob_eq_one`, `prob_eq_zero` and the
-    conditioning of the coins on one pair (`coins_prob_split`) are not in `dynamics/` yet; their
-    move is tracked in issues #42 and #44. The conditioning lemmas for independent products
-    (`Distribution.independent_expect_eq_sum_update`, `Distribution.independent_expect_fin_succ`,
-    `Distribution.independent_prob_fin_succ`) are the core's (`Dynamics.Independent`). Monotonicity, Markov's inequality on `exp (t X)` and the
-    moment-generating-function bound are the core's; congruence, complement and the union bound
-    are shared with EPI-3 (`GiantCoins.lean`).
+11. **Shared lemmas.** The binomial tail `Distribution.binTail` with its recursion
+    `binTail_succ_succ`, the conditioning of independent coins on one coin
+    (`Distribution.independent_bernoulli_prob_split`), the scalar inequality
+    `(1 - ε) e^ε ≤ 1 - ε²/2` (`one_sub_mul_exp_le_one_sub_sq_div_two`), Markov's inequality on
+    `exp (t X)` with the moment-generating-function bound (the fixed-tilt tail
+    `Distribution.prob_ge_le_exp_tilt`), the conditioning lemmas for independent products
+    (`Distribution.independent_expect_eq_sum_update`, `Distribution.independent_prob_fin_succ`,
+    in `Dynamics.Independent`) and the event lemmas (monotonicity, congruence, sure and
+    impossible events, complement, union bound) are the core's (`dynamics/`). Only the
+    arithmetic of the paper's constants (`binomial_tail_le`) and the exploration are local.
 
 ## Small-world networks below the percolation threshold (`SmallWorld*`, EPI-6)
 

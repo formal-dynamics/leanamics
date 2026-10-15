@@ -1,4 +1,5 @@
 import Dynamics.ChernoffAux
+import Dynamics.Independent
 
 /-!
 # Chernoff bounds for independent, non-identical Bernoulli trials
@@ -32,6 +33,11 @@ For uniform rounds over `Fin n` the file also gives the MGF bound `avg_chernoff_
 tails for a free parameter `t` (`avg_chernoff_upper_of_mgf`, `avg_chernoff_lower_of_mgf`),
 the closed forms `exp(k - μ - k log(k/μ))` at an arbitrary threshold `k`
 (`avg_chernoff_upper_log`, `avg_chernoff_lower_log`) and `avg_chernoff_lower_mul`.
+
+For identical coins it also defines the binomial tail `Distribution.binTail p m k` (at least `k`
+heads among `m` Bernoulli(`p`) coins) with its one-step recursion `binTail_succ_succ`, and the
+conditioning of independent Bernoulli(`p`) coins on one coin
+(`independent_bernoulli_prob_split`).
 -/
 
 namespace Dynamics
@@ -190,6 +196,56 @@ theorem bernoulli_chernoff_lower {ι : Type*} [Fintype ι] [DecidableEq ι]
     (fun i b => by split_ifs <;> simp) hδ0 hδ1
     (hμL.trans_eq (sum_bernoulli_expect p hp0 hp1 S).symm)
   simpa only [sum_ite_mem_ite_eq_card] using h
+
+/-! ### Identical coins: conditioning on one coin, binomial tails -/
+
+/-- **Conditioning independent Bernoulli(`p`) coins on one coin** `e`: an event has probability
+`p P(s with ω e set to true) + (1 - p) P(s with ω e set to false)`. -/
+lemma independent_bernoulli_prob_split {α : Type*} [Fintype α] [DecidableEq α] (p : ℝ)
+    (h0 : 0 ≤ p) (h1 : p ≤ 1) (e : α) (s : (α → Bool) → Prop) :
+    (independent fun _ : α => bernoulli p h0 h1).prob s =
+      p * (independent fun _ : α => bernoulli p h0 h1).prob
+          (fun ω => s (Function.update ω e true)) +
+        (1 - p) * (independent fun _ : α => bernoulli p h0 h1).prob
+          (fun ω => s (Function.update ω e false)) := by
+  classical
+  simp only [prob_eq_expect]
+  rw [independent_expect_eq_sum_update _ e, Fintype.sum_bool]
+  simp [bernoulli]
+
+/-- The tail of a binomial distribution: the probability of at least `k` successes in `m`
+independent Bernoulli(`p`) trials. -/
+noncomputable def binTail (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) (m k : ℕ) : ℝ :=
+  (independent fun _ : Fin m => bernoulli p h0 h1).prob
+    (fun ξ => k ≤ (univ.filter fun i => ξ i = true).card)
+
+section BinTail
+variable {p : ℝ} (h0 : 0 ≤ p) (h1 : p ≤ 1)
+
+lemma binTail_zero_right (m : ℕ) : binTail p h0 h1 m 0 = 1 :=
+  prob_eq_one _ fun _ => Nat.zero_le _
+
+lemma binTail_nonneg (m k : ℕ) : 0 ≤ binTail p h0 h1 m k :=
+  prob_nonneg _ _
+
+/-- **One-step recursion of the binomial tail**: condition on the first trial. -/
+lemma binTail_succ_succ (m k : ℕ) :
+    binTail p h0 h1 (m + 1) (k + 1) =
+      p * binTail p h0 h1 m k + (1 - p) * binTail p h0 h1 m (k + 1) := by
+  -- successes among `b` followed by `r`
+  have hcons (b : Bool) (r : Fin m → Bool) :
+      (univ.filter fun i => (Fin.cons b r : Fin (m + 1) → Bool) i = true).card =
+        (if b = true then 1 else 0) + (univ.filter fun i => r i = true).card := by
+    rw [card_filter, card_filter, Fin.sum_univ_succ]
+    simp
+  unfold binTail
+  rw [independent_prob_fin_succ, Fintype.sum_bool]
+  simp only [hcons, if_true, Bool.false_eq_true, if_false, zero_add]
+  have ht : ∀ c : ℕ, k + 1 ≤ 1 + c ↔ k ≤ c := fun c => by omega
+  simp only [ht]
+  simp [bernoulli]
+
+end BinTail
 
 end Distribution
 

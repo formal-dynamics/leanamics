@@ -1,63 +1,24 @@
-import Epidemics.SubcriticalProb
+import Dynamics.Chernoff
 
-/-! # Binomial tails and the Chernoff bound of Theorem E.1 (EPI-2)
+/-! # The Chernoff bound of Theorem E.1 (EPI-2)
 
-The tail `binTail p m k` of the number of successes in `m` independent Bernoulli(`p`) trials (the
-coin `Distribution.bernoulli` of the Chernoff bounds of `dynamics/`), its one-step recursion
-(condition on the first trial), and the Chernoff bound used in the proof of Theorem E.1 of
-Becchetti, Clementi, Denni, Pasquale, Trevisan, Ziccardi, *Percolation and epidemic processes in
-one-dimensional small-world networks* (arXiv:2103.16398).
+The Chernoff bound used in the proof of Theorem E.1 of Becchetti, Clementi, Denni, Pasquale,
+Trevisan, Ziccardi, *Percolation and epidemic processes in one-dimensional small-world networks*
+(arXiv:2103.16398), for the number of successes in independent Bernoulli(`p`) trials (the coin
+`Distribution.bernoulli` of the Chernoff bounds of `dynamics/`). The binomial tail
+`Distribution.binTail` and its one-step recursion `Distribution.binTail_succ_succ`, used by the
+exploration of `SubcriticalExploration.lean`, are the core's (`Dynamics.Chernoff`).
 
 The paper tilts by `ε` rather than by the optimal `log (1 + δ)`, which gives its closed form
 `exp (ε - ε² t / 2)`. Markov's inequality on `exp (ε X)`, the bound on the moment-generating
-function and the scalar inequality `(1 - ε) e^ε ≤ 1 - ε² / 2` are the core's fixed-tilt tail
+function and the scalar inequality `(1 - ε) e^ε ≤ 1 - ε² / 2`
+(`one_sub_mul_exp_le_one_sub_sq_div_two`) are the core's fixed-tilt tail
 `Distribution.prob_ge_le_exp_tilt` (`Dynamics.ChernoffAux`, FND-3); only the arithmetic of the
 paper's constants is local.
 -/
 
 namespace Epidemics
 open Finset Dynamics
-
-/-- The tail of a binomial distribution: the probability of at least `k` successes in `m`
-independent Bernoulli(`p`) trials. -/
-noncomputable def binTail (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) (m k : ℕ) : ℝ :=
-  (Distribution.independent fun _ : Fin m => Distribution.bernoulli p h0 h1).prob
-    (fun ξ => k ≤ (univ.filter fun i => ξ i = true).card)
-
-section BinTail
-variable {p : ℝ} (h0 : 0 ≤ p) (h1 : p ≤ 1)
-
-lemma binTail_zero_right (m : ℕ) : binTail p h0 h1 m 0 = 1 :=
-  Distribution.prob_eq_one _ fun _ => Nat.zero_le _
-
-lemma binTail_nonneg (m k : ℕ) : 0 ≤ binTail p h0 h1 m k :=
-  Distribution.prob_nonneg _ _
-
-/-- Successes among `b` followed by `r`. -/
-lemma card_filter_cons {m : ℕ} (b : Bool) (r : Fin m → Bool) :
-    (univ.filter fun i => (Fin.cons b r : Fin (m + 1) → Bool) i = true).card =
-      (if b = true then 1 else 0) + (univ.filter fun i => r i = true).card := by
-  rw [card_filter, card_filter, Fin.sum_univ_succ]
-  simp
-
-/-- **One-step recursion of the binomial tail**: condition on the first trial. -/
-lemma binTail_succ_succ (m k : ℕ) :
-    binTail p h0 h1 (m + 1) (k + 1) =
-      p * binTail p h0 h1 m k + (1 - p) * binTail p h0 h1 m (k + 1) := by
-  unfold binTail
-  rw [Distribution.independent_prob_fin_succ, Fintype.sum_bool]
-  simp only [card_filter_cons, if_true, Bool.false_eq_true, if_false, zero_add]
-  have ht : ∀ c : ℕ, k + 1 ≤ 1 + c ↔ k ≤ c := fun c => by omega
-  simp only [ht]
-  simp [Distribution.bernoulli]
-
-end BinTail
-
-/-- The key scalar inequality `(1 - ε) e^ε ≤ 1 - ε² / 2` for `0 ≤ ε < 1` (the core
-`Dynamics.one_sub_mul_exp_le_one_sub_sq_div_two`). -/
-lemma one_sub_mul_exp_le {ε : ℝ} (hε : 0 ≤ ε) (hε1 : ε < 1) :
-    (1 - ε) * Real.exp ε ≤ 1 - ε ^ 2 / 2 :=
-  one_sub_mul_exp_le_one_sub_sq_div_two hε hε1
 
 /-- **Chernoff bound** for the proof of Theorem E.1: if `p (d - 1) ≤ 1 - ε` with `0 < ε < 1`, then
 at least `t` successes among `t (d - 1) + 1` independent Bernoulli(`p`) trials occur with
