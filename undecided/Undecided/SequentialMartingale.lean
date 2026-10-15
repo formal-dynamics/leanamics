@@ -105,18 +105,4 @@ theorem expList_ind_le_of_weight [Fintype R] {φ : S → R → ℝ} {F : S → �
 
 end Generic
 
-section Lists
-variable {α : Type*} [Fintype α]
-
-/-- `expList α T` only evaluates its argument on lists of length `T`. -/
-lemma expList_le_expList_of_length {T : ℕ} {F G : List α → ℝ}
-    (h : ∀ l : List α, l.length = T → F l ≤ G l) : expList α T F ≤ expList α T G := by
-  induction T generalizing F G with
-  | zero => exact h [] rfl
-  | succ T ih =>
-    rw [expList_succ, expList_succ]
-    exact avg_le_avg fun a => ih fun l hl => h (a :: l) (by simp [hl])
-
-end Lists
-
 end Undecided.Sequential

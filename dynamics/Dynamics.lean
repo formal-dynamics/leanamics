@@ -1,4 +1,5 @@
 import Dynamics.Absorption
+import Dynamics.Azuma
 import Dynamics.Bridge
 import Dynamics.Chernoff
 import Dynamics.Concentration

@@ -56,6 +56,12 @@ lemma avg_const [Nonempty α] (c : ℝ) : avg (fun _ : α => c) = c := by
   rw [sum_const, card_univ, nsmul_eq_mul, mul_comm, mul_div_assoc,
     div_self (ne_of_gt (card_cast_pos (α := α))), mul_one]
 
+/-- A uniform average of values at most one is at most one (also on an empty type). -/
+lemma avg_le_one {f : α → ℝ} (h : ∀ a, f a ≤ 1) : avg f ≤ 1 := by
+  rcases isEmpty_or_nonempty α with hα | hα
+  · simp [avg]
+  · simpa [avg_const] using avg_le_avg h
+
 /-- Expectation of a functional of `T` i.i.d. uniform draws from `α`,
 in transition-operator form: the head draw is averaged out first. -/
 noncomputable def expList (α : Type*) [Fintype α] : ℕ → (List α → ℝ) → ℝ
@@ -74,11 +80,23 @@ lemma expList_nonneg {T : ℕ} {F : List α → ℝ} (h : ∀ l, 0 ≤ F l) :
   | zero => exact h []
   | succ T ih => exact avg_nonneg fun a => ih fun l => h (a :: l)
 
-lemma expList_le_expList {T : ℕ} {F G : List α → ℝ} (h : ∀ l, F l ≤ G l) :
-    expList α T F ≤ expList α T G := by
+/-- `expList α T` only evaluates its argument on lists of length `T`, so it is monotone as soon
+as the comparison holds on those lists. -/
+lemma expList_le_expList_of_length {T : ℕ} {F G : List α → ℝ}
+    (h : ∀ l : List α, l.length = T → F l ≤ G l) : expList α T F ≤ expList α T G := by
   induction T generalizing F G with
+  | zero => exact h [] rfl
+  | succ T ih => exact avg_le_avg fun a => ih fun l hl => h (a :: l) (by simp [hl])
+
+lemma expList_le_expList {T : ℕ} {F G : List α → ℝ} (h : ∀ l, F l ≤ G l) :
+    expList α T F ≤ expList α T G :=
+  expList_le_expList_of_length fun l _ => h l
+
+/-- An `expList` average of values at most one is at most one (also on an empty type). -/
+lemma expList_le_one {T : ℕ} {F : List α → ℝ} (h : ∀ l, F l ≤ 1) : expList α T F ≤ 1 := by
+  induction T generalizing F with
   | zero => exact h []
-  | succ T ih => exact avg_le_avg fun a => ih fun l => h (a :: l)
+  | succ T ih => exact avg_le_one fun a => ih fun l => h (a :: l)
 
 lemma expList_add (T : ℕ) (F G : List α → ℝ) :
     expList α T (fun l => F l + G l) = expList α T F + expList α T G := by
