@@ -1,4 +1,4 @@
-import Dynamics.Kernel
+import Dynamics.Drift
 
 /-!
 # Progress through nested phases
@@ -15,6 +15,14 @@ The proof works phase by phase with the survival observable `outside B`
 with probability at most `ℓ ε` and fails to jump in each of the `ℓ` steps
 with probability at most `ν^ℓ`. The hypothesis `ε ≤ ν` of the paper is not
 needed.
+
+**Phase calculus with a potential** (`iterate_outside_le_of_phases`): if every set `A j` is
+closed under the chain and, for `j < J`, one step from `A j` enters `A (j + 1)` with probability
+at least `1 - q`, then from `A 0` the chain is outside `A J` after `t` steps with probability at
+most `(q + 1/λ)^t λ^J`, for every `λ ≥ 1`. The potential is `λ^{J - j}` in phase `j` (the largest
+`j ≤ J` with the state in `A j`, `phaseOf`) and `0` in `A J` (`phasePot`); it contracts by
+`q + 1/λ` per step, and `iterate_le_pow_of_closed` iterates the contraction. The sets need not
+be nested, and the bound is exponential in `t` rather than a union bound over the phases.
 -/
 
 namespace Dynamics.Kernel
@@ -218,5 +226,135 @@ theorem nested_phases (K : Dynamics.Kernel α) (A : ℕ → Set α) {T : ℕ} (h
   have hν' : (0 : ℝ) ≤ ν ^ ℓ := pow_nonneg hν ℓ
   push_cast
   nlinarith
+
+/-! ### Phase calculus with a potential -/
+
+/-- The phase of `a`: the largest `j ≤ J` with `a ∈ A j` (`0` if there is none). -/
+noncomputable def phaseOf (A : ℕ → Set α) (J : ℕ) (a : α) : ℕ := by
+  classical
+  exact Nat.findGreatest (fun j => a ∈ A j) J
+
+omit [Fintype α] in
+lemma phaseOf_le (A : ℕ → Set α) (J : ℕ) (a : α) : phaseOf A J a ≤ J := by
+  classical
+  unfold phaseOf
+  convert Nat.findGreatest_le J
+
+omit [Fintype α] in
+lemma mem_phaseOf {A : ℕ → Set α} {J : ℕ} {a : α} (h0 : a ∈ A 0) : a ∈ A (phaseOf A J a) := by
+  classical
+  unfold phaseOf
+  convert Nat.findGreatest_spec (P := fun j => a ∈ A j) (Nat.zero_le J) h0
+
+omit [Fintype α] in
+lemma le_phaseOf {A : ℕ → Set α} {J j : ℕ} {a : α} (hj : j ≤ J) (h : a ∈ A j) :
+    j ≤ phaseOf A J a := by
+  classical
+  unfold phaseOf
+  convert Nat.le_findGreatest (P := fun j => a ∈ A j) hj h
+
+/-- The phase potential: `0` on `A J`, and `λ^{J - j}` in phase `j` otherwise. -/
+noncomputable def phasePot (A : ℕ → Set α) (J : ℕ) (lam : ℝ) (a : α) : ℝ := by
+  classical
+  exact if a ∈ A J then 0 else lam ^ (J - phaseOf A J a)
+
+omit [Fintype α] in
+lemma phasePot_le (A : ℕ → Set α) (J : ℕ) {lam : ℝ} (hlam : 1 ≤ lam) (a : α) :
+    phasePot A J lam a ≤ lam ^ J := by
+  unfold phasePot
+  split_ifs
+  · exact pow_nonneg (by linarith) _
+  · exact pow_le_pow_right₀ hlam (Nat.sub_le _ _)
+
+omit [Fintype α] in
+lemma outside_le_phasePot (A : ℕ → Set α) (J : ℕ) {lam : ℝ} (hlam : 1 ≤ lam) (a : α) :
+    outside (A J) a ≤ phasePot A J lam a := by
+  unfold phasePot
+  by_cases h : a ∈ A J
+  · simp [outside_of_mem h, h]
+  · simp only [outside_of_not_mem h, h, if_false]
+    exact one_le_pow₀ hlam
+
+/-- One step of the phase potential contracts it by `q + 1/λ` from every state of `A 0`. -/
+lemma apply_phasePot_le (K : Dynamics.Kernel α) (A : ℕ → Set α) (J : ℕ) {q lam : ℝ}
+    (hlam : 1 ≤ lam) (hclosed : ∀ j ≤ J, ∀ a b, a ∈ A j → (K a).weight b ≠ 0 → b ∈ A j)
+    (hmove : ∀ j < J, ∀ a ∈ A j, 1 - q ≤ (K a).prob (· ∈ A (j + 1)))
+    (a : α) (ha : a ∈ A 0) :
+    K.apply (phasePot A J lam) a ≤ (q + 1 / lam) * phasePot A J lam a := by
+  classical
+  have hlam0 : 0 < lam := by linarith
+  by_cases hJ : a ∈ A J
+  · -- the chain stays in `A J`, where the potential vanishes
+    have h := K.iterate_le_of_closed (· ∈ A J) (hclosed J le_rfl) (F := phasePot A J lam)
+      (F' := fun _ => 0) (fun b hb => by simp [phasePot, hb]) 1 a hJ
+    rw [K.iterate_const] at h
+    have h0 : phasePot A J lam a = 0 := by simp [phasePot, hJ]
+    rw [h0, mul_zero]
+    exact h
+  · set m := phaseOf A J a with hm
+    have hmJ : m < J := by
+      rcases lt_or_eq_of_le (phaseOf_le A J a) with h | h
+      · exact h
+      · exact absurd (h ▸ mem_phaseOf (J := J) ha) hJ
+    have ham : a ∈ A m := mem_phaseOf ha
+    have hpot : phasePot A J lam a = lam ^ (J - m) := by simp [phasePot, hJ, hm]
+    have hsplit : J - m = (J - (m + 1)) + 1 := by omega
+    -- pointwise bound on `A m`, which the chain does not leave
+    have hpt : ∀ b, b ∈ A m → phasePot A J lam b ≤
+        lam ^ (J - (m + 1)) + lam ^ (J - m) * outside (A (m + 1)) b := by
+      intro b hb
+      have hpow0 : 0 ≤ lam ^ (J - (m + 1)) := pow_nonneg hlam0.le _
+      have hout : 0 ≤ lam ^ (J - m) * outside (A (m + 1)) b :=
+        mul_nonneg (pow_nonneg hlam0.le _) (outside_nonneg _ _)
+      by_cases hbJ : b ∈ A J
+      · simp only [phasePot, hbJ, if_true]
+        linarith
+      · simp only [phasePot, hbJ, if_false]
+        have hbm : m ≤ phaseOf A J b := le_phaseOf hmJ.le hb
+        by_cases hb1 : b ∈ A (m + 1)
+        · have hbm1 : m + 1 ≤ phaseOf A J b := le_phaseOf hmJ hb1
+          have := pow_le_pow_right₀ hlam (Nat.sub_le_sub_left hbm1 J)
+          linarith
+        · rw [outside_of_not_mem hb1, mul_one]
+          have := pow_le_pow_right₀ hlam (Nat.sub_le_sub_left hbm J)
+          linarith
+    have hE := K.iterate_le_of_closed (· ∈ A m) (hclosed m hmJ.le) hpt 1 a ham
+    have hlin : K.iterate 1 (fun b => lam ^ (J - (m + 1)) + lam ^ (J - m) *
+        outside (A (m + 1)) b) a =
+        lam ^ (J - (m + 1)) + lam ^ (J - m) * (1 - (K a).prob (· ∈ A (m + 1))) := by
+      rw [K.iterate_add, K.iterate_const, K.iterate_mul]
+      simp only [iterate_succ, iterate_zero]
+      rw [apply_outside]
+    rw [hlin] at hE
+    have hprob : 1 - (K a).prob (· ∈ A (m + 1)) ≤ q := by linarith [hmove m hmJ a ham]
+    have hmul := mul_le_mul_of_nonneg_left hprob (pow_nonneg hlam0.le (J - m))
+    have hid : lam ^ (J - (m + 1)) = 1 / lam * lam ^ (J - m) := by
+      rw [hsplit, pow_succ]
+      field_simp
+    rw [hpot]
+    calc K.apply (phasePot A J lam) a = K.iterate 1 (phasePot A J lam) a := rfl
+      _ ≤ lam ^ (J - (m + 1)) + lam ^ (J - m) * (1 - (K a).prob (· ∈ A (m + 1))) := hE
+      _ ≤ 1 / lam * lam ^ (J - m) + lam ^ (J - m) * q := by rw [hid]; linarith
+      _ = (q + 1 / lam) * lam ^ (J - m) := by ring
+
+/-- **Phase calculus.** Let every set `A j` (`j ≤ J`) be closed under the chain, and let one step
+from `A j` enter `A (j + 1)` with probability at least `1 - q` for `j < J`. Then from any state
+of `A 0`, the chain is outside `A J` after `t` steps with probability at most
+`(q + 1/λ)^t λ^J`, for every `λ ≥ 1`. -/
+theorem iterate_outside_le_of_phases (K : Dynamics.Kernel α) (A : ℕ → Set α) (J : ℕ)
+    {q lam : ℝ} (hq : 0 ≤ q) (hlam : 1 ≤ lam)
+    (hclosed : ∀ j ≤ J, ∀ a b, a ∈ A j → (K a).weight b ≠ 0 → b ∈ A j)
+    (hmove : ∀ j < J, ∀ a ∈ A j, 1 - q ≤ (K a).prob (· ∈ A (j + 1)))
+    (a : α) (ha : a ∈ A 0) (t : ℕ) :
+    K.iterate t (outside (A J)) a ≤ (q + 1 / lam) ^ t * lam ^ J := by
+  have hlam0 : 0 < lam := by linarith
+  have hθ : 0 ≤ q + 1 / lam := by positivity
+  have hit := K.iterate_le_pow_of_closed (· ∈ A 0) (hclosed 0 (Nat.zero_le J))
+    (phasePot A J lam) hθ (fun b hb => apply_phasePot_le K A J hlam hclosed hmove b hb) t a ha
+  calc K.iterate t (outside (A J)) a ≤ K.iterate t (phasePot A J lam) a :=
+        K.iterate_mono t (outside_le_phasePot A J hlam) a
+    _ ≤ (q + 1 / lam) ^ t * phasePot A J lam a := hit
+    _ ≤ (q + 1 / lam) ^ t * lam ^ J :=
+        mul_le_mul_of_nonneg_left (phasePot_le A J hlam a) (pow_nonneg hθ t)
 
 end Dynamics.Kernel

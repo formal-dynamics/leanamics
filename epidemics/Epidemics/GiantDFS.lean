@@ -1084,11 +1084,11 @@ theorem mem_found_iff_of_queryAnswers (e₀ : Sym2 V) (ω : Sym2 V → Bool) (t 
     e ∈ (ofAnswers V (queryAnswers (nextQuery e₀) ω t)).found ↔ ω e = true := by
   induction t generalizing e with
   | zero =>
-    simp [queryAnswers, ofAnswers_nil, settle_queried, init] at he
+    simp [ofAnswers_nil, settle_queried, init] at he
   | succ t ih =>
     set A := queryAnswers (nextQuery e₀) ω t
     have hs := inv_ofAnswers (V := V) A
-    simp only [queryAnswers] at he ⊢
+    simp only [queryAnswers_succ] at he ⊢
     rw [ofAnswers_append_singleton, settle_queried] at he
     rw [ofAnswers_append_singleton, settle_found]
     rcases pending_answer (s := ofAnswers V A) (ω (nextQuery e₀ A)) with

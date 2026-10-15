@@ -1,5 +1,6 @@
 import Dynamics.DriftAux
 import Dynamics.Rounds
+import Dynamics.Scalar
 
 /-!
 # Drift theorems: from an expected potential drop to absorption
@@ -20,7 +21,8 @@ the voter model in dynamic networks*, ICALP 2016, [arXiv:1603.01895]:
   for every state, then `𝔼[Ψ_T] ≤ ∏_{t < T} (1 - δ_t) Ψ(x₀)` and, by Markov's inequality, the
   chain survives to time `T` with probability at most `∏_{t < T} (1 - δ_t) Ψ(x₀) / Ψ_min`, where
   `Ψ_min` bounds the nonzero values of `Ψ` from below.
-  (`multiplicative_drift_seq`, `multiplicative_drift`.)
+  (`multiplicative_drift_seq`, `multiplicative_drift`; with `∏ (1 - δ_t) ≤ exp (-∑ δ_t)`,
+  `multiplicative_drift_seq_exp`.)
 
 The `_seq` versions allow a time-dependent chain (`iterateSeq`) and time-dependent drift, as for
 the dynamic graphs of the paper; the others are their time-homogeneous specializations, stated
@@ -28,6 +30,9 @@ with `Kernel.event`.
 **Fixed-time drift with an additive error** (`iterate_le_of_drift`, and `expList_le_of_drift` for
 round-based processes): if one step maps `φ` to at most `ρ φ + ε` in expectation, with
 `0 ≤ ρ ≤ 1` and `ε ≥ 0`, then after `T` steps the expected potential is at most `ρ^T φ + T ε`.
+**Contraction on a closed region** (`iterate_le_pow_of_closed`): if the chain cannot leave a
+region `R` and one step contracts `Ψ` by `θ` on `R`, then `t` steps contract it by `θ^t` on `R`;
+observables ordered on `R` have ordered expectations from `R` (`iterate_le_of_closed`).
 -/
 
 namespace Dynamics.Kernel
@@ -139,6 +144,20 @@ theorem multiplicative_drift (K : Dynamics.Kernel α) (Ψ : α → ℝ) {δ Ψmi
     (fun _ _ => hdrift) x₀
   rwa [prod_const, card_range] at h
 
+/-- **Multiplicative drift, exponential form.** Under the hypotheses of
+`multiplicative_drift_seq`, with every rate `δ t ≤ 1`, the chain started at `x₀` still has
+`Ψ > 0` at time `T` with probability at most `exp (-∑_{t < T} δ t) Ψ(x₀) / Ψmin`. -/
+theorem multiplicative_drift_seq_exp (K : ℕ → Dynamics.Kernel α) (Ψ : α → ℝ) (δ : ℕ → ℝ)
+    (T : ℕ) {Ψmin : ℝ} (hΨ : ∀ x, 0 ≤ Ψ x) (hmin : 0 < Ψmin)
+    (hgap : ∀ x, 0 < Ψ x → Ψmin ≤ Ψ x) (hδ : ∀ t < T, δ t ≤ 1)
+    (hdrift : ∀ t < T, ∀ x, (K t).apply Ψ x ≤ (1 - δ t) * Ψ x) (x₀ : α) :
+    iterateSeq K T (fun x => if 0 < Ψ x then 1 else 0) x₀
+      ≤ Real.exp (-∑ t ∈ range T, δ t) * Ψ x₀ / Ψmin := by
+  refine (multiplicative_drift_seq K Ψ δ T hΨ hmin hgap hdrift x₀).trans ?_
+  gcongr
+  · exact hΨ x₀
+  · exact prod_one_sub_le_exp_neg_sum _ δ fun t ht => hδ t (mem_range.mp ht)
+
 /-! ### Fixed-time drift with an additive error -/
 
 /-- **Fixed-time drift.** If one step of `K` maps the potential `φ` to at most `ρ φ + ε`, with
@@ -163,6 +182,45 @@ lemma iterate_le_of_drift (K : Dynamics.Kernel α) (φ : α → ℝ) {ρ ε : �
           push_cast
           rw [pow_succ]
           linarith
+
+/-! ### Contraction on a closed region -/
+
+/-- **Comparison on a closed region.** If the region `Q` is closed under the transitions of `K`
+(every state of positive weight from a state of `Q` is in `Q`) and `F ≤ F'` on `Q`, then
+`𝔼_x F(X_n) ≤ 𝔼_x F'(X_n)` from every state `x` of `Q`. -/
+lemma iterate_le_of_closed (K : Dynamics.Kernel α) (Q : α → Prop)
+    (hQ : ∀ y z, Q y → (K y).weight z ≠ 0 → Q z) {F F' : α → ℝ}
+    (hF : ∀ y, Q y → F y ≤ F' y) (n : ℕ) : ∀ x, Q x → K.iterate n F x ≤ K.iterate n F' x := by
+  induction n with
+  | zero => exact hF
+  | succ n ih =>
+    intro x hx
+    rw [iterate_succ, iterate_succ]
+    unfold apply Distribution.expect
+    refine sum_le_sum fun z _ => ?_
+    by_cases hz : (K x).weight z = 0
+    · simp [hz]
+    · exact mul_le_mul_of_nonneg_left (ih z (hQ x z hx hz)) ((K x).nonneg z)
+
+/-- **Contraction on a closed region.** If the region `R` is closed under the transitions of `K`
+and one step contracts the potential `Ψ` by `θ ≥ 0` from every state of `R`, then `t` steps
+contract it by `θ ^ t` from every state of `R`. -/
+lemma iterate_le_pow_of_closed (K : Dynamics.Kernel α) (R : α → Prop)
+    (hR : ∀ a b, R a → (K a).weight b ≠ 0 → R b) (Ψ : α → ℝ) {θ : ℝ} (hθ : 0 ≤ θ)
+    (hstep : ∀ a, R a → K.apply Ψ a ≤ θ * Ψ a) :
+    ∀ t a, R a → K.iterate t Ψ a ≤ θ ^ t * Ψ a := by
+  intro t
+  induction t with
+  | zero => intro a _; simp
+  | succ t ih =>
+    intro a ha
+    -- the first step: `K^{t+1} Ψ = K^t (K Ψ) ≤ K^t (θ Ψ) = θ K^t Ψ`
+    rw [K.iterate_add_time t 1]
+    calc K.iterate t (K.iterate 1 Ψ) a ≤ K.iterate t (fun b => θ * Ψ b) a :=
+          K.iterate_le_of_closed R hR (fun b hb => hstep b hb) t a ha
+      _ = θ * K.iterate t Ψ a := by rw [K.iterate_mul]
+      _ ≤ θ * (θ ^ t * Ψ a) := mul_le_mul_of_nonneg_left (ih a ha) hθ
+      _ = θ ^ (t + 1) * Ψ a := by ring
 
 end Dynamics.Kernel
 
