@@ -8,7 +8,7 @@ uses Lean 4.32.0 and Mathlib revision
 | --- | --- |
 | `Uniform` | Finite averages, recursive uniform trajectory expectations, independence, reindexing; extracted from 3-majority |
 | `Equivalence` | `expList_eq_avg_ofFn`, the recursive `expList` is the uniform average over `Fin T → α` |
-| `Distribution` | Normalized nonnegative real weights, expectations, event probabilities, uniform distributions, point masses, independent products, pushforward |
+| `Distribution` | Normalized nonnegative real weights, expectations, event probabilities and their elementary bounds (monotonicity, complement, union bounds, inclusion–exclusion, Markov's inequality), uniform distributions, point masses, independent products, pushforward |
 | `Bridge` | The three expectation APIs agree: `avg` is Mathlib's `𝔼 a, f a` (`avg_eq_expect`), the product of uniform laws is uniform (`Distribution.independent_uniform_expect`), and `expList` is the expectation over `T` i.i.d. draws in Mathlib's and in the distribution form (`expList_eq_expect`, `expList_eq_independent_expect`) |
 | `Kernel` | Finite stochastic kernels, finite-time expectations, events, stationarity, harmonic observables |
 | `Trajectory` | Weighted history/endpoint expectations and agreement with kernel iteration |

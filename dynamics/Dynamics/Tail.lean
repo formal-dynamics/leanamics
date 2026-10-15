@@ -9,7 +9,8 @@ shared finite layer (monotonicity of probability in the event is `Distribution.p
 
 * `Distribution.expect_lt_one`, `avg_lt_one`: an observable bounded by `1` that is strictly
   below `1` at a point of positive weight has expectation strictly below `1`.
-* `avg_markov`: **Markov's inequality** `P(X ≥ c) ≤ 𝔼X / c` for uniform averages, and
+* `avg_markov`: **Markov's inequality** `P(X ≥ c) ≤ 𝔼X / c` for uniform averages (for any
+  distribution it is `Distribution.prob_le_expect_div`), and
   `avg_markov_one`: its form `P(X ≥ 1) ≤ 𝔼X` for a sum of independent nonnegative
   coordinates.
 * `Kernel.one_sub_avg_le_prob_ofStep`: one uniformly random round lands in an event with
