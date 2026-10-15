@@ -1,5 +1,6 @@
 import RumorSpread.PullOneRound
 import RumorSpread.PullPhases
+import Dynamics.Moments
 
 /-!
 # The two one-round inputs of the PULL proof
@@ -11,8 +12,9 @@ import RumorSpread.PullPhases
   nodes, so the reverse-Markov argument of `prob_goodRound` does not apply. We use a second
   moment instead: the number `X` of uninformed callers that call into `I` has mean
   `μ = (n - m) m/(n-1) ≥ max(m/2, 1/2)` and, the calls being pairwise independent,
-  `𝔼X² ≤ μ + μ²` (`pull_avg_new_sq_le`). The Paley–Zygmund bound is then obtained from the
-  pointwise inequality `X ≤ μ/4 + X²/(2t) + (t/2)·1[good]` with `t = 4(1+μ)/3`.
+  `𝔼X² ≤ μ + μ²` (`pull_avg_new_sq_le`, from the shared `Dynamics.avg_sq_sum_le_of_pairwise`).
+  The Paley–Zygmund bound is then obtained from the pointwise inequality
+  `X ≤ μ/4 + X²/(2t) + (t/2)·1[good]` with `t = 4(1+μ)/3`.
 * `pull_avg_uninformed_contract` — above half, the expected uninformed count contracts by `2/3`
   (from the exact formula `pull_avg_uninformed`; the true factor is `≤ 1/2`).
 -/
@@ -29,54 +31,20 @@ lemma pull_avg_new_sq_le (hn : 2 ≤ n) (I : Finset (Fin n)) :
     avg (fun r : Tgt n => (∑ v ∈ Iᶜ, if ((r v) : Fin n) ∈ I then (1 : ℝ) else 0) ^ 2)
       ≤ ((n : ℝ) - I.card) * (I.card / ((n : ℝ) - 1))
           + (((n : ℝ) - I.card) * (I.card / ((n : ℝ) - 1))) ^ 2 := by
-  have hn2 : (2 : ℝ) ≤ n := by exact_mod_cast hn
-  have hp0 : (0 : ℝ) ≤ I.card / ((n : ℝ) - 1) :=
-    div_nonneg (Nat.cast_nonneg _) (by linarith)
-  have hsq : ∀ r : Tgt n, (∑ v ∈ Iᶜ, if ((r v) : Fin n) ∈ I then (1 : ℝ) else 0) ^ 2
-      = ∑ v ∈ Iᶜ, ∑ w ∈ Iᶜ, (if ((r v) : Fin n) ∈ I then (1 : ℝ) else 0)
-          * (if ((r w) : Fin n) ∈ I then (1 : ℝ) else 0) :=
-    fun r => by rw [sq, sum_mul_sum]
-  have hpair : ∀ v ∈ Iᶜ, ∀ w ∈ Iᶜ,
-      avg (fun r : Tgt n => (if ((r v) : Fin n) ∈ I then (1 : ℝ) else 0)
-          * (if ((r w) : Fin n) ∈ I then (1 : ℝ) else 0))
-        ≤ (if v = w then I.card / ((n : ℝ) - 1) else 0) + (I.card / ((n : ℝ) - 1)) ^ 2 := by
-    intro v hv w hw
-    have hv' := mem_compl.1 hv
-    have hw' := mem_compl.1 hw
-    by_cases hvw : v = w
-    · rw [if_pos hvw, ← hvw]
-      have hidem : (fun r : Tgt n => (if ((r v) : Fin n) ∈ I then (1 : ℝ) else 0)
-          * (if ((r v) : Fin n) ∈ I then (1 : ℝ) else 0))
-          = fun r : Tgt n => if ((r v) : Fin n) ∈ I then (1 : ℝ) else 0 := by
-        funext r
-        by_cases h : ((r v) : Fin n) ∈ I <;> simp [h]
-      rw [hidem, avg_tgt_call_mem hn hv']
-      nlinarith [sq_nonneg (I.card / ((n : ℝ) - 1))]
-    · rw [if_neg hvw, zero_add]
+  -- pairwise independent indicators of calling into `I`, each with mean `|I|/(n-1)`
+  have hμ : ∑ v ∈ Iᶜ, avg (fun r : Tgt n => if ((r v) : Fin n) ∈ I then (1 : ℝ) else 0)
+      = ((n : ℝ) - I.card) * (I.card / ((n : ℝ) - 1)) := by
+    rw [sum_congr rfl fun v hv => avg_tgt_call_mem hn (mem_compl.1 hv), sum_const, nsmul_eq_mul,
+      cast_card_compl]
+  have key := avg_sq_sum_le_of_pairwise (Ω := Tgt n) Iᶜ
+    (fun v r => if ((r v) : Fin n) ∈ I then (1 : ℝ) else 0)
+    (fun v r => by split_ifs <;> simp) fun v hv w hw hvw => by
       have h := avg_tgt_mul_prod hn (v := v) (S := {w}) (by simpa using hvw)
         (fun y => if y ∈ I then (1 : ℝ) else 0) (fun _ y => if y ∈ I then (1 : ℝ) else 0)
       simp only [prod_singleton] at h
-      rw [h, avg_call_mem hn hv', avg_call_mem hn hw', sq]
-  rw [show (fun r : Tgt n => (∑ v ∈ Iᶜ, if ((r v) : Fin n) ∈ I then (1 : ℝ) else 0) ^ 2)
-      = fun r : Tgt n => ∑ v ∈ Iᶜ, ∑ w ∈ Iᶜ, (if ((r v) : Fin n) ∈ I then (1 : ℝ) else 0)
-          * (if ((r w) : Fin n) ∈ I then (1 : ℝ) else 0) from funext hsq, avg_sum]
-  calc ∑ v ∈ Iᶜ, avg (fun r : Tgt n => ∑ w ∈ Iᶜ,
-          (if ((r v) : Fin n) ∈ I then (1 : ℝ) else 0)
-            * (if ((r w) : Fin n) ∈ I then (1 : ℝ) else 0))
-      = ∑ v ∈ Iᶜ, ∑ w ∈ Iᶜ, avg (fun r : Tgt n =>
-          (if ((r v) : Fin n) ∈ I then (1 : ℝ) else 0)
-            * (if ((r w) : Fin n) ∈ I then (1 : ℝ) else 0)) :=
-        sum_congr rfl fun v _ => avg_sum _ _
-    _ ≤ ∑ v ∈ Iᶜ, ∑ w ∈ Iᶜ, ((if v = w then I.card / ((n : ℝ) - 1) else 0)
-          + (I.card / ((n : ℝ) - 1)) ^ 2) :=
-        sum_le_sum fun v hv => sum_le_sum fun w hw => hpair v hv w hw
-    _ = ∑ v ∈ Iᶜ, (I.card / ((n : ℝ) - 1)
-          + ((Iᶜ).card : ℝ) * (I.card / ((n : ℝ) - 1)) ^ 2) := by
-        refine sum_congr rfl fun v hv => ?_
-        rw [sum_add_distrib, sum_ite_eq, if_pos hv, sum_const, nsmul_eq_mul]
-    _ = _ := by
-        rw [sum_const, nsmul_eq_mul, cast_card_compl]
-        ring
+      rw [h, avg_call_mem hn (mem_compl.1 hv), avg_call_mem hn (mem_compl.1 hw),
+        avg_tgt_call_mem hn (mem_compl.1 hv), avg_tgt_call_mem hn (mem_compl.1 hw)]
+  rwa [hμ] at key
 
 /-- **A PULL round is good with probability at least `1/8`** (second-moment argument). -/
 lemma pull_prob_goodRound (hn : 2 ≤ n) (I : Finset (Fin n)) (hI : I.Nonempty) :

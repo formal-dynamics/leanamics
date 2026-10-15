@@ -154,9 +154,10 @@ state-dependent slack replaces the accumulated errors of Lemma 2, and the potent
 of undecided nodes, `S = n - q - c = ∑_{j≠m} cⱼ`, `µᵢ = cᵢ(cᵢ + 2q)/n`, `ℓ = 3 log n`,
 `dev µ = √(3ℓ(µ + 2ℓ))`, `θ = 1/(1 + α)`, `κ = 1 - θ`, `K = 1/(θκ) = (1 + α)²/α`, `B = 2 md(x₀)`.
 
-1. **Concentration** (`PluralityConc.lean`, from `Dynamics.avg_bernstein`): for a sum of
-   independent `{0, 1}` coordinates with mean `µ`, each tail beyond `dev µ` has probability at
-   most `e^{-ℓ}` (`tail_up`, `tail_down`). A round is *good* if every `cᵢ` stays below
+1. **Concentration** (`PluralityConc.lean`, from the core corollaries
+   `Dynamics.avg_bernstein_of_zero_one` and `avg_bernstein_lower_of_zero_one` of
+   `avg_bernstein`): for a sum of independent `{0, 1}` coordinates with mean `µ`, each tail
+   beyond `dev µ` has probability at most `e^{-ℓ}` (`tail_up`, `tail_down`). A round is *good* if every `cᵢ` stays below
    `µᵢ + dev`, `c_m` above `µ_m - dev`, `S` below its mean plus `dev`, and `q` within `dev` of its
    mean; a bad round has probability at most `(k + 4)/n³` (`bad_le`).
 2. **Invariant** (`PluralitySteps.lean`): `cᵢ + 12√(ℓc) ≤ θc` for all `i ≠ m` and

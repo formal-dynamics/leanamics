@@ -359,8 +359,8 @@ paper mentions but omits after Theorem 2.5; its shape follows claim 2 of Theorem
    `exp (-Ω(ε² t))`. The paper's proof claims `exp (-ε² t / 3)` "by Chernoff bounds", but the
    mean of its `t (d - 1) + 1` trials is `(1 - ε) t + p`, not `(1 - ε) t`: the extra trial at the
    source (degree `d`, not `d - 1`) is what the prefactor `e^ε ≤ e` pays for. The bound is
-   Markov's inequality on `exp (ε X)`, i.e. the core's Chernoff tail before optimization
-   (`Distribution.prob_ge_le_exp`) at the paper's tilt `ε`; the optimized closed forms of the
+   Markov's inequality on `exp (ε X)`, i.e. the core's Chernoff tail before optimization at the
+   paper's fixed tilt `ε` (`Distribution.prob_ge_le_exp_tilt`); the optimized closed forms of the
    core (`bernoulli_chernoff_upper`) do not give this constant directly. Numerically the paper's
    `exp (-ε² t / 3)` also seems to hold for the binomial tail, but it is not what the standard
    argument proves, so it is not claimed.
@@ -395,12 +395,20 @@ paper mentions but omits after Theorem 2.5; its shape follows claim 2 of Theorem
 10. **Erdős–Rényi corollary** (an addition): `G(n, c/n)` is `perc ⊤ ω` with `coins (c/n)`; the
     hypotheses `0 ≤ c/n ≤ 1` are needed to form the coins.
 11. **Local lemmas.** The binomial tail `binTail` with its recursion, the scalar inequality
-    `(1 - ε) e^ε ≤ 1 - ε²/2` (`one_sub_mul_exp_le`), `prob_eq_one`, `prob_eq_zero` and the two
-    conditioning lemmas for independent products (`independent_expect_update`,
-    `independent_expect_fin_succ`, `coins_prob_split`) are not in `dynamics/` yet; their move is
-    tracked in issues #42, #44 and #46. Monotonicity, Markov's inequality on `exp (t X)` and the
-    moment-generating-function bound are the core's; congruence, complement and the union bound
-    are shared with EPI-3 (`GiantCoins.lean`).
+    `(1 - ε) e^ε ≤ 1 - ε²/2` (`one_sub_mul_exp_le`) and the two conditioning lemmas for
+    independent products (`independent_expect_update`, `independent_expect_fin_succ`,
+    `coins_prob_split`) are not in `dynamics/` yet; their move is tracked in issues #44 and #46.
+    The event lemmas (monotonicity, congruence, sure and impossible events, complement, union
+    bound), Markov's inequality on `exp (t X)` and the moment-generating-function bound are the
+    core's (`Dynamics.Distribution`).
+11. **Local lemmas.** The binomial tail `binTail` with its recursion, `prob_eq_one`,
+    `prob_eq_zero` and the two conditioning lemmas for independent products
+    (`independent_expect_update`, `independent_expect_fin_succ`, `coins_prob_split`) are not in
+    `dynamics/` yet; their move is tracked in issues #42, #44 and #46. Monotonicity, Markov's
+    inequality on `exp (t X)`, the moment-generating-function bound and the scalar inequality
+    `(1 - ε) e^ε ≤ 1 - ε²/2` are the core's (`one_sub_mul_exp_le` restates
+    `one_sub_mul_exp_le_one_sub_sq_div_two` under its blueprint name); congruence, complement
+    and the union bound are shared with EPI-3 (`GiantCoins.lean`).
 
 ## Small-world networks below the percolation threshold (`SmallWorld*`, EPI-6)
 
@@ -469,11 +477,12 @@ Source: L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccar
 12. **Local lemmas.** The supermartingale lemma for adaptive observations
     (`expect_prod_hist_le_one`) and its deferred-decisions form for fresh coordinates
     (`expect_prod_hist_le_one_of_fresh`), the coordinatewise combination of independent families
-    (`expect_expect_coord`, `expect_mul_of_dep`), Markov's inequality `prob_le_expect_div`, the
-    moment-generating function of a weighted block of coins (`expect_exp_sum_open`) and the union
-    bound over components for an arbitrary random graph (`prob_components_le_of_tail'`, the
-    form of EPI-2's `prob_components_le_of_tail` for any distribution) are not in `dynamics/`
-    yet; their move is tracked in issues #42, #46 and #49.
+    (`expect_expect_coord`, `expect_mul_of_dep`), the moment-generating function of a weighted
+    block of coins (`expect_exp_sum_open`) and the union bound over components for an arbitrary
+    random graph (`prob_components_le_of_tail'`, the form of EPI-2's
+    `prob_components_le_of_tail` for any distribution) are not in `dynamics/` yet; their move is
+    tracked in issues #42, #46 and #49. Markov's inequality is the core's
+    `Distribution.prob_le_expect_div`.
 
 ## The supercritical giant component (`Giant*`, EPI-3)
 
@@ -523,10 +532,9 @@ Lemma 1, Theorem 1, Theorem 2 in Discussion item 3).
     number of secondary infections caused by the first case is `p (n - 1)`).
 12. **Not formalized**: Theorem 1(1) and Lemma 1(1) (the subcritical regime), Theorems 3–6
     (digraphs, minimum-degree hosts, pseudo-random hosts, Maker–Breaker).
-13. **Local probability lemmas.** `prob_congr`, `prob_not`, `prob_or_le`, `prob_exists_le_sum`
-    and `one_sub_le_prob` (`GiantCoins.lean`) are elementary event bounds not yet in
-    `dynamics/`; their move to the core is tracked in issue #42. Monotonicity and the
-    expectation form of `prob` are the core's.
+13. **Probability lemmas.** The elementary event bounds (monotonicity, congruence, complement,
+    union bounds) and the expectation form of `prob` are the core's (`Dynamics.Distribution`);
+    only the complement bound `one_sub_le_prob` (`GiantCoins.lean`) is local.
 
 ## COBRA ⇔ BIPS duality and the COBRA cover time (`Cobra*`, EPI-4)
 
@@ -584,7 +592,7 @@ indicators, `log` is the natural logarithm.
 
 | Declaration | File | Paper | Statement |
 | --- | --- | --- | --- |
-| `transitionMatrix`, `walkEigenvalues`, `lambdaG` | `CobraCoverSpectral` | Section 1 | `P = A/r`, its sorted eigenvalues, `λ = max {λ₂, \|λₙ\|}` (copies of the `Median` definitions) |
+| `transitionMatrix`, `walkEigenvalues`, `lambdaG` | `Dynamics.Spectral` (core) | Section 1 | `P = A/r`, its sorted eigenvalues, `λ = max {λ₂, \|λₙ\|}` (shared with the `median` package) |
 | `sum_sq_neighbor_le` | `CobraCoverSpectral` | proof of Lemma 1, (6)–(7) | `∑ₓ (d_A(x)/r)² ≤ λ² \|A\| + (1 - λ²) \|A\|²/n` |
 | `bips_expected_growth` | `CobraCoverGrowth` | Lemma 1 | `k ≥ 2`: `E\|A'\| ≥ \|A\| (1 + (1 - λ²)(1 - \|A\|/n))` for every set `A` |
 | `bips_mgf_le` | `CobraCoverGrowth` | (12) in Lemma 2 | `E e^{-φ\|A'\|} ≤ exp(-(1 - e^{-φ}) E\|A'\|)` for every real `φ` |
@@ -624,7 +632,8 @@ proof gives `3/n²`) and `C = 130000` (expectation). Theorem 3 and `bipsCoin_inf
    (`sum_sq_neighbor_le`) and the one-round bounds hold for every regular graph and every infected
    set (not only sets containing `v`).
 2. **`λ`.** The paper's `λ = max_{i ≥ 2} |λᵢ|` is written `max {λ₂, |λₙ|}` (equal since
-   `λₙ ≤ λ₂`), as in `Median.lambdaG`; on graphs with fewer than two vertices it is `0`.
+   `λₙ ≤ λ₂`), the core's `Dynamics.lambdaG`, shared with the `median` package; on graphs with
+   fewer than two vertices it is `0`.
 3. **Asymptotic notation.** "`1 - λ ≫ √(log n/n)`" is the paper's footnote form
    `1 - λ ≥ C₀ √(log n/n)` with `∃ C₀`; "`O(T)` w.h.p." is `∃ C`, with failure probability
    `≤ C n^{-3}` (Theorem 2) or `≤ C n^{-2}` (Theorem 1, as derived in the paper's proof) for every
@@ -688,7 +697,7 @@ proof gives `3/n²`) and `C = 130000` (expectation). Theorem 3 and `bipsCoin_inf
    most `2 (T₀ + 1)` (`cover_tail_sum_le_log`). For BIPS, the process from a state `A ∋ v`
    dominates the one from `{v}` (monotonicity, persistent source), so
    `P(A_{s+T₀} ≠ V) ≤ P(A_s ≠ V)/2` (`GrowthProcess.tail_sum_le_log`).
-4. **Files.** `CobraCoverSpectral` (definitions, eigenbasis lemmas, Lemma 1 (6)–(7)),
+4. **Files.** `CobraCoverSpectral` (Lemma 1 (6)–(7), on the core's `Dynamics.Spectral`),
    `CobraCoverRound` (one BIPS round: independence over `Choices G k`, infection probability
    `1 - (1 - P_u)^k`), `CobraCoverGrowth` (Lemma 1, MGF, Chernoff), `CobraCoverNumerics`
    (real-number estimates of Lemmas 2 to 4), `CobraCoverEngine`, `CobraCoverEngineLarge`,
@@ -701,16 +710,12 @@ proof gives `3/n²`) and `C = 130000` (expectation). Theorem 3 and `bipsCoin_inf
 
 #### Copies and candidates for `dynamics/`
 
-`transitionMatrix`, `transitionMatrix_isHermitian`, `walkEigenvalues`, `lambdaG`, `lambdaG_nonneg`
-are copies of the `Median` declarations of the same names (`Median/ExpanderDefs.lean`,
-`Median/ExpanderMixing.lean`), and the eigenbasis lemmas of `CobraCoverSpectral.lean`
-(`sum_eigvec_mul_eigvec` (private), `dotProduct_eq_sum_eigvec`, `eigvec_dotProduct_mulVec`,
-`dotProduct_mulVec_eq_sum_eigvec`, `indVec`, `indVec_dotProduct_self`, `one_dotProduct_indVec`,
-`transitionMatrix_mulVec_one`, `abs_eigenvalues_le_lambdaG`) are copies of
-`Median.mixing_transition` and its helpers, renamed into the `Epidemics` namespace; the spectral
-part of `sum_sq_neighbor_le` reuses the eigenbasis argument of `Median.mixing_transition` and of
-`Averaging.mulVec_dotProduct_mulVec_le`. The epidemics package depends only on `dynamics`, so
-these are restated here; they should move to `dynamics/` and be shared. Inside the package,
+`transitionMatrix`, `transitionMatrix_isHermitian`, `walkEigenvalues`, `lambdaG`, `lambdaG_nonneg`,
+the eigenbasis lemmas (Parseval `dotProduct_eq_sum_eigenvectorBasis`,
+`eigenvectorBasis_dotProduct_mulVec`), `indVec`, `transitionMatrix_mulVec_one`,
+`abs_eigenvalues_le_lambdaG` and the top-eigenvector argument shared with
+`Median.mixing_transition` (`exists_top_eigenvectorBasis`) are in the core
+(`Dynamics/Spectral.lean`), shared with the median and averaging packages. Inside the package,
 `avg_pi_prod`, `avg_pi_eval`, `pi_count_mgf_le` (any dependent product) and
 `avg_lower_tail_of_mgf` (any observable) generalize `avg_choices_prod`, `avg_choices_depends`,
 `bips_mgf_le` and `bips_chernoff_lower`; the generic round lemmas (`roundRun`, `round_first_hit`,

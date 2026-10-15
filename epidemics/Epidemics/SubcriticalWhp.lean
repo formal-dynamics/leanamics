@@ -37,10 +37,10 @@ theorem prob_components_le_of_tail (G : SimpleGraph V) {p : ℝ} (h0 : 0 ≤ p) 
           exact ⟨s, mem_univ s, (Nat.floor_lt hL).mpr hK⟩
       _ ≤ ∑ s : V, (coins p h0 h1).prob
           (fun ω => ⌊L⌋₊ < ((perc G ω).connectedComponentMk s).supp.ncard) :=
-          prob_exists_le_sum _ _ _
+          Distribution.prob_exists_le_sum _ _ _
       _ ≤ ∑ _s : V, β := sum_le_sum fun s _ => htail s
       _ = Fintype.card V * β := by rw [sum_const, card_univ, nsmul_eq_mul]
-  linarith [prob_not (coins p h0 h1)
+  linarith [Distribution.prob_not (coins p h0 h1)
     (fun ω => ∀ K : (perc G ω).ConnectedComponent, (K.supp.ncard : ℝ) ≤ L)]
 
 /-- The union-bound arithmetic: for `n ≥ 2` and `0 < ε < 1`, the tail `exp (ε - ε² t / 2)` at

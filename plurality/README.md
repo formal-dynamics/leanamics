@@ -79,7 +79,6 @@ proofs in both versions of the paper have gaps. Both are recorded in
 | `Upper` | The phases, one round of each phase, Theorem 3.8 |
 | `Corollaries` | Corollaries 3.10, 3.11, 3.12 |
 | `Binary` | The `k = 2` case via the `three_majority` package |
-| `AnyStartMoments` | Second and fourth moments of independent sums, Paley-Zygmund |
 | `AnyStart` | `k = 2` from any configuration: symmetry breaking, then the vanishing bias |
 | `Lower` | Lemma 4.1 and Theorem 4.2 |
 | `Rules` | 3-input rules, `Δ`, `δ`, solvers, consensus needs survival |
@@ -97,9 +96,9 @@ statements were fixed in advance by a Claude agent and reviewed by a second Clau
 against the source and numerically and found no problems; the proofs are by a Claude agent under
 the fixed-statement protocol (statements unchanged, no placeholders, warning-free build, axiom
 audit). The amplified statement `majority3_any_start_whp` was added after the first review, on the
-reviewer's suggestion, and reviewed the same way. The moment lemmas of `AnyStartMoments.lean` are
-those of `median/Median/AnyStartMoments.lean`. See [PROVENANCE.md](../PROVENANCE.md) for the other
-results.
+reviewer's suggestion, and reviewed the same way. The moment lemmas (second and fourth moments of
+independent sums, Paley-Zygmund) are those of the shared layer, `dynamics/Dynamics/Moments.lean`.
+See [PROVENANCE.md](../PROVENANCE.md) for the other results.
 
 ## Building
 

@@ -1,5 +1,6 @@
 import Undecided.MajorityStages
 import Undecided.SequentialMartingale
+import Dynamics.Scalar
 
 /-! # Assembling the phases of the majority dynamics (UND-1)
 
@@ -20,15 +21,6 @@ The failure probability is at most `T p + (5/6)^T₃ n/3 ≤ 1/n + 1/(3n)`.
 
 namespace Undecided
 open Finset Dynamics Real
-
-/-- `n ≤ q ^ ⌈log n / log q⌉₊` for `q > 1`. -/
-lemma le_pow_ceil {n : ℕ} (hn : 1 ≤ n) {q : ℝ} (hq : 1 < q) :
-    (n : ℝ) ≤ q ^ ⌈log n / log q⌉₊ := by
-  have hlq : 0 < log q := log_pos hq
-  have hn0 : (0 : ℝ) < n := by exact_mod_cast hn
-  rw [← log_le_log_iff hn0 (by positivity), log_pow]
-  have := Nat.le_ceil (log n / log q)
-  rwa [div_le_iff₀ hlq] at this
 
 /-- `log n ≥ 10⁴` forces `n ≥ 1`. -/
 lemma one_le_of_log {n : ℕ} (hL : (10000 : ℝ) ≤ log n) : 1 ≤ n :=

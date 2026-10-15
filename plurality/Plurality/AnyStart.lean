@@ -1,5 +1,5 @@
 import Plurality.Corollaries
-import Plurality.AnyStartMoments
+import Dynamics.Moments
 import Dynamics.DriftHitting
 import Dynamics.Hitting
 

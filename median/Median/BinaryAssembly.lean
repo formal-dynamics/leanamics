@@ -1,4 +1,5 @@
 import Median.BinaryMoves
+import Dynamics.Scalar
 
 /-! # The binary median dynamics: assembling the phases
 
@@ -32,15 +33,6 @@ all-`true` event absorbs (`Dynamics.Kernel.event_monotone`).
 namespace Median
 
 open Finset Real Dynamics
-
-/-- `n ≤ q ^ ⌈log n / log q⌉₊` for `q > 1`. -/
-lemma le_pow_ceil {n : ℕ} (hn : 1 ≤ n) {q : ℝ} (hq : 1 < q) :
-    (n : ℝ) ≤ q ^ ⌈Real.log n / Real.log q⌉₊ := by
-  have hlq : 0 < Real.log q := Real.log_pos hq
-  have hn0 : (0 : ℝ) < n := by exact_mod_cast hn
-  rw [← Real.log_le_log_iff hn0 (by positivity), Real.log_pow]
-  have := Nat.le_ceil (Real.log n / Real.log q)
-  rwa [div_le_iff₀ hlq] at this
 
 /-- The saturation threshold `(n/4)(7/8)^j`, floored at `β`, shrinks by `7/8`
 per round while staying above `β`. -/

@@ -5,11 +5,14 @@ import Dynamics.Concentration
 import Dynamics.Drift
 import Dynamics.DriftHitting
 import Dynamics.GraphRounds
+import Dynamics.Moments
 import Dynamics.Hitting
 import Dynamics.OptionalStopping
 import Dynamics.Phases
 import Dynamics.Reverse
 import Dynamics.Rounds
+import Dynamics.Scalar
+import Dynamics.Spectral
 import Dynamics.Stationary
 import Dynamics.Tail
 import Dynamics.Trajectory
