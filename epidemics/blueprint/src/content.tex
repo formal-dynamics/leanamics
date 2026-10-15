@@ -110,7 +110,7 @@ the exploration in Algorithm~3
 (\href{https://github.com/formal-dynamics/leanamics/blob/main/epidemics/FORMALIZATION_DIFFERENCES.md#small-world-networks-below-the-percolation-threshold-smallworld-epi-6}{details}).
 
 \begin{lemma}[Binomial tail and Chernoff bound]\label{lem:chernoff}
-\lean{Epidemics.binTail,Epidemics.binTail_succ_succ,Epidemics.one_sub_mul_exp_le,Epidemics.binomial_tail_le}\leanok\uses{thm:perc}
+\lean{Dynamics.Distribution.binTail,Dynamics.Distribution.binTail_succ_succ,Dynamics.one_sub_mul_exp_le_one_sub_sq_div_two,Epidemics.binomial_tail_le}\leanok\uses{thm:perc}
 At least $t$ successes among $t(d-1)+1$ independent Bernoulli$(p)$ trials occur with probability
 at most $\exp(\varepsilon - \varepsilon^2 t/2)$.
 \end{lemma}
@@ -184,7 +184,7 @@ open bridge; these combined coins are independent across pairs, with the stated 
 \end{proof}
 
 \begin{lemma}[Supermartingale for adaptive observations]\label{lem:swg-mart}
-\lean{Epidemics.hist,Epidemics.histProd,Epidemics.expect_prod_hist_le_one,Epidemics.expect_prod_hist_le_one_of_fresh,Dynamics.Distribution.prob_le_expect_div}\leanok
+\lean{Dynamics.hist,Dynamics.histProd,Epidemics.expect_prod_hist_le_one,Epidemics.expect_prod_hist_le_one_of_fresh,Dynamics.Distribution.prob_le_expect_div}\leanok
 If an adaptive process reads, at each step, coordinates of an independent family not read before,
 and every factor $f_h \ge 0$ satisfies $\mathbb E[f_h(\mathrm{obs}_h)] \le 1$ for every history $h$,
 then the product of the factors along the process has expectation at most $1$.

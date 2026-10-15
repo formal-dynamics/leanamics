@@ -5,10 +5,11 @@ import Voter.ConductanceMany
 Helpers for Part 2 of Theorem 1.1 of Berenbrink, Giakkoupis, Kermarrec, Mallmann-Trenn,
 *Bounds on the voter model in dynamic networks*, ICALP 2016 (BGKM16):
 
-* `prod_one_sub_le`: `∏_{t < T} (1 - φ_t² / (32 n)) ≤ 1/n³` once `∑_{t < T} φ_t² ≥ 96 n ln n`;
-* `iterateSeq_pos_le_of_mul_drift`: the multiplicative drift lemma
-  `Dynamics.Kernel.multiplicative_drift_seq` with this rate, for a potential whose nonzero values
-  are at least `1`;
+* `prod_one_sub_le`: `∏_{t < T} (1 - φ_t² / (32 n)) ≤ 1/n³` once `∑_{t < T} φ_t² ≥ 96 n ln n`
+  (the core's `Dynamics.prod_one_sub_le_exp_neg_sum`, then `exp_neg_rate_le`);
+* `iterateSeq_pos_le_of_mul_drift`: the multiplicative drift lemma in exponential form
+  `Dynamics.Kernel.multiplicative_drift_seq_exp` with this rate, for a potential whose nonzero
+  values are at least `1`;
 * the potential is at least `1` before consensus (`one_le_potential`) and at most `n`
   (`potential_le_card`), since `vol(s_t) ≤ m ≤ n²`;
 * `sq_conductance_mul_vol_le`: `(φ vol(s_t))² ≤ n ∑_{u ∈ s_t} λ_u d_u` (Cauchy–Schwarz);
@@ -23,25 +24,19 @@ open Dynamics Finset
 section Generic
 variable {α : Type*} [Fintype α]
 
-/-- **The product of the drift factors**: if `0 ≤ φ_t ≤ 1`, `n ≥ 1` and
-`96 n ln n ≤ ∑_{t < T} φ_t²`, then `∏_{t < T} (1 - φ_t² / (32 n)) ≤ 1/n³`, by `1 - x ≤ e^{-x}`. -/
-lemma prod_one_sub_le {n : ℝ} (hn : 1 ≤ n) (φ : ℕ → ℝ) (hφ0 : ∀ t, 0 ≤ φ t)
-    (hφ1 : ∀ t, φ t ≤ 1) (T : ℕ) (hT : 96 * n * Real.log n ≤ ∑ t ∈ range T, φ t ^ 2) :
-    ∏ t ∈ range T, (1 - φ t ^ 2 / (32 * n)) ≤ 1 / n ^ 3 := by
+/-- The rate `φ_t² / (32 n)` is at most `1` when `0 ≤ φ_t ≤ 1` and `n ≥ 1`. -/
+lemma rate_le_one {n : ℝ} (hn : 1 ≤ n) {φ : ℝ} (hφ0 : 0 ≤ φ) (hφ1 : φ ≤ 1) :
+    φ ^ 2 / (32 * n) ≤ 1 := by
+  rw [div_le_one (by positivity)]
+  nlinarith
+
+/-- `exp (-∑_{t < T} φ_t² / (32 n)) ≤ 1/n³` once `96 n ln n ≤ ∑_{t < T} φ_t²`. -/
+lemma exp_neg_rate_le {n : ℝ} (hn : 1 ≤ n) (φ : ℕ → ℝ) (T : ℕ)
+    (hT : 96 * n * Real.log n ≤ ∑ t ∈ range T, φ t ^ 2) :
+    Real.exp (-∑ t ∈ range T, φ t ^ 2 / (32 * n)) ≤ 1 / n ^ 3 := by
   have hn0 : 0 < n := by linarith
-  calc ∏ t ∈ range T, (1 - φ t ^ 2 / (32 * n))
-      ≤ ∏ t ∈ range T, Real.exp (-(φ t ^ 2 / (32 * n))) := by
-        apply prod_le_prod
-        · intro t _
-          have h1 : φ t ^ 2 ≤ 1 := by nlinarith [hφ0 t, hφ1 t]
-          have h2 : φ t ^ 2 / (32 * n) ≤ 1 := by
-            rw [div_le_one (by positivity)]
-            linarith
-          linarith
-        · intro t _
-          linarith [Real.add_one_le_exp (-(φ t ^ 2 / (32 * n)))]
-    _ = Real.exp (-((∑ t ∈ range T, φ t ^ 2) / (32 * n))) := by
-        rw [← Real.exp_sum, sum_div, ← sum_neg_distrib]
+  calc Real.exp (-∑ t ∈ range T, φ t ^ 2 / (32 * n))
+      = Real.exp (-((∑ t ∈ range T, φ t ^ 2) / (32 * n))) := by rw [sum_div]
     _ ≤ Real.exp (-(3 * Real.log n)) := by
         apply Real.exp_le_exp.mpr
         rw [neg_le_neg_iff, le_div_iff₀ (by positivity)]
@@ -52,23 +47,32 @@ lemma prod_one_sub_le {n : ℝ} (hn : 1 ≤ n) (φ : ℕ → ℝ) (hφ0 : ∀ t,
           norm_num
         rw [h3, Real.exp_neg, Real.exp_log (by positivity), one_div]
 
+/-- **The product of the drift factors**: if `0 ≤ φ_t ≤ 1`, `n ≥ 1` and
+`96 n ln n ≤ ∑_{t < T} φ_t²`, then `∏_{t < T} (1 - φ_t² / (32 n)) ≤ 1/n³`, by `1 - x ≤ e^{-x}`
+(the core's `Dynamics.prod_one_sub_le_exp_neg_sum`). -/
+lemma prod_one_sub_le {n : ℝ} (hn : 1 ≤ n) (φ : ℕ → ℝ) (hφ0 : ∀ t, 0 ≤ φ t)
+    (hφ1 : ∀ t, φ t ≤ 1) (T : ℕ) (hT : 96 * n * Real.log n ≤ ∑ t ∈ range T, φ t ^ 2) :
+    ∏ t ∈ range T, (1 - φ t ^ 2 / (32 * n)) ≤ 1 / n ^ 3 :=
+  (prod_one_sub_le_exp_neg_sum _ _ fun t _ => rate_le_one hn (hφ0 t) (hφ1 t)).trans
+    (exp_neg_rate_le hn φ T hT)
+
 /-- **Multiplicative drift with the rate of Lemma 2.4 of BGKM16.** Let `Ψ ≥ 0` with every nonzero
 value at least `1`, and `𝔼[Ψ_{t+1} | X_t = x] ≤ (1 - φ_t² / (32 n)) Ψ(x)` for every step `t < T`,
 with `0 ≤ φ_t ≤ 1` and `n ≥ 1`. If `96 n ln n ≤ ∑_{t < T} φ_t²`, then `Ψ > 0` at time `T` with
-probability at most `Ψ(x₀) / n³`. -/
+probability at most `Ψ(x₀) / n³`. The core's `Kernel.multiplicative_drift_seq_exp` with this
+rate. -/
 lemma iterateSeq_pos_le_of_mul_drift (K : ℕ → Kernel α) (Ψ : α → ℝ) (hΨ : ∀ x, 0 ≤ Ψ x)
     (hgap : ∀ x, 0 < Ψ x → 1 ≤ Ψ x) {n : ℝ} (hn : 1 ≤ n) (φ : ℕ → ℝ) (hφ0 : ∀ t, 0 ≤ φ t)
     (hφ1 : ∀ t, φ t ≤ 1) (T : ℕ)
     (hdrift : ∀ t < T, ∀ x, (K t).apply Ψ x ≤ (1 - φ t ^ 2 / (32 * n)) * Ψ x)
     (hT : 96 * n * Real.log n ≤ ∑ t ∈ range T, φ t ^ 2) (x₀ : α) :
     Kernel.iterateSeq K T (fun x => if 0 < Ψ x then 1 else 0) x₀ ≤ Ψ x₀ / n ^ 3 := by
-  have h := Kernel.multiplicative_drift_seq K Ψ (fun t => φ t ^ 2 / (32 * n)) T hΨ one_pos hgap
-    hdrift x₀
+  have h := Kernel.multiplicative_drift_seq_exp K Ψ (fun t => φ t ^ 2 / (32 * n)) T hΨ one_pos
+    hgap (fun t _ => rate_le_one hn (hφ0 t) (hφ1 t)) hdrift x₀
   rw [div_one] at h
   calc Kernel.iterateSeq K T (fun x => if 0 < Ψ x then 1 else 0) x₀
-      ≤ (∏ t ∈ range T, (1 - φ t ^ 2 / (32 * n))) * Ψ x₀ := h
-    _ ≤ 1 / n ^ 3 * Ψ x₀ :=
-        mul_le_mul_of_nonneg_right (prod_one_sub_le hn φ hφ0 hφ1 T hT) (hΨ x₀)
+      ≤ Real.exp (-∑ t ∈ range T, φ t ^ 2 / (32 * n)) * Ψ x₀ := h
+    _ ≤ 1 / n ^ 3 * Ψ x₀ := mul_le_mul_of_nonneg_right (exp_neg_rate_le hn φ T hT) (hΨ x₀)
     _ = Ψ x₀ / n ^ 3 := by ring
 
 end Generic

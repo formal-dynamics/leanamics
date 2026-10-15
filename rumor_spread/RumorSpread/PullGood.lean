@@ -13,8 +13,8 @@ import Dynamics.Moments
   moment instead: the number `X` of uninformed callers that call into `I` has mean
   `μ = (n - m) m/(n-1) ≥ max(m/2, 1/2)` and, the calls being pairwise independent,
   `𝔼X² ≤ μ + μ²` (`pull_avg_new_sq_le`, from the shared `Dynamics.avg_sq_sum_le_of_pairwise`).
-  The Paley–Zygmund bound is then obtained from the pointwise inequality
-  `X ≤ μ/4 + X²/(2t) + (t/2)·1[good]` with `t = 4(1+μ)/3`.
+  The shared one-sided Paley–Zygmund bound `Dynamics.avg_pz_one_sided` at `θ = 1/4` then gives
+  `P(X > μ/4) ≥ (9/16) μ²/(μ + μ²) ≥ 3/16`, and `X > μ/4 ≥ |I|/8` makes the round good.
 * `pull_avg_uninformed_contract` — above half, the expected uninformed count contracts by `2/3`
   (from the exact formula `pull_avg_uninformed`; the true factor is `≤ 1/2`).
 -/
@@ -60,7 +60,6 @@ lemma pull_prob_goodRound (hn : 2 ≤ n) (I : Finset (Fin n)) (hI : I.Nonempty) 
     have hmn : (2 : ℝ) * I.card ≤ n := by exact_mod_cast hbig
     set X : Tgt n → ℝ := fun r => ∑ v ∈ Iᶜ, if ((r v) : Fin n) ∈ I then (1 : ℝ) else 0
       with hX
-    set G : Tgt n → ℝ := fun r => if goodRoundOf pullStep I r then (1 : ℝ) else 0 with hG
     set μ : ℝ := ((n : ℝ) - I.card) * (I.card / ((n : ℝ) - 1)) with hμ
     have hEX : avg X = μ := pull_avg_new hn I
     have hEX2 : avg (fun r => X r ^ 2) ≤ μ + μ ^ 2 := pull_avg_new_sq_le hn I
@@ -69,41 +68,25 @@ lemma pull_prob_goodRound (hn : 2 ≤ n) (I : Finset (Fin n)) (hI : I.Nonempty) 
       nlinarith [mul_nonneg (by linarith : (0 : ℝ) ≤ ((n : ℝ) + 1) / 2 - I.card)
         (Nat.cast_nonneg (α := ℝ) I.card)]
     have hμ1 : (1 : ℝ) / 2 ≤ μ := by linarith
-    set t : ℝ := 4 * (1 + μ) / 3 with ht
-    have ht0 : 0 < t := by rw [ht]; linarith
-    have hpt : ∀ r : Tgt n, X r ≤ μ / 4 + 1 / (2 * t) * X r ^ 2 + t / 2 * G r := by
-      intro r
-      by_cases hg : goodRoundOf pullStep I r
-      · have hGr : G r = 1 := if_pos hg
-        rw [hGr]
-        have hamgm : X r ≤ 1 / (2 * t) * X r ^ 2 + t / 2 := by
-          have hkey : 1 / (2 * t) * X r ^ 2 + t / 2 - X r = (X r - t) ^ 2 / (2 * t) := by
-            field_simp
-            ring
-          have : 0 ≤ (X r - t) ^ 2 / (2 * t) := by positivity
-          linarith
-        linarith
-      · have hGr : G r = 0 := if_neg hg
-        rw [hGr, mul_zero, add_zero]
-        have hlt : 8 * (pullStep I r).card < 9 * I.card := by
-          by_contra h
-          push Not at h
-          exact hg (Or.inl h)
-        have hcard : ((pullStep I r).card : ℝ) = I.card + X r := card_pullStep I r
-        have hlt' : (8 : ℝ) * (pullStep I r).card < 9 * I.card := by exact_mod_cast hlt
-        have hsq : 0 ≤ 1 / (2 * t) * X r ^ 2 := by positivity
-        linarith
-    have havg := avg_le_avg hpt
-    rw [avg_add, avg_add, avg_const, avg_const_mul, avg_const_mul, hEX] at havg
-    have h1 : 1 / (2 * t) * avg (fun r => X r ^ 2) ≤ 3 * μ / 8 := by
-      calc 1 / (2 * t) * avg (fun r => X r ^ 2) ≤ 1 / (2 * t) * (μ + μ ^ 2) :=
-            mul_le_mul_of_nonneg_left hEX2 (by positivity)
-        _ = 3 * μ / 8 := by
-            rw [ht]
-            field_simp
-            ring
-    have hP : 3 / 8 * μ ≤ t / 2 * avg G := by linarith
-    rw [ht] at hP
+    -- one-sided Paley-Zygmund at `θ = 1/4`: `(9/16) μ² ≤ 𝔼X² P(X > μ/4)`
+    have hpz := avg_pz_one_sided X (by linarith) (θ := 1 / 4) (by norm_num) (by norm_num)
+    rw [hEX] at hpz
+    set P := avg (fun r => if 1 / 4 * μ < X r then (1 : ℝ) else 0)
+    have hP0 : 0 ≤ P := avg_nonneg fun r => by split_ifs <;> norm_num
+    -- `X > μ/4 ≥ |I|/8` makes the round good
+    have hgood : P ≤ avg (fun r : Tgt n => if goodRoundOf pullStep I r then (1 : ℝ) else 0) := by
+      refine avg_le_avg fun r => ?_
+      by_cases hx : 1 / 4 * μ < X r
+      · have hcard : ((pullStep I r).card : ℝ) = I.card + X r := card_pullStep I r
+        have hle : (9 : ℝ) * I.card ≤ 8 * (pullStep I r).card := by linarith
+        have hg : goodRoundOf pullStep I r := Or.inl (by exact_mod_cast hle)
+        rw [if_pos hx, if_pos hg]
+      · rw [if_neg hx]
+        split_ifs <;> norm_num
+    have h2 : 9 / 16 * μ ^ 2 ≤ (μ + μ ^ 2) * P := by
+      calc 9 / 16 * μ ^ 2 = (1 - 1 / 4) ^ 2 * μ ^ 2 := by norm_num
+        _ ≤ avg (fun r => X r ^ 2) * P := hpz
+        _ ≤ (μ + μ ^ 2) * P := mul_le_mul_of_nonneg_right hEX2 hP0
     nlinarith
 
 /-- **PULL contraction above one half**: once `|I| ≥ n/2`, the expected number of uninformed

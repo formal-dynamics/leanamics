@@ -1,53 +1,58 @@
-import Dynamics.Rounds
+import Dynamics.Uniform
 
-/-! # Perturbed round-based processes
+/-!
+# Perturbed round-based processes
 
-Generic tools behind the adversarial results of `Median/Adversary.lean`. A round-based process
-`step : S → R → S`, driven by i.i.d. uniform rounds, is *perturbed within `Adm`* along a function
-`P : List R → S` of the rounds played so far when `P [] = s` and, after every round `r`, the new
-state `P (l ++ [r])` is related by `Adm` to the unperturbed `step (P l) r`. Since `P` may depend
-on the whole list of rounds, this covers adaptive adversaries; the process is no longer a Markov
-chain on `S`, but every bound below only needs one-round estimates that hold for *every*
-admissible perturbation of the round.
+A round-based process `step : S → R → S`, driven by i.i.d. uniform rounds, is *perturbed within
+`Adm`* along a function `P : List R → S` of the rounds played so far when `P [] = s` and, after
+every round `r`, the new state `P (l ++ [r])` is related by `Adm` to the unperturbed
+`step (P l) r`. Since `P` may depend on the whole list of rounds, this covers adaptive
+adversaries; the process is no longer a Markov chain on `S`, but every bound below only needs
+one-round estimates that hold for *every* admissible perturbation of the round.
 
+* `failInd`: the indicator of the failure of a proposition (the `Prop` form of
+  `Dynamics.Kernel.outside`);
 * `Perturbed.shift`: the process seen after the rounds `l₀` is again perturbed;
 * `expList_le_of_drift_perturbed` (**fixed-time drift**): if every perturbed round maps `φ` to at
   most `ρ φ + ε` in expectation, then after `T` rounds `𝔼 φ ≤ ρ ^ T φ + T ε`;
 * `expList_path_perturbed` (**chains of moves**): if every perturbed round from `B i` misses
   `B (i + 1)` with probability at most `ε`, the whole path `P (l.take t) ∈ B t`, `t ≤ T`, fails
-  with probability at most `T ε` (the perturbed, path form of `Dynamics.expList_escape`);
-* `expList_le_of_length`, `expList_le_of_split`: `expList` only looks at lists of the right
-  length, and splits into two phases.
+  with probability at most `T ε` (the perturbed, path form of `Dynamics.expList_escape`).
 
-None of them mentions the median rule; they are candidates for `Dynamics/`.
+Two phases of such a run are glued with `Dynamics.expList_le_of_split`.
 -/
 
-namespace Median
-open Dynamics
+namespace Dynamics
 
-/-- Indicator of the failure of a proposition: `0` if it holds, `1` otherwise. -/
+/-- Indicator of the failure of a proposition: `0` if it holds, `1` otherwise (for a membership
+`b ∈ B`, this is `Kernel.outside B b`). -/
 noncomputable def failInd (p : Prop) : ℝ := by
   classical
   exact if p then 0 else 1
 
+/-- A proposition that holds does not fail. -/
 lemma failInd_of {p : Prop} (h : p) : failInd p = 0 := by
   classical
   simp [failInd, h]
 
+/-- A proposition that does not hold fails. -/
 lemma failInd_of_not {p : Prop} (h : ¬ p) : failInd p = 1 := by
   classical
   simp [failInd, h]
 
+/-- A failure indicator is nonnegative. -/
 lemma failInd_nonneg (p : Prop) : 0 ≤ failInd p := by
   classical
   unfold failInd
   split_ifs <;> norm_num
 
+/-- A failure indicator is at most `1`. -/
 lemma failInd_le_one (p : Prop) : failInd p ≤ 1 := by
   classical
   unfold failInd
   split_ifs <;> norm_num
 
+/-- A stronger proposition fails more often. -/
 lemma failInd_mono {p q : Prop} (h : p → q) : failInd q ≤ failInd p := by
   by_cases hp : p
   · rw [failInd_of (h hp), failInd_of hp]
@@ -155,24 +160,4 @@ lemma expList_path_perturbed (step : S → R → S) (Adm : S → S → Prop) {ε
           exact hB 0 s hs (fun r => P [r]) hP.first
       _ = ((T + 1 : ℕ) : ℝ) * ε := by push_cast; ring
 
-omit [Nonempty R] in
-/-- `expList R T` only evaluates its argument on lists of length `T`. -/
-lemma expList_le_of_length {T : ℕ} {F G : List R → ℝ} (h : ∀ l, l.length = T → F l ≤ G l) :
-    expList R T F ≤ expList R T G := by
-  induction T generalizing F G with
-  | zero => exact h [] rfl
-  | succ T ih =>
-    rw [expList_succ, expList_succ]
-    exact avg_le_avg fun a => ih fun l hl => h (a :: l) (by simp [hl])
-
-/-- **Two phases.** If, after any first phase `l₁` of `T₁` rounds, the expectation of `Φ` over
-the second phase is at most `a + Ψ l₁`, then over both phases it is at most `a + 𝔼 Ψ`. -/
-lemma expList_le_of_split {T₁ T₂ : ℕ} {Φ Ψ : List R → ℝ} {a : ℝ}
-    (h : ∀ l₁, l₁.length = T₁ → expList R T₂ (fun l₂ => Φ (l₁ ++ l₂)) ≤ a + Ψ l₁) :
-    expList R (T₁ + T₂) Φ ≤ a + expList R T₁ Ψ := by
-  rw [expList_append]
-  calc expList R T₁ (fun l₁ => expList R T₂ fun l₂ => Φ (l₁ ++ l₂))
-      ≤ expList R T₁ (fun l₁ => a + Ψ l₁) := expList_le_of_length h
-    _ = a + expList R T₁ Ψ := by rw [expList_add, expList_const]
-
-end Median
+end Dynamics

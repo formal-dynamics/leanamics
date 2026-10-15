@@ -44,8 +44,8 @@ Appl. Math. 10 (1985) (PUSH, partner chosen among the other nodes).
    `prob_goodRound` does not apply; we use a second moment instead (`𝔼X² ≤ μ + μ²` for the
    number `X` of uninformed callers calling into `I`, by pairwise independence of the calls and
    the shared `Dynamics.avg_sq_sum_le_of_pairwise`)
-   and a Paley–Zygmund bound obtained from the pointwise inequality
-   `X ≤ μ/4 + X²/(2t) + (t/2)·1[good]` with `t = 4(1 + μ)/3`, so no Cauchy–Schwarz is needed.
+   and the shared one-sided Paley–Zygmund bound (`Dynamics.avg_pz_one_sided` at `θ = 1/4`:
+   `P(X > μ/4) ≥ (9/16) μ²/𝔼X²`); since `μ ≥ |I|/2`, `X > μ/4` makes the round good.
    The argument actually gives probability at least `3/16`; `1/8` is what the PUSH constants
    need.
 7. **PUSH–PULL by domination.** With the same calls, the PUSH–PULL informed set contains both

@@ -125,7 +125,7 @@ lemma level_time_le [Nonempty V] (hd : ∀ v, 0 < G.degree v) (n j B : ℕ)
   have hK : ∀ y, K.apply (aboveInd n j) y ≤ aboveInd n j y := by
     intro y
     rcases hf01 y with h | h
-    · have hle := iterate_le_of_closed K (fun z => opinions z ⊆ opinions y)
+    · have hle := Kernel.iterate_le_of_closed K (fun z => opinions z ⊆ opinions y)
         (opinions_closed (lazyNeighbor G hd) (opinions y)) (F := aboveInd n j)
         (F' := fun _ => 0) (fun z hz => by
           have hy : ¬ phaseThreshold n (j + 1) < (opinions y).card := by

@@ -66,6 +66,7 @@ import Dynamics
 #print axioms Dynamics.avg_lower_tail_le_of_mgf
 #print axioms Dynamics.avg_hoeffding_lower
 #print axioms Dynamics.variance_le_avg_of_zero_one
+#print axioms Dynamics.avg_pz_one_sided
 #print axioms Dynamics.avg_pz_sum
 #print axioms Dynamics.avg_pz_zero_one
 #print axioms Dynamics.avg_exp_sum_le
@@ -74,6 +75,8 @@ import Dynamics
 #print axioms Dynamics.avg_bernstein_of_zero_one
 #print axioms Dynamics.avg_bernstein_lower_of_zero_one
 #print axioms Dynamics.Distribution.prob_ge_le_exp_tilt
+#print axioms Dynamics.Distribution.binTail_succ_succ
+#print axioms Dynamics.Distribution.independent_bernoulli_prob_split
 #print axioms Dynamics.avg_chernoff_mgf
 #print axioms Dynamics.avg_chernoff_upper_of_mgf
 #print axioms Dynamics.avg_chernoff_lower_of_mgf
@@ -105,3 +108,9 @@ import Dynamics
 #print axioms Dynamics.log_pow_four_div_le
 #print axioms Dynamics.half_le_log_one_add
 #print axioms Dynamics.mul_one_div_sq_le
+#print axioms Dynamics.prod_one_sub_le_exp_neg_sum
+#print axioms Dynamics.Kernel.multiplicative_drift_seq_exp
+#print axioms Dynamics.Kernel.iterate_le_pow_of_closed
+#print axioms Dynamics.Kernel.iterate_outside_le_of_phases
+#print axioms Dynamics.Distribution.expect_prod_hist_le_one
+#print axioms Dynamics.Distribution.expect_prod_hist_le_one_of_fresh

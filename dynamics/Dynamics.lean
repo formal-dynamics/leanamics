@@ -1,4 +1,5 @@
 import Dynamics.Absorption
+import Dynamics.Adaptive
 import Dynamics.Azuma
 import Dynamics.Bridge
 import Dynamics.BridgePMF
@@ -13,6 +14,7 @@ import Dynamics.Hitting
 import Dynamics.Lazy
 import Dynamics.Independent
 import Dynamics.OptionalStopping
+import Dynamics.Perturbed
 import Dynamics.Phases
 import Dynamics.RandomWalk
 import Dynamics.Reverse

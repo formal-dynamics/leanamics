@@ -14,8 +14,9 @@ a set `D` of discovered vertices and a set `X` of examined pairs, whose coins ar
 (`closeOff X ω`; an examined open edge has both endpoints in `D`, so closing it is harmless). The
 `frontier` counts the unexamined edges of `G` leaving `D`. Theorem `prob_reachSet_le_binTail`:
 if `frontier G D X + (k - 1)(d - 1) ≤ m`, then `D` reaches at least `k` new vertices with
-probability at most `binTail p m k`. The induction on `m` conditions on the coin of one frontier
-edge `{w, x}` (`coins_prob_split`):
+probability at most `binTail p m k` (the core binomial tail `Distribution.binTail`). The
+induction on `m` conditions on the coin of one frontier edge `{w, x}` (the core
+`Distribution.independent_bernoulli_prob_split`):
 * closed: the state becomes `(D, X ∪ {wx})` and the frontier loses one edge;
 * open: the state becomes `(D ∪ {x}, X ∪ {wx})`, one vertex is found, and the frontier gains at
   most `d - 1` edges at `x` while losing `wx`;
@@ -25,6 +26,7 @@ most `d`, gives the bound `binTail p (t (d - 1) + 1) t` for `t < |C(s)|`.
 
 namespace Epidemics
 open Finset Dynamics SimpleGraph
+open Dynamics.Distribution (binTail binTail_zero_right binTail_nonneg binTail_succ_succ)
 
 variable {V : Type*} [Fintype V] [DecidableEq V]
 
@@ -194,7 +196,7 @@ lemma coins_prob_update (e : Sym2 V) (s : (Sym2 V → Bool) → Prop) :
     (coins p h0 h1).prob s =
       p * (coins p h0 h1).prob (fun ω => s (Function.update ω e true)) +
         (1 - p) * (coins p h0 h1).prob (fun ω => s (Function.update ω e false)) :=
-  coins_prob_split p h0 h1 e s
+  Distribution.independent_bernoulli_prob_split p h0 h1 e s
 
 /-- With an empty frontier, no new vertex is ever found. -/
 lemma prob_reachSet_eq_zero {D : Finset V} {X : Finset (Sym2 V)} (hF : frontier G D X = 0)

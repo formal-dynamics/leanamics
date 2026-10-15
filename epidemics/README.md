@@ -101,7 +101,8 @@ a cycle edge and `1 + p₀` otherwise, a left eigenvector of the two-type mean m
 paper's Galton–Watson comparison; below the threshold the expected discovered weight shrinks by a
 factor `1 - δ/2` per processed node, so an exponential of the weight balance is a supermartingale
 ([`SmallWorldMart.lean`](Epidemics/SmallWorldMart.lean): products of factors along adaptive
-observations of fresh independent coordinates, the principle of deferred decisions;
+observations of fresh independent coordinates, the principle of deferred decisions, from the
+core's `Dynamics.Adaptive`;
 [`SmallWorldExplore.lean`](Epidemics/SmallWorldExplore.lean): the exploration and the tail bound
 `Explore.prob_cluster_gt_le`). Markov's inequality and a union bound over the nodes conclude
 ([`SmallWorldSubcritical.lean`](Epidemics/SmallWorldSubcritical.lean)). Theorem 2.2, claim 2 is

@@ -243,7 +243,7 @@ coordinates are independent, so Mathlib's Hoeffding inequality for sums of indep
 sub-Gaussian variables applies.
 \end{proof}
 \begin{theorem}[Chernoff bounds for independent Bernoulli trials]\label{thm:chernoff}
-\lean{Dynamics.Distribution.bernoulli,Dynamics.Distribution.chernoff_upper_ratio,Dynamics.Distribution.chernoff_upper,Dynamics.Distribution.chernoff_lower_ratio,Dynamics.Distribution.chernoff_lower,Dynamics.Distribution.bernoulli_chernoff_upper_ratio,Dynamics.Distribution.bernoulli_chernoff_upper,Dynamics.Distribution.bernoulli_chernoff_lower_ratio,Dynamics.Distribution.bernoulli_chernoff_lower,Dynamics.avg_chernoff_upper_ratio,Dynamics.avg_chernoff_upper,Dynamics.avg_chernoff_lower_ratio,Dynamics.avg_chernoff_lower}\leanok\uses{def:distribution,def:avg}
+\lean{Dynamics.Distribution.bernoulli,Dynamics.Distribution.chernoff_upper_ratio,Dynamics.Distribution.chernoff_upper,Dynamics.Distribution.chernoff_lower_ratio,Dynamics.Distribution.chernoff_lower,Dynamics.Distribution.bernoulli_chernoff_upper_ratio,Dynamics.Distribution.bernoulli_chernoff_upper,Dynamics.Distribution.bernoulli_chernoff_lower_ratio,Dynamics.Distribution.bernoulli_chernoff_lower,Dynamics.Distribution.independent_bernoulli_prob_split,Dynamics.Distribution.binTail,Dynamics.Distribution.binTail_succ_succ,Dynamics.avg_chernoff_upper_ratio,Dynamics.avg_chernoff_upper,Dynamics.avg_chernoff_lower_ratio,Dynamics.avg_chernoff_lower}\leanok\uses{def:distribution,def:avg}
 Let $X=\sum_iX_i$ be a sum of independent $\{0,1\}$-valued trials with
 $\Pr(X_i=1)=p_i$, and let $\mu_L\le\mu=\sum_ip_i\le\mu_H$. For $\delta>0$,
 \[\Pr(X\ge(1+\delta)\mu_H)\le\Bigl(\frac{e^{\delta}}{(1+\delta)^{1+\delta}}\Bigr)^{\mu_H}
@@ -255,6 +255,10 @@ The trials are $\{0,1\}$-valued observables of the coordinates of an independent
 product of distributions, independent biased coins (counting the heads in any
 subset), or the coordinates of one uniform round (Mitzenmacher--Upfal,
 \emph{Probability and Computing}, Theorems 4.4 and 4.5 with Exercise 4.7).
+For identical Bernoulli$(p)$ coins, conditioning on one coin gives
+$\Pr(E)=p\,\Pr(E\mid\text{heads})+(1-p)\Pr(E\mid\text{tails})$, and the binomial tail
+$T(m,k)=\Pr(\text{at least $k$ heads among $m$ coins})$ satisfies
+$T(m+1,k+1)=p\,T(m,k)+(1-p)\,T(m,k+1)$.
 \end{theorem}
 \begin{proof}\leanok
 Markov's inequality applied to $e^{tX}$, which factors over the coordinates; each
@@ -263,7 +267,9 @@ $t\ge0$ and $\E e^{tX}\le e^{\mu_L(e^t-1)}$ for $t\le0$. Take $t=\log(1+\delta)$
 respectively $t=\log(1-\delta)$. The closed forms follow from
 $\log(1+\delta)\ge2\delta/(2+\delta)$ (the first term of the series of
 $\log\frac{1+x}{1-x}$ at $x=\delta/(2+\delta)$) and
-$(1-\delta)\log(1-\delta)\ge-\delta+\delta^2/2$.
+$(1-\delta)\log(1-\delta)\ge-\delta+\delta^2/2$. The conditioning formula sums over the
+value of the coin (independence of the coordinates), and the recursion of $T$ is the case of
+the first coin.
 \end{proof}
 \begin{theorem}[Lower tails, MGF and parametric Chernoff bounds]\label{thm:chernoffmgf}
 \lean{Dynamics.avg_lower_tail_le_of_mgf,Dynamics.avg_hoeffding_lower,Dynamics.variance_le_avg_of_zero_one,Dynamics.avg_chernoff_mgf,Dynamics.avg_chernoff_upper_of_mgf,Dynamics.avg_chernoff_lower_of_mgf,Dynamics.avg_chernoff_upper_log,Dynamics.avg_chernoff_lower_log,Dynamics.avg_chernoff_lower_mul,Dynamics.avg_bernstein_lower,Dynamics.avg_bernstein_of_zero_one,Dynamics.avg_bernstein_lower_of_zero_one,Dynamics.Distribution.prob_ge_le_exp_tilt}\leanok\uses{thm:concentration,thm:chernoff}
@@ -293,10 +299,11 @@ $\sigma^2=\mu+2\ell$ and $\lambda=\sqrt{3\ell\sigma^2}$. The last bound is Marko
 inequality on $e^{\varepsilon X}$ with $(1-\varepsilon)e^{\varepsilon}\le1-\varepsilon^2/2$.
 \end{proof}
 \begin{theorem}[Moments and anti-concentration]\label{thm:moments}
-\lean{Dynamics.avg_cauchy,Dynamics.avg_sum_sq,Dynamics.avg_sum_fourth_le,Dynamics.avg_pz,Dynamics.avg_pz_sum,Dynamics.variance_of_zero_one,Dynamics.avg_pz_zero_one,Dynamics.avg_exp_sum_le,Dynamics.avg_sq_sum_le_of_pairwise}\leanok\uses{lem:uniform-product,lem:bridge}
+\lean{Dynamics.avg_cauchy,Dynamics.avg_sum_sq,Dynamics.avg_sum_fourth_le,Dynamics.avg_pz_one_sided,Dynamics.avg_pz,Dynamics.avg_pz_sum,Dynamics.variance_of_zero_one,Dynamics.avg_pz_zero_one,Dynamics.avg_exp_sum_le,Dynamics.avg_sq_sum_le_of_pairwise}\leanok\uses{lem:uniform-product,lem:bridge}
 Let $S=\sum_{i<n}f_i(\omega_i)$ with independent uniform coordinates, each $f_i$
 centered and bounded by $1$ in absolute value, and $\sigma^2=\sum_i\E f_i^2$. Then
-$\E S^2=\sigma^2$ and $\E S^4\le\sigma^2+3\sigma^4$. If $\E Z^2=s>0$ and
+$\E S^2=\sigma^2$ and $\E S^4\le\sigma^2+3\sigma^4$. If $\E X\ge0$ and $0\le\theta\le1$,
+then $(1-\theta)^2(\E X)^2\le\E X^2\,\Pr(X>\theta\,\E X)$ (one-sided Paley--Zygmund). If $\E Z^2=s>0$ and
 $\E Z^4\le4s^2$, then $\Pr(s\le4Z^2)\ge9/64$ (two-sided Paley--Zygmund); hence
 $\Pr(\sigma^2\le4S^2)\ge9/64$ whenever $\sigma^2\ge1$, in particular for centered
 $\{0,1\}$-valued coordinates, whose variance is $p(1-p)$. For $\{0,1\}$-valued
@@ -306,9 +313,10 @@ $\E X^2\le\mu+\mu^2$.
 \end{theorem}
 \begin{proof}\leanok
 The moments by induction on $n$, splitting off the first coordinate, which is
-independent of the others. For Paley--Zygmund, $Z^2\le s/4+Z^2\,1[s\le4Z^2]$
-pointwise, and Cauchy--Schwarz (Mathlib's, through $\operatorname{avg}=\E$) gives
-$(\E[Z^2 1_A])^2\le\E Z^4\,\Pr(A)$. The exponential moment factors over the
+independent of the others. For Paley--Zygmund, $X\le\theta\,\E X+X\,1_A$ with
+$A=\{X>\theta\,\E X\}$ pointwise, and Cauchy--Schwarz (Mathlib's, through
+$\operatorname{avg}=\E$) gives $(\E[X 1_A])^2\le\E X^2\,\Pr(A)$; the two-sided form is the
+one-sided one for $X=Z^2$ and $\theta=1/4$. The exponential moment factors over the
 coordinates, and Hoeffding's lemma bounds each factor. For the last bound, expand
 $X^2$: the diagonal terms are $\E X_i^2=\E X_i$ and the others $\E X_i\,\E X_j$.
 \end{proof}
