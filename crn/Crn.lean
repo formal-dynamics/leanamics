@@ -4,6 +4,7 @@ import Crn.Basic
 import Crn.PairCount
 import Crn.Protocol
 import Crn.ApproximateMajority
+import Crn.JumpChain
 import Crn.StableBasic
 import Crn.StableInteract
 import Crn.StableProduct
