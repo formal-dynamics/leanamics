@@ -3,6 +3,7 @@ import Voter.Coalescence
 import Voter.MeetingConsensus
 import Voter.Lazy
 import Voter.WrightFisher
+import Voter.WrightFisherCounts
 import Voter.Conductance
 import Voter.ConductanceDrift
 import Voter.ConductanceTime
