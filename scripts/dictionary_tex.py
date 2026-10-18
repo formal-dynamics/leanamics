@@ -27,6 +27,17 @@ a description and references) or a `none`, every reference is known, cited and h
 identifier, the `paper` entries have every field and are ASCII, every Lean name is tagged in a
 blueprint (CI checks those tags with `checkdecls`), every blueprint link points to a `\\label` of
 that package's `content.tex`, and every roadmap ID is a target of ROADMAP.md.
+
+`--check` also checks that every Lean name of a `correspondence` or `results` list is declared in
+the sources of one of the packages that the row lists in `leanamics.packages` (a package is a
+directory with a `lakefile.toml`). One of the package's `.lean` files (outside `.lake`) must
+contain `theorem`, `lemma`, `def`, `abbrev`, `structure`, `inductive`, `class` or `instance`
+followed by a dotted name that ends the Lean name, component by component: a declaration is
+written inside its namespaces, so `Crn.Network.jumpKernel` may be declared as `def jumpKernel`
+inside `namespace Network`, or as `def Network.jumpKernel` inside `namespace Crn`. The check is
+textual (a commented-out declaration counts); `checkdecls` in CI resolves the blueprint tags
+exactly.
+
 The table needs the packages `booktabs`, `array`, `afterpage` and `pdflscape` (or `lscape`, which
 rotates the page in print but not on screen), and `amssymb` for `\\checkmark`.
 """
@@ -204,6 +215,31 @@ def blueprint_index():
     return names, labels
 
 
+DECLARATION = re.compile(
+    r"\b(?:theorem|lemma|def|abbrev|structure|inductive|class|instance)\s+([\w.'!?]+)")
+
+
+def lean_declarations():
+    """Dotted names written after a declaration keyword in the Lean sources of each package
+    (a directory with a `lakefile.toml`), outside `.lake`."""
+    decls = {}
+    for lake in ROOT.glob("*/lakefile.toml"):
+        pkg = lake.parent
+        names = set()
+        for f in pkg.rglob("*.lean"):
+            if ".lake" not in f.relative_to(pkg).parts:
+                names.update(DECLARATION.findall(f.read_text(encoding="utf-8")))
+        decls[pkg.name] = names
+    return decls
+
+
+def is_declared(name, names):
+    """Whether one of the declared dotted `names` ends the Lean name `name`, component by
+    component."""
+    parts = name.split(".")
+    return any(".".join(parts[i:]) in names for i in range(len(parts)))
+
+
 def roadmap_ids():
     """Target IDs of ROADMAP.md (first cell of its table rows, e.g. `| VOT-3 |`)."""
     text = (ROOT / "ROADMAP.md").read_text(encoding="utf-8")
@@ -234,6 +270,7 @@ def check(data):
         if f not in WIDTHS:
             problems.append(f"field {f} has no column width in scripts/dictionary_tex.py")
     names, labels = blueprint_index()
+    decls = lean_declarations()
     targets = roadmap_ids()
     ids = [r["id"] for r in data["rows"]]
     if len(ids) != len(set(ids)):
@@ -272,6 +309,9 @@ def check(data):
         for n in lean.get("correspondence", []) + lean.get("results", []):
             if n not in names:
                 problems.append(f"{rid}: Lean name {n} is not tagged in any blueprint")
+            if not any(is_declared(n, decls.get(p, set())) for p in lean.get("packages", [])):
+                problems.append(f"{rid}: Lean name {n} is not declared in the sources of the "
+                                f"row's packages {lean.get('packages', [])}")
         for url in lean.get("blueprint", []):
             m = re.fullmatch(r"/([\w-]+)/blueprint/(?:#(.+))?", url)
             if not m or m.group(1) not in labels:
@@ -333,8 +373,9 @@ def main():
     ap.add_argument("--check-bib", help="the paper's .bib file, to check the keys marked in_paper_bib")
     ap.add_argument("--check", action="store_true",
                     help="only check the YAML (cells of every field, references, relation kinds, "
-                         "Lean names against the blueprints' \\lean tags, blueprint links against "
-                         "their \\label's, roadmap IDs)")
+                         "Lean names against the blueprints' \\lean tags and the declarations of "
+                         "the row's packages, blueprint links against their \\label's, roadmap "
+                         "IDs)")
     args = ap.parse_args()
 
     data = load(args.data)
