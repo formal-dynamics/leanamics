@@ -358,8 +358,8 @@ rows:
         neutral Moran chain on counts that moves up and down with probability $xy/(n(n-1))$
         (`Moran.pullKernel_top_lumps`), whose jump chain moves up or down with probability $1/2$
         (`Moran.pullCountKernel_jump`); Moran's model, with self-loops and probability $xy/n^2$,
-        has the same jump chain (`Moran.moranCountKernel_sameJumpChain`), and both fix with
-        probability $x/n$. The network is an instance of CRN-1 (`Crn.jumpKernel_eq_ppKernel`),
+        has the same jump chain (`Moran.moranCountKernel_sameJumpChain`), and for $n \ge 2$ both
+        fix with probability $x/n$. The network is an instance of CRN-1 (`Crn.jumpKernel_eq_ppKernel`),
         not stated for it, and the continuous-time chains are not formalized.
       correspondence:
         - Moran.pullKernel
@@ -1700,8 +1700,9 @@ rows:
       status: proved
       summary: >-
         The duality on every finite graph and for every $k$, pathwise and by time reversal of
-        i.i.d. rounds (EPI-4). As a duality of kernels (`Dynamics.Kernel.Dual`), COBRA stopped
-        when it visits $v$ and BIPS with source $v$ are dual with respect to
+        i.i.d. rounds (EPI-4). As a duality of kernels (`Dynamics.Kernel.Dual`), when rounds
+        exist (every vertex has a neighbour to sample), COBRA stopped when it visits $v$ and BIPS
+        with source $v$, on the sets that contain $v$, are dual with respect to
         $1\{C \cap A = \emptyset\}$ (`Epidemics.cobra_bips_dual`), which gives the theorem again
         by the Markov property, as in the source's induction on $t$. The COBRA cover time and the
         BIPS infection time on regular expanders.

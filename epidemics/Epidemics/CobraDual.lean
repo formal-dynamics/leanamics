@@ -14,8 +14,9 @@ Rivera (PODC 2016) is such a duality, for `H(C, A) = 1{C ∩ A = ∅}`, between
 * BIPS with persistent source `v` on the sets that contain `v` (`bipsKernel v`): BIPS starts from
   `{v}` and never loses `v`.
 
-In one round both sides of the identity agree for every choice of neighbours (`cobra_bips_dual`),
-so the duality holds at every time. With `A₀ = {v}` this is Theorem 4 with the hitting
+In one round both sides of the identity agree for every choice of neighbours
+(`cobraStopStep_inter_eq_empty_iff`), so the kernels are dual (`cobra_bips_dual`) and the duality
+holds at every time. With `A₀ = {v}` this is Theorem 4 with the hitting
 probability of the COBRA kernel (`cobra_bips_duality_hitProb`), and it gives the statement
 `cobra_bips_duality` back by the Markov property, without reversing the rounds
 (`cobra_bips_duality_of_dual`). The kernels need a round of neighbour choices to exist
@@ -138,9 +139,9 @@ lemma foldl_bipsSourceStep (v : V) (A : {A : Finset V // v ∈ A}) (l : List (Ch
   | nil => rfl
   | cons r l ih => rw [List.foldl_cons, ih]; rfl
 
-/-- **Theorem 4 again, from the duality of kernels.** The statement `cobra_bips_duality`, derived
-from the one-round duality `cobra_bips_dual` by `Dynamics.Kernel.Dual.iterate` (the Markov
-property) instead of the reversal of the rounds. -/
+/-- **Theorem 4 again, from the duality of kernels.** The statement `cobra_bips_duality`, under
+`Nonempty (Choices G k)`, derived from the one-round duality `cobra_bips_dual` by
+`Dynamics.Kernel.Dual.iterate` (the Markov property) instead of the reversal of the rounds. -/
 theorem cobra_bips_duality_of_dual (v : V) (C : Finset V) (t : ℕ) :
     expList (Choices G k) t
         (fun l => if ∀ s ≤ t, v ∉ cobraRun C (l.take s) then 1 else 0) =

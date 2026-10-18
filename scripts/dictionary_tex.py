@@ -31,17 +31,19 @@ that package's `content.tex`, and every roadmap ID is a target of ROADMAP.md.
 `--check` also checks that every Lean name of a `correspondence` or `results` list is declared in
 the sources of one of the packages that the row lists in `leanamics.packages` (a package is a
 directory with a `lakefile.toml`). One of the package's `.lean` files (outside `.lake`) must
-contain `theorem`, `lemma`, `def`, `abbrev`, `structure`, `inductive`, `class` or `instance`
-followed by a dotted name that ends the Lean name, component by component: a declaration is
-written inside its namespaces, so `Crn.Network.jumpKernel` may be declared as `def jumpKernel`
-inside `namespace Network`, or as `def Network.jumpKernel` inside `namespace Crn`. The check is
-textual (a commented-out declaration counts); `checkdecls` in CI resolves the blueprint tags
+contain `theorem`, `lemma`, `def`, `abbrev`, `opaque`, `structure`, `inductive`, `class` or
+`instance` followed by a dotted name that ends the Lean name, component by component: a
+declaration is written inside its namespaces, so `Crn.Network.jumpKernel` may be declared as
+`def jumpKernel` inside `namespace Network`, or as `def Network.jumpKernel` inside
+`namespace Crn` (a universe list `.{u}` and a `_root_.` prefix are ignored). The check is textual,
+so text in comments and docstrings counts too; `checkdecls` in CI resolves the blueprint tags
 exactly.
 
 The table needs the packages `booktabs`, `array`, `afterpage` and `pdflscape` (or `lscape`, which
 rotates the page in print but not on screen), and `amssymb` for `\\checkmark`.
 """
 import argparse
+import os
 import re
 import sys
 from pathlib import Path
@@ -216,7 +218,7 @@ def blueprint_index():
 
 
 DECLARATION = re.compile(
-    r"\b(?:theorem|lemma|def|abbrev|structure|inductive|class|instance)\s+([\w.'!?]+)")
+    r"\b(?:theorem|lemma|def|abbrev|opaque|structure|inductive|class|instance)\s+([\w.'!?]+)")
 
 
 def lean_declarations():
@@ -224,12 +226,15 @@ def lean_declarations():
     (a directory with a `lakefile.toml`), outside `.lake`."""
     decls = {}
     for lake in ROOT.glob("*/lakefile.toml"):
-        pkg = lake.parent
         names = set()
-        for f in pkg.rglob("*.lean"):
-            if ".lake" not in f.relative_to(pkg).parts:
-                names.update(DECLARATION.findall(f.read_text(encoding="utf-8")))
-        decls[pkg.name] = names
+        for top, dirs, files in os.walk(lake.parent):
+            dirs[:] = [d for d in dirs if d != ".lake"]
+            for f in files:
+                if f.endswith(".lean"):
+                    text = Path(top, f).read_text(encoding="utf-8")
+                    names.update(n.rstrip(".").removeprefix("_root_.")
+                                 for n in DECLARATION.findall(text))
+        decls[lake.parent.name] = names
     return decls
 
 

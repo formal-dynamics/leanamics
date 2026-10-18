@@ -14,7 +14,7 @@ every vertex copies the colour of a uniformly random vertex, itself included) lu
 the number of vertices of colour `a`, for any set of colours (`transition_wfKernel_lumps`): the
 two processes are the same chain on counts (row `wright-fisher` of the cross-field dictionary).
 Results transfer through the lumping: the voter's consensus probability `wrightFisher_fixation`
-gives the fixation probability `x / n` of the count chain (`wfCountKernel_fixation`).
+gives the fixation probability `x / n` of the count chain for `n ≥ 1` (`wfCountKernel_fixation`).
 -/
 
 namespace Voter

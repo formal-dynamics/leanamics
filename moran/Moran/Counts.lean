@@ -17,8 +17,8 @@ vertex adopts the type of a uniformly random neighbour, that is of another verte
 self-loops, so the library's kernel is the convention without self-loops. Moran's model has the
 same jump chain (`moranCountKernel_sameJumpChain`), the walk that moves up or down by one with
 probability `1/2` each until it is absorbed at `0` or `n` (`pullCountKernel_jump`): the two
-chains differ only by idle steps. Hence they have the same fixation probability `k / n`
-(`pullCountKernel_fixation`, from `pull_fixation` through the lumping, and
+chains differ only by idle steps. Hence, for `n ≥ 2`, they have the same fixation probability
+`k / n` (`pullCountKernel_fixation`, from `pull_fixation` through the lumping, and
 `moranCountKernel_fixation`, through the jump chain).
 -/
 

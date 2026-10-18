@@ -26,8 +26,8 @@ the dictionary's description of each kind.
   functions (`SameJumpChain.apply_eq_self_iff`) and the same absorption probabilities
   (`SameJumpChain.iSup_event_eq`).
 * **Duality** (`Kernel.Dual H K L`, kind `duality`: "an exact identity between probabilities of
-  one process and of a dual process"): `E_x[H(X_t, y)] = E_y[H(x, Y_t)]`, which follows for every
-  `t` from the case of one step (`Dual.iterate`).
+  one process and of a dual process ..."): `E_x[H(X_t, y)] = E_y[H(x, Y_t)]`, which follows for
+  every `t` from the case of one step (`Dual.iterate`).
 * **Mean field** (`Kernel.MeanField K φ F`, kind `mean-field`: "the expected one-step change ...
   coincides; the stochastic processes may differ"): the expected one-step map of the observables
   `φ` is the recursion `F`, `E_x[φ(X₁)] = F(φ(x))`. A lumping transfers it (`Lumps.meanField`).
@@ -428,7 +428,7 @@ theorem expect_iterate_comm (L : Kernel β) (p : Distribution γ) (F : γ → β
     exact congrArg (L y).expect (funext ih)
 
 /-- **Duality** (kind `duality` of the dictionary: "an exact identity between probabilities of
-one process and of a dual process"). `K` on `α` and `L` on `β` are dual with respect to
+one process and of a dual process ..."). `K` on `α` and `L` on `β` are dual with respect to
 `H : α → β → ℝ` when `𝔼_x[H(X₁, y)] = 𝔼_y[H(x, Y₁)]` for all `x` and `y`; it then holds at every
 time (`Dual.iterate`). -/
 def Dual (H : α → β → ℝ) (K : Kernel α) (L : Kernel β) : Prop :=
