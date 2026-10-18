@@ -10,6 +10,11 @@ import Moran
 #print axioms Moran.pull_unfixed_tendsto
 #print axioms Moran.push_fixation
 #print axioms Moran.pull_fixation
+#print axioms Moran.pullKernel_top_lumps
+#print axioms Moran.moranCountKernel_sameJumpChain
+#print axioms Moran.pullCountKernel_jump
+#print axioms Moran.pullCountKernel_fixation
+#print axioms Moran.moranCountKernel_fixation
 #print axioms Moran.star_potential_invariant
 #print axioms Moran.star_fixation
 #print axioms Moran.star_fixation_leaf

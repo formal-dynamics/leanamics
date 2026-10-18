@@ -29,6 +29,7 @@ and indicator projections give the probability for every color in a finite palet
 | Remark p. 254: Theorem 2.1 on bipartite graphs given one self-loop | `propagate_kernel_region`, `consensus_tendsto_of_selfLoop`, `consensus_probability_of_selfLoop`, `color_consensus_probability_of_selfLoop` |
 | Lazy voter `(I + D⁻¹A)/2` on any connected graph (VOT-2) | `lazy`, `lazyNeighbor`, `lazy_stationary_iff`, `lazy_consensus_probability`, `lazyNeighbor_consensus_probability` |
 | Neutral Wright–Fisher: allele `a` fixes w.p. `c_a / n` (VOT-2) | `wrightFisher_fixation_of_three_le`, `wrightFisher_fixation` |
+| Wright–Fisher on allele counts, `X_{t+1} ~ Bin(n, X_t/n)` (in [`Voter/WrightFisherCounts.lean`](Voter/WrightFisherCounts.lean)): the synchronous voter on `K_n` with self-loops lumps to it under the number of vertices of a colour, any number of colours (the same chain on counts, `Dynamics.Kernel.Lumps`); hence it fixes from `x` copies w.p. `x / n` | `wfCountKernel`, `colorCount`, `transition_wfKernel_lumps`, `wfCountKernel_fixation` |
 | Section 2.4, any sampling kernel: duality with two coalescing tokens; Theorem 2.4 (tail form) | `pairWalk`, `iterate_disagreement_le_pairWalk`, `iterate_disagreement_le_of_meeting` |
 | Section 2.4, Fact 2.3 and Lemma 2.4 for lazy walks: meeting within `51 n³` steps w.p. `≥ 1/2` | `hitting_add_hitting_le`, `lazyNeighbor`, `lazy_meeting_le_half`, `lazy_meeting_le_pow` |
 | Theorem 2.5 (Survey Thm 8), lazy voter: consensus within `255 n³ log n` rounds w.p. `≥ 1 - 1/n` on every connected graph | `lazy_voter_consensus_whp` |

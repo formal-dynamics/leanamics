@@ -509,3 +509,90 @@ $V\ge\tfrac12q^{-\beta c_4}$ below the target, Lemma~\ref{lem:hitdrift} gives
 $\Pr(T>t)\le2\rho^tq^{\beta c_4}\le q^{-c_6}$ for
 $t\ge(1+\beta c_4+c_6)\log q/\log(1/\rho)$.
 \end{proof}
+
+\section{Relations between chains}\label{sec:relations}
+The cross-field dictionary of Leanamics relates processes of different fields by a few kinds of
+relation. Four of them concern one step of two finite kernels and are defined here; the other
+kinds (the same continuous-time chain, a pathwise coupling, a large-population limit, the same
+deterministic recursion) are not.
+\begin{lemma}[Laws at finite times]\label{lem:law}
+\lean{Dynamics.Distribution.ext,Dynamics.Distribution.weight_eq_expect_ite,Dynamics.Distribution.ext_expect,Dynamics.Distribution.map_map,Dynamics.Distribution.map_point,Dynamics.Distribution.expect_comm,Dynamics.Kernel.advance_expect,Dynamics.Kernel.law_expect}\leanok\uses{def:kernel,thm:stationary}
+Distributions with the same weights, or with the same expectations, are equal. The law $pK^t$ at
+time $t$ satisfies $\E_{pK^t}[g]=\E_p[K^tg]$.
+\end{lemma}
+\begin{proof}\leanok
+Take the indicator of a point as observable; induction on $t$, exchanging two finite sums.
+\end{proof}
+\begin{definition}[Same chain on counts: lumping]\label{def:lumps}
+\lean{Dynamics.Kernel.Lumps,Dynamics.Kernel.lumps_iff_apply}\leanok\uses{def:kernel}
+A kernel $K$ on $\alpha$ lumps to a kernel $L$ on $\beta$ along $f:\alpha\to\beta$ if
+$K(x)\circ f^{-1}=L(f(x))$ for every $x$, equivalently $\E_x[g(f(X_1))]=\E_{f(x)}[g(Y_1)]$ for
+every observable $g$.
+\end{definition}
+\begin{lemma}[A lumping holds at every time]\label{lem:lumps}
+\lean{Dynamics.Kernel.Lumps.apply,Dynamics.Kernel.Lumps.iterate,Dynamics.Kernel.Lumps.law,Dynamics.Kernel.Lumps.event,Dynamics.Kernel.Lumps.trajectory,Dynamics.Kernel.Lumps.hitProb,Dynamics.Kernel.Lumps.comp}\leanok\uses{def:lumps,lem:law,def:hitprob}
+If $K$ lumps to $L$ along $f$, then $(pK^t)\circ f^{-1}=(p\circ f^{-1})L^t$ for every initial law
+$p$ and time $t$, and the expectation of every functional of the trajectory
+$f(X_0),\dots,f(X_t)$ is that of $Y_0,\dots,Y_t$ from $f(x)$. In particular the probabilities of
+events at time $t$ and the hitting probabilities agree. Lumpings compose.
+\end{lemma}
+\begin{proof}\leanok
+Induction on $t$: one step of $K$ seen through $f$ is one step of $L$.
+\end{proof}
+\begin{definition}[Jump chain]\label{def:jumpchain}
+\lean{Dynamics.Kernel.jump,Dynamics.Kernel.SameJumpChain}\leanok\uses{def:kernel}
+The jump chain $J$ of $K$ is the step conditioned on moving: $J(x,y)=K(x,y)/(1-K(x,x))$ for
+$y\ne x$ and $J(x,x)=0$, except that a state with $K(x,x)=1$ stays absorbing. Two kernels have
+the same jump chain if their jump chains are equal.
+\end{definition}
+\begin{lemma}[Kernels with the same jump chain]\label{lem:jumpchain}
+\lean{Dynamics.Kernel.sum_erase_weight,Dynamics.Kernel.weight_eq_zero_of_weight_self,Dynamics.Kernel.eq_point_of_weight_self,Dynamics.Kernel.jump_of_weight_self,Dynamics.Kernel.jump_weight_self,Dynamics.Kernel.weight_eq_mul_jump,Dynamics.Kernel.apply_eq_jump,Dynamics.Kernel.apply_eq_self_iff_jump,Dynamics.Kernel.sameJumpChain_of_weight,Dynamics.Kernel.jump_jump,Dynamics.Kernel.jump_eq_self,Dynamics.Kernel.lazy_sameJumpChain,Dynamics.Kernel.SameJumpChain.symm,Dynamics.Kernel.SameJumpChain.apply_eq_self_iff}\leanok\uses{def:jumpchain,def:randomwalk}
+$Kg(x)=K(x,x)g(x)+(1-K(x,x))Jg(x)$, so $g$ is harmonic at $x$ for $K$ iff it is for $J$. If the
+rows of $K$ and $L$ are proportional off the diagonal with positive factors, they have the same
+jump chain; a lazy kernel $(I+K)/2$ has the jump chain of $K$, and $J$ is its own jump chain.
+\end{lemma}
+\begin{proof}\leanok
+Off the diagonal the weights of $K(x)$ add up to $1-K(x,x)$; normalize.
+\end{proof}
+\begin{theorem}[Same jump chain, same absorption probabilities]\label{thm:jump-absorption}
+\lean{Dynamics.Kernel.event_monotone_of_absorbing,Dynamics.Kernel.apply_iSup_event,Dynamics.Kernel.event_le_of_harmonic,Dynamics.Kernel.SameJumpChain.iSup_event_eq}\leanok\uses{lem:jumpchain,thm:optional-stopping}
+If $K$ and $L$ have the same jump chain and $A$ is absorbing for both, then
+$\sup_t\Pr^K_x(X_t\in A)=\sup_t\Pr^L_x(Y_t\in A)$ for every $x$.
+\end{theorem}
+\begin{proof}\leanok
+The absorption probability $h_K$ is the increasing limit of $K^t1_A$, so $Kh_K=h_K$ (a finite
+sum commutes with the limit); by the previous lemma $Lh_K=h_K$. A nonnegative $L$-harmonic
+function that is at least $1$ on $A$ bounds $L^t1_A$ for every $t$, by induction; hence
+$h_L\le h_K$, and symmetrically.
+\end{proof}
+\begin{definition}[Duality]\label{def:dual}
+\lean{Dynamics.Kernel.Dual,Dynamics.Kernel.Dual.symm}\leanok\uses{def:kernel}
+Kernels $K$ on $\alpha$ and $L$ on $\beta$ are dual with respect to $H:\alpha\times\beta\to\mathbb R$
+if $\E_x[H(X_1,y)]=\E_y[H(x,Y_1)]$ for all $x$ and $y$.
+\end{definition}
+\begin{lemma}[Duality at every time]\label{lem:dual}
+\lean{Dynamics.Kernel.expect_iterate_comm,Dynamics.Kernel.Dual.iterate}\leanok\uses{def:dual,lem:law}
+If $K$ and $L$ are dual with respect to $H$, then $\E_x[H(X_t,y)]=\E_y[H(x,Y_t)]$ for every $t$.
+\end{lemma}
+\begin{proof}\leanok
+Induction on $t$: condition on the first step of $K$, apply the induction hypothesis, exchange the
+two finite expectations and apply the one-step duality inside.
+\end{proof}
+\begin{definition}[Mean field]\label{def:meanfield}
+\lean{Dynamics.Kernel.MeanField,Dynamics.Kernel.Lumps.meanField,Dynamics.Kernel.MeanField.iterate_id}\leanok\uses{def:lumps}
+The observables $\varphi_i$ of $K$ have mean-field map $F$ if $\E_x[\varphi(X_1)]=F(\varphi(x))$
+for every $x$. A lumping transfers a mean-field map, and with $F$ the identity every $\varphi_i$
+keeps its expectation at all times.
+\end{definition}
+\begin{lemma}[The binomial law]\label{lem:binomial}
+\lean{Dynamics.countFin,Dynamics.Distribution.binomial,Dynamics.Distribution.binomial_weight_eq,Dynamics.Distribution.map_decide_eq_bernoulli,Dynamics.Distribution.independent_map_pi,Dynamics.Distribution.card_countFin_eq,Dynamics.Distribution.independent_bernoulli_map_countFin}\leanok\uses{def:distribution,lem:weighted-product,lem:bridge-pmf}
+The binomial law on $\{0,\dots,n\}$ has weights $\binom nk p^k(1-p)^{n-k}$, those of Mathlib's
+binomial distribution. The number of heads of independent Bernoulli($p$) coins indexed by a set
+of size $n$ has this law. The indicator of an event is a Bernoulli coin with the probability of
+the event, and an independent product transported coordinatewise is the product of the
+transported coordinates.
+\end{lemma}
+\begin{proof}\leanok
+A configuration with $k$ heads has weight $p^k(1-p)^{n-k}$, and $\binom nk$ configurations have
+$k$ heads (they correspond to the subsets of size $k$); the total mass is $(p+1-p)^n$.
+\end{proof}

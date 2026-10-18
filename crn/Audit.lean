@@ -12,6 +12,11 @@ import Crn
 #print axioms Crn.ApproxMajority.network_jump_expect
 #print axioms Crn.ApproxMajority.network_reactProb_eq
 #print axioms Crn.ApproxMajority.network_jumpKernel_eq_ppKernel
+#print axioms Crn.Network.jumpKernel_jump
+#print axioms Crn.ppStepKernel_jump
+#print axioms Crn.ppStepKernel_jump_eq_ppKernel
+#print axioms Crn.ppStepKernel_sameJumpChain
+#print axioms Crn.ApproxMajority.network_sameJumpChain
 #print axioms Crn.Protocol.StablyComputes.unique
 #print axioms Crn.StablyComputable.map₂
 #print axioms Crn.StablyComputable.not

@@ -786,6 +786,20 @@ Lemma~\ref{lem:pathwise} identifies the two events after reversing the rounds, a
 Lemma~\ref{lem:reverse} says that reversing the rounds preserves their law. The paper proves the
 theorem instead by induction on $t$ with one-step conditioning.
 \end{proof}
+\begin{theorem}[Theorem 4 as a duality of kernels]\label{thm:duality-kernels}
+\lean{Epidemics.bipsSourceStep,Epidemics.cobraStopStep,Epidemics.cobraStopped,Epidemics.bipsKernel,Epidemics.cobraStopStep_inter_eq_empty_iff,Epidemics.cobraStopped_eq_ofStep,Epidemics.cobra_bips_dual,Epidemics.cobra_bips_duality_hitProb,Epidemics.not_mem_foldl_cobraStopStep,Epidemics.foldl_bipsSourceStep,Epidemics.cobra_bips_duality_of_dual}\leanok\uses{def:cobra,thm:duality}
+Assume that rounds exist. COBRA stopped when it visits $v$ and BIPS with source $v$, on the sets
+that contain $v$, are dual with respect to $H(C,A)=1\{C\cap A=\emptyset\}$:
+$\E_C[H(C_1,A)]=\E_A[H(C,A_1)]$ (\texttt{Dynamics.Kernel.Dual}). Hence for every $t$ the
+probability that the COBRA kernel from $C$ has not visited $v$ by time $t$ is
+$\Pr(C\cap A_t=\emptyset\mid A_0=\{v\})$, which is Theorem~\ref{thm:duality} again.
+\end{theorem}
+\begin{proof}\leanok
+For every round and every $A\ni v$, the stopped COBRA step from $C$ avoids $A$ iff $C$ avoids the
+BIPS step from $A$: if $v\in C$ both sides fail, and otherwise both say that no vertex of $C$
+samples a vertex of $A$. Duality at every time follows from the one-step duality by the Markov
+property (the shared lemma on duality), as in the paper's proof by one-step conditioning.
+\end{proof}
 
 \section{COBRA cover time on expanders}\label{sec:crr-cover}
 Here $G$ is $r$-regular with $r>0$ on $n$ vertices, $P=A(G)/r$, $\lambda=\max(\lambda_2,|\lambda_n|)$,

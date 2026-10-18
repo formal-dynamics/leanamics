@@ -248,6 +248,7 @@ infected, and any other vertex is infected next iff one of its sampled neighbour
 | Pathwise: COBRA from `C` visits `v` within the rounds iff BIPS from `{v}` along the reversed rounds infects a vertex of `C` | `cobra_hit_iff_bips_reverse` |
 | Theorem 4: `P(Hit_C(v) > t ∣ C₀ = C) = P(C ∩ A_t = ∅ ∣ A₀ = {v})` | `cobra_bips_duality` |
 | Equation (2): `P(Hit_u(v) > t) = P(u ∉ A_t ∣ A₀ = {v})` | `cobra_bips_duality_singleton` |
+| Theorem 4 as a duality of kernels (in [`Epidemics/CobraDual.lean`](Epidemics/CobraDual.lean), when rounds exist): COBRA stopped when it visits `v` and BIPS with source `v` on the sets containing `v` are dual for `H(C, A) = 1{C ∩ A = ∅}` (`Dynamics.Kernel.Dual`), pathwise in one round; hence `1 - P_C(Hit_C(v) ≤ t) = P(C ∩ A_t = ∅ ∣ A₀ = {v})` with the hitting probability of the COBRA kernel, and Theorem 4 again, from the one-round duality and the Markov property instead of time reversal | `cobra_bips_dual`, `cobra_bips_duality_hitProb`, `cobra_bips_duality_of_dual` |
 
 The paper assumes `G` connected and regular and `k ≥ 1`; the duality holds for every finite graph
 and every `k`. On a connected graph with at least two vertices the rounds exist
