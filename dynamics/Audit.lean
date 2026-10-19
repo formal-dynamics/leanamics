@@ -118,6 +118,16 @@ import Dynamics
 #print axioms Dynamics.Distribution.independent_map_pi
 #print axioms Dynamics.Distribution.independent_bernoulli_map_countFin
 #print axioms Dynamics.Distribution.binomial_weight_eq
+#print axioms Dynamics.Distribution.independent_bernoulli_map_card
+#print axioms Dynamics.Distribution.binomial_expect_val
+#print axioms Dynamics.majorityMap_eq_prob
+#print axioms Dynamics.majorityMap_one_sub
+#print axioms Dynamics.conformistTable_eq
+#print axioms Dynamics.conformistMap_eq_expect
+#print axioms Dynamics.conformistMap_eq_mix
+#print axioms Dynamics.conformistMap_one
+#print axioms Dynamics.conformistMap_zero
+#print axioms Dynamics.galamMap_eq
 #print axioms Dynamics.Kernel.law_expect
 #print axioms Dynamics.Kernel.lumps_iff_apply
 #print axioms Dynamics.Kernel.Lumps.iterate

@@ -9,8 +9,9 @@ success probability `p`: a distribution on `{0, …, n}` (`Fin (n + 1)`) with we
 `C(n, k) p^k (1 - p)^(n - k)` at `k`. Its weights are those of Mathlib's binomial distribution
 `ProbabilityTheory.binomial` (`Distribution.binomial_weight_eq`), and it is the law of the number
 of heads of independent Bernoulli(`p`) coins indexed by any finite type with `n` elements
-(`Distribution.independent_bernoulli_map_countFin`). The number of elements with a property is
-`countFin`, an element of `{0, …, n}`.
+(`Distribution.independent_bernoulli_map_countFin`, `Distribution.independent_bernoulli_map_card`),
+so its mean is `n p` (`Distribution.binomial_expect_val`). The number of elements with a property
+is `countFin`, an element of `{0, …, n}`.
 
 Two facts used on the way are stated in general: the indicator of an event is a Bernoulli coin
 with the probability of the event (`Distribution.map_decide_eq_bernoulli`), and an independent
@@ -130,6 +131,38 @@ theorem independent_bernoulli_map_countFin (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 
     card_countFin_eq, nsmul_eq_mul]
   simp only [binomial]
   ring
+
+/-- `independent_bernoulli_map_countFin` for a finite type with `m` elements, the number of heads
+counted in `{0, …, m}`. -/
+theorem independent_bernoulli_map_card {m : ℕ} (hm : Fintype.card ι = m) (p : ℝ) (h0 : 0 ≤ p)
+    (h1 : p ≤ 1) :
+    (independent fun _ : ι => bernoulli p h0 h1).map
+        (fun ω => Fin.cast (congrArg (· + 1) hm) (countFin fun i => ω i = true)) =
+      binomial m p h0 h1 := by
+  subst hm
+  exact independent_bernoulli_map_countFin p h0 h1
+
+end Distribution
+
+namespace Distribution
+
+/-- **The mean of the binomial law**: `𝔼[Bin(n, p)] = n p`, the expected number of heads of `n`
+independent coins. -/
+theorem binomial_expect_val (n : ℕ) (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) :
+    (binomial n p h0 h1).expect (fun k => (k : ℝ)) = n * p := by
+  classical
+  have hcoin : (bernoulli p h0 h1).expect (fun b => if b = true then 1 else 0) = p := by
+    simp [expect, bernoulli]
+  rw [← independent_bernoulli_map_card (Fintype.card_fin n) p h0 h1, map_expect]
+  have hcount (ω : Fin n → Bool) :
+      (((Fin.cast (congrArg (· + 1) (Fintype.card_fin n))
+        (countFin fun i => ω i = true) : Fin (n + 1)) : ℕ) : ℝ) =
+        ∑ i, if ω i = true then 1 else 0 := by
+    rw [Fin.val_cast, countFin_val, sum_boole]
+  simp only [hcount, expect_sum]
+  rw [sum_congr rfl fun i _ => independent_expect_eval (fun _ : Fin n => bernoulli p h0 h1) i
+    fun b => if b = true then (1 : ℝ) else 0]
+  simp [hcoin]
 
 end Distribution
 end Dynamics

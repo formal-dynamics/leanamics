@@ -13,6 +13,7 @@ import Dynamics.GraphRounds
 import Dynamics.Moments
 import Dynamics.Hitting
 import Dynamics.Lazy
+import Dynamics.MajorityMap
 import Dynamics.Independent
 import Dynamics.OptionalStopping
 import Dynamics.Perturbed

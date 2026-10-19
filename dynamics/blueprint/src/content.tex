@@ -585,14 +585,34 @@ for every $x$. A lumping transfers a mean-field map, and with $F$ the identity e
 keeps its expectation at all times.
 \end{definition}
 \begin{lemma}[The binomial law]\label{lem:binomial}
-\lean{Dynamics.countFin,Dynamics.Distribution.binomial,Dynamics.Distribution.binomial_weight_eq,Dynamics.Distribution.map_decide_eq_bernoulli,Dynamics.Distribution.independent_map_pi,Dynamics.Distribution.card_countFin_eq,Dynamics.Distribution.independent_bernoulli_map_countFin}\leanok\uses{def:distribution,lem:weighted-product,lem:bridge-pmf}
+\lean{Dynamics.countFin,Dynamics.Distribution.binomial,Dynamics.Distribution.binomial_weight_eq,Dynamics.Distribution.map_decide_eq_bernoulli,Dynamics.Distribution.independent_map_pi,Dynamics.Distribution.card_countFin_eq,Dynamics.Distribution.independent_bernoulli_map_countFin,Dynamics.Distribution.independent_bernoulli_map_card,Dynamics.Distribution.binomial_expect_val}\leanok\uses{def:distribution,lem:weighted-product,lem:bridge-pmf}
 The binomial law on $\{0,\dots,n\}$ has weights $\binom nk p^k(1-p)^{n-k}$, those of Mathlib's
 binomial distribution. The number of heads of independent Bernoulli($p$) coins indexed by a set
-of size $n$ has this law. The indicator of an event is a Bernoulli coin with the probability of
-the event, and an independent product transported coordinatewise is the product of the
-transported coordinates.
+of size $n$ has this law, so its mean is $np$. The indicator of an event is a Bernoulli coin with
+the probability of the event, and an independent product transported coordinatewise is the
+product of the transported coordinates.
 \end{lemma}
 \begin{proof}\leanok
 A configuration with $k$ heads has weight $p^k(1-p)^{n-k}$, and $\binom nk$ configurations have
-$k$ heads (they correspond to the subsets of size $k$); the total mass is $(p+1-p)^n$.
+$k$ heads (they correspond to the subsets of size $k$); the total mass is $(p+1-p)^n$. The number
+of heads is the sum of the $n$ indicators, each of mean $p$.
+\end{proof}
+\begin{definition}[The majority map and two recursions]\label{def:majority-map}
+\lean{Dynamics.majorityMap,Dynamics.conformistMap,Dynamics.conformistTable,Dynamics.galamMap}\leanok
+The majority map is $m(p)=3p^2-2p^3$. Conformist transmission (Boyd and Richerson, Eq.~7.1) is the
+recursion $p'=p+Dp(1-p)(2p-1)$: a naive individual whose three models include $j$ holders of a
+variant acquires it with probability $0$, $\frac13-\frac D3$, $\frac23+\frac D3$, $1$ for
+$j=0,1,2,3$. Galam's majority rule with groups of three is the recursion $P'=P^3+3P^2(1-P)$.
+\end{definition}
+\begin{lemma}[Conformist transmission and Galam's rule follow the majority map]\label{lem:majority-map}
+\lean{Dynamics.majorityMap_eq_prob,Dynamics.majorityMap_nonneg,Dynamics.majorityMap_le_one,Dynamics.majorityMap_one_sub,Dynamics.conformistTable_eq,Dynamics.conformistMap_eq_expect,Dynamics.conformistMap_eq_mix,Dynamics.conformistMap_one,Dynamics.conformistMap_zero,Dynamics.conformistMap_nonneg,Dynamics.conformistMap_le_one,Dynamics.galamMap_eq}\leanok\uses{def:majority-map,lem:binomial}
+$m(p)$ is the probability that at least two of three independent coins of bias $p$ show heads. The
+conformist table adopts the majority of the three models with probability $D$ and otherwise
+copies one of them, drawn uniformly; if the three models are independent and each holds the
+variant with probability $p$, the variant is acquired with probability $p+Dp(1-p)(2p-1)
+=(1-D)p+Dm(p)$, which is $p$ for $D=0$ and $m(p)$ for $D=1$. Galam's map is $m$.
+\end{lemma}
+\begin{proof}\leanok
+The number of holders among the three models has the law $\mathrm{Bin}(3,p)$; expand the
+expectations of the table and of the majority indicator.
 \end{proof}
