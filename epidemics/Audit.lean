@@ -10,6 +10,9 @@ import Epidemics
 #print axioms Epidemics.cobra_hit_iff_bips_reverse
 #print axioms Epidemics.cobra_bips_duality
 #print axioms Epidemics.cobra_bips_duality_singleton
+#print axioms Epidemics.cobra_bips_dual
+#print axioms Epidemics.cobra_bips_duality_hitProb
+#print axioms Epidemics.cobra_bips_duality_of_dual
 #print axioms Epidemics.sum_sq_neighbor_le
 #print axioms Epidemics.bips_expected_growth
 #print axioms Epidemics.bips_mgf_le

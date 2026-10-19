@@ -11,6 +11,12 @@ kernels on count vectors. Worked instance: the approximate-majority CRN
 * [`Crn/Protocol.lean`](Crn/Protocol.lean): the population protocol, the pair-sampling identity
   and the main theorem `Crn.jumpKernel_eq_ppKernel`.
 * [`Crn/ApproximateMajority.lean`](Crn/ApproximateMajority.lean): the worked instance.
+* [`Crn/JumpChain.lean`](Crn/JumpChain.lean): CRN-1 with the jump chain of the core
+  (`Dynamics.Kernel.jump`): the population protocol on count vectors (`Crn.ppStepKernel`) and
+  mass-action kinetics have the same jump chain (`Crn.ppStepKernel_jump`,
+  `Crn.ppStepKernel_sameJumpChain`), and that jump chain is the conditioned protocol
+  `ppKernel` (`Crn.ppStepKernel_jump_eq_ppKernel`); for approximate majority,
+  `Crn.ApproxMajority.network_sameJumpChain`.
 * [`Crn/PairCount.lean`](Crn/PairCount.lean): counting ordered pairs of distinct agents by
   species.
 * [`Crn/Condition.lean`](Crn/Condition.lean), [`Crn/DistLemmas.lean`](Crn/DistLemmas.lean):

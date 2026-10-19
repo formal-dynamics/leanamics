@@ -115,6 +115,19 @@ jump chain is the population protocol conditioned on reacting.
 Instances of the general results, with $a_0(x) = k D$.
 \end{proof}
 
+\begin{theorem}[CRN-1 as the same jump chain]\label{thm:crn1-jump}
+\lean{Crn.ppStepKernel,Crn.Network.jumpKernel_jump,Crn.ppStepKernel_jump,Crn.ppStepKernel_jump_eq_ppKernel,Crn.ppStepKernel_sameJumpChain,Crn.ApproxMajority.network_sameJumpChain}\leanok\uses{thm:step,thm:crn1,lem:jump-self,thm:am}
+One interaction of the population protocol is a kernel on count vectors. Its jump chain (the step
+conditioned on changing the counts, \texttt{Dynamics.Kernel.jump}) is the jump chain of
+mass-action kinetics, which is its own jump chain; so the protocol and the network have the same
+jump chain, and the protocol conditioned on reacting is the jump chain of the protocol. This holds
+in particular for the approximate-majority network.
+\end{theorem}
+\begin{proof}\leanok
+Off the diagonal, the interaction moves as the network's jump chain with the probability that the
+drawn pair reacts; if no pair can react, both kernels stay put.
+\end{proof}
+
 \section{Stable computation}\label{sec:aadfp-stable}
 This section and the two following ones formalize the easy direction of the characterization of
 stably computable predicates of Angluin, Aspnes, Diamadi, Fischer and Peralta,

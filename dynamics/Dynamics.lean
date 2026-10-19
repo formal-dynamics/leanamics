@@ -1,6 +1,7 @@
 import Dynamics.Absorption
 import Dynamics.Adaptive
 import Dynamics.Azuma
+import Dynamics.Binomial
 import Dynamics.Bridge
 import Dynamics.BridgePMF
 import Dynamics.Chernoff
@@ -17,6 +18,7 @@ import Dynamics.OptionalStopping
 import Dynamics.Perturbed
 import Dynamics.Phases
 import Dynamics.RandomWalk
+import Dynamics.Relations
 import Dynamics.Reverse
 import Dynamics.Rounds
 import Dynamics.Scalar

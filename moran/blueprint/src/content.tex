@@ -156,6 +156,49 @@ equal to $1$ and $0$ on the two constant configurations; the denominators are po
 every degree is at least $1$.
 \end{proof}
 
+\section{Moran chains on counts}\label{sec:moran-counts}
+Population genetics follows the number $k$ of mutants. In Moran's model (1958) the reproducing
+and the dying individual are drawn independently and uniformly, possibly the same one; on the
+complete graph $K_n$ the death--Birth kernel draws two distinct vertices, since a simple graph has
+no self-loops. A lumping (the same chain on counts) and the same jump chain are defined in the
+shared library (\texttt{Dynamics.Kernel.Lumps}, \texttt{Dynamics.Kernel.SameJumpChain}).
+\begin{definition}[Neutral Moran chains on counts]\label{def:moran-counts}
+\lean{Moran.countDown,Moran.countUp,Moran.moveDist,Moran.birthDeath,Moran.birthDeath_expect,Moran.moranCountKernel,Moran.pullCountKernel,Moran.absorbedWalk,Moran.mutantCount}\leanok
+A symmetric birth--death chain on $\{0,\dots,n\}$ moves from $k$ to $k-1$ and to $k+1$ with
+probability $q(k)$ each. Moran's chain has $q(k)=k(n-k)/n^2$, the chain without self-loops
+$q(k)=k(n-k)/(n(n-1))$, and the absorbed walk $q(k)=1/2$ for $0<k<n$ and $q(0)=q(n)=0$.
+\end{definition}
+\begin{theorem}[Death--Birth on $K_n$ is a Moran chain on counts]\label{thm:pull-lumps}
+\lean{Moran.target_top_of_ne,Moran.pullDist_top_prob,Moran.mutantCount_update,Moran.pullKernel_top_lumps}\leanok\uses{def:pull,def:moran-counts}
+Under the death--Birth kernel on the complete graph, the number of mutants is the chain without
+self-loops: from every configuration with $k$ mutants, one step leads to $k+1$ and to $k-1$
+mutants with probability $k(n-k)/(n(n-1))$ each.
+\end{theorem}
+\begin{proof}\leanok
+The updating vertex $u$ and the copied vertex $w$ form a uniformly random ordered pair of
+distinct vertices. The number of mutants increases iff $u$ is a resident and $w$ a mutant,
+$(n-k)k$ of the $n(n-1)$ pairs, decreases iff $u$ is a mutant and $w$ a resident, and stays
+otherwise.
+\end{proof}
+\begin{theorem}[Same jump chain]\label{thm:moran-jump}
+\lean{Moran.birthDeath_weight_of_ne,Moran.birthDeath_sameJumpChain,Moran.moranCountKernel_sameJumpChain,Moran.absorbedWalk_jump,Moran.pullCountKernel_jump}\leanok\uses{def:moran-counts}
+Moran's chain and the chain without self-loops have the same jump chain: the walk that moves up or
+down by one with probability $1/2$ each until it is absorbed at $0$ or $n$.
+\end{theorem}
+\begin{proof}\leanok
+Off the diagonal, the rows of Moran's chain are $(n-1)/n$ times those of the chain without
+self-loops, and from $0<k<n$ the latter moves to $k-1$ and $k+1$ with equal probabilities.
+\end{proof}
+\begin{theorem}[Fixation on counts]\label{thm:moran-counts-fixation}
+\lean{Moran.birthDeath_prob_self,Moran.allMutant_eq_ite,Moran.pullValue_top,Moran.pullCountKernel_fixation_count,Moran.pullCountKernel_fixation,Moran.moranCountKernel_fixation}\leanok\uses{thm:pull-lumps,thm:moran-jump,thm:pushpull}
+For $n\ge2$, both chains fix from $k$ mutants with probability $k/n$.
+\end{theorem}
+\begin{proof}\leanok
+On the complete graph pull fixation is $(n-1)k/((n-1)n)$; it transfers to the chain without
+self-loops through the lumping, applied to a configuration with $k$ mutants. Kernels with the same
+jump chain have the same absorption probabilities (shared library), which gives Moran's chain.
+\end{proof}
+
 \section{Exact fixation on the star}\label{sec:broom-rychtar}
 The star with $n$ leaves is Mathlib's \texttt{starGraph} $c$ on $n+1$ vertices: the centre $c$
 is adjacent to every leaf and leaves only to $c$. It is not regular, and it amplifies selection

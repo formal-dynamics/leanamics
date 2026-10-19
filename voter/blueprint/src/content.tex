@@ -47,6 +47,14 @@ A shared library result (roadmap FND-4): decompose the observable pointwise into
 on $A$ and off $A\cup B$, take expectations, and bound the second part.
 \end{proof}
 
+\begin{definition}[Same chain on counts; the binomial law]\label{def:lumps-shared}
+\lean{Dynamics.Kernel.Lumps,Dynamics.Kernel.Lumps.event,Dynamics.Distribution.binomial,Dynamics.Distribution.independent_bernoulli_map_countFin}\leanok
+A kernel $K$ lumps to $L$ along $f$ if $K(x)\circ f^{-1}=L(f(x))$ for every state $x$; then the
+probability that $f(X_t)$ lies in a set is the probability that the chain $L$ from $f(x)$ lies in
+it. The number of heads of $n$ independent Bernoulli($p$) coins has the binomial law
+$\mathrm{Bin}(n,p)$.
+\end{definition}
+
 \section{Section 2.1: model}\label{sec:hassin-peleg}
 This section and the following ones formalize Sections 2.1 to 2.4 of Hassin and Peleg,
 \emph{Distributed Probabilistic Polling and Applications to Proportionate Agreement}
@@ -245,6 +253,24 @@ $c_a/n$, where $c_a$ is its initial number of copies.
 \begin{proof}\leanok
 The uniform distribution is stationary and every entry is positive. For $n\ge 3$ the
 complete graph is nonbipartite and Section~2.3 applies; for every $n$ the Remark applies.
+\end{proof}
+\begin{definition}[Wright--Fisher on allele counts]\label{def:wf-counts}
+\lean{Voter.wfCountKernel,Voter.wfCountKernel_weight,Voter.colorCount}\leanok\uses{def:lumps-shared}
+In a population of $n$, an allele present in $x$ copies has $\mathrm{Bin}(n,x/n)$ copies in the
+next generation. For a configuration $s$, $c_a(s)$ is the number of vertices of colour $a$.
+\end{definition}
+\begin{theorem}[The voter model on $K_n$ with self-loops is Wright--Fisher on counts]\label{thm:wf-counts}
+\lean{Voter.transition_wfKernel_lumps,Voter.allColor_eq_ite,Voter.wfCountKernel_fixation_count,Voter.wfCountKernel_fixation}\leanok\uses{def:wf-counts,def:backward,thm:wright-fisher}
+Under Wright--Fisher sampling, for every finite set of colours, the number of vertices of colour
+$a$ is the Wright--Fisher chain on counts: one round from a configuration with $c_a=x$ leads to
+$\mathrm{Bin}(n,x/n)$ vertices of colour $a$. Hence, for $n\ge1$, the Wright--Fisher chain on
+counts fixes from $x$ copies with probability $x/n$.
+\end{theorem}
+\begin{proof}\leanok
+After a round with sampled parents $r$, vertex $v$ has colour $a$ iff $s(r(v))=a$; these are
+independent Bernoulli coins with parameter $c_a(s)/n$, and their number of heads is binomial.
+Fixation transfers through the lumping from Theorem~\ref{thm:wright-fisher}, applied to a
+configuration with $x$ copies.
 \end{proof}
 
 \section{Section 2.4 on connected graphs: meeting time and $O(n^3\log n)$ consensus}\label{sec:kms-meeting-time}

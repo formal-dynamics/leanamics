@@ -31,7 +31,11 @@ notes:
     the same absorption and fixation probabilities but not the same running times. Duality and
     pathwise coupling are exact identities between two different processes. A limit holds only as
     the population size tends to infinity, and a common mean-field map says nothing about
-    fluctuations.
+    fluctuations. In Lean, four kinds are definitions about finite kernels in the shared library
+    (`dynamics/Dynamics/Relations.lean`): the same chain on counts is a lumping
+    (`Dynamics.Kernel.Lumps`), the same jump chain is `Dynamics.Kernel.SameJumpChain` (kernels
+    with the same jump chain have the same absorption probabilities), duality is
+    `Dynamics.Kernel.Dual`, and a common mean-field map is `Dynamics.Kernel.MeanField`.
   - >-
     Chemistry. A stochastic chemical reaction network (CRN) with mass-action kinetics is a
     continuous-time Markov chain on molecule counts in a well-mixed solution. It fires one
@@ -66,8 +70,8 @@ notes:
   - >-
     Formal status. proved: the correspondence itself is a Lean theorem. partial: part of it is a
     Lean theorem, and the summary says which part. definitional: the library defines the process
-    once and names it after both fields (for example, Wright–Fisher sampling is the voter kernel
-    with uniform rows), so every result proved for it holds under both names, but no theorem
+    once and names it after both fields (for example, neutral push is the Birth–death Moran
+    kernel with $r = 1$), so every result proved for it holds under both names, but no theorem
     compares two definitions. results: the library proves results about some of the columns, not
     the correspondence. roadmap: a target of the roadmap, not formalized yet. not formalized:
     neither in the library nor a target of the roadmap.
@@ -231,15 +235,20 @@ rows:
           found.
       refs: [AvenaEtAl2024, AcerbiMesoudiSmolla2022]
     leanamics:
-      status: definitional
+      status: proved
       summary: >-
-        Wright–Fisher sampling is defined as the voter kernel with uniform rows on $V$, self
-        included (`Voter.wfKernel`); neutral fixation $c_a/n$ follows from Hassin and Peleg's
-        proportionate agreement, and consensus within $2n\log n$ rounds from the duality with
-        coalescing walks (row coalescing). The binomial count chain is not stated.
-      correspondence: [Voter.wfKernel]
+        The synchronous voter model on $K_n$ with self-loops (Wright–Fisher sampling,
+        `Voter.wfKernel`) lumps to the Wright–Fisher chain on allele counts, defined from the
+        binomial law alone ($X_{t+1} \sim \mathrm{Bin}(n, X_t/n)$, `Voter.wfCountKernel`), under
+        the number of vertices of any colour (`Voter.transition_wfKernel_lumps`, a lumping
+        `Dynamics.Kernel.Lumps`); on labelled configurations the two processes coincide by
+        definition. Neutral fixation $c_a/n$ follows from Hassin and Peleg's proportionate
+        agreement and transfers to the count chain through the lumping, and consensus within
+        $2n\log n$ rounds follows from the duality with coalescing walks (row coalescing).
+      correspondence: [Voter.wfKernel, Voter.wfCountKernel, Voter.transition_wfKernel_lumps]
       results:
         - Voter.wrightFisher_fixation
+        - Voter.wfCountKernel_fixation
         - Voter.wrightFisher_fixation_of_three_le
         - Voter.consensus_probability_of_selfLoop
         - Voter.voter_consensus_whp
@@ -247,6 +256,7 @@ rows:
       blueprint:
         - /voter/blueprint/#sec:hassin-peleg
         - /voter/blueprint/#thm:wright-fisher
+        - /voter/blueprint/#thm:wf-counts
       roadmap: [VOT-1, VOT-2, VOT-3]
     paper:
       dc: 'synchronous pull voter, $K_n$ with self-loops'
@@ -339,17 +349,33 @@ rows:
           communities.
       refs: [SoodAntalRedner2008, AntalRednerSood2006, Maciejewski2014, Aldous2013, Swart2017, CliffordSudbury1973]
     leanamics:
-      status: definitional
+      status: partial
       summary: >-
         The pull kernel is defined as death–Birth (`Moran.pullKernel`), and a mutant set $S$ fixes
         with probability $\sum_{v\in S}\deg v/2m$ on every connected graph, exactly (Antal,
-        Redner and Sood's degree laws with selection are mean-field approximations). The network
-        is an instance of CRN-1 (`Crn.jumpKernel_eq_ppKernel`), not stated for it.
-      correspondence: [Moran.pullKernel, Crn.jumpKernel_eq_ppKernel]
-      results: [Moran.pull_fixation, Moran.pull_value_invariant]
+        Redner and Sood's degree laws with selection are mean-field approximations). On $K_n$ the
+        library's kernel has no self-loops (a simple graph), and its number of mutants is the
+        neutral Moran chain on counts that moves up and down with probability $xy/(n(n-1))$
+        (`Moran.pullKernel_top_lumps`), whose jump chain moves up or down with probability $1/2$
+        (`Moran.pullCountKernel_jump`); Moran's model, with self-loops and probability $xy/n^2$,
+        has the same jump chain (`Moran.moranCountKernel_sameJumpChain`), and for $n \ge 2$ both
+        fix with probability $x/n$. The network is an instance of CRN-1 (`Crn.jumpKernel_eq_ppKernel`),
+        not stated for it, and the continuous-time chains are not formalized.
+      correspondence:
+        - Moran.pullKernel
+        - Moran.pullKernel_top_lumps
+        - Moran.pullCountKernel_jump
+        - Moran.moranCountKernel_sameJumpChain
+        - Crn.jumpKernel_eq_ppKernel
+      results:
+        - Moran.pull_fixation
+        - Moran.pull_value_invariant
+        - Moran.pullCountKernel_fixation
+        - Moran.moranCountKernel_fixation
       packages: [moran, crn]
       blueprint:
         - /moran/blueprint/#sec:ars-push-pull
+        - /moran/blueprint/#sec:moran-counts
         - /crn/blueprint/#thm:crn1
       roadmap: [VOT-4, CRN-1]
     paper:
@@ -1005,10 +1031,15 @@ rows:
       summary: >-
         The network's jump chain equals the population protocol of the network conditioned on
         reacting (`Crn.ApproxMajority.network_jumpKernel_eq_ppKernel`, a protocol that also draws
-        a uniform reaction); the sequential undecided-state dynamics is defined as Angluin,
-        Aspnes and Eisenstat's protocol, and its convergence and correctness are proved. That the
-        two protocols have the same count chain is not formalized.
-      correspondence: [Crn.ApproxMajority.network_jumpKernel_eq_ppKernel, Undecided.Sequential.step]
+        a uniform reaction): the protocol on count vectors and the network have the same jump
+        chain (`Crn.ApproxMajority.network_sameJumpChain`, a `Dynamics.Kernel.SameJumpChain`). The
+        sequential undecided-state dynamics is defined as Angluin, Aspnes and Eisenstat's
+        protocol, and its convergence and correctness are proved. That the two protocols have the
+        same count chain is not formalized.
+      correspondence:
+        - Crn.ApproxMajority.network_jumpKernel_eq_ppKernel
+        - Crn.ApproxMajority.network_sameJumpChain
+        - Undecided.Sequential.step
       results:
         - Undecided.Sequential.consensus_whp
         - Undecided.Sequential.majority_whp
@@ -1019,6 +1050,7 @@ rows:
       blueprint:
         - /undecided/blueprint/#sec:aae-approx-majority
         - /crn/blueprint/#thm:am
+        - /crn/blueprint/#thm:crn1-jump
         - /crn/blueprint/#sec:mnrs-graph-majority
       roadmap: [UND-2, CRN-1, CRN-4]
     paper:
@@ -1090,11 +1122,17 @@ rows:
       status: proved
       summary: >-
         The jump chain of mass-action kinetics equals the protocol conditioned on reacting
-        (CRN-1). The easy direction of stable computation (CRN-3): Boolean combinations of
-        threshold and remainder predicates are stably computable, hence stably decided by such
-        networks. Majority on connected graphs with four states, optimal (CRN-4), and
-        deterministic exact majority and plurality (CRN-5) in the same framework.
-      correspondence: [Crn.jumpKernel_eq_ppKernel, Crn.condStep_eq_jumpKernel, Crn.pair_prob_eq_propensity]
+        (CRN-1): the protocol on count vectors and the network have the same jump chain
+        (`Crn.ppStepKernel_sameJumpChain`, a `Dynamics.Kernel.SameJumpChain`). The easy direction
+        of stable computation (CRN-3): Boolean combinations of threshold and remainder predicates
+        are stably computable, hence stably decided by such networks. Majority on connected graphs
+        with four states, optimal (CRN-4), and deterministic exact majority and plurality (CRN-5)
+        in the same framework.
+      correspondence:
+        - Crn.jumpKernel_eq_ppKernel
+        - Crn.condStep_eq_jumpKernel
+        - Crn.pair_prob_eq_propensity
+        - Crn.ppStepKernel_sameJumpChain
       results:
         - Crn.IsSemilinearPred.stablyComputable
         - Crn.IsSemilinearPred.exists_network
@@ -1105,6 +1143,7 @@ rows:
       packages: [crn]
       blueprint:
         - /crn/blueprint/#thm:crn1
+        - /crn/blueprint/#thm:crn1-jump
         - /crn/blueprint/#sec:aadfp-stable
         - /crn/blueprint/#sec:mnrs-graph-majority
         - /crn/blueprint/#sec:ghmss-exact-majority
@@ -1661,12 +1700,18 @@ rows:
       status: proved
       summary: >-
         The duality on every finite graph and for every $k$, pathwise and by time reversal of
-        i.i.d. rounds (EPI-4); the COBRA cover time and the BIPS infection time on regular
-        expanders.
+        i.i.d. rounds (EPI-4). As a duality of kernels (`Dynamics.Kernel.Dual`), when rounds
+        exist (every vertex has a neighbour to sample), COBRA stopped when it visits $v$ and BIPS
+        with source $v$, on the sets that contain $v$, are dual with respect to
+        $1\{C \cap A = \emptyset\}$ (`Epidemics.cobra_bips_dual`), which gives the theorem again
+        by the Markov property, as in the source's induction on $t$. The COBRA cover time and the
+        BIPS infection time on regular expanders.
       correspondence:
         - Epidemics.cobra_bips_duality
         - Epidemics.cobra_bips_duality_singleton
         - Epidemics.cobra_hit_iff_bips_reverse
+        - Epidemics.cobra_bips_dual
+        - Epidemics.cobra_bips_duality_hitProb
       results:
         - Epidemics.cobra_cover_time
         - Epidemics.bips_infection_time
@@ -1674,6 +1719,7 @@ rows:
       packages: [epidemics]
       blueprint:
         - /epidemics/blueprint/#sec:crr-cobra-bips
+        - /epidemics/blueprint/#thm:duality-kernels
         - /epidemics/blueprint/#sec:crr-cover
       roadmap: [EPI-4]
     paper:
