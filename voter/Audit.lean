@@ -57,3 +57,5 @@ import Voter
 #print axioms Voter.plain_apart_le_pow
 #print axioms Voter.plain_disagreement_le
 #print axioms Voter.plain_voter_consensus_whp
+#print axioms Voter.transition_dual
+#print axioms Voter.transition_event_someTrue

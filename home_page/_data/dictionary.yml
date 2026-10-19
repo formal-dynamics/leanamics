@@ -660,13 +660,20 @@ rows:
       status: partial
       summary: >-
         The pathwise duality for every sampling kernel (the configuration after $T$ rounds is the
-        initial one composed with the backward map), its two-token form, and on $K_n$ with
-        self-loops the exact probability $(1 - 1/n)^T$ that two backward walks have not met, i.e.
+        initial one composed with the backward map), its two-token form, and the duality of
+        kernels (`Dynamics.Kernel.Dual`) between the voter model and coalescing walks on sets of
+        vertices, $A \mapsto r(A)$, with the additive duality function of the physics column,
+        $1\{\text{some vertex of } A \text{ has opinion } 1\}$, for every sampling kernel and at
+        every time (`Voter.transition_dual`, `Voter.transition_event_someTrue`). On $K_n$ with
+        self-loops, the exact probability $(1 - 1/n)^T$ that two backward walks have not met, i.e.
         that two Wright–Fisher lineages have not coalesced after $T$ generations. Kingman's
         coalescent and the coagulation reading are not formalized.
       correspondence:
         - Voter.runRounds_eq_comp
         - Voter.disagreement_runRounds_eq_zero
+        - Voter.coalescingKernel
+        - Voter.transition_dual
+        - Voter.transition_event_someTrue
         - Voter.iterate_transition_eq_leftRounds
         - Voter.iterate_disagreement_le_pairWalk
         - ThreeMajority.voter_dual
@@ -678,6 +685,7 @@ rows:
       packages: [voter, 3-majority]
       blueprint:
         - /voter/blueprint/#lem:duality
+        - /voter/blueprint/#thm:coalescing-dual
         - /voter/blueprint/#sec:kms-meeting-time
         - /3-majority/blueprint/#sec:bcekmn-any-start
       roadmap: [VOT-3, VOT-6, MAJ-6]
