@@ -168,7 +168,7 @@ def tex_name(pkg):
 CAPTION = (r"Sizes of the packages, in the Lean modules that \code{lake build} builds: all lines "
            r"(comments and blank lines included); theorems (\code{theorem}, \code{lemma}); "
            r"definitions (\code{def}, \code{abbrev}, \code{structure}, \code{inductive}, "
-           r"\code{class}, \code{instance}), with any modifiers. Examples are not counted.")
+           r"\code{class}, \code{instance}), with any modifiers; \code{example} blocks are not counted.")
 
 
 def table():
