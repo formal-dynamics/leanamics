@@ -63,6 +63,18 @@ round is $n(3p^2-2p^3)$, the same cubic as for 3-Majority.
 A \texttt{true} node stays unless both samples are \texttt{false}, a \texttt{false} node switches iff
 both samples are \texttt{true}.
 \end{proof}
+\begin{theorem}[Mean-field map]\label{thm:mean-field}
+\lean{Median.kernel_meanField,Median.TwoChoices.kernel_bool,Median.TwoChoices.kernel_meanField}\leanok\uses{thm:expect}
+With two values, the median rule and 2-Choices are the same kernel, and its mean-field map (shared
+library) is the majority map $p\mapsto3p^2-2p^3$, the mean-field map of binary 3-Majority.
+\end{theorem}
+\begin{proof}\leanok
+Theorem~\ref{thm:expect} divided by $n$; with two colours the 2-Choices rule is the median of
+three Booleans.
+\end{proof}
+The two dynamics share their mean-field map but not their chains: from two nodes, one holding
+\texttt{true}, one round leaves exactly one \texttt{true} with probability $5/8$ under 2-Choices and
+$1/2$ under 3-Majority.
 
 \section{Consensus from a vanishing bias}
 \begin{theorem}[2-Choices, w.h.p.]\label{thm:whp}

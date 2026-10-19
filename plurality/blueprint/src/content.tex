@@ -36,7 +36,8 @@ $(n/\log n)^{1/4}$, and part~(a) of Theorem~4.8 (Theorem~\ref{thm:4_8_a}) leaves
 with $\Delta_r, \Delta_b \le 1$. Observation~3.9 (an adversary) is not
 formalized. Beyond the paper, Section~\ref{sec:any_start} proves that with two opinions
 3-majority reaches consensus from any configuration, including a perfectly balanced one, within
-$O(\log n)$ rounds w.h.p.
+$O(\log n)$ rounds w.h.p., and Section~\ref{sec:mean_field} identifies binary 3-majority with
+conformist transmission on counts.
 \end{abstract}
 
 \section{The model}\label{sec:model}
@@ -559,6 +560,52 @@ $\mathbb{E}s' = s\,(3/2 - s^2/(2n^2))$.
   consensus on either opinion is absorbing, so further rounds keep it. For the second bound, two
   consecutive blocks each fail with probability at most $\varepsilon = C_0\log n/n$, and
   $\varepsilon^2 \le 1/n$.
+\end{proof}
+
+\subsection{Two colors: mean field and conformist transmission}\label{sec:mean_field}
+
+This part goes beyond the paper; it relates binary 3-majority to models of other fields (row
+\texttt{three-majority} of the cross-field dictionary). The relations ``same chain on counts''
+(a lumping) and ``same mean-field map'' are defined in the shared \texttt{dynamics} package,
+together with the majority map $m(x) = 3x^2 - 2x^3$, conformist transmission and Galam's map.
+
+\begin{theorem}[The mean-field map of binary 3-majority]\label{thm:binary_mean_field}
+  \lean{Plurality.binKernel_meanField}
+  \leanok
+  \uses{thm:binary}
+  One round maps the fraction $x = |I|/n$ of nodes with opinion $1$ to $m(x) = 3x^2 - 2x^3$ in
+  expectation; $m$ is also conformist transmission with $D = 1$ and Galam's map with groups of
+  three.
+\end{theorem}
+\begin{proof}
+  \leanok
+  The exact one-round expectation of the \texttt{three\_majority} package, divided by $n$.
+\end{proof}
+
+\begin{definition}[Conformist transmission on counts]\label{def:conformist}
+  \lean{Plurality.count_div_nonneg, Plurality.count_div_le_one, Plurality.conformistCountKernel, Plurality.cardFin}
+  \leanok
+  In a population of $n$ with non-overlapping generations, every new individual samples three
+  models with replacement from the whole previous generation and acquires a variant held by $j$ of
+  them with probability $0$, $\frac13 - \frac D3$, $\frac23 + \frac D3$, $1$ for $j = 0,1,2,3$
+  (Boyd and Richerson). From $k$ carriers, the next generation has
+  $\mathrm{Bin}(n, p + Dp(1-p)(2p-1))$ carriers, $p = k/n$.
+\end{definition}
+
+\begin{theorem}[Binary 3-majority is conformist transmission with $D = 1$ on counts]\label{thm:conformist}
+  \lean{Plurality.conformistCountKernel_meanField, Plurality.uniform_tgt3_eq_independent, Plurality.binKernel_lumps}
+  \leanok
+  \uses{def:conformist, thm:binary_mean_field}
+  The mean-field map of conformist transmission is $p \mapsto p + Dp(1-p)(2p-1)$. Under binary
+  3-majority the number of nodes with opinion $1$ is conformist transmission with $D = 1$: from
+  $k$ such nodes, one round leads to $\mathrm{Bin}(n, m(k/n))$ of them.
+\end{theorem}
+\begin{proof}
+  \leanok
+  The binomial law has mean $np$. A round draws the sample triples of the nodes independently and
+  uniformly, so the indicators that the nodes adopt opinion $1$ are independent Bernoulli coins
+  with the probability $m(k/n)$ that the majority of a uniform triple holds $1$, and their number
+  is binomial.
 \end{proof}
 
 \section{Lower bounds}\label{sec:lower}

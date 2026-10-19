@@ -15,6 +15,7 @@ are numbered differently.
 | The median commutes with monotone maps; thresholding the process gives the binary median process, for the same samples | `med3_monotone`, `threshold_step`, `threshold_run` |
 | Validity (new values are current values), range, consensus fixed points | `step_mem`, `step_mem_Icc`, `step_of_consensus` |
 | Binary case: one round maps the fraction `p` of `true` to `3p² − 2p³` in expectation | `expected_ones` |
+| The same as a mean-field map (the core's `Dynamics.Kernel.MeanField`): synchronous binary 2-Choices and the binary median rule have the mean-field map `Dynamics.majorityMap`, `p ↦ 3p² − 2p³`, that of binary 3-Majority (`Plurality.binKernel_meanField`); with two colours 2-Choices is the median rule as a kernel | `kernel_meanField`, `TwoChoices.kernel_meanField`, `TwoChoices.kernel_bool` (in [`Median/MeanField.lean`](Median/MeanField.lean)) |
 | Almost-sure consensus | `absorbed` |
 | 2-Choices from a gap of `128 √(n log n)`: all nodes hold the majority value after `⌈128 log n⌉` rounds w.p. `≥ 1 − 128/n`, for `log n ≥ 128` | `consensus_whp` (in [`Median/Binary.lean`](Median/Binary.lean)), via `binary_consensus` |
 | 2-Choices from any start (possibly perfectly balanced): consensus after `⌈C log n⌉` rounds w.p. `≥ 1 − C/n`, for `log n ≥ C` (`C = 2¹⁸`) | `binary_any_start` (in [`Median/AnyStart.lean`](Median/AnyStart.lean)) |
