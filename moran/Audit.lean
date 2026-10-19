@@ -15,6 +15,17 @@ import Moran
 #print axioms Moran.pullCountKernel_jump
 #print axioms Moran.pullCountKernel_fixation
 #print axioms Moran.moranCountKernel_fixation
+#print axioms Moran.birthDeath_eq_birthDeathChain
+#print axioms Moran.moranKernel_top_lumps
+#print axioms Moran.moranSelectionCountKernel_sameJumpChain
+#print axioms Moran.birthDeathCountKernel_jump
+#print axioms Moran.moranSelectionCountKernel_jump
+#print axioms Moran.birthDeathCountKernel_fixation
+#print axioms Moran.moranSelectionCountKernel_fixation
+#print axioms Moran.birthDeathCountKernel_one
+#print axioms Moran.moranSelectionCountKernel_one
+#print axioms Moran.moranKernel_top_one_lumps
+#print axioms Moran.moranKernel_one_eq_pullKernel
 #print axioms Moran.star_potential_invariant
 #print axioms Moran.star_fixation
 #print axioms Moran.star_fixation_leaf
