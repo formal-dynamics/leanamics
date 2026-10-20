@@ -70,11 +70,12 @@ notes:
   - >-
     Formal status. proved: the correspondence itself is a Lean theorem. partial: part of it is a
     Lean theorem, and the summary says which part. definitional: the library defines the process
-    once and names it after both fields (for example, neutral push is the Birth–death Moran
-    kernel with $r = 1$), so every result proved for it holds under both names, but no theorem
-    compares two definitions. results: the library proves results about some of the columns, not
-    the correspondence. roadmap: a target of the roadmap, not formalized yet. not formalized:
-    neither in the library nor a target of the roadmap.
+    once and names it after both fields, so every result proved for it holds under both names,
+    but no theorem compares two definitions; part of a row can be definitional in this sense (for
+    example, neutral push is the Birth–death Moran kernel with $r = 1$). results: the library
+    proves results about some of the columns, not the correspondence. roadmap: a target of the
+    roadmap, not formalized yet. not formalized: neither in the library nor a target of the
+    roadmap.
   - >-
     Blueprint links point to the section of a package's blueprint that contains the result; where
     that section has no label, they point to the label of the theorem itself. References were
@@ -359,13 +360,16 @@ rows:
         (`Moran.pullKernel_top_lumps`), whose jump chain moves up or down with probability $1/2$
         (`Moran.pullCountKernel_jump`); Moran's model, with self-loops and probability $xy/n^2$,
         has the same jump chain (`Moran.moranCountKernel_sameJumpChain`), and for $n \ge 2$ both
-        fix with probability $x/n$. The network is an instance of CRN-1 (`Crn.jumpKernel_eq_ppKernel`),
-        not stated for it, and the continuous-time chains are not formalized.
+        fix with probability $x/n$. On every regular graph the pull kernel is neutral push
+        (`Moran.moranKernel_one_eq_pullKernel`, next row). The network is an instance of CRN-1
+        (`Crn.jumpKernel_eq_ppKernel`), not stated for it, and the continuous-time chains are not
+        formalized.
       correspondence:
         - Moran.pullKernel
         - Moran.pullKernel_top_lumps
         - Moran.pullCountKernel_jump
         - Moran.moranCountKernel_sameJumpChain
+        - Moran.moranKernel_one_eq_pullKernel
         - Crn.jumpKernel_eq_ppKernel
       results:
         - Moran.pull_fixation
@@ -376,6 +380,7 @@ rows:
       blueprint:
         - /moran/blueprint/#sec:ars-push-pull
         - /moran/blueprint/#sec:moran-counts
+        - /moran/blueprint/#sec:moran-selection-counts
         - /crn/blueprint/#thm:crn1
       roadmap: [VOT-4, CRN-1]
     paper:
@@ -441,17 +446,26 @@ rows:
         - The CRN counterpart exists only on $K_n$, where push and pull coincide.
       refs: [SoodAntalRedner2008, Maciejewski2014, HindersinTraulsen2015, Castellano2005]
     leanamics:
-      status: definitional
+      status: partial
       summary: >-
-        Neutral push is the Birth–death Moran kernel with $r = 1$ (`Moran.moranKernel`); its
-        fixation probability is proved exactly on every connected graph, and $k/n$ on regular
-        graphs.
-      correspondence: [Moran.moranKernel]
+        Neutral push is defined as the Birth–death Moran kernel with $r = 1$
+        (`Moran.moranKernel`), so the same chain holds on every graph by definition; its fixation
+        probability is proved exactly on every connected graph, and $k/n$ on regular graphs. On
+        every regular graph neutral push and pull are the same kernel
+        (`Moran.moranKernel_one_eq_pullKernel`), and on $K_n$ the number of mutants under push is
+        the neutral chain on counts without self-loops of the previous row
+        (`Moran.moranKernel_top_one_lumps`), whose jump chain is that of the network. The network
+        is an instance of CRN-1, not stated for it.
+      correspondence:
+        - Moran.moranKernel
+        - Moran.moranKernel_one_eq_pullKernel
+        - Moran.moranKernel_top_one_lumps
       results: [Moran.push_fixation, Moran.push_value_invariant, Moran.isothermal_neutral]
       packages: [moran]
       blueprint:
         - /moran/blueprint/#sec:ars-push-pull
         - /moran/blueprint/#sec:lhn-isothermal
+        - /moran/blueprint/#sec:moran-selection-counts
       roadmap: [VOT-4, MOR-2]
     paper:
       include: false   # merged with the previous row in the paper's table
@@ -535,22 +549,39 @@ rows:
           death-driven rule with the biased voter model). The comparisons on finite graphs are our computation.
       refs: [HindersinTraulsen2015, GalanisEtAl2017, DurrettMoseley2015, AntalRednerSood2006, DurocherEtAl2022, Swart2017]
     leanamics:
-      status: definitional
+      status: partial
       summary: >-
-        The Birth–death kernel (`Moran.moranKernel`) is the push voter with fitness-biased senders.
-        The library proves the "if" direction of the isothermal theorem, Moran's formula on $K_n$
-        and exact fixation on the star. Networks with unequal rate constants are not formalized
-        (CRN-1 assumes a common rate constant).
-      correspondence: [Moran.moranKernel]
+        The Birth–death kernel (`Moran.moranKernel`) is the push voter with fitness-biased senders,
+        by definition. On $K_n$ the library's kernel has no self-loops (the offspring replaces
+        another vertex), and its number of mutants is the chain on counts that moves from $k$ up
+        with probability $rk(n-k)/((rk+n-k)(n-1))$ and down with probability
+        $k(n-k)/((rk+n-k)(n-1))$ (`Moran.moranKernel_top_lumps`). Moran's chain on counts, in which
+        the dying individual is drawn among all $n$ (self-loops), has the same jump chain
+        (`Moran.moranSelectionCountKernel_sameJumpChain`): from every mixed state it moves up with
+        probability $r/(1+r)$ (`Moran.birthDeathCountKernel_jump`,
+        `Moran.moranSelectionCountKernel_jump`), and for $r \ne 1$ both chains fix from $k$
+        mutants with probability $(1 - r^{-k})/(1 - r^{-n})$, transferred from Moran's formula on
+        $K_n$. The library also proves the "if" direction of the isothermal theorem and exact
+        fixation on the star. Networks with unequal rate constants are not formalized (CRN-1
+        assumes a common rate constant), nor are the continuous-time chains.
+      correspondence:
+        - Moran.moranKernel
+        - Moran.moranKernel_top_lumps
+        - Moran.moranSelectionCountKernel_sameJumpChain
+        - Moran.birthDeathCountKernel_jump
+        - Moran.moranSelectionCountKernel_jump
       results:
         - Moran.isothermal
         - Moran.moran_formula
+        - Moran.birthDeathCountKernel_fixation
+        - Moran.moranSelectionCountKernel_fixation
         - Moran.star_fixation
         - Moran.star_amplifier
         - Moran.star_fixation_uniform_tendsto
       packages: [moran]
       blueprint:
         - /moran/blueprint/#sec:lhn-isothermal
+        - /moran/blueprint/#sec:moran-selection-counts
         - /moran/blueprint/#sec:broom-rychtar
       roadmap: [MOR-1, MOR-2, MOR-3]
     paper:
@@ -629,13 +660,20 @@ rows:
       status: partial
       summary: >-
         The pathwise duality for every sampling kernel (the configuration after $T$ rounds is the
-        initial one composed with the backward map), its two-token form, and on $K_n$ with
-        self-loops the exact probability $(1 - 1/n)^T$ that two backward walks have not met, i.e.
+        initial one composed with the backward map), its two-token form, and the duality of
+        kernels (`Dynamics.Kernel.Dual`) between the voter model and coalescing walks on sets of
+        vertices, $A \mapsto r(A)$, with the additive duality function of the physics column,
+        $1\{\text{some vertex of } A \text{ has opinion } 1\}$, for every sampling kernel and at
+        every time (`Voter.transition_dual`, `Voter.transition_event_someTrue`). On $K_n$ with
+        self-loops, the exact probability $(1 - 1/n)^T$ that two backward walks have not met, i.e.
         that two Wright–Fisher lineages have not coalesced after $T$ generations. Kingman's
         coalescent and the coagulation reading are not formalized.
       correspondence:
         - Voter.runRounds_eq_comp
         - Voter.disagreement_runRounds_eq_zero
+        - Voter.coalescingKernel
+        - Voter.transition_dual
+        - Voter.transition_event_someTrue
         - Voter.iterate_transition_eq_leftRounds
         - Voter.iterate_disagreement_le_pairWalk
         - ThreeMajority.voter_dual
@@ -647,6 +685,7 @@ rows:
       packages: [voter, 3-majority]
       blueprint:
         - /voter/blueprint/#lem:duality
+        - /voter/blueprint/#thm:coalescing-dual
         - /voter/blueprint/#sec:kms-meeting-time
         - /3-majority/blueprint/#sec:bcekmn-any-start
       roadmap: [VOT-3, VOT-6, MAJ-6]
@@ -828,20 +867,41 @@ rows:
           copy" is ours.
       refs: [BoydRicherson1985, AcerbiMesoudiSmolla2022, Galam2002]
     leanamics:
-      status: results
+      status: proved
       summary: >-
-        The exact expected one-round map $\mathbb E[X_{t+1}] = n(3x^2 - 2x^3)$ (the mean-field
-        identity) and consensus theorems for 3-Majority; conformist transmission is not defined in
-        the library.
-      correspondence: []
+        Conformist transmission is defined on counts, as population genetics defines
+        Wright–Fisher: every new individual samples three models with replacement from the whole
+        previous generation, so from $k$ carriers the next generation has
+        $\mathrm{Bin}(N, p + Dp(1-p)(2p-1))$ carriers, $p = k/N$
+        (`Plurality.conformistCountKernel`; Boyd and Richerson's Eq. 7.1 follows from their table,
+        `Dynamics.conformistMap_eq_expect`, and the table is the majority with probability $D$,
+        otherwise a copy, `Dynamics.conformistTable_eq`). Synchronous binary 3-Majority on $K_N$
+        with self-loops lumps to it with $D = 1$ under the number of nodes holding opinion 1
+        (`Plurality.binKernel_lumps`); on labelled configurations the two coincide by definition.
+        Its mean-field map is $3x^2 - 2x^3$ (`Plurality.binKernel_meanField`, from the exact
+        one-round expectation $\mathbb E[X_{t+1}] = n(3x^2 - 2x^3)$), which is conformist
+        transmission with $D = 1$ (`Dynamics.conformistMap_one`) and Galam's map with groups of
+        three (`Dynamics.galamMap_eq`); Galam's process, which updates whole groups at once, is not
+        formalized. Consensus theorems for 3-Majority.
+      correspondence:
+        - Plurality.conformistCountKernel
+        - Plurality.binKernel_lumps
+        - Plurality.binKernel_meanField
+        - Plurality.conformistCountKernel_meanField
+        - Dynamics.conformistMap_eq_expect
+        - Dynamics.conformistTable_eq
+        - Dynamics.conformistMap_one
+        - Dynamics.galamMap_eq
       results:
         - ThreeMajority.avg_card_step
         - ThreeMajority.majority3_consensus_whp
         - Plurality.majority3_vanishing_bias
         - Plurality.majority3_any_start
         - Plurality.theorem_3_8
-      packages: [3-majority, plurality]
+      packages: [dynamics, 3-majority, plurality]
       blueprint:
+        - /plurality/blueprint/#sec:mean_field
+        - /dynamics/blueprint/#sec:relations
         - /3-majority/blueprint/#sec:map
         - /3-majority/blueprint/#sec:main-statement
         - /plurality/blueprint/#sec:upper
@@ -933,12 +993,20 @@ rows:
           expansions in $1/N$ of the exact ones.
       refs: [CondonEtAl2020, CastellanoMunozPastorSatorras2009, SlaninaLavicka2003, KrapivskyRedner2003]
     leanamics:
-      status: results
+      status: partial
       summary: >-
-        Synchronous 2-Choices and the median rule: the expected one-round map $n(3p^2 - 2p^3)$,
-        consensus from a gap and from any configuration, with an adversary, on expanders and with
-        many colours. The sequential version and the network are not formalized.
-      correspondence: []
+        The mean-field part: synchronous binary 2-Choices, which is the binary median rule as a
+        kernel (`Median.TwoChoices.kernel_bool`), has the mean-field map $p \mapsto 3p^2 - 2p^3$
+        (`Median.TwoChoices.kernel_meanField`, `Median.kernel_meanField`, from the expected
+        one-round map $n(3p^2 - 2p^3)$), `Dynamics.majorityMap`, which is also the mean-field map
+        of binary 3-Majority (`Plurality.binKernel_meanField`, previous row). Consensus from a gap
+        and from any configuration, with an adversary, on expanders and with many colours. The
+        sequential version, the network and the physics models are not formalized, so the
+        jump-chain and same-chain identities are not.
+      correspondence:
+        - Median.kernel_meanField
+        - Median.TwoChoices.kernel_bool
+        - Median.TwoChoices.kernel_meanField
       results:
         - Median.expected_ones
         - Median.consensus_whp
@@ -949,6 +1017,7 @@ rows:
         - Median.TwoChoices.plurality_whp
       packages: [median]
       blueprint:
+        - /median/blueprint/#thm:mean-field
         - /median/blueprint/#sec:dgmss-median
         - /median/blueprint/#thm:binary-adv
         - /median/blueprint/#sec:cer-two-choices
@@ -961,7 +1030,7 @@ rows:
       crn: 'sequential: $2X{+}Y\to 3X$, $X{+}2Y\to 3Y$'
       physics: '$q$-voter, $q{=}2$; on $K_n$: Sznajd, majority rule'
       social: '--'
-      relation: 'jump chain; $q$-voter, Sznajd: same chain'
+      relation: 'jump chain; $q$-voter, Sznajd: same chain; mean field'
       cite:
         dc: [DoerrEtAl2011]
         crn: [CondonEtAl2020]
@@ -1743,7 +1812,7 @@ paper_caption: >-
   \emph{mean field} (same expected one-step map); a field name restricts a relation to its
   column. CRN counterparts exist only on $K_n$ and for sequential dynamics: a CRN is well mixed and
   fires one reaction at a time. Lean: \checkmark{} correspondence proved; partial: part of it;
-  def.: one definition under both names; results: results on the columns only; roadmap: a
+  results: results on the columns only; roadmap: a
   roadmap target, not formalized yet; none: not formalized, not a roadmap target. Conditions and
   references for every cell: project website.
 

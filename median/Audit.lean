@@ -6,6 +6,9 @@ import Median
 #print axioms Median.step_mem_Icc
 #print axioms Median.step_of_consensus
 #print axioms Median.expected_ones
+#print axioms Median.kernel_meanField
+#print axioms Median.TwoChoices.kernel_bool
+#print axioms Median.TwoChoices.kernel_meanField
 #print axioms Median.absorbed
 #print axioms Median.consensus_whp
 #print axioms Median.binary_any_start

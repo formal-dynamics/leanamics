@@ -182,6 +182,19 @@ configuration is a consensus.
 \begin{proof}\leanok
 Induction on the list of rounds, since one round maps $s$ to $s\circ r$.
 \end{proof}
+\begin{theorem}[Duality of kernels with coalescing walks]\label{thm:coalescing-dual}
+\lean{Voter.coalescingKernel,Voter.someTrue,Voter.someTrue_step,Voter.transition_dual,Voter.transition_event_someTrue}\leanok\uses{def:step,lem:duality}
+For every sampling kernel, let coalescing walks on sets of vertices move from $A$ to $r(A)$, for a
+round $r$ drawn as in the voter model. With the additive duality function
+$H(s,A)=1\{s_v=\mathtt{true}\text{ for some }v\in A\}$, the voter model and the coalescing walks
+are dual kernels (shared library): the probability that some vertex of $A$ has colour
+\texttt{true} after $t$ rounds from $s$ equals the probability that the coalescing walks started
+from $A$ occupy, after $t$ steps, some vertex where $s$ has colour \texttt{true}.
+\end{theorem}
+\begin{proof}\leanok
+In one round, $s\circ r$ takes the value \texttt{true} on $A$ iff $s$ takes it on $r(A)$; one-step
+duality holds at every time.
+\end{proof}
 \begin{lemma}[Rounds are independent and uniform]\label{lem:wf-rounds}
 \lean{Voter.independent_wfKernel_expect,Voter.iterate_wfKernel_eq_expList}\leanok\uses{def:backward,lem:product}
 Under Wright--Fisher sampling a round is uniform on $V\to V$, so the $T$-step

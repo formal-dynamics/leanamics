@@ -31,3 +31,7 @@ import Plurality
 #print axioms Plurality.majority3_symmetry_breaking
 #print axioms Plurality.majority3_any_start
 #print axioms Plurality.majority3_any_start_whp
+#print axioms Plurality.binKernel_meanField
+#print axioms Plurality.conformistCountKernel_meanField
+#print axioms Plurality.uniform_tgt3_eq_independent
+#print axioms Plurality.binKernel_lumps

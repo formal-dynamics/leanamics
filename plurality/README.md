@@ -39,6 +39,7 @@ this as `≤ 130 λ log n` rounds with probability `≥ 1 - 143 λ log n / n`.
 | `k = 2` | `binary_consensus_whp` (reuses `three_majority`) | done |
 | `k = 2` from a vanishing bias (gap `22√(3 n log n)`, `≤ 390 log n` rounds) | `majority3_vanishing_bias` (Theorem 3.8 with `λ = 3`, stated for `ThreeMajority.run`) | done |
 | `k = 2` from **any** configuration (symmetry breaking, beyond the paper) | `majority3_symmetry_breaking`, `majority3_any_start`, `majority3_any_start_whp` | done |
+| `k = 2`: the mean-field map `x ↦ 3x² - 2x³` (the core's `Dynamics.majorityMap`, also conformist transmission with `D = 1` and Galam's map), and binary 3-majority as conformist transmission with `D = 1` on counts, `Bin(n, 3x² - 2x³)` (beyond the paper) | `binKernel_meanField`, `conformistCountKernel`, `conformistCountKernel_meanField`, `binKernel_lumps` | done |
 | Corollaries 3.10–3.12 | `corollary_3_10`, `corollary_3_11`, `corollary_3_12` | done |
 | Observation 3.9 (adversary) | | open |
 | Lemma 4.1, Theorem 4.2 (`Ω(k log n)`) | `lemma_4_1`, `theorem_4_2`, `theorem_4_2_log` | done, for `k ≤ n^{1/4-δ}` |
@@ -80,6 +81,7 @@ proofs in both versions of the paper have gaps. Both are recorded in
 | `Corollaries` | Corollaries 3.10, 3.11, 3.12 |
 | `Binary` | The `k = 2` case via the `three_majority` package |
 | `AnyStart` | `k = 2` from any configuration: symmetry breaking, then the vanishing bias |
+| `MeanField` | `k = 2`: the mean-field map, conformist transmission on counts and the lumping of binary 3-majority to it |
 | `Lower` | Lemma 4.1 and Theorem 4.2 |
 | `Rules` | 3-input rules, `Δ`, `δ`, solvers, consensus needs survival |
 | `ClearMajority` | Theorem 4.8 (a) |

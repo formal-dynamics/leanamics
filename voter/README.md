@@ -25,6 +25,7 @@ and indicator projections give the probability for every color in a finite palet
 | Regular graphs | `regular_consensus_probability` |
 | Section 2.3 | `iterate_project`, `color_consensus_probability` |
 | Section 2.4 on the complete graph: duality with coalescing random walks | `runRounds_eq_comp`, `disagreement_runRounds_eq_zero` |
+| Section 2.4, any sampling kernel: the voter model and coalescing random walks on sets of vertices are dual kernels (`Dynamics.Kernel.Dual`) for the additive duality function `1{some vertex of A has colour true}`, at every time (in [`Voter/CoalescingDual.lean`](Voter/CoalescingDual.lean)) | `coalescingKernel`, `someTrue`, `transition_dual`, `transition_event_someTrue` |
 | Section 2.4 on the complete graph: consensus within `2 n log n` rounds w.p. `≥ 1 - 1/n` | `expList_backward_ne`, `iterate_disagreement_le`, `voter_consensus_whp` |
 | Remark p. 254: Theorem 2.1 on bipartite graphs given one self-loop | `propagate_kernel_region`, `consensus_tendsto_of_selfLoop`, `consensus_probability_of_selfLoop`, `color_consensus_probability_of_selfLoop` |
 | Lazy voter `(I + D⁻¹A)/2` on any connected graph (VOT-2) | `lazy`, `lazyNeighbor`, `lazy_stationary_iff`, `lazy_consensus_probability`, `lazyNeighbor_consensus_probability` |

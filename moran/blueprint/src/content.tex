@@ -199,6 +199,62 @@ self-loops through the lumping, applied to a configuration with $k$ mutants. Ker
 jump chain have the same absorption probabilities (shared library), which gives Moran's chain.
 \end{proof}
 
+\section{Moran's chain with selection on counts}\label{sec:moran-selection-counts}
+With mutants of fitness $r>0$ and residents of fitness $1$, Moran's model with selection by
+fecundity (1959) draws the reproducing individual with probability proportional to its fitness and
+the dying individual uniformly from the whole population, possibly the same one. On the complete
+graph the Birth--death kernel draws the parent in the same way, but its offspring replaces a
+uniformly random neighbour, that is another vertex.
+\begin{definition}[Birth--death chains on counts]\label{def:selection-counts}
+\lean{Moran.moveDistOf,Moran.birthDeathChain,Moran.birthDeathChain_expect,Moran.birthDeath_eq_birthDeathChain,Moran.birthDeathCountKernel,Moran.moranSelectionCountKernel,Moran.biasedWalk}\leanok\uses{def:moran-counts}
+A birth--death chain on $\{0,\dots,n\}$ moves from $k$ to $k-1$ with probability $d(k)$ and to
+$k+1$ with probability $u(k)$; the symmetric chains are the case $d=u$. With $F_k=rk+n-k$ the
+total fitness, the chain without self-loops has $u(k)=rk(n-k)/(F_k(n-1))$ and
+$d(k)=k(n-k)/(F_k(n-1))$, Moran's chain has $u(k)=rk(n-k)/(F_kn)$ and $d(k)=k(n-k)/(F_kn)$, and
+the biased walk has $u(k)=r/(1+r)$ and $d(k)=1/(1+r)$ for $0<k<n$, and $u=d=0$ at $0$ and $n$.
+\end{definition}
+\begin{theorem}[Birth--death on $K_n$ is a chain on counts]\label{thm:moran-lumps}
+\lean{Moran.totalFitness_eq,Moran.pairDist_top_prob,Moran.moranKernel_top_lumps}\leanok\uses{def:moran,def:selection-counts,thm:pull-lumps}
+Under the Birth--death kernel with fitness $r$ on the complete graph, the number of mutants is the
+chain without self-loops.
+\end{theorem}
+\begin{proof}\leanok
+The parent $u$ is drawn with probability $f(u)/F_k$ and the replaced vertex $w\neq u$ with
+probability $1/(n-1)$. The number of mutants increases iff $u$ is a mutant and $w$ a resident,
+with probability $rk(n-k)/(F_k(n-1))$, decreases iff $u$ is a resident and $w$ a mutant, with
+probability $(n-k)k/(F_k(n-1))$, and stays otherwise.
+\end{proof}
+\begin{theorem}[Same jump chain]\label{thm:selection-jump}
+\lean{Moran.birthDeathChain_weight_of_ne,Moran.birthDeathChain_sameJumpChain,Moran.moranSelectionCountKernel_sameJumpChain,Moran.biasedWalk_jump,Moran.birthDeathCountKernel_jump,Moran.moranSelectionCountKernel_jump}\leanok\uses{def:selection-counts}
+Moran's chain and the chain without self-loops have the same jump chain, the biased walk: until
+it is absorbed at $0$ or $n$, the count moves up with probability $r/(1+r)$ and down with
+probability $1/(1+r)$.
+\end{theorem}
+\begin{proof}\leanok
+Off the diagonal the rows of Moran's chain are $(n-1)/n$ times those of the chain without
+self-loops, and from $0<k<n$ the latter moves up and down with probabilities in the ratio $r:1$.
+\end{proof}
+\begin{theorem}[Moran's formula on counts]\label{thm:selection-fixation}
+\lean{Moran.birthDeathChain_prob_self,Moran.birthDeathCountKernel_fixation_count,Moran.birthDeathCountKernel_fixation,Moran.moranSelectionCountKernel_fixation}\leanok\uses{thm:moran-lumps,thm:selection-jump,thm:moran}
+For $r\neq1$ and $n\ge1$, both chains fix the mutants from $k$ copies with probability
+$(1-r^{-k})/(1-r^{-n})$.
+\end{theorem}
+\begin{proof}\leanok
+Moran's formula on the complete graph transfers to the chain without self-loops through the
+lumping, applied to a configuration with $k$ mutants, and to Moran's chain through the jump chain.
+\end{proof}
+\begin{theorem}[Neutral push and pull]\label{thm:push-pull-regular}
+\lean{Moran.birthDeathCountKernel_one,Moran.moranSelectionCountKernel_one,Moran.moranKernel_top_one_lumps,Moran.target_comm_of_regular,Moran.moranKernel_one_eq_pullKernel}\leanok\uses{thm:moran-lumps,thm:pull-lumps,def:pull}
+For $r=1$ the two chains are the neutral chains of Definition~\ref{def:moran-counts}, so under
+neutral push on $K_n$ the number of mutants is the neutral chain without self-loops, as under
+pull. On every regular graph, neutral push and pull are the same kernel on configurations.
+\end{theorem}
+\begin{proof}\leanok
+With $r=1$ the total fitness is $n$. On a regular graph a vertex places its offspring on a given
+neighbour with the same probability as that neighbour places its offspring on it, so exchanging
+the two vertices of each pair turns push into pull.
+\end{proof}
+
 \section{Exact fixation on the star}\label{sec:broom-rychtar}
 The star with $n$ leaves is Mathlib's \texttt{starGraph} $c$ on $n+1$ vertices: the centre $c$
 is adjacent to every leaf and leaves only to $c$. It is not regular, and it amplifies selection

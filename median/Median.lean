@@ -6,3 +6,4 @@ import Median.Expander
 import Median.Adversary
 import Median.ExpanderGeneral
 import Median.TwoChoices
+import Median.MeanField
