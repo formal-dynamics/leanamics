@@ -86,7 +86,13 @@ Shared at the repository root:
 home_page/             the Jekyll landing page, deployed at the Pages root
 .github/workflows/     per-project build CI, plus the shared Pages deployment
 .github/pull_request_template.md   the documentation checklist of every pull request
+scripts/               maintenance scripts (axiom audit, dictionary and size tables)
 ```
+
+`python3 scripts/library_sizes.py` prints a LaTeX table of the packages with their main results
+and sizes (lines, theorems and definitions of the Lean sources that `lake build` builds; the
+counting rule is in its docstring); `--check` checks that every package has a one-line main
+result and every main result a package.
 
 To work on one project, `cd` into it and use Lake as usual:
 
