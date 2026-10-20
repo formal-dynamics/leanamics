@@ -1030,7 +1030,7 @@ rows:
       crn: 'sequential: $2X{+}Y\to 3X$, $X{+}2Y\to 3Y$'
       physics: '$q$-voter, $q{=}2$; on $K_n$: Sznajd, majority rule'
       social: '--'
-      relation: 'jump chain; $q$-voter, Sznajd: same chain'
+      relation: 'jump chain; $q$-voter, Sznajd: same chain; mean field'
       cite:
         dc: [DoerrEtAl2011]
         crn: [CondonEtAl2020]
@@ -1812,7 +1812,7 @@ paper_caption: >-
   \emph{mean field} (same expected one-step map); a field name restricts a relation to its
   column. CRN counterparts exist only on $K_n$ and for sequential dynamics: a CRN is well mixed and
   fires one reaction at a time. Lean: \checkmark{} correspondence proved; partial: part of it;
-  def.: one definition under both names; results: results on the columns only; roadmap: a
+  results: results on the columns only; roadmap: a
   roadmap target, not formalized yet; none: not formalized, not a roadmap target. Conditions and
   references for every cell: project website.
 
