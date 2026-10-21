@@ -10,10 +10,10 @@ round by round and for every realization of the samples (`colorSet_step`,
 `colorSet_run`). The one-round bridge is the bridge `ThreeMajority.stepCol_bool`
 of the model with colours of any type, through `step_eq_stepCol` and the renaming
 of the colors `Fin 2` as `Bool`. The binary consensus theorem
-`ThreeMajority.majority3_consensus_whp` therefore transfers verbatim
-(`binary_consensus_whp`): from a `60%` majority, 3-majority with two colors
-reaches the majority color within `O(log n)` rounds with probability
-`1 - O(1/n)`.
+`ThreeMajority.majority3_consensus_whp` therefore holds for two colors as stated,
+through `colorSet_run` and `mono_one_iff_colorSet`: from a `60%` majority,
+3-majority with two colors reaches the majority color within `O(log n)` rounds
+with probability `1 - O(1/n)`.
 
 This is the `k = 2` instance of the paper's Corollary 3.12 (large plurality,
 `λ = Θ(1)`), obtained by reusing the existing statement rather than by
@@ -23,7 +23,7 @@ re-proving it.
 namespace Plurality
 
 open Finset
-open ThreeMajority (Tgt3 tgt3_nonempty T2a)
+open ThreeMajority (Tgt3)
 
 variable {n : ℕ}
 
@@ -50,24 +50,6 @@ lemma colorSet_run (x : Config n 2) (l : List (Tgt3 n)) :
 
 lemma mono_one_iff_colorSet (x : Config n 2) : Mono x 1 ↔ colorSet x 1 = univ := by
   simp [Mono, colorSet, Finset.eq_univ_iff_forall]
-
-/-- **Binary plurality consensus** (reusing `ThreeMajority.majority3_consensus_whp`):
-with two colors, if color `1` is supported by at least `60%` of the nodes and
-`log n ≥ 30`, then after `10 + (⌈6 log n⌉ + 2) = O(log n)` rounds all nodes
-support color `1` with probability at least `1 - 500/n`. -/
-theorem binary_consensus_whp (hbig : (30 : ℝ) ≤ Real.log n) (x : Config n 2)
-    (hx : (n : ℝ) * (3 / 5) ≤ count x 1) :
-    1 - 500 / (n : ℝ)
-      ≤ Dynamics.expList (Tgt3 n) (10 + (T2a n + 2))
-          (fun l => if Mono (run x l) 1 then (1 : ℝ) else 0) := by
-  have h := ThreeMajority.majority3_consensus_whp hbig (colorSet x 1) hx
-  refine h.trans_eq ?_
-  congr 1
-  funext l
-  rw [← colorSet_run]
-  by_cases hm : Mono (run x l) 1
-  · rw [if_pos hm, if_pos ((mono_one_iff_colorSet _).mp hm)]
-  · rw [if_neg hm, if_neg (fun h' => hm ((mono_one_iff_colorSet _).mpr h'))]
 
 /-! ### Two colors from a vanishing bias -/
 

@@ -65,7 +65,7 @@ this as `≤ 130 λ log n` rounds with probability `≥ 1 - 143 λ log n / n`.
 | Lemmas 3.6, 3.7 | `lemma_3_6`, `lemma_3_7_i`, `lemma_3_7_ii` | done |
 | Lemma A.4 | `Dynamics.Kernel.nested_phases` | done |
 | Theorem 3.8 | `theorem_3_8`, `theorem_3_8_bigO` | done |
-| `k = 2` | `binary_consensus_whp` (reuses `ThreeMajority.majority3_consensus_whp`) | done |
+| `k = 2` | `ThreeMajority.majority3_consensus_whp`, through the bridge `colorSet_run` | done |
 | `k = 2` from a vanishing bias (gap `22√(3 n log n)`, `≤ 390 log n` rounds) | `majority3_vanishing_bias` (Theorem 3.8 with `λ = 3`, stated for `ThreeMajority.run`) | done |
 | `k = 2` from **any** configuration (symmetry breaking, beyond the paper) | `majority3_symmetry_breaking`, `majority3_any_start`, `majority3_any_start_whp` | done |
 | `k = 2`: the mean-field map `x ↦ 3x² - 2x³` (the core's `Dynamics.majorityMap`, also conformist transmission with `D = 1` and Galam's map), and binary 3-majority as conformist transmission with `D = 1` on counts, `Bin(n, 3x² - 2x³)` (beyond the paper) | `binKernel_meanField`, `conformistCountKernel`, `conformistCountKernel_meanField`, `binKernel_lumps` | done |

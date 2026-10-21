@@ -43,7 +43,7 @@ READMEs.
 
 | Result | Source | Main theorems | Roadmap |
 | --- | --- | --- | --- |
-| 3-Majority with two opinions: from a 3/5 share, consensus within `10 + ⌈6 log n⌉ + 2` rounds w.p. `≥ 1 − 500/n`, for `log n ≥ 30`; the same for `k = 2` colors in `plurality/`. | No specific paper (own elementary proof) | `ThreeMajority.majority3_consensus_whp`, `Plurality.binary_consensus_whp` | – |
+| 3-Majority with two opinions: from a 3/5 share, consensus within `10 + ⌈6 log n⌉ + 2` rounds w.p. `≥ 1 − 500/n`, for `log n ≥ 30`; the same for colorings with `k = 2` colors, through the bridge `Plurality.colorSet_run`. | No specific paper (own elementary proof) | `ThreeMajority.majority3_consensus_whp` | – |
 | 3-Majority with `k ≥ 2` colors: if the plurality color has `≥ n/λ` nodes and a bias `≥ 22√(λ n log n)`, all nodes adopt it within `130 λ log n` rounds w.p. `≥ 1 − 143 λ log n / n`, for `log n ≥ 40`. | BCNPST, SPAA 2014, Thm 3.8, whose proof needs a minor correction (small repairs) | `Plurality.theorem_3_8`, `theorem_3_8_bigO` | MAJ-7 |
 | Corollaries of Theorem 3.8, including the `O(min{k, (n/log n)^{1/3}} log n)` bound. | BCNPST, SPAA 2014, Cors 3.10–3.12 | `Plurality.corollary_3_10`, `corollary_3_11`, `corollary_3_12` | MAJ-7 |
 | Two opinions from a vanishing bias: a gap `22√(3 n log n)` (a fraction `1/2 + O(√(log n / n))`) gives consensus within `390 log n` rounds w.p. `≥ 1 − 429 log n / n`, for `log n ≥ 40`. | BCNPST, SPAA 2014, Thm 3.8 with `k = 2` | `Plurality.majority3_vanishing_bias` | MAJ-2 |
