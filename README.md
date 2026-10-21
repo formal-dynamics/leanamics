@@ -74,7 +74,6 @@ Lake package. Each has the same shape:
 ```
 <project>/
   README.md            what it proves, how it is proved, how to build it
-  CLAUDE.md            optional orientation for automated contributors
   lakefile.toml        the Lake package (Mathlib + checkdecls, + dynamics if shared)
   lean-toolchain       the pinned Lean version
   <Lib>.lean, <Lib>/   the formalization, one or more libraries
