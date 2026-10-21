@@ -20,14 +20,14 @@ Where the statements of `dynamics/` deviate from their sources, and why.
    abstract of its blueprint); the docstrings cite the dynamics blueprint labels
    (`def:avg`, `lem:uniform-trajectory`, `lem:uniform-agreement`, `lem:weighted-product`).
 6. **`RumorPush.expList_eq_avg_ofFn` is kept although it is a verbatim duplicate**, because the
-   rumor_spread blueprint presents it as a theorem ("Faithfulness of the model"); it is a
-   one-line alias of `Dynamics.expList_eq_avg_ofFn`.
+   blueprint of the library `RumorSpread` (in `epidemics/`) presents it as a theorem
+   ("Faithfulness of the model"); it is a one-line alias of `Dynamics.expList_eq_avg_ofFn`.
 7. **The copyright-header linter is disabled** (`weak.linter.style.header = false` in the
-   lakefiles of `rumor_spread/`, `3-majority/`, `plurality/`, which enable Mathlib's standard
-   linter set). It accepts only Mathlib's Apache 2.0 header, while the repository is released
-   under the MIT License. A style linter does not affect kernel checking.
+   lakefile of `plurality/` and for the library `RumorSpread` of `epidemics/`, which enable
+   Mathlib's standard linter set). It accepts only Mathlib's Apache 2.0 header, while the
+   repository is released under the MIT License. A style linter does not affect kernel checking.
 8. **`ThreeMajority.avg` is an `abbrev`, not an `export`.** An `export Dynamics (avg)` alias is
-   not a constant, and the 3-majority blueprint's `\lean{ThreeMajority.avg}` is checked with
+   not a constant, and the plurality blueprint's `\lean{ThreeMajority.avg}` is checked with
    `Environment.contains`; the reducible abbreviation keeps the name and removes the copy. The
    23 `ThreeMajority.avg_*`/`expList_*` wrappers stay (one-line proofs by the `Dynamics`
    lemmas, tagged in the blueprint, needed by `rw` on `ThreeMajority.avg` terms).
@@ -172,7 +172,7 @@ FND-7:
    (`avg_neighborRound_prod`) holds unconditionally. Both are the dependent-product lemmas
    `avg_pi_prod` and `avg_pi_eval` (`Uniform`) for the factors `G.neighborSet v`. The relation
    of `NeighborRound G` to `RumorPush.Tgt n` (complete graph on `Fin n`) is only documented,
-   since `dynamics/` does not import `rumor_spread/`; `rumor_spread/` uses `avg_pi_prod`
+   since `dynamics/` does not import `epidemics/`; its library `RumorSpread` uses `avg_pi_prod`
    directly.
 
 ## Hitting-time lemma (`DriftHitting`, MAJ-8, Doerr et al. SPAA 2011 Claim 2.9)
@@ -216,7 +216,7 @@ FND-7:
 
 ## Concentration and tail bounds shared by the packages (`Concentration`, `Chernoff`, `Tail`)
 
-The tail bounds that `median/`, `plurality/` and `3-majority/` used to prove locally are stated
+The tail bounds that `median/` and `plurality/` (both libraries) used to prove locally are stated
 once here; the packages call them directly (the old package names, e.g.
 `ThreeMajority.avg_tail_ge_log` or `Plurality.chernoff_lower`, are removed rather than kept as
 aliases, and the package blueprints tag the `Dynamics` names).

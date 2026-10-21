@@ -2,13 +2,13 @@
 
 Shared finite probability and stochastic dynamics for Leanamics. This package
 uses Lean 4.32.0 and Mathlib revision
-`2d8c533bd0a0515caa32f18c0ab4485bd6229378`, exactly matching 3-majority.
+`2d8c533bd0a0515caa32f18c0ab4485bd6229378`, exactly matching the packages that use it.
 
 | Module | API |
 | --- | --- |
 | `Equivalence` | `expList_eq_avg_ofFn`, the recursive `expList` is the uniform average over `Fin T → α` |
 | `Distribution` | Normalized nonnegative real weights, expectations, event probabilities and their elementary bounds (monotonicity, complement, union bounds, inclusion–exclusion, Markov's inequality), uniform distributions, point masses, biased coins `bernoulli`, independent products, pushforward |
-| `Uniform` | Finite averages, recursive uniform trajectory expectations, independence over finite dependent products (`avg_pi_prod`, `avg_pi_eval`) and of disjoint blocks of coordinates (`avg_pi_split`), reindexing; `expList` only sees lists of its length (`expList_le_of_length`, `expList_congr_length`) and splits into two phases (`expList_le_of_split`); extracted from 3-majority |
+| `Uniform` | Finite averages, recursive uniform trajectory expectations, independence over finite dependent products (`avg_pi_prod`, `avg_pi_eval`) and of disjoint blocks of coordinates (`avg_pi_split`), reindexing; `expList` only sees lists of its length (`expList_le_of_length`, `expList_congr_length`) and splits into two phases (`expList_le_of_split`); extracted from `ThreeMajority` |
 | `Independent` | Independent products `Distribution.independent`: resampling and conditioning on one coordinate (`independent_expect_update`, `independent_expect_eq_sum_update`, `independent_expect_fin_succ`), pairwise and block independence (`independent_expect_pair`, `expect_mul_of_dep`), second and third moments of centred sums, coordinatewise combination of independent families (`expect_expect_coord`) |
 | `Adaptive` | Adaptive observation processes: histories `hist obs ω k` (the observation after the history `h` is `obs h ω`), `hist_eq_iff`; the product supermartingale lemma `Distribution.expect_prod_hist_le_one` (factors with conditional expectation at most `1` along the history have a product of expectation at most `1`) and its deferred-decisions form for fresh observations of an independent family, `Distribution.expect_prod_hist_le_one_of_fresh` |
 | `Bridge` | The three expectation APIs agree: `avg` is Mathlib's `𝔼 a, f a` (`avg_eq_expect`), the product of uniform laws is uniform (`Distribution.independent_uniform_expect`), and `expList` is the expectation over `T` i.i.d. draws in Mathlib's and in the distribution form (`expList_eq_expect`, `expList_eq_independent_expect`) |
@@ -69,15 +69,16 @@ generates their dependency graph. Pages CI builds its HTML/PDF and doc-gen4 API
 documentation. The same workflow as the existing packages is used; doc-gen4 is
 resolved separately to preserve the main project's dependency pins.
 
-This is the only finite-probability layer of the repository: `rumor_spread/`,
-`3-majority/` and `plurality/` use `avg` and `expList` from here, and `Bridge` connects them to
+This is the only finite-probability layer of the repository: `plurality/` (both its libraries,
+`Plurality` and `ThreeMajority`) and the library `RumorSpread` of `epidemics/` use `avg` and
+`expList` from here, and `Bridge` connects them to
 Mathlib's `Finset.expect`; `BridgePMF` connects `Distribution` to Mathlib's `PMF` and measures. Where the statements deviate from their sources, see
 [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
-3-majority retains its `ThreeMajority` probability names and blueprint links
+The library `ThreeMajority` (in `plurality/`) retains its probability names and blueprint links
 through compatibility declarations: `ThreeMajority.avg` is a reducible alias of `avg`.
 The scalar facts on ceilings, phase counts and logarithms that `median/`, `plurality/` and
 `undecided/` proved locally live in `Scalar`.
-All concentration, tail and moment bounds of `median/`, `plurality/` and `3-majority/` live in
+All concentration, tail and moment bounds of `median/` and `plurality/` (both libraries) live in
 `Concentration`, `Chernoff`, `Tail` and `Moments`; the packages no longer keep local copies.
 
 ## How to cite

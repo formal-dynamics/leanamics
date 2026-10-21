@@ -46,13 +46,11 @@ PACKAGES = {
     "dynamics": r"shared finite probability layer (Section~\ref{sec:layer})",
     "voter": r"Hassin--Peleg; consensus times on $K_n$ and any graph",
     "moran": r"isothermal theorem; push vs pull; the star amplifier",
-    "3-majority": r"two opinions from $3/5$; $k$ colors from any start",
-    "plurality": r"$k$ colors from a vanishing bias; lower bounds",
+    "plurality": r"$k$ colors: vanishing bias, any start; lower bounds",
     "median": r"2-Choices: any start, adversary, expanders, $k$ colors",
     "undecided": r"majority; $k$ colors, upper and lower bounds",
     "averaging": r"convergence and its rate; community reconstruction",
-    "rumor_spread": r"push, pull, push--pull on $K_n$ in $O(\log n)$ rounds",
-    "epidemics": r"Reed--Frost, percolation, COBRA, SIR; rumor times",
+    "epidemics": r"Reed--Frost, percolation, COBRA, SIR; rumors on $K_n$",
     "crn": r"CRNs as protocols; stable computation; exact majority",
 }
 

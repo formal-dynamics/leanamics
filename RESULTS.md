@@ -27,7 +27,7 @@ READMEs.
 | A finite stochastic kernel from which a target is reachable from every state is absorbed geometrically fast, and every finite kernel has a stationary distribution. | Standard | `Dynamics.Kernel.finite_absorption`, `exists_stationary` | FND-1, FND-2 |
 | The layer's expectations (`avg`, and `expList` over i.i.d. uniform rounds) are Mathlib's `Finset.expect`. | Standard | `Dynamics.avg_eq_expect`, `expList_eq_expect`, `expList_eq_independent_expect` | – |
 | Multiplicative Chernoff bounds for independent, non-identical Bernoulli trials (upper and lower tails, with the mean replaced by any bound). | Mitzenmacher–Upfal, Thms 4.4, 4.5, Ex. 4.7 | `Dynamics.Distribution.chernoff_upper`, `chernoff_lower` | FND-3 |
-| Hoeffding's and Bernstein's inequalities for sums of independent coordinates, Chernoff tails for one uniform round, and Markov's inequality: the concentration and tail bounds used by `3-majority/`, `plurality/` and `median/`, stated once here. | Standard (Dubhashi–Panconesi, Thm 1.1; Mitzenmacher–Upfal, Thms 4.4, 4.5) | `Dynamics.avg_hoeffding`, `avg_bernstein`, `avg_chernoff_upper_of_mgf`, `avg_chernoff_lower_of_mgf`, `avg_markov_one` | – |
+| Hoeffding's and Bernstein's inequalities for sums of independent coordinates, Chernoff tails for one uniform round, and Markov's inequality: the concentration and tail bounds used by `plurality/` (both libraries) and `median/`, stated once here. | Standard (Dubhashi–Panconesi, Thm 1.1; Mitzenmacher–Upfal, Thms 4.4, 4.5) | `Dynamics.avg_hoeffding`, `avg_bernstein`, `avg_chernoff_upper_of_mgf`, `avg_chernoff_lower_of_mgf`, `avg_markov_one` | – |
 | Finite-horizon optional stopping: an observable conserved in expectation and constant on two target events gives the absorption probability `(φ(x₀) − φB)/(φA − φB)`. | Standard | `Dynamics.Kernel.event_error_of_invariant`, `tendsto_event_of_invariant`, `iSup_event_of_invariant` | FND-4 |
 | Time reversal of i.i.d. rounds: a functional of the rounds has the same expectation on the reversed rounds. | Standard | `Dynamics.expList_comp_reverse`, `Kernel.iterate_ofStep_foldr` | FND-6 |
 | Progress through nested phases, without the paper's hypothesis `ε ≤ ν`. | BCNPST, SPAA 2014, Lemma A.4 (stated without proof) | `Dynamics.Kernel.nested_phases` | – |
@@ -35,10 +35,9 @@ READMEs.
 | Round types on a graph: every vertex samples a uniform neighbour, or one uniform oriented edge per step, with their independence and averaging lemmas. | – | `Dynamics.NeighborRound`, `EdgeRound` | FND-7 |
 | Hitting-time lemma for a finite kernel with an observable `X ≤ q` that grows geometrically except with exponentially small probability and leaves `0` with constant probability: `X ≥ c₄ log q` within `O(log q)` steps w.p. `≥ 1 − q^{−c₆}`, with the added hypothesis `c₄ log q ≤ q` that a non-asymptotic statement needs. | Doerr et al. 2011, Claim 2.9 | `Dynamics.Kernel.drift_hitting`, `drift_hitting_log` | MAJ-8 (the lemma) |
 
-## Majority and plurality (`3-majority/`, `plurality/`)
+## Majority and plurality (`plurality/`)
 
-[3-majority README](3-majority/README.md) · [plurality README](plurality/README.md) ·
-[3-majority: differences from the sources](3-majority/FORMALIZATION_DIFFERENCES.md) ·
+[plurality README](plurality/README.md) ·
 [plurality: differences from the sources](plurality/FORMALIZATION_DIFFERENCES.md)
 
 | Result | Source | Main theorems | Roadmap |
@@ -108,10 +107,8 @@ Theorem numbers of Doerr et al. 2011 follow its 2009 version (Dagstuhl Seminar P
 | Neutral push (Birth–death) and pull (death–Birth) on any connected graph: a mutant set `S` fixes w.p. `∑_{v∈S} 1/deg v / ∑_v 1/deg v` (push) and `∑_{v∈S} deg v / 2m` (pull). | Antal, Redner, Sood, PRL 2006 (as conservation laws of the neutral dynamics; their mean-field approximation concerns selection) | `Moran.push_fixation`, `pull_fixation` | VOT-4 |
 | The star: exact fixation probability from every configuration, amplification of selection for every `n ≥ 2`, and uniform-start fixation tending to `1 − 1/r²`. | Broom, Rychtář, Proc. R. Soc. A 2008; Lieberman, Hauert, Nowak 2005 | `Moran.star_fixation`, `star_fixation_uniform_sum`, `star_amplifier`, `star_amplifier_deleterious`, `star_fixation_uniform_tendsto` | MOR-3 (the star) |
 
-## Epidemics and rumor spreading (`epidemics/`, `rumor_spread/`)
+## Epidemics and rumor spreading (`epidemics/`)
 
-[rumor_spread README](rumor_spread/README.md) ·
-[rumor_spread: differences from the sources](rumor_spread/FORMALIZATION_DIFFERENCES.md) ·
 [epidemics README](epidemics/README.md) ·
 [epidemics: differences from the sources](epidemics/FORMALIZATION_DIFFERENCES.md)
 

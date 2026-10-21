@@ -12,8 +12,6 @@
 # Jekyll build, and where it drops them for Jekyll to pick up (see
 # .github/workflows/pages.yml). Both are generated, never committed.
 /site/
-/home_page/rumor_spread/
-/home_page/3-majority/
 
 # Each project has its own .gitignore for its Lake, blueprint and LaTeX
 # build artifacts.

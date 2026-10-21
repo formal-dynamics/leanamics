@@ -53,41 +53,36 @@ jobs:
       matrix:
         include:
           # `package` is the Lake package name in the project's lakefile.toml
-          # (needed by `lake update` in the docs build); `lib` is the lean_lib
-          # whose `:docs` facet doc-gen4 builds.
-          - dir: rumor_spread
-            package: rumor_spread
-            lib: RumorSpread
-          - dir: 3-majority
-            package: three_majority
-            lib: ThreeMajority
+          # (needed by `lake update` in the docs build); `libs` are its
+          # lean_libs (separated by spaces), whose `:docs` facets doc-gen4
+          # builds.
           - dir: dynamics
             package: dynamics
-            lib: Dynamics
+            libs: Dynamics
           - dir: voter
             package: voter
-            lib: Voter
+            libs: Voter
           - dir: moran
             package: moran
-            lib: Moran
+            libs: Moran
           - dir: epidemics
             package: epidemics
-            lib: Epidemics
+            libs: Epidemics RumorSpread
           - dir: undecided
             package: undecided
-            lib: Undecided
+            libs: Undecided
           - dir: averaging
             package: averaging
-            lib: Averaging
+            libs: Averaging
           - dir: median
             package: median
-            lib: Median
+            libs: Median
           - dir: plurality
             package: plurality
-            lib: Plurality
+            libs: Plurality ThreeMajority
           - dir: crn
             package: crn
-            lib: Crn
+            libs: Crn
 
     steps:
       - name: Cleanup to free disk space
@@ -223,9 +218,9 @@ jobs:
           KEY="docinfo-v1-$(printf '%s %s' "$(cat lean-toolchain)" "$DEPS" | sha256sum | cut -c1-16)"
           echo "key=$KEY" >> "$GITHUB_OUTPUT"
           echo "$KEY: $DEPS"
-          # Versions of doc-gen4 before its SQLite database (e.g. the one matching
-          # rumor_spread's older toolchain) have no `docInfo` facet: those projects
-          # skip the cache and build their docs in one go, as before.
+          # Versions of doc-gen4 before its SQLite database (those matching an older
+          # toolchain) have no `docInfo` facet: those projects skip the cache and
+          # build their docs in one go, as before.
           if grep -q 'module_facet docInfo' .lake/packages/doc-gen4/lakefile.lean; then
             echo "cacheable=true" >> "$GITHUB_OUTPUT"
           else
@@ -282,7 +277,7 @@ jobs:
         if: github.event_name != 'pull_request'
         working-directory: .docbuild
         env:
-          LIB: ${{ matrix.lib }}
+          LIBS: ${{ matrix.libs }}
         run: |
           set -euo pipefail
           # Make the bibliography pre-pass run again (see above): its restored output
@@ -290,12 +285,14 @@ jobs:
           # exclusion pattern in the cache paths would not help: actions/cache
           # archives a listed directory whole.)
           rm -f .lake/build/doc-data/references.json*
-          ~/.elan/bin/lake build "$LIB:docs"
+          targets=()
+          for lib in $LIBS; do targets+=("$lib:docs"); done
+          ~/.elan/bin/lake build "${targets[@]}"
 
       - name: Assemble the API documentation
         if: github.event_name != 'pull_request'
         env:
-          LIB: ${{ matrix.lib }}
+          LIBS: ${{ matrix.libs }}
           # A full doc-gen4 run over `import Mathlib` produces ~1.3 GB, almost
           # all of it documentation for the dependencies; two projects' worth
           # would blow through the 1 GB GitHub Pages site limit. So publish
@@ -308,13 +305,15 @@ jobs:
           set -euo pipefail
           DOC=.docbuild/.lake/build/doc
           if [ "$PRUNE_DEPENDENCY_DOCS" = "true" ]; then
-            # Keep: this project's modules, `declarations/` (the search
-            # index), `find/` (the search redirector), and every top-level
-            # file. Drop every other top-level directory.
+            # Keep: this project's modules (those of each of its libraries),
+            # the shared `Dynamics` ones, `declarations/` (the search index),
+            # `find/` (the search redirector), and every top-level file. Drop
+            # every other top-level directory.
+            keep=" $LIBS Dynamics declarations find "
             for d in "$DOC"/*/; do
               name="$(basename "$d")"
-              case "$name" in
-                "$LIB" | Dynamics | ThreeMajority | declarations | find) ;;
+              case "$keep" in
+                *" $name "*) ;;
                 *) rm -rf "$d" ;;
               esac
             done
@@ -391,7 +390,7 @@ jobs:
           check() {
             if [ -e "$1" ]; then echo "ok       $1"; else echo "MISSING  $1"; status=1; fi
           }
-          for p in rumor_spread 3-majority dynamics voter moran epidemics undecided averaging median plurality crn; do
+          for p in dynamics voter moran epidemics undecided averaging median plurality crn; do
             check "_site/$p/blueprint/index.html"
             check "_site/$p/blueprint/dep_graph_document.html"
             check "_site/$p/blueprint.pdf"

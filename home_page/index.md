@@ -30,16 +30,15 @@ sufficiently large $n$" explicit, with thresholds that can be astronomically lar
 {: #majority}
 
 Every round, each node adopts the majority colour among three random nodes. Formalized: consensus
-from a 3/5 majority in $O(\log n)$ rounds ([proof]({{ '/3-majority/blueprint/' | relative_url }}#sec:main-statement)); plurality
+from a 3/5 majority in $O(\log n)$ rounds ([proof]({{ '/plurality/blueprint/' | relative_url }}#sec:main-statement)); plurality
 consensus with $k$ colours from a bias of order $\sqrt{\lambda n \log n}$ ([Becchetti et al., SPAA
 2014]({{ '/plurality/blueprint/' | relative_url }}#sec:upper)) and its [lower bounds]({{ '/plurality/blueprint/' | relative_url }}#sec:lower); with two colours,
 consensus from any start, even a balanced one ([details]({{ '/plurality/blueprint/' | relative_url }}#sec:any_start)); with
 $k \le n^{1/3-\varepsilon}$ colours, consensus in $O((k^2 \sqrt{\log n} + k \log n)(k + \log n))$ rounds ([Becchetti et al., SODA
-2016]({{ '/3-majority/blueprint/' | relative_url }}#sec:bcnpt16-many-opinions)); and, with any number of colours, consensus from any start
-within $O(n^{3/4} \log^{7/8} n)$ rounds ([Berenbrink et al., PODC 2017]({{ '/3-majority/blueprint/' | relative_url }}#sec:bcekmn-any-start)).
+2016]({{ '/plurality/blueprint/' | relative_url }}#sec:bcnpt16-many-opinions)); and, with any number of colours, consensus from any start
+within $O(n^{3/4} \log^{7/8} n)$ rounds ([Berenbrink et al., PODC 2017]({{ '/plurality/blueprint/' | relative_url }}#sec:bcekmn-any-start)).
 
-**Plurality:** [Blueprint]({{ '/plurality/blueprint/' | relative_url }}) · [PDF]({{ '/plurality/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/plurality/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/plurality/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/plurality)  
-**3-Majority:** [Blueprint]({{ '/3-majority/blueprint/' | relative_url }}) · [PDF]({{ '/3-majority/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/3-majority/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/3-majority/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/3-majority)
+[Blueprint]({{ '/plurality/blueprint/' | relative_url }}) · [PDF]({{ '/plurality/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/plurality/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/plurality/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/plurality)
 
 ## Median dynamics and 2-Choices
 {: #median}
@@ -92,7 +91,7 @@ Formalized: the isothermal theorem on regular graphs ([Lieberman, Hauert and Now
 {: #epidemics}
 
 Formalized: push, pull and push–pull rumor spreading on $K_n$ inform all nodes within $O(\log n)$
-rounds ([push]({{ '/rumor_spread/blueprint/' | relative_url }}#sec:main-statement), [pull and push–pull]({{ '/rumor_spread/blueprint/' | relative_url }}#sec:pull)), with
+rounds ([push]({{ '/epidemics/blueprint/' | relative_url }}#sec:main-statement), [pull and push–pull]({{ '/epidemics/blueprint/' | relative_url }}#sec:pull)), with
 sharp upper bounds from a general analysis ([Doerr and Kostrygin, ICALP 2017]({{ '/epidemics/blueprint/' | relative_url }}#sec:doerr-kostrygin)) and the matching [lower bounds]({{ '/epidemics/blueprint/' | relative_url }}#sec:doerr-kostrygin-lower);
 Reed–Frost epidemics as percolation, with small outbreaks below the threshold, also on small-world
 networks ([Becchetti et al.]({{ '/epidemics/blueprint/' | relative_url }}#sec:bcdptz-small-world)), and a giant component above it
@@ -102,8 +101,7 @@ $O(\log n/(1-\lambda)^3)$ on regular expanders ([details]({{ '/epidemics/bluepri
 ([Kermack–McKendrick]({{ '/epidemics/blueprint/' | relative_url }}#sec:kermack-mckendrick)) with their law of large numbers
 ([Kurtz]({{ '/epidemics/blueprint/' | relative_url }}#sec:kurtz)).
 
-**Rumor spreading:** [Blueprint]({{ '/rumor_spread/blueprint/' | relative_url }}) · [PDF]({{ '/rumor_spread/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/rumor_spread/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/rumor_spread/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/rumor_spread)  
-**Epidemics:** [Blueprint]({{ '/epidemics/blueprint/' | relative_url }}) · [PDF]({{ '/epidemics/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/epidemics/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/epidemics/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/epidemics)
+[Blueprint]({{ '/epidemics/blueprint/' | relative_url }}) · [PDF]({{ '/epidemics/blueprint.pdf' | relative_url }}) · [Dependency graph]({{ '/epidemics/blueprint/dep_graph_document.html' | relative_url }}) · [API docs]({{ '/epidemics/docs/' | relative_url }}) · [Source](https://github.com/formal-dynamics/leanamics/tree/main/epidemics)
 
 ## Chemical reaction networks and population protocols
 {: #crn}
@@ -163,7 +161,7 @@ the version you used (here v0.2.0):
 
 Each project is a separate Lean package (its own `lakefile.toml` and toolchain) living in its own
 subdirectory of the repository. The shared `dynamics/` package is used by every other package:
-`rumor_spread/`, `3-majority/`, `plurality/` (which also requires `3-majority/`), `median/`,
-`undecided/`, `voter/`, `moran/`, `epidemics/`, `crn/` and `averaging/`. This page is the shared
-landing page linking to each development; see each subdirectory's own `README.md` for build
-instructions.
+`plurality/` (libraries `Plurality` and `ThreeMajority`), `median/`, `undecided/`, `voter/`,
+`moran/`, `epidemics/` (libraries `Epidemics` and `RumorSpread`), `crn/` and `averaging/`. This
+page is the shared landing page linking to each development; see each subdirectory's own
+`README.md` for build instructions.
