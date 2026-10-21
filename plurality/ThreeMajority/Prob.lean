@@ -3,14 +3,14 @@ import Dynamics.Uniform
 /-!
 Compatibility declarations with the original public statements and names.
 `avg` and `expList` are reducible abbreviations of `Dynamics.avg` and `Dynamics.expList`, and
-every lemma below is the corresponding `Dynamics.Uniform` lemma: this package defines no
+every lemma below is the corresponding `Dynamics.Uniform` lemma: this library defines no
 expectation of its own. The names are kept for the statements and the blueprint.
 -/
 namespace ThreeMajority
 open Finset
 variable {α : Type*} [Fintype α]
 
-/-- The uniform average `Dynamics.avg`, under this package's name (a reducible alias). -/
+/-- The uniform average `Dynamics.avg`, under this library's name (a reducible alias). -/
 noncomputable abbrev avg (f : α → ℝ) : ℝ := Dynamics.avg f
 @[inherit_doc Dynamics.expList]
 noncomputable abbrev expList (α : Type*) [Fintype α] (T : ℕ) (F : List α → ℝ) : ℝ :=

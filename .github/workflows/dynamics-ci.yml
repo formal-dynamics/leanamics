@@ -31,6 +31,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # Every package that requires dynamics/, except plurality/, which has its own workflow
+        # (plurality-ci.yml) that also runs on changes to dynamics/.
         package: [dynamics, voter, moran, epidemics, undecided, averaging, median, crn]
     steps:
       - uses: actions/checkout@v5
@@ -48,6 +50,6 @@ jobs:
         run: |
           # `sorry`/`admit` anywhere; `axiom` only as a declaration keyword, so that
           # prose such as "no axiom beyond Lean core" in a docstring does not fail CI.
-          if grep -R -n -E '\b(sorry|admit)\b|^\s*((private|protected|noncomputable|unsafe)\s+)*axiom\s' dynamics/Dynamics.lean dynamics/Dynamics voter/Voter.lean voter/Voter moran/Moran.lean moran/Moran epidemics/Epidemics.lean epidemics/Epidemics undecided/Undecided.lean undecided/Undecided averaging/Averaging.lean averaging/Averaging median/Median.lean median/Median crn/Crn.lean crn/Crn; then
+          if grep -R -n -E '\b(sorry|admit)\b|^\s*((private|protected|noncomputable|unsafe)\s+)*axiom\s' dynamics/Dynamics.lean dynamics/Dynamics voter/Voter.lean voter/Voter moran/Moran.lean moran/Moran epidemics/Epidemics.lean epidemics/Epidemics epidemics/RumorSpread.lean epidemics/RumorSpread undecided/Undecided.lean undecided/Undecided averaging/Averaging.lean averaging/Averaging median/Median.lean median/Median crn/Crn.lean crn/Crn; then
             exit 1
           fi

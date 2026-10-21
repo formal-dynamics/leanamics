@@ -1,4 +1,5 @@
 import Plurality
+import ThreeMajority
 #print axioms Plurality.expected_count
 #print axioms Plurality.lemma_3_1_c
 #print axioms Plurality.lemma_3_3
@@ -10,7 +11,9 @@ import Plurality
 #print axioms Plurality.phases_le
 #print axioms Plurality.theorem_3_8
 #print axioms Plurality.theorem_3_8_bigO
-#print axioms Plurality.binary_consensus_whp
+#print axioms Plurality.step_eq_stepCol
+#print axioms Plurality.run_eq_runCol
+#print axioms Plurality.colorSet_run
 #print axioms Plurality.corollary_3_10
 #print axioms Plurality.corollary_3_11
 #print axioms Plurality.corollary_3_12
@@ -35,3 +38,31 @@ import Plurality
 #print axioms Plurality.conformistCountKernel_meanField
 #print axioms Plurality.uniform_tgt3_eq_independent
 #print axioms Plurality.binKernel_lumps
+#print axioms ThreeMajority.majority3_consensus_fail_le
+#print axioms ThreeMajority.majority3_consensus_fail_le_clean
+#print axioms ThreeMajority.majority3_consensus_whp
+#print axioms ThreeMajority.stepCol_bool
+#print axioms ThreeMajority.numColours_le_of_majorizes
+#print axioms ThreeMajority.schurConvex_numColours_le
+#print axioms ThreeMajority.expect_le_of_majorizes
+#print axioms ThreeMajority.multinomial_schurConvex
+#print axioms ThreeMajority.ac_comparison
+#print axioms ThreeMajority.ac_numColours
+#print axioms ThreeMajority.alphaVoter_weight
+#print axioms ThreeMajority.alpha3M_weight
+#print axioms ThreeMajority.apply_ofStep_stepCol
+#print axioms ThreeMajority.apply_ofStep_voterStep
+#print axioms ThreeMajority.dominates_alpha3M_alphaVoter
+#print axioms ThreeMajority.voter_le_threeMaj
+#print axioms ThreeMajority.numColours_voterRun_le
+#print axioms ThreeMajority.voter_dual
+#print axioms ThreeMajority.walk_drift
+#print axioms ThreeMajority.walk_drift_paper
+#print axioms ThreeMajority.walk_expect_le
+#print axioms ThreeMajority.voter_reduce_whp
+#print axioms ThreeMajority.threeMaj_reduce_whp
+#print axioms ThreeMajority.anyStart_asymptotics
+#print axioms ThreeMajority.threeMaj_anyStart_consensus
+#print axioms ThreeMajority.bcnpt16Phase2_of_pos
+#print axioms ThreeMajority.threeMaj_anyStart_consensus_unconditional
+#print axioms ThreeMajority.consensus_many_opinions

@@ -9,7 +9,7 @@
 # Local-only scratch files (not part of the committed doc build)
 /docbuild/
 
-# latexmk build byproducts for latex/three_majority.tex (three_majority.pdf IS committed)
+# latexmk build byproducts of a LaTeX proof in latex/ (its PDF IS committed)
 /latex/*.aux
 /latex/*.fdb_latexmk
 /latex/*.fls

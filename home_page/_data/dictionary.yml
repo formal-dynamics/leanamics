@@ -682,12 +682,12 @@ rows:
         - Voter.voter_consensus_whp
         - Voter.lazy_voter_consensus_whp
         - Voter.plain_voter_consensus_whp
-      packages: [voter, 3-majority]
+      packages: [voter, plurality]
       blueprint:
         - /voter/blueprint/#lem:duality
         - /voter/blueprint/#thm:coalescing-dual
         - /voter/blueprint/#sec:kms-meeting-time
-        - /3-majority/blueprint/#sec:bcekmn-any-start
+        - /plurality/blueprint/#sec:bcekmn-any-start
       roadmap: [VOT-3, VOT-6, MAJ-6]
     paper:
       dc: 'voter $\Leftrightarrow$ coalescing random walks'
@@ -898,12 +898,12 @@ rows:
         - Plurality.majority3_vanishing_bias
         - Plurality.majority3_any_start
         - Plurality.theorem_3_8
-      packages: [dynamics, 3-majority, plurality]
+      packages: [dynamics, plurality]
       blueprint:
         - /plurality/blueprint/#sec:mean_field
         - /dynamics/blueprint/#sec:relations
-        - /3-majority/blueprint/#sec:map
-        - /3-majority/blueprint/#sec:main-statement
+        - /plurality/blueprint/#sec:map
+        - /plurality/blueprint/#sec:main-statement
         - /plurality/blueprint/#sec:upper
         - /plurality/blueprint/#sec:any_start
       roadmap: [MAJ-2, MAJ-7, MAJ-8]
@@ -1309,9 +1309,9 @@ rows:
           The jump chain of $S + I \to 2I$ is deterministic (one more infected per reaction), so
           the correspondence is in the timing, between continuous-time chains.
         - >-
-          Calls to oneself: Frieze and Grimmett and Karp et al. allow them, as `epidemics/` does;
-          `rumor_spread/` does not. The identification above is an elementary computation, not
-          stated in the sources.
+          Calls to oneself: Frieze and Grimmett and Karp et al. allow them, as the library
+          `Epidemics` does; the library `RumorSpread` (also in `epidemics/`) does not. The
+          identification above is an elementary computation, not stated in the sources.
         - >-
           The first-passage description holds on every graph, for the infected set grown from a
           given initial set; with other passage-time distributions the growth is not a Markov
@@ -1324,9 +1324,10 @@ rows:
       status: results
       summary: >-
         Synchronous push, pull and push–pull on $K_n$: all nodes informed within $O(\log n)$
-        rounds w.h.p. (`rumor_spread/`), and the sharp times with matching lower bounds
-        (`epidemics/`, Doerr and Kostrygin). The asynchronous protocols and the network are not
-        formalized.
+        rounds w.h.p. without calls to oneself (library `RumorSpread` of `epidemics/`), and the
+        sharp times with matching lower bounds with calls to oneself (library `Epidemics`, Doerr
+        and Kostrygin); the two models are different processes, and neither development uses
+        the other. The asynchronous protocols and the network are not formalized.
       correspondence: []
       results:
         - RumorPush.push_informs_all_whp
@@ -1336,10 +1337,10 @@ rows:
         - Epidemics.Revisited.push_spreading_lower_tail
         - Epidemics.Revisited.pull_spreading_tail
         - Epidemics.Revisited.pushPull_spreading_tail
-      packages: [rumor_spread, epidemics]
+      packages: [epidemics]
       blueprint:
-        - /rumor_spread/blueprint/#sec:main-statement
-        - /rumor_spread/blueprint/#sec:pull
+        - /epidemics/blueprint/#sec:main-statement
+        - /epidemics/blueprint/#sec:pull
         - /epidemics/blueprint/#sec:doerr-kostrygin
         - /epidemics/blueprint/#sec:doerr-kostrygin-lower
       roadmap: [EPI-5, EPI-8]

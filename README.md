@@ -65,17 +65,18 @@ blueprint page links to it.
 
 Every project is a **separate Lake package** with its own `lakefile.toml`,
 `lake-manifest.json` and `lean-toolchain`. The `dynamics/` package is shared by
-`rumor_spread/`, `3-majority/`, `voter/`, `moran/`, `epidemics/`, `undecided/`, `averaging/`, `median/`, `crn/` and `plurality/` (which also requires `3-majority/`). All
+`voter/`, `moran/`, `epidemics/`, `undecided/`, `averaging/`, `median/`, `crn/` and `plurality/`.
+A package may have more than one library: `plurality/` has `Plurality` and `ThreeMajority`,
+`epidemics/` has `Epidemics` and `RumorSpread`, and `lake build` builds them all. All
 projects use the same Lean 4.32.0 toolchain and exact Mathlib revision; there is no root-level
 Lake package. Each has the same shape:
 
 ```
 <project>/
   README.md            what it proves, how it is proved, how to build it
-  CLAUDE.md            optional orientation for automated contributors
   lakefile.toml        the Lake package (Mathlib + checkdecls, + dynamics if shared)
   lean-toolchain       the pinned Lean version
-  <Lib>.lean, <Lib>/   the formalization
+  <Lib>.lean, <Lib>/   the formalization, one or more libraries
   blueprint/src/       the leanblueprint sources
   latex/               optional standalone paper proof
 ```
@@ -97,21 +98,19 @@ result and every main result a package.
 To work on one project, `cd` into it and use Lake as usual:
 
 ```bash
-cd voter               # or: dynamics, moran, epidemics, undecided, averaging, median, crn, 3-majority, plurality, rumor_spread
+cd voter               # or: dynamics, moran, epidemics, undecided, averaging, median, crn, plurality
 lake exe cache get     # download prebuilt Mathlib oleans (once)
 lake build             # verifies every proof in that project
 ```
 
 ## Continuous integration
 
-- `.github/workflows/rumor_spread-ci.yml`, `.github/workflows/three_majority-ci.yml` —
-  `lake build` + lint for one project each. Shared-library changes also rebuild
-  3-majority.
-- `.github/workflows/plurality-ci.yml` builds the plurality package, audits its
-  main theorem axioms and rejects `sorry`; changes to `dynamics/` or `3-majority/`
+- `.github/workflows/plurality-ci.yml` builds the plurality package (libraries `Plurality` and
+  `ThreeMajority`), audits its main theorem axioms and rejects `sorry`; changes to `dynamics/`
   also rebuild it.
-- `.github/workflows/dynamics-ci.yml` builds the shared library and the voter, moran, epidemics, undecided, averaging, median and crn packages
-  and audits the main theorem axioms.
+- `.github/workflows/dynamics-ci.yml` builds the shared library and the voter, moran, epidemics
+  (libraries `Epidemics` and `RumorSpread`), undecided, averaging, median and crn packages and
+  audits the main theorem axioms.
 - `.github/workflows/pages.yml` — builds every project's blueprint (web and
   pdf) and API docs, checks that every declaration named in a blueprint
   actually exists (`lake exe checkdecls`), assembles them under `home_page/`

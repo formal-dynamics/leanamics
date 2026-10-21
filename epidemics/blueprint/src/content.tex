@@ -1,3 +1,8 @@
+% Blueprint for the package `epidemics`, with its two libraries: `Epidemics` (namespace
+% `Epidemics`, files Epidemics/*.lean) and `RumorSpread` (namespace `RumorPush`, files
+% RumorSpread/*.lean; its sections mirror latex/rumor_push.tex lemma-for-lemma). Every statement
+% carries \lean{...} / \leanok / \uses{...} tags matched to the Lean declarations.
+
 \begin{abstract}
 We formalize the pathwise correspondence between the Reed--Frost (Independent Cascade) epidemic
 and bond percolation, after Kempe, Kleinberg and Tardos: with one coin per edge, the nodes
@@ -20,6 +25,12 @@ $s'=-\beta si$, $i'=\beta si-\gamma i$, $r'=\gamma i$ on $[0,\infty)$ with $r(0)
 theorem ($i$ initially increases iff $R_0s(0)>1$, with $R_0=\beta/\gamma$), the epidemic peak, and
 the final-size equation $s_\infty=s(0)e^{-R_0(1-s_\infty)}$, following Hethcote (SIAM Review
 2000, Theorem~2.1). This part uses Mathlib's real analysis.
+
+We also formalize an elementary proof that push, pull and push--pull on $K_n$, with every node
+calling a uniformly random node among the other $n-1$ and from one informed node, inform all
+nodes within $O(\log n)$ rounds with probability at least $1-2/n$ (library \texttt{RumorSpread},
+Sections~\ref{sec:model} to~\ref{sec:pull}); the only concentration tool is an exponential-moment
+induction for adaptive Bernoulli trials.
 
 We also formalize the upper bounds of Doerr and Kostrygin's analysis of general rumor-spreading
 processes (\emph{Randomized rumor spreading revisited}, ICALP 2017): the exponential growth and
@@ -449,6 +460,571 @@ Lemma~\ref{lem:azuma} bounds the complement by $6e^{-c\varepsilon^2N}$. Small $N
 $\varepsilon\ge2$ are absorbed in $C$.
 \end{proof}
 
+\section{Rumor spreading without self-calls: the model}\label{sec:model}
+
+This section and the next ones, up to Section~\ref{sec:pull}, give a complete and elementary
+proof that the uniform \emph{push} protocol on the complete graph $K_n$, started from a single
+informed node, informs all $n$ nodes within $O(\log n)$ rounds with high probability (library
+\texttt{RumorSpread}, namespace \texttt{RumorPush}). Here every node calls a uniformly random node
+among the other $n-1$, whereas the protocols of Sections~\ref{sec:doerr-kostrygin}
+and~\ref{sec:doerr-kostrygin-lower} allow calls to oneself. The probability space is finite and
+uniform throughout; the only analytic ingredients are Bernoulli's inequality and Markov's
+inequality, and the only concentration tool is a one-line exponential-moment induction for
+adaptive Bernoulli trials. No measure theory, no PMF/\texttt{ENNReal}, no Chernoff bounds, and no
+martingales are used. This argument has been \emph{fully formalized} (no \texttt{sorry}) in
+Lean~4 + Mathlib; the main theorem is \texttt{RumorPush.push\_informs\_all\_whp}. With the same
+random calls, the \emph{pull} and \emph{push--pull} protocols of Karp, Schindelhauer, Shenker and
+V\"ocking also inform all nodes within $O(\log n)$ rounds with high probability
+(Section~\ref{sec:pull}); for pull, a second-moment bound replaces the reverse Markov inequality.
+
+Fix $n \ge 2$ and let $V = \{0,1,\dots,n-1\}$ be the vertex set of the
+complete graph $K_n$.
+
+\begin{definition}[Round randomness]\label{def:round}
+  \lean{RumorPush.Tgt}
+  \leanok
+  A \emph{round configuration} is a function
+  $\omega \colon V \to V$ with $\omega(v) \ne v$ for all $v$.
+  Let $R_n$ denote the (finite) set of round configurations; it carries the
+  uniform probability measure, i.e.\ every node picks a uniformly random
+  \emph{target} among the other $n-1$ nodes, independently of all other
+  nodes.
+\end{definition}
+
+\begin{definition}[Push step]\label{def:step}
+  \lean{RumorPush.step}
+  \leanok
+  \uses{def:round}
+  For an \emph{informed set} $I \subseteq V$ and a round configuration
+  $\omega \in R_n$, the next informed set is
+  \[
+    \mathrm{step}(I,\omega) \;=\; I \,\cup\, \omega(I)
+    \;=\; I \cup \{\omega(v) : v \in I\}.
+  \]
+  (Only informed nodes actually transmit; letting \emph{all} nodes draw a
+  target and ignoring the choices of uninformed nodes is an equivalent and
+  formalization-friendlier convention.)
+\end{definition}
+
+\begin{definition}[Process]\label{def:process}
+  \lean{RumorPush.run}
+  \leanok
+  \uses{def:step}
+  Fix a horizon $T \in \N$ and a start vertex $v_0 \in V$. The sample space
+  is $\Omega = R_n^{\,T}$ (uniform measure, i.e.\ i.i.d.\ uniform rounds).
+  For $\omega = (\omega_0,\dots,\omega_{T-1}) \in \Omega$ define
+  $I_0(\omega) = \{v_0\}$ and
+  $I_{t+1}(\omega) = \mathrm{step}(I_t(\omega), \omega_t)$ for $0 \le t < T$.
+  We write $m_t = |I_t|$ and $U_t = n - m_t$ for the numbers of informed and
+  uninformed nodes. Since $\Omega$ is finite, all probabilities are finite
+  ratios and all expectations are finite sums; ``conditioning on $I_t$''
+  means partitioning $\Omega$ according to the first $t$ coordinates. In the
+  formalization, a trajectory is simply a \texttt{List} of round
+  configurations and $\mathrm{run}\ I\ l$ folds \texttt{step} over the list
+  $l$.
+\end{definition}
+
+Two trivial but load-bearing facts, both immediate from
+Definition~\ref{def:step}:
+
+\begin{lemma}[Monotonicity]\label{lem:mono}
+  \lean{RumorPush.subset_step, RumorPush.card_le_card_step,
+    RumorPush.subset_run}
+  \leanok
+  \uses{def:process}
+  $I_t(\omega) \subseteq I_{t+1}(\omega)$ for all $t$ and all $\omega$;
+  hence $m_t$ is non-decreasing and $U_t$ is non-increasing in $t$,
+  pointwise on $\Omega$.
+\end{lemma}
+
+\begin{lemma}[At most doubling]\label{lem:atmost}
+  \lean{RumorPush.card_step_le}
+  \leanok
+  \uses{def:step}
+  $|I_{t+1}(\omega) \smallsetminus I_t(\omega)| \le |I_t(\omega)|$; equivalently
+  $(\mathrm{step}(I,\omega)).\mathrm{card} \le 2\,I.\mathrm{card}$.
+\end{lemma}
+
+\section{Push without self-calls: the main theorem}\label{sec:main-statement}
+
+Throughout, $\log$ denotes the natural logarithm.
+
+\begin{theorem}[Push protocol informs $K_n$ in $O(\log n)$ rounds w.h.p.]
+  \label{thm:main}
+  \lean{RumorPush.push_informs_all_whp, RumorPush.push_informs_all_whp'}
+  \leanok
+  \uses{lem:gluing, lem:constants, lem:phase2cor}
+  Let $n \ge 2$, let $v_0 \in V$, and set
+  \[
+    T_1 \;=\; \ceil{117 \log n} + 23, \qquad
+    T_2 \;=\; \ceil{6 \log n}, \qquad
+    T \;=\; T_1 + T_2 .
+  \]
+  Then $\Pr\bigl[\, I_T = V \,\bigr] \;\ge\; 1 - \frac{2}{n}$.
+  In particular all nodes are informed after $O(\log n)$ rounds with high
+  probability.
+\end{theorem}
+
+\begin{remark}
+  The constants are deliberately crude: the proof is organized to minimize
+  the analytic toolkit, not the round count. The sharp answer is
+  $\log_2 n + \log n + o(\log n)$ (Frieze--Grimmett \cite{FG85}, Pittel
+  \cite{Pittel87}). Replacing $2/n$ by $n^{-\alpha}$ for any fixed
+  $\alpha \ge 1$ only changes the constants in $T_1, T_2$.
+\end{remark}
+
+The proof has two phases, glued by Lemma~\ref{lem:mono}:
+\begin{itemize}
+\item \textbf{Growth phase} (Section~\ref{sec:growth}): while $m_t \le n/2$,
+  each round multiplies $m_t$ by $\ge 9/8$ with probability $\ge 1/8$;
+  an exponential-moment bound for adaptive trials shows that after $T_1$
+  rounds, $m_{T_1} > n/2$ except with probability $\le 1/n$.
+\item \textbf{Saturation phase} (Section~\ref{sec:saturation}): once
+  $m_t \ge n/2$, the expected number of uninformed nodes contracts by a
+  factor $2/3$ per round; after $T_2$ further rounds Markov's inequality
+  gives $U_T = 0$ except with probability $\le 1/n$.
+\end{itemize}
+
+\section{Finite uniform probability}\label{sec:prelim}
+
+All randomness in this development is uniform over finite types, so instead
+of measure theory or \texttt{PMF} we work with plain finite sums. The
+definitions and their basic laws are those of the shared \texttt{dynamics}
+library (\texttt{Dynamics.Uniform}), which also identifies them with Mathlib's
+finite expectation \texttt{Finset.expect} and with the independent product of
+uniform distributions (\texttt{Dynamics.Bridge}).
+
+\begin{definition}[Average]\label{def:avg}
+  \lean{Dynamics.avg, Dynamics.avg_eq_expect}
+  \leanok
+  For a finite type $\alpha$ and $f \colon \alpha \to \R$,
+  $\mathrm{avg}(f) := \bigl(\sum_{a} f(a)\bigr) / |\alpha|$ is the
+  expectation of $f$ under the uniform distribution on $\alpha$.
+\end{definition}
+
+\begin{definition}[Trajectory expectation]\label{def:expList}
+  \lean{Dynamics.expList}
+  \leanok
+  \uses{def:avg}
+  For a finite type $\alpha$, $\mathrm{expList}\ \alpha\ T\ F$ is the
+  expectation of a functional $F$ of a trajectory of $T$ i.i.d.\ uniform
+  draws from $\alpha$, defined \emph{by recursion on $T$}: the head draw is
+  averaged out first, i.e.\ $\mathrm{expList}\ \alpha\ 0\ F = F(\,[]\,)$ and
+  $\mathrm{expList}\ \alpha\ (T{+}1)\ F
+    = \mathrm{avg}\bigl(a \mapsto \mathrm{expList}\ \alpha\ T\ (l \mapsto
+    F(a :: l))\bigr)$.
+  This makes ``conditioning on the first round'' a definitional unfolding
+  rather than a measure-theoretic construction.
+\end{definition}
+
+\begin{lemma}[Basic properties]\label{lem:avg-basic}
+  \lean{Dynamics.avg_le_avg, Dynamics.avg_add, Dynamics.avg_sub,
+    Dynamics.avg_const_mul, Dynamics.avg_const,
+    Dynamics.expList_le_expList, Dynamics.expList_add,
+    Dynamics.expList_const_mul, Dynamics.expList_const}
+  \leanok
+  \uses{def:avg, def:expList}
+  $\mathrm{avg}$ and $\mathrm{expList}$ are monotone, additive, and
+  homogeneous, and constants pass through unchanged. These pointwise
+  inequalities pushed through $\mathrm{avg\_le\_avg}$ /
+  $\mathrm{expList\_le\_expList}$ are the only form in which Markov's
+  inequality and union bounds are used below (Lemmas~\ref{lem:markov}
+  and~\ref{lem:revmarkov}); they are not separately formalized lemmas.
+\end{lemma}
+
+\begin{theorem}[Faithfulness of the model]\label{thm:faithful}
+  \lean{RumorPush.expList_eq_avg_ofFn}
+  \leanok
+  \uses{def:expList}
+  $\mathrm{expList}\ \alpha\ T\ F$ equals the uniform average of $F$ over
+  \emph{all} length-$T$ sequences of draws, i.e.\ over the product
+  probability space $\mathrm{Fin}\ T \to \alpha$ of $T$ i.i.d.\ uniform
+  rounds. This confirms that the recursive definition of
+  Definition~\ref{def:expList} is the textbook object.
+\end{theorem}
+
+\section{Elementary inequalities}\label{sec:ineq}
+
+We write $x := \tfrac{1}{n-1}$, so $0 < x \le 1$ for $n \ge 2$.
+
+\begin{lemma}[Bernoulli]\label{lem:bernoulli}
+  \lean{RumorPush.one_sub_mul_le_pow}
+  \leanok
+  For all real $y \ge -1$ (we only use $y\in[-1,1]$) and $m \in \N$:
+  $(1+y)^m \ge 1 + my$. Equivalently, with $y = -x$:
+  $1 - mx \le (1-x)^m$.
+\end{lemma}
+
+\begin{lemma}[Second-order lower bound, ``Bonferroni'']\label{lem:bonferroni}
+  \lean{RumorPush.mul_sub_sq_le_one_sub_pow, RumorPush.half_mul_le_one_sub_pow}
+  \leanok
+  \uses{lem:bernoulli}
+  For $0 \le x \le 1$ and $m \in \N$:
+  \[
+    1-(1-x)^m \;\ge\; mx - \binom{m}{2}x^2 \;\ge\; mx\Bigl(1-\frac{mx}{2}\Bigr),
+  \]
+  and consequently $mx/2 \le 1-(1-x)^m$ whenever $mx \le 1$.
+\end{lemma}
+
+\begin{lemma}[Upper bound without $e$]\label{lem:upper}
+  \lean{RumorPush.pow_one_sub_le_one_div}
+  \leanok
+  \uses{lem:bernoulli}
+  For $0 \le x \le 1$ and $m \in \N$: $(1-x)^m \le \dfrac{1}{1+mx}$.
+\end{lemma}
+
+\begin{lemma}[Logarithm bounds]\label{lem:logbounds}
+  \lean{RumorPush.one_sub_inv_le_log}
+  \leanok
+  For $x > 0$: $1 - \tfrac1x \le \log x$. (The formalization only needs this
+  left inequality, applied at $x = 9/8,\ 16/15,\ 3/2$, together with
+  Mathlib's numeric bound $\log 2 < 0.6931471808$.)
+\end{lemma}
+
+\begin{lemma}[Markov's inequality, finite uniform version]\label{lem:markov}
+  \lean{Dynamics.avg_le_avg}
+  \leanok
+  \uses{def:avg}
+  Let $\Omega$ be a finite nonempty set with the uniform measure,
+  $f \colon \Omega \to \R$ with $f \ge 0$, and $a > 0$. Then
+  $\Pr[f \ge a] \le \E[f]/a$. In particular, if $f$ takes values in $\N$,
+  then $\Pr[f \ne 0] \le \E[f]$.
+\end{lemma}
+
+\begin{lemma}[Reverse Markov for bounded variables]\label{lem:revmarkov}
+  \lean{Dynamics.avg_le_avg}
+  \leanok
+  \uses{def:avg}
+  Let $f \colon \Omega \to \R$ with $0 \le f \le b$ pointwise, $b > 0$, and
+  let $0 < a < b$. Then $\Pr[f \ge a] \ge \dfrac{\E[f] - a}{b}$. (As with
+  Lemma~\ref{lem:markov}, the formalization does not isolate this as a
+  named lemma: each use site supplies its own pointwise bound and pushes it
+  through $\mathrm{avg\_le\_avg}$, e.g.\ in the proof of
+  Lemma~\ref{lem:goodround}.)
+\end{lemma}
+
+\section{One-round estimates}\label{sec:oneround}
+
+Fix an informed set $I$ with $|I| = m \ge 1$ and let $\omega \in R_n$ be a
+uniform round configuration. All statements in this section concern this
+single round; by independence of the rounds they apply verbatim to the
+conditional law of round $t$ given $I_t = I$.
+
+\begin{lemma}[Contact probability]\label{lem:contact}
+  \lean{RumorPush.avg_not_contacted}
+  \leanok
+  \uses{def:step, def:avg}
+  For any fixed $u \notin I$,
+  \[
+    \Pr_\omega\bigl[u \in \mathrm{step}(I,\omega)\bigr]
+    \;=\; 1 - \Bigl(1-\frac{1}{n-1}\Bigr)^{m}.
+  \]
+  The Lean proof is the only place where a probability is \emph{computed}
+  rather than estimated: it counts round configurations avoiding $u$ on $I$
+  via an explicit equivalence to a product of subtypes and
+  \texttt{Fintype.card\_pi}.
+\end{lemma}
+
+\begin{lemma}[Expected growth]\label{lem:expgrowth}
+  \lean{RumorPush.avg_card_step}
+  \leanok
+  \uses{lem:contact, lem:bonferroni}
+  Let $N(\omega) = |\mathrm{step}(I,\omega)| - m$ be the number of newly
+  informed nodes. The formalization gives the \emph{exact} formula
+  \[
+    \E_\omega[|\mathrm{step}(I,\omega)|] \;=\;
+      m + (n-m)\bigl(1-(1-x)^m\bigr),
+  \]
+  from which, if $1 \le m \le n/2$: $\E_\omega[N] \ge m/4$ (using
+  Lemma~\ref{lem:bonferroni} and $n - m \ge n/2$, $mx \le 1$).
+\end{lemma}
+
+\begin{lemma}[A good round has constant probability]\label{lem:goodround}
+  \lean{RumorPush.prob_goodRound}
+  \leanok
+  \uses{lem:expgrowth, lem:atmost, lem:revmarkov}
+  If $1 \le m \le n/2$, then
+  $\Pr_\omega\bigl[\,|\mathrm{step}(I,\omega)| \ge \tfrac{9}{8}\,m\,\bigr]
+    \ge \tfrac18$.
+\end{lemma}
+
+\begin{lemma}[Contraction above half]\label{lem:contract}
+  \lean{RumorPush.avg_uninformed_le}
+  \leanok
+  \uses{lem:contact, lem:upper}
+  If $m \ge n/2$, then for every fixed $u \notin I$,
+  $\Pr_\omega[u \notin \mathrm{step}(I,\omega)] = (1-x)^m \le \tfrac23$, and
+  consequently, with $U' := n - |\mathrm{step}(I,\omega)|$,
+  $\E_\omega[U'] \le \tfrac23(n-m)$.
+\end{lemma}
+
+\section{Adaptive Bernoulli trials}\label{sec:adaptive}
+
+\begin{definition}[Good rounds]\label{def:good}
+  \lean{RumorPush.goodRound, RumorPush.goodCount}
+  \leanok
+  \uses{def:step}
+  A round is \emph{good} if it multiplies the informed set by $\ge 9/8$, or
+  if the informed set already exceeds $n/2$:
+  \[
+    X_t \;=\; \mathbf{1}\Bigl[\, m_{t+1} \ge \tfrac98\, m_t
+    \;\;\text{or}\;\; m_t > \tfrac n2 \,\Bigr] \in \{0,1\}.
+  \]
+  $\mathrm{goodCount}$ counts the good rounds along a trajectory. By
+  Lemma~\ref{lem:goodround} (applied when $m_t \le n/2$; trivial otherwise),
+  $\Pr[X_t = 1 \mid \omega_0,\dots,\omega_{t-1}] \ge \tfrac18$ for every
+  prefix, since $\omega_t$ is independent of the prefix and
+  $\mathrm{expList}$ conditions on it definitionally.
+\end{definition}
+
+\begin{lemma}[Exponential moment for adaptive trials]\label{lem:adaptive}
+  \lean{RumorPush.expList_half_pow_goodCount}
+  \leanok
+  \uses{def:expList, def:good, lem:goodround}
+  For every $T$ and every nonempty $I$,
+  \[
+    \E\Bigl[\bigl(\tfrac12\bigr)^{\mathrm{goodCount}(I,\,\cdot\,)}\Bigr]
+      \;\le\; \Bigl(\frac{15}{16}\Bigr)^{T}
+  \]
+  over $T$ rounds started at $I$. (This specializes the textbook
+  ``$\E[s^G] \le (1-p(1-s))^T$ for adaptive $\{0,1\}$-trials with
+  per-step success probability $\ge p$'' at $p = 1/8$, $s = 1/2$; the
+  formalization proves the specialized statement directly by induction on
+  $T$ rather than the general one, since only this instance is needed. The
+  ensuing tail bound $\Pr[G < L] \le 2^{L}(15/16)^{T}$ (via
+  $s^{L}\Pr[G<L] \le \E[s^G]$) is likewise not isolated as a separate
+  lemma; it is proved inline inside Lemma~\ref{lem:phase1}
+  (\texttt{phase1}).
+\end{lemma}
+
+\section{Push: the growth phase}\label{sec:growth}
+
+\begin{lemma}[Enough good rounds force half-saturation]\label{lem:force}
+  \lean{RumorPush.pow_goodCount_mul_card_le_card_run}
+  \leanok
+  \uses{def:good, lem:mono}
+  Let $L \in \N$ satisfy $(9/8)^L > n/2$. If the informed set never exceeds
+  $n/2$ up to time $T_1$, then along that trajectory
+  $m_{T_1} \ge (9/8)^{\mathrm{goodCount}} \cdot m_0$: every good round
+  multiplies $m_t$ by $\ge 9/8$ and every round is non-decreasing
+  (Lemma~\ref{lem:mono}), so $\mathrm{goodCount} \ge L$ would force
+  $m_{T_1} > n/2$, a contradiction; hence
+  $\mathrm{goodCount} < L \Rightarrow m_{T_1} \le n/2$ is impossible to rule
+  out only via the deterministic growth bound stated here.
+\end{lemma}
+
+\begin{lemma}[Phase 1]\label{lem:phase1}
+  \lean{RumorPush.phase1}
+  \leanok
+  \uses{lem:force, lem:adaptive}
+  If $(9/8)^L \ge n$, then after $T_1$ rounds the informed set is still
+  $\le n/2$ with probability at most $2^{L}\,(15/16)^{T_1}$.
+\end{lemma}
+
+\begin{lemma}[Admissible constants]\label{lem:constants}
+  \lean{RumorPush.numeric_A, RumorPush.numeric_B}
+  \leanok
+  \uses{lem:phase1, lem:logbounds}
+  With $L = \ceil{9 \log n} + 1$ we have $(9/8)^L \ge n$
+  (\texttt{numeric\_A}), and with $T_1 = \ceil{117 \log n} + 23$ we have
+  $2^{L}(15/16)^{T_1} \le 1/n$ (\texttt{numeric\_B}), using
+  $\log\tfrac98 \ge \tfrac19$, $\log\tfrac{16}{15} \ge \tfrac1{16}$ and
+  $\log 2 < 0.6932$. Combined with Lemma~\ref{lem:phase1}:
+  $\Pr[m_{T_1} \le n/2] \le 1/n$. The clean statement to formalize is that
+  \emph{any} $L, T_1$ satisfying these two numeric inequalities work; the
+  values above merely exhibit admissible ones.
+\end{lemma}
+
+\section{Push: the saturation phase}\label{sec:saturation}
+
+\begin{lemma}[Phase 2]\label{lem:phase2}
+  \lean{RumorPush.saturation}
+  \leanok
+  \uses{lem:contract}
+  Let $A = \{m_{T_1} > n/2\}$ (an event determined by the first $T_1$
+  coordinates). Then for every $s \ge 0$,
+  $\E\bigl[\, U_{T_1 + s}\, \mathbf{1}_A \,\bigr] \le (2/3)^{s}\, n$, by
+  induction on $s$ using Lemma~\ref{lem:contract} at each step (monotonicity
+  keeps $m_{T_1+s} > n/2$ on $A$).
+\end{lemma}
+
+\begin{corollary}\label{lem:phase2cor}
+  \lean{RumorPush.numeric_C}
+  \leanok
+  \uses{lem:phase2, lem:markov, lem:logbounds}
+  With $T_2 = \ceil{6 \log n}$: $\Pr[\, U_T \ge 1 \text{ and } A \,]
+    \le n\,(2/3)^{T_2} \le 1/n$. ($U_T$ is $\N$-valued, so Markov applied to
+  $U_T \mathbf{1}_A$ and Lemma~\ref{lem:phase2} give the first inequality;
+  $(2/3)^{T_2} n \le 1/n$ (\texttt{numeric\_C}) follows from
+  $\log\tfrac32 \ge \tfrac13$ and $T_2 \ge 6\log n$.)
+\end{corollary}
+
+\section{Proof of the push theorem}\label{sec:proof-main}
+
+\begin{lemma}[Gluing the two phases]\label{lem:gluing}
+  \lean{RumorPush.prNotAllInformed, RumorPush.prNotAllInformed_le}
+  \leanok
+  \uses{lem:phase1, lem:phase2, lem:mono}
+  Let $\mathrm{prNotAllInformed}(n,v_0,T)$ be the probability that some node
+  is still uninformed after $T$ rounds started at $v_0$. For all
+  $L, T_1, T_2$ with $(9/8)^L \le n$:
+  \[
+    \mathrm{prNotAllInformed}(n,v_0,T_1+T_2) \;\le\;
+      2^{L}\Bigl(\frac{15}{16}\Bigr)^{T_1} + \Bigl(\frac23\Bigr)^{T_2} n.
+  \]
+  Failure requires either phase 1 to fail (informed set still $\le n/2$
+  after $T_1$ rounds, Lemma~\ref{lem:phase1}) or phase 2 to leave an
+  uninformed node on the complementary event, controlled by
+  Lemma~\ref{lem:phase2} via Markov.
+\end{lemma}
+
+With $T_1 = \ceil{117\log n} + 23$, $T_2 = \ceil{6\log n}$, $T = T_1+T_2$,
+Theorem~\ref{thm:main} follows from Lemma~\ref{lem:gluing},
+Lemma~\ref{lem:constants} and Corollary~\ref{lem:phase2cor}:
+\[
+  \Pr[I_T \ne V] \;=\; \Pr[U_T \ge 1]
+  \;\le\; \Pr[\,\overline{A}\,] + \Pr[\,U_T \ge 1 \text{ and } A\,]
+  \;\le\; \frac1n + \frac1n \;=\; \frac2n .
+\]
+
+\section{PULL and PUSH--PULL without self-calls}\label{sec:pull}
+
+We now treat the two other protocols of Karp, Schindelhauer, Shenker and
+V\"ocking \cite{KSSV00}, driven by the \emph{same} random calls: in a round
+configuration $\omega \in R_n$ every node $v$ calls $\omega(v)$. In PULL the
+caller learns the rumor from its callee; in PUSH--PULL the rumor travels in
+both directions along every call. As for PUSH, partners are chosen among the
+other $n-1$ nodes (KSSV allow self-calls; only constants change), and the
+round count is a crude $O(\log n)$ instead of the sharp
+$\log_3 n + O(\log\log n)$ of \cite[Thm.~2.1]{KSSV00}.
+
+\begin{definition}[PULL and PUSH--PULL rounds]\label{def:pull}
+  \lean{RumorPush.pullStep, RumorPush.pullRun, RumorPush.pushPullStep,
+    RumorPush.pushPullRun, RumorPush.prPullNotAllInformed,
+    RumorPush.prPushPullNotAllInformed}
+  \leanok
+  \uses{def:process}
+  $\mathrm{pullStep}(I,\omega) = I \cup \{v : \omega(v) \in I\}$ and
+  $\mathrm{pushPullStep}(I,\omega) = \mathrm{step}(I,\omega) \cup
+  \mathrm{pullStep}(I,\omega)$; trajectories fold these steps over a list of
+  i.i.d.\ uniform rounds, and the failure probabilities are the
+  probabilities that some node is still uninformed after $T$ rounds started
+  from $\{v_0\}$.
+\end{definition}
+
+\begin{lemma}[Pathwise domination]\label{lem:pull-domination}
+  \lean{RumorPush.run_subset_pushPullRun, RumorPush.pullRun_subset_pushPullRun}
+  \leanok
+  \uses{def:pull, lem:mono}
+  With the same calls, the PUSH--PULL informed set contains the PUSH and the
+  PULL informed sets after every number of rounds.
+\end{lemma}
+
+\begin{lemma}[Independent calls]\label{lem:pull-indep}
+  \lean{Dynamics.avg_pi_prod, RumorPush.avg_tgt_mul_prod,
+    RumorPush.avg_call_mem}
+  \leanok
+  \uses{def:round, def:avg}
+  The calls $\omega(v)$, $v \in V$, of a uniform round are independent, each
+  uniform among the other $n-1$ nodes; in particular a caller $v \notin I$
+  calls into $I$ with probability $|I|/(n-1)$.
+\end{lemma}
+
+\begin{lemma}[One PULL or PUSH--PULL round, exactly]\label{lem:pull-oneround}
+  \lean{RumorPush.pull_prob_stuck_singleton, RumorPush.pull_avg_card_step,
+    RumorPush.pull_avg_uninformed, RumorPush.pull_avg_uninformed_le,
+    RumorPush.pushPull_avg_uninformed}
+  \leanok
+  \uses{lem:pull-indep, lem:contact}
+  Let $m = |I|$ and $u = n - m$. From a single informed node a PULL round
+  informs nobody with probability $(1 - \frac1{n-1})^{n-1}$. After one PULL
+  round, $\E|I'| = m + u\,\frac{m}{n-1}$ and
+  $\E[n - |I'|] = \frac{u(u-1)}{n-1} \le \frac{u^2}{n}$ (quadratic
+  shrinking). After one PUSH--PULL round,
+  $\E[n - |I'|] = \frac{u(u-1)}{n-1}\bigl(1 - \frac1{n-1}\bigr)^{m}$.
+\end{lemma}
+
+\begin{lemma}[The two-phase argument for any inflationary step]
+  \label{lem:pull-phases}
+  \lean{RumorPush.goodRoundOf, RumorPush.goodCountOf,
+    RumorPush.expList_half_pow_goodCountOf, RumorPush.phase1Of,
+    RumorPush.saturationOf, RumorPush.notAllOf_le,
+    RumorPush.notAllOf_le_two_div}
+  \leanok
+  \uses{lem:adaptive, lem:phase1, lem:phase2, lem:gluing, lem:constants,
+    lem:phase2cor}
+  Let $f(I,a) \supseteq I$ be a spreading step driven by i.i.d.\ uniform
+  rounds $a$. Suppose that from every nonempty $I$ a round is good
+  ($|f(I,a)| \ge \frac98 |I|$, or $|I| > n/2$) with probability at least
+  $1/8$, and that for $|I| \ge n/2$ the expected number of uninformed nodes
+  contracts by $2/3$. Then after $\ceil{160 \log n}$ rounds from $\{v_0\}$,
+  some node is uninformed with probability at most $2/n$. The proof is the
+  PUSH proof of Sections~\ref{sec:adaptive}--\ref{sec:proof-main}, which uses
+  no other property of $\mathrm{step}$.
+\end{lemma}
+
+\begin{lemma}[The two inputs for PULL]\label{lem:pull-good}
+  \lean{RumorPush.pull_avg_new_sq_le, RumorPush.pull_prob_goodRound,
+    RumorPush.pull_avg_uninformed_contract}
+  \leanok
+  \uses{lem:pull-indep, lem:pull-oneround}
+  A PULL round is good with probability at least $1/8$, and for
+  $|I| \ge n/2$ it contracts the expected uninformed count by $2/3$.
+\end{lemma}
+
+\begin{proof}
+  The contraction follows from $\frac{u(u-1)}{n-1} \le \frac23 u$ for
+  $u \le n/2$. For good rounds, let $X$ be the number of uninformed callers
+  that call into $I$, so $|I'| = |I| + X$. By Lemma~\ref{lem:pull-indep},
+  $\mu = \E X = \frac{(n-m)m}{n-1} \ge \max(m/2, 1/2)$ for $m \le n/2$ and,
+  the calls being pairwise independent, $\E X^2 \le \mu + \mu^2$. A round
+  with $X > \mu/4 \ge m/8$ is good, and the one-sided Paley--Zygmund
+  inequality gives
+  $\Pr[X > \mu/4] \ge \frac{(3/4)^2\mu^2}{\E X^2} \ge \frac{9\mu}{16(1+\mu)} \ge 3/16$.
+  Unlike PUSH, the reverse Markov argument of Lemma~\ref{lem:goodround} does
+  not apply, since a PULL round can inform many more than $|I|$ new nodes.
+\end{proof}
+
+\begin{theorem}[PULL and PUSH--PULL inform $K_n$ in $O(\log n)$ rounds w.h.p.]
+  \label{thm:pull}
+  \lean{RumorPush.pull_informs_all_whp, RumorPush.pull_informs_all_whp',
+    RumorPush.pushPull_informs_all_whp, RumorPush.pushPull_informs_all_whp'}
+  \leanok
+  \uses{lem:pull-phases, lem:pull-good, lem:pull-domination}
+  Let $n \ge 2$ and $v_0 \in V$. After $\ceil{160 \log n}$ rounds of PULL,
+  or of PUSH--PULL, started from $\{v_0\}$, all nodes are informed with
+  probability at least $1 - 2/n$.
+\end{theorem}
+
+\begin{proof}
+  For PULL, apply Lemma~\ref{lem:pull-phases} with the inputs of
+  Lemma~\ref{lem:pull-good}. For PUSH--PULL, the failure event is contained
+  in the PULL failure event by Lemma~\ref{lem:pull-domination}.
+\end{proof}
+
+\section{The Lean library \texttt{RumorSpread}}\label{sec:lean}
+
+Sections~\ref{sec:model} to~\ref{sec:pull} are fully formalized in the library
+\texttt{RumorSpread} of this package (namespace \texttt{RumorPush}); the build
+contains no \texttt{sorry} and the main theorem depends only on the three
+standard axioms (\texttt{propext}, \texttt{Classical.choice},
+\texttt{Quot.sound}). File structure (dependency order):
+\texttt{Bounds.lean} (Section~\ref{sec:ineq}), \texttt{Dynamics.Uniform}
+of the shared \texttt{dynamics} library (Section~\ref{sec:prelim}), \texttt{Model.lean}
+(Section~\ref{sec:model}), \texttt{OneRound.lean}
+(Section~\ref{sec:oneround}), \texttt{Growth.lean}
+(Sections~\ref{sec:adaptive}--\ref{sec:growth}), \texttt{Saturation.lean}
+(Section~\ref{sec:saturation}), \texttt{Main.lean} (main theorem and
+numeric lemmas), \texttt{Equivalence.lean} (Theorem~\ref{thm:faithful}).
+PULL and PUSH--PULL (Section~\ref{sec:pull}): \texttt{PullFoldl.lean} and
+\texttt{PullModel.lean} (Definition~\ref{def:pull},
+Lemma~\ref{lem:pull-domination}), \texttt{PullIndep.lean}
+(Lemma~\ref{lem:pull-indep}), \texttt{PullOneRound.lean}
+(Lemma~\ref{lem:pull-oneround}), \texttt{PullPhases.lean}
+(Lemma~\ref{lem:pull-phases}), \texttt{PullGood.lean}
+(Lemma~\ref{lem:pull-good}), \texttt{PullMain.lean} and
+\texttt{PullPushPull.lean} (Theorem~\ref{thm:pull}).
+
 \section{Randomized rumor spreading revisited}\label{sec:doerr-kostrygin}
 We follow Doerr and Kostrygin, \emph{Randomized rumor spreading revisited} (ICALP 2017; long
 version arXiv:2303.11150), with the numbering of the long version.
@@ -600,6 +1176,12 @@ In a round every node calls a uniformly random node (itself included), independe
 informed nodes inform the nodes they call. Pull: uninformed nodes calling an informed node become
 informed. Push--pull: both.
 \end{definition}
+
+These protocols allow calls to oneself, as in the paper. Sections~\ref{sec:model}
+to~\ref{sec:pull} treat the same three protocols with calls among the other $n-1$ nodes only:
+there the bounds are $O(\log n)$ with explicit constants, for every $n\ge2$, while here they are
+sharp, with constants and a threshold on $n$ that are only shown to exist. The two models are
+different processes, and neither development uses the other.
 
 \begin{lemma}[One-round quantities and conditions]\label{lem:rumor-protocol-conditions}
 \lean{Epidemics.Revisited.push_informProb,Epidemics.Revisited.pull_informProb,Epidemics.Revisited.pushPull_informProb,Epidemics.Revisited.push_homogeneous,Epidemics.Revisited.pull_homogeneous,Epidemics.Revisited.pushPull_homogeneous,Epidemics.Revisited.push_cov_nonpos,Epidemics.Revisited.pull_cov_eq_zero,Epidemics.Revisited.pushPull_cov_nonpos,Epidemics.Revisited.push_upperGrowth,Epidemics.Revisited.push_upperShrinking,Epidemics.Revisited.pull_upperGrowth,Epidemics.Revisited.pull_upperDoubleShrinking,Epidemics.Revisited.pull_fastFinishing,Epidemics.Revisited.pushPull_upperGrowth,Epidemics.Revisited.pushPull_upperDoubleShrinking,Epidemics.Revisited.pushPull_fastFinishing}\leanok\uses{def:rumor-protocols,def:rumor-conditions,def:rumor-double}
@@ -898,3 +1480,12 @@ Lemma~\ref{lem:crr-spectral}. Then Theorems~\ref{thm:crr-phases} to~\ref{thm:crr
 with $c=\min(1,\rho_0(1-\max(\lambda_0,0)))$, and $128\sqrt{\log n/n}\le c$ for $n$ large.
 \end{proof}
 
+\begin{thebibliography}{9}
+\bibitem{FG85} A.~Frieze, G.~Grimmett.
+\emph{The shortest-path problem for graphs with random arc-lengths}.
+Discrete Applied Mathematics 10 (1985) 57--77.
+\bibitem{Pittel87} B.~Pittel.
+\emph{On spreading a rumor}. SIAM J.\ Appl.\ Math.\ 47 (1987) 213--223.
+\bibitem{KSSV00} R.~Karp, C.~Schindelhauer, S.~Shenker, B.~V\"ocking.
+\emph{Randomized rumor spreading}. FOCS 2000.
+\end{thebibliography}

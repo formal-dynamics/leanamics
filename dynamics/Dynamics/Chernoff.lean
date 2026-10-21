@@ -332,8 +332,8 @@ For `X = ∑ᵢ Yᵢ(ωᵢ)` with `ω : Fin n → γ` uniform and `{0,1}`-valued
 (Dubhashi–Panconesi, *Concentration of Measure for the Analysis of Randomized Algorithms*,
 Theorem 1.1 and its proof; Mitzenmacher–Upfal, Theorem 4.5): the tails before the parameter
 `t` is optimized, the closed forms for an arbitrary threshold `k`, and the lower tail at the
-exact mean. These replace the bounds of the former `3-majority/ThreeMajority/Chernoff.lean`
-(3-majority blueprint `lem:mgf`, `lem:chernoff`, `lem:chernofflog`) and
+exact mean. These replace the bounds of the former `ThreeMajority/Chernoff.lean` (library
+`ThreeMajority` of `plurality/`, blueprint `lem:mgf`, `lem:chernoff`, `lem:chernofflog`) and
 `Plurality.chernoff_lower`. -/
 
 section UniformFin

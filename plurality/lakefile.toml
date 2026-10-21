@@ -1,7 +1,7 @@
 name = "plurality"
 version = "0.1.0"
 keywords = ["math"]
-defaultTargets = ["Plurality"]
+defaultTargets = ["Plurality", "ThreeMajority"]
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
@@ -25,9 +25,8 @@ rev = "3d425859e73fcfbef85b9638c2a91708ef4a22d4"
 name = "dynamics"
 path = "../dynamics"
 
-[[require]]
-name = "three_majority"
-path = "../3-majority"
-
 [[lean_lib]]
 name = "Plurality"
+
+[[lean_lib]]
+name = "ThreeMajority"

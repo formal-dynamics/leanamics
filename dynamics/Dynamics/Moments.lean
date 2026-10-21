@@ -23,10 +23,11 @@ For `S = ∑ i, f i (ω i)` with independent uniform coordinates `ω i` (the set
   of the sum is at most its mean (`avg_sq_sum_le_of_pairwise`).
 
 The lemmas on independent coordinates were proved, identically, in `median/` (symmetry breaking
-of the binary median dynamics), `plurality/` (the `√n` jump of binary 3-Majority near balance) and
-`3-majority/` (symmetry breaking of 3-Majority with many colours); the pairwise bound is the
-second-moment step of the PULL analysis of `rumor_spread/` (`RumorPush.pull_avg_new_sq_le`),
-which then applies the one-sided Paley-Zygmund bound (`RumorPush.pull_prob_goodRound`).
+of the binary median dynamics) and `plurality/` (the `√n` jump of binary 3-Majority near balance,
+and, in the library `ThreeMajority`, symmetry breaking of 3-Majority with many colours); the
+pairwise bound is the second-moment step of the PULL analysis in `epidemics/` (library
+`RumorSpread`, `RumorPush.pull_avg_new_sq_le`), which then applies the one-sided Paley-Zygmund
+bound (`RumorPush.pull_prob_goodRound`).
 -/
 
 namespace Dynamics

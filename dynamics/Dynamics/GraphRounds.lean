@@ -10,9 +10,9 @@ Round types for dynamics on a finite simple graph `G`, to be averaged with `avg`
   It is the product over the vertices of their neighbour sets, so under the uniform
   distribution the samples are independent (`avg_neighborRound_prod`, `avg_neighborRound_mul`)
   and each is uniform among the neighbours (`avg_neighborRound_eval`). On the complete graph
-  this is the round type `RumorPush.Tgt n` of `rumor_spread/`. A uniform vertex together with
-  a uniform synchronous round is the sequential "random vertex, random neighbour" step
-  (`avg_vertex_neighborRound`).
+  this is the round type `RumorPush.Tgt n` of `epidemics/` (library `RumorSpread`). A uniform
+  vertex together with a uniform synchronous round is the sequential "random vertex, random
+  neighbour" step (`avg_vertex_neighborRound`).
 * `EdgeRound G`: a sequential step in which one oriented edge (a `SimpleGraph.Dart`) is
   activated. A uniform oriented edge is a uniform edge (`avg_edgeRound_edge`) with a uniform
   orientation (`avg_edgeRound_symm`); averages over it are sums over adjacent ordered pairs
