@@ -183,7 +183,6 @@ lemma xyI_idle {i r : Op} (h : Idle i r) : xyI i r = 0 := by
 
 lemma vbI_nonneg (i r : Op) : 0 ≤ vbI i r := by unfold vbI; split <;> norm_num
 lemma xyI_nonneg (i r : Op) : 0 ≤ xyI i r := by unfold xyI; split <;> norm_num
-lemma vbI_le_one (i r : Op) : vbI i r ≤ 1 := by unfold vbI; split <;> norm_num
 lemma xyI_le_one (i r : Op) : xyI i r ≤ 1 := by unfold xyI; split <;> norm_num
 
 /-- The blank count moves by `I_xy - I_vb`. -/
@@ -200,15 +199,6 @@ lemma step_of_count_eq {s : Config n} {o : Op} (ho : o = .a ∨ o = .b) (h : cou
   unfold step
   rw [count_eq_n h p.1.1, count_eq_n h p.1.2, update_id_decided ho, ← count_eq_n h p.1.2,
     Function.update_eq_self]
-
-lemma run_of_count_eq {s : Config n} {o : Op} (ho : o = .a ∨ o = .b) (h : count s o = n)
-    (l : List (Interaction n)) : run s l = s := by
-  induction l with
-  | nil => rfl
-  | cons p l ih =>
-    change List.foldl step (step s p) l = s
-    rw [step_of_count_eq ho h p]
-    exact ih
 
 /-- Consensus in the sense of [AAE08, §4.1]: `x = n` or `y = n`. -/
 def Cons (s : Config n) : Prop := count s .a = n ∨ count s .b = n

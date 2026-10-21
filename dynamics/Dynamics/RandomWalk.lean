@@ -31,11 +31,6 @@ noncomputable def uniformNeighbor (hd : ∀ i, 0 < G.degree i) : Kernel V := fun
     rw [he]
     simp [ne_of_gt (hd i)] }
 
-/-- Entries of the simple random walk: `D⁻¹A`. -/
-theorem uniformNeighbor_weight (hd : ∀ i, 0 < G.degree i) (i j : V) :
-    (uniformNeighbor G hd i).weight j = if G.Adj i j then (G.degree i : ℝ)⁻¹ else 0 :=
-  rfl
-
 /-- The simple random walk charges exactly the edges. -/
 theorem uniformNeighbor_support (hd : ∀ i, 0 < G.degree i) (i j : V) :
     0 < (uniformNeighbor G hd i).weight j ↔ G.Adj i j := by

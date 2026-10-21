@@ -17,8 +17,6 @@ open Finset Dynamics Real
 /-- The deviation `√(3ℓ(μ + 2ℓ))` of a sum of indicators with mean `μ`. -/
 noncomputable def dev (ℓ μ : ℝ) : ℝ := √(3 * ℓ * (μ + 2 * ℓ))
 
-lemma dev_nonneg (ℓ μ : ℝ) : 0 ≤ dev ℓ μ := sqrt_nonneg _
-
 /-- `dev` is monotone in the mean. -/
 lemma dev_mono {ℓ μ μ' : ℝ} (hℓ : 0 ≤ ℓ) (h : μ ≤ μ') : dev ℓ μ ≤ dev ℓ μ' := by
   unfold dev

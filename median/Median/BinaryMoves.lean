@@ -122,26 +122,6 @@ lemma markov_le {n : ℕ} (hL : (128 : ℝ) ≤ log n) :
 
 variable {n : ℕ} [NeZero n]
 
-omit [NeZero n] in
-/-- A configuration that is not all-`true` has at least one `false` node. -/
-lemma falsesR_pos {x : Config n Bool} (h : x ≠ (fun _ => true)) : 1 ≤ falsesR x := by
-  by_cases hx : ones x = n
-  · exfalso
-    apply h
-    have hfull : univ.filter (fun v => x v = true) = univ := by
-      apply Finset.eq_univ_of_card
-      rw [show (univ.filter (fun v => x v = true)).card = ones x from rfl, hx]
-      simp
-    funext v
-    have hv := mem_univ v
-    rw [← hfull] at hv
-    exact (Finset.mem_filter.mp hv).2
-  · have h3 : (1 : ℕ) ≤ n - ones x := by
-      have hle := ones_le x
-      omega
-    rw [← cast_nat_sub x]
-    exact_mod_cast h3
-
 lemma kernel_eq : Median.kernel n Bool
     = Dynamics.Kernel.ofStep (Median.step (n := n) (α := Bool)) := rfl
 

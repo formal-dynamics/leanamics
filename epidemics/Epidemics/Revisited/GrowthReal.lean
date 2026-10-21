@@ -89,15 +89,6 @@ lemma threeFourth_split {x : ℝ} (hx : 1 ≤ x) :
     _ = fourthRoot x ^ 4 := by ring
     _ = x := fourthRoot_four hx0
 
-lemma threeFourth_div_self {x : ℝ} (hx : 1 ≤ x) :
-    threeFourth x / x = 1 / fourthRoot x := by
-  have hpos : 0 < x := by linarith only [hx]
-  have hfr : 0 < fourthRoot x := by
-    have h1 : 1 ≤ fourthRoot x := fourthRoot_ge_one hx
-    linarith only [h1]
-  rw [div_eq_div_iff hpos.ne' hfr.ne']
-  simpa [one_mul] using threeFourth_split hx
-
 /-- `3 s^4 - 4 s^3 + 1 = (s - 1)^2 (3 s^2 + 2 s + 1) ≥ 0` for `s ≥ 1`. -/
 lemma three_poly_nonneg {s : ℝ} (hs : 1 ≤ s) : 0 ≤ 3 * s ^ 4 - 4 * s ^ 3 + 1 := by
   have h : 3 * s ^ 4 - 4 * s ^ 3 + 1 = (s - 1) ^ 2 * (3 * s ^ 2 + 2 * s + 1) := by ring
@@ -212,10 +203,6 @@ lemma fShrink_pos {a f : ℝ} (hf : 0 < f) (ha : 0 ≤ a) : 0 < fShrink a f := b
   exact lt_min h1 h2
 
 lemma fShrink_le_half {a f : ℝ} : fShrink a f ≤ f / 2 := min_le_left _ _
-
-lemma fShrink_le_f {a f : ℝ} (hf : 0 < f) : fShrink a f ≤ f := by
-  have hhalf : f / 2 ≤ f := by linarith only [hf]
-  exact le_trans fShrink_le_half hhalf
 
 lemma fShrink_a_le {a f : ℝ} (ha : 0 ≤ a) : (a + 1) * fShrink a f ≤ 1 / 8 := by
   have ha1 : 0 ≤ a + 1 := by linarith only [ha]
@@ -581,14 +568,6 @@ lemma pow_le_of_logb {ρ x : ℝ} {j : ℕ} (hρ : 1 < ρ) (hx : 0 < x)
   rwa [Real.exp_nat_mul (Real.log ρ) j, Real.exp_log (by linarith only [hρ] : 0 < ρ),
     Real.exp_log hx] at hexp
 
-lemma lt_pow_of_logb {ρ x : ℝ} {j : ℕ} (hρ : 1 < ρ) (hx : 0 < x)
-    (hj : Real.logb ρ x < (j : ℝ)) : x < ρ ^ j := by
-  have hlog : 0 < Real.log ρ := Real.log_pos hρ
-  rw [Real.logb, div_lt_iff₀ hlog] at hj
-  have hexp := (Real.exp_lt_exp).mpr hj
-  rwa [Real.exp_nat_mul (Real.log ρ) j, Real.exp_log (by linarith only [hρ] : 0 < ρ),
-    Real.exp_log hx] at hexp
-
 lemma logb_nonneg_of_one_le {ρ x : ℝ} (hρ : 1 < ρ) (hx : 1 ≤ x) : 0 ≤ Real.logb ρ x := by
   have hlogρ : 0 < Real.log ρ := Real.log_pos hρ
   have hlogx : 0 ≤ Real.log x := by
@@ -606,16 +585,6 @@ lemma phaseCount_pow_le {γ a f : ℝ} {n : ℕ} (hγ : 0 < γ) (hfn : 1 ≤ fSh
   have hj : (phaseCount γ a f n : ℝ) ≤ Real.logb (1 + γ) (fShrink a f * n) :=
     Nat.floor_le hlog0
   exact pow_le_of_logb hρ (by linarith only [hfn]) hj
-
-lemma phaseCount_succ_gt {γ a f : ℝ} {n : ℕ} (hγ : 0 < γ) (hfn : 1 ≤ fShrink a f * n) :
-    fShrink a f * n < (1 + γ) ^ (phaseCount γ a f n + 1) := by
-  have hρ : 1 < 1 + γ := by linarith only [hγ]
-  have hx : 0 < fShrink a f * n := by linarith only [hfn]
-  -- `(k + 1 : ℝ)` elaborates as `↑k + 1`, while `lt_pow_of_logb` needs `↑(k + 1)`.
-  have hlt : Real.logb (1 + γ) (fShrink a f * n) < (phaseCount γ a f n : ℝ) + 1 := by
-    simpa [phaseCount] using Nat.lt_floor_add_one (Real.logb (1 + γ) (fShrink a f * n))
-  rw [← Nat.cast_add_one] at hlt
-  exact lt_pow_of_logb hρ hx hlt
 
 noncomputable def gammaFactor (γ b : ℝ) (n : ℕ) : ℝ :=
   1 + γ - γ * b / Real.log n
@@ -1332,21 +1301,6 @@ lemma qTerm_nonneg {γ c A k : ℝ} (hγ : 0 ≤ γ) (hc : 0 ≤ c) :
   have hnum : 0 ≤ γ + c := by linarith only [hγ, hc]
   exact div_nonneg hnum hden
 
-lemma qTerm_le_scaled {γ γhi c A k : ℝ} (hγ : γ ≤ γhi) (hA : A ≠ 0) (hk : 0 < k) :
-    qTerm γ c A k ≤ ((γhi + c) / A ^ 2) * (Real.sqrt k)⁻¹ := by
-  have hsqrt : 0 < Real.sqrt k := Real.sqrt_pos.mpr hk
-  have hA2 : 0 < A ^ 2 := by
-    have hne : A ^ 2 ≠ 0 := fun h => hA (sq_eq_zero_iff.mp h)
-    exact lt_of_le_of_ne (sq_nonneg A) hne.symm
-  have hden : 0 < A ^ 2 * Real.sqrt k := mul_pos hA2 hsqrt
-  have hnum : γ + c ≤ γhi + c := by linarith only [hγ]
-  unfold qTerm
-  have hle := div_le_div_of_nonneg_right hnum hden.le
-  have hident : (γhi + c) / (A ^ 2 * Real.sqrt k) =
-      ((γhi + c) / A ^ 2) * (Real.sqrt k)⁻¹ := by
-    field_simp [hA2.ne', hsqrt.ne']
-  linarith only [hle, hident]
-
 noncomputable def tailQSum (γlo γhi b c : ℝ) : ℝ :=
   qCap γlo γhi b c * (Real.sqrt (alphaSeq b γlo))⁻¹ * (sqrtGap γlo)⁻¹
 
@@ -1472,14 +1426,6 @@ lemma xDecay_gt_one {γlo γhi b c : ℝ} (hγlo : 0 < γlo) (hγ : γlo ≤ γh
   have hdiv : 0 < 1 / (2 * qCap γlo γhi b c) := div_pos (by norm_num) hden
   unfold xDecay
   linarith only [hdiv]
-
-lemma Qstar_bounds {γlo γhi b c : ℝ} (hγlo : 0 < γlo) (hγ : γlo ≤ γhi) (hc : 0 ≤ c) :
-    0 < Qstar γlo γhi b c ∧ Qstar γlo γhi b c < 1 := by
-  have hq : 0 < qCap γlo γhi b c := qCap_pos hγlo hγ hc
-  have hden : 0 < 1 + qCap γlo γhi b c := by linarith only [hq]
-  refine ⟨div_pos hq hden, ?_⟩
-  rw [Qstar, div_lt_one hden]
-  linarith only [hq]
 
 lemma xDecay_Qstar_lt_one {γlo γhi b c : ℝ} (hγlo : 0 < γlo) (hγ : γlo ≤ γhi) (hc : 0 ≤ c) :
     xDecay γlo γhi b c * Qstar γlo γhi b c < 1 := by

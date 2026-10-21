@@ -203,32 +203,6 @@ lemma sum_range_shift_le {a : ℕ → ℝ} {T₀ : ℕ} {ε : ℝ} (hT : 0 < T�
 
 variable {V : Type*} [Fintype V] [DecidableEq V] {G : SimpleGraph V} {k : ℕ}
 
-lemma bipsRun_mono (v : V) {A B : Finset V} (h : A ⊆ B) (l : List (Choices G k)) :
-    bipsRun v A l ⊆ bipsRun v B l := by
-  induction l generalizing A B with
-  | nil => simpa [bipsRun] using h
-  | cons ρ l ih =>
-    simpa [bipsRun] using ih (bipsStep_mono v h ρ)
-
-lemma source_mem_bipsRun (v : V) {A : Finset V} (hv : v ∈ A) (l : List (Choices G k)) :
-    v ∈ bipsRun v A l := by
-  induction l generalizing A with
-  | nil => simpa [bipsRun] using hv
-  | cons ρ l ih =>
-    simpa [bipsRun] using ih (source_mem_bipsStep v A ρ)
-
-lemma bipsRun_univ (v : V) (hk : 1 ≤ k) (l : List (Choices G k)) :
-    bipsRun v univ l = univ := by
-  induction l with
-  | nil => simp [bipsRun]
-  | cons ρ l ih =>
-    simpa [bipsRun, bipsStep_univ v hk ρ] using ih
-
-omit [Fintype V] in
-lemma cobraRun_append (C : Finset V) (l₁ l₂ : List (Choices G k)) :
-    cobraRun C (l₁ ++ l₂) = cobraRun (cobraRun C l₁) l₂ := by
-  simp [cobraRun, List.foldl_append]
-
 omit [Fintype V] in
 lemma cobraStep_nonempty (hk : 1 ≤ k) {D : Finset V} (hD : D.Nonempty) (ρ : Choices G k) :
     (cobraStep D ρ).Nonempty := by

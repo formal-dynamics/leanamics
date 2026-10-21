@@ -404,15 +404,6 @@ theorem card_good_ge (hG : IsClusteredRegular G V₁ d b) (x₀ : V → ℝ) {ε
   linarith
 
 
-omit [Fintype V] [DecidableEq V] [DecidableRel G.Adj] in
-lemma ite_exists_some {α : Type*} (o : Option α) (P : α → Prop) [DecidablePred P]
-    [Decidable (∃ e, o = some e ∧ P e)] :
-    (if ∃ e, o = some e ∧ P e then (1 : ℝ) else 0) =
-      match o with
-      | some e => if P e then 1 else 0
-      | none => 0 := by
-  cases o <;> simp
-
 /-- One bad round: `P(bad) ≤ b/d + 2 |B|/n`. -/
 lemma IsClusteredRegular.avg_isBadStep_le (hG : IsClusteredRegular G V₁ d b) (θ : ℝ)
     (x₁ y : V → ℝ) :

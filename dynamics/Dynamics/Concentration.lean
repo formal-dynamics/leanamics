@@ -272,9 +272,6 @@ theorem avg_hoeffding [Nonempty γ] (Y : Fin n → γ → ℝ) (hY : ∀ i x, Y 
 /-- The variance of a coordinate, `𝔼[(Y - 𝔼Y)²]`. -/
 noncomputable def variance (f : γ → ℝ) : ℝ := avg (fun y => (f y - avg f) ^ 2)
 
-lemma variance_nonneg (f : γ → ℝ) : 0 ≤ variance f :=
-  avg_nonneg fun _ => sq_nonneg _
-
 /-- The variance is at most the second moment. -/
 lemma variance_le_avg_sq [Nonempty γ] (f : γ → ℝ) : variance f ≤ avg (fun y => f y ^ 2) := by
   unfold variance

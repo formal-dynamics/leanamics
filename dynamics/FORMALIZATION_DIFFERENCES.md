@@ -29,7 +29,7 @@ Where the statements of `dynamics/` deviate from their sources, and why.
 8. **`ThreeMajority.avg` is an `abbrev`, not an `export`.** An `export Dynamics (avg)` alias is
    not a constant, and the plurality blueprint's `\lean{ThreeMajority.avg}` is checked with
    `Environment.contains`; the reducible abbreviation keeps the name and removes the copy. The
-   22 `ThreeMajority.avg_*`/`expList_*` wrappers stay (one-line proofs by the `Dynamics`
+   21 `ThreeMajority.avg_*`/`expList_*` wrappers stay (one-line proofs by the `Dynamics`
    lemmas, tagged in the blueprint, needed by `rw` on `ThreeMajority.avg` terms).
 9. **Not yet consolidated:** a few generic lemmas re-proved in moran, voter and undecided
    (see the section on tail bounds below), and the single-copy independence lemmas

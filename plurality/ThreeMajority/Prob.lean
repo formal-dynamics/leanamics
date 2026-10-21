@@ -42,9 +42,6 @@ lemma avg_indicator (P : α → Prop) [DecidablePred P] :
       = ((univ.filter P).card : ℝ) / (Fintype.card α : ℝ) :=
   Dynamics.avg_indicator P
 
-lemma card_cast_pos [Nonempty α] : (0 : ℝ) < (Fintype.card α : ℝ) :=
-  Dynamics.card_cast_pos
-
 lemma avg_const [Nonempty α] (c : ℝ) : avg (fun _ : α => c) = c :=
   Dynamics.avg_const c
 

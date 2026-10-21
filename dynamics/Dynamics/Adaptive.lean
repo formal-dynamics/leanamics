@@ -8,8 +8,8 @@ randomness being `ω` (`hist obs ω k` is the history after `k` steps). Examples
 `ω (next h)` per step (EPI-3's depth-first search, where `obs h ω = ω (next h)`), or a block of
 coins, or the partners of a node in a random matching (EPI-6's exploration).
 
-* **Histories.** `hist`, its length and prefixes (`hist_take`), one more step
-  (`hist_succ_eq_iff`), and the history as a list of prescribed answers (`hist_eq_iff`).
+* **Histories.** `hist`, its length, one more step (`hist_succ_eq_iff`), and the history as a
+  list of prescribed answers (`hist_eq_iff`).
 * **Supermartingale lemma** (`Distribution.expect_prod_hist_le_one`): if every factor
   `f h b ≥ 0` has conditional expectation at most `1` given the history `h`, the product of the
   factors along the process (`histProd`) has expectation at most `1`. With Markov's inequality this
@@ -37,25 +37,11 @@ def hist (obs : List β → Ω → β) (ω : Ω) : ℕ → List β
 
 @[simp] lemma hist_zero (obs : List β → Ω → β) (ω : Ω) : hist obs ω 0 = [] := rfl
 
-lemma hist_succ (obs : List β → Ω → β) (ω : Ω) (k : ℕ) :
-    hist obs ω (k + 1) = hist obs ω k ++ [obs (hist obs ω k) ω] := rfl
-
 @[simp] lemma length_hist (obs : List β → Ω → β) (ω : Ω) (k : ℕ) :
     (hist obs ω k).length = k := by
   induction k with
   | zero => rfl
   | succ k ih => simp [hist, ih]
-
-/-- The history after `j ≤ k` steps is a prefix of the history after `k` steps. -/
-lemma hist_take (obs : List β → Ω → β) (ω : Ω) {j k : ℕ} (hjk : j ≤ k) :
-    (hist obs ω k).take j = hist obs ω j := by
-  induction k with
-  | zero => obtain rfl : j = 0 := Nat.le_zero.mp hjk; rfl
-  | succ k ih =>
-    rcases Nat.lt_or_ge j (k + 1) with h | h
-    · rw [hist, List.take_append_of_le_length (by simp; omega), ih (by omega)]
-    · obtain rfl : j = k + 1 := le_antisymm hjk h
-      exact List.take_of_length_le (by simp)
 
 lemma hist_succ_eq_iff (obs : List β → Ω → β) (ω : Ω) (k : ℕ) (h : List β) (b : β) :
     hist obs ω (k + 1) = h ++ [b] ↔ hist obs ω k = h ∧ obs h ω = b := by

@@ -32,9 +32,6 @@ def Tgt3 (n : ℕ) := Fin n → Fin n × Fin n × Fin n
 instance (n : ℕ) : Fintype (Tgt3 n) :=
   inferInstanceAs (Fintype (Fin n → Fin n × Fin n × Fin n))
 
-instance (n : ℕ) : DecidableEq (Tgt3 n) :=
-  inferInstanceAs (DecidableEq (Fin n → Fin n × Fin n × Fin n))
-
 lemma tgt3_nonempty {n : ℕ} (hn : 1 ≤ n) : Nonempty (Tgt3 n) :=
   ⟨fun _ => (⟨0, hn⟩, ⟨0, hn⟩, ⟨0, hn⟩)⟩
 
@@ -83,9 +80,6 @@ lemma step_mono {I I' : Finset (Fin n)} (h : I ⊆ I') (r : Tgt3 n) :
   intro v hv
   rw [mem_step] at hv ⊢
   exact hv.trans (sampleCount_mono h r v)
-
-lemma card_step_le (I : Finset (Fin n)) (r : Tgt3 n) : (step I r).card ≤ n := by
-  simpa using card_le_card (subset_univ (step I r))
 
 /-- The opinion-`1` set after consuming a list of rounds. -/
 def run (I : Finset (Fin n)) : List (Tgt3 n) → Finset (Fin n)

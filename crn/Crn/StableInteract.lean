@@ -63,10 +63,6 @@ lemma Reaches.trans {c d e : Fin n → Q} (h₁ : P.Reaches c d) (h₂ : P.Reach
 lemma Step.reaches {c d : Fin n → Q} (h : P.Step c d) : P.Reaches c d :=
   Relation.ReflTransGen.single h
 
-/-- A path followed by a step is a path. -/
-lemma Reaches.tail {c d e : Fin n → Q} (h₁ : P.Reaches c d) (h₂ : P.Step d e) :
-    P.Reaches c e := Relation.ReflTransGen.tail h₁ h₂
-
 /-- One encounter is a step. -/
 lemma reaches_interact (c : Fin n → Q) (e : AgentPair n) : P.Reaches c (P.interact c e) :=
   Step.reaches ⟨e, rfl⟩
@@ -77,11 +73,6 @@ lemma Reaches.invariant {I : (Fin n → Q) → Prop} (hI : ∀ c d, I c → P.St
   induction h with
   | refl => exact hc
   | tail _ hst ih => exact hI _ _ ih hst
-
-/-- Output-stability is inherited along reachability. -/
-lemma OutputStable.reaches {b : Bool} {c d : Fin n → Q} (hc : P.OutputStable b c)
-    (h : P.Reaches c d) : P.OutputStable b d :=
-  fun e he => hc e (h.trans he)
 
 /-- A property preserved by every step, under which all agents output `b`, gives
 output-stability. -/

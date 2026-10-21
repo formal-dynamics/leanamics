@@ -66,12 +66,6 @@ theorem StablyMarks.map {P : Protocol X Q} {O : Q → Y} {g : (X → ℕ) → X 
   obtain ⟨d, hd, hs⟩ := h n hn ι c hc
   exact ⟨d, hd, fun e he v => congrArg F (hs e he v)⟩
 
-/-- Post-composing the outputs of a uniform computation. -/
-theorem StablyComputesWith.map {P : Protocol X Q} {O : Q → Y} {f : (X → ℕ) → Y}
-    (h : P.StablyComputesWith O f) (F : Y → Z) :
-    P.StablyComputesWith (fun q => F (O q)) fun x => F (f x) :=
-  StablyMarks.map h F
-
 /-- `StablyMarks` only evaluates the output map and the targets. -/
 theorem StablyMarks.congr {P : Protocol X Q} {O O' : Q → Y} {g g' : (X → ℕ) → X → Y}
     (h : P.StablyMarks O g) (hO : ∀ q, O q = O' q) (hg : ∀ x i, g x i = g' x i) :

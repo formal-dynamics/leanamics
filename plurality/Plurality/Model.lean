@@ -41,15 +41,6 @@ variable {n k : ℕ}
 first one, `a`, if all three differ. -/
 def maj3 (a b c : Fin k) : Fin k := if b = c then b else a
 
-lemma maj3_of_eq_left {a b c : Fin k} (h : a = b) : maj3 a b c = a := by
-  unfold maj3; split_ifs with h' <;> simp_all
-
-lemma maj3_of_eq_right {a b c : Fin k} (h : b = c) : maj3 a b c = b := by
-  simp [maj3, h]
-
-lemma maj3_of_eq_outer {a b c : Fin k} (h : a = c) : maj3 a b c = a := by
-  unfold maj3; split_ifs with h' <;> simp_all
-
 lemma maj3_mem (a b c : Fin k) : maj3 a b c = a ∨ maj3 a b c = b ∨ maj3 a b c = c := by
   unfold maj3; split_ifs <;> simp
 
@@ -73,9 +64,6 @@ def run (x : Config n k) (l : List (Tgt3 n)) : Config n k := runWith maj3 x l
 @[simp] lemma runWith_nil (f : Fin k → Fin k → Fin k → Fin k) (x : Config n k) :
     runWith f x [] = x := rfl
 
-@[simp] lemma runWith_cons (f : Fin k → Fin k → Fin k → Fin k) (x : Config n k) (r : Tgt3 n)
-    (l : List (Tgt3 n)) : runWith f x (r :: l) = runWith f (stepWith f x r) l := rfl
-
 lemma runWith_append (f : Fin k → Fin k → Fin k → Fin k) (x : Config n k)
     (l₁ l₂ : List (Tgt3 n)) : runWith f x (l₁ ++ l₂) = runWith f (runWith f x l₁) l₂ := by
   simp [runWith, List.foldl_append]
@@ -91,14 +79,8 @@ theorem run_eq_runCol (x : Config n k) (l : List (Tgt3 n)) :
     run x l = ThreeMajority.runCol x l :=
   (ThreeMajority.runCol_eq_foldl x l).symm
 
-@[simp] lemma run_nil (x : Config n k) : run x [] = x := rfl
-
 @[simp] lemma run_cons (x : Config n k) (r : Tgt3 n) (l : List (Tgt3 n)) :
     run x (r :: l) = run (step x r) l := rfl
-
-lemma run_append (x : Config n k) (l₁ l₂ : List (Tgt3 n)) :
-    run x (l₁ ++ l₂) = run (run x l₁) l₂ :=
-  runWith_append maj3 x l₁ l₂
 
 /-! ### Color counts -/
 

@@ -22,8 +22,8 @@ arXiv:1201.6529).
   i.i.d. Bernoulli(`p`) (`expect_queryAnswers`, `prob_queryAnswers`). The proof: the answers equal
   a given list `L` iff the coordinates queried along `L`, which are determined by `L`, take the
   values of `L`, a cylinder event. The answers are the history (`Dynamics.hist`, in the core's
-  `Dynamics.Adaptive`) of the adaptive observation process `l ↦ ω (next l)`, whose length,
-  prefix and answer-list lemmas they reuse.
+  `Dynamics.Adaptive`) of the adaptive observation process `l ↦ ω (next l)`, whose length and
+  answer-list lemmas they reuse.
 * **Symmetry**: relabelling the vertices does not change the law of the coins (`coins_prob_perm`).
 
 `coins` is built from `Epidemics.bernoulli`, an abbreviation of the coin
@@ -130,11 +130,6 @@ omit [Fintype ι] [DecidableEq ι] in
 lemma length_queryAnswers (next : List Bool → ι) (ω : ι → Bool) (t : ℕ) :
     (queryAnswers next ω t).length = t :=
   length_hist _ ω t
-
-omit [Fintype ι] [DecidableEq ι] in
-lemma take_queryAnswers (next : List Bool → ι) (ω : ι → Bool) {s t : ℕ} (hst : s ≤ t) :
-    (queryAnswers next ω t).take s = queryAnswers next ω s :=
-  hist_take _ ω hst
 
 omit [Fintype ι] [DecidableEq ι] in
 /-- The answers are a given list `L` iff the coordinates queried along `L` take its values. -/

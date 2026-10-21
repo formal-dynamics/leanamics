@@ -61,11 +61,6 @@ def Solver (f : Rule k) (n : ℕ) (s ε : ℝ) : Prop :=
     ∀ δ > 0, ∃ T : ℕ, 1 - ε - δ ≤
       expList (Tgt3 n) T (fun l => if Mono (runWith f x l) m then (1 : ℝ) else 0)
 
-lemma ClearMajority.conservative_pair {f : Rule k} (hf : ClearMajority f) (r b : Fin k) :
-    majCount f r b = 3 := by
-  obtain ⟨h1, h2, h3⟩ := hf r b
-  simp [majCount, h1, h2, h3]
-
 /-- The counts of the three distinct colors sum to `6`. -/
 lemma deltaCount_sum {f : Rule k} (hf : Conservative f) {r g b : Fin k}
     (hrg : r ≠ g) (hgb : g ≠ b) (hrb : r ≠ b) :

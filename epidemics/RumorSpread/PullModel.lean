@@ -110,12 +110,6 @@ lemma run_eq_foldl (I : Finset (Fin n)) (l : List (Tgt n)) : run I l = l.foldl s
   | nil => rfl
   | cons r l ih => exact ih (step I r)
 
-lemma subset_pullRun (I : Finset (Fin n)) (l : List (Tgt n)) : I ⊆ pullRun I l :=
-  subset_foldl subset_pullStep I l
-
-lemma subset_pushPullRun (I : Finset (Fin n)) (l : List (Tgt n)) : I ⊆ pushPullRun I l :=
-  subset_foldl subset_pushPullStep I l
-
 /-- **PUSH–PULL dominates PUSH pathwise**: driven by the same calls, PUSH–PULL has informed at
 least the nodes informed by PUSH after every prefix of rounds. -/
 theorem run_subset_pushPullRun (I : Finset (Fin n)) (l : List (Tgt n)) :

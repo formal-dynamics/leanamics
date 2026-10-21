@@ -29,10 +29,6 @@ omit [DecidableEq V] in
 /-- The total volume is twice the number of edges. -/
 lemma vol_univ : vol G univ = 2 * G.edgeFinset.card := G.sum_degrees_eq_twice_card_edges
 
-/-- A set and its complement share the total volume. -/
-lemma vol_add_vol_compl (S : Finset V) : vol G S + vol G Sᶜ = vol G univ :=
-  sum_add_sum_compl S _
-
 /-- The two colour classes of a two-opinion configuration share the total volume. -/
 lemma vol_false_add_vol_true (s : Config V Bool) :
     vol G (univ.filter fun u => s u = false) + vol G (univ.filter fun u => s u = true) =
@@ -61,11 +57,6 @@ lemma vol_eq_zero_iff {G} [DecidableRel G.Adj] (hd : ∀ v, 0 < G.degree v) (S :
     exact (vol_pos hd (nonempty_iff_ne_empty.mpr hne)).ne' h
   · rintro rfl
     simp [vol]
-
-omit [DecidableEq V] in
-/-- Volume is monotone. -/
-lemma vol_mono {S T : Finset V} (h : S ⊆ T) : vol G S ≤ vol G T :=
-  sum_le_sum_of_subset h
 
 /-! ### The minority side and the potential -/
 

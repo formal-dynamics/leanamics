@@ -29,10 +29,6 @@ def coinEquiv (q : ℕ) : (Choices G 2 × (V → Fin q)) ≃ ((u : V) → CoinSa
   left_inv _ := rfl
   right_inv _ := rfl
 
-omit [Fintype V] [DecidableEq V] [DecidableRel G.Adj] in
-@[simp] lemma coinEquiv_apply {q : ℕ} (ρ : Choices G 2 × (V → Fin q)) (u : V) :
-    coinEquiv G q ρ u = (ρ.1 u, ρ.2 u) := rfl
-
 /-- The neighbours used by `u` given its samples: the first one, and the second one when the
 coin is `< p`. -/
 def coinTgt {q : ℕ} (p : ℕ) {u : V} (a : CoinSample G q u) : Finset V :=

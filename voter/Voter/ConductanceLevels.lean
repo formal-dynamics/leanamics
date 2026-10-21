@@ -11,8 +11,7 @@ Berenbrink, Giakkoupis, Kermarrec, Mallmann-Trenn (ICALP 2016):
   in `D`, `∑_{t < N} P_x(X_t ∈ D)`, is at most `B / p` (and zero outside `A`). With `D = A` the
   non-consensus states this is "restarting": `𝔼[T] ≤ B / p`.
 * the supporting facts on `Kernel.iterate`: it commutes with finite sums
-  (`iterate_finset_sum`), constant configurations are absorbing for every observable
-  (`transition_iterate_constant`), and disagreement cannot reappear (`transition_disagreement_le`).
+  (`iterate_finset_sum`), and disagreement cannot reappear (`transition_disagreement_le`).
 
 `sum_iterate_le_of_block` and `iterate_finset_sum` are candidates for `dynamics/`.
 -/
@@ -123,13 +122,6 @@ end Generic
 /-! ### Constant configurations and disagreement -/
 
 variable {V C : Type*} [Fintype V] [DecidableEq V] [Fintype C]
-
-/-- A constant configuration is absorbing: every observable keeps its value. -/
-lemma transition_iterate_constant (H : Kernel V) (c : C) (f : Config V C → ℝ) (n : ℕ) :
-    (transition H).iterate n f (fun _ => c) = f (fun _ => c) := by
-  induction n with
-  | zero => rfl
-  | succ n ih => rw [Kernel.iterate_succ, transition_constant, ih]
 
 omit [Fintype V] [DecidableEq V] [Fintype C] in
 /-- Disagreement is `0` or `1`. -/
