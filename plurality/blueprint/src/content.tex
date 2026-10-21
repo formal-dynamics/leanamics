@@ -57,11 +57,12 @@ hypothesis.
 \section{The model}\label{sec:model}
 
 \begin{definition}[Colorings and color counts]\label{def:config}
-  \lean{Plurality.Config, Plurality.count, Plurality.sum_count}
+  \lean{Plurality.Config, Plurality.count, Plurality.sum_count, Plurality.count_eq_colourCount}
   \leanok
   A \emph{coloring} is a map $x \colon [n] \to [k]$. The number of nodes of
   color $j$ is $c_j = |\{v : x(v) = j\}|$, and $\sum_j c_j = n$. The vector
-  $c = (c_1,\dots,c_k)$ is the paper's $k$-color distribution ($k$-cd).
+  $c = (c_1,\dots,c_k)$ is the paper's $k$-color distribution ($k$-cd), the configuration
+  vector of Definition~\ref{def:as-model} at colors $[k]$.
 \end{definition}
 
 \begin{definition}[3-input rules and the 3-majority rule]\label{def:rule}
@@ -74,13 +75,15 @@ hypothesis.
 \end{definition}
 
 \begin{definition}[One round and the process]\label{def:step}
-  \lean{Plurality.stepWith, Plurality.step, Plurality.runWith, Plurality.run}
+  \lean{Plurality.stepWith, Plurality.step, Plurality.runWith, Plurality.run, Plurality.step_eq_stepCol, Plurality.run_eq_runCol}
   \leanok
-  \uses{def:config, def:rule}
+  \uses{def:config, def:rule, def:as-model}
   A round is a map $r \colon [n] \to [n]^3$ (the three samples of every node),
   drawn uniformly. The next coloring under rule $f$ is
   $v \mapsto f(x(r_v^1), x(r_v^2), x(r_v^3))$. The process after $T$ rounds
-  folds this step over $T$ independent uniform rounds.
+  folds this step over $T$ independent uniform rounds. Under 3-majority, a round is the round
+  of 3-Majority with colours of any type (Definition~\ref{def:as-model}) at colors $[k]$, by
+  definition.
 \end{definition}
 
 \begin{definition}[Consensus]\label{def:mono}
@@ -103,7 +106,7 @@ hypothesis.
 \section{The next expected coloring}\label{sec:expected}
 
 \begin{lemma}[Adoption probability]\label{lem:adopt}
-  \lean{Plurality.count_stepWith_eq_sum, Plurality.avg_adopt, Plurality.sum_triple_maj3, Plurality.avg_adopt_maj3}
+  \lean{Plurality.count_stepWith_eq_sum, Plurality.avg_adopt, Plurality.sum_triple_maj3, Plurality.avg_adopt_maj3, Plurality.adopt_maj3_eq_adoptInd}
   \leanok
   \uses{def:step}
   The new count of color $j$ is a sum of $n$ independent indicators, one per
@@ -459,9 +462,10 @@ missing), and the repaired proof is what is formalized
 \begin{theorem}[Binary case]\label{thm:binary}
   \lean{Plurality.colorSet_step, Plurality.colorSet_run, Plurality.binary_consensus_whp}
   \leanok
-  \uses{def:step, def:binary-step, thm:main}
+  \uses{def:step, def:binary-step, thm:main, lem:as-bool}
   With $k = 2$ the set of nodes of color $1$ evolves exactly as the binary
-  3-majority process of Section~\ref{sec:binary-model}. Hence, if
+  3-majority process of Section~\ref{sec:binary-model} (Lemma~\ref{lem:as-bool}, with the colors
+  renamed). Hence, if
   $c_1 \ge \frac35 n$ and $\log n \ge 30$, all nodes support color $1$ after
   $O(\log n)$ rounds with probability at least $1 - 500/n$.
 \end{theorem}
@@ -1467,7 +1471,8 @@ colours. Consensus is $\kappa(c)\le1$.
 \uses{def:round}
 In a round of 3-Majority every agent draws an ordered sample triple $(s_1,s_2,s_3)$ uniformly
 with replacement (Definition~\ref{def:round}); if $s_2$ and $s_3$ have the same colour it adopts
-that colour, otherwise the colour of $s_1$. In a round of Voter every agent adopts the colour of
+that colour, otherwise the colour of $s_1$. This is the only definition of the round with colours:
+at colours $[k]$ it is the 3-majority round of Definition~\ref{def:step}. In a round of Voter every agent adopts the colour of
 one uniformly random agent (itself included).
 \end{definition}
 
@@ -1475,11 +1480,12 @@ The paper breaks a three-way tie by a uniformly random sample; since the samples
 taking the first one gives the same law (Lemma~\ref{lem:as-alpha}).
 
 \begin{lemma}[Two colours]\label{lem:as-bool}
-\lean{ThreeMajority.stepCol_bool}\leanok\uses{def:as-model,def:binary-step}
+\lean{ThreeMajority.stepCol_bool,ThreeMajority.stepCol_comp}\leanok\uses{def:as-model,def:binary-step}
 With colours $\{0,1\}$, a round of 3-Majority is the step of Definition~\ref{def:binary-step}.
+Renaming the colours by an injective map commutes with a round.
 \end{lemma}
 \begin{proof}\leanok
-Case analysis on the colours of the three samples.
+Case analysis on the colours of the three samples; the rule only compares colours.
 \end{proof}
 
 \begin{definition}[Majorization, Schur-convex observables]\label{def:as-majorization}

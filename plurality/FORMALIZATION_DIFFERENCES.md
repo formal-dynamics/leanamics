@@ -219,7 +219,8 @@ replacement);
 `voterStep` and `voterRun` are Voter, with rounds `Fin n → Fin n`. `colourCount c a` is the
 number of agents of colour `a`, `numColours c` the number of remaining colours; consensus is
 `numColours c ≤ 1`. With colours `Bool`, `stepCol` is the two-opinion `ThreeMajority.step`
-(`stepCol_bool`).
+(`stepCol_bool`), and with colours `Fin k` it is the round `Plurality.step` of Sections 1 to 5
+(`Plurality.step_eq_stepCol`).
 
 Majorization (`AnyStartMajorization.lean`, Section 2.1). `Majorizes x y` (the paper's `x ⪰ y`):
 equal sums, and every sum of `y` over a set is at most a sum of `x` over a set of the same size

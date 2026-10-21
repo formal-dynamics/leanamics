@@ -11,6 +11,9 @@ import ThreeMajority
 #print axioms Plurality.phases_le
 #print axioms Plurality.theorem_3_8
 #print axioms Plurality.theorem_3_8_bigO
+#print axioms Plurality.step_eq_stepCol
+#print axioms Plurality.run_eq_runCol
+#print axioms Plurality.colorSet_run
 #print axioms Plurality.binary_consensus_whp
 #print axioms Plurality.corollary_3_10
 #print axioms Plurality.corollary_3_11

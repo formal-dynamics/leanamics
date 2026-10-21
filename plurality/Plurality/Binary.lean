@@ -4,10 +4,12 @@ import ThreeMajority.Main
 /-!
 # Two colors: the existing binary 3-majority development
 
-For `k = 2` the 3-majority dynamics of this package is *literally* the process
-formalized in `ThreeMajority`: the set of nodes of color `1` evolves by
-`ThreeMajority.step`, round by round and for every realization of the samples
-(`colorSet_step`, `colorSet_run`). The binary consensus theorem
+For `k = 2` the 3-majority round `step` is *literally* the two-opinion process
+of `ThreeMajority`: the set of nodes of color `1` evolves by `ThreeMajority.step`,
+round by round and for every realization of the samples (`colorSet_step`,
+`colorSet_run`). The one-round bridge is the bridge `ThreeMajority.stepCol_bool`
+of the model with colours of any type, through `step_eq_stepCol` and the renaming
+of the colors `Fin 2` as `Bool`. The binary consensus theorem
 `ThreeMajority.majority3_consensus_whp` therefore transfers verbatim
 (`binary_consensus_whp`): from a `60%` majority, 3-majority with two colors
 reaches the majority color within `O(log n)` rounds with probability
@@ -30,21 +32,14 @@ def colorSet {k : ℕ} (x : Config n k) (j : Fin k) : Finset (Fin n) := univ.fil
 
 lemma card_colorSet {k : ℕ} (x : Config n k) (j : Fin k) : (colorSet x j).card = count x j := rfl
 
-/-- With two colors, 3-majority returns color `1` iff at least two of the three
-samples have color `1`. -/
-lemma maj3_eq_one_iff (a b c : Fin 2) :
-    maj3 a b c = 1 ↔
-      2 ≤ (if a = 1 then 1 else 0) + (if b = 1 then 1 else 0) + (if c = 1 then 1 else 0) := by
-  revert a b c
-  decide
-
-/-- **One round.** The color-`1` set evolves by the binary 3-majority step. -/
+/-- **One round.** The color-`1` set evolves by the binary 3-majority step: the bridge
+`ThreeMajority.stepCol_bool`, with the colors `Fin 2` renamed as `Bool`. -/
 lemma colorSet_step (x : Config n 2) (r : Tgt3 n) :
     colorSet (step x r) 1 = ThreeMajority.step (colorSet x 1) r := by
-  ext v
-  simp only [colorSet, mem_filter, mem_univ, true_and, ThreeMajority.mem_step,
-    ThreeMajority.sampleCount, ThreeMajority.sampleCountOf, step, stepWith]
-  exact maj3_eq_one_iff _ _ _
+  have he : Function.Injective fun j : Fin 2 => decide (j = 1) := by decide
+  have h := ThreeMajority.stepCol_bool ((fun j : Fin 2 => decide (j = 1)) ∘ x) r
+  rw [ThreeMajority.stepCol_comp he] at h
+  simpa [colorSet, step_eq_stepCol] using h
 
 /-- **Every trajectory.** The color-`1` set evolves by `ThreeMajority.run`. -/
 lemma colorSet_run (x : Config n 2) (l : List (Tgt3 n)) :

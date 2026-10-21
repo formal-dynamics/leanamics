@@ -1,4 +1,5 @@
 import Plurality.Model
+import ThreeMajority.ManyOpinionsExpect
 
 /-!
 # The next expected coloring (Lemma 2.1)
@@ -51,6 +52,12 @@ under rule `f`. -/
 def adopt (f : Fin k → Fin k → Fin k → Fin k) (x : Config n k) (j : Fin k)
     (s : Fin n × Fin n × Fin n) : ℝ :=
   if f (x s.1) (x s.2.1) (x s.2.2) = j then 1 else 0
+
+/-- Under 3-majority, `adopt` is the adoption indicator `ThreeMajority.adoptInd` of 3-Majority
+with colours of any type, at colours `Fin k` (whose agent argument is not used). -/
+theorem adopt_maj3_eq_adoptInd (x : Config n k) (j : Fin k) (v : Fin n)
+    (s : Fin n × Fin n × Fin n) : adopt maj3 x j s = ThreeMajority.adoptInd x j v s :=
+  rfl
 
 lemma adopt_zero_one (f : Fin k → Fin k → Fin k → Fin k) (x : Config n k) (j : Fin k)
     (s : Fin n × Fin n × Fin n) : adopt f x j s = 0 ∨ adopt f x j s = 1 := by

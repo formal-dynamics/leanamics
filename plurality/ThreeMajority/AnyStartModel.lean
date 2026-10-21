@@ -12,10 +12,13 @@ agents holds a colour of an arbitrary type `σ`; the paper's colours `[k] ⊆ [n
   colour supported by at least two samples, and otherwise a uniformly random one of the three
   samples. Here a three-way tie adopts the *first* sample: since the three samples are i.i.d.,
   this has the same law (the process function of Equation (2), `alpha3M_weight`), and it keeps
-  the round randomness `Tgt3 n` of this package.
+  the round randomness `Tgt3 n` of the two-opinion model.
 * `stepCol`, `runCol`: one round and a whole trajectory of 3-Majority, on the round type
-  `Tgt3 n` of `ThreeMajority.Model`. With two colours this is the package's `step`
-  (`stepCol_bool`), so the model is the existing one, extended to any number of colours.
+  `Tgt3 n` of `ThreeMajority.Model`. With two colours this is the two-opinion `step`
+  (`stepCol_bool`), so the model is the two-opinion one, extended to any number of colours.
+  This is the one definition of the 3-Majority round with colours: the round `Plurality.step`
+  of the library `Plurality` is `stepCol` at colours `Fin k` (`Plurality.step_eq_stepCol`, by
+  `rfl`), and its bridge to the two-opinion model is derived from `stepCol_bool`.
 * `voterStep`, `voterRun`: the Voter process (Equation (1)); a round is `Fin n → Fin n`, every
   agent pulling the colour of one uniformly random agent (itself included).
 * `colourCount c a`, `numColours c`: the configuration vector of the paper and the number of
@@ -99,7 +102,7 @@ lemma runCol_append (c : Fin n → σ) (l₁ l₂ : List (Tgt3 n)) :
   simp [runCol_eq_foldl, List.foldl_append]
 
 /-- **Bridge to the two-opinion model.** With colours `Bool`, the agents of colour `true` after
-one round of `stepCol` are the opinion-`1` set after one round of the package's `step`. -/
+one round of `stepCol` are the opinion-`1` set after one round of the two-opinion `step`. -/
 theorem stepCol_bool (c : Fin n → Bool) (r : Tgt3 n) :
     univ.filter (fun v => stepCol c r v = true) = step (univ.filter fun v => c v = true) r := by
   ext v
@@ -107,6 +110,14 @@ theorem stepCol_bool (c : Fin n → Bool) (r : Tgt3 n) :
     majColour]
   rcases r v with ⟨a, b, d⟩
   cases ha : c a <;> cases hb : c b <;> cases hd : c d <;> simp
+
+/-- Renaming the colours by an injective map commutes with a round: the rule only compares
+colours. -/
+lemma stepCol_comp {τ : Type*} [DecidableEq τ] {g : σ → τ} (hg : Function.Injective g)
+    (c : Fin n → σ) (r : Tgt3 n) : stepCol (g ∘ c) r = g ∘ stepCol c r := by
+  funext v
+  simp only [stepCol, majColour, Function.comp_apply, hg.eq_iff]
+  split_ifs <;> rfl
 
 /-- 3-Majority never creates a colour: the colours after a round are among the current ones. -/
 lemma image_stepCol_subset (c : Fin n → σ) (r : Tgt3 n) :

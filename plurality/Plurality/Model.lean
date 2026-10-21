@@ -1,4 +1,4 @@
-import ThreeMajority.Model
+import ThreeMajority.AnyStartModel
 import Dynamics.Rounds
 
 /-!
@@ -20,12 +20,17 @@ lemma `Dynamics.Kernel.nested_phases` (the paper's Lemma A.4) applies.
 Section 4.2 of the paper compares 3-majority with an arbitrary deterministic
 3-input rule `f : Fin k → Fin k → Fin k → Fin k`, so the round is defined for
 any such rule (`stepWith f`) and 3-majority is the instance `f = maj3`.
+
+The 3-majority round itself is defined once, for colours of any type, as
+`ThreeMajority.stepCol` (`ThreeMajority.AnyStartModel`): `step`, `run` and `count` are
+`ThreeMajority.stepCol`, `ThreeMajority.runCol` and `ThreeMajority.colourCount` at colours
+`Fin k` (`step_eq_stepCol`, `run_eq_runCol`, `count_eq_colourCount`).
 -/
 
 namespace Plurality
 
 open Finset
-open ThreeMajority (Tgt3 tgt3_nonempty)
+open ThreeMajority (Tgt3)
 
 /-- A coloring of `n` nodes with `k` colors. -/
 abbrev Config (n k : ℕ) := Fin n → Fin k
@@ -75,6 +80,17 @@ lemma runWith_append (f : Fin k → Fin k → Fin k → Fin k) (x : Config n k)
     (l₁ l₂ : List (Tgt3 n)) : runWith f x (l₁ ++ l₂) = runWith f (runWith f x l₁) l₂ := by
   simp [runWith, List.foldl_append]
 
+/-- **One model.** The round of 3-majority is the round `ThreeMajority.stepCol` of
+3-Majority with colours of any type, at colours `Fin k`: `maj3` is the rule
+`ThreeMajority.majColour` on the colours of the three samples. -/
+theorem step_eq_stepCol (x : Config n k) (r : Tgt3 n) : step x r = ThreeMajority.stepCol x r :=
+  rfl
+
+/-- The process `run` is `ThreeMajority.runCol` at colours `Fin k`. -/
+theorem run_eq_runCol (x : Config n k) (l : List (Tgt3 n)) :
+    run x l = ThreeMajority.runCol x l :=
+  (ThreeMajority.runCol_eq_foldl x l).symm
+
 @[simp] lemma run_nil (x : Config n k) : run x [] = x := rfl
 
 @[simp] lemma run_cons (x : Config n k) (r : Tgt3 n) (l : List (Tgt3 n)) :
@@ -89,6 +105,11 @@ lemma run_append (x : Config n k) (l₁ l₂ : List (Tgt3 n)) :
 /-- The number `c_j` of nodes supporting color `j`. The map `count x` is the
 paper's `k`-color distribution (`k`-cd) of `x`. -/
 def count (x : Config n k) (j : Fin k) : ℕ := (univ.filter fun v => x v = j).card
+
+/-- `count` is the configuration vector `ThreeMajority.colourCount` at colours `Fin k`. -/
+theorem count_eq_colourCount (x : Config n k) (j : Fin k) :
+    count x j = ThreeMajority.colourCount x j :=
+  rfl
 
 lemma count_le (x : Config n k) (j : Fin k) : count x j ≤ n := by
   unfold count
@@ -158,9 +179,10 @@ lemma run_mono {x : Config n k} {j : Fin k} (hx : Mono x j) (l : List (Tgt3 n)) 
     Mono (run x l) j :=
   runWith_mono maj3_mem hx l
 
-/-! ### The Markov kernel -/
+/-! ### The Markov kernel
 
-instance [NeZero n] : Nonempty (Tgt3 n) := tgt3_nonempty (Nat.one_le_iff_ne_zero.mpr (NeZero.ne n))
+Rounds exist when `n ≠ 0`: the instance `Nonempty (Tgt3 n)` for `[NeZero n]` is the one of
+`ThreeMajority.AnyStartModel`. -/
 
 /-- The dynamics with rule `f` as a finite Markov kernel on colorings. -/
 noncomputable def kernel [NeZero n] (f : Fin k → Fin k → Fin k → Fin k) :

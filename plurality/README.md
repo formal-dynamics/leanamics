@@ -17,6 +17,13 @@ The package has two libraries:
   see [below](#3-majority-with-many-opinions-roadmap-maj-12-a). Together they give the
   `O(n^{3/4} log^{7/8} n)` bound without hypothesis.
 
+**One model.** The 3-majority round is defined once, for colours of any type:
+`ThreeMajority.stepCol`. The round `Plurality.step` of the plurality development is that round
+at colours `Fin k` (`Plurality.step_eq_stepCol`, by `rfl`; likewise `run_eq_runCol` and
+`count_eq_colourCount`), both on the same randomness `Tgt3 n`, and the bridge from colorings with
+two colors to the two-opinion process, `Plurality.colorSet_step`, is derived from the bridge
+`ThreeMajority.stepCol_bool` of the model with any colours.
+
 **[Blueprint](https://formal-dynamics.github.io/leanamics/plurality/blueprint/)** ·
 **[Blueprint as pdf](https://formal-dynamics.github.io/leanamics/plurality/blueprint.pdf)** ·
 **[Dependency graph](https://formal-dynamics.github.io/leanamics/plurality/blueprint/dep_graph_document.html)** ·
@@ -255,7 +262,7 @@ Library `Plurality`:
 
 | Module | Content |
 | --- | --- |
-| `Model` | Colorings, 3-input rules, `maj3`, rounds, the Markov kernel |
+| `Model` | Colorings, 3-input rules, `maj3`, rounds, the Markov kernel; `step`, `run`, `count` as `ThreeMajority.stepCol`, `runCol`, `colourCount` at colours `Fin k` |
 | `Expectation` | Adoption probabilities and Lemma 2.1 |
 | `Quantities` | `m(c)`, `M(c)`, `s(c)`, `α(c)`, `γ(c)`, `μ_j(c)`; Lemmas 3.1, 3.2 |
 | `Numerics` | Explicit "sufficiently large `n`" bounds |
