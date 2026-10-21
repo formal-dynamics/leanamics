@@ -11,14 +11,6 @@
    "manifestFile": "lake-manifest.json"
   },
   {
-   "type": "path",
-   "name": "three_majority",
-   "dir": "../3-majority",
-   "inherited": false,
-   "configFile": "lakefile.toml",
-   "manifestFile": "lake-manifest.json"
-  },
-  {
    "url": "https://github.com/PatrickMassot/checkdecls.git",
    "type": "git",
    "subDir": null,
