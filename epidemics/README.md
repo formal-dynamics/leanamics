@@ -1,4 +1,13 @@
-# Epidemics: Reed–Frost and bond percolation; subcritical percolation; small-world networks below the threshold; the giant component; the COBRA–BIPS duality and the COBRA cover time on expanders; the Kermack–McKendrick SIR model; Kurtz's law of large numbers; rumor spreading revisited
+# Epidemics: Reed–Frost and bond percolation; subcritical percolation; small-world networks below the threshold; the giant component; the COBRA–BIPS duality and the COBRA cover time on expanders; the Kermack–McKendrick SIR model; Kurtz's law of large numbers; push, pull and push–pull on `K_n`; rumor spreading revisited
+
+The package has two libraries: `Epidemics` (namespace `Epidemics`), with every section below but
+one, and `RumorSpread` (namespace `RumorPush`), with push, pull and push–pull on `K_n` without
+self-calls ([below](#rumor-spreading-on-the-complete-graph-library-rumorspread-epi-5)).
+
+**[Blueprint](https://formal-dynamics.github.io/leanamics/epidemics/blueprint/)** ·
+**[Blueprint as pdf](https://formal-dynamics.github.io/leanamics/epidemics/blueprint.pdf)** ·
+**[Dependency graph](https://formal-dynamics.github.io/leanamics/epidemics/blueprint/dep_graph_document.html)** ·
+**[API docs](https://formal-dynamics.github.io/leanamics/epidemics/docs/)**
 
 A Lean formalization of the pathwise correspondence between the Reed–Frost (Independent Cascade)
 epidemic and bond percolation (after Kempe, Kleinberg and Tardos, KDD 2003; see also Becchetti et
@@ -169,6 +178,74 @@ the sources (discrete time, natural-number rates, sampling with replacement, tim
 condition, the integral-curve hypothesis) are listed in
 [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
 
+## Rumor spreading on the complete graph (library `RumorSpread`, EPI-5)
+
+A complete, `sorry`-free formalization of the classical rumor-spreading result in distributed
+computing:
+
+> **Theorem.** In the uniform *push* model on the complete graph `K_n`, if one
+> node is informed initially, then after `O(log n)` rounds **all** nodes are
+> informed with high probability.
+
+Formally (`RumorPush.push_informs_all_whp` in
+[RumorSpread/Main.lean](RumorSpread/Main.lean)): for `n ≥ 2`, after
+`T = (⌈117 ln n⌉ + 23) + ⌈6 ln n⌉` rounds the probability that some node is
+still uninformed is at most `2/n`. The constants are deliberately crude (the
+sharp threshold is `log₂ n + ln n`, Frieze–Grimmett 1985, Pittel 1987) in
+exchange for a minimal analytic toolkit.
+
+A self-contained paper proof, written to mirror the formalization
+lemma-for-lemma, is in [latex/rumor_push.tex](latex/rumor_push.tex).
+
+**PULL and PUSH–PULL** (roadmap EPI-5, after Karp, Schindelhauer, Shenker,
+Vöcking, *Randomized rumor spreading*, FOCS 2000): with the same random calls,
+`RumorPush.pull_informs_all_whp` ([PullMain.lean](RumorSpread/PullMain.lean))
+and `RumorPush.pushPull_informs_all_whp`
+([PullPushPull.lean](RumorSpread/PullPushPull.lean)) inform all nodes after
+`⌈160 ln n⌉` rounds with probability at least `1 - 2/n`;
+[PullOneRound.lean](RumorSpread/PullOneRound.lean) has the exact one-round
+picture (PULL's quadratic shrinking `𝔼u' = u(u-1)/(n-1) ≤ u²/n`). Deviations
+from the paper are listed in
+[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md#pull-and-pushpull-on-the-complete-graph-rumorspreadpull-epi-5);
+the [blueprint sections](https://formal-dynamics.github.io/leanamics/epidemics/blueprint/#sec:main-statement)
+start at the model.
+
+**Relation to rumor spreading revisited.** Here every node calls a uniformly random node among
+the other `n - 1`, while the push, pull and push–pull instances of the
+[next section](#randomized-rumor-spreading-revisited-epi-8) allow calls to oneself (the
+convention of Doerr and Kostrygin). The two models are different processes, and neither
+development uses the other: the bounds here hold for every `n ≥ 2` with explicit constants,
+those of the next section are sharp, with constants and a threshold on `n` that are only shown
+to exist.
+
+The development avoids measure theory, `PMF`, `ENNReal`, the exponential
+function, Chernoff bounds and martingales entirely:
+
+- **Probability** (the shared [`Dynamics.Uniform`](../dynamics/Dynamics/Uniform.lean)
+  of the [dynamics package](../dynamics)): all randomness is
+  uniform over finite types. `avg` is a sum divided by a cardinality;
+  `expList α T F` (the expectation of a trajectory functional over `T`
+  i.i.d. uniform rounds) is defined by recursion on `T`, which makes
+  conditioning on a round a definitional unfolding.
+  [Equivalence.lean](RumorSpread/Equivalence.lean) records that this equals the
+  uniform average over the product space of all round sequences
+  (`Dynamics.Bridge` adds Mathlib's `Finset.expect` and the product distribution).
+- **Model** ([Model.lean](RumorSpread/Model.lean)): a round is
+  `Tgt n := ∀ v : Fin n, {u // u ≠ v}` (every node picks a target ≠ itself);
+  `step I r = I ∪ I.image r`; trajectories are lists of rounds.
+- **One computed probability** ([OneRound.lean](RumorSpread/OneRound.lean)):
+  a fixed uninformed node is missed by all pushes with probability exactly
+  `(1 - 1/(n-1))^|I|`, by counting a product of subtypes.
+- **Growth phase** ([Growth.lean](RumorSpread/Growth.lean)): while `|I| ≤ n/2`
+  a round grows `|I|` by a factor `9/8` with probability `≥ 1/8`
+  (expected growth + reverse Markov); the only concentration tool is the
+  exponential-moment induction `𝔼[(1/2)^(good rounds)] ≤ (15/16)^T`.
+- **Saturation phase** ([Saturation.lean](RumorSpread/Saturation.lean)): above
+  `n/2` the expected uninformed count contracts by `2/3` per round; Markov
+  finishes.
+- **Elementary inequalities** ([Bounds.lean](RumorSpread/Bounds.lean)):
+  Bernoulli's inequality and its consequences; `1 - 1/x ≤ log x`.
+
 ## Randomized rumor spreading revisited (EPI-8)
 
 Doerr and Kostrygin, *Randomized rumor spreading revisited*, ICALP 2017 (long version
@@ -223,9 +300,10 @@ informed nodes, the lower bounds from one informed node:
 | Generic tools: round-by-round lower envelope, first-moment bound on reaching `m` nodes, joining two phases at a fixed time | Lemmas 42 and 50 (round-by-round form); replace Theorem 27 and Lemma 20 for the instances | `envelope_le`, `envelope_seq_le`, `reach_le_of_expect_card_le`, `reach_add_le` (`LowerGeneric.lean`) |
 
 For push the two sides give the sharp `log₂ n + ln n ± O(1)` of Frieze and Grimmett and of
-Pittel, with exponential tails on both sides. The package `rumor_spread/` has
-its own PUSH, PULL and PUSH–PULL models (without self-calls) and proves `O(log n)` bounds with
-large constants; the two developments are independent. The lower bounds join the growth phase
+Pittel, with exponential tails on both sides. The library `RumorSpread` of this package has its
+own PUSH, PULL and PUSH–PULL models (without self-calls, [above](#rumor-spreading-on-the-complete-graph-library-rumorspread-epi-5))
+and proves `O(log n)` bounds with large constants; the two models are different processes, and
+neither development uses the other. The lower bounds join the growth phase
 and the final phase at a fixed time (Markov property) instead of through Lemma 20. Deviations
 (Theorem 43's proof, the parameters of the instances, the direct route of the lower bounds) are
 listed in [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
@@ -317,9 +395,12 @@ Build and audit:
 
 ```bash
 lake exe cache get
-lake build
-python3 ../scripts/check_axioms.py
+lake build                           # both libraries, Epidemics and RumorSpread
+python3 ../scripts/check_axioms.py   # audits the theorems listed in Audit.lean
 ```
+
+The main theorems of both libraries depend only on the standard axioms (`propext`,
+`Classical.choice`, `Quot.sound`).
 
 This package requires the sibling `dynamics/` package and shares its Lean 4.32.0 toolchain and exact
 Mathlib pin. The [blueprint](blueprint/src/content.tex) maps the results to declarations.

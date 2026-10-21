@@ -1,6 +1,6 @@
 name = "epidemics"
 version = "0.1.0"
-defaultTargets = ["Epidemics"]
+defaultTargets = ["Epidemics", "RumorSpread"]
 
 [leanOptions]
 relaxedAutoImplicit = false
@@ -21,3 +21,15 @@ path = "../dynamics"
 
 [[lean_lib]]
 name = "Epidemics"
+
+# Rumor spreading on K_n without self-calls (namespace `RumorPush`), with the options it was
+# developed under: Mathlib's style linters and a higher synthesis depth.
+[[lean_lib]]
+name = "RumorSpread"
+
+[lean_lib.leanOptions]
+pp.unicode.fun = true # pretty-prints `fun a ↦ b`
+weak.linter.mathlibStandardSet = true
+# Mathlib's header linter only accepts its Apache 2.0 header; the repository is MIT-licensed
+weak.linter.style.header = false
+maxSynthPendingDepth = 3
