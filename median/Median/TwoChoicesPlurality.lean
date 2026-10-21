@@ -26,8 +26,8 @@ The proof of the paper, as split here:
   from three quarters, the indicator of the colour dominates the binary median process
   (`run_dominates`), which reaches consensus by `Median.binary_consensus` (`finish_phase`).
 
-With two colours the dynamics is the median dynamics, so `Median.consensus_whp` transfers
-(`two_colours_consensus_whp`).
+With two colours the dynamics is the median dynamics (`run_bool`), so `Median.consensus_whp`
+applies, through `count_true` and `count_true_add_count_false`.
 -/
 
 namespace Median.TwoChoices
@@ -97,23 +97,6 @@ theorem absorbed [NeZero n] [Fintype α] [Nonempty α] (x : Config n α) :
     (fun y => notConsensus_cases y) hstep hacc x
 
 /-! ### Two colours -/
-
-/-- **Two colours** (Elsässer et al., Section 2.1, citing Cooper et al. for `k = 2`): the binary
-result `Median.consensus_whp` transferred through `run_bool`: from a gap of `C √(n log n)`
-between `true` and `false`, all nodes hold `true` after `⌈C log n⌉` rounds w.p. `≥ 1 − C/n`. -/
-theorem two_colours_consensus_whp : ∃ C : ℝ, 0 < C ∧ ∀ (n : ℕ) [NeZero n], C ≤ Real.log n →
-    ∀ x : Config n Bool, C * √(n * Real.log n) ≤ (count x true : ℝ) - count x false →
-      1 - C / n ≤ expList (Round n) ⌈C * Real.log n⌉₊
-        (fun l => if run x l = (fun _ => true) then (1 : ℝ) else 0) := by
-  obtain ⟨C, hC, h⟩ := consensus_whp
-  refine ⟨C, hC, fun n _ hL x hx => ?_⟩
-  have hsum : (count x true : ℝ) + count x false = n := by
-    exact_mod_cast count_true_add_count_false x
-  have hx' : C * √(n * Real.log n) ≤ (ones x : ℝ) - (n - ones x) := by
-    rw [← count_true]
-    linarith
-  simp_rw [run_bool]
-  exact h n hL x hx'
 
 /-! ### The finishing phase -/
 

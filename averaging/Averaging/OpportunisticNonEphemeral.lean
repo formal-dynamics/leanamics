@@ -35,7 +35,7 @@ theorem avg_le_of_mul_le {g : (V → ℤˣ) → ℝ} {a K : ℝ} (ha : 0 ≤ a) 
       a * (Fintype.card V * cutCoef V₁ (signVec σ) ^ 2) + K ^ 2) :
     avg g ≤ a + 1 / Real.sqrt (Fintype.card V + 1) +
       2 * K * (1 + Real.log (Fintype.card V)) := by
-  have hn := hG.card_real_pos
+  have hn := hG.card_pos_real
   set N : ℝ := (Fintype.card V : ℝ)
   set S : (V → ℤˣ) → ℝ := fun σ => ∑ v, cutVec V₁ v * signVec σ v
   have hs0 : ∀ σ, N * cutCoef V₁ (signVec σ) ^ 2 = S σ ^ 2 / N := fun σ =>
@@ -107,7 +107,7 @@ lemma avg_cross :
   simp_rw [h]
   have h1 := hG.sum_dart_cutWeight_fst (fun _ => (1 : ℝ))
   rw [avg, h1, hG.card_dart_real]
-  have := hG.card_real_pos
+  have := hG.card_pos_real
   have := hG.d_real_pos
   simp only [sum_const, card_univ, nsmul_eq_mul, mul_one]
   field_simp
@@ -125,7 +125,7 @@ lemma avg_fst_mem (B : Finset V) :
   rw [hE]
   simp only [hG.degree_eq, mul_ite, mul_one, mul_zero, Finset.sum_ite_mem, Finset.univ_inter,
     sum_const, nsmul_eq_mul]
-  have := hG.card_real_pos
+  have := hG.card_pos_real
   have := hG.d_real_pos
   field_simp
 
@@ -197,7 +197,7 @@ lemma expList_cutDev_signVec_le (hl3 : 0 < lam3) (hN : (16 : ℝ) ≤ Fintype.ca
         (cutCoef V₁ (avgRun G (signVec σ) l) - cutCoef V₁ (signVec σ)) ^ 2) ≤
       2 * (t₁ * (2 * b / d) / Fintype.card V) * (Fintype.card V * cutCoef V₁ (signVec σ) ^ 2) +
         5 * ((2 * b / d) / lam3) := by
-  have hNpos := hG.card_real_pos
+  have hNpos := hG.card_pos_real
   refine (hG.expList_secondMoment_le h3 hl3 (by linarith) (signVec σ) t₁).1.trans ?_
   exact cutDevBound_le_start hN hl3 (by positivity) (restSq_nonneg _) (hG.restSq_signVec_le σ)
     (hG.cutCoef_sq_add_restSq_signVec_le σ) (by positivity) hL (by positivity) hr
@@ -211,7 +211,7 @@ lemma expList_restSq_signVec_le (hl3 : 0 < lam3) (hN : (16 : ℝ) ≤ Fintype.ca
       Fintype.card V * (1 - lam3 / Fintype.card V) ^ t₁ +
         3 * ((2 * b / d) / lam3) * (Fintype.card V * cutCoef V₁ (signVec σ) ^ 2) +
         10 * ((2 * b / d) / lam3) ^ 2 := by
-  have hNpos := hG.card_real_pos
+  have hNpos := hG.card_pos_real
   have hl3le := hG.lam3_le_two h3
   refine (hG.expList_secondMoment_le h3 hl3 (by linarith) (signVec σ) t₁).2.trans ?_
   have hCD := cutDevBound_le_start hN hl3 (by positivity) (restSq_nonneg _)
@@ -240,7 +240,7 @@ lemma expList_devVec_le (hl3 : 0 < lam3) (hN : (16 : ℝ) ≤ Fintype.card V)
     expList G.Dart k (fun p => ∑ v, devVec V₁ x₁ (avgRun G x₁ p) v ^ 2) ≤
       (5 / 2 * (k * (2 * b / d) / Fintype.card V) + 2 * ((2 * b / d) / lam3)) *
           (Fintype.card V * cutCoef V₁ x₁ ^ 2) + 2 * restSq V₁ x₁ := by
-  have hNpos := hG.card_real_pos
+  have hNpos := hG.card_pos_real
   have hl3le := hG.lam3_le_two h3
   have hdev : ∀ p : List G.Dart, ∑ v, devVec V₁ x₁ (avgRun G x₁ p) v ^ 2 =
       Fintype.card V * (cutCoef V₁ (avgRun G x₁ p) - cutCoef V₁ x₁) ^ 2 +
@@ -350,7 +350,7 @@ theorem card_good_ge (hG : IsClusteredRegular G V₁ d b) (x₀ : V → ℝ) {ε
     (1 - 3 * ε) * Fintype.card V ≤ #{v | ∀ t : ℕ, l₁.length ≤ t → t ≤ l₁.length + l₂.length →
       (avgRun G x₀ ((l₁ ++ l₂).take t) v - (projOne x₀ v + projCut V₁ x₀ v)) ^ 2 ≤
         ε ^ 2 / Fintype.card V * ∑ w, projCut V₁ x₀ w ^ 2} := by
-  have hn := hG.card_real_pos
+  have hn := hG.card_pos_real
   set N : ℝ := (Fintype.card V : ℝ)
   set s₀ := N * cutCoef V₁ x₀ ^ 2
   set θ := thr V₁ ε x₀
@@ -447,7 +447,7 @@ theorem IsClusteredRegular.expList_good_ge (hG : IsClusteredRegular G V₁ d b) 
           (avgRun G x₀ (l.take t) v - (projOne x₀ v + projCut V₁ x₀ v)) ^ 2 ≤
             ε ^ 2 / Fintype.card V * ∑ w, projCut V₁ x₀ w ^ 2} then 1 else 0) := by
   haveI := hG.nonempty_dart
-  have hn := hG.card_real_pos
+  have hn := hG.card_pos_real
   set N : ℝ := (Fintype.card V : ℝ)
   have hεN : 0 < ε * N := by positivity
   set θ := thr V₁ ε x₀
@@ -618,7 +618,7 @@ lemma manyBad_bound (hl3 : 0 < lam3) (hN : (16 : ℝ) ≤ Fintype.card V) {ε : 
         4 / ε ^ 3 * (Fintype.card V * (1 - lam3 / Fintype.card V) ^ t₁ +
           10 * ((2 * b / d) / lam3) ^ 2) := by
   have hb := hG.expList_restSq_signVec_le h3 hl3 hN σ t₁ hL hr
-  have hn := hG.card_real_pos
+  have hn := hG.card_pos_real
   set N : ℝ := (Fintype.card V : ℝ)
   set s₀ := N * cutCoef V₁ (signVec σ) ^ 2
   rw [mul_comm, ← expList_const_mul]
@@ -661,7 +661,7 @@ lemma badRound_bound (hl3 : 0 < lam3) (hN : (16 : ℝ) ≤ Fintype.card V) {ε :
           10 * ((2 * b / d) / lam3) ^ 2) := by
   haveI := hG.nonempty_dart
   have hz1 := hG.expList_restSq_signVec_le h3 hl3 hN σ t₁ hL hr
-  have hn := hG.card_real_pos
+  have hn := hG.card_pos_real
   set N : ℝ := (Fintype.card V : ℝ)
   set x₀ := signVec σ
   set s₀ := N * cutCoef V₁ x₀ ^ 2
@@ -1073,7 +1073,7 @@ lemma avg_badRound_le (hl3 : 0 < lam3) (hN : (16 : ℝ) ≤ Fintype.card V) {ε 
               Fintype.card V))) ≤
       A + 1 / Real.sqrt (Fintype.card V + 1) + 2 * K * (1 + Real.log (Fintype.card V)) := by
   haveI := hG.nonempty_dart
-  have hn := hG.card_real_pos
+  have hn := hG.card_pos_real
   have hA0 : 0 ≤ A := le_trans (by positivity) hA
   have hle : ∀ σ : V → ℤˣ, expList G.Dart t₁ (fun l₁ =>
       (if CutMoved V₁ ε (signVec σ) (avgRun G (signVec σ) l₁) then 0 else 1) *
@@ -1118,7 +1118,7 @@ theorem nonEphemeral_aux {ε : ℝ} (hε0 : 0 < ε) (hε1 : ε ≤ 1) (hl3 : 0 <
             (projOne (signVec σ) v + projCut V₁ (signVec σ) v)) ^ 2 ≤
             ε ^ 2 / Fintype.card V * ∑ w, projCut V₁ (signVec σ) w ^ 2} then 1 else 0)) := by
   haveI := hG.nonempty_dart
-  have hn := hG.card_real_pos
+  have hn := hG.card_pos_real
   have hl3le := hG.lam3_le_two h3
   have hl2N := hG.two_div_card_lt
   set N : ℝ := (Fintype.card V : ℝ) with hN_def

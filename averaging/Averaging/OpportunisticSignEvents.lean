@@ -79,7 +79,7 @@ lemma projOne_add_projCut_signVec (σ : V → ℤˣ) (v : V) :
     projOne (signVec σ) v + projCut V₁ (signVec σ) v =
       if v ∈ V₁ then 2 * blockSum V₁ σ / Fintype.card V
       else 2 * blockSum V₁ᶜ σ / Fintype.card V := by
-  have hn := hG.card_real_pos
+  have hn := hG.card_pos_real
   simp only [projOne, projCut, avg, sum_cutVec_mul_split]
   rw [sum_signVec_split V₁ σ]
   split_ifs with hv

@@ -6,7 +6,7 @@ import RumorSpread
 #print axioms Epidemics.final_recovered_iff
 #print axioms Epidemics.coins_prob_open
 #print axioms Epidemics.prob_infected_eq_prob_connected
-#print axioms Epidemics.extinct_of_dist_lt
+#print axioms Epidemics.no_infected_of_dist_lt
 #print axioms Epidemics.choices_nonempty
 #print axioms Epidemics.cobra_hit_iff_bips_reverse
 #print axioms Epidemics.cobra_bips_duality
@@ -152,7 +152,6 @@ import RumorSpread
 #print axioms Epidemics.lt_half_iff
 #print axioms Epidemics.PerfectMatching.nonempty
 #print axioms Epidemics.swg3_degree_le
-#print axioms Epidemics.expect_prod_hist_le_one_of_fresh
 #print axioms Epidemics.Explore.prob_cluster_gt_le
 #print axioms Epidemics.expect_prob_swg_eq
 #print axioms Epidemics.swg_step
@@ -163,7 +162,6 @@ import RumorSpread
 #print axioms Epidemics.swg_reedFrost_subcritical
 #print axioms Epidemics.swg3_reedFrost_subcritical
 #print axioms RumorPush.push_informs_all_whp
-#print axioms RumorPush.expList_eq_avg_ofFn
 #print axioms RumorPush.pull_informs_all_whp
 #print axioms RumorPush.pushPull_informs_all_whp
 #print axioms RumorPush.pull_prob_stuck_singleton

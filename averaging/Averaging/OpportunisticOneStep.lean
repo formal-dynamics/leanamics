@@ -49,8 +49,6 @@ namespace IsClusteredRegular
 variable (hG : IsClusteredRegular G V₁ d b)
 include hG
 
-lemma card_real_pos : (0 : ℝ) < Fintype.card V := hG.card_pos_real
-
 lemma d_real_pos : (0 : ℝ) < d := by exact_mod_cast hG.d_pos
 
 omit [DecidableRel G.Adj] hG in
@@ -105,7 +103,7 @@ lemma avg_cutCoef_edgeAvg (x : V → ℝ) :
     avg (fun e : G.Dart => cutCoef V₁ (edgeAvg G x e)) =
       (1 - (2 * b / d : ℝ) / Fintype.card V) * cutCoef V₁ x := by
   haveI := hG.nonempty_dart
-  have hn := hG.card_real_pos.ne'
+  have hn := hG.card_pos_real.ne'
   have h : ∀ e : G.Dart, cutCoef V₁ (edgeAvg G x e) =
       (∑ v, cutVec V₁ v * edgeAvg G x e v) / Fintype.card V := fun e => by
     rw [cutCoef, avg]
@@ -187,7 +185,7 @@ lemma avg_cutCoef_edgeAvg_sub_sq_le (x : V → ℝ) :
     Fintype.card V * avg (fun e : G.Dart => (cutCoef V₁ (edgeAvg G x e) - cutCoef V₁ x) ^ 2) ≤
       4 * (2 * b / d) / Fintype.card V ^ 2 *
         (Fintype.card V * cutCoef V₁ x ^ 2 + restSq V₁ x) := by
-  have hn := hG.card_real_pos
+  have hn := hG.card_pos_real
   have hd := hG.d_real_pos
   have h : ∀ e : G.Dart, (cutCoef V₁ (edgeAvg G x e) - cutCoef V₁ x) ^ 2 =
       ((cutVec V₁ e.fst - cutVec V₁ e.snd) / 2) ^ 2 * (x e.fst - x e.snd) ^ 2 /
@@ -248,7 +246,7 @@ lemma avg_restSq_edgeAvg_le (h3 : ThirdEigenvalueLB G V₁ d lam3) (x : V → �
     avg (fun e : G.Dart => restSq V₁ (edgeAvg G x e)) ≤
       (1 - lam3 / Fintype.card V) * restSq V₁ x + (2 * b / d) * cutCoef V₁ x ^ 2 := by
   haveI := hG.nonempty_dart
-  have hn := hG.card_real_pos
+  have hn := hG.card_pos_real
   have hd := hG.d_real_pos
   set N : ℝ := (Fintype.card V : ℝ)
   have hR : ∀ e : G.Dart, restSq V₁ (edgeAvg G x e) =
@@ -290,7 +288,7 @@ lemma avg_cutDev_edgeAvg_le (x : V → ℝ) (γ : ℝ) :
         (2 * b / d) * γ ^ 2 + 4 * (2 * b / d) / Fintype.card V ^ 2 *
           (Fintype.card V * cutCoef V₁ x ^ 2 + restSq V₁ x) := by
   haveI := hG.nonempty_dart
-  have hn := hG.card_real_pos
+  have hn := hG.card_pos_real
   set N : ℝ := (Fintype.card V : ℝ)
   set β := cutCoef V₁ x
   set l2 : ℝ := 2 * b / d

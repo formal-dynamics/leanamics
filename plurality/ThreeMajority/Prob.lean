@@ -95,11 +95,6 @@ lemma avg_snd_mul {β δ : Type*} [Fintype β] [Nonempty β] [Fintype δ] (h : �
     avg (fun p : β × δ => h p.2) = avg h :=
   Dynamics.avg_snd_mul h
 
-@[inherit_doc Dynamics.avg_equiv]
-lemma avg_equiv {β : Type*} [Fintype β] (e : α ≃ β) (F : β → ℝ) :
-    avg (fun a => F (e a)) = avg F :=
-  Dynamics.avg_equiv e F
-
 @[inherit_doc Dynamics.avg_prod_pi]
 lemma avg_prod_pi {γ : Type*} [Fintype γ] :
     ∀ (n : ℕ) (f : Fin n → γ → ℝ),

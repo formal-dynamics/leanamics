@@ -15,7 +15,7 @@ are numbered differently.
 | The median commutes with monotone maps; thresholding the process gives the binary median process, for the same samples | `med3_monotone`, `threshold_step`, `threshold_run` |
 | Validity (new values are current values), range, consensus fixed points | `step_mem`, `step_mem_Icc`, `step_of_consensus` |
 | Binary case: one round maps the fraction `p` of `true` to `3p² − 2p³` in expectation | `expected_ones` |
-| The same as a mean-field map (the core's `Dynamics.Kernel.MeanField`): synchronous binary 2-Choices and the binary median rule have the mean-field map `Dynamics.majorityMap`, `p ↦ 3p² − 2p³`, that of binary 3-Majority (`Plurality.binKernel_meanField`); with two colours 2-Choices is the median rule as a kernel | `kernel_meanField`, `TwoChoices.kernel_meanField`, `TwoChoices.kernel_bool` (in [`Median/MeanField.lean`](Median/MeanField.lean)) |
+| The same as a mean-field map (the core's `Dynamics.Kernel.MeanField`): synchronous binary 2-Choices and the binary median rule have the mean-field map `Dynamics.majorityMap`, `p ↦ 3p² − 2p³`, that of binary 3-Majority (`Plurality.binKernel_meanField`); with two colours 2-Choices is the median rule as a kernel | `kernel_meanField`, `TwoChoices.kernel_bool` (in [`Median/MeanField.lean`](Median/MeanField.lean)) |
 | Almost-sure consensus | `absorbed` |
 | 2-Choices from a gap of `128 √(n log n)`: all nodes hold the majority value after `⌈128 log n⌉` rounds w.p. `≥ 1 − 128/n`, for `log n ≥ 128` | `consensus_whp` (in [`Median/Binary.lean`](Median/Binary.lean)), via `binary_consensus` |
 | 2-Choices from any start (possibly perfectly balanced): consensus after `⌈C log n⌉` rounds w.p. `≥ 1 − C/n`, for `log n ≥ C` (`C = 2¹⁸`) | `binary_any_start` (in [`Median/AnyStart.lean`](Median/AnyStart.lean)) |
@@ -125,7 +125,7 @@ consensus* (PODC 2017), Theorem 5 and Theorem 1 (Simplified) of
 | **Lemma 2.3**, as a stochastic domination: if `c ≤ b`, then `P(c' ≥ t) ≤ P(b' ≥ t)` for every `t` | `count_stochDom` |
 | **Theorem 1.2** (no adversary, any number of colours): if colour `i` leads every other colour by `z √(n log n)`, all nodes hold `i` after `⌈C (n/c_i) log n⌉` rounds w.p. `≥ 1 − C/n`, for `log n ≥ C` (`z = 128`, `C = 384`); also after `⌈C k log n⌉` rounds | `plurality_whp`, `plurality_whp_k` |
 | The growth phase (the gap grows by `1 + a/(8n)` per round up to `a = 3n/4`) and the finishing phase (via the binary median process) | `growth_round`, `growth_phase`, `finish_phase` |
-| Two colours, and almost-sure consensus | `two_colours_consensus_whp`, `absorbed` |
+| Two colours (`Median.consensus_whp` through the bridges `run_bool`, `count_true`, `count_true_add_count_false`), and almost-sure consensus | `Median.consensus_whp`, `run_bool`, `count_true`, `count_true_add_count_false`, `absorbed` |
 | One colour cannot grow fast: `P(∃ t ≤ T, c_i(t) > L) ≤ exp(−(L − c_i) + (e − 1) T L²/n)` | `colour_escape_le` (in [`Median/TwoChoicesLower.lean`](Median/TwoChoicesLower.lean)) |
 | **Theorem 5** of Berenbrink et al.: if every colour has at most `ℓ` nodes, `ℓ' = max {2ℓ, γ log n}` and `T < n/(γ ℓ')`, no colour exceeds `ℓ'` nodes up to time `T` except w.p. `≤ 1/n`, for every `γ ≥ 8` | `lower_bound_strong` |
 | **Theorem 1 (Simplified)**, 2-Choices lower bound: from colours of at most `β log n` nodes each, no consensus within `T` rounds except w.p. `≤ 1/n` whenever `(T + 1) C log n < n` (`C = max(8, 2β)²`), so consensus needs `Ω(n/log n)` rounds | `consensus_time_lower` |

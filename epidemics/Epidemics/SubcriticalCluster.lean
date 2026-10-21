@@ -139,7 +139,7 @@ lemma infected_eq_empty_of_ncard_le (G : SimpleGraph V) [DecidableRel G.Adj]
     (ω : Sym2 V → Bool) (I₀ : Finset V) {k : ℕ}
     (h : ∀ u, ((perc G ω).connectedComponentMk u).supp.ncard ≤ k) :
     (run G ω I₀ k).infected = ∅ := by
-  refine extinct_of_dist_lt G ω I₀ k fun v hv => ?_
+  refine no_infected_of_dist_lt G ω I₀ k fun v hv => ?_
   obtain ⟨u, hu, hr⟩ := (setDist_ne_top_iff (perc G ω) I₀).mp hv
   have hle : setDist (perc G ω) I₀ v ≤ (perc G ω).edist u v := by
     simpa [setDist] using biInf_le (s := (↑I₀ : Set V)) (fun w => (perc G ω).edist w v) hu

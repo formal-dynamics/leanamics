@@ -1,6 +1,5 @@
 import Epidemics.CobraCoverIndep
 import Epidemics.CobraCoverEngine
-import Epidemics.CobraReverse
 import Dynamics.Reverse
 
 /-! # COBRA and BIPS with target sets (EPI-4, Theorem 3)
@@ -86,7 +85,7 @@ theorem tgt_duality [Fintype V] [Fintype R] (v : V) (C : Finset V) (t : ℕ) :
         (fun l => if ∀ s ≤ t, v ∉ roundRun (tgtCobraStep tg) C (l.take s) then (1 : ℝ) else 0) =
       expList R t (fun l => if C ∩ roundRun (tgtBipsStep tg v) {v} l = ∅ then (1 : ℝ) else 0) := by
   conv_rhs => rw [← expList_comp_reverse]
-  refine expList_congr_length t fun l hl => ?_
+  refine Dynamics.expList_congr_length fun l hl => ?_
   have h : (∀ s ≤ t, v ∉ roundRun (tgtCobraStep tg) C (l.take s)) ↔
       C ∩ roundRun (tgtBipsStep tg v) {v} l.reverse = ∅ := by
     rw [← Finset.not_nonempty_iff_eq_empty, ← tgt_hit_iff_bips_reverse, hl]

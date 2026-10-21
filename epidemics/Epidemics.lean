@@ -2,7 +2,6 @@ import Epidemics.Cobra
 import Epidemics.CobraDuality
 import Epidemics.CobraDual
 import Epidemics.CobraLemmas
-import Epidemics.CobraReverse
 import Epidemics.CobraCoverSpectral
 import Epidemics.CobraCoverRound
 import Epidemics.CobraCoverGrowth

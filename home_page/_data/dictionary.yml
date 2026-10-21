@@ -250,7 +250,6 @@ rows:
       results:
         - Voter.wrightFisher_fixation
         - Voter.wfCountKernel_fixation
-        - Voter.wrightFisher_fixation_of_three_le
         - Voter.consensus_probability_of_selfLoop
         - Voter.voter_consensus_whp
       packages: [voter]
@@ -997,7 +996,7 @@ rows:
       summary: >-
         The mean-field part: synchronous binary 2-Choices, which is the binary median rule as a
         kernel (`Median.TwoChoices.kernel_bool`), has the mean-field map $p \mapsto 3p^2 - 2p^3$
-        (`Median.TwoChoices.kernel_meanField`, `Median.kernel_meanField`, from the expected
+        (`Median.kernel_meanField`, from the expected
         one-round map $n(3p^2 - 2p^3)$), `Dynamics.majorityMap`, which is also the mean-field map
         of binary 3-Majority (`Plurality.binKernel_meanField`, previous row). Consensus from a gap
         and from any configuration, with an adversary, on expanders and with many colours. The
@@ -1006,7 +1005,6 @@ rows:
       correspondence:
         - Median.kernel_meanField
         - Median.TwoChoices.kernel_bool
-        - Median.TwoChoices.kernel_meanField
       results:
         - Median.expected_ones
         - Median.consensus_whp

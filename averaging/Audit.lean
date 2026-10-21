@@ -31,7 +31,6 @@ import Averaging
 #print axioms Averaging.prob_dotProduct_clusterIndicator_eq_zero
 #print axioms Averaging.choose_div_four_pow_le
 #print axioms Averaging.strong_reconstruction
-#print axioms Averaging.Opportunistic.avg_dart_edge
 #print axioms Averaging.Opportunistic.oppRun_isSome_iff
 #print axioms Averaging.Opportunistic.oppRun_getD
 #print axioms Averaging.Opportunistic.sum_avgRun

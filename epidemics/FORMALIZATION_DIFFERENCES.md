@@ -538,9 +538,9 @@ Source: L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccar
 11. **Not formalized (yet).** Claim 1 (the supercritical regime) of Theorems 2.1, 2.2, 2.4 and 2.5
     (Appendices B and D), and the extensions of Appendix F.
 12. **Local lemmas.** The supermartingale lemma for adaptive observations
-    (`expect_prod_hist_le_one`) and its deferred-decisions form for fresh coordinates
-    (`expect_prod_hist_le_one_of_fresh`) are the core's (`Dynamics.Adaptive`, with the histories
-    `hist`, the products `histProd` and the read sets `readSet`), as are the coordinatewise
+    (`Distribution.expect_prod_hist_le_one`) and its deferred-decisions form for fresh
+    coordinates (`Distribution.expect_prod_hist_le_one_of_fresh`) are the core's
+    (`Dynamics.Adaptive`, with the histories `hist`, the products `histProd` and the read sets `readSet`), as are the coordinatewise
     combination of independent families (`Distribution.expect_expect_coord`,
     `Distribution.expect_mul_of_dep`, in `Dynamics.Independent`) and Markov's inequality
     `Distribution.prob_le_expect_div`, and the moment-generating function of a weighted block of

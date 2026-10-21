@@ -64,7 +64,7 @@ A \texttt{true} node stays unless both samples are \texttt{false}, a \texttt{fal
 both samples are \texttt{true}.
 \end{proof}
 \begin{theorem}[Mean-field map]\label{thm:mean-field}
-\lean{Median.kernel_meanField,Median.TwoChoices.kernel_bool,Median.TwoChoices.kernel_meanField}\leanok\uses{thm:expect}
+\lean{Median.kernel_meanField,Median.TwoChoices.kernel_bool}\leanok\uses{thm:expect}
 With two values, the median rule and 2-Choices are the same kernel, and its mean-field map (shared
 library) is the majority map $p\mapsto3p^2-2p^3$, the mean-field map of binary 3-Majority.
 \end{theorem}
@@ -584,7 +584,7 @@ Lemma~\ref{lem:tc-growth-round} supplies.
 \end{proof}
 
 \begin{theorem}[Two colours and almost-sure consensus]\label{thm:tc-two}
-\lean{Median.TwoChoices.two_colours_consensus_whp,Median.TwoChoices.absorbed}\leanok\uses{lem:tc-basic,thm:whp}
+\lean{Median.consensus_whp,Median.TwoChoices.run_bool,Median.TwoChoices.count_true,Median.TwoChoices.count_true_add_count_false,Median.TwoChoices.absorbed}\leanok\uses{lem:tc-basic,thm:whp}
 With two colours, a gap of $C\sqrt{n\log n}$ gives consensus on the majority after
 $\lceil C\log n\rceil$ rounds with probability at least $1-C/n$, whenever $\log n\ge C$. With
 finitely many colours, consensus is reached almost surely.

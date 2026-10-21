@@ -82,7 +82,7 @@ and the nodes recovered by round $t$ are those with $d(v)<t$.
 Both statements together, by induction on $t$, using Lemma~\ref{lem:dist}.
 \end{proof}
 \begin{corollary}[Extinction and final size]\label{cor:final}
-\lean{Epidemics.no_infected_of_dist_lt,Epidemics.extinct_of_dist_lt,Epidemics.extinct,Epidemics.final_recovered_iff}\leanok\uses{thm:layers}
+\lean{Epidemics.no_infected_of_dist_lt,Epidemics.extinct,Epidemics.final_recovered_iff}\leanok\uses{thm:layers}
 Nobody is infected in round $t$ as soon as every finite $d(v)$ is $<t$, in particular for
 $t\ge|V|$; the nodes recovered after $|V|$ rounds are those connected to $I_0$ in $G_\omega$.
 \end{corollary}
@@ -195,7 +195,7 @@ open bridge; these combined coins are independent across pairs, with the stated 
 \end{proof}
 
 \begin{lemma}[Supermartingale for adaptive observations]\label{lem:swg-mart}
-\lean{Dynamics.hist,Dynamics.histProd,Epidemics.expect_prod_hist_le_one,Epidemics.expect_prod_hist_le_one_of_fresh,Dynamics.Distribution.prob_le_expect_div}\leanok
+\lean{Dynamics.hist,Dynamics.histProd,Dynamics.Distribution.expect_prod_hist_le_one,Dynamics.Distribution.expect_prod_hist_le_one_of_fresh,Dynamics.Distribution.prob_le_expect_div}\leanok
 If an adaptive process reads, at each step, coordinates of an independent family not read before,
 and every factor $f_h \ge 0$ satisfies $\mathbb E[f_h(\mathrm{obs}_h)] \le 1$ for every history $h$,
 then the product of the factors along the process has expectation at most $1$.
@@ -551,7 +551,7 @@ Throughout, $\log$ denotes the natural logarithm.
 
 \begin{theorem}[Push protocol informs $K_n$ in $O(\log n)$ rounds w.h.p.]
   \label{thm:main}
-  \lean{RumorPush.push_informs_all_whp, RumorPush.push_informs_all_whp'}
+  \lean{RumorPush.push_informs_all_whp}
   \leanok
   \uses{lem:gluing, lem:constants, lem:phase2cor}
   Let $n \ge 2$, let $v_0 \in V$, and set
@@ -633,7 +633,7 @@ uniform distributions (\texttt{Dynamics.Bridge}).
 \end{lemma}
 
 \begin{theorem}[Faithfulness of the model]\label{thm:faithful}
-  \lean{RumorPush.expList_eq_avg_ofFn}
+  \lean{Dynamics.expList_eq_avg_ofFn}
   \leanok
   \uses{def:expList}
   $\mathrm{expList}\ \alpha\ T\ F$ equals the uniform average of $F$ over
@@ -987,8 +987,7 @@ $\log_3 n + O(\log\log n)$ of \cite[Thm.~2.1]{KSSV00}.
 
 \begin{theorem}[PULL and PUSH--PULL inform $K_n$ in $O(\log n)$ rounds w.h.p.]
   \label{thm:pull}
-  \lean{RumorPush.pull_informs_all_whp, RumorPush.pull_informs_all_whp',
-    RumorPush.pushPull_informs_all_whp, RumorPush.pushPull_informs_all_whp'}
+  \lean{RumorPush.pull_informs_all_whp, RumorPush.pushPull_informs_all_whp}
   \leanok
   \uses{lem:pull-phases, lem:pull-good, lem:pull-domination}
   Let $n \ge 2$ and $v_0 \in V$. After $\ceil{160 \log n}$ rounds of PULL,
@@ -1015,7 +1014,8 @@ of the shared \texttt{dynamics} library (Section~\ref{sec:prelim}), \texttt{Mode
 (Section~\ref{sec:oneround}), \texttt{Growth.lean}
 (Sections~\ref{sec:adaptive}--\ref{sec:growth}), \texttt{Saturation.lean}
 (Section~\ref{sec:saturation}), \texttt{Main.lean} (main theorem and
-numeric lemmas), \texttt{Equivalence.lean} (Theorem~\ref{thm:faithful}).
+numeric lemmas), \texttt{Dynamics.Equivalence} of the shared \texttt{dynamics} library
+(Theorem~\ref{thm:faithful}).
 PULL and PUSH--PULL (Section~\ref{sec:pull}): \texttt{PullFoldl.lean} and
 \texttt{PullModel.lean} (Definition~\ref{def:pull},
 Lemma~\ref{lem:pull-domination}), \texttt{PullIndep.lean}
@@ -1338,7 +1338,7 @@ from $A_0$: $A_{s+1}=\{v\}\cup\{u : \exists i,\ r_{s+1}(u,i)\in A_s\}$.
 
 \section{COBRA--BIPS duality}
 \begin{lemma}[Time reversal of i.i.d.\ rounds]\label{lem:reverse}
-\lean{Dynamics.expList_comp_reverse,Epidemics.expList_congr_length}\leanok
+\lean{Dynamics.expList_comp_reverse,Dynamics.expList_congr_length}\leanok
 For every functional $F$ of $T$ i.i.d.\ uniform rounds,
 $\mathbb E[F(r_T,\dots,r_1)]=\mathbb E[F(r_1,\dots,r_T)]$.
 \end{lemma}

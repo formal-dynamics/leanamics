@@ -128,8 +128,9 @@ whenever you meet: opportunistic protocols for community detection*, ESA 2018
 Lemma A.1, Lemmas B.1, B.3, B.4, C.1 to C.4.
 
 1. **Uniform edge as a uniform dart.** Each round draws a dart of `G` uniformly (`G.Dart`, the
-   core's `EdgeRound`); every edge carries two darts, so this is a uniform edge (`avg_dart_edge`).
-   Rounds are i.i.d., with expectations through `Dynamics.expList G.Dart`.
+   core's `EdgeRound`); every edge carries two darts, so this is a uniform edge
+   (`Dynamics.avg_edgeRound_edge`). Rounds are i.i.d., with expectations through
+   `Dynamics.expList G.Dart`.
 2. **First-activation coins drawn in advance.** The coins `σ : V → ℤˣ` are uniform and
    independent of the edges, as in the paper's deferred-decision argument (Section 3). The protocol
    with first activations is modelled (`oppStep`, `oppRun`: a node holds no value before its first

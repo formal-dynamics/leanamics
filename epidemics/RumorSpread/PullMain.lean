@@ -27,23 +27,4 @@ theorem pull_informs_all_whp (hn : 2 ≤ n) (v₀ : Fin n) :
   exact notAllOf_le_two_div hn subset_pullStep (pull_prob_goodRound hn)
     (pull_avg_uninformed_contract hn) v₀
 
-/-- Complement form of `pull_informs_all_whp`: after `⌈160 log n⌉` rounds of PULL, **all**
-nodes are informed with probability at least `1 - 2/n`. -/
-theorem pull_informs_all_whp' (hn : 2 ≤ n) (v₀ : Fin n) :
-    1 - 2 / (n : ℝ)
-      ≤ expList (Tgt n) ⌈(160 : ℝ) * Real.log n⌉₊
-          (fun l => if pullRun {v₀} l = univ then (1 : ℝ) else 0) := by
-  haveI := tgt_nonempty hn
-  have hsum : expList (Tgt n) ⌈(160 : ℝ) * Real.log n⌉₊
-        (fun l => if pullRun {v₀} l = univ then (1 : ℝ) else 0)
-      + prPullNotAllInformed n v₀ ⌈(160 : ℝ) * Real.log n⌉₊ = 1 := by
-    rw [prPullNotAllInformed, ← expList_add]
-    have h : (fun l => (if pullRun {v₀} l = univ then (1 : ℝ) else 0)
-        + (if pullRun {v₀} l = univ then (0 : ℝ) else 1)) = fun _ => (1 : ℝ) := by
-      funext l
-      split <;> norm_num
-    rw [h, expList_const]
-  have hmain := pull_informs_all_whp hn v₀
-  linarith
-
 end RumorPush
