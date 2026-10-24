@@ -76,13 +76,6 @@ lemma argmaxSet_eq_singleton {c : Fin k → ℕ} {m : Fin k} (hM : argmaxSet c =
   have : m ∈ argmaxSet c := by rw [hM]; exact mem_singleton_self m
   exact mem_argmaxSet.mp this
 
-lemma lt_of_argmaxSet_eq_singleton {c : Fin k → ℕ} {m : Fin k} (hM : argmaxSet c = {m})
-    {j : Fin k} (hj : j ≠ m) : c j < maxc c := by
-  refine lt_of_le_of_ne (le_maxc c j) fun h => hj ?_
-  have : j ∈ argmaxSet c := mem_argmaxSet.mpr h
-  rw [hM] at this
-  exact mem_singleton.mp this
-
 lemma bias_of_singleton {c : Fin k → ℕ} {m : Fin k} (hM : argmaxSet c = {m}) :
     bias c = maxc c - secondc c := by
   simp [bias, hM]

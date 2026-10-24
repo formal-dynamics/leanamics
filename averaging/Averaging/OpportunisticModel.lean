@@ -11,11 +11,11 @@ two endpoints of the active edge replace their values by their average (Algorith
 `Averaging(δ)` with `δ = 1/2`).
 
 A uniformly random edge is drawn as a uniformly random dart (oriented edge): every edge carries
-exactly two darts (`avg_dart_edge`). The rounds are i.i.d. uniform darts, so expectations over `T`
-rounds are `Dynamics.expList G.Dart T`. As in the paper (principle of deferred decisions,
-Section 3), the first-activation coins are drawn in advance as a uniform vector `σ : V → ℤˣ`,
-independent of the edges; `oppRun_getD` shows that the protocol then runs the averaging process
-`avgRun` started at `x⁽⁰⁾ = σ`.
+exactly two darts (the core's `Dynamics.avg_edgeRound_edge`). The rounds are i.i.d. uniform
+darts, so expectations over `T` rounds are `Dynamics.expList G.Dart T`. As in the paper
+(principle of deferred decisions, Section 3), the first-activation coins are drawn in advance as
+a uniform vector `σ : V → ℤˣ`, independent of the edges; `oppRun_getD` shows that the protocol
+then runs the averaging process `avgRun` started at `x⁽⁰⁾ = σ`.
 -/
 
 namespace Averaging.Opportunistic
@@ -45,12 +45,6 @@ noncomputable def oppStep (σ : V → ℤˣ) (s : V → Option ℝ) (d : G.Dart)
 /-- The opportunistic protocol after the rounds `l`, starting with no node activated. -/
 noncomputable def oppRun (σ : V → ℤˣ) (l : List G.Dart) : V → Option ℝ :=
   l.foldl (oppStep G σ) fun _ => none
-
-/-- A uniformly random dart is a uniformly random edge: every edge carries two darts (the core's
-`Dynamics.avg_edgeRound_edge`). -/
-theorem avg_dart_edge (f : Sym2 V → ℝ) :
-    avg (fun d : G.Dart => f d.edge) = avg (fun e : G.edgeSet => f e) :=
-  avg_edgeRound_edge G f
 
 omit [Fintype V] [DecidableRel G.Adj] in
 lemma oppStep_isSome (σ : V → ℤˣ) (s : V → Option ℝ) (d : G.Dart) (v : V) :

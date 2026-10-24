@@ -32,12 +32,6 @@ lemma phaseThreshold_pos {n : ℕ} (hn : 0 < n) (j : ℕ) : 0 < phaseThreshold n
   have : (0 : ℝ) < n := by exact_mod_cast hn
   positivity
 
-lemma phaseThreshold_antitone (n : ℕ) : Antitone (phaseThreshold n) := by
-  intro j k hjk
-  unfold phaseThreshold
-  exact mul_le_mul_of_nonneg_left (pow_le_pow_of_le_one (by norm_num) (by norm_num) hjk)
-    (Nat.cast_nonneg n)
-
 lemma exists_phaseThreshold_lt_two (n : ℕ) : ∃ J, phaseThreshold n J < 2 := by
   obtain ⟨J, hJ⟩ := exists_pow_lt_of_lt_one (by positivity : (0 : ℝ) < 2 / (n + 1))
     (by norm_num : (5 / 6 : ℝ) < 1)

@@ -185,6 +185,8 @@ theorem recovered_iff (G : SimpleGraph V) [DecidableRel G.Adj] (ω : Sym2 V → 
     v ∈ (run G ω I₀ t).recovered ↔ setDist (perc G ω) I₀ v < t :=
   (infected_recovered_iff G ω I₀ t v).2
 
+/-- The epidemic cannot outlast the percolation distances: if every node connected to `I₀` is at
+distance `< t`, nobody is infected in round `t`. -/
 lemma no_infected_of_dist_lt (G : SimpleGraph V) [DecidableRel G.Adj] (ω : Sym2 V → Bool)
     (I₀ : Finset V) (t : ℕ)
     (h : ∀ v, setDist (perc G ω) I₀ v ≠ ⊤ → setDist (perc G ω) I₀ v < t) :
@@ -259,12 +261,5 @@ theorem prob_infected_eq_prob_connected (G : SimpleGraph V) [DecidableRel G.Adj]
   by_cases hr : v ∈ (run G ω I₀ (Fintype.card V)).recovered
   · rw [if_pos hr, if_pos ((final_recovered_iff G ω I₀ v).mp hr)]
   · rw [if_neg hr, if_neg (fun h => hr ((final_recovered_iff G ω I₀ v).mpr h))]
-
-/-- The epidemic cannot outlast the percolation distances: if every node connected to `I₀` is at
-distance `< t`, nobody is infected in round `t`. -/
-theorem extinct_of_dist_lt (G : SimpleGraph V) [DecidableRel G.Adj] (ω : Sym2 V → Bool)
-    (I₀ : Finset V) (t : ℕ) (h : ∀ v, setDist (perc G ω) I₀ v ≠ ⊤ → setDist (perc G ω) I₀ v < t) :
-    (run G ω I₀ t).infected = ∅ :=
-  no_infected_of_dist_lt G ω I₀ t h
 
 end Epidemics

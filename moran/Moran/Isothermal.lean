@@ -567,18 +567,6 @@ lemma iterate_allMutant (K : Kernel (Config V)) (n : ℕ) (s : Config V) :
   rw [K.event_eq_iterate]
   rfl
 
-omit [DecidableEq V] in
-/-- `unfixed` indicates the configurations that are neither all-mutant nor all-resident. -/
-lemma unfixed_eq (s : Config V) :
-    unfixed s = if ¬ s = (fun _ => true) ∧ ¬ s = (fun _ => false) then 1 else 0 :=
-  nonConsensus_bool s
-
-/-- Finite-time survival (no fixation yet) as an event. -/
-lemma iterate_unfixed (K : Kernel (Config V)) (n : ℕ) (s : Config V) :
-    K.iterate n unfixed s =
-      K.event (fun t => ¬ t = (fun _ => true) ∧ ¬ t = (fun _ => false)) n s :=
-  K.iterate_nonConsensus_bool n s
-
 /-- **Fixation probability from an invariant** (finite-horizon optional stopping, roadmap
 FND-4). If `ψ` is harmonic for `K`, equals `1` on the all-mutant and `0` on the all-resident
 configuration, all-mutant is absorbing, and the probability that neither type has fixed tends

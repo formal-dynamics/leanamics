@@ -101,7 +101,7 @@ values stay close to the initial average of each community over the phase
 | Paper | Lean |
 | --- | --- |
 | Algorithm 1, first activations by deferred decisions | `oppStep`, `oppRun`, `oppRun_getD`, `oppRun_isSome_iff` |
-| Uniform edge as uniform dart; conservation | `avg_dart_edge`, `sum_avgRun` |
+| Uniform edge as uniform dart; conservation | `Dynamics.avg_edgeRound_edge`, `sum_avgRun` |
 | Equations (1), (2), Observation A.2, equation (15) | `stepMatrix`, `meanStepMatrix`, `stepMatrix_mulVec`, `stepMatrix_isSymm`, `stepMatrix_mul_self`, `avg_stepMatrix`, `meanStepMatrix_isSymm`, `meanStepMatrix_mem_doublyStochastic`, `avg_edgeAvg`, `expList_avgRun`, `avg_sum_sq_edgeAvg` |
 | Definition 2.2, `χ`, `Q₁`, `Q₂`, `Q₃⋯ₙ` (equation (7)), `λ₃` | `IsClusteredRegular`, `cutVec`, `projOne`, `projCut`, `projRest`, `ThirdEigenvalueLB` |
 | Theorem 3.1 on clustered regular graphs (Lemmas B.1, B.3, B.4) | `meanStepMatrix_mulVec_cutVec`, `expList_projCut`, `expList_avgRun_decomp`, `sum_sq_meanStepMatrix_pow_le`, `monotone_criterion`, `sign_criterion` |

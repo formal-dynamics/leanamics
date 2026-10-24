@@ -38,9 +38,6 @@ noncomputable def wfKernel (V : Type*) [Fintype V] [Nonempty V] : Kernel V :=
   fun _ => Distribution.uniform V
 
 omit [Fintype V] [DecidableEq V] in
-lemma backward_nil : backward ([] : List (V → V)) = id := rfl
-
-omit [Fintype V] [DecidableEq V] in
 lemma backward_cons (r : V → V) (l : List (V → V)) :
     backward (r :: l) = r ∘ backward l := rfl
 

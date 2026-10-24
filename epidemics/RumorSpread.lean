@@ -6,7 +6,6 @@ import RumorSpread.OneRound
 import RumorSpread.Growth
 import RumorSpread.Saturation
 import RumorSpread.Main
-import RumorSpread.Equivalence
 import RumorSpread.PullModel
 import RumorSpread.PullOneRound
 import RumorSpread.PullMain

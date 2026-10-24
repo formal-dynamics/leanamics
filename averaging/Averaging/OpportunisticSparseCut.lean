@@ -68,7 +68,7 @@ theorem IsClusteredRegular.prob_good_window (hG : IsClusteredRegular G V₁ d b)
             (t : ℝ) ≤ 12 * Fintype.card V / lam3 * Real.log (Fintype.card V) →
             IsGood V₁ ε (signVec σ) (avgRun G (signVec σ) (l.take t)) v}
         then 1 else 0 := by
-  have hn := hG.card_real_pos
+  have hn := hG.card_pos_real
   have hl3le := hG.lam3_le_two h3
   set N : ℝ := (Fintype.card V : ℝ) with hN_def
   set a := 6 * N / lam3 * Real.log N with ha_def
@@ -104,7 +104,7 @@ lemma IsClusteredRegular.card_mul_pow_four_ge (hG : IsClusteredRegular G V₁ d 
     (h3 : ThirdEigenvalueLB G V₁ d lam3) {ε : ℝ} (hε0 : 0 < ε) (hl3 : 0 < lam3)
     (hc : (2 * b / d : ℝ) / lam3 ≤ lam3 * ε ^ 4 / (10 ^ 6 * Real.log (Fintype.card V) ^ 2)) :
     5 * 10 ^ 5 ≤ (Fintype.card V : ℝ) * ε ^ 4 := by
-  have hn := hG.card_real_pos
+  have hn := hG.card_pos_real
   have hl3le := hG.lam3_le_two h3
   have hl2N := hG.two_div_card_lt
   set N : ℝ := (Fintype.card V : ℝ) with hN_def
@@ -150,7 +150,7 @@ lemma IsClusteredRegular.blockSum_small (hG : IsClusteredRegular G V₁ d b) {ε
     (h : (projOne (signVec σ) v + projCut V₁ (signVec σ) v) ^ 2 ≤
       ε ^ 2 / Fintype.card V * ∑ w, projCut V₁ (signVec σ) w ^ 2) :
     |blockSum V₁ σ| ≤ ε * |blockSum V₁ᶜ σ| ∨ |blockSum V₁ᶜ σ| ≤ ε * |blockSum V₁ σ| := by
-  have hn := hG.card_real_pos
+  have hn := hG.card_pos_real
   rw [hG.projOne_add_projCut_signVec, hG.sum_sq_projCut_signVec] at h
   set S₁ := blockSum V₁ σ
   set S₂ := blockSum V₁ᶜ σ
@@ -197,7 +197,7 @@ theorem IsClusteredRegular.prob_sign_window (hG : IsClusteredRegular G V₁ d b)
               SignType.sign (projOne (signVec σ) v + projCut V₁ (signVec σ) v)}
         then 1 else 0 := by
   haveI := hG.nonempty_dart
-  have hn := hG.card_real_pos
+  have hn := hG.card_pos_real
   have hgood := hG.prob_good_window h3 hε0 hε1 hl3 hc
   have hA := hG.avg_abs_blockSum_le_mul (V₁ := V₁) hε0.le
   have hB := hG.avg_abs_blockSum_compl_le_mul (V₁ := V₁) hε0.le
@@ -281,7 +281,7 @@ lemma IsClusteredRegular.isWeakReconstruction_of_good (hG : IsClusteredRegular G
       (projOne (signVec σ) v + projCut V₁ (signVec σ) v) ^ 2)
     (hopp : blockSum V₁ σ * blockSum V₁ᶜ σ < 0) :
     IsWeakReconstruction V₁ (6 * ε) fun v => if 0 < x v then 1 else -1 := by
-  have hn := hG.card_real_pos
+  have hn := hG.card_pos_real
   have hV₁ : (#V₁ : ℝ) = Fintype.card V / 2 := by
     have := hG.card_eq
     have : (2 * #V₁ : ℝ) = Fintype.card V := by exact_mod_cast this
@@ -338,7 +338,7 @@ theorem IsClusteredRegular.prob_weakReconstruction_window (hG : IsClusteredRegul
               fun v => if 0 < avgRun G (signVec σ) (l.take t) v then 1 else -1
         then 1 else 0 := by
   haveI := hG.nonempty_dart
-  have hn := hG.card_real_pos
+  have hn := hG.card_pos_real
   have hgood := hG.prob_good_window h3 hε0 hε1 hl3 hc
   have hA := hG.avg_abs_blockSum_le_mul (V₁ := V₁) hε0.le
   have hB := hG.avg_abs_blockSum_compl_le_mul (V₁ := V₁) hε0.le

@@ -23,7 +23,7 @@ open edge becomes infected, and every infected node recovers for good.
 | --- | --- |
 | Nodes infected in round `t` = nodes at distance `t` from `I₀` in `perc G ω` | `infected_iff` |
 | Nodes recovered by round `t` = nodes at distance `< t` | `recovered_iff` |
-| The epidemic is over after `card V` rounds, and as soon as all finite distances are `< t` | `extinct`, `extinct_of_dist_lt` |
+| The epidemic is over after `card V` rounds, and as soon as all finite distances are `< t` | `extinct`, `no_infected_of_dist_lt` |
 | Final outbreak = nodes connected to `I₀` by open edges | `final_recovered_iff` |
 | With i.i.d. Bernoulli(`p`) coins, P(`v` eventually infected) = P(`v` connected to `I₀`) | `coins_prob_open`, `prob_infected_eq_prob_connected` |
 
@@ -227,7 +227,8 @@ function, Chernoff bounds and martingales entirely:
   `expList α T F` (the expectation of a trajectory functional over `T`
   i.i.d. uniform rounds) is defined by recursion on `T`, which makes
   conditioning on a round a definitional unfolding.
-  [Equivalence.lean](RumorSpread/Equivalence.lean) records that this equals the
+  The core's `Dynamics.expList_eq_avg_ofFn`
+  ([Dynamics/Equivalence.lean](../dynamics/Dynamics/Equivalence.lean)) records that this equals the
   uniform average over the product space of all round sequences
   (`Dynamics.Bridge` adds Mathlib's `Finset.expect` and the product distribution).
 - **Model** ([Model.lean](RumorSpread/Model.lean)): a round is

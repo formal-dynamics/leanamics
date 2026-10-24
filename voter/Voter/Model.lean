@@ -36,12 +36,6 @@ lemma transition_apply [Fintype C] (H : Kernel V) (s : Config V C)
     (f : Config V C → ℝ) : (transition H).apply f s = round H s f :=
   Distribution.map_expect _ _ _
 
-/-- One coordinate has precisely the distribution of its sampled neighbor. -/
-lemma round_eval (H : Kernel V) (s : Config V C) (i : V) (f : C → ℝ) :
-    round H s (fun t => f (t i)) = (H i).expect (fun j => f (s j)) := by
-  classical
-  exact Distribution.independent_expect_eval H i (fun j => f (s j))
-
 /-- Product observables factor over the independently updated vertices. -/
 lemma round_prod (H : Kernel V) (s : Config V C) (f : V → C → ℝ) :
     round H s (fun t => ∏ i, f i (t i)) = ∏ i, (H i).expect (fun j => f i (s j)) := by

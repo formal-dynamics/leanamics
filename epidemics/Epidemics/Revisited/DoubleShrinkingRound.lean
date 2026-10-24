@@ -29,8 +29,6 @@ lemma npow_add {n : ℕ} (hn : 1 ≤ n) (x y : ℝ) :
 lemma npow_pow {n : ℕ} (x : ℝ) (k : ℕ) : ((n : ℝ) ^ x) ^ k = (n : ℝ) ^ (x * k) := by
   rw [← Real.rpow_natCast, ← Real.rpow_mul (Nat.cast_nonneg n)]
 
-lemma npow_one' {n : ℕ} : (n : ℝ) ^ (1 : ℝ) = n := Real.rpow_one _
-
 /-- Every constant is eventually below `n^ε`. -/
 lemma exists_le_npow (B : ℝ) {ε : ℝ} (hε : 0 < ε) :
     ∃ N : ℕ, ∀ n : ℕ, N ≤ n → B ≤ (n : ℝ) ^ ε := by

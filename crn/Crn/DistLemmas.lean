@@ -34,13 +34,6 @@ lemma prob_eq_sum (p : Distribution α) (E : α → Prop) [DecidablePred E] :
     p.prob E = ∑ a, if E a then p.weight a else 0 := by
   simp [p.prob_eq_expect, Distribution.expect]
 
-/-- Expectation of an observable vanishing off `E`, for any decidability instance. -/
-lemma expect_ite (p : Distribution α) (E : α → Prop) [DecidablePred E] (f : α → ℝ) :
-    p.expect (fun a => if E a then f a else 0) = ∑ a, if E a then p.weight a * f a else 0 := by
-  unfold Distribution.expect
-  refine sum_congr rfl fun a _ => ?_
-  by_cases h : E a <;> simp [h]
-
 /-- Expectation under normalized weights: `∑ w·f / ∑ w`. -/
 lemma normalize_expect (w : α → ℝ) (hw : ∀ a, 0 ≤ w a) (h : ∑ a, w a ≠ 0) (f : α → ℝ) :
     (normalize w hw h).expect f = (∑ a, w a * f a) / ∑ a, w a := by

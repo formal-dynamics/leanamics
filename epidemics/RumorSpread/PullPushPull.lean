@@ -37,23 +37,4 @@ theorem pushPull_informs_all_whp (hn : 2 ≤ n) (v₀ : Fin n) :
   · rw [if_neg h]
     split <;> norm_num
 
-/-- Complement form of `pushPull_informs_all_whp`: after `⌈160 log n⌉` rounds of PUSH–PULL,
-**all** nodes are informed with probability at least `1 - 2/n`. -/
-theorem pushPull_informs_all_whp' (hn : 2 ≤ n) (v₀ : Fin n) :
-    1 - 2 / (n : ℝ)
-      ≤ expList (Tgt n) ⌈(160 : ℝ) * Real.log n⌉₊
-          (fun l => if pushPullRun {v₀} l = univ then (1 : ℝ) else 0) := by
-  haveI := tgt_nonempty hn
-  have hsum : expList (Tgt n) ⌈(160 : ℝ) * Real.log n⌉₊
-        (fun l => if pushPullRun {v₀} l = univ then (1 : ℝ) else 0)
-      + prPushPullNotAllInformed n v₀ ⌈(160 : ℝ) * Real.log n⌉₊ = 1 := by
-    rw [prPushPullNotAllInformed, ← expList_add]
-    have h : (fun l => (if pushPullRun {v₀} l = univ then (1 : ℝ) else 0)
-        + (if pushPullRun {v₀} l = univ then (0 : ℝ) else 1)) = fun _ => (1 : ℝ) := by
-      funext l
-      split <;> norm_num
-    rw [h, expList_const]
-  have hmain := pushPull_informs_all_whp hn v₀
-  linarith
-
 end RumorPush

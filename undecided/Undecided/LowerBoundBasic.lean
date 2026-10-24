@@ -49,9 +49,6 @@ lemma ratio_term_le_one (x : Config n k) (i : Fin k) :
   · rw [div_le_one (by exact_mod_cast h)]
     exact_mod_cast count_le_maxCount x i
 
-lemma ratioR_nonneg (x : Config n k) : 0 ≤ ratioR x :=
-  sum_nonneg fun i _ => ratio_term_nonneg x i
-
 lemma md_nonneg (x : Config n k) : 0 ≤ md x := by
   rw [md_def]
   exact sum_nonneg fun i _ => sq_nonneg _

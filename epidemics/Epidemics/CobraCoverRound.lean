@@ -101,15 +101,6 @@ lemma sum_neighbor_frac {r : ℕ} (hreg : G.IsRegularOfDegree r) (hr : 0 < r) (A
   exact_mod_cast hr.ne'
 
 omit [Fintype V] [DecidableRel G.Adj] in
-/-- The indicator that `u` is infected is `1` at the source and otherwise depends only on the
-samples of `u`: it equals `1` exactly when one of those samples lands in `A`. -/
-lemma bips_infect_indicator {k : ℕ} {v u : V} (huv : u ≠ v) (A : Finset V)
-    (σ : Fin k → G.neighborSet u) :
-    (if u = v ∨ ∃ i, (σ i : V) ∈ A then (1 : ℝ) else 0) =
-      if ∃ i, (σ i : V) ∈ A then 1 else 0 := by
-  by_cases h : ∃ i, (σ i : V) ∈ A <;> simp [h, huv]
-
-omit [Fintype V] [DecidableRel G.Adj] in
 /-- Hitting `A` with at least one of `k` samples is `1` minus the product of the misses. -/
 lemma hit_eq_one_sub_prod {k : ℕ} (u : V) (A : Finset V) (σ : Fin k → G.neighborSet u) :
     (if ∃ i, (σ i : V) ∈ A then (1 : ℝ) else 0) =

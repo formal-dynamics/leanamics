@@ -67,14 +67,6 @@ noncomputable def pullValue (G : SimpleGraph V) [DecidableRel G.Adj] (s : Config
 /-- Indicator of the mutant type, as a real number. -/
 def typeInd (s : Config V) (v : V) : ℝ := if s v = true then 1 else 0
 
-omit [Fintype V] [DecidableEq V] in
-lemma typeInd_true {s : Config V} {v : V} (h : s v = true) : typeInd s v = 1 := by
-  simp [typeInd, h]
-
-omit [Fintype V] [DecidableEq V] in
-lemma typeInd_false {s : Config V} {v : V} (h : s v = false) : typeInd s v = 0 := by
-  simp [typeInd, h]
-
 lemma pushValue_gain (G : SimpleGraph V) [DecidableRel G.Adj] (s : Config V) {w : V}
     (hw : s w = false) :
     pushValue G (Function.update s w true) = pushValue G s + (G.degree w : ℝ)⁻¹ := by

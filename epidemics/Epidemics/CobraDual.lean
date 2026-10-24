@@ -150,7 +150,7 @@ theorem cobra_bips_duality_of_dual (v : V) (C : Finset V) (t : ℕ) :
   rw [cobraStopped_eq_ofStep, bipsKernel, Kernel.iterate_ofStep, Kernel.iterate_ofStep] at h
   simp only [foldl_bipsSourceStep] at h
   rw [← h]
-  refine expList_congr_length t fun l hl => if_congr ?_ rfl rfl
+  refine Dynamics.expList_congr_length fun l hl => if_congr ?_ rfl rfl
   rw [← disjoint_iff_inter_eq_empty, disjoint_singleton_right, not_mem_foldl_cobraStopStep, hl]
 
 end Epidemics

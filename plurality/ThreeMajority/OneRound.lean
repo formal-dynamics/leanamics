@@ -26,9 +26,6 @@ variable {n : ℕ}
 /-- The real-valued membership indicator. -/
 def ind (I : Finset (Fin n)) (x : Fin n) : ℝ := if x ∈ I then 1 else 0
 
-lemma ind_eq_zero_or_one (I : Finset (Fin n)) (x : Fin n) : ind I x = 0 ∨ ind I x = 1 := by
-  unfold ind; split_ifs <;> simp
-
 lemma avg_ind (I : Finset (Fin n)) : avg (ind I) = (I.card : ℝ) / (Fintype.card (Fin n) : ℝ) := by
   unfold ind
   rw [avg_indicator]

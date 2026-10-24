@@ -118,16 +118,16 @@ neither development uses the other.
 Sources: [KSSV00] R. Karp, C. Schindelhauer, S. Shenker, B. Vöcking, *Randomized rumor
 spreading*, FOCS 2000 (§1.2 model, §2 push versus pull, Theorem 2.1 for push&pull); [FG85]
 A. Frieze, G. Grimmett, *The shortest-path problem for graphs with random arc-lengths*, Discrete
-Appl. Math. 10 (1985) (PUSH, partner chosen among the other nodes).
+Appl. Math. 10 (1985) (§5, PUSH).
 
-1. **Partner choice excludes self-calls.** [KSSV00, §1.2] lets every player choose its partner
-   uniformly among *all* players (its §2 startup analysis mentions a player "calling itself").
-   We reuse the PUSH round model `Tgt n` of the library (each node calls a uniform node among
-   the *other* `n - 1`, the [FG85] convention), so that PUSH, PULL and PUSH–PULL are driven by
-   the same random calls. Only constants change: the exact one-round formulas have `n - 1` where
-   the heuristics of [KSSV00] have `n`. For instance the expected number of uninformed nodes
-   after a PULL round is `u(u-1)/(n-1)` (`pull_avg_uninformed`, with `u = n - |I|`) instead of
-   `s²n = u²/n`; we state the exact form and the bound `≤ u²/n` (`pull_avg_uninformed_le`).
+1. **Partner choice excludes self-calls.** [KSSV00, §1.2] and [FG85, §5] let every player choose
+   its partner uniformly among *all* players (including itself). We reuse the PUSH round model
+   `Tgt n` of the library (each node calls a uniform node among the *other* `n - 1`), so that
+   PUSH, PULL and PUSH–PULL are driven by the same random calls. Only constants change: the exact
+   one-round formulas have `n - 1` where the heuristics of [KSSV00] have `n`. For instance the
+   expected number of uninformed nodes after a PULL round is `u(u-1)/(n-1)` (`pull_avg_uninformed`,
+   with `u = n - |I|`) instead of `s²n = u²/n`; we state the exact form and the bound `≤ u²/n`
+   (`pull_avg_uninformed_le`).
 2. **Round count `⌈160 ln n⌉ = O(log n)`, not sharp.** [KSSV00, Thm 2.1] gives
    `log₃ n + O(log log n)` rounds for push&pull. We prove the `O(log n)` statement with an
    explicit, deliberately crude constant, chosen so that the PULL proof reuses the PUSH
@@ -538,9 +538,9 @@ Source: L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccar
 11. **Not formalized (yet).** Claim 1 (the supercritical regime) of Theorems 2.1, 2.2, 2.4 and 2.5
     (Appendices B and D), and the extensions of Appendix F.
 12. **Local lemmas.** The supermartingale lemma for adaptive observations
-    (`expect_prod_hist_le_one`) and its deferred-decisions form for fresh coordinates
-    (`expect_prod_hist_le_one_of_fresh`) are the core's (`Dynamics.Adaptive`, with the histories
-    `hist`, the products `histProd` and the read sets `readSet`), as are the coordinatewise
+    (`Distribution.expect_prod_hist_le_one`) and its deferred-decisions form for fresh
+    coordinates (`Distribution.expect_prod_hist_le_one_of_fresh`) are the core's
+    (`Dynamics.Adaptive`, with the histories `hist`, the products `histProd` and the read sets `readSet`), as are the coordinatewise
     combination of independent families (`Distribution.expect_expect_coord`,
     `Distribution.expect_mul_of_dep`, in `Dynamics.Independent`) and Markov's inequality
     `Distribution.prob_le_expect_div`, and the moment-generating function of a weighted block of

@@ -223,26 +223,4 @@ theorem push_informs_all_whp (hn : 2 ≤ n) (v₀ : Fin n) :
   have htwo : 1 / (n : ℝ) + 1 / n = 2 / n := by ring
   linarith
 
-/-- Complement form: after `(⌈117 log n⌉ + 23) + ⌈6 log n⌉` rounds, **all**
-nodes are informed with probability at least `1 - 2/n`. -/
-theorem push_informs_all_whp' (hn : 2 ≤ n) (v₀ : Fin n) :
-    1 - 2 / (n : ℝ)
-      ≤ expList (Tgt n)
-          ((⌈(117 : ℝ) * Real.log n⌉₊ + 23) + ⌈(6 : ℝ) * Real.log n⌉₊)
-          (fun l => if run {v₀} l = univ then (1 : ℝ) else 0) := by
-  haveI := tgt_nonempty hn
-  set T := (⌈(117 : ℝ) * Real.log n⌉₊ + 23) + ⌈(6 : ℝ) * Real.log n⌉₊ with hT
-  have hsum : expList (Tgt n) T
-        (fun l => if run {v₀} l = univ then (1 : ℝ) else 0)
-      + prNotAllInformed n v₀ T = 1 := by
-    rw [prNotAllInformed, ← expList_add]
-    have h : (fun l => (if run {v₀} l = univ then (1 : ℝ) else 0)
-        + (if run {v₀} l = univ then (0 : ℝ) else 1)) = fun _ => (1 : ℝ) := by
-      funext l
-      split <;> norm_num
-    rw [h, expList_const]
-  have hmain := push_informs_all_whp hn v₀
-  rw [← hT] at hmain
-  linarith
-
 end RumorPush

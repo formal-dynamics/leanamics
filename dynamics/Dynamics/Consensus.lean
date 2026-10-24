@@ -32,9 +32,6 @@ lemma nonConsensus_binary (s : V → C) : nonConsensus s = 0 ∨ nonConsensus s 
   unfold nonConsensus
   split <;> simp
 
-lemma nonConsensus_nonneg (s : V → C) : 0 ≤ nonConsensus s := by
-  rcases nonConsensus_binary s with h | h <;> simp [h]
-
 lemma nonConsensus_le_one (s : V → C) : nonConsensus s ≤ 1 := by
   rcases nonConsensus_binary s with h | h <;> simp [h]
 

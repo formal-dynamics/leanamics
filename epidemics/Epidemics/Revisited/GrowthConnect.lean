@@ -43,15 +43,6 @@ lemma gap_of_not_lt {m : ℝ} {T : Finset (Fin n)} (h : ¬ (T.card : ℝ) < m) :
   classical
   simp [gap, h]
 
-lemma gap_nonneg (m : ℝ) (T : Finset (Fin n)) : 0 ≤ gap m T := by
-  classical
-  unfold gap
-  split
-  · have hle : T.card ≤ n := by
-      simpa [Fintype.card_fin] using card_le_univ (s := T)
-    exact sub_nonneg.mpr (Nat.cast_le.mpr hle)
-  · norm_num
-
 lemma gap_le_deficit (m : ℝ) (T : Finset (Fin n)) :
     gap m T ≤ (n : ℝ) - T.card := by
   classical

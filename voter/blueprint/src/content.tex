@@ -250,7 +250,7 @@ Lemma~2.2 only needs nonconsensus probability to vanish; then project colours as
 Section~2.3.
 \end{proof}
 \begin{theorem}[Lazy voter]\label{thm:lazy}
-\lean{Dynamics.Kernel.lazy,Dynamics.Kernel.lazyNeighbor,Dynamics.Kernel.lazy_weight,Dynamics.Kernel.lazyNeighbor_weight,Voter.lazy_stationary_iff,Dynamics.Kernel.lazy_selfLoop_pos,Dynamics.Kernel.lazy_weight_pos,Voter.lazy_consensus_probability,Voter.lazyNeighbor_consensus_probability}\leanok\uses{thm:selfloop,cor:22}
+\lean{Dynamics.Kernel.lazy,Dynamics.Kernel.lazyNeighbor,Dynamics.Kernel.lazy_weight,Dynamics.Kernel.lazyNeighbor_weight,Dynamics.Kernel.lazy_stationary_iff,Dynamics.Kernel.lazy_selfLoop_pos,Dynamics.Kernel.lazy_weight_pos,Voter.lazy_consensus_probability,Voter.lazyNeighbor_consensus_probability}\leanok\uses{thm:selfloop,cor:22}
 The lazy kernel $(I+H)/2$ has the stationary distributions of $H$ and positive self-loops.
 On any connected graph the lazy voter $(I+D^{-1}A)/2$ reaches consensus in colour $c$ with
 probability $\sum_{i:s(i)=c} d_i/2m$.
@@ -259,7 +259,7 @@ probability $\sum_{i:s(i)=c} d_i/2m$.
 Apply the Remark to $(I+H)/2$; for uniform neighbour sampling use the degree distribution.
 \end{proof}
 \begin{theorem}[Neutral Wright--Fisher fixation]\label{thm:wright-fisher}
-\lean{Voter.wfKernel_pos,Voter.wfKernel_stationary,Voter.uniform_prob_eq_card,Voter.top_not_colorable_two,Voter.wrightFisher_fixation_of_three_le,Voter.wrightFisher_fixation}\leanok\uses{thm:colors,thm:selfloop,def:backward}
+\lean{Voter.wfKernel_pos,Voter.wfKernel_stationary,Voter.uniform_prob_eq_card,Voter.top_not_colorable_two,Voter.wrightFisher_fixation}\leanok\uses{thm:colors,thm:selfloop,def:backward}
 If every offspring picks a uniform parent, itself included, allele $a$ fixes with probability
 $c_a/n$, where $c_a$ is its initial number of copies.
 \end{theorem}

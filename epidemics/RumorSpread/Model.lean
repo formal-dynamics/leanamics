@@ -27,9 +27,6 @@ def Tgt (n : ℕ) := ∀ v : Fin n, {u : Fin n // u ≠ v}
 instance (n : ℕ) : Fintype (Tgt n) :=
   inferInstanceAs (Fintype (∀ v : Fin n, {u : Fin n // u ≠ v}))
 
-instance (n : ℕ) : DecidableEq (Tgt n) :=
-  inferInstanceAs (DecidableEq (∀ v : Fin n, {u : Fin n // u ≠ v}))
-
 lemma tgt_nonempty {n : ℕ} (hn : 2 ≤ n) : Nonempty (Tgt n) := by
   have : ∀ v : Fin n, Nonempty {u : Fin n // u ≠ v} := by
     intro v
@@ -81,10 +78,6 @@ lemma run_append (I : Finset (Fin n)) (l₁ l₂ : List (Tgt n)) :
   induction l₁ generalizing I with
   | nil => simp
   | cons r l ih => simp [ih]
-
-lemma card_run_le (I : Finset (Fin n)) (l : List (Tgt n)) :
-    (run I l).card ≤ n := by
-  simpa using card_le_card (subset_univ (run I l))
 
 /-- A round is *good* if it grows the informed set by a factor `≥ 9/8`,
 or if the informed set already exceeds `n/2`. -/

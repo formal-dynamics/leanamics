@@ -1026,7 +1026,7 @@ instead of measure theory or \texttt{PMF} we work with plain finite sums.
 
 \begin{lemma}[Independence over a product space]\label{lem:indep}
   \lean{ThreeMajority.avg_mul_prod, ThreeMajority.avg_fst_mul, ThreeMajority.avg_snd_mul,
-    ThreeMajority.avg_equiv, ThreeMajority.avg_prod_pi, ThreeMajority.avg_eval}
+    Dynamics.avg_equiv, ThreeMajority.avg_prod_pi, ThreeMajority.avg_eval}
   \leanok
   \uses{def:avg}
   \textbf{New relative to the push protocol}, since that development only
@@ -1136,13 +1136,11 @@ $\mathrm{avg}(\mathrm{ind}(I)) = |I|/n$.
 \end{lemma}
 
 \begin{lemma}[Exponential beats any fixed power]\label{lem:exppow}
-  \lean{Real.pow_div_factorial_le_exp, ThreeMajority.exp_ge_cube}
+  \lean{Real.pow_div_factorial_le_exp}
   \leanok
   For $x\ge0$ and any $k\in\N$: $x^k/k! \le \exp(x)$: the single
   degree-$k$ term of the Taylor truncation, extracted by dropping every
-  other (nonnegative, since $x\ge0$) term of the sum. The cubic case
-  $k=3$ (\texttt{exp\_ge\_cube}) is the special case used by
-  Lemma~\ref{lem:logquad}. Choosing $k$ large enough relative to a given
+  other (nonnegative, since $x\ge0$) term of the sum. Choosing $k$ large enough relative to a given
   lower bound on $\log n$ lets $n$ be shown to dominate any fixed
   polynomial in $\log n$ using only a \emph{modest} such lower bound
   (Stage 2b, Lemma~\ref{lem:stage2b}, and the final numeric bound

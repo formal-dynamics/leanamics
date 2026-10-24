@@ -262,11 +262,6 @@ lemma expect_finset_sum {ι : Type*} (D : Distribution α) (s : Finset ι) (f : 
   simp_rw [mul_sum]
   rw [sum_comm]
 
-lemma indicator_sq (x : Fin n) (T : Finset (Fin n)) :
-    (if x ∈ T then (1 : ℝ) else 0) ^ 2 = if x ∈ T then (1 : ℝ) else 0 := by
-  classical
-  by_cases hx : x ∈ T <;> simp [hx]
-
 /-- Variance of `∑_{x ∈ comp} 1[x ∈ T]`, with pairwise covariances at most `c`. -/
 lemma variance_sum_indicator_le (D : Distribution (Finset (Fin n))) (comp : Finset (Fin n))
     {c : ℝ} (hc : 0 ≤ c)

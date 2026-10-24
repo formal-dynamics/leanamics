@@ -42,9 +42,6 @@ lemma avg_indicator (P : α → Prop) [DecidablePred P] :
       = ((univ.filter P).card : ℝ) / (Fintype.card α : ℝ) :=
   Dynamics.avg_indicator P
 
-lemma card_cast_pos [Nonempty α] : (0 : ℝ) < (Fintype.card α : ℝ) :=
-  Dynamics.card_cast_pos
-
 lemma avg_const [Nonempty α] (c : ℝ) : avg (fun _ : α => c) = c :=
   Dynamics.avg_const c
 
@@ -94,11 +91,6 @@ lemma avg_fst_mul {β δ : Type*} [Fintype β] [Fintype δ] [Nonempty δ] (g : �
 lemma avg_snd_mul {β δ : Type*} [Fintype β] [Nonempty β] [Fintype δ] (h : δ → ℝ) :
     avg (fun p : β × δ => h p.2) = avg h :=
   Dynamics.avg_snd_mul h
-
-@[inherit_doc Dynamics.avg_equiv]
-lemma avg_equiv {β : Type*} [Fintype β] (e : α ≃ β) (F : β → ℝ) :
-    avg (fun a => F (e a)) = avg F :=
-  Dynamics.avg_equiv e F
 
 @[inherit_doc Dynamics.avg_prod_pi]
 lemma avg_prod_pi {γ : Type*} [Fintype γ] :

@@ -391,8 +391,9 @@ expected gap `𝔼(c_i' − c_j') = (c_i − c_j)(1 + (c_i + c_j)/n − S/n²)` 
 `Median/TwoChoicesPlurality.lean`: `distance_increases` (Lemma 2.2), `count_stochDom` (Lemma
 2.3), `growth_round` and `growth_phase` (the growth part of the proof of Theorem 1.2),
 `finish_phase`, `plurality_whp` (Theorem 1.2 without the adversary) and `plurality_whp_k`, plus
-`two_colours_consensus_whp` (the case `k = 2`, from `Median.consensus_whp`) and `absorbed`
-(almost-sure consensus, the "almost agreement" of the last paragraph of the proof).
+`absorbed` (almost-sure consensus, the "almost agreement" of the last paragraph of the proof); the
+case `k = 2` is `Median.consensus_whp` through `run_bool`, `count_true` and
+`count_true_add_count_false`.
 
 `plurality_whp`: there are `z, C > 0` such that, for every `n` with `log n ≥ C`, every `k`, every
 configuration `x` with colours in `Fin k` and every colour `i` that leads every other colour by

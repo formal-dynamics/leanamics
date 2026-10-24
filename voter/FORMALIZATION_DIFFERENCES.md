@@ -200,10 +200,9 @@ fixation. Files: [`LazyPropagation.lean`](Voter/LazyPropagation.lean),
   configurations is what makes fixation a corollary of the voter theorem.
 * The population is an arbitrary finite type `V` with `n = Fintype.card V`, rather than
   `Fin n` (a special case).
-* Two versions are proved: [`wrightFisher_fixation_of_three_le`](Voter/WrightFisher.lean)
-  (`3 ≤ n`) follows from the original `color_consensus_probability` on the complete graph,
-  which is nonbipartite once `n ≥ 3`; [`wrightFisher_fixation`](Voter/WrightFisher.lean)
-  holds for every `n ≥ 1` and goes through the self-loop extension.
+* [`wrightFisher_fixation`](Voter/WrightFisher.lean) holds for every `n ≥ 1` and goes through
+  the self-loop extension (for `n ≥ 3` the complete graph is also nonbipartite, so the original
+  `color_consensus_probability` applies as well).
 
 ### 3.2 The lazy voter on bipartite graphs needs the Remark
 * `consensus_probability` assumes `¬ G.Colorable 2`. For the lazy kernel on a bipartite `G`

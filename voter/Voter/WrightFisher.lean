@@ -45,16 +45,6 @@ lemma top_not_colorable_two (hn : 3 ≤ Fintype.card V) : ¬ (⊤ : SimpleGraph 
   rw [Nat.card_eq_fintype_card] at this
   omega
 
-/-- **Neutral Wright–Fisher fixation on `K_n`, `n ≥ 3` (VOT-2), via Hassin–Peleg Section 2.3.**
-In a population of `n = |V| ≥ 3` individuals, allele `a` eventually fixes with probability
-`c_a / n`, where `c_a` is the number of individuals initially carrying `a`. -/
-theorem wrightFisher_fixation_of_three_le [Nonempty V] [Fintype C] [DecidableEq C]
-    (hn : 3 ≤ Fintype.card V) (s : Config V C) (a : C) :
-    eventualColor (wfKernel V) a s =
-      ((univ.filter fun i => s i = a).card : ℝ) / Fintype.card V := by
-  rw [color_consensus_probability ⊤ SimpleGraph.connected_top (top_not_colorable_two hn)
-    (wfKernel V) (fun i j _ => wfKernel_pos i j) _ wfKernel_stationary, uniform_prob_eq_card]
-
 /-- **Neutral Wright–Fisher fixation for every population size (VOT-2), via the Remark on
 p. 254 of Hassin–Peleg.** Allele `a` eventually fixes with probability `c_a / n`. -/
 theorem wrightFisher_fixation [Nonempty V] [Fintype C] [DecidableEq C]

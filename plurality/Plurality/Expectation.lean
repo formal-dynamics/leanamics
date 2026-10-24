@@ -29,13 +29,6 @@ noncomputable def frac (x : Config n k) (j : Fin k) : ℝ := (count x j : ℝ) /
 lemma frac_nonneg (x : Config n k) (j : Fin k) : 0 ≤ frac x j := by
   unfold frac; positivity
 
-lemma frac_le_one (x : Config n k) (j : Fin k) : frac x j ≤ 1 := by
-  unfold frac
-  rcases Nat.eq_zero_or_pos n with rfl | hn
-  · simp
-  · rw [div_le_one (by exact_mod_cast hn)]
-    exact_mod_cast count_le x j
-
 lemma sum_frac (hn : 1 ≤ n) (x : Config n k) : ∑ j, frac x j = 1 := by
   unfold frac
   rw [← sum_div, sum_count_real, div_self]

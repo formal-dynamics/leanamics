@@ -403,10 +403,6 @@ lemma phaseIdx_next {γlo γ a b : ℝ} {n J : ℕ} {k : ℝ} {j : ℕ}
   unfold phaseIdx at hj
   exact Nat.findGreatest_is_greatest hj hjJ
 
-lemma phaseIdx_of_ge {γlo γ a b : ℝ} {n J : ℕ} {k : ℝ}
-    (hk : kSeq γ a b (growthA γlo b) n J ≤ k) : phaseIdx γlo γ a b n J k = J :=
-  le_antisymm (phaseIdx_le γlo γ a b n J k) (le_phaseIdx le_rfl hk)
-
 noncomputable def connectP (γlo γhi a b f : ℝ) : ℝ :=
   γlo * (alphaSeq b γlo * fShrink a f / (1 + γhi)) * ((1 - a * f) / 2)
 

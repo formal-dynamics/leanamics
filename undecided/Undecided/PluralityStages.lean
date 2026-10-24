@@ -43,11 +43,6 @@ lemma step_mem_allM {y : Config n k} {m : Fin k} (hy : y ∈ allM m) (r : Fin n 
   rw [hy', step_const]
   rfl
 
-/-- Once all nodes hold `m`, they keep it. -/
-lemma miss_allM_of_mem {y : Config n k} {m : Fin k} (hy : y ∈ allM m) (T : ℕ) :
-    miss (allM m) T y = 0 :=
-  missProb_of_closed step (fun _ hy r => step_mem_allM hy r) hy T
-
 /-- The probability of not being monochromatic in `m` does not increase with time. -/
 lemma miss_allM_antitone [NeZero n] (x : Config n k) (m : Fin k) {T T' : ℕ} (h : T ≤ T') :
     miss (allM m) T' x ≤ miss (allM m) T x :=

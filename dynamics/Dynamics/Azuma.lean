@@ -15,8 +15,8 @@ W. Hoeffding, J. Amer. Statist. Assoc. 58, 1963, Theorem 2 for the independent c
 maximal form obtained from Ville's (Doob's) maximal inequality for the exponential supermartingale
 `exp(θ M_k - k θ² c² / 2)`.
 
-* `incrementSum`: the partial sums, linear and monotone in the increments (`incrementSum_add`,
-  `incrementSum_sub`, `incrementSum_const_mul`, `incrementSum_mono`), with `incrementSum_mul_sub`,
+* `incrementSum`: the partial sums, additive and monotone in the increments (`incrementSum_add`,
+  `incrementSum_mono`), with `incrementSum_mul_sub`,
   `incrementSum_neg`, `incrementSum_telescope` (increments `φ (step y a) - φ y - ψ y` telescope)
   and `incrementSum_take` (the sum of a state function along the first `k` rounds);
 * `avg_exp_mul_le`: **Hoeffding's lemma** for a centred variable bounded by `c` under a uniform
@@ -80,21 +80,6 @@ noncomputable def incrementSum (step : σ → R → σ) (D : σ → R → ℝ) (
 lemma incrementSum_add (step : σ → R → σ) (D E : σ → R → ℝ) (x : σ) (l : List R) :
     incrementSum step (fun y a => D y a + E y a) x l
       = incrementSum step D x l + incrementSum step E x l := by
-  induction l generalizing x with
-  | nil => simp
-  | cons a l ih => simp only [incrementSum_cons, ih]; ring
-
-/-- Sums of differences of increments. -/
-lemma incrementSum_sub (step : σ → R → σ) (D E : σ → R → ℝ) (x : σ) (l : List R) :
-    incrementSum step (fun y a => D y a - E y a) x l
-      = incrementSum step D x l - incrementSum step E x l := by
-  induction l generalizing x with
-  | nil => simp
-  | cons a l ih => simp only [incrementSum_cons, ih]; ring
-
-/-- Scaling the increments scales their sum. -/
-lemma incrementSum_const_mul (step : σ → R → σ) (c : ℝ) (D : σ → R → ℝ) (x : σ) (l : List R) :
-    incrementSum step (fun y a => c * D y a) x l = c * incrementSum step D x l := by
   induction l generalizing x with
   | nil => simp
   | cons a l ih => simp only [incrementSum_cons, ih]; ring

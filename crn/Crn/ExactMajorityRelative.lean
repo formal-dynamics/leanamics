@@ -46,11 +46,6 @@ instance RelState.instFintype (k : ℕ) : ∀ m, Fintype (RelState k m)
   | 0 => inferInstanceAs (Fintype (Label k))
   | m + 1 => @instFintypeProd (RelState k m) DynState (RelState.instFintype k m) _
 
-/-- Decidable equality of states. -/
-instance RelState.instDecidableEq (k : ℕ) : ∀ m, DecidableEq (RelState k m)
-  | 0 => inferInstanceAs (DecidableEq (Label k))
-  | m + 1 => @instDecidableEqProd (RelState k m) DynState (RelState.instDecidableEq k m) _
-
 /-- The bit `i` of a label (`false` for `i ≥ k`). -/
 def bitAt (L : Label k) (i : ℕ) : Bool := if h : i < k then L ⟨i, h⟩ else false
 

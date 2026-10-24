@@ -46,8 +46,6 @@ def voterRun (c : Fin n → σ) : List (Fin n → Fin n) → Fin n → σ
   | [] => c
   | y :: l => voterRun (voterStep c y) l
 
-@[simp] lemma voterRun_nil (c : Fin n → σ) : voterRun c [] = c := rfl
-
 @[simp] lemma voterRun_cons (c : Fin n → σ) (y : Fin n → Fin n) (l : List (Fin n → Fin n)) :
     voterRun c (y :: l) = voterRun (voterStep c y) l := rfl
 

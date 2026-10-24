@@ -13,10 +13,9 @@ development, none requiring calculus/derivatives:
   needed is a bound strictly below `0`. This derives a genuinely
   quadratic-tight lower bound on `log` near `1`, from Mathlib's degree-`3`
   Taylor lower bound for `exp` (`Real.sum_le_exp_of_nonneg`).
-* Mathlib's `Real.pow_div_factorial_le_exp` (with `exp_ge_cube` as its `k = 3` special
-  case): `xᵏ/k! ≤ exp x` for any degree `k`, the single-term generalization of the same
-  Taylor truncation. Picking `k` large enough relative to a given lower
-  bound on `log n` is what keeps that bound modest (Stage 2b,
+* Mathlib's `Real.pow_div_factorial_le_exp`: `xᵏ/k! ≤ exp x` for any degree `k`, the
+  single-term generalization of the same Taylor truncation. Picking `k` large enough relative to a
+  given lower bound on `log n` is what keeps that bound modest (Stage 2b,
   `saturation_stage2b`) instead of astronomically large.
 * `log_le_tangent_div`, `exp_three_ge_twenty`, `log_log_le_of_pos`: a
   tangent-line bound on `log` at an arbitrary reference point `c` (tight at
@@ -55,13 +54,6 @@ lemma log_ge_quadratic {x : ℝ} (hx0 : (1 : ℝ) / 2 ≤ x) (hx1 : x ≤ 1) :
     rwa [Real.log_exp] at this
   have heq : -(t + t ^ 2) = (x - 1) - (x - 1) ^ 2 := by rw [ht]; ring
   linarith [heq ▸ h5]
-
-/-- **Exponential beats cubic**: `x³/6 ≤ exp x` for `x ≥ 0`. Special case of
-Mathlib's `Real.pow_div_factorial_le_exp` at `k = 3`. -/
-lemma exp_ge_cube {x : ℝ} (hx : 0 ≤ x) : x ^ 3 / 6 ≤ Real.exp x := by
-  have h := Real.pow_div_factorial_le_exp _ hx 3
-  norm_num at h
-  linarith
 
 /-- **Tangent-line log bound**: for `L > 0` and any reference point `c > 0`,
 `log L ≤ log c - 1 + L / c`, from the crude linear bound `log t ≤ t - 1`

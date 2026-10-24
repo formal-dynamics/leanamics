@@ -73,12 +73,6 @@ lemma exists_plurality (x : Config n k) (hq : count x none = 0) (hn : 0 < n) :
   obtain ⟨m, -, hm⟩ := exists_mem_eq_sup univ hk fun i => count x (some i)
   exact ⟨m, fun i => (count_le_maxCount x i).trans (le_of_eq hm)⟩
 
-lemma one_lt_of_log {C : ℝ} (hC : 0 < C) {n : ℕ} (hL : C ≤ Real.log n) : 1 < n := by
-  by_contra h
-  have : (n : ℝ) ≤ 1 := by exact_mod_cast not_lt.mp h
-  have := Real.log_nonpos (Nat.cast_nonneg n) this
-  linarith
-
 lemma one_le_div_log {n : ℕ} (hn : 1 < n) : 1 ≤ (n : ℝ) / Real.log n := by
   have hn0 : (0 : ℝ) < n := by exact_mod_cast (show 0 < n by omega)
   have hlog : 0 < Real.log n := Real.log_pos (by exact_mod_cast hn)
@@ -109,7 +103,7 @@ theorem lower_bound_whp : ∃ C : ℝ, 0 < C ∧ ∀ n : ℕ, C ≤ Real.log n �
   refine ⟨C3 + C6 + C7 + 2 * γ + 1, by positivity, ?_⟩
   intro n hL k hk x hq T hT
   set C := C3 + C6 + C7 + 2 * γ + 1 with hCdef
-  have hn1 : 1 < n := one_lt_of_log (by positivity) hL
+  have hn1 : 1 < n := one_lt_n_of_log (by positivity) hL
   haveI : NeZero n := ⟨by omega⟩
   have hn0 : (0 : ℝ) < n := by exact_mod_cast (show 0 < n by omega)
   have hN := one_le_div_log hn1
@@ -205,7 +199,7 @@ theorem lower_bound_consensus : ∃ C : ℝ, 0 < C ∧ ∀ n : ℕ, C ≤ Real.l
   obtain ⟨C, hC, h⟩ := lower_bound_whp
   refine ⟨2 * C, by positivity, ?_⟩
   intro n hL k hk x hq T hT
-  have hn1 : 1 < n := one_lt_of_log (by positivity) hL
+  have hn1 : 1 < n := one_lt_n_of_log (by positivity) hL
   haveI : NeZero n := ⟨by omega⟩
   have hn0 : (0 : ℝ) < n := by exact_mod_cast (show 0 < n by omega)
   have hk' : C * k ≤ ((n : ℝ) / Real.log n) ^ ((1 : ℝ) / 6) :=

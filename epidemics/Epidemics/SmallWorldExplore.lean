@@ -12,9 +12,9 @@ queue.
 Every discovered node `y ≠ s` carries the weight `h e` of the pair `e` through which it was
 discovered (the root carries `w₀`). If the expected weight discovered from a node of weight `w`
 is at most `λ w` (hypothesis `hstep`, with `κ λ ≤ 1`, the subcritical condition), the potential
-`exp θ (discovered weight − κ λ · processed weight)` is a supermartingale
-(`expect_prod_hist_le_one_of_fresh`); a cluster with more than `t` nodes forces `t` processed
-nodes and a large potential, whence, by Markov's inequality (`prob_cluster_gt_le`),
+`exp θ (discovered weight − κ λ · processed weight)` is a supermartingale (the core's
+`Distribution.expect_prod_hist_le_one_of_fresh`); a cluster with more than `t` nodes forces `t`
+processed nodes and a large potential, whence, by Markov's inequality (`prob_cluster_gt_le`),
 `P(|C(s)| ≥ t + 1) ≤ exp (-θ ((1 - κ λ) t w_min - w_max))`.
 
 For `SWG(n, c/n)` the weights distinguish nodes reached through a cycle edge from nodes reached
@@ -575,7 +575,7 @@ theorem prob_cluster_gt_le (r : Sym2 V → ℝ) (hr0 : ∀ e, 0 ≤ r e) (hr1 : 
   have hh0 : ∀ e, 0 ≤ h e := fun e => hwmin.trans (hh e).1
   have hM : P.expect (fun ω => histProd (obs (G := G) (h := h) s w₀)
       (fac (G := G) (h := h) θ (κ * lam) s w₀) ω 0 t) ≤ 1 := by
-    refine expect_prod_hist_le_one_of_fresh _ (obs (G := G) (h := h) s w₀)
+    refine Distribution.expect_prod_hist_le_one_of_fresh _ (obs (G := G) (h := h) s w₀)
       (fun l => block G (state G h s w₀ l)) (fun l ω ω' hag => ?_)
       (fun l => block_fresh s w₀ l) _ (fac_nonneg θ (κ * lam) s w₀)
       (fun l => expect_fac_le_one r hr0 hr1 hh0 (fun e => (hh e).2) hθ hθκ hκ2 s w₀ hstep l) t

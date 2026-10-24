@@ -191,12 +191,6 @@ lemma dotProduct_lap_le (z : V → ℝ) :
     ring
   linarith
 
-omit hG in
-lemma dotProduct_lap_nonneg (z : V → ℝ) : 0 ≤ z ⬝ᵥ (G.lapMatrix ℝ *ᵥ z) := by
-  have h := sum_dart_sq G z
-  have : 0 ≤ ∑ e : G.Dart, (z e.fst - z e.snd) ^ 2 := Finset.sum_nonneg fun _ _ => sq_nonneg _
-  linarith
-
 lemma lam3_le_two (h3 : ThirdEigenvalueLB G V₁ d lam3) : lam3 ≤ 2 := by
   have hcard : 1 < #V₁ := by have := hG.card_eq; have := hG.four_le_card; omega
   obtain ⟨a, ha, c, hc, hac⟩ := Finset.one_lt_card.mp hcard

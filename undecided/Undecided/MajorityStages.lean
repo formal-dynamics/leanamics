@@ -79,13 +79,6 @@ lemma one_le_pot {x : Config n} (hx : x ∉ allA n) : 1 ≤ pot x := by
   | b => have := hpos .b h; linarith
   | u => have := hpos .u h; linarith
 
-/-- Rounds do not move a monochromatic configuration. -/
-lemma foldl_of_mono {x : Config n} (hx : Mono x) (l : List (Fin n → Fin n)) :
-    l.foldl step x = x := by
-  induction l with
-  | nil => rfl
-  | cons r l ih => simp only [List.foldl_cons, step_of_mono x hx r, ih]
-
 /-! ### Missing probabilities
 
 The general facts (`Dynamics.missProb_succ`, `_nonneg`, `_le_one`, `_mono`, `_comp`) are stated
@@ -105,10 +98,6 @@ lemma step_mem_allA {y : Config n} (hy : y ∈ allA n) (r : Fin n → Fin n) :
   have hm : Mono y := ⟨.a, fun v => by rw [show y = fun _ => .a from hy]⟩
   rw [step_of_mono y hm r]
   exact hy
-
-/-- Once all nodes hold `a`, they keep it. -/
-lemma missP_allA_of_mem {y : Config n} (hy : y ∈ allA n) (T : ℕ) : missP (allA n) T y = 0 :=
-  missProb_of_closed step (fun _ hy r => step_mem_allA hy r) hy T
 
 /-- The probability of not being all-`a` does not increase with time. -/
 lemma missP_allA_antitone [NeZero n] (x : Config n) {T T' : ℕ} (h : T ≤ T') :

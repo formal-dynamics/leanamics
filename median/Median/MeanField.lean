@@ -5,8 +5,8 @@ import Dynamics.MajorityMap
 
 With two values, one synchronous round of the median rule (`Median.kernel n Bool`), which is
 2-Choices with two colours (`TwoChoices.kernel_bool`), maps the fraction `p` of nodes holding
-`true` to `3p² - 2p³` in expectation (`kernel_meanField` and `TwoChoices.kernel_meanField`:
-`expected_ones` stated as a `Dynamics.Kernel.MeanField`). This is the majority map
+`true` to `3p² - 2p³` in expectation (`kernel_meanField`: `expected_ones` stated as a
+`Dynamics.Kernel.MeanField`). This is the majority map
 `Dynamics.majorityMap`, the mean-field map of binary 3-Majority (`Plurality.binKernel_meanField`):
 the two dynamics share their mean-field map, but not their chains, since a node keeps its own
 opinion unless its two samples agree, while under 3-Majority it ignores its own opinion (from two
@@ -36,14 +36,6 @@ theorem kernel_bool (n : ℕ) [NeZero n] : kernel n Bool = Median.kernel n Bool 
   have h : (step : Config n Bool → Round n → Config n Bool) = Median.step :=
     funext fun x => funext fun r => step_bool x r
   simp only [kernel, Median.kernel, h]
-
-/-- **The mean-field map of synchronous binary 2-Choices is the majority map.** One round maps the
-fraction `p` of nodes holding `true` to `3p² - 2p³` in expectation. -/
-theorem kernel_meanField (n : ℕ) [NeZero n] :
-    (kernel n Bool).MeanField (fun x (_ : Unit) => (count x true : ℝ) / n)
-      fun u _ => majorityMap (u ()) := by
-  rw [kernel_bool]
-  exact Median.kernel_meanField n
 
 end TwoChoices
 end Median

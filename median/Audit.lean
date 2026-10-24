@@ -8,7 +8,6 @@ import Median
 #print axioms Median.expected_ones
 #print axioms Median.kernel_meanField
 #print axioms Median.TwoChoices.kernel_bool
-#print axioms Median.TwoChoices.kernel_meanField
 #print axioms Median.absorbed
 #print axioms Median.consensus_whp
 #print axioms Median.binary_any_start
@@ -50,7 +49,6 @@ import Median
 #print axioms Median.TwoChoices.expected_gap
 #print axioms Median.TwoChoices.expected_gap_ge
 #print axioms Median.TwoChoices.absorbed
-#print axioms Median.TwoChoices.two_colours_consensus_whp
 #print axioms Median.TwoChoices.finish_phase
 #print axioms Median.TwoChoices.distance_increases
 #print axioms Median.TwoChoices.count_stochDom

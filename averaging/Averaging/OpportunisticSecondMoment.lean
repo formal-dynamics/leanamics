@@ -155,7 +155,7 @@ theorem expList_secondMoment_le (hl3 : 0 < lam3) (hN : (8 : ℝ) ≤ Fintype.car
           (2 * (Fintype.card V * cutCoef V₁ x ^ 2) + 2 * cutDevBound (Fintype.card V) (2 * b / d)
             lam3 (Fintype.card V * cutCoef V₁ x ^ 2) (restSq V₁ x) T) := by
   haveI := hG.nonempty_dart
-  have hNpos : (0 : ℝ) < Fintype.card V := hG.card_real_pos
+  have hNpos : (0 : ℝ) < Fintype.card V := hG.card_pos_real
   have hl3le := hG.lam3_le_two h3
   set N : ℝ := (Fintype.card V : ℝ) with hN_def
   set l2 : ℝ := 2 * b / d with hl2_def
@@ -302,13 +302,13 @@ lemma cutCoef_sq_add_restSq_signVec_le (σ : V → ℤˣ) :
 
 lemma card_mul_cutCoef_sq (x : V → ℝ) :
     Fintype.card V * cutCoef V₁ x ^ 2 = (∑ v, cutVec V₁ v * x v) ^ 2 / Fintype.card V := by
-  have hn := hG.card_real_pos
+  have hn := hG.card_pos_real
   rw [cutCoef, avg]; field_simp
 
 /-- `E ‖y⁽⁰⁾‖² = 1` for uniform initial signs. -/
 lemma avg_cutCoef_sq_signVec :
     avg (fun σ : V → ℤˣ => Fintype.card V * cutCoef V₁ (signVec σ) ^ 2) = 1 := by
-  have hn := hG.card_real_pos
+  have hn := hG.card_pos_real
   simp_rw [hG.card_mul_cutCoef_sq, div_eq_mul_inv]
   rw [show (fun σ : V → ℤˣ => (∑ v, cutVec V₁ v * signVec σ v) ^ 2 * (Fintype.card V : ℝ)⁻¹) =
       fun σ => (Fintype.card V : ℝ)⁻¹ * (∑ v, cutVec V₁ v * signVec σ v) ^ 2 from
@@ -333,7 +333,7 @@ theorem expList_sum_sq_dev_signVec_le (hl3 : 0 < lam3) (hN : (8 : ℝ) ≤ Finty
         Fintype.card V * (1 - lam3 / Fintype.card V) ^ T +
         2 * ((2 * b / d) / lam3) * (Fintype.card V * cutCoef V₁ (signVec σ) ^ 2) := by
   haveI := hG.nonempty_dart
-  have hNpos := hG.card_real_pos
+  have hNpos := hG.card_pos_real
   have hl3le := hG.lam3_le_two h3
   obtain ⟨hY, hZ⟩ := hG.expList_secondMoment_le h3 hl3 hN (signVec σ) T
   simp_rw [sum_sq_dev_eq hG (signVec σ)]
@@ -424,7 +424,7 @@ theorem secondMoment_bound_aux
     avg (fun σ : V → ℤˣ => expList G.Dart T fun l =>
       ∑ v, (projCut V₁ (avgRun G (signVec σ) l) v + projRest V₁ (avgRun G (signVec σ) l) v -
         projCut V₁ (signVec σ) v) ^ 2) ≤ 3 * (2 * b / d) * T / Fintype.card V := by
-  have hNpos := hG.card_real_pos
+  have hNpos := hG.card_pos_real
   have hl3le := hG.lam3_le_two h3
   have hl2N := hG.two_div_card_lt
   set N : ℝ := (Fintype.card V : ℝ) with hN_def

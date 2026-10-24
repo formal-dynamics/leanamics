@@ -19,9 +19,9 @@ Where the statements of `dynamics/` deviate from their sources, and why.
 5. **No paper numbering.** `dynamics/` is a generic library without a source paper (see the
    abstract of its blueprint); the docstrings cite the dynamics blueprint labels
    (`def:avg`, `lem:uniform-trajectory`, `lem:uniform-agreement`, `lem:weighted-product`).
-6. **`RumorPush.expList_eq_avg_ofFn` is kept although it is a verbatim duplicate**, because the
-   blueprint of the library `RumorSpread` (in `epidemics/`) presents it as a theorem
-   ("Faithfulness of the model"); it is a one-line alias of `Dynamics.expList_eq_avg_ofFn`.
+6. **The blueprint of the library `RumorSpread` (in `epidemics/`) tags the core's
+   `Dynamics.expList_eq_avg_ofFn`** for its theorem "Faithfulness of the model"; the library has no
+   copy of it.
 7. **The copyright-header linter is disabled** (`weak.linter.style.header = false` in the
    lakefile of `plurality/` and for the library `RumorSpread` of `epidemics/`, which enable
    Mathlib's standard linter set). It accepts only Mathlib's Apache 2.0 header, while the
@@ -29,7 +29,7 @@ Where the statements of `dynamics/` deviate from their sources, and why.
 8. **`ThreeMajority.avg` is an `abbrev`, not an `export`.** An `export Dynamics (avg)` alias is
    not a constant, and the plurality blueprint's `\lean{ThreeMajority.avg}` is checked with
    `Environment.contains`; the reducible abbreviation keeps the name and removes the copy. The
-   23 `ThreeMajority.avg_*`/`expList_*` wrappers stay (one-line proofs by the `Dynamics`
+   21 `ThreeMajority.avg_*`/`expList_*` wrappers stay (one-line proofs by the `Dynamics`
    lemmas, tagged in the blueprint, needed by `rw` on `ThreeMajority.avg` terms).
 9. **Not yet consolidated:** a few generic lemmas re-proved in moran, voter and undecided
    (see the section on tail bounds below), and the single-copy independence lemmas
