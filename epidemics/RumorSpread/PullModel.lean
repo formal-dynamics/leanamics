@@ -8,8 +8,8 @@ import RumorSpread.PullFoldl
 The random phone call model of Karp, Schindelhauer, Shenker and Vöcking [KSSV00, §1.2]: in
 every round each node `v` calls a random partner `r v`, and the rumor may travel along the call
 in either direction. We reuse the round configurations `Tgt n` of the PUSH development
-(`Model.lean`: every node calls a uniformly random *other* node, as in [FG85]), so that the three
-protocols are driven by the same random calls:
+(`Model.lean`: every node calls a uniformly random *other* node, whereas [KSSV00] and [FG85]
+allow self-calls), so that the three protocols are driven by the same random calls:
 
 * PUSH (`step`, in `Model.lean`): an informed caller informs its callee;
 * PULL (`pullStep`): an uninformed caller learns the rumor if its callee is informed;

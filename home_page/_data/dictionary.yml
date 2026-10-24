@@ -1767,13 +1767,12 @@ rows:
     leanamics:
       status: proved
       summary: >-
-        The duality on every finite graph and for every $k$, pathwise and by time reversal of
-        i.i.d. rounds (EPI-4). As a duality of kernels (`Dynamics.Kernel.Dual`), when rounds
-        exist (every vertex has a neighbour to sample), COBRA stopped when it visits $v$ and BIPS
-        with source $v$, on the sets that contain $v$, are dual with respect to
-        $1\{C \cap A = \emptyset\}$ (`Epidemics.cobra_bips_dual`), which gives the theorem again
-        by the Markov property, as in the source's induction on $t$. The COBRA cover time and the
-        BIPS infection time on regular expanders.
+        The duality on every finite graph without isolated vertices and for every $k$, pathwise and
+        by time reversal of i.i.d. rounds (EPI-4). As a duality of kernels (`Dynamics.Kernel.Dual`),
+        COBRA stopped when it visits $v$ and BIPS with source $v$, on the sets that contain $v$,
+        are dual with respect to $1\{C \cap A = \emptyset\}$ (`Epidemics.cobra_bips_dual`), which
+        gives the theorem again by the Markov property, as in the source's induction on $t$. The
+        COBRA cover time and the BIPS infection time on regular expanders.
       correspondence:
         - Epidemics.cobra_bips_duality
         - Epidemics.cobra_bips_duality_singleton
