@@ -43,15 +43,15 @@ ROOT = Path(__file__).resolve().parent.parent
 
 # Package directory -> main result (LaTeX), in the order of the rows.
 PACKAGES = {
-    "dynamics": r"shared finite probability layer (Section~\ref{sec:layer})",
-    "voter": r"Hassin--Peleg; consensus times on $K_n$ and any graph",
-    "moran": r"isothermal theorem; push vs pull; the star amplifier",
-    "plurality": r"$k$ colors: vanishing bias, any start; lower bounds",
-    "median": r"2-Choices: any start, adversary, expanders, $k$ colors",
-    "undecided": r"majority; $k$ colors, upper and lower bounds",
-    "averaging": r"convergence and its rate; community reconstruction",
-    "epidemics": r"Reed--Frost, percolation, COBRA, SIR; rumors on $K_n$",
-    "crn": r"CRNs as protocols; stable computation; exact majority",
+    "dynamics": r"shared finite probability layer; \code{finite\_absorption} (Sec.~\ref{sec:layer})",
+    "voter": r"Hassin--Peleg; consensus times on $K_n$ and any graph; \code{consensus\_probability}, \code{voter\_consensus\_whp} (Sec.~\ref{sec:voter})",
+    "moran": r"isothermal theorem; push vs pull; the star amplifier; \code{isothermal}, \code{pull\_fixation} (Sec.~\ref{sec:moran})",
+    "plurality": r"$k$ colors: vanishing bias, any start; lower bounds; \code{theorem\_3\_8} (Sec.~\ref{sec:plurality})",
+    "median": r"2-Choices: any start, adversary, expanders, $k$ colors; \code{consensus\_whp} (Sec.~\ref{sec:plurality})",
+    "undecided": r"majority; $k$ colors, upper and lower bounds; \code{majority\_whp\_abs} (Sec.~\ref{sec:und-avg})",
+    "averaging": r"convergence and its rate; community reconstruction; \code{tendsto\_degAvg} (Sec.~\ref{sec:und-avg})",
+    "epidemics": r"Reed--Frost, percolation, COBRA, SIR; rumors on $K_n$; \code{infected\_iff}, \code{push\_informs\_all\_whp} (Sec.~\ref{sec:rumor}, \ref{sec:epidemics})",
+    "crn": r"CRNs as protocols; stable computation; exact majority; \code{ppStepKernel\_sameJumpChain} (Sec.~\ref{sec:dictionary})",
 }
 
 THEOREM_KEYWORDS = ["theorem", "lemma"]
@@ -163,7 +163,8 @@ def tex_name(pkg):
     return r"\code{" + pkg.replace("_", r"\_") + "}"
 
 
-CAPTION = (r"Sizes of the packages, in the Lean modules that \code{lake build} builds: all lines "
+CAPTION = (r"The packages: their main results, with the Lean names of the theorems discussed in the "
+           r"paper and the section that discusses them, and their sizes, in the Lean modules that \code{lake build} builds: all lines "
            r"(comments and blank lines included); theorems (\code{theorem}, \code{lemma}); "
            r"definitions (\code{def}, \code{abbrev}, \code{structure}, \code{inductive}, "
            r"\code{class}, \code{instance}), with any modifiers; \code{example} blocks are not counted.")

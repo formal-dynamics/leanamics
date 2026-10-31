@@ -45,7 +45,11 @@ row, naming the row and giving the cells to show), as a portrait float with a co
 field that has a cell; the full dictionary, with the correspondences known from the literature but
 not formalized, stays on the website.
 
-The table needs the packages `booktabs`, `array`, `afterpage` and `pdflscape` (or `lscape`, which
+`--check` checks that every `paper_formal` entry lists, under `lean`, declarations of its row's
+`leanamics.correspondence` (themselves checked against the sources, see below), and that the
+table fits the text width.
+
+Without `--formal`, the table needs the packages `booktabs`, `array`, `afterpage` and `pdflscape` (or `lscape`, which
 rotates the page in print but not on screen), and `amssymb` for `\\checkmark`.
 """
 import argparse
@@ -221,20 +225,32 @@ def formal_table(data):
 
 
 def check_formal(data, refs, fields):
+    """Problems of `paper_formal`: every entry names a row with formal content, every cell is
+    backed by declarations of that row's `leanamics.correspondence`, and the table fits."""
     problems = []
     rows = {r["id"]: r for r in data["rows"]}
+    seen = set()
     for e in data.get("paper_formal", []):
         rid = e.get("row")
         if rid not in rows:
             problems.append(f"paper_formal: unknown row {rid}")
             continue
+        if rid in seen:
+            problems.append(f"paper_formal: row {rid} listed twice")
+        seen.add(rid)
+        corr = rows[rid]["leanamics"].get("correspondence", [])
+        if not e.get("lean"):
+            problems.append(f"paper_formal.{rid}: no `lean` declarations")
+        for n in e.get("lean", []):
+            if n not in corr:
+                problems.append(f"paper_formal.{rid}: {n} is not in the row's correspondence list")
         if rows[rid]["leanamics"]["status"] not in FORMAL_STATUSES:
             problems.append(f"paper_formal.{rid}: status {rows[rid]['leanamics']['status']} "
                             "has no formal content")
         if "relation" not in e or "dc" not in e:
             problems.append(f"paper_formal.{rid}: needs dc and relation")
         for k, v in e.items():
-            if k in ("row", "cite"):
+            if k in ("row", "cite", "lean"):
                 continue
             if k not in fields + ["relation"]:
                 problems.append(f"paper_formal.{rid}: unknown key {k}")
@@ -243,9 +259,22 @@ def check_formal(data, refs, fields):
         for f, ks in e.get("cite", {}).items():
             if f not in fields:
                 problems.append(f"paper_formal.{rid}.cite: unknown field {f}")
+            elif f not in e:
+                problems.append(f"paper_formal.{rid}.cite: citation for {f}, which has no cell")
             for key in ks:
                 if key not in refs:
                     problems.append(f"paper_formal.{rid}: unknown reference {key}")
+    if data.get("paper_formal"):
+        missing = [k for k in fields if k not in FORMAL_WIDTHS]
+        if missing:
+            problems.append(f"paper_formal: no column width for the fields {missing}")
+        else:
+            cols = formal_fields(data) + ["relation"]
+            width = sum(FORMAL_WIDTHS[k] for k in cols) + (len(cols) - 1) * 5 / 72.27 * 2.54
+            if width > 16.0:
+                problems.append(f"paper_formal: the table is {width:.2f} cm wide, more than 16 cm")
+        if "paper_formal_caption" not in data:
+            problems.append("paper_formal: no paper_formal_caption")
     return problems
 
 
@@ -498,6 +527,10 @@ def main():
         print("cited keys not in the paper's bibliography: " + (", ".join(new) or "none"),
               file=sys.stderr)
 
+    if args.formal:
+        problems = check_formal(data, refs, [f["key"] for f in data["fields"]])
+        if problems:
+            sys.exit("paper_formal: " + "; ".join(problems))
     tex = formal_table(data) if args.formal else table(data)
     if args.table:
         Path(args.table).write_text(tex, encoding="utf-8")
