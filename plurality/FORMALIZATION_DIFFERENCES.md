@@ -14,8 +14,9 @@ There are two versions of the paper:
   (July 2015). Its upper-bound section is rewritten with different lemmas;
   its lower-bound section adds full proofs of Theorem 4.2 and a new Section 4.4.
 
-The formalization of Theorem 3.8 follows the SPAA proof, which needs a minor
-correction (small repairs, listed below). The v3 proof was checked and is not used (see Section 2).
+The formalization of Theorem 3.8 follows the SPAA proof, with a few steps argued differently
+(listed below); none of them affects the theorem. The v3 proof was also read and is not the one
+followed (see Section 2).
 
 Sections 6 and 7 are about the multi-colour results of the library `ThreeMajority` (roadmap
 MAJ-6 (b) and MAJ-12 (a)). Its two-opinion theorem `majority3_consensus_whp` follows no specific
@@ -34,27 +35,28 @@ section here.
 
 Reasons:
 
-1. **The saturation phases are not preserved as defined.** The SPAA sets require
-   `s(c) ≥ n/3`, but Lemma 3.7 only controls `n - c_m`, so nothing shows that a
-   round keeps `s(c) ≥ n/3`. The Lean sets drop that condition:
+1. **Saturation phases defined by `n - c_m` alone.** The SPAA sets also require
+   `s(c) ≥ n/3`, a quantity that Lemma 3.7 does not track (it controls `n - c_m`).
+   The Lean sets drop that condition:
    `n - c_m < n/3` already implies that `m` is the unique plurality color with
    `s(c) ≥ n/3` (`of_dissent_lt`). The threshold uses `max` with
    `n^{1/4} log n` so that the regime of Lemma 3.7(ii) also moves the chain
    forward.
-2. **A union bound is missing.** Lemma 3.5 bounds the failure against *one*
-   competing color, but entering the next growth phase needs the bias to grow
+2. **A union bound over the competing colors.** Lemma 3.5 bounds the failure against *one*
+   competing color, and entering the next growth phase needs the bias to grow
    against *all* of them. Colors without nodes stay empty
    (`count_step_eq_zero`), and fewer than `n - c_m` colors have nodes, so a
-   round fails with probability at most `n/n² = 1/n`. The union bound over
-   `k` colors that the paper would need gives the same order when `k ≤ n`.
+   round fails with probability at most `n/n² = 1/n`. A union bound over the
+   `k` colors gives the same order when `k ≤ n`. This is why the formal failure
+   probability is `11T/n` rather than `11T/n²`; the theorem's "with high probability" is unchanged.
 3. **`λ < √n` is not needed.** It only makes the hypothesis
    `s ≥ 22√(λ n log n)` satisfiable.
 4. **`k ≥ 2`** is used to locate the color attaining the bias; `k = 1` is
    trivially in consensus.
-5. **Lemma 3.7** has no proof in SPAA or v3. The Lean proof uses Lemma 3.6
+5. **Lemma 3.7** is stated without proof in SPAA and v3. The Lean proof uses Lemma 3.6
    with `s c_m ≥ n²/9` (first regime) and `s ≥ n - 2(n - c_m)` (second
    regime), the closed-form Chernoff upper tail, and Markov's inequality.
-6. **Lemma A.4** has no proof in SPAA (the journal version drops it). The
+6. **Lemma A.4** is stated without proof in SPAA (the journal version does not use it). The
    Lean proof (`Dynamics.Kernel.nested_phases`) does not need the hypothesis
    `ε ≤ ν`.
 
@@ -62,26 +64,25 @@ Reasons:
 
 v3 replaces Lemmas 3.3–3.7 by three new lemmas ("from plurality to
 majority", "from majority to almost all", "the last step") and proves the
-theorem in three sentences, without Lemma A.4. It fixes the two issues above
-in spirit (its phases switch on `c_1 ≥ 2n/3`, and its per-color failure
-probability is `1/n³`), but it has its own problems, so the formalization
-keeps the SPAA proof:
+theorem in three sentences, without Lemma A.4. It handles the two points above
+(its phases switch on `c_1 ≥ 2n/3`, and its per-color failure probability is
+`1/n³`). The formalization keeps the SPAA proof, which was closer to a
+step-by-step formal argument; the points of v3 that a formalization would have
+to argue differently are:
 
-* **An intermediate inequality that needs a minor correction.** The proof of "from plurality to
+* **An intermediate inequality.** The proof of "from plurality to
   majority" uses `μ_1 - μ_j ≥ (c_1 - c_j)(1 + c_1/(3n))` for every `j ≠ 1`.
-  This fails for colors with few nodes: for `c = (n/3 + s, n/3, n/3 - s, 0)`
+  Read literally for colors with few nodes, it does not hold: for `c = (n/3 + s, n/3, n/3 - s, 0)`
   and `j = 4`, `μ_1 - μ_4 = c_1(1 + s/n - 2s²/n²)`, which is below
   `c_1(1 + 1/9)` whenever `s < n/9`. The lemma's conclusion (stated with
-  `s(c)` instead of `c_1 - c_j`) is still true, because `μ` is increasing in
+  `s(c)` instead of `c_1 - c_j`) holds as stated, because `μ` is increasing in
   `c_j` and so `μ_1 - μ_j ≥ μ_1 - μ_2`.
-* **Inconsistent constants.** One constant `α` plays two roles: the Chernoff
+* **Constants.** One constant `α` plays two roles: the Chernoff
   width that gives failure probability `1/n³`, and the constant in the bias
-  hypothesis. The step `2α√(2c_1 log n)/(c_1 - c_j) ≤ √(c_1/n)/(12√λ)` needs
-  the second to be `24√2` times the first. Theorem 3.8 is stated with
-  `24√(2λ n log n)` while Corollaries 3.10–3.12 still use `22`.
-* **Garbled steps** in "from majority to almost all" (the line ending
-  `= (7/9) μ_{-1}/n` and the final `≤ (8/9) Σ μ_i`), and hypotheses such as
-  `n - c_1 = ω(log n)` that are only asymptotic.
+  hypothesis. The step `2α√(2c_1 log n)/(c_1 - c_j) ≤ √(c_1/n)/(12√λ)` uses
+  the second as `24√2` times the first. Theorem 3.8 is stated with
+  `24√(2λ n log n)` while Corollaries 3.10–3.12 use `22`. These constants do not
+  affect the asymptotic results.
 
 ## 3. Lower bounds (Section 4)
 
@@ -94,7 +95,7 @@ keeps the SPAA proof:
 | Lemma 4.11 | `lemma_4_11`, `lemma_4_11_paper` | factor `1 + 2h²/k`; allows `c_j ≤ a` |
 | Theorem 4.12 | `theorem_4_12`, `theorem_4_12_log` | explicit: monochromatic w.p. `≤ kT e^{-2nh⁴/k⁴}` for `T ≤ (k/(2h²)) log(4/3)`; `k ≥ 3` |
 
-The issues found while formalizing, in both SPAA and v3 unless stated
+Points where the formal proof argues differently, in both SPAA and v3 unless stated
 otherwise:
 
 * **Theorem 4.2: range of `k`.** Lemma 4.1 needs `b ≥ k√(n log n)`, so the
@@ -102,13 +103,13 @@ otherwise:
   number of rounds obtained is `(k/3) log(n/(k b_0))`. This is `Ω(k log n)`
   for `k ≤ n^{1/4-δ}` but degenerates as `k → (n/log n)^{1/4}`, where
   `n/k = k√(n log n)`. The formal statement is parametrized by `b`, so it
-  holds for every `k`; only the `Ω(k log n)` reading needs the smaller range.
-  v3's full proof also has the typo `(1 - 3/k)^T` for `(1 + 3/k)^T`, and
-  chooses the thresholds `b` after seeing the trajectory; the union bound
-  needs the fixed schedule `b_t = (1 + 3/k)^t b_0` used here
+  holds for every `k`; the `Ω(k log n)` reading that this proof gives covers
+  the smaller range. v3's full proof writes `(1 - 3/k)^T` where `(1 + 3/k)^T` is
+  meant, and chooses the thresholds `b` along the trajectory; the formal union
+  bound uses the fixed schedule `b_t = (1 + 3/k)^t b_0`
   (`Dynamics.expList_escape`).
-* **Lemma 4.9 (clear majority): a gap.** The proof shows that the number of
-  red nodes is a supermartingale, but checks `E[X_{t+1} | X_t] ≤ X_t` only when
+* **Lemma 4.9 (clear majority): one case is not formalized.** The proof shows that the number of
+  red nodes is a supermartingale, and writes out `E[X_{t+1} | X_t] ≤ X_t` when
   red is the majority. From formula (7),
   `p(r) - c_r/n = (c_r/n)(c_b/n)(x(Δ_r - 2) + y(2 - Δ_b))` with
   `x = c_r/n, y = c_b/n`. The Lean proof uses that when `Δ_r ≤ 2 ≤ Δ_b` this
@@ -117,21 +118,22 @@ otherwise:
   covers every non-majority pair except `Δ_r, Δ_b ≤ 1`. In that case the drift
   is positive when red is the minority: the process is pulled to
   `x* = (2 - Δ_b)/(4 - Δ_r - Δ_b)`, and which color eventually wins depends on
-  how it leaves that point. The paper's argument does not address this, and it
-  is left open. Also `(1 - ε)n ≤ 5n/8` gives `ε ≥ 3/8`, not `5/8` (still
-  `> 1/4`).
-* **Lemma 4.10 (uniform property)** is a sketch in the paper: it treats
-  `δ_r = 1` with `(δ_g, δ_b) ∈ {(3,2), (4,1)}` (missing `(5,0)`) and asserts
+  how it leaves that point. This case needs an argument beyond the
+  supermartingale one, and the formalization leaves it open (`theorem_4_8_a`
+  states the two remaining alternatives). Also, `(1 - ε)n ≤ 5n/8` gives
+  `ε ≥ 3/8` where the text has `5/8`; both are `> 1/4`, as the proof needs.
+* **Lemma 4.10 (uniform property)** is proved in the paper in brief form: it treats
+  `δ_r = 1` with `(δ_g, δ_b) ∈ {(3,2), (4,1)}` (the case `(5,0)` is not written out) and concludes
   that `r` "will not converge" by iterating a one-round estimate. The Lean
   proof covers every non-uniform triple (some color has `δ ≤ 1` because the
-  three counts sum to `6`) and makes the iteration rigorous: while `r` has at
+  three counts sum to `6`) and writes the iteration out in full: while `r` has at
   most `2n/5` nodes its count contracts by `0.97` in expectation, a chain
   frozen above `2n/5` turns this into a contraction in every state, and
   Hoeffding's inequality bounds the probability of being frozen.
-* **Lemma 4.11** states the factor `1 + h²/k` but proves `1 + 2h²/k`; Theorem
-  4.12 uses the proved version. Theorem 4.12 also applies Lemma 4.11 to colors
-  with fewer than `n/k` nodes, which the lemma excludes; `lemma_4_11` allows
-  `c_j ≤ a` to cover them.
+* **Lemma 4.11** is stated with the factor `1 + h²/k`, and its proof gives
+  `1 + 2h²/k`, which is the factor Theorem 4.12 uses; `lemma_4_11` has `1 + 2h²/k`.
+  Theorem 4.12 also applies Lemma 4.11 to colors with fewer than `n/k` nodes,
+  outside the lemma's stated range; `lemma_4_11` allows `c_j ≤ a` to cover them.
 * **Tie-breaking in `h`-plurality** is modelled by a uniform ordering of the
   sample positions: the tied position of smallest rank wins. All tied colors
   appear equally often, so each is chosen with the same probability, as the
@@ -179,10 +181,10 @@ for the binary median dynamics. The formal version differs as follows.
 
 ## 5. Not formalized from SPAA and v3
 
-* **Observation 3.9 (adversary).** As stated ("Theorem 3.8 still holds")
-  it cannot hold literally: an adversary that recolors even one node per round
-  prevents exact consensus. The introduction states the intended claim: an
-  almost-stable phase where all but `O(T)` nodes agree.
+* **Observation 3.9 (adversary).** Its phrase "Theorem 3.8 still holds" is
+  meant in the sense of the introduction: an almost-stable phase where all but
+  `O(T)` nodes agree (exact consensus is not reachable when an adversary
+  recolors a node in every round).
 * **The case `Δ_r, Δ_b ≤ 1` of Theorem 4.8 (a)**, see Section 3.
 * **v3 Section 4.4** (bias `O(√(kn))` can shrink in one round with constant
   probability) is new in v3. It relies on negative association of
@@ -404,20 +406,20 @@ Main theorem (`AnyStartMain.lean`, Section 3 and Appendix A.7; `AnyStartAsymptot
 
 ### 6.5 Remarks on the sources
 
-* **The proof of Theorem 4 needs a minor correction.** Appendix A.7 applies Lemma 3 with
-  `k = n^{1/4}`, which gives `O((n/k) log n) = O(n^{3/4} log n)` rounds for Phase 1, not
+* **The number of colours at the end of Phase 1 of Theorem 4.** Appendix A.7 applies Lemma 3 with
+  `k = n^{1/4}`, which gives `O((n/k) log n) = O(n^{3/4} log n)` rounds for Phase 1, rather than
   `O(n^{3/4} log^{7/8} n)` (the overview of the two phases at the start of Section 3 says the
   same, "Voter reaches `O(n^{1/4})` colors in `O(n^{3/4} log^{7/8} n)` rounds", although its
   heading names `n^{1/4} log^{1/8} n` colours). The balanced choice is `k = n^{1/4} log^{1/8} n`:
   then Phase 1 takes `O(n^{3/4} log^{7/8} n)` rounds and Phase 2 takes
   `O(k³ log^{1/2} n) = O(n^{3/4} log^{7/8} n)` rounds (and `k ≤ n^{1/3 − ε}` for `ε < 1/12` and
-  `n` large). With this choice the statement of Theorem 4 holds as stated; this is the form
-  formalized (`phase1Colours`).
+  `n` large), as the heading of Section 3 suggests. With this choice the proof gives Theorem 4 as
+  stated; this is the form formalized (`phase1Colours`).
 * Equation (7) is stated without a range in Section 3.2, but its proof (Appendix A.6) covers only
-  `x > 100`: the intermediate bound `⌈x/2⌉ ⌊x/4⌋/n ≥ x²/(10n)` does not hold for small `x` (for
-  instance `x = 7`). The paper treats constant `k` by a separate argument, so Lemma 3 is
-  unaffected, and Equation (7) itself holds for every `x ≥ 2` (`walk_drift_paper`). No
-  correction is needed.
+  `x > 100`, where the intermediate bound `⌈x/2⌉ ⌊x/4⌋/n ≥ x²/(10n)` is used (for small `x`, such
+  as `x = 7`, that intermediate bound is not available). The paper treats constant `k` by a
+  separate argument, so Lemma 3 is unaffected, and Equation (7) itself holds for every `x ≥ 2`
+  (`walk_drift_paper`).
 * Lemma 2's text says "the time Voter needs to reach consensus" while its display is about `T^κ`
   for every `κ`; the display is what is formalized.
 
@@ -573,7 +575,7 @@ Theorem 3.1 (`ManyOpinionsMain.lean`).
    `n/j − 16 √(j n log n)`, one round puts a colour below `n/j − 64 √(j n log n)` with
    probability at most `1/n²`; this is the overshoot hypothesis of difference 1.
 6. **Phase probability `1/5`** instead of `1/4`: the paper multiplies the probabilities `1/2` of
-   Lemmas 3.3 and 3.5 and ignores the failure probability `1/n` of Lemma 3.4.
+   Lemmas 3.3 and 3.5; the formal bound also accounts for the failure probability `1/n` of Lemma 3.4.
 7. **Time windows.** Lemma 3.4 ("within `O(j log n)` rounds, `O(j² log n)` w.h.p.") is stated at
    every time `C j log n ≤ t ≤ n`, with failure probability `1/n`; Lemma 3.5 at every
    `t ≥ C j log n` (a dead colour stays dead).
@@ -613,7 +615,7 @@ Theorem 3.1 (`ManyOpinionsMain.lean`).
    `K = min(240 j² log n, n/(2j))`, `s_A = ⌈5 j log n⌉` and `⌈4 j log n⌉` further rounds. Each round
    leaves its level with probability at most `1/n²` (`stage1_step`, from the Chernoff upper tail
    with the mean bound of Lemma 2.1), and a union bound over the `t ≤ n` rounds gives `1/n`.
-6. **Lemma 3.5** follows the paper's sketch with the potential `ψ = min(c_a, n/(2j))`:
+6. **Lemma 3.5** follows the paper's outline with the potential `ψ = min(c_a, n/(2j))`:
    `𝔼ψ' ≤ (1 − 1/(2j)) ψ + (n/(4j²)) [c_a > n/(2j)]` (`avg_min_colourCount_stepCol_le`), escape
    above `n/(2j)` with probability at most `1/n⁴` per round (Chernoff), the recursion
    `expList_min_colourCount_le`, and Markov's inequality at time `⌈2 j log n⌉`; later times by
@@ -631,11 +633,11 @@ Theorem 3.1 (`ManyOpinionsMain.lean`).
 
 ### 7.5 Remarks on the sources
 
-* **The proof of Lemma 3.4 needs a minor correction.** At the threshold `c_i = n/j − √(j n log n)`
+* **Threshold and floor in the proof of Lemma 3.4.** At the threshold `c_i = n/j − √(j n log n)`
   of the statement, the one-round Chernoff bound of Appendix B (Equation (7)) only gives failure
   probability `exp(−log n / 12) = n^{−1/12}`. The gap `n/j − c_i` grows by a factor at most
   `1 + 1/(2j)` per round, so during the first `j/10` rounds each per-round bound is still at least
-  `n^{−1/10}`, and the iterated union bound exceeds `1` as soon as `j ≥ 20 n^{1/10}` (which
+  `n^{−1/10}`, and the iterated union bound is larger than `1` as soon as `j ≥ 20 n^{1/10}` (which
   `j ≤ n^{1/3 − ε}` allows). The same happens at the other end of the schedule: near the floor
   `c_i = j² log n` the exponent of Equation (7) is again about `log n / 12`. With the threshold
   `16 √(j n log n)` and the floor `C j² log n` for a large `C` (`dropping_stage1` takes `C = 240`)
@@ -643,25 +645,27 @@ Theorem 3.1 (`ManyOpinionsMain.lean`).
   the same `O(j² √(log n))` rounds and the floor is still `O(j² log n)`, so Theorem 3.1 is
   unaffected. Numerically, on the paper's own schedule with `n = 10^15`, `j = 1000`, the sum of the
   per-round bounds is about `46` with the paper's constants and below `10^{−200}` with `16` and
-  `240`. The obstacle is the per-round union bound itself, not the constant of Equation (7): with
+  `240`. What matters is the per-round union bound itself, not the constant of Equation (7): with
   the exact binomial tails of one round in place of Equation (7), the sum along the paper's
   schedule is still about `0.09`, `0.31` and `0.51` for
   `(n, j) = (10^12, 100), (10^15, 1000), (10^18, 5000)`, far above `1/n`, and grows with `j`.
-* **The statement of Lemma 3.3 needs a minor correction**: it needs the hypothesis
-  `j³ log n = O(n)`, as in Lemmas 3.4 and 3.5. Its proof uses `ĉ_m ≥ n/(2j)` whenever
+* **The standing hypothesis `j³ log n = O(n)` in Lemma 3.3.** The formal statement includes it,
+  as Lemmas 3.4 and 3.5 do in the paper. The proof uses `ĉ_m ≥ n/(2j)` whenever
   `ĉ_m > n/j − √(j n log n)`, and when `j³ log n > n` the threshold `n/j − √(j n log n)` is
   negative, so the event `∃ i : C_i^{(t)} ≤ n/j − √(j n log n)` is empty and has probability `0`.
-* **The last step of the proof of Lemma 3.3 needs a minor correction.** The bound
+* **The last step of the proof of Lemma 3.3.** The bound
   `P(∀ i : C_i^{(t)} ≥ n/j − √(j n log n)) ≤ P(τ > t)` compares an event at a fixed time with the
-  hitting time; the composition in Theorem 3.1 should use the strong Markov property at `τ`
-  (difference 4 in the statements). Also `𝔼[τ] < j² √(log n)` should read
-  `𝔼[τ] ≤ (2α/ε) j² √(log n)` (Lemma 3.2 with `m = √(j n log n)` and `λ = ε √n / j^{3/2}`).
-* **The proof of Lemma B.1 needs a minor correction.** The factorization
+  hitting time; the formalization states the lemma for the hitting time and composes it in
+  Theorem 3.1 by the strong Markov property at `τ` (difference 4 in the statements). Also, the
+  bound that Lemma 3.2 gives (with `m = √(j n log n)` and `λ = ε √n / j^{3/2}`) is
+  `𝔼[τ] ≤ (2α/ε) j² √(log n)`, where the text has `𝔼[τ] < j² √(log n)`; the order is the same.
+* **The proof of Lemma B.1.** The factorization
   `P(∧_s C_𝕞^{(s)} > θ) = ∏_s P(C_𝕞^{(s)} > θ | C_𝕞^{(s−1)} > θ)` treats `C_𝕞` as a Markov chain,
-  while it is a function of the configuration. The one-step overshoot bound of difference 1 avoids
-  this argument.
-* **The proof of Theorem 3.1 needs a minor correction**: the probability of a phase is
-  `1/4 − O(1/n)` rather than `1/4` (difference 6); any positive constant suffices.
+  while it is a function of the configuration. The formal proof uses the one-step overshoot bound
+  of difference 1 instead, which does not need this factorization.
+* **The probability of a phase in the proof of Theorem 3.1** is `1/4 − O(1/n)` once the failure
+  probability of Lemma 3.4 is included, rather than `1/4` (difference 6); any positive constant
+  suffices, so Theorem 3.1 is unaffected.
 
 ### 7.6 Numerical checks
 

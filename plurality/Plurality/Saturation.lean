@@ -14,7 +14,7 @@ not support the plurality color `m` decreases geometrically.
   after one more round except with probability `n^{-1/5}`, and the threshold is
   not exceeded again except with probability `1/n²`.
 
-The paper omits the proof of Lemma 3.7; the one here uses Lemma 3.6 with the
+The paper states Lemma 3.7 without proof; the proof here uses Lemma 3.6 with the
 bounds `s cₘ ≥ n²/9` (first regime) and `s ≥ n - 2(n - cₘ)` (second regime),
 the closed-form Chernoff upper tail `Dynamics.avg_chernoff_upper_log`, and Markov's
 inequality `Dynamics.avg_markov_one`. "Sufficiently large `n`" is made explicit as `log n ≥ 40`.

@@ -24,13 +24,13 @@ along one moving target `stage1Level` (`stage1_step`, `Dynamics.expList_escape`)
 iterates the contraction of `min(c_a, n/(2j))` (`expList_min_colourCount_le`, BCNPT16,
 Appendix B) and applies Markov's inequality.
 
-Both assume `C j³ log n ≤ n`, implied by the paper's `j ≤ n^{1/3 − ε}` for large `n`. The proof of
-Lemma 3.4 needs a minor correction: from the paper's threshold `n/j − √(j n log n)` the one-round
-Chernoff bound (Appendix B, Equation (7)) only gives failure probability `n^{-1/12}`, still at least
-`n^{-1/10}` during the first `j/10` rounds, so the iterated union bound exceeds `1` as soon as
-`j ≥ 20 n^{1/10}`, and the same happens near the floor `j² log n`. With the threshold
-`n/j − 16 √(j n log n)` and the floor `C j² log n` for a large `C` the failure is at most `n^{-5}`
-per round.
+Both assume `C j³ log n ≤ n`, implied by the paper's `j ≤ n^{1/3 − ε}` for large `n`. The
+threshold and floor of Lemma 3.4 differ from the paper's: from the threshold
+`n/j − √(j n log n)` the one-round Chernoff bound (Appendix B, Equation (7)) gives failure
+probability `n^{-1/12}`, still at least `n^{-1/10}` during the first `j/10` rounds, so the iterated
+union bound is larger than `1` as soon as `j ≥ 20 n^{1/10}`, and similarly near the floor
+`j² log n`. With the threshold `n/j − 16 √(j n log n)` and the floor `C j² log n` for a large `C`
+the failure is at most `n^{-5}` per round. Theorem 3.1 is unaffected.
 -/
 
 namespace ThreeMajority
@@ -272,8 +272,8 @@ lemma avg_colourCount_stepCol_ge_gap {y : Fin n → Fin n} {a : Fin n} {j : ℕ}
       ≤ g ^ 2 / (32 * j * n) * (2 * (n / j)) := mul_le_mul_of_nonneg_left hsum (by positivity)
     _ = (g / (4 * j)) ^ 2 := by field_simp; ring
 
-/-- The target levels of the proof of Lemma 3.4 (BCNPT16, Appendix B, with the corrections listed
-in `FORMALIZATION_DIFFERENCES.md`):
+/-- The target levels of the proof of Lemma 3.4 (BCNPT16, Appendix B, with the threshold and
+floor described in `FORMALIZATION_DIFFERENCES.md`):
 `max(n/j − m (1 + 1/(4j))^s, (n/(2j)) (1 − 1/(4j))^(s − s_A), K)`. The
 first term is the gap-growth block (until `c_a ≤ n/(2j)`), the second the geometric decrease
 from `n/(2j)` (after round `s_A`), and `K` the floor. -/

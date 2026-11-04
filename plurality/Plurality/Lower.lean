@@ -21,8 +21,8 @@ particular the coloring is not monochromatic when `k ≥ 3`.
 
 Lemma 4.1 needs `b ≥ k √(n log n)`, so the schedule starts at
 `b ≥ max ((n/k)^{1-ε}, k √(n log n))`, and the number of rounds obtained is
-`(k/3) log (n / (k b))`. This is `Ω(k log n)` when `k ≤ n^{1/4 - δ}`, but it
-degenerates as `k` approaches `(n / log n)^{1/4}`, where `n/k = k √(n log n)`.
+`(k/3) log (n / (k b))`. This is `Ω(k log n)` when `k ≤ n^{1/4 - δ}`, and it
+becomes smaller as `k` approaches `(n / log n)^{1/4}`, where `n/k = k √(n log n)`.
 The paper states the theorem for all `k ≤ (n / log n)^{1/4}`; see
 `FORMALIZATION_DIFFERENCES.md`.
 -/
