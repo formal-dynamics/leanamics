@@ -67,10 +67,10 @@ existential:
 | Lemma 7 (plateau): from there, w.h.p. every colour stays at most `2γ n/md(c)` for `Ω(md(c))` rounds | `plateau_step`, `plateau` |
 | SODA 2015, Theorem 8: there is `C` such that, if `log n ≥ C`, `C k ≤ (n / log n)^{1/6}` and there are no undecided nodes, then after every `T ≤ md(x)/C` rounds every colour has at most `C n/md(x)` nodes with probability `≥ 1 - C/n`; if `C(T + 1) ≤ md(x)`, all nodes hold the same colour after `T` rounds with probability at most `C/n` | `lower_bound_whp`, `lower_bound_consensus` |
 
-Lemmas 6 and 7 need minor corrections (a missing factor `n`, the growth factor of Lemma 7, the
-direction of a Cauchy–Schwarz bound, bounds on the largest colour rather than the initial
-plurality); see [`FORMALIZATION_DIFFERENCES.md`](FORMALIZATION_DIFFERENCES.md) for these and the
-proof route, in `Undecided/LowerBound{Basic,Arith,Round,First,DescentCore,Descent,Plateau}.lean`.
+Some steps of the proofs of Lemmas 6 and 7 are formalized differently (in particular, the bounds
+are stated for the largest colour rather than the initial plurality); this does not affect
+Theorem 8. See [`FORMALIZATION_DIFFERENCES.md`](FORMALIZATION_DIFFERENCES.md) for the details and
+the proof route, in `Undecided/LowerBound{Basic,Arith,Round,First,DescentCore,Descent,Plateau}.lean`.
 
 ## Sequential version (UND-2)
 

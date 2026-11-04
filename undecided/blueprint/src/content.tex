@@ -117,10 +117,10 @@ $\mu_q=(q^2+(n-q)^2-\sum_i c_i^2)/n$ undecided nodes (their (3)--(4)). The monoc
 is $\mathrm{md}(c)=\sum_i(c_i/c_1)^2\in[1,k]$, $c_1$ the plurality. For $k=2$ the dynamics is the
 binary one.
 
-The range of $k$ in Theorem~11 of the paper needs a minor correction: its proof invokes Lemma~10,
-which assumes $k=O((n/\log n)^{1/4})$, and the round-by-round argument closes for
-$k\le\varepsilon(\alpha)(n/\log n)^{1/3}$. The formalized statement takes
-$Ck\le(n/\log n)^{1/3}$ with $C=C(\alpha)$
+The formalized statement of Theorem~11 takes $Ck\le(n/\log n)^{1/3}$ with $C=C(\alpha)$, the
+paper's exponent with a sufficiently small constant, which is where the round-by-round argument
+closes. The formal proof does not go through the paper's Lemma~10, which assumes
+$k=O((n/\log n)^{1/4})$
 (\href{https://github.com/formal-dynamics/leanamics/blob/main/undecided/FORMALIZATION_DIFFERENCES.md#the-dynamics-with-k-colours-plurality-roadmap-und-3}{details}).
 
 \begin{theorem}[Model]\label{thm:pmodel}
@@ -179,12 +179,11 @@ there no colour grows faster than by a factor $1+O(1/\mathrm{md})$ per round (Le
 constants are existential, ``w.h.p.'' is $1-C/n$, and $k$ ranges over $Ck\le(n/\log n)^{a}$ with
 the paper's exponent $a$.
 
-Lemmas~6 and~7 need minor corrections: the window $|Q-n/2|\le 2\gamma^2/\mathrm{md}(\bar c)$ should
-read $2\gamma^2n/\mathrm{md}(\bar c)$; the proof of (17) uses the initial instead of the current
-monochromatic distance; in Lemma~7 the growth factor is $1+(4\gamma^2+2\gamma+1)/\mathrm{md}$, the
-lower bound (23) on $E[\Delta']$ reverses the Cauchy--Schwarz inequality, and the proof needs
-$\gamma\ge1$ (any $\gamma>1/2$ would do) rather than an arbitrary $\gamma>0$; and both lemmas must
-bound the largest colour, not only the initial plurality
+Lemmas~6 and~7 are formalized with some differences in the proofs, which do not affect
+Theorem~8: both lemmas bound the largest colour, not only the initial plurality; the window around
+$n/2$ is $|Q-n/2|\le 2\gamma^2n/\mathrm{md}(\bar c)$, as in the proof of Lemma~6; in Lemma~7 the
+growth factor is $1+(4\gamma^2+2\gamma+1)/\mathrm{md}$, and the lemma is stated for $\gamma\ge1$
+(any $\gamma>1/2$ would do), which is what its proof needs
 (\href{https://github.com/formal-dynamics/leanamics/blob/main/undecided/FORMALIZATION_DIFFERENCES.md#the-lower-bound-with-k-colours-lowerbound-roadmap-und-3}{details}).
 
 \begin{lemma}[Ratios and expectations]\label{lem:lb-basic}
@@ -215,7 +214,7 @@ $\mu_m\ge n/k^2\ge C^2\log n$ and with $n/\Lambda\ge n/k$. Proved with $C=100$.
 Let $Ck\le(n/\log n)^{1/6}$. If $q=(1+\delta)n/2$ with $1-\delta\ge1/(2k)$, then after one round
 $Q'\le(1+\delta^2)n/2$ with probability at least $1-C/n^2$ (16). If every colour is at most
 $\gamma n/D$, with $\gamma\ge1$ and $0<D\le k$, then $Q'\ge n/2-2\gamma^2n/D$ with probability at
-least $1-C/n^2$ (17, corrected). Hence there are $\gamma\ge1$ and $C$ such that, for $x$ without
+least $1-C/n^2$ (17). Hence there are $\gamma\ge1$ and $C$ such that, for $x$ without
 undecided nodes with $\mathrm{md}(x)\ge C$ and $y$ satisfying the conclusion of
 Lemma~\ref{lem:lb-first}, there is a round $t\le C\log n$ such that, with probability at least
 $1-C/n$, every colour is at most $\gamma n/\mathrm{md}(x)$ at each round $s\le t$, and at round $t$
