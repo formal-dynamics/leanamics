@@ -3,6 +3,7 @@
 The detail view is a list of `(text, style)` lines; the curses app maps styles to colors and the
 plain output ignores them. Styles: title, h, dim, code, doc, ok, bad, warn, link, key, text.
 """
+import re
 import textwrap
 import unicodedata
 
@@ -77,6 +78,12 @@ def wrap_code(text, width, indent="  ", marker="↪ "):
             if not line:
                 break
     return out
+
+
+def prose(doc):
+    """A doc comment as prose: single line breaks become spaces (paragraphs, list items and
+    indented code lines keep theirs)."""
+    return re.sub(r"(?<!\n)\n(?!\n|\s*[-*•+]\s|\s*\d+[.)]\s|    )", " ", doc.strip())
 
 
 def tex(s):
@@ -207,7 +214,7 @@ def detail(model, e, width=80, raw=False):
         if d.parent:
             add(f"      member of {d.parent}", "dim")
         if d.doc:
-            for ln in wrap("/-- " + d.doc + " -/", W, "    "):
+            for ln in wrap("/-- " + prose(d.doc) + " -/", W, "    "):
                 add(ln, "doc")
         if d.variables:
             for ln in wrap("variable " + " ".join(d.variables), W, "    ", "        "):
@@ -276,7 +283,7 @@ def decl_lines(model, d, width=80):
     L = [(f"{d.name}  ({d.kind})", "title"), (f"{d.path}:{d.line}", "dim"),
          ("This declaration is not named by any blueprint item.", "warn"), ("", "text")]
     if d.doc:
-        L += [(ln, "doc") for ln in wrap("/-- " + d.doc + " -/", W, "  ")]
+        L += [(ln, "doc") for ln in wrap("/-- " + prose(d.doc) + " -/", W, "  ")]
     if d.variables:
         L += [(ln, "code") for ln in wrap("variable " + " ".join(d.variables), W, "  ", "      ")]
     L += [(ln, "code") for ln in wrap_code(d.text, W, "  ")]

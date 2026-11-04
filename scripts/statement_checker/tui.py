@@ -143,9 +143,12 @@ class App:
 
     def apply(self, keep=None):
         base = self.m.priority if SORTS[self.sort] == "priority" else self.m.entries
+        old_sel = self.sel
         self.rows = [e for e in base if self.matches(e)]
         self.sel = 0
         if keep is not None:
+            # stay on the same item, or at the same place if it left the view
+            self.sel = min(old_sel, max(0, len(self.rows) - 1))
             for k, e in enumerate(self.rows):
                 if e.id == keep:
                     self.sel = k
