@@ -1,0 +1,2 @@
+# Checks are append-only JSON Lines, one file per reviewer; on a merge keep the lines of both sides.
+verification/checks/*.jsonl merge=union

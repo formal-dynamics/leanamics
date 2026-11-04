@@ -27,3 +27,6 @@
 
 # local secrets (API keys)
 .env
+
+# Python bytecode (scripts/)
+__pycache__/
