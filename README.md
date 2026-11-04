@@ -88,6 +88,7 @@ home_page/             the Jekyll landing page, deployed at the Pages root
 .github/workflows/     per-project build CI, plus the shared Pages deployment
 .github/pull_request_template.md   the documentation checklist of every pull request
 scripts/               maintenance scripts (axiom audit, dictionary and size tables)
+experiments/fixed-statement/   acceptance check, pinned commits and prompts of the agent runs
 ```
 
 `python3 scripts/library_sizes.py` prints a LaTeX table of the packages with their main results

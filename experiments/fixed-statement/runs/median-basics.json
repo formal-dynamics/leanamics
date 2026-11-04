@@ -1,0 +1,73 @@
+{
+ "id": "median-basics",
+ "target": "median basics",
+ "agent": "GLM-5.3 (Mistral Vibe agent)",
+ "package": "median",
+ "namespace": "Median",
+ "baseline": "dbe73d6be9e0ca9ef5b6b590628b960a5e711891",
+ "accepted": "ce1e12f11c5a87e02cbe6500a4f7aabe71e5aa86",
+ "file": "median/Median/Basic.lean",
+ "defs": [],
+ "theorems": [
+  "med3_monotone",
+  "threshold_step",
+  "threshold_run",
+  "step_mem",
+  "step_mem_Icc",
+  "step_of_consensus",
+  "expected_ones",
+  "absorbed"
+ ],
+ "pinned_files": [
+  "median/Median/Defs.lean"
+ ],
+ "pinned_file_defs": [
+  "med3",
+  "Config",
+  "Round",
+  "step",
+  "run",
+  "ones",
+  "Consensus",
+  "notConsensus",
+  "kernel"
+ ],
+ "keywords": [
+  "def",
+  "abbrev",
+  "structure",
+  "theorem",
+  "lemma"
+ ],
+ "context": [
+  "variable",
+  "namespace",
+  "open ",
+  "import"
+ ],
+ "reviewed": [],
+ "allowed": "^(median/Median/Basic[A-Za-z0-9_]*\\.lean|median/PROGRESS\\.md)$",
+ "scan": [
+  "median/Median/Basic*.lean"
+ ],
+ "prompts": [
+  "prompts/median-basics.md",
+  "prompts/median-basics-resume.md"
+ ],
+ "logs": {
+  "kind": "vibe",
+  "sessions": [
+   "1cb992ef-f942-78e8-c986-74e83132f95f",
+   "c07fb0d3-b80c-ddef-406f-61c66ad46a99",
+   "7f62cc2d-5866-175b-4da7-d6116ae2bc98",
+   "968bc6a1-eca1-591d-986f-f43b119d085f",
+   "0e6de702-4168-e0ac-2d04-e926c87b0b04"
+  ],
+  "not_counted": [
+   {
+    "session": "b30e3a39-54e1-7c6c-23cd-646360d40a91",
+    "reason": "sandbox test before the run (one shell command, not the task)"
+   }
+  ]
+ }
+}

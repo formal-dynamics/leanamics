@@ -50,6 +50,8 @@ baseline, no placeholders, a warning-free build, and only standard axioms. Pinni
 mean that a human wrote or checked the statements: contributors are free to use AI tools for that too, and
 an entry names who pinned or checked the statements only where this is recorded.
 
+The acceptance check, pinned commits, prompts and measured run times of the eight fixed-statement runs are in [`experiments/fixed-statement/`](experiments/fixed-statement/).
+
 Entries naming a Claude or Grok agent reproduce what the commit messages and package READMEs
 state. An entry says that the statements were reviewed by a second agent against the source only when the
 PR or the package README records it.

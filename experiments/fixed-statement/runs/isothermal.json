@@ -1,0 +1,55 @@
+{
+ "id": "isothermal",
+ "target": "isothermal theorem",
+ "agent": "grok-4.7 (Grok command-line agent)",
+ "package": "moran",
+ "namespace": "Moran",
+ "baseline": "d06dc8a13c7e5e606fb1d7f1f2e69b67acd1f7f4",
+ "accepted": "ae9388335c821c2bb62775b38f77c9a78f813096",
+ "file": "moran/Moran/Isothermal.lean",
+ "defs": [
+  "Config",
+  "mutants",
+  "fitness",
+  "totalFitness",
+  "target",
+  "pairDist",
+  "moranKernel",
+  "allMutant",
+  "unfixed",
+  "fixation"
+ ],
+ "theorems": [
+  "pair_weight_nonneg",
+  "pair_weight_sum_one",
+  "moran_potential_invariant",
+  "moran_mutants_invariant",
+  "moran_unfixed_tendsto",
+  "isothermal",
+  "isothermal_neutral",
+  "moran_formula"
+ ],
+ "pinned_files": [],
+ "keywords": [
+  "def",
+  "abbrev",
+  "theorem",
+  "lemma"
+ ],
+ "context": [],
+ "reviewed": [],
+ "allowed": "^(moran/Moran/.+\\.lean|moran/Moran\\.lean|moran/MORAN_PROGRESS\\.md)$",
+ "scan": [
+  "moran/Moran",
+  "moran/Moran.lean"
+ ],
+ "prompts": [
+  "prompts/isothermal.md"
+ ],
+ "logs": {
+  "kind": "grok",
+  "sessions": [
+   "01a0f2da-4dfb-7603-b527-b229ad97d8dd"
+  ]
+ }
+}

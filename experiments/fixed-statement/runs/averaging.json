@@ -1,0 +1,53 @@
+{
+ "id": "averaging",
+ "target": "averaging convergence",
+ "agent": "grok-4.7 (Grok command-line agent)",
+ "package": "averaging",
+ "namespace": "Averaging",
+ "baseline": "f18d21d7fffe578fc1fb9e9a16783f28b35ade47",
+ "accepted": "4c62cd397fd8fa3cd56c311a01afeb5dae57b5c0",
+ "file": "averaging/Averaging/Basic.lean",
+ "defs": [
+  "avgStep",
+  "avgIter",
+  "degAvg"
+ ],
+ "theorems": [
+  "degree_weighted_sum_step",
+  "avgStep_le",
+  "le_avgStep",
+  "tendsto_degAvg",
+  "not_tendsto_of_colorable"
+ ],
+ "pinned_files": [],
+ "keywords": [
+  "def",
+  "abbrev",
+  "structure",
+  "inductive",
+  "theorem",
+  "lemma"
+ ],
+ "context": [
+  "variable",
+  "namespace",
+  "open "
+ ],
+ "reviewed": [
+  "open SimpleGraph"
+ ],
+ "allowed": "^(averaging/Averaging/.+\\.lean|averaging/PROGRESS\\.md)$",
+ "scan": [
+  "averaging/Averaging",
+  "averaging/Averaging.lean"
+ ],
+ "prompts": [
+  "prompts/averaging.md"
+ ],
+ "logs": {
+  "kind": "grok",
+  "sessions": [
+   "01a0fbc3-38d0-7341-939c-b96191942fe0"
+  ]
+ }
+}
