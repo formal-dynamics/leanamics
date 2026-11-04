@@ -11,8 +11,8 @@ Theorem~21). On $d$-regular graphs with $\lambda_G\le 3/5-\varepsilon$, two-samp
 eliminates a minority of size at most $(\varepsilon/5)n$ within $O(\log n)$ rounds with high
 probability (Theorem~4 of Cooper, Elsässer and Radzik, ICALP 2014), and on every $d$-regular graph
 an initial imbalance $\nu_0\ge K\lambda_G$ suffices, with a failure probability that tends to $0$
-once $\nu_0^2n$ is large compared with $\log\log n$ (their Theorem~2, which needs a major correction
-for very small $\lambda_G$). For 2-Choices with any number
+once $\nu_0^2n$ is large compared with $\log\log n$ (their Theorem~2; for very small $\lambda_G$ the formalized
+version states the failure probability in this form). For 2-Choices with any number
 $k$ of colours, the plurality colour wins within $O((n/c_1)\log n)$ rounds from a gap of order
 $\sqrt{n\log n}$ to every other colour (Theorem~1.2 of Elsässer, Friedetzky, Kaaser,
 Mallmann-Trenn and Trinker, arXiv:1602.04667, in arXiv v5 numbering, without their hypothesis
@@ -258,8 +258,8 @@ This section formalizes Theorem~2 of Cooper, Elsässer and Radzik (ICALP 2014, a
 with its Phase~I (Lemma~2 and Corollary~2), on top of
 Section~\ref{sec:cer-two-choices}; numbering follows the arXiv version
 (\href{https://github.com/formal-dynamics/leanamics/blob/main/median/FORMALIZATION_DIFFERENCES.md#two-sample-voting-on-expanders-from-a-small-imbalance-expandergeneral-roadmap-maj-5-b}{differences
-from the paper}). Theorem~2 of the paper needs a major correction for very small $\lambda_G$, and
-the corrected statement is formalized (Remark~\ref{rem:cer-correction}). Throughout, $a$ is the
+from the paper}). For very small $\lambda_G$ the formalized statement differs from the printed one
+(Remark~\ref{rem:cer-theorem2-form}). Throughout, $a$ is the
 majority opinion, $A$ and $B$ are the numbers of vertices holding $a$ and not holding $a$,
 $n=A+B$, and primes denote the values after one round.
 
@@ -345,7 +345,7 @@ exceeds $1-2c$, so the process is frozen; a union bound over the rounds gives th
 $\lambda_G\le\alpha$, Lemma~\ref{lem:cer-mixing-prop} gives the mixing hypothesis.
 \end{proof}
 
-\begin{theorem}[Theorem~2, corrected]\label{thm:cer-theorem2}
+\begin{theorem}[Theorem~2, formalized form]\label{thm:cer-theorem2}
 \lean{Median.ExpanderGeneral.not_consensus_le,Median.ExpanderGeneral.two_choices_expander_general_explicit,Median.ExpanderGeneral.phaseIRounds_le,Median.ExpanderGeneral.general_of_explicit,Median.ExpanderGeneral.two_choices_expander_general}\leanok\uses{thm:cer-phaseI,thm:expander}
 Let $G$ be $d$-regular with $d>0$ and $\nu_0>0$, $4000\lambda_G\le\nu_0$, and let
 $\alpha=\nu_0/4000$ and $T_1=T_1(\nu_0,1/20)$. For every $T_2$, after $T_1+T_2$ rounds every
@@ -364,17 +364,17 @@ an induction on the length of Phase~I. For the $O(\log n)$ form, $T_1\le5\log n+
 $\nu_0\ge1/n$), and the remaining rounds make $(24/25)^{T_2}n\le1/n$.
 \end{proof}
 
-\begin{remark}[Theorem~2 of the paper needs a major correction]\label{rem:cer-correction}
+\begin{remark}[Theorem~2 of the paper and its formalized form]\label{rem:cer-theorem2-form}
 The paper states Theorem~2 with success probability $1-o(1)$ whenever $\nu_0\ge K\lambda_G$, on
 every $d$-regular graph. Its proof applies Lemma~2 with $\alpha=\lambda_G$, whose failure
-probability is $e^{-\Theta(\lambda_G^2n)}$; this is not $o(1)$ when $\lambda_G$ is of order
-$1/\sqrt n$ or smaller. On the complete graph, $\lambda_G=1/(n-1)$, so a constant difference
+probability is $e^{-\Theta(\lambda_G^2n)}$; this is $o(1)$ when $\lambda_G\ge n^{-1/2+\varepsilon}$,
+but not when $\lambda_G$ is of order $1/\sqrt n$ or smaller. For example, on the complete graph, $\lambda_G=1/(n-1)$, so a constant difference
 $A-B\in\{K+2,K+3\}$ satisfies the hypothesis for $n\ge K+3$; the first round produces
 fluctuations of order $\sqrt n$ in $A-B$, and by symmetry the initial majority then wins with
-probability tending to $1/2$. Theorem~\ref{thm:cer-theorem2} is the corrected statement: it keeps
+probability tending to $1/2$. Theorem~\ref{thm:cer-theorem2} keeps
 the hypothesis $\nu_0\ge K\lambda_G$ and bounds the failure probability in terms of $\nu_0^2n$,
 which tends to $0$ once $\nu_0^2n$ is large compared with $\log\log n$
-(\href{https://github.com/formal-dynamics/leanamics/blob/main/median/FORMALIZATION_DIFFERENCES.md#theorem-2-of-the-paper-needs-a-major-correction}{details}).
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/median/FORMALIZATION_DIFFERENCES.md#theorem-2-the-formalized-form}{details}).
 \end{remark}
 
 \section{Almost stable consensus against an adaptive adversary}
@@ -519,8 +519,8 @@ $m^2$ pairs with both samples on it, a node of that colour keeps it on the $n^2-
 do not agree on another colour, and both counts increase with $m$. Choose a permutation of the
 sample pairs embedding the first set into the second.
 The induced bijection of rounds preserves the uniform distribution and maps the rounds with
-$c_c'\ge t$ into the rounds with $c_b'\ge t$. The paper's coupling, read literally, needs a minor
-correction
+$c_c'\ge t$ into the rounds with $c_b'\ge t$. This makes the coupling of the paper's Lemma~2.3
+explicit, with the nodes permuted as well as the samples
 (\href{https://github.com/formal-dynamics/leanamics/blob/main/median/FORMALIZATION_DIFFERENCES.md#remarks-on-the-sources}{details}).
 \end{proof}
 
@@ -578,9 +578,9 @@ probability at least $1-C/n$.
 \begin{proof}\leanok
 Take $z=128$ and $C=384$: Lemma~\ref{lem:tc-growth-phase}, then Lemma~\ref{lem:tc-finish} from the
 configuration reached, with failure at most $256/n$; consensus is absorbing, so more rounds do not
-hurt. For the second form, $c_i\ge n/k$. The paper's proof of Theorem~1.2 needs a minor
-correction (the range $n/2<a<(1/2+\varepsilon_1)n$ and the time bound), which
-Lemma~\ref{lem:tc-growth-round} supplies.
+hurt. For the second form, $c_i\ge n/k$. Lemma~\ref{lem:tc-growth-round}, valid up to $a=3n/4$ and with
+$a'\ge a$, also covers the range $n/2<a<(1/2+\varepsilon_1)n$ and gives the time bound in terms of
+the initial $a$.
 \end{proof}
 
 \begin{theorem}[Two colours and almost-sure consensus]\label{thm:tc-two}
@@ -637,8 +637,7 @@ colour has more than $\ell'$ nodes at some time $t\le T$ is at most $1/n$.
 Take $\gamma_0=8$. By Lemma~\ref{lem:tc-escape} with $L=\ell'$, since $L-c_i\ge\ell'/2$ and
 $T\ell'^2/n<\ell'/\gamma$, one colour exceeds $\ell'$ with probability at most
 $\exp(-\ell'(1/2-(e-1)/\gamma))\le n^{-2}$; take a union bound over the at most $n$ colours
-present. A constant in the paper's proof needs a minor correction ($\gamma\ge36$ instead of
-$\gamma\ge18$ in its Chernoff step); the theorem is unaffected.
+present.
 \end{proof}
 
 \begin{theorem}[2-Choices needs $\Omega(n/\log n)$ rounds, Theorem~1 (Simplified)]\label{thm:tc-lower}
