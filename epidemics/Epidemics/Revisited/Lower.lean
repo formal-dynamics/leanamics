@@ -18,12 +18,12 @@ in expectation, and finishing `r` rounds earlier than this has probability at mo
 `pushPull_spreading_tail` (and their `_expect` forms) this determines the expected spreading
 times up to additive constants.
 
-The paper obtains the lower bounds from Theorems 27, 38 and 48 joined through Lemma 20, which
-needs a major correction (see `Lemma20`). The proofs here take a direct route: the growth phase
-by the first moment (`push_growth_lower`, `pull_growth_lower`, `pushPull_growth_lower`), the
-final phase by a round-by-round lower envelope of the number of uninformed nodes
-(`push_final_lower`, `pull_final_lower`, `pushPull_final_lower`), and the two joined by the
-Markov property at a fixed time (`reach_add_le`), which needs no overshoot estimate.
+The paper obtains the lower bounds from Theorems 27, 38 and 48 joined through Lemma 20 (see
+`Lemma20` for the form of Lemma 20 that is formalized). The proofs here take a direct route:
+the growth phase by the first moment (`push_growth_lower`, `pull_growth_lower`,
+`pushPull_growth_lower`), the final phase by a round-by-round lower envelope of the number of
+uninformed nodes (`push_final_lower`, `pull_final_lower`, `pushPull_final_lower`), and the two
+joined by the Markov property at a fixed time (`reach_add_le`), which needs no overshoot estimate.
 
 `1 - P.notYet n t S` is the probability `P[T(|S|, n) ≤ t]` that all `n` nodes are informed
 after `t` rounds. Expectations are sums of tails, `E[T] = ∑_{t ≥ 0} P[T > t]`, and every partial
