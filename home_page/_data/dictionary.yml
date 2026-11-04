@@ -343,8 +343,7 @@ rows:
           and pull are then the same chain.
         - >-
           With selection the names diverge: the "biased voter model" of Antal, Redner and Sood
-          puts selection on the death step (their remark that this is equivalent to random death
-          and fitness-proportional replacement needs a minor correction), so it is death–Birth
+          puts selection on the death step, so it is death–Birth
           only in the neutral case, and "biased voter" denotes different chains in different
           communities.
       refs: [SoodAntalRedner2008, AntalRednerSood2006, Maciejewski2014, Aldous2013, Swart2017, CliffordSudbury1973]
@@ -525,10 +524,10 @@ rows:
           ratio, so no network of two copying reactions with constant rates has its jump chain;
           with self-loops (Moran's independent draws) it coincides with Birth–death.
         - >-
-          The isothermal theorem's informal "only if" needs a minor correction (Galanis et al.,
-          Proposition 12: a non-isothermal weighted graph on three vertices on which a uniformly
-          placed mutant fixes with the Moran probability); its formal statement in Lieberman,
-          Hauert and Nowak's supplement is correct.
+          For the converse of the isothermal theorem, the precise statement is the one in Lieberman,
+          Hauert and Nowak's supplement: Galanis et al. (Proposition 12) give an evolutionary graph
+          that is not isothermal and on which a uniformly placed mutant fixes with the Moran
+          probability.
         - >-
           "Biased voter" names three chains. (i) In probability (Bramson and Griffeath; Durrett
           and Moseley; Swart), defined on $\mathbb Z^d$: births at rate equal to fitness onto a
@@ -1410,9 +1409,9 @@ rows:
         exact because the infectious
         period is fixed: Grassberger shows that a fixed period gives "precisely the problem of
         bond percolation" while exponential periods give "neither site nor bond percolation";
-        Newman's 2002 claim of an exact isomorphism for random infectious periods needs a major
-        correction (Kenah and Robins: the mapping gives the right threshold and final size, but not
-        the distribution of outbreak sizes or the probability of an epidemic).
+        for random infectious periods, Kenah and Robins show that Newman's 2002 mapping to bond
+        percolation gives the epidemic threshold and the final size, but not the distribution of
+        outbreak sizes or the probability of an epidemic.
       conditions:
         - >-
           Each edge is tried at most once (after its coin is seen from an infected endpoint, that
