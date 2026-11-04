@@ -113,6 +113,13 @@ def report(m):
             f"{len(extra)} library definitions are used by the statements of items but are not "
             "named by any blueprint item, so no check covers them directly. The detail view lists "
             "them under each item (press `D`).", ""]
+    if extra:
+        out += ["<details><summary>The definitions, with the first item using each</summary>", ""]
+        for n in sorted(extra):
+            d = m.index.get(n)
+            out.append(f"- `{n}` ({d.path}:{d.line}), used by `{extra[n][0]}`"
+                       + (f" and {len(extra[n]) - 1} more" if len(extra[n]) > 1 else ""))
+        out += ["", "</details>", ""]
     return "\n".join(out)
 
 

@@ -87,7 +87,9 @@ Shared at the repository root:
 home_page/             the Jekyll landing page, deployed at the Pages root
 .github/workflows/     per-project build CI, plus the shared Pages deployment
 .github/pull_request_template.md   the documentation checklist of every pull request
-scripts/               maintenance scripts (axiom audit, dictionary and size tables)
+scripts/               maintenance scripts (axiom audit, dictionary and size tables,
+                       statement checker)
+verification/          records of statements checked against their sources
 ```
 
 `python3 scripts/library_sizes.py` prints a LaTeX table of the packages with their main results
@@ -102,6 +104,28 @@ cd voter               # or: dynamics, moran, epidemics, undecided, averaging, m
 lake exe cache get     # download prebuilt Mathlib oleans (once)
 lake build             # verifies every proof in that project
 ```
+
+## Checking statements against their sources
+
+Lean checks the proofs, not whether a statement says what its source says. To record that a
+person compared a Lean statement (or definition) with the paper, run, from the repository root,
+
+```bash
+python3 scripts/check_statements.py                 # terminal app; reviewer from git config user.name
+python3 scripts/check_statements.py --report        # who checked what, per package
+python3 scripts/check_statements.py --validate      # well-formed record, every \lean{} name declared
+```
+
+The app lists every blueprint node that names Lean declarations (main results and the definitions
+they use first) and shows, for each, its source (with the original statement when
+[`verification/sources.toml`](verification/sources.toml) has it), the blueprint statement, the
+Lean statements and the definitions they use. Press `a` (agrees), `d` (differs, with a comment)
+or `u` (unsure, with a question) to record a check; `?` lists the keys. Checks are appended to
+`verification/checks/<your-name>.jsonl`, one file per reviewer, so branches merge without
+conflicts: commit that file with your other changes. A check becomes stale when the item's Lean or
+source text changes. [`verification/README.md`](verification/README.md) explains what a check
+means and how they are counted. The tests are in `scripts/statement_checker/tests`
+(`python3 scripts/statement_checker/tests/run.py`).
 
 ## Continuous integration
 

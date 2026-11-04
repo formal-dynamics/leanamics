@@ -1,0 +1,1056 @@
+# Source references and original statements of blueprint items.
+#
+# One [[source]] table per (item, numbered result of the source). Fields:
+#   item       blueprint item id `<package>:<label>` (or `items = [...]` for several items)
+#   paper      authors and title
+#   venue      where it appeared
+#   version    the version the statement was transcribed from (e.g. arXiv:1310.2858v2)
+#   result     the numbering in that version (Theorem 3.8, Lemma C.1, ...)
+#   page       page of that version's PDF where the statement starts (optional)
+#   url        link to that version (optional)
+#   status     how the statement was obtained, e.g. "transcribed from the arXiv LaTeX source,
+#              not yet compared with the PDF"; update it when someone compares it with the PDF
+#   statement  the original statement, verbatim (LaTeX; statement only, no proof)
+#   context    verbatim definitions the statement depends on (optional)
+#   notes      macros replaced, numbering differences between versions, typos kept (optional)
+#
+# The hash of an item's source side includes version, result, statement and context, so
+# editing them makes earlier checks of the item stale. The checker reads this file with
+# Python's tomllib; `python3 scripts/check_statements.py --validate` checks it.
+#
+# The entries below were transcribed by an AI agent from the arXiv LaTeX sources (macros of
+# the papers replaced by standard LaTeX, as listed in `notes`). None has been compared with the
+# PDF yet.
+
+# Group 1: package plurality (SPAA 2014, PODC 2017, SODA 2016) and median:thm:tc-lower-strong.
+
+[[source]]
+item = "plurality:thm:3_8"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri, L. Trevisan. Simple dynamics for plurality consensus"
+venue = "SPAA 2014"
+version = "arXiv:1310.2858v2"
+result = "Theorem 3.8"
+page = 14
+url = "https://arxiv.org/abs/1310.2858v2"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+[the general upper bound]
+Let $\lambda$ be any value such that  $ 3  \leqslant  \lambda <  \sqrt{n}$. If $\overline{c}$ is a $k$-cd such that, for some $m \in [k]$,
+$M(\overline{c}) = \{m\}$, $c_m \geqslant n / \lambda $, and $s(\overline{c}) \geqslant 22\sqrt{\lambda \, n \log n}$, then
+w.h.p. the 3-majority protocol converges to color $m$ in $\mathrm{O}\left(\lambda \, \log n \right)$ time.
+'''
+context = '''
+A \emph{$k$-color distribution}, \emph{$k$-cd} for short, is any $k$-tuple $\overline{c} = (c_1,\ldots, c_k)$ such that $c_j$s are non negative integers and $\sum_{j=1,\ldots,k} c_j = n$.
+[Section 3:] For a $k$-cd $\overline{c}$, we define
+\begin{align*}
+& m(\overline{c}) = \max_{h\in [k]} c_h\\
+& M(\overline{c}) = \left\{ j \in [k] \;\left|\; c_j = m(\overline{c}) \right.\right\}\\
+& s(\overline{c}) = \left\{ \begin{array}{ll}
+m(\overline{c})- \max_{h \in [k] - M(\overline{c})} & \mbox{if $|M(\overline{c})| = 1$}\\
+0 & \mbox{otherwise}
+\end{array}\right.
+\end{align*}
+'''
+notes = "arXiv v1 and v2 use the SPAA 2014 numbering (v3 is the journal version, where Theorem 3.8 and Corollaries 3.10-3.12 become Theorem 3.1 and Corollaries 3.2-3.4); the section files of v1 and v2 are identical (only abstract, introduction and conclusions differ), so v1 has the same statement on the same page. The optional theorem title is shown in brackets. The definition of s(c) is quoted verbatim, including the source's missing c_h after the max (the paper later uses s(c) = m(c) - max_{h in [k]-{m}} c_h). No paper macros in the statement."
+
+[[source]]
+item = "plurality:cor:3_10"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri, L. Trevisan. Simple dynamics for plurality consensus"
+venue = "SPAA 2014"
+version = "arXiv:1310.2858v2"
+result = "Corollary 3.10"
+page = 16
+url = "https://arxiv.org/abs/1310.2858v2"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+If  $\overline{c}$ is a $k$-cd such that, for some $m \in [k]$,  $M(\overline{c}) = \{m\}$ and
+\[
+s(\overline{c}) \geqslant 22\sqrt{\min\left\{2k,\; \sqrt[3]{\frac{n}{\log n}}\right\}n\log n}
+\]
+then, w.h.p. the 3-majority protocol converges to color $m$ in $\mathrm{O}\left(\min\left\{2k,\; \sqrt[3]{\frac{n}{\log n}}\right\}\log n\right)$ time.
+'''
+context = '''
+Corollary~3.10 is obtained by setting
+ $\lambda = \min\left\{ 2k,\; \sqrt[3]{\frac{ n}{\log n}}\right\}$ and it provides a bound which does not assume any condition on $c_m$.
+'''
+notes = "Same numbering in arXiv v1 and v2 (SPAA numbering). k-cd, M(c), s(c) as in Theorem 3.8 (see the plurality:thm:3_8 entry). Context quoted from the sentence before the corollary, with the \\ref replaced by its number."
+
+[[source]]
+item = "plurality:cor:3_11"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri, L. Trevisan. Simple dynamics for plurality consensus"
+venue = "SPAA 2014"
+version = "arXiv:1310.2858v2"
+result = "Corollary 3.11"
+page = 16
+url = "https://arxiv.org/abs/1310.2858v2"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+If  $\overline{c}$ is a $k$-cd such that, for some $m \in [k]$,  $M(\overline{c}) = \{m\}$, $c_m \geqslant n/\log^\ell n$, and
+$s(\overline{c}) \geqslant 22\sqrt{n\log^{\ell + 1} n}$, then
+w.h.p. the 3-majority protocol converges to color $m$ in $\mathrm{O}(\log^{\ell + 1} n)$ time.
+'''
+context = '''
+Corollaries~3.11 and~3.12
+ are  obtained by setting  $\lambda =  \mathrm{poly}\log(n)$ and $\lambda = \Theta(1)$, respectively.    They require some lower bounds on $c_m$.
+'''
+notes = "The blueprint item cor:3_11 covers both Corollary 3.11 and Corollary 3.12 (there is no separate cor:3_12 label); the next entry gives Corollary 3.12. The statement does not quantify ell (the context says lambda = polylog(n)). Macro \\poly in the context replaced by \\mathrm{poly}; \\refs replaced by numbers."
+
+[[source]]
+item = "plurality:cor:3_11"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri, L. Trevisan. Simple dynamics for plurality consensus"
+venue = "SPAA 2014"
+version = "arXiv:1310.2858v2"
+result = "Corollary 3.12"
+page = 16
+url = "https://arxiv.org/abs/1310.2858v2"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+If  $\overline{c}$ is a $k$-cd such that, for some $m \in [k]$,  $M(\overline{c}) = \{m\}$, $c_m \geqslant  n/ \beta$, and
+$s(\overline{c}) \geqslant 22\sqrt{\beta n\log n}$, for some constant $\beta \geqslant 3$, then
+w.h.p. the 3-majority protocol converges to color $m$ in $\mathrm{O}(\log n)$ time.
+'''
+notes = "Second numbered result of blueprint item cor:3_11 (Corollaries 3.11 and 3.12). Same numbering in arXiv v1 and v2."
+
+[[source]]
+item = "plurality:thm:4_2"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri, L. Trevisan. Simple dynamics for plurality consensus"
+venue = "SPAA 2014"
+version = "arXiv:1310.2858v2"
+result = "Theorem 4.2"
+page = 18
+url = "https://arxiv.org/abs/1310.2858v2"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Let $C_t$ be the random variable indicating the coloring at time $t$ according to the $3$-majority protocol and let $\tau = \inf\{ t \in \mathbb{N} \,:\, C_t \mbox{ is monochromatic} \}$ be the random variable indicating the first time step such that $C_t$ is monochromatic. If the initial number of colors is $k \leqslant (n/\log n)^{1/4}$ and the initial coloring is $C_0 = (c_1, \dots, c_k)$ with $\max \{ c_h \,:\, h = 1, \dots, k \} \leqslant \frac{n}{k} + \left( \frac{n}{k} \right)^{1-\varepsilon}$ then $\tau = \Omega(k \log n)$ w.h.p.
+'''
+context = '''
+Let us say that a coloring $\overline{c} = (c_1, \dots, c_k) \in \{ 0, 1, \dots, n \}^k$ with $\sum_{h=1}^k c_h = n$ is \emph{monochromatic} if there is an $h \in [k]$ such that $c_h = n$.
+'''
+notes = "Same numbering in arXiv v1 and v2; the journal version v3 keeps the number 4.2 with a slightly reworded statement. The paper's statement is asymptotic (k <= (n/log n)^{1/4}, imbalance (n/k)^{1-eps}, tau = Omega(k log n)); the explicit form with b >= k sqrt(n log n) and (1+3/k)^T in the blueprint comes from Lemma 4.1 and the proof, not from the statement. No paper macros."
+
+[[source]]
+item = "plurality:thm:4_8_a"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri, L. Trevisan. Simple dynamics for plurality consensus"
+venue = "SPAA 2014"
+version = "arXiv:1310.2858v2"
+result = "Theorem 4.8 (a)"
+page = 21
+url = "https://arxiv.org/abs/1310.2858v2"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+[properties for good solvers] (a) If a protocol $\mathcal{P}$ is an $(n/4,1/4)$-solver in $\mathcal{D}_3$ then its $f$ must have the clear-majority property.
+'''
+context = '''
+\begin{definition}[$\mathcal{D}_h(k)$ protocols]
+An \emph{$h$-dynamics} is a synchronous protocol where at each time step every node picks $h$ random neighbors (including itself and with repetition) and recolors itself according to some deterministic rule that depends only on the colors it sees.
+Let $\mathcal{D}_h(k)$ be the class of $h$-dynamics and observe that a dynamics $\mathcal{P} \in \mathcal{D}_h$ can be specified by a function
+\[
+f\,:\, [k]^h \rightarrow [k]
+\]
+such that $f(x_1, \dots, x_h) \in \{ x_1, \dots, x_h \}$. Where $f(x_1, \dots, x_h)$ is the color chosen by a node that sees the (ordered) sequence $(x_1, \dots, x_h)$ of colors.
+\end{definition}
+\begin{definition}[clear-majority property]
+Let $(x_1,x_2,x_3) \in [k]^3$ be a triple of colors. We say that $(x_1,x_2,x_3)$ has a \emph{clear majority} if at least two of the three entries have the same value.
+A dynamics $\mathcal{P} \in \mathcal{D}_3(k)$ has the \emph{clear-majority} property if whenever its $f$ sees a clear majority it returns the majority color.
+\end{definition}
+\begin{definition}[$(s,\varepsilon)$-majority consensus solver]
+We say that a protocol $\mathcal{P}$ is an \emph{$(s,\varepsilon)$-solver} (for the majority consensus problem) if for every initial
+$s$-biased  coloring $\overline c$, when running $\mathcal{P}$,   with probability at least $1-\varepsilon$ there is a time step $t$ by which all
+nodes   gets the majority color of $c$.
+\end{definition}
+'''
+notes = "Part (a) of Theorem 4.8 (one theorem environment with parts (a) and (b)); the optional theorem title is shown in brackets. Same numbering in arXiv v1 and v2; the journal version v3 keeps the number 4.8 (titled 'properties of good solvers', reworded). s-biased: a color m exists with c_m >= c_j + s for every other color j (Section 2)."
+
+[[source]]
+item = "plurality:thm:4_8_b"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri, L. Trevisan. Simple dynamics for plurality consensus"
+venue = "SPAA 2014"
+version = "arXiv:1310.2858v2"
+result = "Theorem 4.8 (b)"
+page = 21
+url = "https://arxiv.org/abs/1310.2858v2"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+[properties for good solvers] (b) A constant $\eta > 0$ exists such that, if $\mathcal{P}$ is an $(\eta \cdot n,1/4)$-solver, then its $f$ must have the uniform property.
+'''
+context = '''
+Given any $3$-input dynamics function
+$f(x_1,x_2,x_3)$, for any triple of distinct colors $r,g,b \in [k]$, let $\Pi(r,g,b)$ be the subset of permutations of the colors $r,g,b$ and define the following ``counters'':
+\begin{eqnarray*}
+\delta_r & = & |\{(z_1,z_2,z_3) \in \Pi(r,g,b) , \ s.t. \ f(z_1,z_2,z_3) = r \}| \\
+\delta_g & = & |\{(z_1,z_2,z_3) \in \Pi(r,g,b) , \ s.t. \ f(z_1,z_2,z_3) = g \}| \\
+\delta_b & = & |\{(z_1,z_2,z_3) \in \Pi(r,g,b) , \ s.t. \ f(z_1,z_2,z_3) = b \}|
+\end{eqnarray*}
+\begin{definition} [uniform property]
+A dynamics $\mathcal{P} \in \mathcal{D}_3(k)$ has the \emph{uniform} property if, for any triple of distinct colors $r,g,b \in [k]$, it holds that $\delta_r = \delta_g = \delta_b \ (= 2)$.
+\end{definition}
+'''
+notes = "Part (b) of Theorem 4.8; the optional theorem title is shown in brackets. The paper leaves eta unspecified (the blueprint uses eta = 1/20). D_3, (s, eps)-solver: see the plurality:thm:4_8_a entry. Same numbering in arXiv v1 and v2."
+
+[[source]]
+item = "plurality:thm:as-main-unconditional"
+paper = "P. Berenbrink, A. Clementi, R. Elsässer, P. Kling, F. Mallmann-Trenn, E. Natale. Ignore or comply? On breaking symmetry in consensus"
+venue = "PODC 2017"
+version = "arXiv:1702.04921v1"
+result = "Theorem 4"
+page = 8
+url = "https://arxiv.org/abs/1702.04921v1"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Starting from \emph{any} configuration $c \in \mathcal{C}$, $3$-\textsc{Majority}
+reaches consensus w.h.p. in $\mathrm{O}\bigl( n^{3/4}\log^{7/8} n \bigr)$ rounds.
+'''
+context = '''
+We
+describe the system state after any round by an $n$-dimensional integral vector
+$c = (c_i)_{i \in [n]} \in \mathbb{N}_0^n$ with $\sum_{ i \in [n] }
+c_i = n$. Here, the $i$-th component $c_i \in \mathbb{N}_0$ corresponds to the number of
+nodes supporting opinion $i$. If $k < n$, then $c_i = 0$ for all $i \in
+\{k+1, k+2, \dots, n\}$. We use $\mathcal{C} := \{ c\in\mathbb{N}_0^n \mid
+\sum_{ i \in [k] } c_i = n \}$ to denote the set of all possible
+configurations.
+'''
+notes = "arXiv v1 is the only version. Macros replaced: \\hmajority{3} -> $3$-\\textsc{Majority}, \\LDAUOmicron[small]{x} -> \\mathrm{O}\\bigl(x\\bigr); in the context \\N -> \\mathbb{N}, \\intoo{.} -> (.), \\intcc{n} -> [n], \\set{.} -> \\{.\\} (with | -> \\mid), \\coloneqq -> :=. The paper gives no explicit definition of w.h.p."
+
+[[source]]
+item = "median:thm:tc-lower-strong"
+paper = "P. Berenbrink, A. Clementi, R. Elsässer, P. Kling, F. Mallmann-Trenn, E. Natale. Ignore or comply? On breaking symmetry in consensus"
+venue = "PODC 2017"
+version = "arXiv:1702.04921v1"
+result = "Theorem 5"
+page = 10
+url = "https://arxiv.org/abs/1702.04921v1"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Let $\gamma$ be a sufficiently large constant.
+Consider the 2-\textsc{Choices} process
+starting from any initial configuration $c \in \mathcal{C}$. Let $\ell := \max_i c_i(0)$ be the support of the largest color.
+Then, for  $\ell' := \max\{ 2\ell, \gamma \log n\}$, it holds with high probability that no color has a support  larger than $\ell'$ for $n/(\gamma \ell')$ rounds. In symbols,
+\begin{equation}
+    \Pr\left[ \max_i\hspace{2pt} c_i(t)   > \ell'\text{ for some }  t< \frac{n}{\gamma\ell'}\right] \leq \frac 1n.
+\end{equation}
+In particular, starting from the $n$-color configuration,
+it holds with high probability that no color has a support  larger than $\gamma \log n$ for $  \frac{n}{\gamma^2\log n}$ rounds.
+'''
+context = '''
+We use $\mathcal{C} := \{ c\in\mathbb{N}_0^n \mid
+\sum_{ i \in [k] } c_i = n \}$ to denote the set of all possible
+configurations.
+'''
+notes = "arXiv v1 is the only version. Macros replaced: \\twochoice -> 2-\\textsc{Choices}, \\coloneqq -> :=, \\Pr{X} -> \\Pr\\left[X\\right] (auxkling.sty); LaTeX comment lines (%) dropped. Context as in the plurality:thm:as-main-unconditional entry."
+
+[[source]]
+item = "plurality:thm:mo-phase2"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, L. Trevisan. Stabilizing consensus with many opinions"
+venue = "SODA 2016"
+version = "arXiv:1508.06782v1"
+result = "Theorem 3.1"
+page = 7
+url = "https://arxiv.org/abs/1508.06782v1"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+[The Adversary-Free Case.]
+Starting from any initial configuration with $k \leqslant n^{1/3 - \varepsilon}$ active opinions,
+where $\varepsilon > 0$ is an arbitrarily-small constant, the 3-majority dynamics reaches
+consensus within
+$\mathcal{O}\left( (k^{2} \log^{1/2} n + k \log n) (k + \log n) \right)$ rounds, w.h.p.
+'''
+context = '''
+According to
+the standard definition, we say that a sequence  of  events
+$\mathcal E_n$,  $n= 1,2, \ldots$ holds \emph{with high
+probability} if  $ \mathbf{P}_{} \left( \mathcal E_n \right) = 1-\mathcal{O} (1/n^{\lambda})$ for
+some positive constant $\lambda >0$.
+'''
+notes = "arXiv v1 is the only version. The optional theorem title is shown in brackets. Context is the w.h.p. footnote of the introduction, with \\Prob{}{X} -> \\mathbf{P}_{} \\left( X \\right) and \\bigO -> \\mathcal{O}. BCEKMN17 (arXiv:1702.04921v1) restates this result in its appendix, citing it as [BCNPT16, Theorem 3.1]."
+
+[[source]]
+item = "undecided:thm:plurality"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri. Plurality consensus in the gossip model"
+venue = "SODA 2015"
+version = "arXiv:1407.2565v2"
+result = "Theorem 11"
+page = 20
+url = "https://arxiv.org/abs/1407.2565v2"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Let $k=O\left( (n/\log n)^{1/3} \right)$
+and let $\bar c$ be any initial configuration such that for any $i\neq 1$
+$c_{1}\geq\left(1+\alpha\right)\cdot c_{i}$ holds, where
+$\alpha$ is an arbitrarily small positive constant.
+Then, w.h.p. after at most $T=O\left(\mathsf{md}(\bar{\mathbf{c}})\cdot\log n\right)$ time steps
+all agents support the initial plurality color.
+'''
+context = '''
+It naturally induces a function $\mathsf{md}(\cdot)$, called the \emph{monochromatic distance},
+which
+equals the \emph{distance} between any configuration $\mathbf{c}$ and the target configuration:
+\[
+	\mathsf{md}(\mathbf{c}) \ = \ \sum_{i=1}^k \, \left(\frac{c_i}{c_{1}}\right)^2
+\]
+'''
+notes = "Section 3.6 (supremacy.tex), label thm:upperB; theorem-like environments share one counter. v1 and v2 have the same numbering and the same statement (latest version v2 used; the repo does not name a version). Macros replaced: \\m -> 1, \\cdist -> \\mathsf{md}(\\bar{\\mathbf{c}}) (paper: \\mbox{\\textsf{md}}(\\bar \\genc)), \\genc -> \\mathbf{c}, \\mdist -> \\mathsf{md} (paper: \\textnormal{\\textsf{md}}). Context is from the introduction (Our Contributions). The paper has no separate two-colour majority theorem; the two-colour SODA 2015 form used in undecided:thm:majority is this Theorem 11 with k = 2."
+
+[[source]]
+item = "undecided:thm:lb"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri. Plurality consensus in the gossip model"
+venue = "SODA 2015"
+version = "arXiv:1407.2565v2"
+result = "Theorem 8"
+page = 18
+url = "https://arxiv.org/abs/1407.2565v2"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Let $\bar{\mathbf{c}}$ be the initial color configuration. If the initial number of colors is $k \leqslant \varepsilon \cdot (n/\log n)^{1/6}$, where $\varepsilon > 0$ is a sufficiently small positive constant, then the convergence time of the Undecided-State Dynamics is $\Omega(\mathsf{md}(\bar{\mathbf{c}}))$ w.h.p.
+'''
+context = '''
+It naturally induces a function $\mathsf{md}(\cdot)$, called the \emph{monochromatic distance},
+which
+equals the \emph{distance} between any configuration $\mathbf{c}$ and the target configuration:
+\[
+	\mathsf{md}(\mathbf{c}) \ = \ \sum_{i=1}^k \, \left(\frac{c_i}{c_{1}}\right)^2
+\]
+'''
+notes = "Section 3.5 (middleage.tex), label thm:lowerbound. v1 and v2 have the same numbering and the same statement (latest version v2 used). Macros replaced: \\genc -> \\mathbf{c}, \\mdist -> \\mathsf{md}, \\threestate -> the text 'Undecided-State Dynamics' (paper: $\\textrm{Undecided-State Dynamics}$), \\m -> 1 in the context."
+
+[[source]]
+item = "undecided:thm:majority"
+paper = "A. Clementi, M. Ghaffari, L. Gualà, E. Natale, F. Pasquale, G. Scornavacca. A tight analysis of the parallel undecided-state dynamics with two colors"
+venue = "MFCS 2018"
+version = "arXiv:1707.05135v3"
+result = "Theorem 3.2"
+page = 8
+url = "https://arxiv.org/abs/1707.05135v3"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Let $\gamma$ be any positive constant. Assume that the U-Process
+starts at any biased configuration such that $\vert s \vert \geq \gamma\sqrt{n \log
+n}$ and assume w.l.o.g. the majority color is \texttt{Alpha}. Then the process converges
+to the monochromatic configuration with $a = n$ within $\mathcal{O}(\log n)$ rounds,
+w.h.p. Furthermore, the result is almost tight in a twofold sense: (i) An
+initial configuration exists, with $\vert s \vert = \Omega(\sqrt{n \log n})$, such
+that the process requires $\Omega(\log n)$ rounds to converge w.h.p. and (ii)
+there is an initial configuration with $\vert s \vert = \Theta(\sqrt{n})$ such that
+the process converges to the minority color with constant probability.
+'''
+context = '''
+It is convenient to give names also to two other quantities that will appear
+often in the analysis: The number $q(\textbf{x}) = n - a(\textbf{x}) - b(\textbf{x})$ of undecided
+nodes and the difference $s(\textbf{x}) = a(\textbf{x}) - b(\textbf{x})$ called the \textit{bias} of $\textbf{x}$.
+'''
+notes = "Theorem titled 'Plurality consensus' (label thm:mainmajority), Section 3. v2 and v3 number it Theorem 3.2; v1 has unnumbered-by-section theorems (Theorem 2). Latest version v3 used; the repo does not name a version. Macros replaced: \\threestateprocess -> the text 'U-Process' (paper: $\\textrm{U-Process}$), \\abs{s} -> \\vert s \\vert, \\colA -> \\texttt{Alpha}, \\bigO -> \\mathcal{O}, \\x -> \\textbf{x} in the context. Here a, b are the numbers of Alpha- and Beta-coloured nodes. The blueprint item also covers the SODA 2015 ratio form (no undecided nodes, a >= (1+alpha) b): the SODA 2015 paper (arXiv:1407.2565) has no separate two-colour theorem, so that form is its Theorem 11 with k = 2 (see the undecided:thm:plurality entry)."
+
+[[source]]
+item = "median:thm:expander"
+paper = "C. Cooper, R. Elsässer, T. Radzik. The power of two choices in distributed voting"
+venue = "ICALP 2014"
+version = "arXiv:1404.7479v1"
+result = "Theorem 4"
+page = 5
+url = "https://arxiv.org/abs/1404.7479v1"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Let $G$ be a $d$-regular $n$-vertex graph with
+$\lambda = \lambda_G = 3/5 - \epsilon$.
+Then, provided
+the initial size of the minority vote $B$ is at most $(\epsilon/5)n$,
+with high probability two-sample voting is completed in $O(\log n)$ steps and
+the winner is the initial majority opinion~$A$.
+'''
+context = '''
+We give a similar result for expanders, that is, for a $d$-regular graph $G$ with a small
+second eigenvalue $\lambda_G = \max \{\lambda_2, |\lambda_n|\}$, where $\lambda_1 \geq \lambda_2
+\geq \dots \geq \lambda_n$ are the eigenvalues of the transition matrix $P = (1/d)A$ of a random walk on
+$G$ and $A$ is the adjacency matrix of $G$.
+'''
+notes = "Label phaseIIandIII-expander. Only one arXiv version exists. Macro replaced: \\l -> \\lambda. 'With high probability' is defined in a footnote of the introduction as 'with probability tending to 1 as n increases'. The paper adds that its theorems hold under an adversary that redistributes the opinions at the start of each step without changing their counts."
+
+[[source]]
+item = "median:thm:cer-theorem2"
+paper = "C. Cooper, R. Elsässer, T. Radzik. The power of two choices in distributed voting"
+venue = "ICALP 2014"
+version = "arXiv:1404.7479v1"
+result = "Theorem 2"
+page = 5
+url = "https://arxiv.org/abs/1404.7479v1"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Let $G$ be an $n$-vertex $d$-regular graph
+and let opinions $A$ and $B$ be placed  on the vertices of $G$.
+There is an absolute constant $K$ (independent of $d$ and  $\lambda_G$) such that, provided
+\[ \nu_0 \; \ge \;  K \lambda_G,
+\]
+ with high probability two-sample voting is completed in $O(\log n)$ steps and
+the winner is the opinion with the initial majority.
+'''
+context = '''
+We give a similar result for expanders, that is, for a $d$-regular graph $G$ with a small
+second eigenvalue $\lambda_G = \max \{\lambda_2, |\lambda_n|\}$, where $\lambda_1 \geq \lambda_2
+\geq \dots \geq \lambda_n$ are the eigenvalues of the transition matrix $P = (1/d)A$ of a random walk on
+$G$ and $A$ is the adjacency matrix of $G$.
+'''
+notes = "Label Th1-expanders. Only one arXiv version exists. Macro replaced: \\l -> \\lambda; a commented-out line inside the display (%\\min\\left\\{ K \\l_G, \\frac{6(3/5 - \\lambda_G)}{13}\\right\\} ,) was dropped. The initial imbalance is defined in Theorem 1 as $\\nu_0 = |A-B|/n$ (introduction: $\\nu_0 = (|A| -|B|)/n$). 'With high probability' = with probability tending to 1 as n increases (footnote in the introduction)."
+
+[[source]]
+item = "median:thm:tc-plurality"
+paper = "R. Elsässer, T. Friedetzky, D. Kaaser, F. Mallmann-Trenn, H. Trinker. Rapid asynchronous plurality consensus (v1 to v4: Efficient k-party voting with two choices)"
+venue = "arXiv:1602.04667"
+version = "arXiv:1602.04667v5"
+result = "Theorem 1.2"
+page = 5
+url = "https://arxiv.org/abs/1602.04667v5"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Consider the synchronous model. Let $G=K_{n}$ be the complete graph with $n$
+nodes. Let $k=O\left(n^\varepsilon\right)$ be the number of opinions for some small
+constant $\varepsilon > 0$. The Two-Choices plurality consensus process defined in
+Algorithm~1 converges with high probability to $\mathcal{A}$ within $O\left({n}/{c_1} \cdot
+\log{n}\right)$ rounds, if the initial bias is at least $c_1-c_2 \geq z \cdot
+\sqrt{n\log{n}}$ for some constant $z$. Assuming this bias, the process
+fulfills the stabilizing near-plurality conditions in presence of any
+$F=c_1(c_1-c_2)/(8n)$-dynamic adversary.
+
+Furthermore, if we assume that $c_1-c_2 = z \cdot \sqrt{n\log{n}}$ for some
+constant $z$, and $c_j =c_2$ for any $j = 3, \dots , k$, then the Two-Choices protocol
+requires $\Omega\left(n/c_1+\log n\right)$ rounds in expectation to converge.
+'''
+context = '''
+W.l.o.g., we assume
+that colors are ordered in descending order such that $c_1 \geq c_2 \geq \dots
+\geq c_k$. We will denote the initial plurality color $\mathcal{C}_{1}$ as $\mathcal{A}$ with size $a =
+c_1$ and we will use $\mathcal{B}$ to denote the second largest color $\mathcal{C}_{2}$ of size $b =
+c_2$.
+'''
+notes = "v5 numbering, as named in median/README.md (label thm:main-result, Section 1.2 'Our Contributions'; theorem counter per section, Definition 1.1 precedes it). Macros replaced: \\TC -> Two-Choices, \\BigO{x} -> O\\left(x\\right), \\BigOmega{x} -> \\Omega\\left(x\\right), \\whp -> 'with high probability' (defined in a footnote as probability at least $1 - n^{-\\Omega(1)}$), \\A -> $\\mathcal{A}$, \\B -> $\\mathcal{B}$, \\C{j} -> $\\mathcal{C}_{j}$; \\autoref{alg:two-choices} rendered as Algorithm~1 (the PDF reads 'Algorithm 1'). Algorithm 1: every node samples u_1, u_2 in N(v) uniformly at random and adopts color(u_1) if color(u_1) = color(u_2). The stabilizing near-plurality conditions are Definition 1.1. Context is from Section 1.1 (Model)."
+
+[[source]]
+item = "voter:thm:bgkm-two"
+paper = "P. Berenbrink, G. Giakkoupis, A.-M. Kermarrec, F. Mallmann-Trenn. Bounds on the voter model in dynamic networks"
+venue = "ICALP 2016"
+version = "arXiv:1603.01895v2"
+result = "Theorem 1.1 (i)"
+page = 3
+url = "https://arxiv.org/abs/1603.01895v2"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Consider the Standard Voter model and in the dynamic graph model. Assume
+$\kappa \leq n$  opinions are  arbitrarily distributed over the nodes of $G_1$.
+Let $\phi_t$ be a lower bound on the conductance at time step $t$.
+Let $b>0$ be a suitable chosen constant.
+Then, with a probability of $1/2$ we
+have that $T\le \min\{\tau,\tau'\}$, where
+\begin{enumerate}[(i)]
+\item $\tau$ is the first round so that
+$\sum_{t=1}^\tau \phi_t \geq b \cdot m/d_{min}$. \emph{(part 1)}
+\item  $\tau'$ is the first round so that $\sum_{t=1}^{\tau'} \phi_t^2 \geq b \cdot n \log n.$  \phantom{2}\emph{(part 2)}
+\end{enumerate}
+For static graphs ($G_{i+1}=G_i$ for all $i$), we have $T\leq \min \{m/(d_{min} \cdot \phi), n\log n/\phi^2\}$.
+'''
+context = '''
+The consensus time $T$ is defined at the first time step at which all nodes have the same opinion.
+[...] In every synchronous time step every node chooses a neighbour u.a.r. and adopts its opinion with probability $1/2$.
+[...] The constraints are that each  graph $G_i$  has to have conductance $\phi_i$ and node $j$ has to have degree $d_j$ (the degrees of the nodes do not change over time).
+[Section 2:] let $\lambda_{u}$ be the number of  neighbours of $u$ in $V\setminus S$. Let
+ $\operatorname{vol}(S)=\sum_{u\in S} d_u.$
+The \emph{conductance} of $G$ is defined as
+$$\phi=\phi(G)=\min \left\{  \tfrac{\sum_{u \in U} \lambda_{u}
+}{\operatorname{vol}(U)}\colon U\subset V \text{ with } 0 < \operatorname{vol}(U) \leq m\right\}.$$
+'''
+notes = "The theorem has one statement with two parts; this item is part (i) (the whole theorem is quoted). The item also formalizes Lemma 2.2 (next entry). Macros replaced: \\dmin -> d_{min}, \\vol -> \\operatorname{vol}, \\de -> d. LaTeX comments inside the statement dropped ('%generation' after 'dynamic graph', and a commented-out line). v1 has the same numbering; v2 (latest) fixes typos ('first rounds' -> 'first round') and adds '(part 1)', '(part 2)'."
+
+[[source]]
+item = "voter:thm:bgkm-two"
+paper = "P. Berenbrink, G. Giakkoupis, A.-M. Kermarrec, F. Mallmann-Trenn. Bounds on the voter model in dynamic networks"
+venue = "ICALP 2016"
+version = "arXiv:1603.01895v2"
+result = "Lemma 2.2"
+page = 7
+url = "https://arxiv.org/abs/1603.01895v2"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Assume that $s_{\hat t}$  is fixed for an arbitrary $(\hat{t}\ge 0)$  and $\kappa=2$.\\
+ Let $\tau^*= \min\left\{t' : \sum_{i= \hat t}^{t'}  \phi_i \geq 129 \cdot \operatorname{vol}(s_{\hat t})/d_{min} \right\}$.
+Then
+$\Pr\left(T \leq \tau^*+\hat t\right) \geq 1/2.$\\
+In particular, if the graph is static with conductance $\phi$, then $\Pr\big(T \leq \frac{129 \cdot \mbox{vol}(s_{\hat t})}{\phi \cdot d_{min}}+\hat t\big) \geq 1/2.$
+'''
+context = '''
+Let $s_t$ denote the set having the smaller volume, i.e., $s_t = v^{(0)}_t$ if $\operatorname{vol}(v^{(0)}_t)\leq \operatorname{vol}(v^{(1)}_t)$, and  $s_t = v^{(1)}_t$ otherwise.
+'''
+notes = "Macros replaced: \\dmin -> d_{min}, \\vol -> \\operatorname{vol}. Same numbering in v1."
+
+[[source]]
+item = "voter:thm:bgkm-sq"
+paper = "P. Berenbrink, G. Giakkoupis, A.-M. Kermarrec, F. Mallmann-Trenn. Bounds on the voter model in dynamic networks"
+venue = "ICALP 2016"
+version = "arXiv:1603.01895v2"
+result = "Theorem 1.1 (ii)"
+page = 3
+url = "https://arxiv.org/abs/1603.01895v2"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Consider the Standard Voter model and in the dynamic graph model. Assume
+$\kappa \leq n$  opinions are  arbitrarily distributed over the nodes of $G_1$.
+Let $\phi_t$ be a lower bound on the conductance at time step $t$.
+Let $b>0$ be a suitable chosen constant.
+Then, with a probability of $1/2$ we
+have that $T\le \min\{\tau,\tau'\}$, where
+\begin{enumerate}[(i)]
+\item $\tau$ is the first round so that
+$\sum_{t=1}^\tau \phi_t \geq b \cdot m/d_{min}$. \emph{(part 1)}
+\item  $\tau'$ is the first round so that $\sum_{t=1}^{\tau'} \phi_t^2 \geq b \cdot n \log n.$  \phantom{2}\emph{(part 2)}
+\end{enumerate}
+For static graphs ($G_{i+1}=G_i$ for all $i$), we have $T\leq \min \{m/(d_{min} \cdot \phi), n\log n/\phi^2\}$.
+'''
+context = '''
+The consensus time $T$ is defined at the first time step at which all nodes have the same opinion.
+[...] In every synchronous time step every node chooses a neighbour u.a.r. and adopts its opinion with probability $1/2$.
+[...] The constraints are that each  graph $G_i$  has to have conductance $\phi_i$ and node $j$ has to have degree $d_j$ (the degrees of the nodes do not change over time).
+[Section 2:] let $\lambda_{u}$ be the number of  neighbours of $u$ in $V\setminus S$. Let
+ $\operatorname{vol}(S)=\sum_{u\in S} d_u.$
+The \emph{conductance} of $G$ is defined as
+$$\phi=\phi(G)=\min \left\{  \tfrac{\sum_{u \in U} \lambda_{u}
+}{\operatorname{vol}(U)}\colon U\subset V \text{ with } 0 < \operatorname{vol}(U) \leq m\right\}.$$
+'''
+notes = "The theorem has one statement with two parts; this item is part (ii) (the whole theorem is quoted). The item also formalizes Lemma 2.4 (next entry). Macros replaced: \\dmin -> d_{min}, \\vol -> \\operatorname{vol}, \\de -> d. LaTeX comments inside the statement dropped. v1 has the same numbering."
+
+[[source]]
+item = "voter:thm:bgkm-sq"
+paper = "P. Berenbrink, G. Giakkoupis, A.-M. Kermarrec, F. Mallmann-Trenn. Bounds on the voter model in dynamic networks"
+venue = "ICALP 2016"
+version = "arXiv:1603.01895v2"
+result = "Lemma 2.4"
+page = 8
+url = "https://arxiv.org/abs/1603.01895v2"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Assume $\kappa=2$. We have
+$\Pr\left(T \leq \tau' \right) \geq 1/n^2.$
+In particular, if the graph is static with conductance $\phi$, then $\Pr\big(T \leq \frac{96\cdot n\log n}{\phi^2 }\big) \geq 1-1/n^2$.
+'''
+context = '''
+[Theorem 1.1 (ii):] $\tau'$ is the first round so that $\sum_{t=1}^{\tau'} \phi_t^2 \geq b \cdot n \log n.$
+'''
+notes = "Verbatim, including the printed '\\geq 1/n^2' in the first claim (the repo's PROVENANCE.md notes the proof gives 1 - 1/n^2). Same numbering in v1."
+
+[[source]]
+item = "crn:thm:ambassador"
+paper = "G. B. Mertzios, S. E. Nikoletseas, C. L. Raptopoulos, P. G. Spirakis. Determining majority in networks with local interactions and very small local memory"
+venue = "ICALP 2014"
+version = "arXiv:1404.7671v1"
+result = "Theorem 2"
+page = 8
+url = "https://arxiv.org/abs/1404.7671v1"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Given any (un)directed graph, if there exists initially a majority, then the $4$-state ambassador protocol stably computes the initial majority value.
+'''
+context = '''
+Assuming that the input symbols are $g$ (for green) and $r$ (for red), the set of states in the ambassador protocol is $Q=\{(g,0),(g,1),(r,0),(r,1)\}$. The input function $\iota $ is such that $\iota(g)=(g,1)$ and $\iota(r)=(r,1)$. The output function $\gamma$ is such that $\gamma((g,i))=g$ and $\gamma((r,i))=r$, where $i \in \{0,1\}$. Finally, for simplicity of the presentation, we present the transition function $\delta$ in the form of a table in Figure 1.
+'''
+notes = "Figure 1 (the transition table) is not quoted. The only arXiv version is v1."
+
+[[source]]
+item = "crn:thm:three-states"
+paper = "G. B. Mertzios, S. E. Nikoletseas, C. L. Raptopoulos, P. G. Spirakis. Determining majority in networks with local interactions and very small local memory"
+venue = "ICALP 2014"
+version = "arXiv:1404.7671v1"
+result = "Theorem 1"
+page = 6
+url = "https://arxiv.org/abs/1404.7671v1"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Let $\mathcal{P}_{majority}$ be the class of population protocols that stably compute the majority function in any 2-type population of agents and for any interaction graph. Then $R(\mathcal{P}_{majority}) > 3$.
+'''
+context = '''
+For any population protocol $P$, denote by $Q(P)$ the set of types used by $P$.
+Let $\mathcal{P}_{g}$ be a class of population protocols that stably compute the function $g$.
+The \emph{rank} of $\mathcal{P}_{g}$ is
+\begin{equation}
+R(\mathcal{P}_{g}) \stackrel{def}{=} \min_{P \in \mathcal{P}_{g}} |Q(P)|.
+\end{equation}
+'''
+notes = "Replaced {\\cal P} by \\mathcal{P}. Context is Definition 1 (rank). The only arXiv version is v1."
+
+[[source]]
+item = "crn:lem:hall"
+paper = "G. B. Mertzios, S. E. Nikoletseas, C. L. Raptopoulos, P. G. Spirakis. Determining majority in networks with local interactions and very small local memory"
+venue = "ICALP 2014"
+version = "arXiv:1404.7671v1"
+result = "Corollary 1"
+page = 10
+url = "https://arxiv.org/abs/1404.7671v1"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Let $\mathcal{T}_1, \mathcal{T}_2, \ldots, \mathcal{T}_x$ be $r$-element subsets of a universe of $y$ elements, such that each element belongs to the same number $d \geq 1$ of these sets. If $x \leq y$, then the sets $\mathcal{T}_1, \mathcal{T}_2, \ldots, \mathcal{T}_x$ have a system of distinct representatives.
+'''
+notes = "Replaced {\\cal T} by \\mathcal{T}. The paper attributes the corollary to its reference [9] (Jukna, Extremal Combinatorics, chapter 5); the header citation is omitted from the statement."
+
+[[source]]
+item = "crn:thm:am-graph"
+paper = "G. B. Mertzios, S. E. Nikoletseas, C. L. Raptopoulos, P. G. Spirakis. Determining majority in networks with local interactions and very small local memory"
+venue = "ICALP 2014"
+version = "arXiv:1404.7671v1"
+result = "Theorem 4"
+page = 10
+url = "https://arxiv.org/abs/1404.7671v1"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+For any strongly connected directed graph $G$, if the initial assignment of individuals to the vertices of $G$ is random, then the majority protocol described in [2] correctly identifies the initial majority with probability at least $\frac{1}{2}$.
+'''
+notes = "\\cite{AAE08} rendered as [2], the paper's numbering (Angluin, Aspnes, Eisenstat, A simple population protocol for fast robust approximate majority, Distrib. Comput. 2008). The only arXiv version is v1."
+
+[[source]]
+item = "crn:thm:am-half"
+paper = "G. B. Mertzios, S. E. Nikoletseas, C. L. Raptopoulos, P. G. Spirakis. Determining majority in networks with local interactions and very small local memory"
+venue = "ICALP 2014"
+version = "arXiv:1404.7671v1"
+result = "Theorem 4"
+page = 10
+url = "https://arxiv.org/abs/1404.7671v1"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+For any strongly connected directed graph $G$, if the initial assignment of individuals to the vertices of $G$ is random, then the majority protocol described in [2] correctly identifies the initial majority with probability at least $\frac{1}{2}$.
+'''
+notes = "\\cite{AAE08} rendered as [2], the paper's numbering (Angluin, Aspnes, Eisenstat, A simple population protocol for fast robust approximate majority, Distrib. Comput. 2008). The only arXiv version is v1."
+
+[[source]]
+items = ["epidemics:thm:subcritical", "epidemics:cor:subcritical"]
+paper = "L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccardi. Percolation and Epidemic Processes in One-Dimensional Small-World Networks"
+venue = "arXiv preprint"
+version = "arXiv:2103.16398v3"
+result = "Theorem 2.3"
+page = 5
+url = "https://arxiv.org/abs/2103.16398v3"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Let $G=(V,E)$ be a graph of maximum degree $d$, $\varepsilon >0$ be an
+arbitrary positive number, $p < (1-\varepsilon)/(d-1)$  be a bond percolation  probability, and $I_0$ be a subset of $V$.
+  Consider the percolation graph $G_p$.  Then,
+w.h.p.,  all the connected components of $G_p$ have size $\mathcal{O}_{\varepsilon}(\log n)$.
+'''
+context = '''
+As usual, we say that an event
+$\mathcal{E}_n$ occurs \emph{with high probability} if $\mathbf{Pr} \left( \mathcal{E}_n \right)
+\geq 1-(1/n)^{\Omega(1)}$.
+'''
+notes = "Theorem title in the paper: 'Percolation on bounded-degree graphs'. Macro \\bigO replaced by \\mathcal{O}, \\Prc{.} by \\mathbf{Pr} \\left( . \\right). The context is the footnote of Theorem 2.1 defining w.h.p. The paper states the Reed-Frost consequence of Theorem 2.3 only informally ('we omit here the formal statement', end of Section 2), so for the item cor:subcritical this entry is the closest numbered result, not its exact source; the quantitative version (exp tail) is Theorem E.1. The repo cites the paper only via arXiv (it does not name a venue)."
+
+[[source]]
+item = "epidemics:thm:swg-sub"
+paper = "L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccardi. Percolation and Epidemic Processes in One-Dimensional Small-World Networks"
+venue = "arXiv preprint"
+version = "arXiv:2103.16398v3"
+result = "Theorem 2.1 (claim 2)"
+page = 4
+url = "https://arxiv.org/abs/2103.16398v3"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Let $V$ be a set of $n$ vertices and $p>0$ be a bond percolation  probability. For any constant
+$c>0$,  sample a graph $G=(V, E_1 \cup E_2)$ from the $\mathcal{SWG}(n,c/n)$ distribution, and consider the percolation graph $G_p$. For any constant $\varepsilon>0$:
+\begin{enumerate}
+\item If $p>\frac{\sqrt{c^{2} + 6c +1}-c-1}{2c} + \varepsilon$,  w.h.p.
+      a subset of nodes of size $\Omega_\varepsilon(n)$ exists
+      that induces   a   subgraph  of $G_p$ having  diameter $\mathcal{O}_{\varepsilon}(\log n)$;
+\item If  $p<\frac{\sqrt{c^{2} + 6c +1}-c-1}{2c} - \varepsilon$,  w.h.p.  all the connected components of  $G_p$ have size $\mathcal{O}_{\varepsilon}(\log n)$.
+\end{enumerate}
+'''
+context = '''
+As usual, we say that an event
+$\mathcal{E}_n$ occurs \emph{with high probability} if $\mathbf{Pr} \left( \mathcal{E}_n \right)
+\geq 1-(1/n)^{\Omega(1)}$.
+'''
+notes = "Full statement of Theorem 2.1 ('Percolation on the SWG(n,q) model'); the formalized part is claim 2 (item 2). The footnote defining w.h.p. (attached to 'w.h.p.' in item 1) is moved to context. Macros replaced: \\SWGm -> \\mathcal{SWG}, \\bigO -> \\mathcal{O}, \\Prc{.} -> \\mathbf{Pr} \\left( . \\right). The blueprint item also cites Lemma C.1 (separate entry below), which is what the formal statement follows. The repo cites v3 explicitly; v3 is the latest arXiv version."
+
+[[source]]
+item = "epidemics:thm:swg-sub"
+paper = "L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccardi. Percolation and Epidemic Processes in One-Dimensional Small-World Networks"
+venue = "arXiv preprint"
+version = "arXiv:2103.16398v3"
+result = "Lemma C.1"
+page = 32
+url = "https://arxiv.org/abs/2103.16398v3"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Let $V$ be a set of $n$ nodes. For every $\varepsilon>0$, $c>0$ and for every
+contagion probability $p$ such that
+\[
+0 \, \leq \, p \, \leq \, \frac{\sqrt{c^{2} + 6c +1}-c-1}{2c} - \varepsilon
+\]
+there is a positive constant $\beta$ that depends only on $c$ and $\varepsilon$
+such that the following holds. Sample a graph $G=(V,E)$ according to the
+$\mathcal{SWG}(n,c/n)$ distribution, and let $G_p$ be the percolation graph of
+$G$ with parameter $p$. If $n$ is sufficiently large, with probability at least
+$1 - 1/n$ with respect to the randomness of $G$ and the randomness of $G_p$,
+$G_p$ contains no connected component of size exceeding $\beta \log n$.
+'''
+notes = "Secondary source of the item (the blueprint title is 'Lemma C.1 and Theorem 2.1, claim 2'). No paper macros in the statement."
+
+[[source]]
+item = "epidemics:thm:perc"
+paper = "L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccardi. Percolation and Epidemic Processes in One-Dimensional Small-World Networks"
+venue = "arXiv preprint"
+version = "arXiv:2103.16398v3"
+result = "Theorem A.3"
+page = 19
+url = "https://arxiv.org/abs/2103.16398v3"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Consider the bond percolation process and the   $\mathrm{IC}$ protocol   on the same graph $G=(V,E)$ and
+let $I_0 = A_0 = V_0$, where $V_0$ is any fixed subset of $V$, and with
+transmission probabilities and percolation probabilities equal to $\{ p(e) \}_{e\in
+E}$.
+
+Then,  for every integer $t \geq 1$ and for every subsets $V_1, \dots, V_{t-1}
+\subseteq V$, the events $\{I_0 = V_0, \dots, I_{t-1} = V_{t-1}\}$ and $\{A_0 =
+V_0, \dots, A_{t-1} = V_{t-1}\}$ have either both zero probability   or
+non-zero probability, and, in the latter case, the  distribution of the
+infectious set $I_{t}$,  conditional to the event $\{I_0 = V_0, \dots, I_{t-1}
+= V_{t-1}\}$, is   the same  to that of  the $t$-active set $A_t$, conditional
+to the event  $\{A_0 = V_0, \dots, A_{t-1} = V_{t-1}\}$.
+'''
+context = '''
+Definition A.1 (The Bond Percolation process). Given a graph $G = (V,E)$, and given, for every edge $e \in E$, a
+\emph{percolation probability} $p(e) \in [0,1]$, the \emph{bond percolation}  process consists to
+\emph{remove} each edge $e \in E$, independently, with probability $1-p(e)$.
+The random subgraph, called the \emph{percolation graph} $G_p=(V,E_p)$, is
+defined by the edges that are not removed (i.e. they are activated), i.e., $E_p = \{ e \in E \, : \,
+\mbox{edge $e$ is not removed} \}$. Given an initial subset $A_0 \subseteq V$ of
+\emph{active} nodes, for every integer $t \leq n-1$, we define the random
+subset $A_{t}$ of  $t$-active nodes as the subset of nodes that are at distance
+$t$ from $A_{0}$ in the percolation graph $G_p=(V,E_p)$, i.e., $A_{t} =
+N_{G_{p}}^{t}(A_{0})$. Finally, the subset of all active nodes from $A_{0}$ is
+the subset $N^*_{G_p}(A_0)$.
+'''
+notes = "Theorem title in the paper: 'Bond percolation and IC processes are equivalent, [KKT15]' (Kempe, Kleinberg, Tardos). Macro \\IC replaced by $\\mathrm{IC}$. The IC protocol (Definition A.2, of which Reed-Frost is the special case with equal transmission probabilities) is too long to quote here. The blueprint label of this item is thm:perc."
+
+[[source]]
+item = "epidemics:thm:path"
+paper = "M. Krivelevich, B. Sudakov. The phase transition in random graphs: a simple proof"
+venue = "Random Structures & Algorithms 43 (2013)"
+version = "arXiv:1201.6529v4"
+result = "Theorem 1 (2)"
+page = 4
+url = "https://arxiv.org/abs/1201.6529v4"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Let $\epsilon>0$ be a small enough constant. Let $G\sim G(n,p)$.
+\begin{enumerate}
+\item Let $p=\frac{1-\epsilon}{n}$. Then \textbf{whp} all connected
+components of $G$ are of size at most $\frac{7}{\epsilon^2}\ln n$.
+\item Let $p=\frac{1+\epsilon}{n}$. Then \textbf{whp} $G$ contains a path of
+length at least $\frac{\epsilon^2 n}{5}$.
+\end{enumerate}
+'''
+context = '''
+We say that an event  $\mathcal{E}_n$ occurs with high
+probability, or \textbf{whp} for brevity, in the probability space $G(n,p)$
+if $\lim_{n\rightarrow\infty}Pr[G\sim G(n,p)\in \mathcal{E}_n]=1$.
+'''
+notes = "Full statement of Theorem 1; the formalized part is item 2. Macro \\whp ({\\bf whp}) replaced by \\textbf{whp}, {\\cal E} by \\mathcal{E}. Context is the footnote of the introduction defining whp. The repo names no arXiv version; v4 (latest) is used, and its numbering matches the repo's."
+
+[[source]]
+item = "epidemics:thm:giant"
+paper = "M. Krivelevich, B. Sudakov. The phase transition in random graphs: a simple proof"
+venue = "Random Structures & Algorithms 43 (2013)"
+version = "arXiv:1201.6529v4"
+result = "Theorem 2"
+page = 5
+url = "https://arxiv.org/abs/1201.6529v4"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Let $p=\frac{1+\epsilon}{n}$, for $\epsilon>0$ a small enough
+constant. Let $G\sim G(n,p)$. Then \textbf{whp} $G$ has a connected
+component with at least $\frac{\epsilon n}{2}$ vertices.
+'''
+context = '''
+We say that an event  $\mathcal{E}_n$ occurs with high
+probability, or \textbf{whp} for brevity, in the probability space $G(n,p)$
+if $\lim_{n\rightarrow\infty}Pr[G\sim G(n,p)\in \mathcal{E}_n]=1$.
+'''
+notes = "Macro \\whp replaced by \\textbf{whp}, {\\cal E} by \\mathcal{E}. The repo names no arXiv version; v4 (latest) is used, and its numbering matches the repo's. The blueprint item's second claim (a linear component for every epsilon > 0) has no counterpart in this theorem, which assumes epsilon small."
+
+[[source]]
+item = "epidemics:thm:duality"
+paper = "C. Cooper, T. Radzik, N. Rivera. The coalescing-branching random walk on expanders and the dual epidemic process"
+venue = "PODC 2016"
+version = "arXiv:1602.05768v2"
+result = "Theorem 4"
+page = 5
+url = "https://arxiv.org/abs/1602.05768v2"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Let $G$ be a connected regular graph and consider the COBRA and BIPS processes on $G$ with parameter $k \ge 1$.
+For each $v \in V$, $C \subseteq V$ and $t \geq 0$ we have
+$$\widehat{\mathbf{P}}(\mathrm{Hit}_C(v)> t| C_0 = C) \;\; = \; \; \mathbf{P}(C \cap  A_t = \emptyset| A_0 = v).$$
+'''
+context = '''
+For a connected graph $G=(V,E)$, denote $\mathrm{Hit}_C(v) = \min\{t: v \in C_t, C_0=C\}$ the hitting time of vertex $v$ for a COBRA process starting from $C$.
+In particular, $\mathrm{Hit}_u(v)$ is the hitting time of $v$ starting from $u$. [...]
+\begin{equation}
+\mathbf{P}(\mathrm{Hit}_u(v)> t) = \mathbf{P}(u \not \in A_t | A_0 = \{ v\} ).  \tag{2}
+\end{equation}
+[...] To avoid confusion, we use the notation $\mathbf{P}( \cdot)$ for probabilities in the BIPS process, and
+$\widehat{\mathbf{P}}(\cdot)$ in the COBRA process.
+To simplify notation, we will write ``$A_0 = v$'' for the frequently appearing condition ``$A_0 = \{ v \}$.''
+'''
+notes = "Macros replaced: \\Prob (\\mbox{{\\bf P}}) -> \\mathbf{P}, \\wh -> \\widehat, \\Hit -> \\mathrm{Hit}, \\COBRA/\\BIPS -> COBRA/BIPS. Context quotes Section 1 (definition of Hit and equation (2), label bkp09e23; the \\tag{2} is added to show its number) and Section 2 (notation). The repo names no arXiv version; v2 (latest) is used, and its numbering matches the repo's."
+
+[[source]]
+item = "epidemics:thm:crr-cobra"
+paper = "C. Cooper, T. Radzik, N. Rivera. The coalescing-branching random walk on expanders and the dual epidemic process"
+venue = "PODC 2016"
+version = "arXiv:1602.05768v2"
+result = "Theorem 1"
+page = 3
+url = "https://arxiv.org/abs/1602.05768v2"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Let $G$ be a connected regular $n$-vertex graph with
+$1-\lambda\gg \sqrt{(\log n)/n}$. \footnote{%
+$(1-\lambda) \ge  C\sqrt{(\log n)/n}$ for some suitably large constant $C$.}
+Let
+\begin{eqnarray*}
+T= \frac{\log(n)}{(1-\lambda)^3}.
+\end{eqnarray*}
+Let $\mathrm{COV}(G)=\max_{u \in V} \mathrm{COV}(u)$ be the cover time of $G$ by a COBRA process with branching factor $k=2$. Then $COV(G)=\mathcal{O}(T)$ and for all $u \in V$, w.h.p. $\mathbf{cov}(u)=\mathcal{O}(T)$.
+'''
+context = '''
+Let
+$\lambda=\lambda_{\max}=\max_{i=2,...,n} |\lambda_i|$ be the second largest eigenvalue (in absolute value). [...]
+For $C_0 = \{ u \}$, let $\mathbf{cov}(u) = \min\{ T: \bigcup_{t=1}^{T} C_t = V\}$
+be the number of steps needed for the COBRA process
+to visit all vertices of the graph $G$ starting from vertex $u$; and let $\mathrm{COV}(u) = \mathbf{E}(\mathbf{cov}(u))$.
+'''
+notes = "Macros replaced: \\COV -> \\mathrm{COV}, \\cov -> \\mathbf{cov}, \\COBRA -> COBRA, \\bigO -> \\mathcal{O}, \\E -> \\mathbf{E}, \\l -> \\lambda. '$COV(G)' (without backslash) is verbatim from the source. lambda is defined for the random-walk transition matrix P = A(G)/r. The repo names no arXiv version; v2 (latest) is used, and its numbering matches the repo's."
+
+[[source]]
+item = "epidemics:thm:crr-bips"
+paper = "C. Cooper, T. Radzik, N. Rivera. The coalescing-branching random walk on expanders and the dual epidemic process"
+venue = "PODC 2016"
+version = "arXiv:1602.05768v2"
+result = "Theorem 2"
+page = 3
+url = "https://arxiv.org/abs/1602.05768v2"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Let $G$ be a connected $n$-vertex $r$-regular graph with $1-\lambda \gg \sqrt{(\log n)/n}$. Then  for every
+$v \in V$, the infection time, $\mathbf{infec}(v)$, by a BIPS process with $k=2$ satisfies $\mathbf{infec}(v) = \mathcal{O}(\log(n)/(1-\lambda)^3)$ in expectation and with probability at least $1-\mathcal{O}(1/n^3)$. Moreover $\mathrm{Infec}(G)= \mathcal{O}(\log(n)/(1-\lambda)^3)$.
+'''
+context = '''
+If we define $\mathbf{infec}(v)$ as the first time when all vertices are infected when the source is $v$,
+ $\mathrm{Infec}(v) = \mathbf{E}(\mathbf{infec}(v))$, and $\mathrm{Infec}(G)= \max_{u \in V} \mathrm{Infec}(v)$, then we have the analogue theorem of Theorem 1.
+'''
+notes = "Macros replaced: \\inf -> \\mathbf{infec}, \\INF -> \\mathrm{Infec}, \\BIPS -> BIPS, \\bigO -> \\mathcal{O}, \\E -> \\mathbf{E}. The footnote of Theorem 1 reads '$(1-\\lambda) \\ge C\\sqrt{(\\log n)/n}$ for some suitably large constant $C$'. The repo names no arXiv version; v2 (latest) is used, and its numbering matches the repo's."
+
+[[source]]
+item = "epidemics:thm:rumor-growth"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Theorem 21"
+page = 19
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Consider a homogeneous epidemic protocol satisfying the upper exponential growth conditions in $[1,fn[$.
+Then there exist constant $A', \alpha'$ such that
+\begin{eqnarray*}
+	&& \mathbb{E}[T(1, fn)] \le \log_{1+\gamma_n} n + O(1), \\
+	&& \mathbb{P}[T(1,fn) > \log_{1+\gamma_n} n + r] \le A' e^{-\alpha' r} \, \mbox{for any $r \in N$}.
+\end{eqnarray*}
+'''
+context = '''
+Definition 9 (upper exponential growth conditions). Let $\gamma_n$ be bounded between two positive constants.
+Let $a, b, c \ge 0$ and $0 < f < 1$ with $af<1$.
+We say that a homogeneous epidemic protocol satisfies the \emph{upper exponential growth conditions} in $[1,fn[$ if for any $n \in \mathbb{N}$ big enough the following properties are satisfied for any $k < fn$.
+(i) $p_k \ge \gamma_n \tfrac{k}{n} \cdot \left(1- a\tfrac{k}{n} - \tfrac{b}{\ln n}\right)$.
+(ii) $c_k \le c\tfrac{k}{n^2}$.
+
+Definition 8 (Rumor spreading times). Consider a homogeneous rumor spreading process. For all $t = 0, 1, \dots$ denote by $I_t$ the number of informed nodes at the end of the $t$-th round ($I_0 := 1$). Let $k \le m \le n$. By $T(k,m)$ we denote the time it takes to increase the number of informed nodes from $k$ to $m$ or more, that is,
+\[ T(k,m) = \min\{ t-s | I_s = k \operatorname{ and } I_t \ge m \}. \]
+We call $T(1,n)$ the rumor spreading time of the process.
+'''
+notes = "Theorem title in the paper: 'upper bound for the spreading time'. Macros replaced: \\Expect -> \\mathbb{E}, \\Pr (redefined by the paper) -> \\mathbb{P}, \\Pk -> p_k, \\Ck -> c_k, \\N -> \\mathbb{N}. The source writes '$r \\in N$' (plain N) in the statement. Context: Definitions 9 and 8 (page 19 and 17), enumerate environment flattened to (i), (ii). p_k is the probability that an uninformed node becomes informed in a round starting with k informed nodes, c_k the covariance number (Definitions 6, 7). Only arXiv version: v1."
+
+[[source]]
+item = "epidemics:thm:rumor-shrinking"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Theorem 31"
+page = 28
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Consider a homogeneous epidemic protocol satisfying the upper exponential shrinking conditions.
+Then there are constant $A', \alpha' > 0$ such that
+\begin{eqnarray*}
+	&& \mathbb{E}[T(n-\lfloor g n \rfloor, n)] \le \tfrac1{\rho_n}\ln n + O(1), \\
+	&& \mathbb{P}[T(n-\lfloor g n \rfloor, n) > \tfrac1{\rho_n}\ln n + r] \le A' e^{-\alpha r}\,
+		\mbox{ for all $r \in \mathbb{N}$}.
+\end{eqnarray*}
+'''
+context = '''
+Definition 11 (upper exponential shrinking conditions). Let $\rho_n$ be bounded between two positive constants.
+Let $0 < g < 1$ and $a, c \in \mathbb{R}_{\ge0}$ such that $e^{-{\rho_n}} + ag < 1$.
+We say that a homogeneous epidemic protocol satisfies \emph{the upper exponential shrinking conditions} if for any $n \in \mathbb{N}$ big enough, the following properties are satisfied, for all $u = n-k \le gn$.
+(i) $1-p_k = 1-p_{n-u} \le e^{-{\rho_n}} + a\frac{u}{n}$;
+(ii) $c_k = c_{n-u} \le \frac{c}{u}$.
+'''
+notes = "Theorem title in the paper: 'upper bound for spreading time'. The tail bound is written $A' e^{-\\alpha r}$ (alpha without prime) in the source although the constants introduced are $A', \\alpha'$. Macros replaced: \\Expect -> \\mathbb{E}, \\Pr (redefined by the paper) -> \\mathbb{P}, \\N -> \\mathbb{N}, \\R -> \\mathbb{R}. Context: Definition 11 (page 27), enumerate flattened. T(k,m) as in Definition 8 (see the rumor-growth entry)."
+
+[[source]]
+item = "epidemics:thm:rumor-double"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Theorem 43"
+page = 35
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Consider a homogeneous epidemic protocol satisfying the upper double exponential shrinking conditions in $[n^{-\alpha},g]$.
+Suppose further that there exists $\tau > 0$ such that $1-p_{n-u} \le n^{-\tau}$ for all $u \le n^{1-\alpha}$.
+
+Then there exist constant $A', \alpha' > 0$ such that
+\begin{eqnarray*}
+	&& \mathbb{E}[T(\lceil (1-g)n \rceil,n)] \le \log_\ell \ln n + O(1), \\
+	&& \mathbb{P}[T(\lceil (1-g)n \rceil,n) \ge \log_\ell \ln n + r] \le O(n^{-\alpha' r+A'})\, \mbox{ for all $r \in \mathbb{N}$}.
+\end{eqnarray*}
+'''
+context = '''
+Definition 13 (upper double exponential shrinking conditions). Let $g, \alpha \in [0,1]$, $\ell > 1$, and $a, c \in \mathbb{R}_{\ge0}$ such that $ag^{\ell-1} < 1$.
+We say that a homogeneous epidemic protocol satisfies \emph{the upper double exponential shrinking conditions}
+if for any $n$ big enough, the following properties are satisfied for all $u \in [n^{1-\alpha}, gn]$.
+(i) $1-p_{n-u} \le a\left(\tfrac{u}{n}\right)^{\ell-1}$.
+(ii) $c_{n-u} \le c \tfrac{n}{u^2}$.
+'''
+notes = "Untitled theorem in the paper. Macros replaced: \\Expect -> \\mathbb{E}, \\Pr (redefined by the paper) -> \\mathbb{P}, \\N -> \\mathbb{N}, \\R -> \\mathbb{R}. Context: Definition 13 (page 34), enumerate flattened. T(k,m) as in Definition 8 (see the rumor-growth entry)."
+
+[[source]]
+item = "epidemics:thm:rumor-protocols"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Theorems 51, 52, 53"
+page = 39
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Theorem 51. The expected rumor spreading time of the push protocol on the complete graph with $n$ vertices is $\log_2 n + \ln n \pm O(1)$.
+
+Theorem 52. The expected rumor spreading time of the pull protocol on the complete graph with $n$ vertices is $\log_2 n + \log_2 \ln n \pm O(1)$.
+
+Theorem 53. The expected rumor spreading time of the push-pull protocol on the complete graph with $n$ vertices is $\log_3n + \log_2\ln n \pm O(1)$.
+'''
+notes = "One entry with all three statements (each is one sentence); the labels 'Theorem 51.' etc. are added to separate them. Theorem 51 is on page 39, Theorems 52 and 53 on page 41. The paper states these as expected times only (no tail bounds); the blueprint item covers the upper halves (with tails), the lower halves are in the separate lower-bound section."
+
+[[source]]
+item = "averaging:thm:strong"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, L. Trevisan. Find your place: simple distributed algorithms for community detection"
+venue = "SODA 2017 / SIAM J. Comput. 2020"
+version = "arXiv:1511.03927v4"
+result = "Theorem 3.2"
+page = 7
+url = "https://arxiv.org/abs/1511.03927v4"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Let $G = ((V_1, V_2),E)$ be a connected $(2n,d,b)$-clustered regular graph with
+$1 - 2b/d > (1+\delta) \lambda$ for an arbitrarily-small constant $\delta > 0$.
+Then the \textsc{Averaging} protocol produces a strong reconstruction within $\mathcal{O}(\log n)$ rounds, w.h.p.
+'''
+context = '''
+In what follows we always denote by $\lambda_1 \geq \ldots \geq
+\lambda_{2n}$ the eigenvalues of $P$. [...] We denote by $\lambda$ the largest, in
+absolute value, among all but the first two eigenvalues, namely
+$\lambda = \max\left\{ | \lambda_i | \,:\, i = 3, 4, \dots, 2n \right\}$.
+'''
+notes = "Theorem title: 'Strong reconstruction'. Numbering: Theorem 4.3 in v2 (v1 has no such theorem); Theorem 3.2 in v3 and v4 with identical LaTeX statements; transcribed from v4 (latest), whose Lemmas B.1 and C.1 also match the numbering of PROVENANCE.md. Macros replaced: \\avg -> \\textsc{Averaging}, \\strong -> 'strong reconstruction', \\bigO -> \\mathcal{O}. Context from Section 2 (P = (1/d)A is the transition matrix of the d-regular graph). The paper's statement has no explicit number of rounds or failure probability; the blueprint's T(n, delta) and 1 - 1/sqrt(pi n) come from the proof."
+
+[[source]]
+item = "averaging:thm:opp-31"
+paper = "L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale, P. Raghavendra, L. Trevisan. Average whenever you meet: opportunistic protocols for community detection"
+venue = "ESA 2018"
+version = "arXiv:1703.05045v3"
+result = "Theorem 3.1"
+page = 9
+url = "https://arxiv.org/abs/1703.05045v3"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Let $G = (V,E)$ be an $(n, d, \beta)$-almost regular graph $G = (V,E)$ with a
+balanced partition $V = (V_1,V_2)$ and such that: (i) The cut  $E(V_1,V_2)$ is
+sparse, i.e.,  $m_{1,2} = |E(V_1,V_2)| = o(m)$; (ii) The gap $\lambda_3 -
+\lambda_2 = \Omega(1)$. If nodes of $G$
+execute Protocol~\textsc{Averaging} then, with constant probability w.r.t. the initial
+random vector $\mathbf{x}^{(0)} \in \{-1,1\}^n$, after $\Theta(n \log n)$ rounds the
+following holds for all but $o(n)$ nodes: (i) The expected value of a node $u$
+increases or decreases depending on the community it belongs to, i.e.,
+$\mathbf{sgn}\left( \mathbb{E}\left[\mathbf{x}^{(t-1)}_u\,|\,\mathbf{x}^{(0)}\right] -
+\mathbb{E}\left[\mathbf{x}^{(t)}_u\,|\,\mathbf{x}^{(0)}\right] \right) = \mathbf{sgn}\left( \boldsymbol{\chi}_u \right)$; (ii)
+Over a time window of length $\Omega(n \log n)$ the sign of the expected value
+of a    node $u$ reflects the community $u$ belongs to, i.e.,  $ \mathbf{sgn}\left(
+\mathbb{E}\left[\mathbf{x}^{(t)}_u\,|\,\mathbf{x}^{(0)}\right] \right) = \mathbf{sgn}\left( \alpha_2 \boldsymbol{\chi}_u
+\right)$, for some $\alpha_2 = \alpha_2(\mathbf{x}^{(0)})$.
+'''
+notes = "The paper's Theorem 3.1 is for (n,d,beta)-almost regular graphs; the blueprint item is its clustered-regular case (through Lemmas B.1, B.3, B.4). Footnote after condition (ii) removed: 'In practice, this means that each of the subgraphs induced by community $V_i$ ($i=1,2$) is an expander.' Macros replaced: \\aveproc -> \\textsc{Averaging}, \\sgn -> \\mathbf{sgn}, \\Expec{}{X} -> \\mathbb{E}\\left[X\\right], \\bx -> \\mathbf{x}, \\bchi -> \\boldsymbol{\\chi}."
+
+[[source]]
+item = "averaging:thm:opp-41"
+paper = "L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale, P. Raghavendra, L. Trevisan. Average whenever you meet: opportunistic protocols for community detection"
+venue = "ESA 2018"
+version = "arXiv:1703.05045v3"
+result = "Theorem 4.1"
+page = 11
+url = "https://arxiv.org/abs/1703.05045v3"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Let $G$ be  an $(n,d,b)$-clustered regular graph with $\lambda_2
+= \frac{2b}{d} = o\left(\lambda_3 / \log n \right)$.
+Then, for every
+$\frac{3n}{\lambda_3}\log n\le t \le \frac{n}{4\lambda_2}$ it holds that
+\begin{equation*}
+    \mathbb{E}\left[\left\| \mathbf{y}^{(t)} + \mathbf{z}^{(t)} - \mathbf{y}^{(0)} \right\|^2\right]
+    \leq  \frac{3 \lambda_2 t}{n} \,.
+\end{equation*}
+'''
+context = '''
+For the sake of readability, we here denote by $\mathbf{y}^{(t)} = Q_2 \mathbf{x}^{(t)}$ the component
+of the state vector in the eigenspace of the second eigenvalue of
+$\overline{W}$, while $\mathbf{z}^{(t)} = Q_{3 \cdots n} \mathbf{x}^{(t)}$ denotes
+$\mathbf{x}^{(t)}$'s projection onto the subspace
+orthogonal to $\mathbf{1}$ and $\boldsymbol{\chi}$.
+'''
+notes = "Theorem title: 'Second moment analysis'. Commented-out lines of the source removed. Macros replaced: \\Expec{}{X} -> \\mathbb{E}\\left[X\\right], \\by -> \\mathbf{y}, \\bz -> \\mathbf{z}, \\bx -> \\mathbf{x}, \\avgW -> \\overline{W}, \\bone -> \\mathbf{1}, \\bchi -> \\boldsymbol{\\chi}. The blueprint item also covers Lemma C.4 (the unrolled recursions, Appendix C.1)."
+
+[[source]]
+item = "averaging:thm:opp-42"
+paper = "L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale, P. Raghavendra, L. Trevisan. Average whenever you meet: opportunistic protocols for community detection"
+venue = "ESA 2018"
+version = "arXiv:1703.05045v3"
+result = "Lemma 4.2"
+page = 12
+url = "https://arxiv.org/abs/1703.05045v3"
+status = "transcribed from the arXiv LaTeX source, not yet compared with the PDF"
+statement = '''
+Let $\varepsilon > 0$ be an arbitrarily small value, let $G$ be an
+$(n,d,b)$-clustered regular graph with
+$\frac{\lambda_2}{\lambda_3}\le\frac{\lambda_3\epsilon^4}{c \log^2 n}$, for a
+large enough costant $c$. If we  execute \textsc{Averaging}$(1/2)$ on $G$, it holds that
+\[
+\mathbb{P}\left[  |B_t|  \leq 3 \epsilon\cdot n \, ,   \, \forall  \, t \, : \,
+ 6 \frac{n}{\lambda_3} \log n \leq t\leq 12 \frac{n}{\lambda_3}
+\log n \right] \geq 1 - \epsilon \,.
+\]
+'''
+context = '''
+Definition 4.1. A node $v$ is \emph{$\epsilon$-good} at time $t$ if
+\[
+    ( \mathbf{x}^{(t)}_{v} - ( \mathbf{x}_{\|,{v}} + \mathbf{y}^{(0)}_{v}) )^2 \leq
+    \frac {\epsilon^2}{n}\|\mathbf{y}^{(0)}\|^2,
+\]
+it is \emph{$\epsilon$-bad} otherwise. We define by $B_t$ the set of
+nodes  that are $\epsilon$-bad at time $t$:
+$B_t = \{u: u\makebox{ is $\epsilon$-bad at time $t$}\}$.
+'''
+notes = "Lemma title: 'Non-ephemeral good nodes'. The source mixes \\varepsilon and \\epsilon (kept). Commented-out lines removed. Macros replaced: \\aveproc{$(1/2)$} -> \\textsc{Averaging}$(1/2)$, \\Prob{}{X} -> \\mathbb{P}\\left[X\\right], \\bx -> \\mathbf{x}, \\by -> \\mathbf{y}. In Definition 4.1, $\\mathbf{x}_{\\|} = Q_1 \\mathbf{x}^{(0)}$ (projection on $\\mathbf{1}$) and $\\mathbf{y}^{(0)} = Q_2 \\mathbf{x}^{(0)}$ (see the opp-41 entry)."
