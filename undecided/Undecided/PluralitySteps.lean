@@ -10,7 +10,7 @@ deviation parameter `ℓ = 3 log n`.
 
 * `Inv ℓ θ B m`: every other community has at most `θ c - 12√(ℓc)` nodes and all other
   communities together at most `B c - 12B√(ℓc)`, where `c = c_m` (the slack shrinks relative to
-  `c` as `c` grows; this replaces the accumulated errors of the paper's Lemma 2);
+  `c` as `c` grows; this replaces the accumulated error terms of the paper's Lemma 2);
 * `Fpsi m`: the final set `4S + q ≤ n/10`, `S` the nodes of other colours, `q` the undecided.
 
 Under the numerical conditions `Hyp` (all consequences of `n ≥ C³ k³ log n` with `C = C(α)`):

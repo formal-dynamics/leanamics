@@ -65,9 +65,9 @@ Where the statements of `dynamics/` deviate from their sources, and why.
 
 ## Chernoff bounds for independent Bernoulli trials (`Chernoff`, FND-3)
 
-1. **`≤` instead of `<` in (4.1).** M&U state the ratio upper tail with strict `<`; it fails
-   when `μ = 0` (both sides equal `1`). Exercise 4.7 itself uses `≤`. All bounds are
-   non-strict.
+1. **`≤` instead of `<` in (4.1).** M&U state the ratio upper tail with strict `<`, which
+   presumes `μ > 0` (at `μ = 0` both sides equal `1`). Exercise 4.7 itself uses `≤`. All bounds
+   are non-strict, so they also cover `μ = 0`.
 2. **Closed upper form `exp (-δ²μH/(2+δ))` for all `δ > 0`** (as in the roadmap) instead of Theorem 4.4 (4.2), `e^{-δ²μ/3}` for `0 < δ ≤ 1`. It is stronger
    (`2 + δ ≤ 3` on that range) and is the standard consequence of (4.1) via
    `log (1+δ) ≥ 2δ/(2+δ)`. (4.2), (4.3) (`R ≥ 6μ ⇒ 2^{-R}`) and Corollary 4.6 (two-sided) are
@@ -156,9 +156,10 @@ FND-5:
    `Ψ_min ≥ 1`, `Ψ₀ ≤ n`) and concludes `P(T ≤ τ') ≥ 1 − 1/n²` via AM–GM and `exp`. We state the
    generic bound `∏_{t<T}(1 − δ_t) Ψ₀ / Ψmin` (`(1 − δ)^T Ψ₀/Ψmin` for one kernel); the `exp`
    form follows from `Real.one_sub_le_exp_neg`-type lemmas. No hypothesis on `δ` is needed (if
-   `1 − δ_t < 0`, `hdrift` forces `Ψ ≡ 0`). Source typos noticed: the statement of Lemma 2.4
-   reads `Pr(T ≤ τ') ≥ 1/n²` (the proof gives `1 − 1/n²`), and its chain of inequalities ends
-   with `exp(+∑ φ_i²/32n)` instead of `exp(−∑ φ_i²/32n)`.
+   `1 − δ_t < 0`, `hdrift` forces `Ψ ≡ 0`). Two signs of the printed text differ from the proof: the statement of
+   Lemma 2.4 reads `Pr(T ≤ τ') ≥ 1/n²` where its proof gives `1 − 1/n²`, which is what is used,
+   and its chain of inequalities ends with `exp(+∑ φ_i²/32n)` where `exp(−∑ φ_i²/32n)` is meant.
+   Neither affects the paper's results.
 
 FND-7:
 

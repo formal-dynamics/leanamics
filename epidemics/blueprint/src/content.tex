@@ -35,7 +35,8 @@ induction for adaptive Bernoulli trials.
 We also formalize the upper bounds of Doerr and Kostrygin's analysis of general rumor-spreading
 processes (\emph{Randomized rumor spreading revisited}, ICALP 2017): the exponential growth and
 shrinking regimes and the total spreading time $\log_{1+\gamma}n+\frac1\rho\ln n+O(1)$, with
-exponential tails. Lemma~20 of that paper needs a major correction; we prove corrected versions.
+exponential tails. For Lemma~20 of that paper we formalize the one-round estimate of its proof
+and a path statement that also counts the rounds spent below the threshold.
 
 We also formalize the duality between the coalescing-branching random walk (COBRA) and the BIPS
 epidemic of Cooper, Radzik and Rivera (Theorem~4), pathwise and by time reversal of i.i.d.\ rounds,
@@ -111,13 +112,13 @@ and its proof, Theorem E.1. Throughout, the degrees of $G$ are at most $d$, $n =
 $p(d-1) \le 1 - \varepsilon$ with $0 < \varepsilon < 1$. The small-world part of the paper is
 formalized in the next section (EPI-6).
 
-A few points of the paper need a minor correction, and the corrected versions are what is
-formalized: the Chernoff step in the proof of Theorem~E.1, which does not account for the extra
-trial at the source (the formal bound is $e^{\varepsilon}\exp(-\varepsilon^2 t/2)$, still of the
-form $\exp(-\Omega(\varepsilon^2 t))$ that the theorem states), and a typo in its union bound
+A few details are formalized in a slightly different form, none of which affects the paper's
+results: the Chernoff step in the proof of Theorem~E.1 also accounts for the extra trial at the
+source (the formal bound is $e^{\varepsilon}\exp(-\varepsilon^2 t/2)$, of the form
+$\exp(-\Omega(\varepsilon^2 t))$ that the theorem states)
 (\href{https://github.com/formal-dynamics/leanamics/blob/main/epidemics/FORMALIZATION_DIFFERENCES.md#subcritical-percolation-and-small-outbreaks-subcritical-epi-2}{details}),
-and, in the small-world part, the hypothesis of claim~2 of Theorem~2.5 and the starting set of
-the exploration in Algorithm~3
+and, in the small-world part, the threshold in claim~2 of Theorem~2.5 is the one of
+Theorem~2.2 and the exploration of Algorithm~3 starts from the local cluster of the source
 (\href{https://github.com/formal-dynamics/leanamics/blob/main/epidemics/FORMALIZATION_DIFFERENCES.md#small-world-networks-below-the-percolation-threshold-smallworld-epi-6}{details}).
 
 \begin{lemma}[Binomial tail and Chernoff bound]\label{lem:chernoff}
@@ -1029,11 +1030,12 @@ Lemma~\ref{lem:pull-domination}), \texttt{PullIndep.lean}
 We follow Doerr and Kostrygin, \emph{Randomized rumor spreading revisited} (ICALP 2017; long
 version arXiv:2303.11150), with the numbering of the long version.
 
-Lemma~20 of the paper needs a major correction; corrected versions are formalized
-(Lemma~\ref{lem:rumor-jump},
-\href{https://github.com/formal-dynamics/leanamics/blob/main/epidemics/FORMALIZATION_DIFFERENCES.md#lemma-20-of-the-paper-needs-a-major-correction}{details}).
-The proof of Theorem~43 and the parameters of the push, pull and push--pull instances need a
-minor correction, and the corrected versions are formalized
+For Lemma~20 of the paper, the one-round estimate of its proof and a path statement are
+formalized (Lemma~\ref{lem:rumor-jump},
+\href{https://github.com/formal-dynamics/leanamics/blob/main/epidemics/FORMALIZATION_DIFFERENCES.md#lemma-20-and-the-formalized-path-statement}{details}).
+The first stage of the proof of Theorem~43 is done with geometric phase targets, and the push,
+pull and push--pull instances use parameters inside the ranges of the paper's definitions;
+neither changes the paper's results
 (\href{https://github.com/formal-dynamics/leanamics/blob/main/epidemics/FORMALIZATION_DIFFERENCES.md#theorem-43-and-the-push-pull-and-pushpull-protocols}{details}).
 
 \begin{definition}[Rumor-spreading processes]\label{def:rumor-process}
@@ -1088,7 +1090,7 @@ on the iterated kernel replaces the paper's domination by geometric variables. L
 crosses the last stretch up to $fn$.
 \end{proof}
 
-\begin{lemma}[Lemma 20, corrected]\label{lem:rumor-jump}
+\begin{lemma}[Lemma 20, formalized form]\label{lem:rumor-jump}
 \lean{Epidemics.Revisited.JumpsOver,Epidemics.Revisited.RumorProcess.jumpProb,Epidemics.Revisited.overshoot_round,Epidemics.Revisited.jumpProb_le}\leanok\uses{lem:rumor-variance}
 If every round started with $1\le|S|<fn$ has $p_k\le p$ and covariances at most $c/n$, then
 (one round) for every $f'\in\,]f+p(1-f),1[$, a round from $|S|<fn$ ends with at least $f'n$
@@ -1100,10 +1102,11 @@ expected number of these rounds started below $fn$, i.e.\ $O(E[T(|S|,fn)]/n)$.
 Chebyshev's inequality with Lemma~\ref{lem:rumor-variance} for one round, then a union bound over
 the rounds along the trajectory.
 \end{proof}
-The paper's Lemma~20 claims probability $1-O(1/n)$ of landing in $[fn,f'n]$; this needs a
-major correction, as the process that from every $|S|<fn$ informs all nodes with probability $c/n$ (and otherwise none)
-satisfies the hypotheses and jumps from $1$ to $n$ with probability one
-(\href{https://github.com/formal-dynamics/leanamics/blob/main/epidemics/FORMALIZATION_DIFFERENCES.md#lemma-20-of-the-paper-needs-a-major-correction}{details}).
+The paper's Lemma~20 states probability $1-O(1/n)$ of landing in $[fn,f'n]$. The path form
+above also counts the rounds spent below $fn$: as printed, the statement does not hold for the
+process that from every $|S|<fn$ informs all nodes with probability $c/n$ (and otherwise none),
+which satisfies the hypotheses and jumps from $1$ to $n$ with probability one
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/epidemics/FORMALIZATION_DIFFERENCES.md#lemma-20-and-the-formalized-path-statement}{details}).
 
 \begin{theorem}[Theorem 31: exponential shrinking]\label{thm:rumor-shrinking}
 \lean{Epidemics.Revisited.shrinking_upper_tail,Epidemics.Revisited.shrinking_upper_expect}\leanok\uses{def:rumor-conditions,lem:rumor-variance,lem:rumor-connect}
@@ -1220,15 +1223,14 @@ Section~\ref{sec:doerr-kostrygin}): started from one informed node, push, pull a
 need $\log_2n+\ln n$, $\log_2n+\log_2\ln n$ and $\log_3n+\log_2\ln n$ rounds minus $O(1)$, in
 expectation and with exponential tails. With Theorem~\ref{thm:rumor-protocols} this determines the
 spreading times up to additive constants. The general lower bounds (Theorems~27, 38 and~48) are
-not formalized: the paper joins them through Lemma~20, which needs a major correction, and the
+not formalized: the paper joins them through Lemma~20 (see Lemma~\ref{lem:rumor-jump}), and the
 formal proofs take a direct route for the instances. The growth phase is bounded by the first
 moment, the final phase by a round-by-round lower envelope, and the two are joined at a fixed time.
 
-The paper's joining of the phases also needs a minor correction (Theorems~38 and~48 start from an
-exact number of uninformed nodes, which the process started from one node need not visit), and so
-do Corollary~17 (not for $u=0$), the statement of Lemma~42 ($q(u_{j+1})$ for $q(u_j)$), some typos
-in Lemmas~39 and~40, and a constant in the proof of Theorem~27; none affects the statements
-(\href{https://github.com/formal-dynamics/leanamics/blob/main/epidemics/FORMALIZATION_DIFFERENCES.md#lower-bounds-of-theorems-51-to-53-lowerlean}{details}).
+The direct route also avoids a comparison between starting states (Theorems~38 and~48 start
+from an exact number of uninformed nodes, which the process started from one node need not
+visit). A few smaller points of reading are listed in the
+\href{https://github.com/formal-dynamics/leanamics/blob/main/epidemics/FORMALIZATION_DIFFERENCES.md#lower-bounds-of-theorems-51-to-53-lowerlean}{differences}; none affects the paper's statements.
 
 \begin{lemma}[Lower envelopes and joining at a fixed time]\label{lem:rumor-lower-generic}
 \lean{Epidemics.Revisited.envelope_le,Epidemics.Revisited.envelope_seq_le,Epidemics.Revisited.reach_le_of_expect_card_le,Epidemics.Revisited.reach_add_le}\leanok\uses{def:rumor-process}
@@ -1430,8 +1432,9 @@ $n^{-5}$. BIPS satisfies the hypotheses with $c=1-\lambda$.
 Lemma~2: the exponential supermartingale $e^{-\varphi|A_t|}$ on the event of staying small,
 $\varphi=\log(1+c/2)$. Lemma~3: a round with $|A'|<|A|(1+c/23)$ has probability $\le n^{-5}$;
 union bound over rounds with moving targets. Lemma~4: staying above $9n/10$ and the recursion
-$\E B_{t+1}\le\theta\E B_t+tn^{-7}$ for the number $B_t$ of healthy vertices. The paper's
-Lemmas~3 and~4 need minor corrections ($\log_2$ versus $\ln$ doublings; a missing factor $B_0$).
+$\E B_{t+1}\le\theta\E B_t+tn^{-7}$ for the number $B_t$ of healthy vertices. The constants
+of Lemma~3 ($24\log n/(1-\lambda)$ rounds, counting $\log_2 n$ doublings) and the bookkeeping
+of Lemma~4 differ slightly from the paper's, without changing its statements.
 \end{proof}
 
 \begin{theorem}[Theorem~2]\label{thm:crr-bips}
@@ -1442,8 +1445,9 @@ $3/n^3$ for $T\ge60000\log n/(1-\lambda)^3$, and $\sum_{s<H}\Pr(A_s\ne V)\le
 \end{theorem}
 \begin{proof}\leanok
 Chain the three phases at their first hitting times with $m=\ceil{4000\log n/(1-\lambda)^2}$ and
-$C=3$. (The paper's proof takes $m=4000\log n/(1-\lambda^2)$, which needs a minor correction:
-Lemma~3 needs $|A|\ge4000\log n/(1-\lambda)^2$.) For the expectation, restart from the current
+$C=3$. (The paper's proof writes $m=4000\log n/(1-\lambda^2)$; the value
+$4000\log n/(1-\lambda)^2$ is the one that Lemma~3 requires, and gives the $(1-\lambda)^{-3}$
+of the theorem.) For the expectation, restart from the current
 set: monotonicity and the persistent source give $\Pr(A_{s+T_0}\ne V)\le\Pr(A_s\ne V)/2$.
 \end{proof}
 

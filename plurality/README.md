@@ -205,9 +205,9 @@ paper's proof uses it. That result is formalized in this package too
 
 The comparison of Theorem 2 is proved from Proposition 1 alone, by induction on time, without
 the paper's coupling and Strassen's theorem; the Voter bound uses an exact occupancy computation
-for coalescing walks instead of the variable drift theorem. The proof of Theorem 4 needs a minor
-correction (Phase 1 must stop at `n^{1/4} log^{1/8} n` colours, not `n^{1/4}`), which the
-formalization makes. The modules use the finite `Distribution` and `Kernel` layer of the shared
+for coalescing walks instead of the variable drift theorem. Phase 1 stops at
+`n^{1/4} log^{1/8} n` colours, which balances the two phases and gives the bound of Theorem 4 as
+stated. The modules use the finite `Distribution` and `Kernel` layer of the shared
 [`dynamics`](../dynamics) library (still no measure theory). Details:
 [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md#6-3-majority-from-any-configuration-anystart-roadmap-maj-6-b)
 and the
@@ -244,12 +244,10 @@ then a colour dies per phase), with: Lemma 3.2 for a finite horizon, with a one-
 bound in place of Lemma B.1 (no optional stopping); the strong Markov property at the hitting
 time of the symmetry-breaking stage, where the paper evaluates at a fixed time; Equation (3) near
 the uniform configuration from the Paley–Zygmund inequality instead of the Central Limit
-Theorem; and the threshold `16 √(j n log n)` and floor `240 j² log n` in Lemmas 3.3 and 3.4. The
-statements assume `C k³ log n ≤ n`, which `k ≤ n^{1/3−ε}` implies for large `n`. The proof of
-Lemma 3.4 needs a minor correction (with the threshold `√(j n log n)` of the paper, its iterated
-union bound exceeds `1` for large `j`), as do the statement of Lemma 3.3 (it needs
-`j³ log n = O(n)`) and the proofs of Lemma 3.3, Lemma B.1 and Theorem 3.1; the formalization
-makes these corrections. Details:
+Theorem; and the threshold `16 √(j n log n)` and floor `240 j² log n` in Lemmas 3.3 and 3.4,
+which keep the per-round union bound of Lemma 3.4 small for every `j`. The statements assume
+`C k³ log n ≤ n`, which `k ≤ n^{1/3−ε}` implies for large `n`. These choices do not affect the
+paper's results. Details:
 [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md#7-3-majority-with-many-opinions-manyopinions-roadmap-maj-12-a)
 and the
 [blueprint section](https://formal-dynamics.github.io/leanamics/plurality/blueprint/#sec:bcnpt16-many-opinions).

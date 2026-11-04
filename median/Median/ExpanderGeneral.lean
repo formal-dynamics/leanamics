@@ -22,10 +22,10 @@ The paper states the failure probability as `o(1)`. Phase I (the paper's Lemma 2
 Corollary 2) only gives the failure probability `e^{−Θ(α² n)}` per round with `α ≥ λ_G`, so the
 bound here is in terms of `ν₀² n` (taking `α = ν₀/K`): it tends to `0` once `ν₀² n` is large
 compared with `log log n` (for instance for fixed `ν₀ > 0`), that is, once the initial
-difference `|A − B| = ν₀ n` is somewhat larger than `√n`. Without such a condition the
-statement of Theorem 2 needs a major correction: on the complete graph `λ_G = 1/(n − 1)`,
-and an initial difference `|A − B|` bounded by a constant does not let the majority win with
-probability tending to `1`.
+difference `|A − B| = ν₀ n` is somewhat larger than `√n`. As printed, Theorem 2 also covers
+graphs with `λ_G` of order `1/√n` or smaller, where the success probability is not `1 − o(1)`:
+on the complete graph `λ_G = 1/(n − 1)`, and with an initial difference `|A − B|` bounded by a
+constant the majority wins with probability tending to `1/2`.
 -/
 
 namespace Median.ExpanderGeneral

@@ -110,22 +110,19 @@ hold `m` after `⌈C · md(x) · log n⌉` rounds with probability at least `1 -
 
 1. **Range of `k`: `C k ≤ (n / log n)^{1/3}` with `C = C(α)`**, that is the paper's exponent with
    a sufficiently small constant, instead of `k = O((n / log n)^{1/3})` with an arbitrary
-   constant. The range of `k` in [BCNPS15, Theorem 11] needs a minor correction:
-   * the proof of Theorem 11 invokes Lemma 10, which assumes `k = O((n / log n)^{1/4})`, so the
-     proof covers that smaller range;
-   * the paper bounds the ratios `Cᵢ / C₁` (Lemma 2) round by round with high probability. When
-     `c₁ ≈ n / (2 md)`, the drift of a ratio in one round is about `α / (2 md)` and its one-round
-     fluctuation about `√(md log n / n)`, so the per-round argument closes if and only if
-     `md^{3/2} ≲ α √(n / log n)`, that is `k ≤ ε(α) (n / log n)^{1/3}`; an arbitrary constant
-     would need concentration over many rounds (martingale arguments), which neither the paper nor
-     `dynamics/` provides;
-   * simulations of the exact count dynamics with `n = 10⁵` and `10⁶`, `k = ⌊(n / log n)^{1/3}⌋`
-     and `α = 0.05` gave consensus on the plurality colour in only 2 to 7 runs out of 20 (with
-     `α = 0.2`: 12 to 20 out of 20), while with `k ≤ 10` it won in all 40 runs, always within
-     `0.63 md log n` rounds.
+   constant. Two remarks on this range:
+   * the proof of Theorem 11 in the paper invokes Lemma 10, which assumes
+     `k = O((n / log n)^{1/4})`; the formal proof does not use Lemma 10 and reaches the exponent
+     `1/3` of the statement;
+   * the formal proof, like the paper's Lemma 2, bounds the ratios `Cᵢ / C₁` round by round with
+     high probability. When `c₁ ≈ n / (2 md)`, the drift of a ratio in one round is about
+     `α / (2 md)` and its one-round fluctuation about `√(md log n / n)`, so this per-round
+     argument closes when `md^{3/2} ≲ α √(n / log n)`, that is `k ≤ ε(α) (n / log n)^{1/3}`. A
+     larger constant would call for concentration over many rounds (martingale arguments), which
+     the formalization does not attempt.
 
    For large `n` the stated range contains `k = O((n / log n)^{1/4})` with any constant, the range
-   that the paper's proof assumes.
+   of Lemma 10.
 2. **Explicit "with high probability"**: `log n ≥ C`, `⌈C md(x) log n⌉` rounds, probability at
    least `1 - C/n` (the paper: `O(md(c) log n)` rounds and `1 - n^{-Θ(1)}`). The error `C/n` is
    reachable because every expectation used is at least `n^{1/3}` up to logarithmic factors, and
@@ -149,7 +146,7 @@ hold `m` after `⌈C · md(x) · log n⌉` rounds with probability at least `1 -
 ### Differences in the proofs
 
 The proof does not follow Lemmas 1 to 10 of [BCNPS15] verbatim: a single invariant with a
-state-dependent slack replaces the accumulated errors of Lemma 2, and the potential
+state-dependent slack replaces the accumulated error terms of Lemma 2, and the potential
 `Φ = c(c + 2q)/n` replaces the two-step use of Lemmas 1 and 9. Notation: `c = c_m`, `q` the number
 of undecided nodes, `S = n - q - c = ∑_{j≠m} cⱼ`, `µᵢ = cᵢ(cᵢ + 2q)/n`, `ℓ = 3 log n`,
 `dev µ = √(3ℓ(µ + 2ℓ))`, `θ = 1/(1 + α)`, `κ = 1 - θ`, `K = 1/(θκ) = (1 + α)²/α`, `B = 2 md(x₀)`.
@@ -198,19 +195,19 @@ expectations (20) `µᵢ = (1 + (2δ + cᵢ)/n) cᵢ` and (19) `E[Q' - n/2] = (2
 * `undecided_square` ((16); `C k ≤ (n / log n)^{1/6}`): if `q = (1 + δ)n/2` and
   `1 - δ ≥ 1/(2k)`, then after one round `Q' ≤ (1 + δ²) n/2` with probability at least
   `1 - C/n²`.
-* `undecided_not_below` ((17), corrected; `C k ≤ (n / log n)^{1/6}`): for every `γ ≥ 1` and
+* `undecided_not_below` ((17), formalized form; `C k ≤ (n / log n)^{1/6}`): for every `γ ≥ 1` and
   `D ∈ (0, k]`, if every colour is at most `γ n/D`, then after one round `Q' ≥ n/2 - 2γ² n/D`
   with probability at least `1 - C/n²` (`C` does not depend on `γ`).
-* `descent` (Lemma 6, corrected; `C k ≤ (n / log n)^{1/6}`): there are `γ ≥ 1` and `C` such
+* `descent` (Lemma 6, formalized form; `C k ≤ (n / log n)^{1/6}`): there are `γ ≥ 1` and `C` such
   that, for `x` without undecided nodes with `md(x) ≥ C` and `y` satisfying the conclusion of
   Lemma 3 (every colour at most `2n/R(x)²`, `n(1 - 2/Λ(x)) ≤ q ≤ n(1 - 1/(2Λ(x)))`), there is a
   round `t ≤ C log n` such that, with probability at least `1 - C/n`, every colour is at most
   `γ n/md(x)` at each round `s ≤ t`, and at round `t` moreover `|q - n/2| ≤ 2γ² n/md(x)`.
-* `plateau_step` (one round of Lemma 7, corrected; `C k ≤ (n / log n)^{1/4}`): for every
+* `plateau_step` (one round of Lemma 7, formalized form; `C k ≤ (n / log n)^{1/4}`): for every
   `γ ≥ 1` there is `C` such that, if `C ≤ D ≤ k`, `|q - n/2| ≤ 2γ² n/D` and every colour is at
   most `B ∈ [γ n/D, 2γ n/D]`, then after one round, with probability at least `1 - C/n²`, every
   colour is at most `(1 + (4γ² + 2γ + 1)/D) B` and still `|q - n/2| ≤ 2γ² n/D`.
-* `plateau` (Lemma 7, corrected; `C k ≤ (n / log n)^{1/4}`): for every `γ ≥ 1` there is `C`
+* `plateau` (Lemma 7, formalized form; `C k ≤ (n / log n)^{1/4}`): for every `γ ≥ 1` there is `C`
   such that, if `C ≤ D ≤ k`, `|q - n/2| ≤ 2γ² n/D` and every colour is at most `γ n/D`, then for
   every `T ≤ D/C`, after `T` rounds, with probability at least `1 - C/n`, every colour is at
   most `2γ n/D` and `|q - n/2| ≤ 2γ² n/D`.
@@ -238,8 +235,8 @@ for `lower_bound_consensus`).
 2. **All colours, not only the initial plurality.** The lower bound needs that *no* colour
    reaches all nodes. Lemmas 6 and 7 bound only the initial plurality `C₁`, but their proofs use
    properties of the largest colour (`∑ⱼ cⱼ² ≤ c₁ (n - q)`, `c₁ ≥ (n - q)/k`), and without a bias
-   another colour may overtake the initial plurality. This needs a minor correction: every upper
-   bound is stated for `maxCount`. Lemma 3 also keeps the paper's lower bound on the plurality
+   another colour may overtake the initial plurality. The formalization therefore states every
+   upper bound for `maxCount`, which is what the proofs give. Lemma 3 also keeps the paper's lower bound on the plurality
    colour `m`.
 3. **Theorem 8, form of the conclusion.** "The convergence time is `Ω(md(c̄))` w.h.p." becomes
    (a) `lower_bound_whp`: at every round `T ≤ md(x)/C`, w.h.p. no colour has more than
@@ -253,9 +250,9 @@ for `lower_bound_consensus`).
 4. **Initial configurations without undecided nodes** (`count x none = 0`), as in the paper
    (Section 2.1: "In the initial state we always have `q⁽⁰⁾ = 0`"). No bias is assumed, as in the
    paper.
-5. **Lemma 6 and Theorem 8: `2γ² n/md(c̄)`.** The window `|Q - n/2| ≤ 2γ²/md(c̄)` in the
-   statement of Lemma 6 and in the proof of Theorem 8 needs a minor correction (a typo): it
-   should read `2γ² n/md(c̄)`, the interval used in the proof of Lemma 6.
+5. **Lemma 6 and Theorem 8: `2γ² n/md(c̄)`.** The statement of Lemma 6 and the proof of
+   Theorem 8 print the window as `|Q - n/2| ≤ 2γ²/md(c̄)`; the interval used in the proof of
+   Lemma 6, and formalized, is `2γ² n/md(c̄)`.
 6. **Lemma 6: a deterministic round, and all rounds before it.** The paper gives a round
    `t̄ = O(log n)` at which, w.h.p., `C₁ ≤ γ n/md` and `|Q - n/2| ≤ 2γ² n/md`. Here the round
    `t` is deterministic (it depends on `n`, `Λ(c̄)` and `md(c̄)`; the proof takes the first `s`
@@ -268,23 +265,23 @@ for `lower_bound_consensus`).
    with `1 - δ ≥ 1/(2k)` (also `δ < 1/md(c̄)`, possibly negative), which contains the paper's
    range `1/md(c̄) ≤ δ ≤ 1 - 1/(2Λ(c̄))` since `Λ ≤ k`; the paper's computation holds verbatim on
    the larger range.
-7. **(17) needs a minor correction.** The paper's proof writes `∑ⱼ cⱼ² = c₁² md(c̄)`, with the
-   monochromatic distance of the *initial* configuration instead of the current one. The bound
-   `∑ⱼ cⱼ² ≤ (maxⱼ cⱼ)(n - q) ≤ γ n²/md` gives `E[Q'] ≥ n/2 - γ n/md`, and the statement for every
-   `γ ≥ 1`.
-8. **Lemma 7 needs minor corrections.**
-   * The growth factor is `1 + (4γ² + 2γ + 1)/md` instead of `1 + (2γ(γ + 1) + 1)/md`: with
-     `|δ| ≤ 2γ² n/md`, the term `2δ/n` of (20) is at most `4γ²/md`, not `2γ²/md`. The number of
-     rounds changes accordingly (still `Ω(md)`).
-   * The lower bound (23), `E[Δ'] ≥ -(4/9) n/md`, uses `∑ⱼ cⱼ² ≤ k ((n - q)/k)²`, which is the
-     reverse of the Cauchy–Schwarz inequality `∑ⱼ cⱼ² ≥ (n - q)²/k`. With
-     `∑ⱼ cⱼ² ≤ (maxⱼ cⱼ)(n - q) ≤ (2γ n/md)(2n/3)` one gets `E[Δ'] ≥ -(4γ/3) n/md`, which stays
-     inside the window `-2γ² n/md` for `γ ≥ 1`.
-   * The lemma is stated for `γ ≥ 1` instead of "an arbitrary positive constant `γ`": the proof's
-     invariant (the window `|Δ| ≤ 2γ² n/md`, part of the formal conclusion) is not preserved for
-     `γ < 1/2`, since from `q = n/2` and `md/(4γ)` colours of size `2γ n/md` one gets
-     `E[Δ'] = -γ n/md < -2γ² n/md`. Whether the paper's conclusion (which bounds only `C₁`) holds
-     for small `γ` is left open; Theorem 8 needs only one large `γ`.
+7. **The proof of (17).** The paper's proof writes `∑ⱼ cⱼ² = c₁² md(c̄)`, with the
+   monochromatic distance of the *initial* configuration. The formal proof uses the bound
+   `∑ⱼ cⱼ² ≤ (maxⱼ cⱼ)(n - q) ≤ γ n²/md` on the current configuration, which gives
+   `E[Q'] ≥ n/2 - γ n/md`, and the statement for every `γ ≥ 1`.
+8. **Lemma 7: constants and the range of `γ`.** None of these changes affects Theorem 8.
+   * The growth factor is `1 + (4γ² + 2γ + 1)/md` (the paper has `1 + (2γ(γ + 1) + 1)/md`): with
+     `|δ| ≤ 2γ² n/md`, the term `2δ/n` of (20) is at most `4γ²/md`. The number of rounds changes
+     accordingly (still `Ω(md)`).
+   * The lower bound on `E[Δ']` is `-(4γ/3) n/md`, from `∑ⱼ cⱼ² ≤ (maxⱼ cⱼ)(n - q) ≤
+     (2γ n/md)(2n/3)`; it stays inside the window `-2γ² n/md` for `γ ≥ 1`. (The paper's (23),
+     `E[Δ'] ≥ -(4/9) n/md`, is derived from `∑ⱼ cⱼ² ≤ k ((n - q)/k)²`; Cauchy–Schwarz gives this
+     inequality in the direction `∑ⱼ cⱼ² ≥ (n - q)²/k`, so the formal proof uses the bound above.)
+   * The lemma is stated for `γ ≥ 1` (the paper: "an arbitrary positive constant `γ`"): the
+     proof's invariant (the window `|Δ| ≤ 2γ² n/md`, part of the formal conclusion) is not
+     preserved for `γ < 1/2`, since from `q = n/2` and `md/(4γ)` colours of size `2γ n/md` one
+     gets `E[Δ'] = -γ n/md < -2γ² n/md`. The formalization does not settle the paper's conclusion
+     (which bounds only `C₁`) for small `γ`; Theorem 8 needs only one large `γ`.
    * `md(c̄)` is a real parameter `D` with `C ≤ D ≤ k`; the paper assumes `md(c̄) ≥ 8γ²`, a
      "sufficiently large constant".
 9. **Lemma 3** is stated with the same constant `C` in the range `C k ≤ (n / log n)^{1/2}` (the

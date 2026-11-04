@@ -4,9 +4,9 @@ import Epidemics.Revisited.ShrinkingAux
 
 Doerr and Kostrygin, *Randomized rumor spreading revisited* (ICALP 2017; long version
 arXiv:2303.11150), lower bounds of Theorems 51, 52 and 53. The paper derives them from its
-general lower bounds (Theorems 27, 38 and 48), joined through Lemma 20, which needs a major
-correction (see `Lemma20`). The lower bounds here follow a direct route instead, made of three
-generic tools.
+general lower bounds (Theorems 27, 38 and 48), joined through Lemma 20 (see `Lemma20` for the
+form of Lemma 20 that is formalized). The lower bounds here follow a direct route instead, made
+of three generic tools.
 
 * `reach_le_of_expect_card_le` (first moment): if one round multiplies the expected number of
   informed nodes by at most `μ`, then at least `m` nodes are informed after `t` rounds with

@@ -159,19 +159,19 @@ phases together"). Numbering follows the arXiv version; equation names such as (
 are the labels of the arXiv source. The model and the definitions are those of `Expander` above
 (its items 1, 2 and 7 apply unchanged).
 
-### Theorem 2 of the paper needs a major correction
+### Theorem 2: the formalized form
 
 Theorem 2 states that on "an `n`-vertex `d`-regular graph", for "an absolute constant `K`
 (independent of `d` and `λ_G`)", an initial imbalance `ν₀ = (A − B)/n ≥ K λ_G` makes two-sample
 voting complete in `O(log n)` steps with the initial majority winning with high probability,
 which the paper defines as "probability tending to 1 as `n` increases" (footnote in Section 2);
 the abstract says "for any regular graph". The proof goes through Corollary 2 (Lemma 2 with
-`α = λ_G`), whose success probability is only `1 − e^{−Θ(λ_G² n)}`: Lemma 2 assumes
-`α² c² n = Ω(n^ε)`, which the proof of Corollary 2 does not check when it takes `α = λ_G`, and
-Section 7 does not state a probability for Phase I. When `λ_G` is of order `1/√n` or smaller,
-this is not `1 − o(1)`.
+`α = λ_G`), whose success probability is `1 − e^{−Θ(λ_G² n)}`. Lemma 2 assumes
+`α² c² n = Ω(n^ε)`, which with `α = λ_G` holds when `λ_G ≥ n^{−1/2+ε}`, and Section 7 does not
+state a probability for Phase I. As printed, Theorem 2 also covers graphs with `λ_G` of order
+`1/√n` or smaller, where this success probability is not `1 − o(1)`.
 
-**Example.** The printed statement does not hold on the complete graph `K_n`. There
+**Example: the complete graph.** On `K_n`,
 `λ_G = 1/(n − 1)`, so the hypothesis `ν₀ ≥ K λ_G` holds for a constant difference
 `A − B ∈ {K + 2, K + 3}` (the one with the parity of `n`) once `n ≥ K + 3`. The first round
 already produces fluctuations of order `√n` in `A − B`, and by the symmetry between the two
@@ -238,7 +238,7 @@ The helper files are `Median/ExpanderGeneralLoss.lean` (the combinatorial core o
 ### Differences in the statements
 
 1. **The failure probability of Theorem 2.** It is `1/n + (2 C log n + C) e^{−ν₀² n/C}` instead of
-   `o(1)`, because Theorem 2 needs a major correction (see above).
+   `o(1)`, for the reason explained above (Theorem 2: the formalized form).
 2. **Explicit constants.** `K = 120` in Lemma 2, `K = 4000` and `c = 1/20` in the explicit form
    of Theorem 2, `C = 2 · 10¹⁰` in its `O(log n)` form. "With high probability" is the explicit
    failure bound. The number of rounds `phaseIRounds` is the paper's
@@ -460,20 +460,21 @@ least `1 − C/n`. The proof gives `z = 128` and `C = 384`.
 
 ### Remarks on the sources
 
-* **The proof of Theorem 1.2 needs a minor correction.** Lemma 2.2 is proved for `a ≤ n/2`, while
-  the hand-off to the two-colour process needs `a ≥ (1/2 + ε₁) n`, so the range between is not
-  covered. The time bound `O((n/a) log n)` uses the initial `a`, while the growth factor
-  `1 + a/(4n)` of Lemma 2.2 uses the current one, and the proof does not show that `a` does not
-  decrease. Both are repaired by `growth_round`, which is valid up to `3n/4` and gives `a' ≥ a`
-  with high probability.
-* **The proof of Lemma 2.3 needs a minor correction.** Read literally (in `P'`, every node samples
-  `π(v)` whenever it samples `v` in `P`, and the configuration is unchanged), the coupling does not
-  give `c' ≤ b'` round by round, even under the lemma's hypotheses: for `n = 5` and colours
-  `(A, A, A, B, C)`, where `π` swaps the node of `C` with the node of `B`, it fails in 2 406 250 of
-  the 9 765 625 rounds. The coupling moves the samples but not the nodes, so a node of `C` that
-  keeps its colour is not matched with a node of `B̂` that keeps its colour. The statement itself
-  holds, as a stochastic domination (`count_stochDom`, item 5 of the differences in the statements
-  and item 2 of the differences in the proofs).
+* **Theorem 1.2: the range between `n/2` and `(1/2 + ε₁) n`, and the time bound.** Lemma 2.2 is
+  stated for `a ≤ n/2`, and the hand-off to the two-colour process starts from
+  `a ≥ (1/2 + ε₁) n`; the formal proof also covers the range between. The time bound
+  `O((n/a) log n)` is in terms of the initial `a`, and the growth factor `1 + a/(4n)` of Lemma 2.2
+  in terms of the current one; the formal proof also shows that `a` does not decrease. Both
+  points are handled by `growth_round`, which is valid up to `3n/4` and gives `a' ≥ a` with high
+  probability. The theorem is unaffected.
+* **Lemma 2.3: the coupling.** Read literally (in `P'`, every node samples `π(v)` whenever it
+  samples `v` in `P`, and the configuration is unchanged), the coupling does not give `c' ≤ b'`
+  round by round, even under the lemma's hypotheses: for `n = 5` and colours `(A, A, A, B, C)`,
+  where `π` swaps the node of `C` with the node of `B`, `c' > b'` in 2 406 250 of the 9 765 625
+  rounds. The coupling moves the samples but not the nodes, so a node of `C` that keeps its colour
+  is not matched with a node of `B̂` that keeps its colour; the formal proof permutes the nodes as
+  well as the samples. The statement itself holds, as a stochastic domination (`count_stochDom`,
+  item 5 of the differences in the statements and item 2 of the differences in the proofs).
 
 ## The lower bound for 2-Choices (`TwoChoicesLower`, roadmap MAJ-6 (a))
 
@@ -521,11 +522,10 @@ with `(T + 1) C log n < n`. The proof gives `C = max(8, 2β)²`.
 
 ### Remarks on the sources
 
-* **The proof of Theorem 5 needs a minor correction of a constant.** In equation (21), the
-  threshold `(1 + δ)μ = max {2μ, (γ/2) log n}` (with `μ = 𝔼B`) has `δ ≥ 1`, and the Chernoff bound
-  `exp(−δμ/3)` for `δ ≥ 1` gives, since `δμ = (1 + δ)μ − μ ≥ (γ/4) log n`, only
-  `exp(−(γ/12) log n)`, not the `exp(−(γ/6) log n)` written there (which uses `(1 + δ)μ` in place
-  of `δμ`). The bound is attained at `δ = 1` (`ℓ' = (γ²/4) log n`), where even the full Chernoff
-  bound `(e/4)^μ` gives only about `n^{−0.097γ}`. Taking `γ ≥ 36` instead of `γ ≥ 18` restores
-  the `1/n³` of equation (21). The theorem is unaffected, since `γ` is any sufficiently large
-  constant.
+* **Theorem 5: the constant `γ`.** In equation (21), the threshold
+  `(1 + δ)μ = max {2μ, (γ/2) log n}` (with `μ = 𝔼B`) has `δ ≥ 1`, and the Chernoff bound
+  `exp(−δμ/3)` for `δ ≥ 1` gives `exp(−(γ/12) log n)`, since `δμ = (1 + δ)μ − μ ≥ (γ/4) log n`;
+  the bound `exp(−(γ/6) log n)` written there corresponds to `(1 + δ)μ` in place of `δμ`. The
+  extreme case is `δ = 1` (`ℓ' = (γ²/4) log n`), where the full Chernoff bound `(e/4)^μ` gives
+  about `n^{−0.097γ}`. With `γ ≥ 36` in place of `γ ≥ 18`, equation (21) holds with its `1/n³`.
+  Since `γ` is any sufficiently large constant, Theorem 5 is unchanged.

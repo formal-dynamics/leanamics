@@ -263,15 +263,16 @@ the probability that fewer than `m` nodes are informed after `t` rounds from `S`
 | Crossing a range where every uninformed node is informed w.p. `≥ p`: tail and expectation | Lemma 19 | `connect_tail`, `connect_expect` |
 | Exponential growth regime: `f n` nodes informed after `log_{1+γ} n + O(1)` rounds, exponential tail | Theorem 21 (Theorem 1, upper bounds) | `growth_upper_tail`, `growth_upper_expect` |
 | One round from `< f n` informed nodes overshoots `f' n` w.p. `O(1/n)` | Lemma 20 (its proof) | `overshoot_round` |
-| Jumping over `[f n, f' n[` has probability `O(E[T(|S|, f n)] / n)` (corrected Lemma 20) | Lemma 20 | `jumpProb_le` |
+| Jumping over `[f n, f' n[` has probability `O(E[T(|S|, f n)] / n)` (Lemma 20 in path form) | Lemma 20 | `jumpProb_le` |
 | Exponential shrinking regime: from `≤ g n` uninformed nodes, all informed after `(1/ρ) ln n + O(1)` rounds, exponential tail | Theorem 31 (Theorem 2, upper bounds) | `shrinking_upper_tail`, `shrinking_upper_expect` |
 | Total spreading time `log_{1+γ} n + (1/ρ) ln n + O(1)`, exponential tail | Theorems 21 and 31 with Lemma 19 | `spreading_upper_tail`, `spreading_upper_expect` |
 | Double exponential shrinking regime: from `≤ g n` uninformed nodes, all informed after `log_ℓ ln n + O(1)` rounds, tail `O(n^{A' - α' r})` | Theorem 43 (Theorem 3, upper bounds) | `double_shrinking_upper_tail`, `double_shrinking_upper_expect` |
 | Total spreading time `log_{1+γ} n + log_ℓ ln n + O(1)`, exponential tail | Theorems 21 and 43 with Lemma 19 | `spreading_upper_tail_double`, `spreading_upper_expect_double` |
 
-**Lemma 20 of the paper needs a major correction** (a process can stay below `f n` for many rounds,
-with a chance to jump over `[f n, f' n]` in each); the one-round estimate of its proof and a
-corrected path statement are formalized instead. The example and the other deviations
+For Lemma 20, the formalization states the one-round estimate of its proof (`overshoot_round`)
+and a path statement whose bound also counts the rounds spent below `f n` (`jumpProb_le`), since
+a process may stay below `f n` for many rounds, with a chance to jump over `[f n, f' n]` in each.
+An example and the other deviations
 (conditions for every state instead of homogeneity, arbitrary starting sets, a uniform side
 condition in Definition 11, the composed total-time theorems) are listed in
 [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md). Theorem 31 is proved with a
@@ -360,8 +361,9 @@ The phase lemmas are proved once for an abstract round-driven process with growt
 `GrowthProcess.fail_le`), and the passage from BIPS to the COBRA cover time once for any dual pair
 (`cover_fail_le_log`, `cover_tail_sum_le_log`); Theorems 1 and 2 use `c = 1 - λ`, Theorem 3 uses
 `c = min(1, ρ₀ (1 - max(λ₀, 0)))`. Expectations are written as tail sums `∑_{s < H} P(τ > s)`,
-bounded uniformly in `H`. The paper's Lemmas 3 and 4 and its proof of Theorem 2 need minor
-corrections (see [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md)). The cover-time
+bounded uniformly in `H`. Some constants in the proofs of Lemmas 3 and 4 and of Theorem 2 are
+chosen differently; this does not affect the paper's results (see
+[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md)). The cover-time
 statements were pinned by a Claude agent and reviewed by a second agent against the paper before
 any proof; the proofs were started by a Grok agent (Lemmas 1 to 4 and the phase engine) and
 completed by a Claude agent (Theorems 1 to 3 and Corollary 1), under the fixed-statement protocol

@@ -68,16 +68,16 @@ Angluin, Aspnes and Eisenstat (PODC 2006) [AAE06].
    right output (the form of [AAER07] and [CDS14, §2.2]). For finite populations the two are
    equivalent (by AADFP06 Lemma 1, the configurations occurring infinitely often in a fair
    execution form a final strongly connected component); this equivalence is not formalized.
-2. **Populations of every size `n ≥ 1`, and a minor correction to AADFP06 Lemma 5 for `n = 1`.** AADFP06 do
-   not state a lower bound on the population size, but the protocols of their Lemma 5 start every
-   agent with output bit `0` (input map `σᵢ ↦ (1, 0, aᵢ)`). With a single agent no encounter ever
-   happens: under AADFP06's definitions this case is degenerate (no interaction, hence no
-   computation), and under the natural convention that a lone agent keeps its state, the output
-   stays `0` even when the predicate holds (for example `a = (1)`, `c = 3`,
-   one agent: `1 < 3` holds but the output is `0`); the protocols are correct for `n ≥ 2`. The
-   theorems here are existential in the protocol, so this is harmless: the protocols used here
-   start an agent with input `i` with output bit equal to the single-agent value (`[aᵢ < c]`,
-   resp. `[aᵢ ≡ c (mod m)]`). The empty population `n = 0` is excluded, as usual (no agent, no
+2. **Populations of every size `n ≥ 1`, including a single agent.** AADFP06 do not state a lower
+   bound on the population size; the protocols of their Lemma 5 start every agent with output
+   bit `0` (input map `σᵢ ↦ (1, 0, aᵢ)`) and are designed for populations with at least two
+   agents. With a single agent no encounter ever happens: under AADFP06's definitions this case is
+   degenerate (no interaction, hence no computation). The formalization adopts the convention that
+   a lone agent keeps its state, so its output must already be the right one (for example
+   `a = (1)`, `c = 3`, one agent: `1 < 3` holds, while an initial output `0` would stay `0`). The
+   theorems here are existential in the protocol, so the protocols used here start an agent with
+   input `i` with output bit equal to the single-agent value (`[aᵢ < c]`, resp.
+   `[aᵢ ≡ c (mod m)]`); for `n ≥ 2` they behave as AADFP06's. The empty population `n = 0` is excluded, as usual (no agent, no
    output).
 3. **Scope.** Predicates only (output alphabet `Bool`, all-agents predicate output convention),
    standard populations (complete interaction graph on `Fin n`), symbol-count input convention.
@@ -256,21 +256,23 @@ namespace `Crn.ApproxMajority`).
    majority type `Y` (the paper's eq. (18)), with `X` on the complement; `Y` plays the paper's
    green majority `g` and `X` its red minority `r`.
 
-### Corrections to the source
+### Details of the proofs
 
-* **Theorem 1** needs a minor correction in its proof: "agents `v` and `u` remain of type `r`"
-  should read type `g`, and "`|G_1| = k − 1`" for `C_2` should read `|G_2| = k − 1`.
-* **Theorem 2** needs a minor correction in its proof: "for every configuration in `𝒞_{k,ℓ}` there
-  exists a chain of transitions that lead to `𝒞_{k−1,ℓ−1}`" does not address ambassadors blocking
-  each other (an ambassador cannot move onto a vertex holding an ambassador of the same color).
-  Choosing a closest pair of ambassadors of opposite colors fixes this (see the proof route
-  below).
-* **Theorem 4** needs a minor correction in its proof: the monotonicity claim "increasing the
-  initial number of agents of type `r` increases the probability that agents of type `r` win" is
-  stated without proof (it holds by the monotone coupling below, the rule being monotone for
-  `g < b < r`), and the conclusion "with probability at least `1/2`" additionally needs absorption
-  with probability 1, which is not argued (it holds on connected graphs,
-  `tendsto_event_unanimous`).
+None of the following affects the paper's theorems; they record where the formal proofs spell out
+or organize a step differently.
+
+* **Theorem 1.** In the proof, "agents `v` and `u` remain of type `r`" refers to type `g`, and
+  "`|G_1| = k − 1`" for `C_2` refers to `|G_2| = k − 1`; the formal proof uses these readings.
+* **Theorem 2.** The proof states that "for every configuration in `𝒞_{k,ℓ}` there exists a chain
+  of transitions that lead to `𝒞_{k−1,ℓ−1}`". The formal proof also handles ambassadors of the
+  same color that are next to each other (an ambassador cannot move onto a vertex holding an
+  ambassador of the same color) by choosing a closest pair of ambassadors of opposite colors (see
+  the proof route below).
+* **Theorem 4.** The proof uses that "increasing the initial number of agents of type `r`
+  increases the probability that agents of type `r` win"; the formal proof derives it from a
+  monotone coupling (the rule is monotone for `g < b < r`, `iterate_graphKernel_mono`). The
+  conclusion "with probability at least `1/2`" also uses absorption with probability 1, which the
+  formal proof establishes on connected graphs (`tendsto_event_unanimous`).
 
 ### Proof route
 
@@ -386,7 +388,7 @@ is the case `g x _ = f x`.
   (Figs. 3 and 4) and the state change forced by a colour change, `card_dynState`.
 * `Protocol.GStep`, `Protocol.GReaches`: steps between agents of the same group (for Section 5).
 * `DynInv`: per group, the colour sum equals the weight sum (Invariant 1); `|w − c| ≤ 1`
-  (Invariant 2); every group contains a strong state (a third invariant, see the corrections).
+  (Invariant 2); every group contains a strong state (a third invariant, see the details of the proofs).
   `DynInv.input`: the initial configuration `[c_a]` satisfies it.
 * `DynInv.gstep`, `DynInv.recolour` (Lemma 4): interactions inside groups and colour changes with
   `recolour` preserve `DynInv`.
@@ -495,48 +497,45 @@ is the case `g x _ = f x`.
    outputs whether its own colour is the winner (the most frequent colour, the lexicographically
    largest among several). It is not plurality consensus in the sense of all agents outputting the
    winner's label: Section 1.2's "all nodes learn about the most frequent colour with the largest
-   label" needs an additional dissemination layer, which the paper does not give and which is not
-   formalized. Section 1.2's "all most frequent colours eventually become aware of their dominance"
-   is not what Section 5.1 does either: among several most frequent colours only the
-   lexicographically largest is marked, the others lose a tie at some stage.
-7. **Space.** The paper claims `O(k)` bits; the formal bounds are exact state counts:
+   label" would need an additional dissemination layer, which is outside the scope of Section 5.1
+   and is not formalized. Similarly, Section 1.2 says that "all most frequent colours eventually
+   become aware of their dominance"; with the tie-breaking of Section 5.1, among several most
+   frequent colours the lexicographically largest is marked and the others lose a tie at some
+   stage, and this is what is formalized.
+7. **Space.** The paper states `O(k)` bits; the formal bounds are exact state counts:
    `2^k · 6^k · 8 ≤ 2^(4k+3)` (Absolute-Majority, `card_absState`) and `2^(4k)`
    (Relative-Majority, `card_relState`).
 
-### Corrections to the source
+### Details of the source
 
-* **Fig. 4 needs a minor correction.** The prose rules of Section 3 are formalized. The table of
-  Fig. 4 differs from them in five entries. Four are harmless (`[2]` meeting `[−1]` gives
-  `[1], ⟨1⟩` instead of `[1], [0]`, symmetrically for `[−2]`, `[1]`: same weights). The entry for
-  the initiator `[1]` meeting the responder `[0]`, printed `(⟨1⟩, [1])`, moves the weight to the
-  `[0]` agent and breaks Invariant 2 (`|w(s_a) − c_a| ≤ 1`): an agent of colour `−1` in state `[0]`
-  (reachable, e.g. after `[−1]` meets `[1]`) gets `[1]`, and a later change of its colour to `1`
-  asks for the nonexistent state `[3]`. With the printed table, Absolute-Majority reaches this
-  situation already for `k = 2` and the four colours `00, 00, 01, 01`. The text's `([1], ⟨1⟩)` is
-  used.
-* **The final argument of Section 3 needs a minor correction.** It uses, in the tie case ("the
-  last entity that reached state `[0]`"), that every group contains a strong state, an invariant
-  the paper does not state; Invariants 1 and 2 alone do not suffice (colours all `0` with states
-  `⟨1⟩, ⟨−1⟩` satisfy them and never change). `DynInv` adds this third invariant: it holds
-  initially and is preserved (an interaction never removes the last strong state, and a colour
-  change makes a state strong), so the conclusion stands.
-* **Section 5.2 (uniqueness) needs a major correction and is not formalized.** Section 5.2 adds a
-  bit `c'` meant to inform all agents whether the most frequent colour is unique. Rule (2) sets the
-  bit `c'` of a potential winner to `1` when it sees a tie, and only losers can reset it (rule (4)).
-  A tie seen before the stages stabilize then persists: for `k = 1` and colours `1, 1, −1`, the
-  `−1`-agent must eventually annihilate with one of the `1`-agents, which then reports `[0]` (a
-  tie) and keeps `c' = 1` forever, while the other `1`-agent stays in `[1]` and keeps `c' = 0`; the
-  loser's bit then changes forever (rules (3) and (4)). So the mechanism of Section 5.2 never
-  stabilizes on this input, in any execution (checked by exhaustive search: none of the 25
-  reachable configurations is output-stable for `c'`), and the claim that all entities are
-  eventually informed does not hold as stated. A repaired rule, in which a potential winner
-  recomputes `c'` from its current stage reports (`1` iff one of the stages it currently wins is a
-  tie) and losers copy `c'` from potential winners, was checked by exhaustive search for
-  `k = 1, n ≤ 5` and `k = 2, n ≤ 4`; it is not proved. Section 5.1 and Theorem 7 do not depend on
-  Section 5.2.
-* **Typos.** In the proof of Theorem 7, "let `i > k − 1`" should read `i < k − 1`; in the proof of
-  Theorem 6, "instances of `P`" and "`P(2)`" should read `P₁` and `P₂`, and "`l(i)`" should read
-  `l[i]`.
+Theorems 3, 6 and 7 are formalized as stated; the following records where the formalization reads
+or completes the paper's text.
+
+* **Fig. 4 and the rules of Section 3.** The prose rules of Section 3 are formalized. The table of
+  Fig. 4 differs from them in five entries. Four give the same weights (`[2]` meeting `[−1]` gives
+  `[1], ⟨1⟩` instead of `[1], [0]`, symmetrically for `[−2]`, `[1]`). For the initiator `[1]`
+  meeting the responder `[0]`, the table gives `(⟨1⟩, [1])` and the text `([1], ⟨1⟩)`; the
+  formalization uses the text, which preserves Invariant 2 (`|w(s_a) − c_a| ≤ 1`). With the table's
+  entry, an agent of colour `−1` in state `[0]` (reachable, e.g. after `[−1]` meets `[1]`) would
+  get `[1]`, and a later change of its colour to `1` would call for a state `[3]`.
+* **A third invariant in Section 3.** In the tie case ("the last entity that reached state
+  `[0]`"), the final argument of Section 3 uses that every group contains a strong state.
+  Invariants 1 and 2 alone do not give this (colours all `0` with states `⟨1⟩, ⟨−1⟩` satisfy them
+  and never change), so `DynInv` states it as a third invariant and proves that it holds initially
+  and is preserved (an interaction never removes the last strong state, and a colour change makes
+  a state strong). The conclusion of Section 3 is then as in the paper.
+* **Section 5.2 (uniqueness) is not formalized.** Section 5.2 adds a bit `c'` meant to inform all
+  agents whether the most frequent colour is unique. Rule (2) sets the bit `c'` of a potential
+  winner to `1` when it sees a tie, and only losers can reset it (rule (4)). Read literally, a tie
+  seen before the stages stabilize then persists: for `k = 1` and colours `1, 1, −1`, the
+  `−1`-agent eventually annihilates with one of the `1`-agents, which then reports `[0]` (a tie)
+  and keeps `c' = 1`, while the other `1`-agent stays in `[1]` and keeps `c' = 0`; the loser's bit
+  then keeps changing (rules (3) and (4)). So on this input the rules as printed do not bring `c'`
+  to a stable value. A formal treatment of Section 5.2 would need a variant of these rules; it is
+  left out. Section 5.1 and Theorem 7 do not depend on Section 5.2.
+* **Indices in the proofs of Theorems 6 and 7.** The formal proofs read "let `i > k − 1`" in the
+  proof of Theorem 7 as `i < k − 1`, and "instances of `P`", "`P(2)`" and "`l(i)`" in the proof of
+  Theorem 6 as `P₁`, `P₂` and `l[i]`.
 
 ### Proof route
 
@@ -589,7 +588,6 @@ is the case `g x _ = f x`.
 
 ### Not covered
 
-* Section 5.2 (informing all agents whether the most frequent colour is unique), which needs a
-  major correction (see above).
+* Section 5.2 (informing all agents whether the most frequent colour is unique; see above).
 * Dissemination of the winner's label to all agents (plurality consensus in the sense of
-  Section 1.2), which the paper does not give.
+  Section 1.2), which goes beyond the protocol of Section 5.1.

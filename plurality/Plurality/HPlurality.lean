@@ -23,8 +23,8 @@ with the same probability, as the paper requires.
   `T ≤ (k/(2h²)) log (4/3)` rounds, except with probability
   `k T exp(-2 n h⁴/k⁴)`.
 
-The paper states Lemma 4.11 with the factor `1 + h²/k` but proves
-`1 + 2h²/k`, which is also what Theorem 4.12 uses.
+The paper states Lemma 4.11 with the factor `1 + h²/k`; its proof gives
+`1 + 2h²/k`, the factor that Theorem 4.12 uses and that is formalized here.
 -/
 
 namespace Plurality

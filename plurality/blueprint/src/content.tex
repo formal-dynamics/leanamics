@@ -139,9 +139,10 @@ hypothesis.
 
 This section formalizes Theorem~3.8 of Becchetti, Clementi, Natale, Pasquale, Silvestri and
 Trevisan, \emph{Simple Dynamics for Plurality Consensus} (SPAA 2014), and its Corollaries 3.10
-to~3.12. The SPAA proof of Theorem~3.8 needs a minor correction (small repairs: the saturation
-phases as defined are not shown to be preserved, and a union bound over the competing colors is
-missing), and the repaired proof is what is formalized
+to~3.12. The formalization follows the SPAA proof of Theorem~3.8, with saturation phases defined
+by the number of dissenters alone and a union bound over the competing colors; this changes the
+failure probability from $O(\lambda\log n/n^2)$ to $O(\lambda\log n/n)$, still a
+high-probability bound
 (\href{https://github.com/formal-dynamics/leanamics/blob/main/plurality/FORMALIZATION_DIFFERENCES.md#1-theorem-38-how-the-lean-proof-differs-from-spaa}{details}).
 
 \subsection{Plurality, bias, \texorpdfstring{$\alpha$}{alpha} and \texorpdfstring{$\gamma$}{gamma}}
@@ -293,7 +294,7 @@ missing), and the repaired proof is what is formalized
 \end{lemma}
 
 \begin{proof}
-  The paper omits this proof. (i) By Lemma~\ref{lem:3_6} and
+  The paper states this lemma without proof. (i) By Lemma~\ref{lem:3_6} and
   $s\,c_m \ge n^2/9$, $\E\bar C_{m,t+1} \le \frac89(n - c_m)$; apply the
   closed-form Chernoff upper tail at ratio $17/16$. (ii) Here
   $s(c) \ge n - 2(n - c_m)$, so $\E\bar C_{m,t+1} \le 3(n-c_m)^2/n
@@ -315,7 +316,7 @@ missing), and the repaired proof is what is formalized
 \end{lemma}
 
 \begin{proof}
-  The paper omits this proof. Phase by phase: within $\ell$ steps the chain
+  The paper states this lemma without proof. Phase by phase: within $\ell$ steps the chain
   leaves $A_i$ with probability at most $\ell\varepsilon$, and fails to jump
   into $A_{i+1}$ in each of the $\ell$ steps with probability at most
   $\nu^\ell$. The hypothesis $\varepsilon \le \nu$ of the paper is not needed.
@@ -415,8 +416,8 @@ missing), and the repaired proof is what is formalized
 
 \begin{remark}
   The paper states the failure probability as $11T/n^2$; the extra factor
-  $n$ comes from the union bound over competing colors in
-  Lemma~\ref{lem:phase_steps}, which the paper omits. The paper's
+  $n$ here comes from the union bound over competing colors in
+  Lemma~\ref{lem:phase_steps}. The paper's
   hypothesis $\lambda < \sqrt n$ is not used; it only makes the hypothesis
   on $s(c)$ satisfiable.
 \end{remark}
@@ -681,9 +682,9 @@ together with the majority map $m(x) = 3x^2 - 2x^3$, conformist transmission and
   With $b = \max\{(n/k)^{1-\varepsilon}, k\sqrt{n\log n}\}$ this gives
   $\Omega(k\log(n/(kb)))$ rounds, which is $\Omega(k\log n)$ for
   $k \le n^{1/4-\delta}$. The paper states $\Omega(k\log n)$ for all
-  $k \le (n/\log n)^{1/4}$, but at that end $n/k = k\sqrt{n\log n}$ and the
-  argument gives nothing. The paper's proof also chooses the thresholds after
-  seeing the trajectory; the union bound needs the fixed schedule used here.
+  $k \le (n/\log n)^{1/4}$; near that end $n/k = k\sqrt{n\log n}$, and this
+  argument gives fewer rounds. The proof here uses a fixed schedule of
+  thresholds, chosen in advance, for the union bound.
 \end{remark}
 
 \subsection{Which 3-input rules solve plurality consensus}
@@ -732,13 +733,13 @@ together with the majority map $m(x) = 3x^2 - 2x^3$, conformist transmission and
 \end{proof}
 
 \begin{remark}
-  The paper claims that an $(n/4,1/4)$-solver has the clear-majority
+  The paper states that an $(n/4,1/4)$-solver has the clear-majority
   property, i.e.\ that $\Delta_r, \Delta_b \le 1$ is also impossible. Its
-  proof uses the supermartingale property, but checks it only when red is the
-  majority; for $\Delta_r, \Delta_b \le 1$ it fails when red is the minority,
-  because the process is pulled to the interior point
-  $x^* = (2 - \Delta_b)/(4 - \Delta_r - \Delta_b)$. That case is not
-  formalized.
+  proof uses the supermartingale property, written out when red is the
+  majority. For $\Delta_r, \Delta_b \le 1$ the drift is positive when red is
+  the minority (the process is pulled to the interior point
+  $x^* = (2 - \Delta_b)/(4 - \Delta_r - \Delta_b)$), so this case needs
+  another argument; it is not formalized.
 \end{remark}
 
 \begin{lemma}[Adopting $r$ among three colors]\label{lem:adopt3}
@@ -788,10 +789,10 @@ together with the majority map $m(x) = 3x^2 - 2x^3$, conformist transmission and
 \end{proof}
 
 \begin{remark}
-  The paper's proof (Lemma 4.10) is a sketch that treats $\delta_r = 1$ with
-  $(\delta_g,\delta_b) \in \{(3,2),(4,1)\}$ and asserts that $r$ ``will not
+  The paper's proof (Lemma 4.10) is brief: it treats $\delta_r = 1$ with
+  $(\delta_g,\delta_b) \in \{(3,2),(4,1)\}$ and concludes that $r$ ``will not
   converge'' by iterating a one-round estimate. The proof here covers every
-  non-uniform triple and makes the iteration rigorous.
+  non-uniform triple and writes the iteration out in full.
 \end{remark}
 
 \subsection{A lower bound for \texorpdfstring{$h$}{h}-plurality}
@@ -1665,10 +1666,9 @@ Let $k=\lfloor n^{1/4}\log^{1/8}n\rfloor$ and $T_1=\lceil24(n/k)\log n\rceil$. A
 more than $k$ colours remain with probability at most $1/n$ (Lemma~\ref{lem:as-phase1});
 otherwise the current configuration has at most $k\le n^{1/3-1/24}$ colours, and
 $\mathrm{Phase2}(1/24)$ bounds the failure of the remaining $T-T_1$ rounds by $1/n$.
-Lemma~\ref{lem:as-asymptotics} fits both phases in $Cn^{3/4}\log^{7/8}n$ rounds. The proof in the
-paper needs a minor correction: it applies Lemma~3 with $k=n^{1/4}$, which gives
-$O(n^{3/4}\log n)$ rounds for Phase~1; the choice $k=n^{1/4}\log^{1/8}n$ balances the two phases
-and gives the bound as stated.
+Lemma~\ref{lem:as-asymptotics} fits both phases in $Cn^{3/4}\log^{7/8}n$ rounds. The choice
+$k=n^{1/4}\log^{1/8}n$ (the paper's Appendix~A.7 takes $k=n^{1/4}$, which gives
+$O(n^{3/4}\log n)$ rounds for Phase~1) balances the two phases and gives the bound as stated.
 \end{proof}
 
 \begin{theorem}[Theorem~4]\label{thm:as-main-unconditional}
@@ -1700,8 +1700,8 @@ with colours in $\{0,\dots,n-1\}$. We write $c_a$ for the support of colour $a$,
 support after one round, $j$ or $k$ for the number of colours, and $m=16\sqrt{jn\log n}$. Where
 the paper assumes $j\le n^{1/3-\varepsilon}$, the statements below assume $Cj^3\log n\le n$ for a
 constant $C$, which is what the proofs use; it holds for $j\le n^{1/3-\varepsilon}$ and $n$
-large. The proofs follow the paper's, with the deviations and the minor corrections noted in each
-proof.
+large. The proofs follow the paper's, with the deviations noted in each proof; none affects the
+paper's results.
 
 \subsection{One round}
 
@@ -1813,9 +1813,8 @@ colour of $x$ below $n/j-64\sqrt{jn\log n}$ agents with probability at most $1/n
 Take $C=2^{14}$. Every support is at most $n/j+(j-1)m$, so by Lemma~\ref{lem:mo-expect} every
 colour of $x$ has $\E[C'_a]\ge n/j-2m$. The Chernoff lower tail at $n/j-4m$
 (Lemma~\ref{lem:mo-tails}) and a union bound over the at most $n$ colours give $1/n^2$. The paper
-bounds the overshoot at the hitting time instead (Lemma~B.1); its proof needs a minor correction,
-since it treats the smallest support as a Markov chain, while it is a function of the
-configuration. The one-step form avoids this argument.
+bounds the overshoot at the hitting time instead (Lemma~B.1), with a factorization that treats
+the smallest support as a Markov chain; the one-step form does not need that factorization.
 \end{proof}
 
 \begin{lemma}[Lemma~3.3, symmetry breaking]\label{lem:mo-breaking}
@@ -1833,12 +1832,12 @@ $\eta=1/n^2$ (Lemma~\ref{lem:mo-overshoot}), and $M=n/j$. For $t\ge Cj^2\sqrt{\l
 takes $C=145\,409$), $\lambda t\ge4\beta$ and $M\eta t\le\lambda t/4$, so $\Pr(\tau>t)\le1/2$.
 
 The paper states the conclusion at the fixed time $t$, while its proof bounds the hitting time,
-which is what is stated here; its composition in Theorem~3.1 needs a minor correction, the strong
-Markov property at the hitting time (Lemma~\ref{lem:mo-strong-markov}). The statement also needs
-a minor correction: it needs the hypothesis $j^3\log n=O(n)$, as do the paper's Lemmas~3.4
-and~3.5 (otherwise
-the threshold $n/j-\sqrt{jn\log n}$ is negative and the event has probability $0$). Finally, its
-bound $\E[\tau]<j^2\sqrt{\log n}$ should read $\E[\tau]\le(2\alpha/\varepsilon)j^2\sqrt{\log n}$.
+which is what is stated here; Theorem~3.1 then uses the strong Markov property at the hitting time
+(Lemma~\ref{lem:mo-strong-markov}). The statement includes the standing hypothesis
+$j^3\log n=O(n)$ of the paper's Lemmas~3.4 and~3.5 (without it the threshold
+$n/j-\sqrt{jn\log n}$ can be negative). Lemma~3.2 gives
+$\E[\tau]\le(2\alpha/\varepsilon)j^2\sqrt{\log n}$, of the same order as the paper's
+$j^2\sqrt{\log n}$.
 \end{proof}
 
 \subsection{Dropping}
@@ -1861,10 +1860,10 @@ the Chernoff upper tail (Lemma~\ref{lem:mo-tails}), $c_a$ exceeds the level of t
 with probability at most $1/n^2$; after $s_A+\lceil4j\log n\rceil\le240j\log n$ rounds the level
 is $K$, and a union bound over the $t\le n$ rounds gives $1/n$.
 
-The proof in the paper needs a minor correction. At its threshold $n/j-\sqrt{jn\log n}$, and
-again near its floor $j^2\log n$, the one-round bound of its Equation~(7) is only about
-$n^{-1/12}$, and the union bound over the rounds exceeds $1$ for large $j$ (for instance
-$j\ge20n^{1/10}$, which $j\le n^{1/3-\varepsilon}$ allows). The threshold $16\sqrt{jn\log n}$,
+The threshold and the floor differ from the paper's. At the paper's threshold
+$n/j-\sqrt{jn\log n}$, and again near its floor $j^2\log n$, the one-round bound of its
+Equation~(7) is about $n^{-1/12}$, and the union bound over the rounds is larger than $1$ for large
+$j$ (for instance $j\ge20n^{1/10}$, which $j\le n^{1/3-\varepsilon}$ allows). The threshold $16\sqrt{jn\log n}$,
 which Lemma~\ref{lem:mo-breaking} reaches within the same $O(j^2\sqrt{\log n})$ rounds, and the
 floor $240j^2\log n$ make each round fail with probability at most $1/n^2$.
 \end{proof}
@@ -1877,7 +1876,7 @@ $j$ colours and every colour $a$ with at most $n/(2j)$ agents, colour $a$ has di
 $t\ge Cj\log n$ rounds with probability at least $1/2$.
 \end{lemma}
 \begin{proof}\leanok
-Take $C=1024$. As in the paper's sketch, with the potential $\psi=\min\{c_a,n/(2j)\}$:
+Take $C=1024$. As in the paper's outline, with the potential $\psi=\min\{c_a,n/(2j)\}$:
 Lemma~\ref{lem:mo-expect} gives $\E[\psi']\le(1-1/(2j))\psi+(n/(4j^2))[c_a>n/(2j)]$, and by the
 Chernoff upper tail $c_a$ escapes above $n/(2j)$ with probability at most $1/n^4$ per round.
 Hence $\E[\psi_s]\le(1-1/(2j))^s\,n/(2j)+(n/(4j^2))\,n^{-4}s^2$, which is at most $1/2$ at
@@ -1901,8 +1900,8 @@ $240j^2\log n\le n/(2j)$ agents except with probability $1/n$, and Lemma~\ref{le
 it with probability at least $1/2$: in total at least $\frac12(1-\frac1n)\ge\frac25$. Fewer than
 $j$ colours is absorbing, so Lemma~\ref{lem:mo-strong-markov} at the hitting time of broken
 symmetry and Lemma~\ref{lem:mo-breaking} give $\frac12\cdot\frac25=\frac15$ (the proof takes
-$C=293\,349$). The paper's proof of Theorem~3.1 needs a minor correction here: its probability
-$1/4$ ignores the failure probability of Lemma~3.4; any positive constant suffices.
+$C=293\,349$). The paper's proof uses the probability $1/4$; with the failure probability of
+Lemma~3.4 included it is slightly smaller, and any positive constant suffices.
 \end{proof}
 
 \begin{lemma}[Amplification over phases]\label{lem:mo-phases}

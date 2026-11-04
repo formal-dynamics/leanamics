@@ -19,12 +19,12 @@ is at most `5/8` (`not_solver_of_drift`). No optional stopping is needed.
 `Δ_r = Δ_b = 3` (it follows the clear majority on that pair) or
 `Δ_r, Δ_b ≤ 1`.
 
-**The remaining case.** The paper's proof also claims the case
-`Δ_r, Δ_b ≤ 1`, but it only checks the supermartingale inequality when red is
+**The remaining case.** The paper's statement also covers the case
+`Δ_r, Δ_b ≤ 1`; its proof writes out the supermartingale inequality when red is
 the majority. In this case `p(x) - x > 0` when red is the minority: the process
 is pulled towards an interior point `x* = (2 - Δ_b)/(4 - Δ_r - Δ_b)`, and which
-color eventually wins depends on how the process leaves that point, which is
-not addressed. That case is left open here.
+color eventually wins depends on how the process leaves that point, which needs
+a further argument. That case is left open here.
 -/
 
 namespace Plurality
@@ -215,7 +215,7 @@ theorem not_solver_of_drift (h8 : 8 ∣ n) (hn : 1 ≤ n) {f : Rule k} (hf : Con
 
 /-- **Theorem 4.8 (a), proved cases.** If `f` is an `(n/4, 1/4)`-solver (with
 `8 ∣ n`), then for every pair of distinct colors either `f` follows the clear
-majority on that pair (`Δ_r = Δ_b = 3`) or `Δ_r, Δ_b ≤ 1`. The paper claims
+majority on that pair (`Δ_r = Δ_b = 3`) or `Δ_r, Δ_b ≤ 1`. The paper states
 that the second alternative is also impossible; see the module docstring. -/
 theorem theorem_4_8_a (h8 : 8 ∣ n) (hn : 1 ≤ n) {f : Rule k} (hf : Conservative f)
     (hS : Solver f n (n / 4) (1 / 4)) {r b : Fin k} (hrb : r ≠ b) :

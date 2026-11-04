@@ -62,12 +62,12 @@ Boyd, Ghosh, Prabhakar, Shah, *Randomized gossip algorithms*, IEEE Trans. Inf. T
 1. **Simple graphs.** `G : SimpleGraph V` on a finite type (no multi-edges or self-loops, which
    footnote 24 allows), to reuse `avgIter`/`transW` of `Averaging.Basic` and Mathlib's
    `adjMatrix`, `degMatrix`, `lapMatrix`.
-2. **Typo in the Survey.** Its Theorem 33 prints `√(d(v)/d(v)) λᵗ`; the correct factor, as in
-   Lovász's Theorem 5.1, is `√(d(v)/d(u)) λᵗ`, which is what `abs_walkMatrix_pow_sub_walkStationary_le`
-   states. We take `λ = max {|λ₂|, |λₙ|}` as in the Survey: with `min` instead of `max` the bound
-   would fail, e.g. on a connected bipartite graph, where `λₙ = -1` and `Pᵗ(u, v)` does not converge.
-   Lovász's text itself defines `λ = min {|λ₂|, |λₙ|}`, a slip for `max` that needs a minor
-   correction; the Survey correctly uses `max`.
+2. **The factor `√(d(v)/d(u))` and the definition of `λ`.** The Survey's Theorem 33 writes
+   `√(d(v)/d(v)) λᵗ` where `√(d(v)/d(u)) λᵗ` is meant, as in Lovász's Theorem 5.1; the latter is
+   what `abs_walkMatrix_pow_sub_walkStationary_le` states. We take `λ = max {|λ₂|, |λₙ|}`, as in
+   the Survey. Lovász's text writes `min {|λ₂|, |λₙ|}` where `max` is meant: the bound needs `max`
+   (on a connected bipartite graph `λₙ = -1` and `Pᵗ(u, v)` does not converge). Neither point
+   affects the results.
 3. **Theorem 33 under a weaker hypothesis.** Every degree positive (`∀ v, 0 < G.degree v`)
    instead of "connected" (with at least one edge, implicit for a random walk). Connected graphs
    with at least two nodes satisfy it (`Connected.preconnected.degree_pos_of_nontrivial`), so the
@@ -155,9 +155,10 @@ Lemma A.1, Lemmas B.1, B.3, B.4, C.1 to C.4.
    `prob_sign_window`, `prob_weakReconstruction_window`. Logarithms are natural.
 6. **Theorem 4.1.** The statement is the paper's, `E‖y⁽ᵗ⁾ + z⁽ᵗ⁾ - y⁽⁰⁾‖² ≤ 3λ₂t/n` for
    `3 (n/λ₃) log n ≤ t ≤ n/(4λ₂)`, the expectation being over the initial signs and the edges; the
-   proof does not use the upper bound `t ≤ n/(4λ₂)`. The paper's proof needs a minor correction:
-   its last step uses `E‖z⁽⁰⁾‖² ≤ 1/n`, while for uniform signs `E‖z⁽⁰⁾‖² = n - 2` (since
-   `‖x⁽⁰⁾‖² = n` and `E‖x_∥‖² = E‖y⁽⁰⁾‖² = 1`); the conclusion still holds. Our bookkeeping, for fixed
+   proof does not use the upper bound `t ≤ n/(4λ₂)`. The formal proof handles the last step of the
+   paper's proof differently: that step uses `E‖z⁽⁰⁾‖² ≤ 1/n`, while for uniform signs
+   `E‖z⁽⁰⁾‖² = n - 2` (since `‖x⁽⁰⁾‖² = n` and `E‖x_∥‖² = E‖y⁽⁰⁾‖² = 1`). The theorem holds as
+   stated, with the following bookkeeping. For fixed
    signs and with `L = λ₂t/n`, `r = λ₂/λ₃`, `s₀ = ‖y⁽⁰⁾‖²`, is
    `E‖y⁽ᵗ⁾ + z⁽ᵗ⁾ - y⁽⁰⁾‖² ≤ (1 + 2r)(L (1 + 8/n) s₀ + 4r + 4Lr) + n (1 - λ₃/n)ᵗ + 2r s₀`
    (`expList_sum_sq_dev_signVec_le`), from the one-round bounds
