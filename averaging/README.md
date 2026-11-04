@@ -34,7 +34,7 @@ and [`Averaging/Sequential.lean`](Averaging/Sequential.lean) (definitions in `Ra
 | First moment `𝔼[x⁽ᵗ⁾] = W̄ᵗ x⁽⁰⁾` (Section 7.3.2) | `Sequential.expList_seqRun` |
 
 Proof files: `RateMatrix.lean`, `RateSpectral.lean`, `RateGap.lean`, `RateBound.lean`,
-`SequentialMatrix.lean`. The Survey's Theorem 33 prints `√(d(v)/d(v))`, a typo for `√(d(v)/d(u))`.
+`SequentialMatrix.lean`. The bound is stated with the factor `√(d(v)/d(u))` of Lovász's Theorem 5.1.
 On a `d`-regular graph, `walkMatrix` and `normAdjMatrix` are the core's `Dynamics.transitionMatrix`
 used by AVG-2 (`transitionMatrix_eq_walkMatrix`, `normAdjMatrix_eq_transitionMatrix`) and
 `walkLambda` is the core's `Dynamics.lambdaG` (`walkLambda_eq_lambdaG`). The eigenbasis lemmas

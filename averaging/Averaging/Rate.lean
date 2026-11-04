@@ -7,7 +7,7 @@ Theorem 33 of Becchetti, Clementi, Natale, *Consensus Dynamics: An Overview*, SI
 a survey*, 1993. For the random walk `P = D⁻¹A` with stationary distribution `π(v) = d(v) / 2m`
 and `λ = max {|λ₂(P)|, |λₙ(P)|}`,
 `|Pᵗ(u, v) - π(v)| ≤ √(d(v) / d(u)) λᵗ` for all nodes `u, v` and times `t`
-(the Survey prints `√(d(v) / d(v))`, a typo). Unless `G` is bipartite, `λ < 1`, so the
+(as in Lovász's Theorem 5.1). Unless `G` is bipartite, `λ < 1`, so the
 averaging dynamics `x⁽ᵗ⁾ = Pᵗ x⁽⁰⁾` converges exponentially fast to `∑ π(v) x⁽⁰⁾(v)` at every
 node.
 
