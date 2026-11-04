@@ -132,10 +132,9 @@ drawn pair reacts; if no pair can react, both kernels stay put.
 This section and the two following ones formalize the easy direction of the characterization of
 stably computable predicates of Angluin, Aspnes, Diamadi, Fischer and Peralta,
 \emph{Computation in networks of passively mobile finite-state sensors} (Distributed Computing
-18, 2006). Their Lemma~5 needs a minor correction for a population of a single agent: no
-encounter happens, and if a lone agent keeps its state, its output stays $0$ even when the
-predicate holds. The protocols
-formalized here start each agent with its single-agent output and are correct for every $n\ge1$
+18, 2006). Populations of every size $n\ge1$ are allowed. A single agent has no encounter, and
+here a lone agent keeps its state, so the protocols formalized here start each agent with its
+single-agent output; for $n\ge2$ they behave as those of Lemma~5
 (\href{https://github.com/formal-dynamics/leanamics/blob/main/crn/FORMALIZATION_DIFFERENCES.md#semilinear-predicates-are-stably-computable-stable-crn-3-easy-direction}{details}).
 \begin{definition}[Population protocols with input and output]\label{def:protocol}
 \lean{Crn.Protocol,Crn.Protocol.interact,Crn.Protocol.Step,Crn.Protocol.Reaches,Crn.Protocol.OutputStable}\leanok\uses{def:pp}
@@ -241,11 +240,10 @@ This section formalizes Theorems~1, 2 and~4 of Mertzios, Nikoletseas, Raptopoulo
 (ICALP 2014, arXiv:1404.7671, whose numbering we use; Distributed Computing 30, 2017): population
 protocols run on a connected interaction graph, and two agents interact only along an edge. The
 3-state protocol is that of Angluin, Aspnes and Eisenstat (Distributed Computing 21, 2008).
-Graphs are undirected. The proofs of Theorems~1, 2 and~4 need minor corrections: in Theorem~1 the
-type of two agents and one set index are corrected; in Theorem~2 ambassadors of the same color can
-block each other, which a closest pair of opposite ambassadors avoids; in Theorem~4 the
-monotonicity step is stated without proof (it follows from a monotone coupling), and the bound
-$1/2$ also needs absorption with probability $1$
+Graphs are undirected. The formal proofs spell out some steps differently, without affecting the
+theorems: in Theorem~2 the walk of an ambassador starts from a closest pair of ambassadors of
+opposite colours; in Theorem~4 the monotonicity step comes from a monotone coupling, and
+absorption with probability $1$ is proved on connected graphs
 (\href{https://github.com/formal-dynamics/leanamics/blob/main/crn/FORMALIZATION_DIFFERENCES.md#majority-on-graphs-with-very-small-local-memory-graphmajority-crn-4}{details}).
 
 \begin{definition}[Protocols on an interaction graph]\label{def:graph-stable}
@@ -407,13 +405,11 @@ Absorption in a finite chain follows, and the two convergence probabilities sum 
 This section formalizes Theorems~3, 6 and~7 of Gąsieniec, Hamilton, Martin, Spirakis and
 Stachowiak, \emph{Deterministic population protocols for exact majority and plurality} (OPODIS
 2016, LIPIcs 70, paper 14). Colours are $k$-bit labels, so $C \le 2^k$ colours need $O(k)$ bits of
-memory. Fig.~4 of the paper needs a minor correction: one entry of its table breaks Invariant~2,
-and the rules of the text are used. The final argument of Section~3 needs a minor correction: it
-uses, in the tie case, that every group keeps a strong state, an invariant the paper does not
-state, which is added and proved. Section~5.2, which should inform all agents whether the most
-frequent colour is unique, needs a major correction and is not formalized: on the colours
-$1, 1, -1$ its bit never stabilizes, in any execution (a repaired rule passes exhaustive checks on
-small populations). Theorem~7 is formalized as the protocol of Section~5.1 computes it: every
+memory. Where the table of Fig.~4 and the rules of Section~3 differ, the rules of the text are
+used. In the tie case, the final argument of Section~3 uses that every group keeps a strong state;
+this is stated and proved as a third invariant. Section~5.2, which informs all agents whether the
+most frequent colour is unique, is not formalized; Theorem~7 does not depend on it. Theorem~7 is
+formalized as the protocol of Section~5.1 computes it: every
 agent learns whether its own colour is the plurality colour, not the winner's label
 (\href{https://github.com/formal-dynamics/leanamics/blob/main/crn/FORMALIZATION_DIFFERENCES.md#deterministic-exact-majority-and-plurality-exactmajority-crn-5}{details}).
 

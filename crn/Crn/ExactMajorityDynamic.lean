@@ -31,11 +31,11 @@ Main statements:
 * `dynamicMajority_stablyComputes`: without the force, `P₂` stably computes the sign of
   `#1 - #(-1)`.
 
-The table of Fig. 4 differs from the text in five entries. Four are harmless (`[±2]` meeting
-`[∓1]` gives `⟨±1⟩` instead of `[0]`, of the same weight). The entry for `[1]` meeting `[0]`,
-`(⟨1⟩, [1])`, needs a minor correction: it moves the weight to the `[0]` agent and breaks
-Invariant 2 (an agent of colour `-1` in state `[0]` would get `[1]`, and a later change of its
-colour to `1` would require the state `[3]`); the text's `([1], ⟨1⟩)` is used.
+The table of Fig. 4 differs from the text in five entries. Four give the same weights (`[±2]`
+meeting `[∓1]` gives `⟨±1⟩` instead of `[0]`). For `[1]` meeting `[0]`, the table gives
+`(⟨1⟩, [1])` and the text `([1], ⟨1⟩)`; the text is used, which preserves Invariant 2 (with the
+table's entry, an agent of colour `-1` in state `[0]` would get `[1]`, and a later change of its
+colour to `1` would call for a state `[3]`).
 -/
 
 namespace Crn
@@ -96,8 +96,8 @@ the weak state of the sign of the strong state `b` (its output); otherwise nothi
 def recruit (a b : DynState) : DynState :=
   if !b.isWeak && (a.isWeak || (a == zero && b.weight != 0)) then weak b.out else a
 
-/-- The transition function of [GHMSS16, Section 3] (the text; Fig. 4 with its entry for `[1]`
-meeting `[0]` corrected): opposite strong states annihilate (`[1], [-1]` and `[2], [-2]` into
+/-- The transition function of [GHMSS16, Section 3] (the rules of the text; for the five entries where
+Fig. 4 differs, see the module docstring): opposite strong states annihilate (`[1], [-1]` and `[2], [-2]` into
 `[0], [0]`, `[2], [-1]` into `[1], [0]`, `[-2], [1]` into `[-1], [0]`), all other encounters
 recruit (`recruit`). -/
 def δ : DynState × DynState → DynState × DynState
