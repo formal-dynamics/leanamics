@@ -291,10 +291,11 @@ Theorem~2.5 of Hassin and Peleg (Theorem~8 of the survey of Becchetti, Clementi 
 \emph{Consensus dynamics: an overview}, SIGACT News 2020) is formalized for the lazy voter, with
 the meeting-time argument of Kanade, Mallmann-Trenn and Sauerwald, \emph{On coalescence time in
 graphs} (SODA 2019), Proposition~B.9 ($t_{\mathrm{meet}}\le 4t_{\mathrm{hit}}$). For the
-synchronous voter with plain uniform-neighbour sampling, Theorem~8 of the survey needs a minor
-correction (a nonbipartiteness hypothesis, or a lazy walk); this section formalizes the lazy
+synchronous voter with plain uniform-neighbour sampling, Theorem~8 of the survey holds on
+nonbipartite graphs, or for a lazy walk (on a bipartite graph an alternating colouring alternates
+forever); this section formalizes the lazy
 version, and Section~\ref{sec:hp-plain-walk} the plain walk on nonbipartite graphs
-(\href{https://github.com/formal-dynamics/leanamics/blob/main/voter/FORMALIZATION_DIFFERENCES.md#41-survey-theorem-8-needs-a-minor-correction-the-lazy-walk-is-formalized}{details}).
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/voter/FORMALIZATION_DIFFERENCES.md#41-survey-theorem-8-the-lazy-walk-is-formalized}{details}).
 \begin{definition}[Two-token walk, lazy sampling]\label{def:pairwalk}
 \lean{Voter.pairWalk,Voter.leftRounds}\leanok\uses{def:backward,thm:lazy}
 For a sampling kernel $H$, two tokens move with the rounds of the voter dynamics: the
@@ -381,9 +382,9 @@ meeting time through the bipartite double cover $\tilde G$, quoting Tetali and W
 (\emph{Simultaneous reversible Markov chains}, 1993). We follow the reduction to $\tilde G$, but
 prove the meeting bound with the potential of Coppersmith, Tetali and Winkler
 (\emph{Collisions among random walks on a graph}, SIAM J.\ Discrete Math.\ 1993) on $\tilde G$.
-The proof of Lemma~2.4 needs a minor correction: it uses $\mathrm{Diam}(\tilde G)\le n$, but the
-diameter of $\tilde G$ can be $2n-3$ (a path ending in a triangle); $\mathrm{Diam}(\tilde G)\le
-2n-1$ only changes the constant, and our route does not use the diameter
+The proof of Lemma~2.4 uses $\mathrm{Diam}(\tilde G)\le n$; the diameter of $\tilde G$ can be
+$2n-3$ (a path ending in a triangle), and $\mathrm{Diam}(\tilde G)\le 2n-1$ only changes the
+constant, so the lemma is unaffected. Our route does not use the diameter
 (\href{https://github.com/formal-dynamics/leanamics/blob/main/voter/FORMALIZATION_DIFFERENCES.md#43-the-plain-walk-on-connected-nonbipartite-graphs-lemma-24-and-theorem-25}{details}).
 Hitting times $h$ are those of Lemma~\ref{lem:hitting}, twice the hitting times of the plain walk.
 \begin{definition}[Bipartite double cover]\label{def:double-cover}
@@ -465,10 +466,10 @@ Source: Berenbrink, Giakkoupis, Kermarrec, Mallmann-Trenn, \emph{Bounds on the v
 dynamic networks}, ICALP 2016, arXiv:1603.01895 (BGKM16). The process is the lazy voter
 $(I+D^{-1}A)/2$ of Theorem~\ref{thm:lazy}.
 
-Lemma~2.1 of BGKM16 needs a minor correction (its sum should run over the minority side, which is
-what its proof gives), and so do the statement of Lemma~2.4 (it prints $1/n^2$ for $1-1/n^2$)
-and the sign of an exponent in its proof; the corrected versions are formalized
-(\href{https://github.com/formal-dynamics/leanamics/blob/main/voter/FORMALIZATION_DIFFERENCES.md#51-lemma-21-of-bgkm16-needs-a-minor-correction}{details
+Lemma~2.1 of BGKM16 is formalized with its sum over the minority side, which is what its proof
+gives, and Lemma~2.4 with the probability $1-1/n^2$ given by its proof; these details do not
+affect the paper's results
+(\href{https://github.com/formal-dynamics/leanamics/blob/main/voter/FORMALIZATION_DIFFERENCES.md#51-lemma-21-of-bgkm16-the-sum-over-the-minority-side}{details
 on Lemma~2.1},
 \href{https://github.com/formal-dynamics/leanamics/blob/main/voter/FORMALIZATION_DIFFERENCES.md#5-consensus-time-via-conductance-berenbrinkgiakkoupiskermarrecmallmann-trenn}{details
 on Lemma~2.4} in Section~5.5 there).
@@ -489,13 +490,14 @@ all of them improves $\mathbb{E}f(c+\sum_i g_i(x_i))$ (BGKM16 Lemma~A.1).
 \begin{proof}\leanok
 Reindex the pairs $(x,a)$ by $(x[i\mapsto a],x_i)$; induct over the set of replaced coordinates.
 \end{proof}
-\begin{lemma}[BGKM16 Lemma~2.1, corrected]\label{lem:bgkm-21}
+\begin{lemma}[BGKM16 Lemma~2.1, formalized form]\label{lem:bgkm-21}
 \lean{Voter.potential_drift,Voter.potential_drift_conductance,Voter.expect_sqrt_le_comp,Voter.expect_compSum_sq_ge,Voter.expect_compSum_cube_le,Voter.sqrt_add_le_taylor,Voter.sqrt_chord}\leanok\uses{def:conductance,lem:indep,thm:lazy}
 If $s_t\neq\emptyset$, then
 $\mathbb{E}[\Psi_{t+1}\mid s_t]\le\Psi-\sum_{u\in s_t}\lambda_u d_u/(32\Psi^3)
-\le\Psi-d_{\min}\varphi/(32\Psi)$. The paper prints the sum over all of $V$; this needs a minor correction (the
-inequality does not hold on the star $K_{1,15}$), and its proof gives the sum over $s_t$
-(\href{https://github.com/formal-dynamics/leanamics/blob/main/voter/FORMALIZATION_DIFFERENCES.md#51-lemma-21-of-bgkm16-needs-a-minor-correction}{details}).
+\le\Psi-d_{\min}\varphi/(32\Psi)$. The paper prints the sum over all of $V$; its proof gives the sum over $s_t$, which is the
+form used in the proof of Lemma~2.2 and formalized here (as printed, the inequality does not
+hold on the star $K_{1,15}$;
+\href{https://github.com/formal-dynamics/leanamics/blob/main/voter/FORMALIZATION_DIFFERENCES.md#51-lemma-21-of-bgkm16-the-sum-over-the-minority-side}{details}).
 \end{lemma}
 \begin{proof}\leanok
 $\Psi_{t+1}$ is at most the root of the new volume $P+\sum_u X_u$ of the opinion of $s_t$.
