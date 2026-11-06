@@ -143,11 +143,13 @@ def detail(model, e, width=80, raw=False):
                 where += f", {s['version']}"
             if s.get("page"):
                 where += f", p. {s['page']}"
-            add("  " + where, "key")
+            for ln in wrap(where, W, "  "):
+                add(ln, "key")
             if s.get("url"):
                 for ln in wrap_code(s["url"], W, "  ", ""):
                     add(ln, "link")
-            add("  [" + s.get("status", "status unknown") + "]", "warn")
+            for ln in wrap("[" + s.get("status", "status unknown") + "]", W, "  "):
+                add(ln, "warn")
             if s.get("statement"):
                 add("  Original statement:", "dim")
                 body = s["statement"] if raw else tex(s["statement"])

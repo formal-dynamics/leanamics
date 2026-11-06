@@ -242,8 +242,13 @@ class TestRepository(unittest.TestCase):
         self.assertEqual(self.m.source_problems, [])
         self.assertGreater(len(self.m.source_entries), 20)
         for s in self.m.source_entries:
-            self.assertIn("not yet compared with the PDF", s["status"])
-            self.assertTrue(s.get("statement"), s["items"])
+            # Every entry says how its text was obtained; an entry without a statement
+            # (no open copy of the source) must say so.
+            self.assertTrue(s["status"].strip(), s["items"])
+            if not s.get("statement"):
+                self.assertNotIn("compared with the PDF", s["status"], s["items"])
+            self.assertNotIn("checked by", s["status"].replace("not checked by", "")
+                             .replace("not yet checked by", ""), s["items"])
             for i in s["items"]:
                 self.assertIn(i, self.m.by_id)
 
