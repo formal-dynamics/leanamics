@@ -147,7 +147,7 @@ nodes that are at distance $i$ from $S$, i.e. $N^{(i)}_{G}(S) = \{v \in V \mid
 d_{G}(S,v) = i\}$. Moreover, the set of nodes that are  within finite distance
 from $S$, i.e. that are reachable from $S$, will be denoted as $N^*_{G}(S)$.
 '''
-notes = "Definition A.1 is on p. 17, Definition A.2 on p. 18. Labels 'Definition A.1 (...)' and 'Definition A.2 (...)' added to separate the two. Macros replaced: \\IC -> $\\mathrm{IC}$, \\SIR -> SIR. The footnote after 'initially infectious' is omitted: 'we use here the term infectious for two reasons: to emphasize that the node is both informed and active and, moreover, to be consistent with the literature in mathematical epidemiology.' Definition A.1 writes N^{t}_{G_p} where the notation paragraph writes N^{(i)}_G, as printed."
+notes = "The paper redefines \\le, \\leq as \\leqslant and \\ge, \\geq as \\geqslant (printed slanted); they are kept as \\le, \\leq, \\ge, \\geq. Definition A.1 is on p. 17, Definition A.2 on p. 18. Labels 'Definition A.1 (...)' and 'Definition A.2 (...)' added to separate the two. Macros replaced: \\IC -> $\\mathrm{IC}$, \\SIR -> SIR. The footnote after 'initially infectious' is omitted: 'we use here the term infectious for two reasons: to emphasize that the node is both informed and active and, moreover, to be consistent with the literature in mathematical epidemiology.' Definition A.1 writes N^{t}_{G_p} where the notation paragraph writes N^{(i)}_G, as printed."
 
 [[source]]
 item = "epidemics:thm:layers"
@@ -198,7 +198,7 @@ node $v$ is the length of the shortest path among all paths from any node in
 $S$ to $v$ in $G$, if no such path exists $d_{G}(S,v) = + \infty$, if $v \in
 S$, $d_{G}(S,v) = 0$.
 '''
-notes = "Unnumbered claim of the text, stated as a distributional equivalence; the paper formalizes it as Theorem A.3 (see the thm:perc entry of verification/sources.toml). The \\ref to the bond percolation definition is rendered as 'Definition A.1'. Similar statement in the introduction (p. 2): 'the set of nodes infected in the first t steps (that is, the union of infectious and recovered nodes at time t) has the same distribution as the set of nodes reachable in the percolation graph G_p from I_0 in at most t steps'."
+notes = "The paper redefines \\le, \\leq as \\leqslant and \\ge, \\geq as \\geqslant (printed slanted); they are kept as \\le, \\leq, \\ge, \\geq. Unnumbered claim of the text, stated as a distributional equivalence; the paper formalizes it as Theorem A.3 (see the thm:perc entry of verification/sources.toml). The \\ref to the bond percolation definition is rendered as 'Definition A.1'. Similar statement in the introduction (p. 2): 'the set of nodes infected in the first t steps (that is, the union of infectious and recovered nodes at time t) has the same distribution as the set of nodes reachable in the percolation graph G_p from I_0 in at most t steps'."
 
 [[source]]
 item = "epidemics:thm:subcritical"
@@ -224,7 +224,7 @@ $\mathcal{E}_n$ occurs \emph{with high probability} if $\mathbf{Pr} \left( \math
 [Section 1, p. 2:] Given a graph $G=(V,E)$ and a bond percolation probability $p$, the bond percolation process is to subsample a random graph $G_p= (V,E_p)$ by independently choosing each edge of $G$ to be included in $E_p$ with probability $p$ and to be omitted with probability $1-p$. We will call $G_p$ the {\em percolation graph} of $G$.
 [Appendix E, p. 41:] In this section, we analyze the percolation process in regular graphs and prove Theorem 2.3.
 '''
-notes = "Untitled theorem in the paper (Appendix E, 'Regular Graphs Below the Threshold'). Macros replaced: \\bigO -> \\mathcal{O}, \\Prc{.} -> \\mathbf{Pr} \\left( . \\right). The proof states the tail as exp(-epsilon^2 t/3) ('By Chernoff bounds this happens with probability exp(-epsilon^2 t/3)'). The paper's statement assumes p = (1-epsilon)/(d-1). The other numbered result of this item, Theorem 2.3, is in verification/sources.toml."
+notes = "The paper redefines \\le, \\leq as \\leqslant and \\ge, \\geq as \\geqslant (printed slanted); they are kept as \\le, \\leq, \\ge, \\geq. Untitled theorem in the paper (Appendix E, 'Regular Graphs Below the Threshold'). Macros replaced: \\bigO -> \\mathcal{O}, \\Prc{.} -> \\mathbf{Pr} \\left( . \\right). The proof states the tail as exp(-epsilon^2 t/3) ('By Chernoff bounds this happens with probability exp(-epsilon^2 t/3)'). The paper's statement assumes p = (1-epsilon)/(d-1). The other numbered result of this item, Theorem 2.3, is in verification/sources.toml."
 
 [[source]]
 item = "epidemics:cor:subcritical"
@@ -252,7 +252,7 @@ $\mathcal{E}_n$ occurs \emph{with high probability} if $\mathbf{Pr} \left( \math
 \geq 1-(1/n)^{\Omega(1)}$.
 [Section 2.2, p. 5:] As remarked in Section 1, bond percolation with percolation probability   $p$ is equivalent to the   Reed-Frost   process (for short, RF process) with transmission probability $p$.
 '''
-notes = "The 'above two theorems' are Theorems 2.4 and 2.5 (the RF process on SWG(n,c/n) and on 3-SWG(n)). The \\ref's are rendered by their numbers. 'Claim 2 of Theorem 2.3' is as printed (Theorem 2.3 has a single claim). Macros: \\bigO -> \\mathcal{O}, \\Prc -> \\mathbf{Pr}. The paper gives no formal statement here; the library's Lean statement (and the Erdos-Renyi part, Theorem 2.3 applied to K_n) is the formalization's own. Theorem 2.3 itself is the verification/sources.toml entry of this item."
+notes = "The paper redefines \\le, \\leq as \\leqslant and \\ge, \\geq as \\geqslant (printed slanted); they are kept as \\le, \\leq, \\ge, \\geq. The 'above two theorems' are Theorems 2.4 and 2.5 (the RF process on SWG(n,c/n) and on 3-SWG(n)). The \\ref's are rendered by their numbers. 'Claim 2 of Theorem 2.3' is as printed (Theorem 2.3 has a single claim). Macros: \\bigO -> \\mathcal{O}, \\Prc -> \\mathbf{Pr}. The paper gives no formal statement here; the library's Lean statement (and the Erdos-Renyi part, Theorem 2.3 applied to K_n) is the formalization's own. Theorem 2.3 itself is the verification/sources.toml entry of this item."
 
 [[source]]
 item = "epidemics:def:swg"
@@ -289,7 +289,7 @@ similarly to the regular 3-$\mathcal{SWG}(n)$ model, each node here has one brid
 edge in average, and the obtained critical value for the percolation probability
 $p$ turns out to be $\sqrt{2}-1$.
 '''
-notes = "Labels 'Definition 1.1' and 'Definition 1.2' added; the titles are the paper's. Macros replaced: \\SWG -> $\\mathcal{SWG}(n,q)$, \\SWGm -> \\mathcal{SWG}, \\SWGreg -> 3-$\\mathcal{SWG}(n)$, \\Erdos -> Erd\\H{o}s-R\\'enyi, \\bigO -> \\mathcal{O}. Definition 1.1 is on p. 3, Definition 1.2 on p. 3 to 4. The paper defines no name for the threshold (sqrt(c^2+6c+1)-c-1)/(2c); it appears in Theorems 2.1 and 2.4 (excerpt in context). The library's p* and its characterization as the root of c p (1 + p) = 1 - p are the formalization's."
+notes = "The paper redefines \\le, \\leq as \\leqslant and \\ge, \\geq as \\geqslant (printed slanted); they are kept as \\le, \\leq, \\ge, \\geq. Labels 'Definition 1.1' and 'Definition 1.2' added; the titles are the paper's. Macros replaced: \\SWG -> $\\mathcal{SWG}(n,q)$, \\SWGm -> \\mathcal{SWG}, \\SWGreg -> 3-$\\mathcal{SWG}(n)$, \\Erdos -> Erd\\H{o}s-R\\'enyi, \\bigO -> \\mathcal{O}. Definition 1.1 is on p. 3, Definition 1.2 on p. 3 to 4. The paper defines no name for the threshold (sqrt(c^2+6c+1)-c-1)/(2c); it appears in Theorems 2.1 and 2.4 (excerpt in context). The library's p* and its characterization as the root of c p (1 + p) = 1 - p are the formalization's."
 
 [[source]]
 item = "epidemics:cor:swg3-sub"
@@ -317,7 +317,7 @@ $\mathcal{E}_n$ occurs \emph{with high probability} if $\mathbf{Pr} \left( \math
 \geq 1-(1/n)^{\Omega(1)}$.
 [Section 2.1, p. 5:] Also in the above theorem, the probabilities are taken over the randomness of $G$ and  over the randomness of the percolation process process. The second claim is a special case of the following more general result of ours. [Theorem 2.3]
 '''
-notes = "Theorem title: 'Percolation on the 3-SWG(n) model'. The formalized part is claim 2 (item 2). Macros replaced: \\SWGreg -> 3-$\\mathcal{SWG}(n)$, \\bigO -> \\mathcal{O}, \\Prc -> \\mathbf{Pr}. 'percolation process process' is as printed. Theorem 2.3 is quoted in the epidemics:thm:subcritical entry of verification/sources.toml."
+notes = "The paper redefines \\le, \\leq as \\leqslant and \\ge, \\geq as \\geqslant (printed slanted); they are kept as \\le, \\leq, \\ge, \\geq. Theorem title: 'Percolation on the 3-SWG(n) model'. The formalized part is claim 2 (item 2). Macros replaced: \\SWGreg -> 3-$\\mathcal{SWG}(n)$, \\bigO -> \\mathcal{O}, \\Prc -> \\mathbf{Pr}. 'percolation process process' is as printed. Theorem 2.3 is quoted in the epidemics:thm:subcritical entry of verification/sources.toml."
 
 [[source]]
 item = "epidemics:cor:swg-rf"
@@ -371,7 +371,7 @@ $\mathcal{E}_n$ occurs \emph{with high probability} if $\mathbf{Pr} \left( \math
 \geq 1-(1/n)^{\Omega(1)}$.
 [Section 2.2, p. 6:] On the other hand, the second claims of the above two theorems are   simple consequences of   the corresponding  claims  of Theorems 2.1 and 2.2.
 '''
-notes = "Two theorems in one entry; the labels 'Theorem 2.4' and 'Theorem 2.5' are added, the titles are the paper's. The formalized parts are the two claims 2. Claim 2 of Theorem 2.5 is printed with the SWG(n,c/n) threshold (sqrt(c^2+6c+1)-c-1)/(2c), while claim 2 of Theorem 2.2, of which it is said to be a consequence, has 1/2; the library uses 1/2 - epsilon (see FORMALIZATION_DIFFERENCES.md). Both theorems are on p. 5. Macros replaced: \\SWGm -> \\mathcal{SWG}, \\SWG -> $\\mathcal{SWG}(n,q)$, \\SWGreg -> 3-$\\mathcal{SWG}(n)$, \\bigO -> \\mathcal{O}, \\Prc -> \\mathbf{Pr}; Theorem 2.5 writes O_epsilon (plain O) in claim 2, as printed."
+notes = "The paper redefines \\le, \\leq as \\leqslant and \\ge, \\geq as \\geqslant (printed slanted); they are kept as \\le, \\leq, \\ge, \\geq. Two theorems in one entry; the labels 'Theorem 2.4' and 'Theorem 2.5' are added, the titles are the paper's. The formalized parts are the two claims 2. Claim 2 of Theorem 2.5 is printed with the SWG(n,c/n) threshold (sqrt(c^2+6c+1)-c-1)/(2c), while claim 2 of Theorem 2.2, of which it is said to be a consequence, has 1/2; the library uses 1/2 - epsilon (see FORMALIZATION_DIFFERENCES.md). Both theorems are on p. 5. Macros replaced: \\SWGm -> \\mathcal{SWG}, \\SWG -> $\\mathcal{SWG}(n,q)$, \\SWGreg -> 3-$\\mathcal{SWG}(n)$, \\bigO -> \\mathcal{O}, \\Prc -> \\mathbf{Pr}; Theorem 2.5 writes O_epsilon (plain O) in claim 2, as printed."
 
 # ---------------------------------------------------------------------------------------------
 # Krivelevich, Sudakov, arXiv:1201.6529v4.
