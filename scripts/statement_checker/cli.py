@@ -1,4 +1,5 @@
-"""Command line: the curses app, and plain commands for CI and the paper."""
+"""Command line: plain commands to list, show and record checks, for people, the
+repository skill `check-statements`, CI and the paper."""
 import argparse
 import datetime
 import os
@@ -88,6 +89,19 @@ def report(m):
             cur = sum(1 for e in m.entries if r in sts[e.id].checked_by)
             out.append(f"| {r} | {cur} |")
         out.append("")
+    basis = {}
+    for e in m.entries:
+        latest = checks.latest_by_reviewer(m.store.for_item(e.id))
+        for r in sts[e.id].checked_by:
+            b = latest[r].basis or "not recorded"
+            basis[b] = basis.get(b, 0) + 1
+    if basis:
+        out += ["Current checks by what the statement was compared with (`paper`: the paper "
+                "itself; `transcription`: the original statement in the sources files; "
+                "`blueprint`: only the blueprint paraphrase, which is not the source):", "",
+                "| Basis | Checks |", "| --- | ---: |"]
+        out += [f"| {b} | {n} |" for b, n in sorted(basis.items())]
+        out.append("")
     for title, key in (("Recorded differences", "differs"), ("Open questions (unsure)", "unsure")):
         rows = []
         for e in m.entries:
@@ -152,11 +166,12 @@ def validate(m):
     return problems
 
 
-def list_items(m, flt="all", package=None, query=""):
-    from .tui import FILTERS
-    rows = []
+def matching(m, flt="all", package=None, query="", skip=()):
+    """The entries in priority order that pass the filter."""
     for e in m.priority:
         st = m.status(e)
+        if e.id in skip:
+            continue
         if package and e.item.package != package:
             continue
         if flt == "unchecked" and st.n:
@@ -172,6 +187,12 @@ def list_items(m, flt="all", package=None, query=""):
             continue
         if query and not all(w in e.search_text() for w in query.lower().split()):
             continue
+        yield e, st
+
+
+def list_items(m, flt="all", package=None, query=""):
+    rows = []
+    for e, st in matching(m, flt, package, query):
         mark = "*" if e.tier == 0 else "+" if e.tier == 1 else " "
         rows.append(f"{mark} {st.n} {e.item.package:<10} {e.kind:<5} {e.id:<45} "
                     f"{render.tex(e.item.title)}")
@@ -181,27 +202,42 @@ def list_items(m, flt="all", package=None, query=""):
 def main(argv=None):
     ap = argparse.ArgumentParser(
         prog="check_statements.py",
-        description="Check the Lean statements of Leanamics against their sources. Without a "
-                    "command, starts the terminal app.")
+        description="Check the Lean statements of Leanamics against their sources: list the "
+                    "items, show one (source next to the Lean statement), record a check.")
     ap.add_argument("--reviewer", help="your name (default: git config user.name)")
     ap.add_argument("--root", default=str(ROOT), help=argparse.SUPPRESS)
     ap.add_argument("--checks-dir", help="directory of the checks (default: verification/checks)")
     ap.add_argument("--sources", help="sources file (default: verification/sources.toml)")
-    ap.add_argument("--no-color", action="store_true", help="monochrome terminal app")
     g = ap.add_mutually_exclusive_group()
     g.add_argument("--report", action="store_true", help="print a Markdown summary of the checks")
     g.add_argument("--validate", action="store_true",
                    help="check the checks file, the sources file and the \\lean{} names")
     g.add_argument("--list", action="store_true", help="list the items as plain text")
     g.add_argument("--show", metavar="ID", help="print the detail view of an item")
-    g.add_argument("--ask-context", metavar="ID", help="print the context sent by the ask key")
+    g.add_argument("--next", action="store_true",
+                   help="print the id of the first item, in priority order, that passes --filter "
+                        "(default: unchecked), --package and --search")
+    g.add_argument("--context", metavar="ID",
+                   help="print an item as Markdown with the full definitions its statement uses")
+    g.add_argument("--record", metavar="ID",
+                   help="record a check of an item by the reviewer (needs --verdict)")
     g.add_argument("--lean-type", metavar="ID",
                    help="ask Lean (lake env lean, slow) for the types of an item's declarations")
-    ap.add_argument("--filter", default="all",
+    ap.add_argument("--filter",
                     choices=["all", "unchecked", "unchecked-by-me", "stale", "differs", "unsure"],
-                    help="with --list")
-    ap.add_argument("--package", help="with --list: only this package")
-    ap.add_argument("--search", default="", help="with --list: only items matching these words")
+                    help="with --list (default: all) or --next (default: unchecked)")
+    ap.add_argument("--package", help="with --list or --next: only this package")
+    ap.add_argument("--search", default="",
+                    help="with --list or --next: only items matching these words")
+    ap.add_argument("--skip", nargs="*", default=[], metavar="ID",
+                    help="with --next: ignore these items")
+    ap.add_argument("--verdict", choices=["agrees", "differs", "unsure"], help="with --record")
+    ap.add_argument("--basis", choices=list(checks.BASES),
+                    help="with --record: what the statement was compared with: the paper itself, "
+                         "the transcription in the sources files, or only the blueprint")
+    ap.add_argument("--comment", default="",
+                    help="with --record: required for differs (what differs) and unsure "
+                         "(the question)")
     ap.add_argument("--width", type=int, default=100, help="with --show: line width")
     ap.add_argument("--raw", action="store_true", help="with --show: LaTeX source")
     a = ap.parse_args(argv)
@@ -225,10 +261,16 @@ def main(argv=None):
               + ("FAILED" if probs else "OK"))
         return 1 if probs else 0
     if a.list:
-        for r in list_items(m, a.filter, a.package, a.search):
+        for r in list_items(m, a.filter or "all", a.package, a.search):
             print(r)
         return 0
-    for opt in (a.show, a.ask_context, a.lean_type):
+    if a.next:
+        for e, _ in matching(m, a.filter or "unchecked", a.package, a.search, set(a.skip)):
+            print(e.id)
+            return 0
+        print("no item passes the filter", file=sys.stderr)
+        return 1
+    for opt in (a.show, a.context, a.lean_type, a.record):
         if opt and opt not in m.by_id:
             print(f"unknown item `{opt}` (ids look like voter:thm:21; see --list)",
                   file=sys.stderr)
@@ -237,18 +279,26 @@ def main(argv=None):
         for text, _ in render.detail(m, m.by_id[a.show], a.width, raw=a.raw):
             print(text)
         return 0
-    if a.ask_context:
-        print(render.ask_context(m, m.by_id[a.ask_context]))
+    if a.context:
+        print(render.item_context(m, m.by_id[a.context]))
+        return 0
+    if a.record:
+        if not a.verdict or not a.basis:
+            print("--record needs --verdict (agrees, differs, unsure) and --basis (paper, "
+                  "transcription, blueprint)", file=sys.stderr)
+            return 2
+        try:
+            c = m.record(m.by_id[a.record], a.verdict, a.comment, a.basis)
+        except ValueError as err:
+            print(f"nothing recorded: {err}", file=sys.stderr)
+            return 2
+        print(f"recorded: {c.item} {c.verdict} (basis: {c.basis}) by {c.reviewer} ({c.date}) in "
+              f"verification/checks/{checks.slug(c.reviewer)}.jsonl")
         return 0
     if a.lean_type:
         from . import lean_check
         e = m.by_id[a.lean_type]
         print(lean_check.check_types(m, [n for n, d in e.decls if d is not None]))
         return 0
-    if not sys.stdout.isatty():
-        print("The terminal app needs a terminal; see --help for the plain commands.",
-              file=sys.stderr)
-        return 2
-    from . import tui
-    tui.main(m, color=not a.no_color)
+    ap.print_help()
     return 0

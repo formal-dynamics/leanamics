@@ -11,6 +11,11 @@ the latest check of each reviewer counts. A reviewer appends only to their own f
 made on different branches merge without conflicts (`.gitattributes` also sets `merge=union`
 on these files, for the case of one reviewer working on two branches).
 
+The optional field `basis` says what the reviewer compared the Lean statement with: `paper`
+(the paper itself, PDF or printed copy), `transcription` (the original statement transcribed in
+the sources files, without opening the paper) or `blueprint` (only the blueprint paraphrase,
+which was written for the formalization and is not the source).
+
 A check is stale when the hash of the item's Lean text or of its source text differs from the
 hash recorded with it: the statement was changed after the check.
 """
@@ -23,6 +28,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 VERDICTS = ("agrees", "differs", "unsure")
+BASES = ("paper", "transcription", "blueprint")
 NEEDS_COMMENT = ("differs", "unsure")
 FIELDS = ("item", "reviewer", "date", "verdict", "comment", "lean_hash", "source_hash")
 VERSION = 1
@@ -54,15 +60,18 @@ class Check:
     lean_hash: str
     source_hash: str
     lean: tuple = ()
+    basis: str = ""
     file: str = ""
     line: int = 0
 
     def to_json(self):
-        return json.dumps({"item": self.item, "reviewer": self.reviewer, "date": self.date,
-                           "verdict": self.verdict, "comment": self.comment,
-                           "lean_hash": self.lean_hash, "source_hash": self.source_hash,
-                           "lean": list(self.lean), "version": VERSION},
-                          ensure_ascii=False, sort_keys=False)
+        obj = {"item": self.item, "reviewer": self.reviewer, "date": self.date,
+               "verdict": self.verdict, "comment": self.comment, "lean_hash": self.lean_hash,
+               "source_hash": self.source_hash, "lean": list(self.lean)}
+        if self.basis:
+            obj["basis"] = self.basis
+        obj["version"] = VERSION
+        return json.dumps(obj, ensure_ascii=False, sort_keys=False)
 
 
 def validate_record(obj):
@@ -93,6 +102,8 @@ def validate_record(obj):
     if "lean" in obj and not (isinstance(obj["lean"], list)
                               and all(isinstance(x, str) for x in obj["lean"])):
         problems.append("`lean` is not a list of names")
+    if "basis" in obj and obj["basis"] not in BASES:
+        problems.append(f"basis `{obj['basis']}` is not one of {', '.join(BASES)}")
     return problems
 
 
@@ -126,7 +137,8 @@ class Store:
                     item=obj["item"], reviewer=obj["reviewer"].strip(), date=obj["date"],
                     verdict=obj["verdict"], comment=obj["comment"],
                     lean_hash=obj["lean_hash"], source_hash=obj["source_hash"],
-                    lean=tuple(obj.get("lean", ())), file=path.name, line=k + 1))
+                    lean=tuple(obj.get("lean", ())), basis=obj.get("basis", ""),
+                    file=path.name, line=k + 1))
 
     def path_for(self, reviewer):
         return self.dir / f"{slug(reviewer)}.jsonl"

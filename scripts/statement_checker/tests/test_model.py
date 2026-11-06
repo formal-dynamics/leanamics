@@ -155,6 +155,51 @@ class TestToyRepository(unittest.TestCase):
         self.assertIn("Toy.Missing", text)
         self.assertIn("unknown item `toy:thm:two`", text)
 
+    def run_cli(self, *args):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = cli.main(["--root", str(self.repo.root), "--reviewer", "Ada Lovelace", *args])
+        return code, out.getvalue(), err.getvalue()
+
+    def test_next_and_record(self):
+        code, out, _ = self.run_cli("--next")
+        self.assertEqual((code, out.strip()), (0, "toy:thm:one"))
+        code, out, _ = self.run_cli("--next", "--skip", "toy:thm:one")
+        self.assertEqual((code, out.strip()), (0, "toy:def:good"))
+        code, _, err = self.run_cli("--record", "toy:thm:one", "--verdict", "agrees")
+        self.assertEqual(code, 2)
+        self.assertIn("--basis", err)
+        code, _, err = self.run_cli("--record", "toy:thm:one", "--verdict", "differs",
+                                    "--basis", "paper")
+        self.assertEqual(code, 2)
+        self.assertIn("nothing recorded", err)
+        code, out, _ = self.run_cli("--record", "toy:thm:one", "--verdict", "agrees",
+                                    "--basis", "transcription")
+        self.assertEqual(code, 0)
+        self.assertIn("ada-lovelace.jsonl", out)
+        m = self.repo.model()
+        self.assertEqual(m.store.checks[0].basis, "transcription")
+        self.assertEqual(cli.validate(m), [])
+        self.assertIn("| transcription | 1 |", cli.report(m))
+        code, out, _ = self.run_cli("--next")
+        self.assertEqual(out.strip(), "toy:def:good")
+        self.run_cli("--record", "toy:def:good", "--verdict", "unsure", "--basis", "blueprint",
+                     "--comment", "is 2 right?")
+        code, out, _ = self.run_cli("--next")   # unsure is not a check
+        self.assertEqual(out.strip(), "toy:def:good")
+        code, out, _ = self.run_cli("--next", "--skip", "toy:def:good")
+        self.assertEqual(code, 1)
+
+    def test_package_sources_dir(self):
+        d = self.repo.root / "verification" / "sources"
+        d.mkdir()
+        (d / "toy.toml").write_text(SOURCES.replace("toy:thm:one", "toy:def:good")
+                                    .replace("Theorem 1", "Definition 1"))
+        m = self.repo.model()
+        self.assertEqual(len(m.source_entries), 2)
+        self.assertEqual(m.by_id["toy:def:good"].sources[0]["result"], "Definition 1")
+        self.assertEqual(cli.validate(m), [])
+
     def test_report_and_render(self):
         m = self.repo.model()
         m.record(m.by_id["toy:thm:one"], "agrees", "")
@@ -168,7 +213,7 @@ class TestToyRepository(unittest.TestCase):
                      "→ toy:def:good", "agrees: Ada Lovelace"):
             self.assertIn(part, text)
         self.assertTrue(all(render.cwidth(t) <= 80 for t in lines))
-        ctx = render.ask_context(m, m.by_id["toy:thm:one"], "Why 3?")
+        ctx = render.item_context(m, m.by_id["toy:thm:one"], "Why 3?")
         self.assertIn("Why 3?", ctx)
         self.assertIn("def Good (x : ℕ) : Prop := 2 ≤ x", ctx)
         out = io.StringIO()

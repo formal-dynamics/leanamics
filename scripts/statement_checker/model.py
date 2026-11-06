@@ -13,6 +13,7 @@ from . import blueprint, checks, lean_decls, sources
 PACKAGE_ORDER = ["dynamics", "voter", "moran", "plurality", "median", "undecided", "averaging",
                  "epidemics", "crn"]
 SOURCES_FILE = "verification/sources.toml"
+SOURCES_DIR = "verification/sources"
 CHECKS_DIR = "verification/checks"
 TIERS = {0: "main result", 1: "definition used by a main result", 2: "result in PROVENANCE.md",
          3: "definition", 4: "other"}
@@ -127,6 +128,12 @@ class Model:
         self.readme_rows = sources.readme_rows(self.root, self.packages())
         self.sources_path = self.root / (sources_file or SOURCES_FILE)
         self.source_entries, self.source_problems = sources.load_sources(self.sources_path)
+        if sources_file is None:
+            # Per-package files, so that several people can transcribe sources in parallel.
+            for path in sorted((self.root / SOURCES_DIR).glob("*.toml")):
+                es, ps = sources.load_sources(path)
+                self.source_entries += es
+                self.source_problems += ps
         self.entries = [self._entry(it) for it in self.items]
         self.by_id = {e.id: e for e in self.entries}
         self.by_decl = {}
@@ -265,7 +272,7 @@ class Model:
         return checks.status(self.store.for_item(entry.id), entry.lean_hash, entry.source_hash,
                              self.reviewer)
 
-    def record(self, entry, verdict, comment):
+    def record(self, entry, verdict, comment, basis=""):
         if verdict not in checks.VERDICTS:
             raise ValueError(f"unknown verdict {verdict}")
         if verdict in checks.NEEDS_COMMENT and not comment.strip():
@@ -274,7 +281,8 @@ class Model:
             raise ValueError("no reviewer name (use --reviewer or git config user.name)")
         c = checks.Check(item=entry.id, reviewer=self.reviewer, date=checks.now(),
                          verdict=verdict, comment=comment.strip(), lean_hash=entry.lean_hash,
-                         source_hash=entry.source_hash, lean=tuple(entry.item.lean))
+                         source_hash=entry.source_hash, lean=tuple(entry.item.lean),
+                         basis=basis)
         self.store.append(c)
         return c
 

@@ -293,8 +293,8 @@ def decl_lines(model, d, width=80):
     return L
 
 
-def ask_context(model, e, question=""):
-    """The text sent to the assistant command (Markdown)."""
+def item_context(model, e, question=""):
+    """An item as Markdown, with the full definitions its statement uses (`--context`)."""
     it = e.item
     out = ["# Checking a Lean statement against its source", ""]
     out.append("You help a reviewer check that a statement of the Leanamics library (Lean 4 + "
