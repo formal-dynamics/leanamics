@@ -1361,6 +1361,39 @@ Let us say that a coloring $\overline{c} = (c_1, \dots, c_k) \in \{ 0, 1, \dots,
 notes = "The paper uses 'w.h.p.' (with high probability) without a formal definition and does not state the base of log. The library numbers this paper after the SPAA 2014 proceedings; arXiv v1 and v2 have the same numbering in Sections 2 to 4 and say 'majority' where the proceedings say 'plurality' (for example Lemma 3.5 'large plurality and large bias', Definition 4.7 '(s, eps)-plurality consensus solver', Section 4.3 'h-plurality'). Paper macros replaced where they occur: \\probc{A}{B} -> \\mathbf{P}\\left(\\left. A \\;\\right| B \\right), \\probb, \\Prob{}{X} -> \\mathbf{P}\\left( X \\right), \\expe, \\expec, \\Expec{}{X} -> \\mathbf{E}\\left[ X \\right]; \\label commands dropped, \\ref replaced by the printed numbers."
 
 [[source]]
+items = ["plurality:lem:tails", "plurality:lem:mgf", "plurality:lem:chernoff", "plurality:lem:chernofflog"]
+paper = "M. Mitzenmacher, E. Upfal. Probability and Computing"
+venue = "textbook, Cambridge University Press"
+result = "Theorems 4.4 and 4.5, Exercise 4.7"
+status = "no open copy found; not transcribed"
+notes = "Cited by PROVENANCE.md for the Chernoff bounds of the shared layer that these items name."
+
+[[source]]
+item = "plurality:lem:tails"
+paper = "D. P. Dubhashi, A. Panconesi. Concentration of measure for the analysis of randomized algorithms"
+venue = "textbook, Cambridge University Press, 2009"
+result = "Theorem 1.1"
+status = "no open copy found; not transcribed"
+notes = "Cited by PROVENANCE.md for the tail bounds of the shared layer; the SPAA 2014 paper cites the same book for Bernstein's inequality (see the Lemma A.4 entry)."
+
+[[source]]
+item = "plurality:def:conformist"
+paper = "R. Boyd, P. J. Richerson. Culture and the evolutionary process"
+venue = "book, University of Chicago Press, 1985"
+result = "conformist transmission (three models)"
+status = "no open copy found; not transcribed"
+notes = "The Lean doc comment attributes the model to Boyd and Richerson (1985) without a chapter or equation number."
+
+[[source]]
+items = ["plurality:lem:jump_near_balance", "plurality:lem:growth_far", "plurality:thm:symmetry_breaking", "plurality:thm:any_start"]
+paper = "L. Becchetti, A. Clementi, E. Natale. Consensus dynamics: an overview"
+venue = "SIGACT News 51(1):58-104, 2020"
+result = "Section 4, Case 3"
+url = "https://doi.org/10.1145/3388392.3388403"
+status = "open preprint not downloadable by the agent; not transcribed"
+notes = "An open preprint is listed in the Sapienza institutional repository (iris.uniroma1.it, handle 11573/1463335); the agent could not download it, so nothing was transcribed and the section was not read. According to PROVENANCE.md, Section 4, Case 3 describes the symmetry breaking for the binary median dynamics of Doerr, Goldberg, Minder, Sauerwald, Scheideler (SPAA 2011). PROVENANCE.md cites this section for the argument; the items carry it out for binary 3-majority, which the README describes as beyond the SPAA 2014 paper. The symmetry-breaking argument itself is from Doerr et al., SPAA 2011 (the blueprint uses the hitting-time bound of their Claim 2.9); no open copy of that proceedings version was found (the University of Paderborn repository record is closed access), and the open Dagstuhl Seminar Proceedings version of 2010 was not consulted."
+
+[[source]]
 item = "plurality:def:as-model"
 paper = "P. Berenbrink, A. Clementi, R. Elsässer, P. Kling, F. Mallmann-Trenn, E. Natale. Ignore or comply? On breaking symmetry in consensus"
 venue = "PODC 2017"
