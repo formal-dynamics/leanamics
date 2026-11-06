@@ -30,9 +30,9 @@ variable {V : Type*} [Fintype V] [DecidableEq V] {G : SimpleGraph V} [DecidableR
 /-- **Lemma 3** (Section 5). Let `G` be `r`-regular (`r > 0`) with `λ = lambdaG G r < 1`, and
 `k ≥ 2`. If BIPS with source `v` starts from a set `A₀` with `|A₀| ≥ 4000 log n/(1 - λ)²`, then
 for every `T ≥ 24 log n/(1 - λ)` the probability that `|A_s| < 9n/10` for all `s ≤ T` is at most
-`T/n⁵`. The paper states `23 log n/(1 - λ)` rounds and probability `1 - n^{-4}`; its doubling
-count needs a minor correction (`log₂ n` doublings, not `ln n`), and `24 log n/(1 - λ)` rounds
-suffice since `(1 + (1 - λ)/23)^T ≥ e^{T(1 - λ)/24}`. -/
+`T/n⁵`. The paper states `23 log n/(1 - λ)` rounds and probability `1 - n^{-4}`; counting
+`log₂ n` doublings, `24 log n/(1 - λ)` rounds suffice since
+`(1 + (1 - λ)/23)^T ≥ e^{T(1 - λ)/24}`. -/
 theorem bips_large_phase {r : ℕ} (hreg : G.IsRegularOfDegree r) (hr : 0 < r) (hk : 2 ≤ k)
     (hlam : lambdaG G r < 1) (v : V) (A₀ : Finset V)
     (hA₀ : 4000 * Real.log (Fintype.card V) / (1 - lambdaG G r) ^ 2 ≤ A₀.card) {T : ℕ}
@@ -84,9 +84,9 @@ theorem bips_large_phase {r : ℕ} (hreg : G.IsRegularOfDegree r) (hr : 0 < r) (
 and assume `4000 log n/(1 - λ)² ≤ (9/10) n` (the paper's `1 - λ ≫ √(log n / n)`). If BIPS with
 source `v` starts from a set `A₀` with `|A₀| ≥ 9n/10`, then for every `T ≥ 8 log n/(1 - λ)` the
 whole graph is infected at time `T` except with probability at most `n^{-5}`. The paper's proof
-gives `n^{-5} + O(T² n^{-7})` (its `E B_T ≤ θ^T + ⋯` needs a minor correction to
-`θ^T (n/10) + ⋯`, and its `T = 5 log n/log(1/θ)` should be `6 log n/log(1/θ)`); with
-`B₀ ≤ n/10` and `T² ≤ n²` the total is at most `n^{-5}`. -/
+gives `n^{-5} + O(T² n^{-7})` (reading `E B_T ≤ θ^T + ⋯` with the factor `B₀`, as
+`θ^T (n/10) + ⋯`, and taking `T = 6 log n/log(1/θ)` throughout); with `B₀ ≤ n/10` and
+`T² ≤ n²` the total is at most `n^{-5}`. -/
 theorem bips_end_phase {r : ℕ} (hreg : G.IsRegularOfDegree r) (hr : 0 < r) (hk : 2 ≤ k)
     (hlam : lambdaG G r < 1)
     (hn : 4000 * Real.log (Fintype.card V) / (1 - lambdaG G r) ^ 2 ≤ 9 * Fintype.card V / 10)

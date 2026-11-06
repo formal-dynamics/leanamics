@@ -178,33 +178,32 @@ Source: B. Doerr, A. Kostrygin, *Randomized rumor spreading revisited*, ICALP 20
 arXiv:2303.11150 (numbering of the long version: Lemma 9, Lemma 19, Lemma 20, Definition 11,
 Theorem 21, Theorem 31).
 
-### Lemma 20 of the paper needs a major correction
+### Lemma 20 and the formalized path statement
 
-Lemma 20 (Lemma 5 of the overview) claims: if `p_k ≤ p` and `c_k ≤ c/n` for every `k < f n`,
+Lemma 20 (Lemma 5 of the overview) reads: if `p_k ≤ p` and `c_k ≤ c/n` for every `k < f n`,
 then there is `f' ∈ ]f, 1[` such that, with probability `1 - O(1/n)`, the number of informed
 nodes lies in `[f n, f' n]` at the end of some round. The proof bounds one round: from
-`k < f n`, `P[k + X(k) ≥ f' n] = O(1/n)`. It then concludes that the whole process jumps over
-`[f n, f' n]` with probability `O(1/n)`, but the process may spend many rounds below `f n`, with
-a chance to jump in each.
+`k < f n`, `P[k + X(k) ≥ f' n] = O(1/n)`. To pass from one round to the whole process, one also
+has to account for the number of rounds the process spends below `f n`, since each of them gives
+a chance to jump over the interval.
 
-**Example.** The printed statement does not hold for the following process. From every `S` with `|S| < f n`, inform all nodes with probability
-`ε = c/n` and otherwise none. For `n ≥ c/p`, `p_k = ε ≤ p` and `c_k = ε(1 - ε) ≤ c/n`, but the
-process started from one node jumps from `1` to `n` with probability 1. (The same process with
-`ε_k = c k / n²` satisfies the lower exponential growth conditions, so the last sentence of
-Theorem 1, which rests on Lemma 20 (through Theorem 27), needs another argument in general. That
-sentence belongs to the general lower bounds (Theorems 1 to 3 and 27), which are not formalized;
-the lower bounds of the instances, Theorems 51 to 53, are formalized by a route that does not use
-Lemma 20, see below. The long version also uses Lemma 20 in the proofs of Theorems 57 and 58.)
+**Example.** As printed, the statement does not hold for the following process, which satisfies
+its hypotheses. From every `S` with `|S| < f n`, inform all nodes with probability `ε = c/n` and otherwise none. For `n ≥ c/p`,
+`p_k = ε ≤ p` and `c_k = ε(1 - ε) ≤ c/n`, but the process started from one node jumps from `1`
+to `n` with probability 1. (In the paper, Lemma 20 also enters the general lower bounds
+(Theorems 1 to 3, through Theorem 27) and, in the long version, the proofs of Theorems 57 and 58;
+these are not formalized. The lower bounds of the instances, Theorems 51 to 53, are formalized by
+a route that does not use Lemma 20, see below.)
 
-Two corrected versions are formalized instead:
+Two statements are formalized:
 
 * `overshoot_round`, the one-round estimate of the proof, for every `f' ∈ ]f + p(1-f), 1[`;
 * `jumpProb_le`, the path statement with the union bound over rounds:
   `P[jump within t rounds] ≤ C/n · E[number of those rounds started below f n]`, that is,
   `O(E[T(|S|, f n)] / n)`.
 
-A smaller slip in the same proof: it writes `E[X(k)] ≤ p n (1 - f)`; the correct bound is
-`p (n - k)`. The threshold `f + p(1-f)` for `f'` is still right, because
+In the same proof, the expectation is bounded as `E[X(k)] ≤ p n (1 - f)`; the formal proof uses
+`E[X(k)] ≤ p (n - k)`. The threshold `f + p(1-f)` for `f'` is unchanged, because
 `k + p(n - k) < n (f + p(1-f))` for `k < f n`.
 
 ### Statements
@@ -290,14 +289,14 @@ Source: the same paper, Definition 13, Theorem 43 (Appendix B.6) and Theorems 51
 3. **Starting sets.** Theorem 43 starts from exactly `⌈(1 - g) n⌉` informed nodes; here from any
    `S` with `n - |S| ≤ g n`. The total-time theorems and the instances start from any nonempty
    set (the paper: one informed node).
-4. **The proof of Theorem 43 needs a minor correction.** The paper first reduces to a small `g`
-   by Lemma 19. This gives `O(1)` expected rounds for that stage, but Lemma 19's tail
-   `(g/g') (1 - p)^r` has a rate that does not depend on `n`, so the stated tail
-   `O(n^{-α' r + A'})` does not follow for the whole process. The statement holds: the formal
-   proof replaces Lemma 19 by geometric phase targets `g μ^j n`, `μ = (1 + a g^{ℓ-1}) / 2`, whose
-   failure probability per round is `O(1/n)` by Chebyshev's inequality with the variance bound of
-   Lemma 9 (or `O(n^{-τ})` by Markov's inequality below `n^{1-α}` uninformed nodes). In the
-   paper's tail bound (11), `J q^{-r}` has a typo in the sign of the exponent.
+4. **The first stage of the proof of Theorem 43.** The paper first reduces to a small `g` by
+   Lemma 19. This gives `O(1)` expected rounds for that stage, while Lemma 19's tail
+   `(g/g') (1 - p)^r` has a rate that does not depend on `n`, so the tail `O(n^{-α' r + A'})` of
+   the whole process needs a different first stage. The formal proof replaces Lemma 19 by
+   geometric phase targets `g μ^j n`, `μ = (1 + a g^{ℓ-1}) / 2`, whose failure probability per
+   round is `O(1/n)` by Chebyshev's inequality with the variance bound of Lemma 9 (or `O(n^{-τ})`
+   by Markov's inequality below `n^{1-α}` uninformed nodes). Theorem 43 holds as stated. In the
+   tail bound (11), the exponent of `J q^{-r}` is meant with the opposite sign.
 5. **Proof route** (not a statement change). The double exponential targets are written in
    closed form, `ε_j = exp (-(κ + ℓ^j D₀))` with `κ (ℓ - 1) = ln (2 a₁)` and `a₁ = max a 1`, and
    the number of phases is `J = ⌊log_ℓ (β ln n / (2 D₀))⌋ ≤ log_ℓ ln n` with `β = min α (1/4)`,
@@ -318,12 +317,13 @@ Source: the same paper, Definition 13, Theorem 43 (Appendix B.6) and Theorems 51
    without self-calls ([previous section](#pull-and-pushpull-on-the-complete-graph-rumorspreadpull-epi-5)),
    with `O(log n)` bounds whose constants are explicit and which hold for every `n ≥ 2`; the two
    models are different processes, and neither development uses the other.
-8. **The parameters of the instances need a minor correction.** Definition 9 requires
-   `0 < f < 1` and `a f < 1`, and Definition 13 requires `a g^{ℓ-1} < 1`. The paper takes
-   `f = 1` and `a = 1` for push, `f = 1` for pull, and `g = 1`, `a = 1`, `α = 0` for the double
-   exponential shrinking of pull; with `α = 0`, Theorem 43's fast finishing would also be
-   required for all `u ≤ n`, which fails at `u = n/2` (the stay probability of pull is `u/n`).
-   The formal instances take `f = g = 1/2` (so the middle range of Lemma 19 is empty),
+8. **The parameters of the instances.** Definition 9 requires `0 < f < 1` and `a f < 1`, and
+   Definition 13 requires `a g^{ℓ-1} < 1`. The paper takes `f = 1` and `a = 1` for push, `f = 1`
+   for pull, and `g = 1`, `a = 1`, `α = 0` for the double exponential shrinking of pull; with
+   `α = 0`, Theorem 43's fast finishing would also be required for all `u ≤ n`, including
+   `u = n/2`, where the stay probability of pull is `1/2`. The formal instances take values
+   inside the ranges of the definitions, with the same estimates, and Theorems 51 to 53 are
+   unchanged: `f = g = 1/2` (so the middle range of Lemma 19 is empty),
    `a = 1/2` for push (the paper's own estimate `p_k ≥ k/n - k²/(2n²)`), `a = 3/4` and
    `γ = 2` for push–pull (from `p_k ≥ 2k/n - 3k²/(2n²)`), `ℓ = 2`, `a = 1`, `c = 0`,
    `α = τ = 1/2` for the double exponential shrinking of pull and push–pull, and `ρ = 1`,
@@ -352,12 +352,12 @@ Appendix B for the instances: Theorem 27 (exponential growth), Theorem 38 with L
    `envelope_seq_le`, `reach_le_of_expect_card_le` and `reach_add_le` (`LowerGeneric.lean`).
 2. **Direct route, not through Lemma 20.** The general lower bounds (Theorems 27, 38 and 48, and
    the lower halves of Theorems 1 to 3) are not formalized. The paper derives the lower halves of
-   Theorems 51 to 53 by joining Theorem 27 with Theorem 38 or 48 through Lemma 20, which needs a
-   major correction (above). This joining also needs a minor correction of its own: Theorems 38
-   and 48 start from an exact number of uninformed nodes (`⌊g n⌋`, resp. `⌈g n⌉`), which the
-   process started from one node need not visit, so a comparison between starting states is
-   missing. The statements hold. Here the two phases are joined at a fixed time
-   (`reach_add_le`, the Markov property): after `⌊log₂ n⌋ - ⌈r/2⌉` rounds for push (about
+   Theorems 51 to 53 by joining Theorem 27 with Theorem 38 or 48 through Lemma 20 (see the
+   discussion of Lemma 20 above). Theorems 38 and 48 start from an exact number of uninformed
+   nodes (`⌊g n⌋`, resp. `⌈g n⌉`), which the process started from one node need not visit, so
+   this joining also uses a comparison between starting states. The statements of Theorems 51
+   to 53 hold, and the formal route avoids both points: the two phases are joined at a fixed
+   time (`reach_add_le`, the Markov property): after `⌊log₂ n⌋ - ⌈r/2⌉` rounds for push (about
    `log_ρ n + 5 - r` rounds for pull, `ρ = 2`, and push–pull, `ρ = 3`) at most `n/2` nodes are
    informed except with probability `O(2^{-r/2})`, by the first moment, and from any state with
    at least `n/2` uninformed nodes the final phase is slow. No overshoot estimate is needed.
@@ -393,15 +393,15 @@ Appendix B for the instances: Theorem 27 (exponential growth), Theorem 38 with L
    `E[T] = ∑_{t ≥ 0} P[T > t]`. The threshold is `N = 2` for push; for pull and push–pull it is
    `N = max 3 N₁` with `ln N₁ ≥ 2⁵` (so that `⌊log₂ ln n⌋ ≥ 5`). Some threshold is needed: for
    `n = 1` the single informed node is everybody.
-6. **Other minor corrections in the source,** none of which affects the statements:
-   Corollary 17 holds for `1 ≤ u < n`, not for `u = 0` (Lemma 13 gives `(1 - 1/n)^n ≤ 1/e`); the
-   proof of Lemma 42 gives the bound `q(u_{j+1})`, not `q(u_j)` (the proof of Theorem 38 uses it
-   correctly, as `P[τ = s] ≤ q(u_s)`); in the subsection of Theorem 38, Lemma 39 is for `u ≤ g n`
-   (printed `u > g n`), Lemma 40 should read `u_j ≥ (1/2) u_0 e^{-j ρ_n}` for `j ≤ ln n / ρ_n`,
+6. **Smaller points of reading,** none of which affects the statements of the paper:
+   Corollary 17 holds for `1 ≤ u < n`, not at `u = 0` (Lemma 13 gives `(1 - 1/n)^n ≤ 1/e`); the
+   proof of Lemma 42 gives the bound `q(u_{j+1})`, printed `q(u_j)` (the proof of Theorem 38 uses
+   it as `P[τ = s] ≤ q(u_s)`); in the subsection of Theorem 38, Lemma 39 is for `u ≤ g n`
+   (printed `u > g n`), Lemma 40 is read as `u_j ≥ (1/2) u_0 e^{-j ρ_n}` for `j ≤ ln n / ρ_n`,
    the phases are defined by the number of uninformed nodes, and `(u_j)` is nonincreasing; in
-   the proof of Theorem 27, the bound `P[d_j ≥ h] ≤ q_{h-1}(k_j)` needs a constant factor from
+   the proof of Theorem 27, the bound `P[d_j ≥ h] ≤ q_{h-1}(k_j)` carries a constant factor from
    the rounds spent in phase `j`, and the stochastic domination of `D` by a sum of independent
-   variables uses a standard domination lemma that is not stated.
+   variables uses a standard domination lemma.
 
 ## Subcritical percolation and small outbreaks (`Subcritical*`, EPI-2)
 
@@ -409,7 +409,8 @@ Source: L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccar
 *Percolation and epidemic processes in one-dimensional small-world networks*, arXiv:2103.16398:
 Theorem 2.3 (bounded-degree graphs, Section 2.1) and Theorem E.1 (Appendix E, "Regular graphs
 below the threshold") with its deferred-decision proof. The Reed–Frost corollary is the one the
-paper mentions but omits after Theorem 2.5; its shape follows claim 2 of Theorems 2.4 and 2.5.
+paper mentions after Theorem 2.5 without a separate statement; its shape follows claim 2 of
+Theorems 2.4 and 2.5.
 
 1. **Threshold written multiplicatively**: `p * ((d : ℝ) - 1) ≤ 1 - ε` instead of
    `p < (1 - ε)/(d - 1)` (Theorem 2.3) or `p = (1 - ε)/(d - 1)` (Theorem E.1). It covers both
@@ -424,24 +425,24 @@ paper mentions but omits after Theorem 2.5; its shape follows claim 2 of Theorem
    `G.maxDegree ≤ d`); the proof only uses the upper bound. Component sizes are measured as in
    Mathlib, by `K.supp.ncard`.
 4. **Explicit tail constant**: `exp (ε - ε² t / 2) = e^ε exp (-ε² t / 2)` for Theorem E.1's
-   `exp (-Ω(ε² t))`. The paper's proof claims `exp (-ε² t / 3)` "by Chernoff bounds", but the
-   mean of its `t (d - 1) + 1` trials is `(1 - ε) t + p`, not `(1 - ε) t`: the extra trial at the
-   source (degree `d`, not `d - 1`) is what the prefactor `e^ε ≤ e` pays for. The bound is
+   `exp (-Ω(ε² t))`. The paper's proof writes `exp (-ε² t / 3)` "by Chernoff bounds"; the mean
+   of its `t (d - 1) + 1` trials is `(1 - ε) t + p`, and the extra trial at the source (degree
+   `d`, not `d - 1`) is what the prefactor `e^ε ≤ e` accounts for. The bound is
    Markov's inequality on `exp (ε X)`, i.e. the core's Chernoff tail before optimization at the
    paper's fixed tilt `ε` (`Distribution.prob_ge_le_exp_tilt`); the optimized closed forms of the
    core (`bernoulli_chernoff_upper`) do not give this constant directly. Numerically the paper's
-   `exp (-ε² t / 3)` also seems to hold for the binomial tail, but it is not what the standard
-   argument proves, so it is not claimed.
+   `exp (-ε² t / 3)` also seems to hold for the binomial tail; the formal statement keeps the
+   bound that the standard argument gives.
 5. **"W.h.p." made explicit**: probability at least `1 - 1/n` with `C_ε = 10/ε²`, for every
    `n = |V|` (no "n large enough"; for `n ≤ 1` the statement is trivial, and for `n = 0` Lean's
-   `1/0 = 0` makes it claim probability 1, which holds since there are no components). The
-   paper's union-bound sentence ("probability … at most `1 - 1/n²`") has a typo for `1/n²`.
+   `1/0 = 0` makes it claim probability 1, which holds since there are no components). In the
+   paper's union-bound sentence ("probability … at most `1 - 1/n²`"), `1/n²` is meant.
 6. **Deferred decisions as a probability comparison**: the paper's "we have observed at most
    `t (d - 1) + 1` Bernoulli random variables with parameter `p` and found that at least `t` of
    them were 1" is stated as `P(|C(s)| > t) ≤ P(≥ t successes among t (d - 1) + 1 i.i.d.
    Bernoulli(p))`, with the product `Distribution.independent` over `Fin (t * (d - 1) + 1)`
-   (natural subtraction: one trial when `d = 0`, still true). The paper's BFS (which has a stray
-   `y` for `x`) is replaced by any one-vertex-at-a-time exploration.
+   (natural subtraction: one trial when `d = 0`, still true). The paper's BFS is replaced by any
+   one-vertex-at-a-time exploration.
 7. **Proof route** (not a statement change). There is no BFS queue: the induction is on a budget
    `m` over exploration states `(D, X)` (discovered set, examined pairs whose coins are forced
    closed): if `frontier G D X + (k - 1)(d - 1) ≤ m` then `P(|D| + k ≤ |reach of D|) ≤
@@ -452,8 +453,8 @@ paper mentions but omits after Theorem 2.5; its shape follows claim 2 of Theorem
 8. **Percolation model**: EPI-1's `coins` put one coin on every element of `Sym2 V` (non-edges
    and the diagonal included); only the coins of edges of `G` matter, so `perc G ω` has the law
    of `G_p`.
-9. **Reed–Frost corollary**: the paper omits its formal statement for bounded-degree graphs. We
-   take the shape of claim 2 of Theorems 2.4 and 2.5 ("stops within `O_ε(log n)` steps,
+9. **Reed–Frost corollary**: the paper does not state it separately for bounded-degree graphs.
+   We take the shape of claim 2 of Theorems 2.4 and 2.5 ("stops within `O_ε(log n)` steps,
    `O_ε(|I₀| log n)` recovered nodes") with explicit constants, for EPI-1's pathwise process (one
    coin per edge, equivalent in law to Reed–Frost with transmission probability `p`). The
    reproduction number is `R₀ = p (d - 1)` (an infected non-source node has at most `d - 1`
@@ -510,10 +511,10 @@ Source: L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccar
    `T` steps" is `∃ t ≤ T` with no infectious node; "recovered nodes at the end" is
    `(run … n).recovered` (the epidemic is over after `n` rounds); the bounds `O(log n)` and
    `O(|I₀| log n)` share one constant `β`.
-8. **Theorem 2.5, claim 2 needs a minor correction.** In v3 its hypothesis repeats the `SWG(n, c/n)`
-   threshold `p < (√(c² + 6c + 1) - c - 1)/(2c) - ε`, but `3-SWG(n)` has no parameter `c`. The
-   formal statement uses `p < 1/2 - ε`, the threshold of Theorem 2.2, claim 2, from which the
-   paper derives it.
+8. **Theorem 2.5, claim 2: the threshold.** In v3 its hypothesis is printed with the
+   `SWG(n, c/n)` threshold `p < (√(c² + 6c + 1) - c - 1)/(2c) - ε`; `3-SWG(n)` has no parameter
+   `c`, and the formal statement uses `p < 1/2 - ε`, the threshold of Theorem 2.2, claim 2, from
+   which the paper derives it.
 9. **Theorem 2.2, claim 2** is derived, as in the paper, from Theorem 2.3: EPI-2's
    `prob_components_small` with `d = 3` (`swg3_degree_le`) and `2ε` in place of `ε`
    (`2 p ≤ 1 - 2ε`). Theorem 2.3 itself is EPI-2's and is not restated.
@@ -529,10 +530,10 @@ Source: L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccar
     discovered from a node of weight `w` is at most `(1 - δ/2) w`. An exponential of the weight
     balance is then a supermartingale, by deferred decisions on fresh coins, which gives
     `P(|C(s)| > t) ≤ exp (δ/4 - δ² t / 32)`. In the paper's Algorithm 3 the queue starts as `{s}`
-    and only local clusters of bridge neighbours are enqueued, so the cycle neighbours of `s` (its
-    local cluster) are never visited unless reached through a bridge: the claim that the
-    algorithm visits the component of `s` needs a minor correction (start from the local cluster
-    of `s`, which adds one more local cluster to the domination). The exploration here processes
+    and only local clusters of bridge neighbours are enqueued; for the algorithm to visit the
+    whole component of `s`, it can start from the local cluster of `s` (its cycle neighbours),
+    which adds one more local cluster to the domination and does not change the result. The
+    exploration here processes
     every discovered node, the root included, whose two cycle neighbours are covered by its
     weight `1 + p₀`.
 11. **Not formalized (yet).** Claim 1 (the supercritical regime) of Theorems 2.1, 2.2, 2.4 and 2.5
@@ -580,7 +581,7 @@ Lemma 1, Theorem 1, Theorem 2 in Discussion item 3).
    queries as time steps `S` can jump, so the formal argument takes the first query time at
    which `3 |S ∪ U| ≥ n` (`|S ∪ U|` grows by at most `2` per query) and concludes `3 |S ∪ U| < n`
    at `N₀`.
-9. **Floors and ceilings**, omitted in the paper, are explicit (`N₀ = ⌊θ n²⌋`, `t₁ = ⌊η n²⌋`).
+9. **Floors and ceilings**, left implicit in the paper, are explicit (`N₀ = ⌊θ n²⌋`, `t₁ = ⌊η n²⌋`).
 10. **DFS details.** (a) The fixed order `σ` is replaced by an arbitrary deterministic choice
     (`DFS.pick`, `Classical.choose`); the analysis never uses `σ`. (b) The coupling goes the
     other way: the coins on the pairs come first and the search reads them adaptively; the
@@ -588,7 +589,7 @@ Lemma 1, Theorem 1, Theorem 2 in Discussion item 3).
     of deferred decisions (`prob_queryAnswers`). (c) Each query is one step of `ofAnswers`;
     moves without query are grouped by `settle`. (d) The completion phase is kept, so the
     strategy is fresh for all `n(n-1)/2` pairs.
-11. **Additions.** `exists_linear_component` covers every `ε > 0` (the paper proves only small
+11. **Additions.** `exists_linear_component` covers every `ε > 0` (the paper treats small
     `ε`); it is obtained by the same DFS argument with `N₀ = ⌊θ n²⌋`, `θ` small in terms of `ε`
     (parametric cores `core_path`, `core_component`). The epidemic corollaries are the Reed–Frost
     reading via the percolation coupling (`final_recovered_iff`): the final outbreak from `{v}`
@@ -716,20 +717,20 @@ proof gives `3/n²`) and `C = 130000` (expectation). Theorem 3 and `bipsCoin_inf
    (slightly stronger); the extra step for the start vertex is one application of the duality from
    the first round's image.
 6. **Explicit constants in the lemmas.** Lemma 2 is stated with the paper's explicit `T` and the
-   exact bound `n^{-C}` (the proof gives it; the paper writes `1 - O(n^{-C})`). Lemma 3 needs a
-   minor correction: the paper's `23 log n/(1 - λ)` rounds come from "the infection doubles every
-   `23/(1 - λ)` rounds", which gives `log₂ n` doublings, not `ln n`; the formal version uses
-   `24 log n/(1 - λ)` rounds, enough since `(1 + (1 - λ)/23)^T ≥ e^{T(1 - λ)/24}`, and keeps the
-   union bound `T n^{-5}` instead of `n^{-4}`. The proof of Lemma 4 needs minor corrections: its
-   display (24) drops a factor `B₀ ≤ n/10` (`E B_T ≤ θ^T + …` should be `θ^T n/10 + …`), and it
-   switches from `T = 5 log n/log(1/θ)` to `6 log n/log(1/θ)`; with `6` the proof gives
+   exact bound `n^{-C}` (the proof gives it; the paper writes `1 - O(n^{-C})`). In Lemma 3, the
+   paper's `23 log n/(1 - λ)` rounds come from "the infection doubles every `23/(1 - λ)`
+   rounds", which counts `log₂ n` doublings; the formal version uses `24 log n/(1 - λ)` rounds,
+   enough since `(1 + (1 - λ)/23)^T ≥ e^{T(1 - λ)/24}`, and keeps the union bound `T n^{-5}`
+   instead of `n^{-4}`. In the proof of Lemma 4, display (24) is read with the factor
+   `B₀ ≤ n/10` (`E B_T ≤ θ^T n/10 + …`); the proof starts with `T = 5 log n/log(1/θ)` and then
+   uses `6 log n/log(1/θ)`, which the formal proof takes throughout; with `6` the proof gives
    `n^{-5} + O(T² n^{-7})`, and with `T ≤ n` this is at most `n^{-5}`, the paper's statement. The
    paper's "`1 - λ ≫ √(log n/n)`" in Lemma 4 is the explicit condition
    `4000 log n/(1 - λ)² ≤ 9n/10` used in its proof.
-7. **The proof of Theorem 2 needs a minor correction.** It applies Lemma 2 with
-   `m = 4000 log n/(1 - λ²)`, but Lemma 3 needs `|A| ≥ 4000 log n/(1 - λ)²`, so `m` should be
-   `4000 log n/(1 - λ)²` (this gives the `(1 - λ)^{-3}` of the theorem). The formal proof uses
-   `m = ⌈4000 log n/(1 - λ)²⌉₊` and `C = 3` in Lemma 2.
+7. **The value of `m` in the proof of Theorem 2.** The proof applies Lemma 2 with
+   `m = 4000 log n/(1 - λ²)`; Lemma 3 needs `|A| ≥ 4000 log n/(1 - λ)²`, so the formal proof
+   uses `m = ⌈4000 log n/(1 - λ)²⌉₊` (which gives the `(1 - λ)^{-3}` of the theorem) and `C = 3`
+   in Lemma 2. Theorem 2 is unchanged.
 8. **Branching factor `1 + ρ` (Theorem 3).** The paper's coin of bias `ρ` is a uniform coin in
    `Fin q` compared with `p`, so `ρ = p/q` is rational: the finite uniform-round layer has no
    biased coins with irrational bias. Theorem 3 is stated for all `ρ = p/q ∈ [ρ₀, 1]`, which

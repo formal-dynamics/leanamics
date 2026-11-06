@@ -27,7 +27,7 @@ with probability more than `1/4`: `f` is not an `(n/20, 1/4)`-solver
 (`not_solver_of_nonuniform`).
 
 `theorem_4_8_b`: an `(n/20, 1/4)`-solver with the clear-majority property has
-the uniform property. The paper's proof of Lemma 4.10 is a sketch covering
+the uniform property. The paper's proof of Lemma 4.10 is brief and writes out
 `δ_r = 1` with `(δ_g, δ_b) ∈ {(3,2), (4,1)}`; the argument here covers every
 triple with some `δ ≤ 1`, which is every non-uniform triple.
 -/

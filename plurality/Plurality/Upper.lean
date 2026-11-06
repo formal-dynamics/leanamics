@@ -27,11 +27,11 @@ The proof runs the chain through nested phases and applies
 ## Differences from the paper
 
 * The paper's saturation sets also require `s(c) ≥ n/3`, which Lemma 3.7
-  does not show is preserved. Here the saturation sets only bound
+  does not track. Here the saturation sets only bound
   `n - c_m < n/3`, which already implies a unique plurality color and
   `s(c) ≥ n/3` (`of_dissent_lt`).
-* The paper charges each growth round `1/n²`, but Lemma 3.5 bounds the
-  failure against *one* competing color, so a round needs a union bound over
+* The paper charges each growth round `1/n²`; Lemma 3.5 bounds the
+  failure against *one* competing color, and here a round takes a union bound over
   all of them. Only colors that currently have a node matter (the others stay
   empty), and there are fewer than `n - c_m` of them, so a round fails with
   probability at most `1/n`. The final failure probability is therefore

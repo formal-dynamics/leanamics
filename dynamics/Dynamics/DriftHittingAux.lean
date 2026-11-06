@@ -3,7 +3,7 @@ import Dynamics.DriftHittingStop
 /-!
 # Helpers for the hitting-time bound (Claim 2.9 of Doerr et al., SPAA 2011)
 
-The proof of `Dynamics.Kernel.drift_hitting` (the paper omits it) applies the geometric drift
+The proof of `Dynamics.Kernel.drift_hitting` (the paper states the claim without proof) applies the geometric drift
 bound `one_sub_hitProb_le_of_drift` to a potential `V = g ∘ X` off the target (`V = 0` on it):
 
 * `g` is antitone with values in `(0, 1]`. On the low levels `x < x₀`, where one step only

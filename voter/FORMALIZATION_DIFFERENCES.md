@@ -149,7 +149,7 @@ The following portions of the paper were not formalized:
 
 ### 2.5 Stationary Distribution: Existence vs. Uniqueness
 * **In the paper (page 253)**:
-  The authors cite Motwani & Raghavan [MR95] asserting that for a strongly connected graph, there exists a *unique* stationary distribution $\pi_H$.
+  The paper cites Motwani & Raghavan [MR95] for the existence of a *unique* stationary distribution $\pi_H$ on a strongly connected graph.
 * **In Lean**:
   - **Uniqueness is not needed**: Theorem 2.1 ([`consensus_probability`](Voter/Main.lean#L159)) is parameterized by *any* stationary distribution `p` (`hp : H.Stationary p`). Because the LHS (`eventualColor`) does not depend on `p`, any stationary distribution must yield identical mass on Boolean indicators.
   - **Constructive existence**: Existence is proved from scratch in the generic library ([`Dynamics.Kernel.exists_stationary`](../dynamics/Dynamics/Stationary.lean#L53)) using Cesàro averages of iterated distributions and compactness of the probability simplex in $\mathbb{R}^{|V|}$, requiring no black-box citations.
@@ -206,7 +206,7 @@ fixation. Files: [`LazyPropagation.lean`](Voter/LazyPropagation.lean),
 
 ### 3.2 The lazy voter on bipartite graphs needs the Remark
 * `consensus_probability` assumes `¬ G.Colorable 2`. For the lazy kernel on a bipartite `G`
-  this cannot be repaired by choosing another graph: every loopless graph `G'` whose edges are
+  this cannot be avoided by choosing another graph: every loopless graph `G'` whose edges are
   charged by `(I + D⁻¹A)/2` is a subgraph of `G`, hence bipartite. The lazy results are
   therefore proved through the self-loop extension
   ([`consensus_probability_of_selfLoop`](Voter/LazyLoop.lean),
@@ -229,7 +229,7 @@ fixation. Files: [`LazyPropagation.lean`](Voter/LazyPropagation.lean),
   ([`lazy_consensus_probability`](Voter/Lazy.lean),
   [`lazyNeighbor_consensus_probability`](Voter/Lazy.lean), with consensus probability
   `∑ i with s i = c, deg i / (2 |E|)`); the Boolean form is the instance `C = Bool`,
-  `c = true`. This also supplies the many-colour degree-weight corollary missing in §2.7,
+  `c = true`. This also supplies the many-colour degree-weight corollary not restated in §2.7,
   for the lazy kernel.
 * `eventualColor` is, as elsewhere in the package, the supremum of the finite-time consensus
   probabilities (§2.2).
@@ -247,16 +247,17 @@ Further sources: Becchetti, Clementi, Natale, *Consensus dynamics: an overview*,
 51(1), 2020 (the "survey"); Kanade, Mallmann-Trenn, Sauerwald, *On coalescence time in graphs*,
 SODA 2019 (arXiv:1611.02460); Cooper, Elsässer, Ono, Radzik, SIAM J. Discrete Math. 2013.
 
-### 4.1 Survey Theorem 8 needs a minor correction; the lazy walk is formalized
+### 4.1 Survey Theorem 8: the lazy walk is formalized
 * Theorem 8 of the survey states: "Let G be any connected undirected graph. Starting from an
   arbitrary initial configuration c on G, the Voter dynamics reaches consensus w.h.p. in
-  O(n³ log n) rounds." For the synchronous voter with plain uniform-neighbour sampling the statement needs a
-  **nonbipartiteness hypothesis** (or a lazy walk): two tokens on opposite sides of a bipartite graph never meet,
-  and an alternating colouring never reaches consensus
-  (cf. [`twoVertex_never_consensus`](Voter/Examples.lean)). Hassin and Peleg's standing
-  hypotheses (§2.1) do require a nonbipartite graph, and their Theorem 2.5 is the uniform case
+  O(n³ log n) rounds." For the synchronous voter with plain uniform-neighbour sampling, the statement
+  holds on connected **nonbipartite** graphs, or for a lazy walk. On a bipartite graph two tokens on
+  opposite sides never meet, and an alternating colouring alternates forever (on `K_2`:
+  [`twoVertex_flip`](Voter/Examples.lean), [`twoVertex_cycle`](Voter/Examples.lean),
+  [`twoVertex_never_consensus`](Voter/Examples.lean)). Hassin and Peleg's standing
+  hypotheses (§2.1) include a nonbipartite graph, and their Theorem 2.5 is the uniform case
   `H_ij = 1/d_i`.
-* We formalize the **lazy** version, which makes "every connected graph" true: every vertex
+* We formalize the **lazy** version, which holds on every connected graph: every vertex
   keeps its colour with probability `1/2` and otherwise copies a uniformly random neighbour,
   i.e. the kernel [`lazyNeighbor`](../dynamics/Dynamics/RandomWalk.lean) `= (I + D⁻¹A)/2` of §3. This kernel lies
   within Hassin and Peleg's weighted-polling framework with self-loops (the Remark on p. 254;
@@ -267,7 +268,7 @@ SODA 2019 (arXiv:1611.02460); Cooper, Elsässer, Ono, Radzik, SIAM J. Discrete M
   ([`iterate_outside_succ_le`](Voter/MeetingDrift.lean)). The main theorem is
   [`lazy_voter_consensus_whp`](Voter/MeetingConsensus.lean).
 * Hassin and Peleg's own setting (plain walk on a connected nonbipartite graph) is formalized
-  too, with the corrected hypothesis: [`plain_voter_consensus_whp`](Voter/PlainConsensus.lean)
+  too, with the nonbipartiteness hypothesis: [`plain_voter_consensus_whp`](Voter/PlainConsensus.lean)
   (§4.3). Both versions go through
   [`iterate_disagreement_le_of_meeting`](Voter/Meeting.lean), which holds for every sampling
   kernel.
@@ -400,15 +401,15 @@ with blocks of `16 n³` steps.
    `plain_meeting_le_half`, and `A = 80 = 5 · 16` for `plain_voter_consensus_whp` (both
    statements are existential in `A`). These are smaller than the lazy constants (`51`,
    `255`), since the exact drift needs no comparison with sequential walks.
-5. **The proof of Lemma 2.4 needs a minor correction.** It states `l ≤ Diam(G̃) ≤ n`, but the
-   double cover has `2n` vertices and its diameter can be close to `2n`: for a path of length
+5. **The diameter of the double cover in the proof of Lemma 2.4.** The proof uses
+   `l ≤ Diam(G̃) ≤ n`. The double cover has `2n` vertices and its diameter can be close to `2n`: for a path of length
    `L` ending in a triangle (`n = L + 3`), the distance in `G̃` from `(x, 0)` to `(x, 1)`, with
    `x` the free end of the path, is `2L + 3 = 2n − 3`. An exhaustive search over all connected
    nonbipartite graphs with `n ≤ 6` vertices confirms that `2n − 3` is the maximum there. The
-   bound `Diam(G̃) ≤ 2n − 1` only changes the constant. Our route does not use the diameter of
+   bound `Diam(G̃) ≤ 2n − 1` holds and only changes the constant, so Lemma 2.4 is unaffected. Our route does not use the diameter of
    `G̃`, only a path in `G̃` (inside `hitting_add_hitting_le`).
-6. **Survey Theorem 8** needs a minor correction (the nonbipartiteness hypothesis, §4.1);
-   `plain_voter_consensus_whp` is the corrected statement.
+6. **Survey Theorem 8** for the plain walk is formalized with the nonbipartiteness hypothesis
+   (§4.1): `plain_voter_consensus_whp`.
 
 ---
 
@@ -420,28 +421,28 @@ bound), Lemma 2.1 (potential drop), Lemma 2.2 (drift implies time), Lemma 2.3 (p
 `κ` opinions), Lemma 2.4 (the bound `n log n / φ²`). Files: `Conductance*.lean`. The
 dynamics is the lazy voter [`lazyNeighbor`](../dynamics/Dynamics/RandomWalk.lean) `= (I + D⁻¹A)/2` of §3.
 
-### 5.1 Lemma 2.1 of BGKM16 needs a minor correction
+### 5.1 Lemma 2.1 of BGKM16: the sum over the minority side
 * The paper states
   `𝔼[Ψ(S_{t+1}) | S_t = s_t] ≤ Ψ(s_t) - ∑_{u ∈ V} λ_{u,t} d_u / (32 Ψ(s_t)³)`,
   with the sum over **all** vertices, where `Ψ(s) = √(vol(minority))` and `λ_u` is the
-  number of neighbours of `u` with the other opinion. With the sum over all vertices the inequality
-  does not hold. Example: the star
+  number of neighbours of `u` with the other opinion. As printed, with the sum over all vertices, the
+  inequality does not hold. Example: the star
   `K_{1,k}` with `k ≥ 12` and a single leaf in the minority (`Ψ = 1`). Only the leaf and the
   hub can change opinion, and exactly
   `𝔼[Ψ'] = ½ (1 - 1/(2k)) + (√(k-1) + √k)/(4k)`; for `k = 15` this is `0.6102`, while the
   printed bound is `1 - (1 + 15)/32 = 0.5` (the hub contributes `λ d = 15`); for `k = 40` it is
   `0.5723` against `-0.2812`.
-* The paper's proof only yields the sum over the **minority side** `v^(0)`, and Lemma 2.2 only
-  uses that sum. [`potential_drift`](Voter/ConductanceDrift.lean) formalizes this corrected
+* The paper's proof gives the sum over the **minority side** `v^(0)`, and Lemma 2.2 only
+  uses that sum. [`potential_drift`](Voter/ConductanceDrift.lean) formalizes this
   form, with the paper's constant `32`:
   `𝔼 Ψ' ≤ Ψ - ∑_{u ∈ minority} λ_u d_u / (32 Ψ³)`. The conductance form
   ([`potential_drift_conductance`](Voter/ConductanceDrift.lean), `𝔼 Ψ' ≤ Ψ - d_min φ / (32 Ψ)`)
   is the display at the start of the proof of Lemma 2.2.
-* The definition of `λ_u` in the paper has typos ("neighbours of `u` in `V ∖ v^1(t)`" for
-  `u ∈ v^(0)`); the intended meaning, used in the proof, is the number of neighbours with the
+* The definition of `λ_u` in the paper reads "neighbours of `u` in `V ∖ v^1(t)`" for
+  `u ∈ v^(0)`; the meaning used in the proof, and formalized, is the number of neighbours with the
   other opinion ([`discordant`](Voter/Conductance.lean)).
-* In the replacement lemma (Lemma A.1) the printed proof drops a factor `1/2` that cancels;
-  the formalized version is [`independent_expect_comp_sum_le`](Voter/ConductanceIndep.lean).
+* In the printed proof of the replacement lemma (Lemma A.1) a factor `1/2` is not written; it
+  cancels, and the formalized version is [`independent_expect_comp_sum_le`](Voter/ConductanceIndep.lean).
 * Lemma 2.3 says "with probability 1/2 by Markov's inequality"; the reverse Markov argument
   gives `1/3`, which is what is used ([`phase_step`](Voter/ConductanceManyAux.lean)).
 
@@ -505,20 +506,20 @@ dynamics is the lazy voter [`lazyNeighbor`](../dynamics/Dynamics/RandomWalk.lean
 Files: [`ConductanceSq.lean`](Voter/ConductanceSq.lean),
 [`ConductanceSqAux.lean`](Voter/ConductanceSqAux.lean).
 * **The multiplicative drift** ([`potential_drift_mul`](Voter/ConductanceSq.lean),
-  `𝔼 Ψ' ≤ (1 - φ²/(32n)) Ψ` from every two-opinion configuration) is derived from the corrected
-  Lemma 2.1 of §5.1 (sum over the minority side). The proof of Lemma 2.4 starts from the printed
+  `𝔼 Ψ' ≤ (1 - φ²/(32n)) Ψ` from every two-opinion configuration) is derived from
+  Lemma 2.1 in the form of §5.1 (sum over the minority side). The proof of Lemma 2.4 starts from the printed
   form of Lemma 2.1 (sum over all of `V`) but immediately restricts the sum to the minority side
-  `v^(0)`, so the corrected form is exactly what it needs. Cauchy–Schwarz is applied over the
+  `v^(0)`, so the form of §5.1 is exactly what it needs. Cauchy–Schwarz is applied over the
   minority side, which has at most `n` vertices, as in the paper.
-* **Lemma 2.4 needs a minor correction to its statement:** it prints
-  `Pr(T ≤ τ') ≥ 1/n²`, while its proof and its own static special case give
-  `Pr(T ≤ τ') ≥ 1 - 1/n²`. The formalized statements
+* **The probability in the statement of Lemma 2.4.** The statement prints
+  `Pr(T ≤ τ') ≥ 1/n²`, where `Pr(T ≤ τ') ≥ 1 - 1/n²` is meant, as its proof and its own static
+  special case give. The formalized statements
   ([`lazy_consensus_conductance_sq`](Voter/ConductanceSq.lean),
   [`dynamic_consensus_conductance_sq`](Voter/ConductanceSq.lean)) read: for every `T` with
   `96 n ln n ≤ φ² T` (static) or `96 n ln n ≤ ∑_{t < T} φ_t²` (dynamic), the opinions still
   disagree at time `T` with probability at most `1/n²`.
-* **A minor correction to the proof of Lemma 2.4:** the recursion display ends with
-  `Ψ_0 exp(+∑ φ_i² / (32n))`; the sign of the exponent must be negative. The formal proof uses
+* **The sign of an exponent in the proof of Lemma 2.4.** The recursion display ends with
+  `Ψ_0 exp(+∑ φ_i² / (32n))`, where the exponent `−∑ φ_i² / (32n)` is meant. The formal proof uses
   `1 - x ≤ e^{-x}` factor by factor ([`prod_one_sub_le`](Voter/ConductanceSqAux.lean)) instead of
   the arithmetic–geometric mean step, and the multiplicative drift lemma of the shared library
   (`Dynamics.Kernel.multiplicative_drift_seq`) for `P(Ψ_T > 0) ≤ 𝔼 Ψ_T` (using `Ψ ≥ 1` before

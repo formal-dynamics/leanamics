@@ -14,10 +14,12 @@ that they can be iterated over `O(log n)` rounds):
 * (17) `undecided_not_below`: if all colours are at most `γ n / D`, then w.h.p.
   `Q' ≥ n/2 - 2γ² n / D` (`Q` cannot jump over the window around `n/2`).
 
-Corrections (see `FORMALIZATION_DIFFERENCES.md`):
-* the conclusion `|Q - n/2| ≤ 2γ² / md(c̄)` of the paper is a typo for `2γ² n / md(c̄)`;
-* the proof of (17) uses `∑ⱼ cⱼ² = c₁² md(c̄)`, which mixes the current configuration and the
-  initial one; the bound `∑ⱼ cⱼ² ≤ maxⱼ cⱼ · (n - q) ≤ maxⱼ cⱼ · n` gives (17) for every `γ ≥ 1`;
+Differences from the paper (see `FORMALIZATION_DIFFERENCES.md`):
+* the window is `|Q - n/2| ≤ 2γ² n / md(c̄)`, the interval used in the paper's proof (the
+  statement prints `2γ² / md(c̄)`);
+* the formal proof of (17) uses the bound `∑ⱼ cⱼ² ≤ maxⱼ cⱼ · (n - q) ≤ maxⱼ cⱼ · n` (the paper
+  writes `∑ⱼ cⱼ² = c₁² md(c̄)` with the initial monochromatic distance), which gives (17) for
+  every `γ ≥ 1`;
 * the bound is kept for **every** colour (`maxCount`), not only the initial plurality;
 * the round `t̄` is deterministic here (it depends only on `n`, `Λ(c̄)` and `md(c̄)`), and the
   colours stay below `γ n / md(c̄)` at **every** round up to `t̄`, not only at `t̄`: this is what
@@ -127,7 +129,7 @@ theorem undecided_square : ∃ C : ℝ, 0 < C ∧ ∀ n : ℕ, C ≤ Real.log n 
           rw [div_le_div_iff₀ (pow_pos hnR 2) (pow_pos hnR 2)]
           exact mul_le_mul_of_nonneg_right (by norm_num : (5 : ℝ) ≤ 8) (sq_nonneg (n : ℝ))
 
-/-- **Equation (17) of [BCNPS15]** (proof of Lemma 6, corrected): `Q` cannot jump below the
+/-- **Equation (17) of [BCNPS15]** (proof of Lemma 6, formalized form): `Q` cannot jump below the
 window around `n/2`. There is `C > 0` such that, for every `γ ≥ 1`, every `n` with
 `log n ≥ C`, every `k` with `C k ≤ (n / log n)^{1/6}`, every `D ∈ (0, k]` and every
 configuration `y` whose colours are all at most `γ n / D`, after one round, with probability at
@@ -206,7 +208,7 @@ theorem undecided_not_below : ∃ C : ℝ, 0 < C ∧ ∀ γ : ℝ, 1 ≤ γ → 
         exact mul_le_mul_of_nonneg_right (by norm_num : (5 : ℝ) ≤ 8) (sq_nonneg (n : ℝ))
 
 set_option maxHeartbeats 2000000 in
-/-- **Lemma 6 of [BCNPS15]** (descent of the undecided, corrected). There are `γ ≥ 1` and
+/-- **Lemma 6 of [BCNPS15]** (descent of the undecided, formalized form). There are `γ ≥ 1` and
 `C > 0` such that, for every `n` with `log n ≥ C`, every `k` with `C k ≤ (n / log n)^{1/6}`,
 every initial configuration `x` without undecided nodes and with `md(x) ≥ C`, and every
 configuration `y` as after the first round (Lemma 3: all colours at most `2n / R(x)²`, and

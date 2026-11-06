@@ -55,8 +55,8 @@ complete graphs, so 4 states are optimal (Theorem 1); and the 3-state approximat
 protocol of Angluin, Aspnes and Eisenstat, with a uniformly random oriented edge per step and a
 uniformly random placement of the two types, converges to the majority with probability at least
 that of converging to the minority, at every finite time, hence with probability at least `1/2`
-on connected graphs (Theorem 4). The proofs of Theorems 1, 2 and 4 need minor corrections (see
-the differences file). Graphs are undirected.
+on connected graphs (Theorem 4). Some steps of the proofs are formalized differently; this does
+not affect the paper's results (see the differences file). Graphs are undirected.
 
 * [`Crn/GraphMajorityBasic.lean`](Crn/GraphMajorityBasic.lean): protocols on an interaction
   graph, stable computation on graphs (agreeing with CRN-3 on complete graphs), majority.
@@ -79,9 +79,8 @@ this protocol makes while it stabilizes. Hence Absolute-Majority stably computes
 by more than half of the agents, or reports that there is none (Theorem 6, `2^k·6^k·8` states), and
 Relative-Majority stably marks the agents of the plurality colour, ties to the lexicographically
 largest label (Theorem 7, `2^(4k)` states): each agent learns whether its own colour wins, not the
-winner's label. Fig. 4 and the final argument of Section 3 need minor corrections; the uniqueness
-mechanism of Section 5.2 needs a major correction and is not formalized (see the differences
-file).
+winner's label. The uniqueness mechanism of Section 5.2 is not formalized; Theorems 3, 6 and 7 do
+not depend on it (see the differences file).
 
 * [`Crn/ExactMajorityOutput.lean`](Crn/ExactMajorityOutput.lean): stable computation with outputs
   in any type, possibly depending on the agent's input (`Protocol.StablyMarks`).

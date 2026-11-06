@@ -14,7 +14,7 @@ opinions*, SODA 2016, arXiv:1508.06782 (BCNPT16 below): from any configuration w
   `O(j² √(log n) + j log n)` rounds with probability at least `1/5` (symmetry breaking,
   Lemma 3.3, then dropping, Lemmas 3.4 and 3.5, composed at the hitting time by
   `hitProb_mul_le_event`). The paper says `1/4`, the product of the probabilities `1/2` of
-  Lemmas 3.3 and 3.5, ignoring the failure probability of Lemma 3.4.
+  Lemmas 3.3 and 3.5; the bound `1/5` also accounts for the failure probability of Lemma 3.4.
 * `consensus_of_phases`: if every phase of `L` rounds removes a colour with probability at
   least `p`, then after `M` phases consensus fails with probability at most
   `(1 − p/2)^M 2^k` (the potential `2^{#colours}`).

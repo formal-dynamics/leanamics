@@ -66,7 +66,7 @@ The proof replaces the paper's Phases II and III by a single supermartingale arg
 
 **Provenance (Theorem 4).** The statements were written and fixed in advance by a Claude
 agent and reviewed against the paper by a second agent, which found no problem with them (it
-corrected the paper's lemma numbers cited in the docstrings and suggested stating the one-round
+adjusted the lemma numbers cited in the docstrings to the paper's numbering and suggested stating the one-round
 expectation bound separately, which was added as `expected_minority_step`); the proofs are by a
 Claude agent under the fixed-statement protocol, and verified mechanically (statements
 unchanged, no placeholders, warning-free build, axiom audit).
@@ -89,18 +89,18 @@ mixing hypothesis `MixingProp G d α c` of Lemma 2 (implied by `λ_G ≤ α`):
 | **Theorem 2**, explicit form: `4000 λ_G ≤ ν₀`; after `T₁ + T₂` rounds the majority holds everywhere except w.p. `≤ T₁(e^{−α²n/120} + e^{−α²n/800}) + (24/25)^{T₂} n + (T₁ + T₂) e^{−n/97000}` with `α = ν₀/4000` | `two_choices_expander_general_explicit` |
 | **Theorem 2**, `O(log n)` form: `K λ_G ≤ ν₀`; after `⌈C log n⌉` rounds, failure `≤ 1/n + (2C log n + C) e^{−ν₀²n/C}` (`K = 4000`, `C = 2·10¹⁰`) | `two_choices_expander_general` |
 
-The paper's Theorem 2 needs a major correction: it claims success with probability tending to
-`1` whenever `ν₀ ≥ K λ_G`, but when `λ_G` is of order `1/√n` or smaller this does not follow
-from Phase I, and on the complete graph (`λ_G = 1/(n − 1)`) a constant difference `A − B ≥ K + 2`
-lets the majority win only with probability tending to `1/2`. The formal theorem keeps the
-hypothesis `ν₀ ≥ K λ_G` and bounds the failure probability in terms of `ν₀² n` instead (it tends
-to `0` once `ν₀² n` is large compared with `log log n`, for instance for every fixed `ν₀ > 0`);
-see [FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md#theorem-2-of-the-paper-needs-a-major-correction).
+As printed, the paper's Theorem 2 also covers graphs with `λ_G` of order `1/√n` or smaller,
+where Phase I does not give a success probability `1 − o(1)` (on the complete graph, where
+`λ_G = 1/(n − 1)`, a constant difference `A − B ≥ K + 2` satisfies the hypothesis, and the
+majority wins with probability tending to `1/2`). The formalized version keeps the hypothesis
+`ν₀ ≥ K λ_G` and bounds the failure probability in terms of `ν₀² n` (it tends to `0` once
+`ν₀² n` is large compared with `log log n`, for instance for every fixed `ν₀ > 0`); see
+[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md#theorem-2-the-formalized-form).
 Theorems 1 and 3 (random regular graphs) and the robustness result are not formalized.
 
 **Provenance (Theorem 2).** The statements were pinned by a Claude agent (together with the
 defining equations `*_spec` of the definitions they use) and reviewed by a second agent, which
-confirmed the major correction; the proofs are by a Claude agent under the fixed-statement
+agreed with the formalized form of Theorem 2; the proofs are by a Claude agent under the fixed-statement
 protocol, and verified mechanically (statements unchanged, no placeholders, warning-free build,
 axiom audit).
 
@@ -133,9 +133,10 @@ consensus* (PODC 2017), Theorem 5 and Theorem 1 (Simplified) of
 The paper's hypothesis `k = O(n^ε)` is not needed: one-round Bernstein bounds with a node-wise
 variance bound (`Median/TwoChoicesConc.lean`) replace its multiplicative Chernoff bounds, and
 Observation 2.1 replaces the coupling of Lemma 2.3 in the growth step. The adversary of
-Theorem 1.2 and its lower bounds are not formalized. The proofs of Theorem 1.2 and Lemma 2.3 of
-Elsässer et al. and of Theorem 5 of Berenbrink et al. need minor corrections; see
-[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md).
+Theorem 1.2 and its lower bounds are not formalized. Some steps of the proofs of Theorem 1.2 and
+Lemma 2.3 of Elsässer et al. and of Theorem 5 of Berenbrink et al. are formalized differently;
+this does not affect the papers' results (see
+[FORMALIZATION_DIFFERENCES.md](FORMALIZATION_DIFFERENCES.md)).
 
 **Provenance (k-party 2-Choices).** The definitions and statements were pinned by a Claude agent
 and reviewed by a second agent; the proofs are by a Grok agent (grok-4.7) under the

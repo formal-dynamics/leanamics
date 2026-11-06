@@ -76,12 +76,12 @@ theorem prob_components_small (G : SimpleGraph V) [DecidableRel G.Adj] {d : ℕ}
         _ ≤ _ := Distribution.prob_nonneg _ _
   · exact le_trans (by linarith [card_mul_exp_le hn hε hε1]) hwhp
 
-/-- **Subcritical Reed–Frost** (the bounded-degree statement whose formal version [BCDPTZ22]
-omits after Theorem 2.5; compare claim 2 of Theorems 2.4 and 2.5): if the degrees of `G` are at
-most `d` and the reproduction number `R₀ = p (d - 1)` is at most `1 - ε` with `0 < ε < 1`, then
-with probability at least `1 - 1/n` the epidemic started from `I₀` infects at most
-`|I₀| (10 / ε²) log n` nodes in total, and nobody is infected in round `⌊(10 / ε²) log n⌋`: the
-epidemic is over by then. -/
+/-- **Subcritical Reed–Frost** (the bounded-degree statement that [BCDPTZ22] mentions after
+Theorem 2.5 without stating it separately; compare claim 2 of Theorems 2.4 and 2.5): if the
+degrees of `G` are at most `d` and the reproduction number `R₀ = p (d - 1)` is at most `1 - ε`
+with `0 < ε < 1`, then with probability at least `1 - 1/n` the epidemic started from `I₀`
+infects at most `|I₀| (10 / ε²) log n` nodes in total, and nobody is infected in round
+`⌊(10 / ε²) log n⌋`: the epidemic is over by then. -/
 theorem reedFrost_subcritical (G : SimpleGraph V) [DecidableRel G.Adj] {d : ℕ}
     (hdeg : ∀ v, G.degree v ≤ d) {p ε : ℝ} (h0 : 0 ≤ p) (h1 : p ≤ 1) (hε : 0 < ε) (hε1 : ε < 1)
     (hR₀ : p * ((d : ℝ) - 1) ≤ 1 - ε) (I₀ : Finset V) :

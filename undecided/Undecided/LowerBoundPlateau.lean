@@ -12,15 +12,14 @@ The one-round step (`plateau_step`) has failure probability `C / n²`, so that i
 over `T ≤ D / C ≤ n` rounds. Here the monochromatic distance `md(c̄)` of the initial
 configuration is a real parameter `D ≤ k` (as `md(c̄) ≤ k`, `md_le_card`).
 
-Corrections (see `FORMALIZATION_DIFFERENCES.md`):
+Differences from the paper (see `FORMALIZATION_DIFFERENCES.md`):
 * the bound is kept for **every** colour (`maxCount`): the proof bounds `∑ⱼ cⱼ²` and uses
   `c_m ≥ (n - q)/k`, which hold for the largest colour, not for a fixed colour `m`;
-* the growth factor is `1 + (4γ² + 2γ + 1)/D`, not `1 + (2γ(γ + 1) + 1)/D`: from
+* the growth factor is `1 + (4γ² + 2γ + 1)/D` (the paper has `1 + (2γ(γ + 1) + 1)/D`): from
   `|q - n/2| ≤ 2γ² n / D` the term `2δ/n` in `µ_m = (1 + (2δ + c_m)/n) c_m` is at most `4γ²/D`;
-* the lower bound `E[Q' - n/2] ≥ -(4/9) n / D` needs a minor correction (it bounds `∑ⱼ cⱼ²` from
-  above by `k ((n - q)/k)²`, which is a lower bound): with `∑ⱼ cⱼ² ≤ maxⱼ cⱼ · (n - q)` one gets
-  `E[Q' - n/2] ≥ -(4γ/3) n / D`, which stays inside the window for `γ ≥ 1` (not for an arbitrary
-  `γ > 0`: for `γ < 1/2` the window is left in one round from configurations with many equal
+* the lower bound on `E[Q' - n/2]` is `-(4γ/3) n / D` (the paper has `-(4/9) n / D`), from
+  `∑ⱼ cⱼ² ≤ maxⱼ cⱼ · (n - q)`; it stays inside the window for `γ ≥ 1`, hence the hypothesis
+  `γ ≥ 1` (for `γ < 1/2` the window is left in one round from configurations with many equal
   colours).
 -/
 
@@ -324,7 +323,7 @@ lemma colour_dev_le {ℓ B D : ℝ} (hℓ : 0 ≤ ℓ) (hB : 0 < B) (hD : 0 < D)
   have hL : 0 ≤ 2 * √(2 * ℓ * B) := mul_nonneg (by norm_num) (sqrt_nonneg _)
   exact (sq_le_sq₀ hL (div_nonneg hB.le hD.le)).mp hgoal
 
-/-- **One round of the plateau** (proof of [BCNPS15, Lemma 7], corrected growth factor). Let
+/-- **One round of the plateau** (proof of [BCNPS15, Lemma 7], with the growth factor of the formal proof). Let
 `γ ≥ 1`. There is `C > 0` such that, for every `n` with `log n ≥ C`, every `k` with
 `C k ≤ (n / log n)^{1/4}`, every `D` with `C ≤ D ≤ k`, every configuration `y` with
 `|q - n/2| ≤ 2γ² n / D` and every `B ∈ [γ n / D, 2γ n / D]` bounding all colours of `y`, after

@@ -12,14 +12,14 @@ of some round.
 The paper's proof bounds one round: by Lemma 9 and Chebyshev's inequality, for every
 `f' ∈ ]f + p (1 - f), 1[` a round started with `k < f n` informed nodes ends with at least
 `f' n` with probability at most `(p + c) / (n (f' - f - p (1 - f))²)`. This is
-`overshoot_round`. The lemma's conclusion, that the whole process jumps over the interval with
-probability `O(1/n)`, does not follow from it: the process may spend many rounds below `f n`
-and have a chance to jump in each. (For instance, the process that from every `k < f n` informs
-all nodes with probability `c / n` and otherwise no node satisfies the hypotheses, and jumps
-from `1` to `n` with probability one.) `jumpProb_le` is the path statement that does follow,
-by a union bound over the rounds: the probability of jumping over `[f n, f' n[` within `t`
-rounds is at most `C / n` times the expected number of these rounds that start below `f n`,
-that is, `O(E[T(|S|, f n)] / n)`.
+`overshoot_round`. To bound the probability that the whole process jumps over the interval,
+one also counts the rounds it spends below `f n`, since each gives a chance to jump. (As
+printed, the lemma does not hold for the process that from every `k < f n` informs all nodes
+with probability `c / n` and otherwise no node: it satisfies the hypotheses, and jumps from `1`
+to `n` with probability one.) `jumpProb_le` is the path statement, by a union bound over the
+rounds: the probability of jumping over `[f n, f' n[` within `t` rounds is at most `C / n`
+times the expected number of these rounds that start below `f n`, that is,
+`O(E[T(|S|, f n)] / n)`.
 -/
 
 namespace Epidemics.Revisited
