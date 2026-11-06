@@ -111,16 +111,19 @@ Lean checks the proofs, not whether a statement says what its source says. To re
 person compared a Lean statement (or definition) with the paper, run, from the repository root,
 
 ```bash
-python3 scripts/check_statements.py                 # terminal app; reviewer from git config user.name
+python3 scripts/check_statements.py --next          # the next unchecked item
+python3 scripts/check_statements.py --show ID       # its source next to its Lean statement
+python3 scripts/check_statements.py --record ID --verdict agrees --basis transcription
 python3 scripts/check_statements.py --report        # who checked what, per package
 python3 scripts/check_statements.py --validate      # well-formed record, every \lean{} name declared
 ```
 
-The app lists every blueprint node that names Lean declarations (main results and the definitions
-they use first) and shows, for each, its source (with the original statement when
-[`verification/sources.toml`](verification/sources.toml) has it), the blueprint statement, the
-Lean statements and the definitions they use. Press `a` (agrees), `d` (differs, with a comment)
-or `u` (unsure, with a question) to record a check; `?` lists the keys. Checks are appended to
+or, in Claude Code, ask for the `check-statements` skill, which walks you through the same steps
+one item at a time: it shows the original statement of the paper (when transcribed in
+[`verification/sources.toml`](verification/sources.toml) or `verification/sources/`) next to the
+Lean statements and the definitions they use, answers your questions, and records your verdict
+(`agrees`, `differs` with a comment, or `unsure` with a question) and what you compared with (the
+paper, the transcription, or only the blueprint). Checks are appended to
 `verification/checks/<your-name>.jsonl`, one file per reviewer, so branches merge without
 conflicts: commit that file with your other changes. A check becomes stale when the item's Lean or
 source text changes. [`verification/README.md`](verification/README.md) explains what a check

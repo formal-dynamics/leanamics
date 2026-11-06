@@ -1,7 +1,6 @@
-"""Text of the detail view, of the `ask` context and of the reports.
+"""Text of the detail view (`--show`), of the Markdown context (`--context`) and of the reports.
 
-The detail view is a list of `(text, style)` lines; the curses app maps styles to colors and the
-plain output ignores them. Styles: title, h, dim, code, doc, ok, bad, warn, link, key, text.
+The detail view is a list of `(text, style)` lines; the plain output ignores the styles. Styles: title, h, dim, code, doc, ok, bad, warn, link, key, text.
 """
 import re
 import textwrap

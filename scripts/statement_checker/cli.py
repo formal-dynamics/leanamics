@@ -126,7 +126,7 @@ def report(m):
     out += ["## Definitions outside the blueprint", "",
             f"{len(extra)} library definitions are used by the statements of items but are not "
             "named by any blueprint item, so no check covers them directly. The detail view lists "
-            "them under each item (press `D`).", ""]
+            "them under each item (`--show`).", ""]
     if extra:
         out += ["<details><summary>The definitions, with the first item using each</summary>", ""]
         for n in sorted(extra):
