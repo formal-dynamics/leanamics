@@ -1,0 +1,1262 @@
+# Source references and original statements for the items of the package `undecided`.
+#
+# Same format as `verification/sources.toml` (see its header for the fields). The entries of
+# that file for this package (undecided:thm:plurality, undecided:thm:lb, undecided:thm:majority
+# with MFCS 2018 Theorem 3.2) are not repeated here; this file adds the other (item, result)
+# pairs that the blueprint, PROVENANCE.md, ROADMAP.md, the package README, the docstrings and
+# undecided/FORMALIZATION_DIFFERENCES.md attribute to a source.
+#
+# Sources:
+#   [BCNPS15] Becchetti, Clementi, Natale, Pasquale, Silvestri, Plurality consensus in the gossip
+#             model, SODA 2015, arXiv:1407.2565v2 (LaTeX source, compared with the PDF);
+#   [CGGNPS18] Clementi, Ghaffari, Gualà, Natale, Pasquale, Scornavacca, A tight analysis of the
+#             parallel undecided-state dynamics with two colors, MFCS 2018, arXiv:1707.05135v3
+#             (LaTeX source, compared with the PDF);
+#   [AAE08]   Angluin, Aspnes, Eisenstat, A simple population protocol for fast robust approximate
+#             majority, Distributed Computing 21(2), 2008 (the authors' PDF of the journal
+#             version, no LaTeX source);
+#   [Survey]  Becchetti, Clementi, Natale, Consensus dynamics: an overview, SIGACT News 51(1),
+#             2020, HAL preprint hal-02507613v1 (PDF only).
+#
+# All entries were transcribed by an AI agent; none has been checked by a person. Pages are pages
+# of the PDF file (for arXiv:1407.2565v2 and for the survey the printed page number is one less).
+# Citations inside quoted text are kept as printed; "[...]" marks omitted text.
+
+# ---------------------------------------------------------------------------------------------
+# [BCNPS15] The model with k colours (thm:pmodel) and the basic quantities (lem:lb-basic)
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+item = "undecided:thm:pmodel"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri. Plurality consensus in the gossip model"
+venue = "SODA 2015"
+version = "arXiv:1407.2565v2"
+result = "Section 2, Table 1 (update rule)"
+page = 5
+url = "https://arxiv.org/abs/1407.2565v2"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v2 and compared with the PDF of v2; not yet checked by a person"
+statement = '''
+The Undecided-State Dynamics works as follows.
+According to the (uniform) gossip model,
+at every round $t \geqslant 0$, each agent $u$ chooses a neighbor $v$ uniformly at random and
+decides to get a new color/state according to the rules in Table 1,
+
+\begin{tabular}{|c||c|c|c|}
+\hline
+$u\big\backslash v$ & undecided & color $i$ & color $j$\tabularnewline
+\hline
+\hline
+undecided & undecided & $i$ & $j$\tabularnewline
+\hline
+color $i$ & $i$ & $i$ & undecided\tabularnewline
+\hline
+color $j$ & $j$ & undecided & $j$\tabularnewline
+\hline
+\end{tabular}
+
+Table 1: The update rule of the Undecided-State Dynamics where $i,j\in\left[k\right]$ and $i\neq j$.
+'''
+context = '''
+[Section 1, p. 2:] We study plurality consensus in the \emph{$\mathcal{GOSSIP}$ model} [9, 15, 21] in which each of $n$
+agents of a communication network can, in every round, contact one (possibly random)
+neighbor to exchange information.
+
+[Section 2, p. 5:] Let us consider a complete graph of $n$ anonymous nodes (\emph{agents}): each of them is initially
+colored with one out of $k$ possible colors, where $k = k(n) \in [n]$. It is assumed that
+there is an initial \emph{plurality} $c_{1} > n/k$ of agents colored with the \emph{plurality color} $1$.
+A synchronous protocol for the \emph{plurality problem} is a finite set of local rules (applied by
+every agent) that bring the system
+into the \emph{target} configuration where all agents are colored by $1$.
+
+\textbf{The Undecided-State Dynamics.}
+We analyze the synchronous version of the Undecided-State Dynamics introduced in [3] and [30].
+Differently from other ones (e.g., the majority dynamics considered in [5]), in this protocol,
+after the first round, agents can also enter an \emph{undecided} state $q$, to which no color is associated.
+Accordingly, at each round $t$, the global state
+of the system can be represented by a \emph{color configuration} $\mathbf{c}^{(t)}=\langle c_1^{(t)},\dots,c_k^{(t)}, q^{(t)}\rangle$ where $c_{i}^{(t)}$ is the number of $i$-colored agents, and $q^{(t)}$ is the number of undecided agents.
+In the sequel, wlog, we will assume that $c_i \geq c_{i+1}$ for any $i \leq k-1$.
+
+[Section 2, p. 5:] The dynamic process that results from running the Undecided-State Dynamics on the complete
+graph can be represented by a finite-state Markov chain defined
+over the space of all color configurations.
+
+[Section 2.1, p. 6:] Considered any time $t$, the state of the process (i.e.
+the Markov chain) is completely characterized
+by the corresponding color configuration, namely by
+\[ \mathbf{c}^{(t)}=\langle c_{1}^{(t)},c_{2}^{(t)}, \ldots,c_{k}^{(t)},q^{(t)}\rangle \]
+The set of all possible color configurations will be denoted by $\mathcal{S}$.
+In the initial state we always have $q^{(0)} = 0$.
+'''
+notes = '''
+The update rule is Table 1 of Section 2 (preliminaries.tex). The model text says "chooses a neighbor v uniformly at random" on the complete graph; whether v may be u itself is not stated. Macros replaced: \threestate -> the text "Undecided-State Dynamics" (paper: $\textrm{Undecided-State Dynamics}$), \gossip -> $\mathcal{GOSSIP}$, \genc -> \mathbf{c}, \cconf{t} -> \langle c_1^{(t)},\dots,c_k^{(t)}, q^{(t)}\rangle, \m -> 1, \sS -> \mathcal{S}. The paper redefines \le, \leq, \ge, \geq as \leqslant, \geqslant; they are kept as written. The \cite commands are replaced by the printed numbers. v1 and v2 have the same text here.
+'''
+
+[[source]]
+item = "undecided:thm:pmodel"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri. Plurality consensus in the gossip model"
+venue = "SODA 2015"
+version = "arXiv:1407.2565v2"
+result = "Equations (3) and (4)"
+page = 8
+url = "https://arxiv.org/abs/1407.2565v2"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v2 and compared with the PDF of v2; not yet checked by a person"
+statement = '''
+If $\mathbf{c} = \langle c_1,\dots,c_k, q\rangle$ is the current color configuration (i.e. state)
+of the Markov chain, then we can easily derive the ``expectation'' of the
+next color configuration
+\begin{align}
+	\mu_{i} & = \mathbf{E}\left[\left. C_{i}' \;\right| \bar{\mathbf{c}} \right] = c_{i} \cdot \frac{c_{i}+2q}{n} \quad (i \in \left[ k \right]) \tag{3}\\
+	\mu_{q} & = \mathbf{E}\left[\left. Q' \;\right| \bar{\mathbf{c}} \right] = \frac{q^{2}+\sum_{i\neq j}c_{i}\cdot c_{j}}{n}=\frac{q^{2}+\left(n-q\right)^{2}-\sum_{i} c_{i}^{2}}{n} \tag{4}
+\end{align}
+'''
+context = '''
+[Section 2, p. 5:] Let us consider a complete graph of $n$ anonymous nodes (\emph{agents}): each of them is initially
+colored with one out of $k$ possible colors, where $k = k(n) \in [n]$. [...]
+Accordingly, at each round $t$, the global state
+of the system can be represented by a \emph{color configuration} $\mathbf{c}^{(t)}=\langle c_1^{(t)},\dots,c_k^{(t)}, q^{(t)}\rangle$ where $c_{i}^{(t)}$ is the number of $i$-colored agents, and $q^{(t)}$ is the number of undecided agents.
+
+The Undecided-State Dynamics works as follows.
+According to the (uniform) gossip model,
+at every round $t \geqslant 0$, each agent $u$ chooses a neighbor $v$ uniformly at random and
+decides to get a new color/state according to the rules in Table 1,
+
+\begin{tabular}{|c||c|c|c|}
+\hline
+$u\big\backslash v$ & undecided & color $i$ & color $j$\tabularnewline
+\hline
+\hline
+undecided & undecided & $i$ & $j$\tabularnewline
+\hline
+color $i$ & $i$ & $i$ & undecided\tabularnewline
+\hline
+color $j$ & $j$ & undecided & $j$\tabularnewline
+\hline
+\end{tabular}
+
+Table 1: The update rule of the Undecided-State Dynamics where $i,j\in\left[k\right]$ and $i\neq j$.
+
+[Section 2.1, p. 6:] If we condition the system to be in a fixed state $\mathbf{c}$ at a generic round,
+the random sizes of the $i$-color communities and that of the undecided community at the next round will
+be denoted as $C_{i}'$ and $Q'$, respectively.
+
+For brevity' sake, we define
+\begin{align*}
+	\mu_{i} := \mathbf{E}\left[\left. C_{i}' \;\right| \mathbf{c} \right] \,\,\, (i \in [ k ]),
+	\quad
+	\mu := \mathbf{E}\left[\left. \sum_iC_i' \;\right| \mathbf{c} \right]
+	\quad \mbox{ and }
+	\quad
+	\mu_{q} := \mathbf{E}\left[\left. Q' \;\right| \mathbf{c} \right]
+\end{align*}
+'''
+notes = '''
+Section 3.2, General bounds (generalbounds.tex), labels eq:average_of_c and eq:average_of_q; the numbers (3) and (4) are shown with \tag. As printed, the conditioning in (3) and (4) is on \bar{\mathbf{c}} while the sentence before names the current configuration \mathbf{c}. Macros replaced: \medi -> \mu_{i}, \medq -> \mu_{q}, \Med -> \mu, \expec{X}{Y} -> \mathbf{E}\left[\left. X \;\right| Y \right], \genc -> \mathbf{c}, \ccgen -> \langle c_1,\dots,c_k, q\rangle, \cconf{t} as in the model entry. v1 and v2 have the same text here.
+'''
+
+[[source]]
+item = "undecided:thm:pmodel"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri. Plurality consensus in the gossip model"
+venue = "SODA 2015"
+version = "arXiv:1407.2565v2"
+result = "Equation (1), definition of md"
+page = 7
+url = "https://arxiv.org/abs/1407.2565v2"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v2 and compared with the PDF of v2; not yet checked by a person"
+statement = '''
+For every $\mathbf{c}$, it holds that
+\begin{equation}
+1 \ \leq \ R (\mathbf{c}), \mathsf{md}(\mathbf{c}) \ \leq \ k \tag{1}
+\end{equation}
+'''
+context = '''
+[Section 2, p. 5:] Let us consider a complete graph of $n$ anonymous nodes (\emph{agents}): each of them is initially
+colored with one out of $k$ possible colors, where $k = k(n) \in [n]$. [...]
+Accordingly, at each round $t$, the global state
+of the system can be represented by a \emph{color configuration} $\mathbf{c}^{(t)}=\langle c_1^{(t)},\dots,c_k^{(t)}, q^{(t)}\rangle$ where $c_{i}^{(t)}$ is the number of $i$-colored agents, and $q^{(t)}$ is the number of undecided agents.
+In the sequel, wlog, we will assume that $c_i \geq c_{i+1}$ for any $i \leq k-1$.
+
+[Section 2.1, p. 6:] Given any color configuration $\mathbf{c}\langle c_1,c_2,\ldots,c_k, q\rangle$,
+consider the following ratio
+\[ R(\mathbf{c}) \ = \ \sum_{i=1}^{k} \frac {c_i}{c_{1}} \]
+[...]
+
+[Section 2.1, p. 7:] Let us now consider the equivalence class $\mathcal M$ of the ($k$) possible \emph{monochromatic} color configurations
+and recall the definition of \emph{monochromatic distance} (given in the introduction),
+\[ \mathsf{md}(\mathbf{c}) \ = \ \sum_{i=1}^k \, \left(\frac{c_i}{c_{1}}\right)^2 \]
+[...] Consistently, it is
+straightforward to see that $\mathsf{md}$ is maximized by ``uniform'' configurations, i.e., configurations
+$\mathbf{c}$ such that $c_{1}\approx n/k$.
+'''
+notes = '''
+Section 2.1 (preliminaries.tex), label fa:ranger; the number (1) is shown with \tag. Here colour 1 is the plurality colour (the convention c_i >= c_{i+1}). Macros replaced: \genc -> \mathbf{c}, \m -> 1, \mdist -> \mathsf{md} (paper: \textnormal{\textsf{md}}), \cconf{t} as in the model entry. The paper renders \leq as \leqslant. v1 and v2 have the same text here.
+'''
+
+[[source]]
+item = "undecided:lem:lb-basic"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri. Plurality consensus in the gossip model"
+venue = "SODA 2015"
+version = "arXiv:1407.2565v2"
+result = "Equation (2), definitions of R and Λ"
+page = 7
+url = "https://arxiv.org/abs/1407.2565v2"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v2 and compared with the PDF of v2; not yet checked by a person"
+statement = '''
+Finally, let us define the following ratio
+\[
+	\Lambda(\mathbf{c}) \ := \ \frac{ R(\mathbf{c} )^2 }{ \mathsf{md}(\mathbf{c}) }
+\]
+From the definitions of $R(\mathbf{c})$ and $\mathsf{md}(\mathbf{c})$ and
+from a simple application of the Cauchy-Schwartz
+inequality to $R(\mathbf{c})$, we get
+\begin{equation}
+	\Lambda(\mathbf{c}) \ \le \ k \tag{2}
+\end{equation}
+for every configuration $\mathbf{c}$.
+'''
+context = '''
+[Section 2, p. 5:] Let us consider a complete graph of $n$ anonymous nodes (\emph{agents}): each of them is initially
+colored with one out of $k$ possible colors, where $k = k(n) \in [n]$. [...]
+Accordingly, at each round $t$, the global state
+of the system can be represented by a \emph{color configuration} $\mathbf{c}^{(t)}=\langle c_1^{(t)},\dots,c_k^{(t)}, q^{(t)}\rangle$ where $c_{i}^{(t)}$ is the number of $i$-colored agents, and $q^{(t)}$ is the number of undecided agents.
+In the sequel, wlog, we will assume that $c_i \geq c_{i+1}$ for any $i \leq k-1$.
+
+[Section 2.1, p. 6:] Given any color configuration $\mathbf{c}\langle c_1,c_2,\ldots,c_k, q\rangle$,
+consider the following ratio
+\[ R(\mathbf{c}) \ = \ \sum_{i=1}^{k} \frac {c_i}{c_{1}} \]
+[...]
+
+[Section 2.1, p. 7:] Let us now consider the equivalence class $\mathcal M$ of the ($k$) possible \emph{monochromatic} color configurations
+and recall the definition of \emph{monochromatic distance} (given in the introduction),
+\[ \mathsf{md}(\mathbf{c}) \ = \ \sum_{i=1}^k \, \left(\frac{c_i}{c_{1}}\right)^2 \]
+[...]
+For every $\mathbf{c}$, it holds that
+\begin{equation}
+1 \ \leq \ R (\mathbf{c}), \mathsf{md}(\mathbf{c}) \ \leq \ k \tag{1}
+\end{equation}
+'''
+notes = '''
+Section 2.1 (preliminaries.tex), label le:ratio1; the numbers (1) and (2) are shown with \tag. Macros replaced: \rratio -> \Lambda, \genc -> \mathbf{c}, \m -> 1, \mdist -> \mathsf{md} (paper: \textnormal{\textsf{md}}), \cconf{t} as in the thm:pmodel entries. "Cauchy-Schwartz" as printed. The paper renders \le, \leq as \leqslant. The item also states md <= R and md <= Lambda, which the paper does not state as numbered results. v1 and v2 have the same text here.
+'''
+
+[[source]]
+item = "undecided:lem:lb-basic"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri. Plurality consensus in the gossip model"
+venue = "SODA 2015"
+version = "arXiv:1407.2565v2"
+result = "Equations (19) and (20) (proof of Lemma 7)"
+page = 16
+url = "https://arxiv.org/abs/1407.2565v2"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v2 and compared with the PDF of v2; not yet checked by a person"
+statement = '''
+Let us define $\delta = q - n/2$ and let $\Delta'$
+be the random variable $Q' - n/2$ in the next round.
+From (3) we get
+\begin{align}
+\mathbf{E}\left[\left. \Delta' \;\right| \mathbf{c} \right]
+& = \frac{1}{n} \left(2 \delta^2 - \sum_{j=1}^k \left(c_j\right)^2 \right) \tag{19}\\
+\mu_{i} & =
+\left( 1 + \frac{2 \delta + c_i}{n} \right) c_i \tag{20}
+\end{align}
+'''
+context = '''
+[Section 2, p. 5:] Let us consider a complete graph of $n$ anonymous nodes (\emph{agents}): each of them is initially
+colored with one out of $k$ possible colors, where $k = k(n) \in [n]$. [...]
+Accordingly, at each round $t$, the global state
+of the system can be represented by a \emph{color configuration} $\mathbf{c}^{(t)}=\langle c_1^{(t)},\dots,c_k^{(t)}, q^{(t)}\rangle$ where $c_{i}^{(t)}$ is the number of $i$-colored agents, and $q^{(t)}$ is the number of undecided agents.
+
+The Undecided-State Dynamics works as follows.
+According to the (uniform) gossip model,
+at every round $t \geqslant 0$, each agent $u$ chooses a neighbor $v$ uniformly at random and
+decides to get a new color/state according to the rules in Table 1, [Table 1: an undecided agent that chooses an agent of color $i$ gets color $i$; an agent of color $i$ that chooses an agent of color $j \neq i$ becomes undecided; in all other cases the agent keeps its state.]
+
+[Section 2.1, p. 6:] If we condition the system to be in a fixed state $\mathbf{c}$ at a generic round,
+the random sizes of the $i$-color communities and that of the undecided community at the next round will
+be denoted as $C_{i}'$ and $Q'$, respectively.
+
+For brevity' sake, we define
+\begin{align*}
+	\mu_{i} := \mathbf{E}\left[\left. C_{i}' \;\right| \mathbf{c} \right] \,\,\, (i \in [ k ]),
+	\quad
+	\mu := \mathbf{E}\left[\left. \sum_iC_i' \;\right| \mathbf{c} \right]
+	\quad \mbox{ and }
+	\quad
+	\mu_{q} := \mathbf{E}\left[\left. Q' \;\right| \mathbf{c} \right]
+\end{align*}
+
+[Section 3.2, p. 8:] If $\mathbf{c} = \langle c_1,\dots,c_k, q\rangle$ is the current color configuration (i.e. state)
+of the Markov chain, then we can easily derive the ``expectation'' of the
+next color configuration
+\begin{align}
+	\mu_{i} & = \mathbf{E}\left[\left. C_{i}' \;\right| \bar{\mathbf{c}} \right] = c_{i} \cdot \frac{c_{i}+2q}{n} \quad (i \in \left[ k \right]) \tag{3}\\
+	\mu_{q} & = \mathbf{E}\left[\left. Q' \;\right| \bar{\mathbf{c}} \right] = \frac{q^{2}+\sum_{i\neq j}c_{i}\cdot c_{j}}{n}=\frac{q^{2}+\left(n-q\right)^{2}-\sum_{i} c_{i}^{2}}{n} \tag{4}
+\end{align}
+'''
+notes = '''
+First lines of the proof of Lemma 7 (middleage.tex), labels eq:lb_av_delta and eq:lb_av_cm; the paper's eqnarray is written as align, with the numbers shown by \tag. As printed, the sentence before (19) and (20) refers to (3). The bracketed summary of Table 1 in the context is not a quotation (the full table is in the undecided:thm:pmodel entry for Section 2). Macros replaced: \expec{X}{Y} -> \mathbf{E}\left[\left. X \;\right| Y \right], \genc -> \mathbf{c}, \medi -> \mu_{i}, \medq -> \mu_{q}, \Med -> \mu, \ccgen and \cconf{t} written out. v1 and v2 have the same text here.
+'''
+
+# ---------------------------------------------------------------------------------------------
+# [BCNPS15] The lower bound: Lemma 3, Lemma 6 with (16) and (17), Lemma 7
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+item = "undecided:lem:lb-first"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri. Plurality consensus in the gossip model"
+venue = "SODA 2015"
+version = "arXiv:1407.2565v2"
+result = "Lemma 3"
+page = 11
+url = "https://arxiv.org/abs/1407.2565v2"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v2 and compared with the PDF of v2; not yet checked by a person"
+statement = '''
+Let $k = o\left(\sqrt{n/\log n}\right)$. Given any initial color configuration $\bar{\mathbf{c}}$, after the first round w.h.p. it holds:
+\[
+\frac{1}{2} \, \frac{n}{ R(\bar{\mathbf{c}})^2} \ \leqslant \ C_{1}' \leqslant \ 2 \,
+\frac{n}{ R(\bar{\mathbf{c}})^2} \ \mbox{ and } \
+{n}\left(1 - \frac{2} { \Lambda(\bar{\mathbf{c}})} \right) \ \leqslant \ Q'
+\ \leqslant \ {n}\left(1 - \frac{1} { 2 \Lambda(\bar{\mathbf{c}})} \right)
+\]
+'''
+context = '''
+[Section 1, p. 2, footnote 1:] As usual, we say that an event $\mathcal{E}_n$ holds
+w.h.p. if $\mathbf{P}\left(\mathcal{E}_n\right)\ge 1 - n^{-\Theta(1)}$.
+
+[Section 2, p. 5:] Let us consider a complete graph of $n$ anonymous nodes (\emph{agents}): each of them is initially
+colored with one out of $k$ possible colors, where $k = k(n) \in [n]$. It is assumed that
+there is an initial \emph{plurality} $c_{1} > n/k$ of agents colored with the \emph{plurality color} $1$. [...]
+Accordingly, at each round $t$, the global state
+of the system can be represented by a \emph{color configuration} $\mathbf{c}^{(t)}=\langle c_1^{(t)},\dots,c_k^{(t)}, q^{(t)}\rangle$ where $c_{i}^{(t)}$ is the number of $i$-colored agents, and $q^{(t)}$ is the number of undecided agents.
+In the sequel, wlog, we will assume that $c_i \geq c_{i+1}$ for any $i \leq k-1$.
+
+The Undecided-State Dynamics works as follows.
+According to the (uniform) gossip model,
+at every round $t \geqslant 0$, each agent $u$ chooses a neighbor $v$ uniformly at random and
+decides to get a new color/state according to the rules in Table 1, [Table 1: an undecided agent that chooses an agent of color $i$ gets color $i$; an agent of color $i$ that chooses an agent of color $j \neq i$ becomes undecided; in all other cases the agent keeps its state.]
+
+[Section 2.1, p. 6:] The set of all possible color configurations will be denoted by $\mathcal{S}$.
+In the initial state we always have $q^{(0)} = 0$. [...]
+If we condition the system to be in a fixed state $\mathbf{c}$ at a generic round,
+the random sizes of the $i$-color communities and that of the undecided community at the next round will
+be denoted as $C_{i}'$ and $Q'$, respectively.
+
+[Section 2.1, p. 6:] Given any color configuration $\mathbf{c}\langle c_1,c_2,\ldots,c_k, q\rangle$,
+consider the following ratio
+\[ R(\mathbf{c}) \ = \ \sum_{i=1}^{k} \frac {c_i}{c_{1}} \]
+[...]
+
+[Section 2.1, p. 7:] [...] recall the definition of \emph{monochromatic distance} (given in the introduction),
+\[ \mathsf{md}(\mathbf{c}) \ = \ \sum_{i=1}^k \, \left(\frac{c_i}{c_{1}}\right)^2 \]
+[...]
+Finally, let us define the following ratio
+\[
+	\Lambda(\mathbf{c}) \ := \ \frac{ R(\mathbf{c} )^2 }{ \mathsf{md}(\mathbf{c}) }
+\]
+
+[Section 3.3, p. 11:] We will implicitly assume that the process starts in a fixed initial
+color configuration
+\[ \bar{\mathbf{c}} =\langle \bar c_{1} ,\bar c_{2} , \ldots,\bar c_{k} \rangle \]
+So, in the next lemmas, events and related probabilities are conditioned on some fixed
+$\bar{\mathbf{c}}$.
+'''
+notes = '''
+Section 3.3 (bigbang.tex), label lem:first_step_bounds; theorem-like environments share one counter, so this is Lemma 3 in v1 and v2. Macros replaced: \genc -> \mathbf{c}, \ratio -> R, \rratio -> \Lambda, \m -> 1, \mdist -> \mathsf{md}, \Prob{}{X} -> \mathbf{P}\left( X \right); a \label inside the display removed. The bracketed summary of Table 1 in the context is not a quotation (the full table is in the undecided:thm:pmodel entry for Section 2).
+'''
+
+[[source]]
+item = "undecided:lem:lb-descent"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri. Plurality consensus in the gossip model"
+venue = "SODA 2015"
+version = "arXiv:1407.2565v2"
+result = "Lemma 6"
+page = 14
+url = "https://arxiv.org/abs/1407.2565v2"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v2 and compared with the PDF of v2; not yet checked by a person"
+statement = '''
+Let $k \leqslant \varepsilon \cdot (n/\log n)^{1/6}$ be the initial number of colors, where $\varepsilon > 0$ is a sufficiently small positive constant.
+Let $\bar{\mathbf{c}}$ be the initial color configuration and let $\mathbf{c}^{(1)}$ be the color configuration after the first round. If it holds that:
+\begin{equation*}
+	\frac{1}{2} \, \frac{n}{ R(\bar{\mathbf{c}})^2} \, \leq c_{1}^{(1)} \leq \, 2 \, \frac{n}{R(\bar{\mathbf{c}})^2}
+	\quad \mbox{ and } \quad
+	n \left(1 - \frac{2 } { \Lambda(\bar{\mathbf{c}})}\right)
+	\, \leq q^{(1)} \leq \, n \left(1 - \frac{ 1 } { 2 \Lambda(\bar{\mathbf{c}})}\right)
+\end{equation*}
+within the next $O(\log n)$ rounds there will be a round $\bar{t}$ such that
+$$
+C^{(\bar{t})}_{1} \leqslant \gamma \frac n{\mathsf{md}(\bar{c})} \ \mbox{and } \ \left| Q^{(\bar{t})} - \frac{n}{2} \right| \, \leq \, 2 \frac{\gamma^2}{\mathsf{md}(\bar{\mathbf{c}})}
+$$
+w.h.p., where $\gamma > 0$ is a sufficiently large constant.
+'''
+context = '''
+[Section 1, p. 2, footnote 1:] As usual, we say that an event $\mathcal{E}_n$ holds
+w.h.p. if $\mathbf{P}\left(\mathcal{E}_n\right)\ge 1 - n^{-\Theta(1)}$.
+
+[Section 2, p. 5:] Let us consider a complete graph of $n$ anonymous nodes (\emph{agents}): each of them is initially
+colored with one out of $k$ possible colors, where $k = k(n) \in [n]$. It is assumed that
+there is an initial \emph{plurality} $c_{1} > n/k$ of agents colored with the \emph{plurality color} $1$. [...]
+Accordingly, at each round $t$, the global state
+of the system can be represented by a \emph{color configuration} $\mathbf{c}^{(t)}=\langle c_1^{(t)},\dots,c_k^{(t)}, q^{(t)}\rangle$ where $c_{i}^{(t)}$ is the number of $i$-colored agents, and $q^{(t)}$ is the number of undecided agents.
+In the sequel, wlog, we will assume that $c_i \geq c_{i+1}$ for any $i \leq k-1$.
+
+The Undecided-State Dynamics works as follows.
+According to the (uniform) gossip model,
+at every round $t \geqslant 0$, each agent $u$ chooses a neighbor $v$ uniformly at random and
+decides to get a new color/state according to the rules in Table 1, [Table 1: an undecided agent that chooses an agent of color $i$ gets color $i$; an agent of color $i$ that chooses an agent of color $j \neq i$ becomes undecided; in all other cases the agent keeps its state.]
+
+[Section 2.1, p. 6:] In the initial state we always have $q^{(0)} = 0$.
+For any time $t \geqslant 0$,
+the execution of one round of the dynamics rule (uniquely) determines the probability distribution of
+the (vectorial) random variable representing the random state at time $t$:
+\[ \mathbf{C}^{(t)}=\langle C_{1}^{(t)},C_{2}^{(t)}, \ldots,C_{k}^{(t)},Q^{(t)}\rangle \]
+[...]
+Thus, $Q^{(t)}$ and $C_i^{\left( t \right)}$ denote
+the r.v.s counting the number of nodes that, respectively, are undecided and that have color $i$ at time $t$.
+
+[Section 2.1, p. 6:] Given any color configuration $\mathbf{c}\langle c_1,c_2,\ldots,c_k, q\rangle$,
+consider the following ratio
+\[ R(\mathbf{c}) \ = \ \sum_{i=1}^{k} \frac {c_i}{c_{1}} \]
+[...]
+
+[Section 2.1, p. 7:] [...] recall the definition of \emph{monochromatic distance} (given in the introduction),
+\[ \mathsf{md}(\mathbf{c}) \ = \ \sum_{i=1}^k \, \left(\frac{c_i}{c_{1}}\right)^2 \]
+[...]
+Finally, let us define the following ratio
+\[
+	\Lambda(\mathbf{c}) \ := \ \frac{ R(\mathbf{c} )^2 }{ \mathsf{md}(\mathbf{c}) }
+\]
+'''
+notes = '''
+Section 3.4 (afterbigbang.tex), label lem:lb_phase2; Lemma 6 in v1 and v2. As printed, the bound on C_1 uses md(\bar{c}) (LaTeX \mdist(\bar{c}), where the rest of the paper has \bar{\genc}), and the window on Q is printed as 2\gamma^2/md(\bar{\mathbf{c}}), without a factor n; the proof of the lemma works with the interval [n/2 - 2\gamma^2 n/md, n/2 + 2\gamma^2 n/md] (see the entry for (17)). Macros replaced: \genc -> \mathbf{c}, \ratio -> R, \rratio -> \Lambda, \m -> 1, \mdist -> \mathsf{md}, \genC -> \mathbf{C}. The bracketed summary of Table 1 in the context is not a quotation.
+'''
+
+[[source]]
+item = "undecided:lem:lb-descent"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri. Plurality consensus in the gossip model"
+venue = "SODA 2015"
+version = "arXiv:1407.2565v2"
+result = "Equation (16) (proof of Lemma 6)"
+page = 14
+url = "https://arxiv.org/abs/1407.2565v2"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v2 and compared with the PDF of v2; not yet checked by a person"
+statement = '''
+First, we prove that if at an arbitrary round $t$ the number of undecided nodes is
+$q = (1+\delta)(n/2)$ with $1/\mathsf{md}(\bar{\mathbf{c}}) \leq \delta \leq 1 - (2\Lambda(\bar{\mathbf{c}}))^{-1}$,
+then at the next round it holds that $Q' \leq \left(1 + \delta^2\right)(n/2)$ w.h.p.
+[...]
+\begin{align}
+	\mathbf{P}\left(\left. Q' \geq \left( 1 + \delta^2 \right) \frac{n}{2} \;\right| \mathbf{c} \right)
+	& \leq \exp\left( -\frac{n}{128 k^6} \right)\leq n^{-1/\left( 128 \varepsilon^6 \right)} \tag{16}
+\end{align}
+where in the last inequality we used the hypothesis on $k$.
+'''
+context = '''
+[Section 3.4, p. 14, statement of Lemma 6 (the proof of which contains (16)):]
+Let $k \leqslant \varepsilon \cdot (n/\log n)^{1/6}$ be the initial number of colors, where $\varepsilon > 0$ is a sufficiently small positive constant.
+Let $\bar{\mathbf{c}}$ be the initial color configuration and let $\mathbf{c}^{(1)}$ be the color configuration after the first round. If it holds that:
+\begin{equation*}
+	\frac{1}{2} \, \frac{n}{ R(\bar{\mathbf{c}})^2} \, \leq c_{1}^{(1)} \leq \, 2 \, \frac{n}{R(\bar{\mathbf{c}})^2}
+	\quad \mbox{ and } \quad
+	n \left(1 - \frac{2 } { \Lambda(\bar{\mathbf{c}})}\right)
+	\, \leq q^{(1)} \leq \, n \left(1 - \frac{ 1 } { 2 \Lambda(\bar{\mathbf{c}})}\right)
+\end{equation*}
+within the next $O(\log n)$ rounds there will be a round $\bar{t}$ such that
+$$
+C^{(\bar{t})}_{1} \leqslant \gamma \frac n{\mathsf{md}(\bar{c})} \ \mbox{and } \ \left| Q^{(\bar{t})} - \frac{n}{2} \right| \, \leq \, 2 \frac{\gamma^2}{\mathsf{md}(\bar{\mathbf{c}})}
+$$
+w.h.p., where $\gamma > 0$ is a sufficiently large constant.
+
+[Section 1, p. 2, footnote 1:] As usual, we say that an event $\mathcal{E}_n$ holds
+w.h.p. if $\mathbf{P}\left(\mathcal{E}_n\right)\ge 1 - n^{-\Theta(1)}$.
+
+[Section 2, p. 5:] [...] at each round $t$, the global state
+of the system can be represented by a \emph{color configuration} $\mathbf{c}^{(t)}=\langle c_1^{(t)},\dots,c_k^{(t)}, q^{(t)}\rangle$ where $c_{i}^{(t)}$ is the number of $i$-colored agents, and $q^{(t)}$ is the number of undecided agents.
+[...] at every round $t \geqslant 0$, each agent $u$ chooses a neighbor $v$ uniformly at random and
+decides to get a new color/state according to the rules in Table 1, [Table 1: an undecided agent that chooses an agent of color $i$ gets color $i$; an agent of color $i$ that chooses an agent of color $j \neq i$ becomes undecided; in all other cases the agent keeps its state.]
+
+[Section 2.1, p. 6:] If we condition the system to be in a fixed state $\mathbf{c}$ at a generic round,
+the random sizes of the $i$-color communities and that of the undecided community at the next round will
+be denoted as $C_{i}'$ and $Q'$, respectively.
+[...] Finally, we often write $\mathbf{P}\left(A\right)$ for
+$\mathbf{P}\left(A|B\right)$ when the conditioning event $B$ is
+clear from context.
+
+[Section 2.1, pp. 6-7:] $R(\mathbf{c}) = \sum_{i=1}^{k} \frac {c_i}{c_{1}}$, \quad
+$\mathsf{md}(\mathbf{c}) = \sum_{i=1}^k \, \left(\frac{c_i}{c_{1}}\right)^2$, \quad
+$\Lambda(\mathbf{c}) := \frac{ R(\mathbf{c} )^2 }{ \mathsf{md}(\mathbf{c}) }$
+'''
+notes = '''
+In the proof of Lemma 6 (afterbigbang.tex), label eq:superexp_decreasing_of_q; the paper's eqnarray is written as align, with the number shown by \tag. The omitted text ([...]) is the computation of \mu_q and the sentence "Therefore, since Q' is a sum of independent Bernoulli r.v., from the Chernoff bound (Lemma 16 with \lambda = 1/16k^3) it follows that". The last line of the context gathers the three displayed definitions of Section 2.1 (quoted in full in the Lemma 6 entry). Macros replaced: \probc{X}{Y} -> \mathbf{P}\left(\left. X \;\right| Y \right), \genc -> \mathbf{c}, \rratio -> \Lambda, \ratio -> R, \mdist -> \mathsf{md}, \m -> 1. The bracketed summary of Table 1 is not a quotation.
+'''
+
+[[source]]
+item = "undecided:lem:lb-descent"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri. Plurality consensus in the gossip model"
+venue = "SODA 2015"
+version = "arXiv:1407.2565v2"
+result = "Equation (17) (proof of Lemma 6)"
+page = 15
+url = "https://arxiv.org/abs/1407.2565v2"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v2 and compared with the PDF of v2; not yet checked by a person"
+statement = '''
+Now we show that the number $Q$ of undecided nodes, while decreasing quickly, cannot jump over the whole interval
+$$
+\left[\frac{n}{2} - 2 \gamma^2 \frac{n}{\mathsf{md}(\bar{\mathbf{c}})}, \; \frac{n}{2} + 2 \gamma^2 \frac{n}{\mathsf{md}(\bar{\mathbf{c}})} \right]
+$$
+[...] Hence if at some round $t$ we have that $q \geqslant (n/2)\left(1 + 4 \gamma^2/\mathsf{md}(\bar{\mathbf{c}})\right)$ and $c_1 \leqslant \gamma n /\mathsf{md}(\bar{\mathbf{c}})$, in~(4) we get
+\begin{align*}
+\mu_{q} & \geqslant \frac{1}{n} \left( \left( \frac{n}{2} + 2 \gamma^2 \frac{n}{\mathsf{md}(\bar{\mathbf{c}})} \right)^2 + \left( \frac{n}{2} + 2 \gamma^2 \frac{n}{\mathsf{md}(\bar{\mathbf{c}})} \right)^2 - \sum_{j=1}^k c_j^2 \right) \\
+& = \frac{n}{2} + 4 \gamma^4 \frac{n}{\mathsf{md}(\bar{\mathbf{c}})^2} - \frac{1}{n} \sum_{j=1}^k \left(c_j\right)^2 \\
+& \geqslant \frac{n}{2} - \frac{1}{n} \sum_{j=1}^k \left(c_j\right)^2 = \frac{n}{2} - \frac{\left(c_1\right)^2 \mathsf{md}(\bar{\mathbf{c}})}{n} \geqslant \frac{n}{2} - \gamma^2 \frac{n}{\mathsf{md}(\bar{\mathbf{c}})}
+\end{align*}
+where in the last inequality we used that $c_1 \leqslant \gamma n /\mathsf{md}(\bar{\mathbf{c}})$. Since $Q'$ is a sum of $n$ independent Bernoulli r.v., from Chernoff bound it follows that
+\begin{align}
+	\mathbf{P}\left(\left. Q' \leqslant n/2 - 2 \gamma^2 n / \mathsf{md}(\bar{\mathbf{c}}) \;\right| \mathbf{c} \right)
+& \leqslant \exp \left( - 2 \gamma^2 \frac{n}{\mathsf{md}(\bar{\mathbf{c}})^2} \right)
+\leqslant \exp \left( - 2 \gamma^2 \frac{n}{k^2} \right) \nonumber\\
+& \leqslant \exp \left( - \Omega\left( n^{2/3} \right) \right) \tag{17}
+\end{align}
+'''
+context = '''
+[Section 3.4, p. 14, statement of Lemma 6 (the proof of which contains (17)):]
+Let $k \leqslant \varepsilon \cdot (n/\log n)^{1/6}$ be the initial number of colors, where $\varepsilon > 0$ is a sufficiently small positive constant.
+Let $\bar{\mathbf{c}}$ be the initial color configuration and let $\mathbf{c}^{(1)}$ be the color configuration after the first round. If it holds that:
+\begin{equation*}
+	\frac{1}{2} \, \frac{n}{ R(\bar{\mathbf{c}})^2} \, \leq c_{1}^{(1)} \leq \, 2 \, \frac{n}{R(\bar{\mathbf{c}})^2}
+	\quad \mbox{ and } \quad
+	n \left(1 - \frac{2 } { \Lambda(\bar{\mathbf{c}})}\right)
+	\, \leq q^{(1)} \leq \, n \left(1 - \frac{ 1 } { 2 \Lambda(\bar{\mathbf{c}})}\right)
+\end{equation*}
+within the next $O(\log n)$ rounds there will be a round $\bar{t}$ such that
+$$
+C^{(\bar{t})}_{1} \leqslant \gamma \frac n{\mathsf{md}(\bar{c})} \ \mbox{and } \ \left| Q^{(\bar{t})} - \frac{n}{2} \right| \, \leq \, 2 \frac{\gamma^2}{\mathsf{md}(\bar{\mathbf{c}})}
+$$
+w.h.p., where $\gamma > 0$ is a sufficiently large constant.
+
+[Section 2, p. 5:] [...] at each round $t$, the global state
+of the system can be represented by a \emph{color configuration} $\mathbf{c}^{(t)}=\langle c_1^{(t)},\dots,c_k^{(t)}, q^{(t)}\rangle$ where $c_{i}^{(t)}$ is the number of $i$-colored agents, and $q^{(t)}$ is the number of undecided agents.
+In the sequel, wlog, we will assume that $c_i \geq c_{i+1}$ for any $i \leq k-1$.
+[...] at every round $t \geqslant 0$, each agent $u$ chooses a neighbor $v$ uniformly at random and
+decides to get a new color/state according to the rules in Table 1, [Table 1: an undecided agent that chooses an agent of color $i$ gets color $i$; an agent of color $i$ that chooses an agent of color $j \neq i$ becomes undecided; in all other cases the agent keeps its state.]
+
+[Section 2.1, p. 6:] If we condition the system to be in a fixed state $\mathbf{c}$ at a generic round,
+the random sizes of the $i$-color communities and that of the undecided community at the next round will
+be denoted as $C_{i}'$ and $Q'$, respectively. [...] $\mu_{q} := \mathbf{E}\left[\left. Q' \;\right| \mathbf{c} \right]$
+
+[Section 2.1, pp. 6-7:] $R(\mathbf{c}) = \sum_{i=1}^{k} \frac {c_i}{c_{1}}$, \quad
+$\mathsf{md}(\mathbf{c}) = \sum_{i=1}^k \, \left(\frac{c_i}{c_{1}}\right)^2$, \quad
+$\Lambda(\mathbf{c}) := \frac{ R(\mathbf{c} )^2 }{ \mathsf{md}(\mathbf{c}) }$
+
+[Section 3.2, p. 8:]
+\begin{align}
+	\mu_{q} & = \mathbf{E}\left[\left. Q' \;\right| \bar{\mathbf{c}} \right] = \frac{q^{2}+\sum_{i\neq j}c_{i}\cdot c_{j}}{n}=\frac{q^{2}+\left(n-q\right)^{2}-\sum_{i} c_{i}^{2}}{n} \tag{4}
+\end{align}
+'''
+notes = '''
+In the proof of Lemma 6 (afterbigbang.tex), label eq:q_not_too_below_nhalf; the paper's eqnarray environments are written as align, with the number shown by \tag. The omitted text ([...]) is the sentence "Observe that function f(q) = q^2 + (n-q)^2 has a minimum for q = n/2, so for any q >= n/2 + 2\gamma^2 n/md it holds that f(q) >= f(n/2 + 2\gamma^2 n/md)." As printed, the computation uses \sum_j c_j^2 = c_1^2 md(\bar{\mathbf{c}}), with the monochromatic distance of the initial configuration. The w.h.p. convention and the model are quoted in the entry for (16). Macros replaced: \medq -> \mu_{q}, \probc{X}{Y} -> \mathbf{P}\left(\left. X \;\right| Y \right), \genc -> \mathbf{c}, \mdist -> \mathsf{md}, \rratio -> \Lambda, \ratio -> R, \m -> 1. The bracketed summary of Table 1 is not a quotation.
+'''
+
+[[source]]
+item = "undecided:lem:lb-plateau"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri. Plurality consensus in the gossip model"
+venue = "SODA 2015"
+version = "arXiv:1407.2565v2"
+result = "Lemma 7"
+page = 16
+url = "https://arxiv.org/abs/1407.2565v2"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v2 and compared with the PDF of v2; not yet checked by a person"
+statement = '''
+Let $\bar{\mathbf{c}}$ be the initial color configuration, let $k \leqslant \varepsilon \cdot (n/\log n)^{1/4}$ be the initial number of colors, where $\varepsilon > 0$ is a sufficiently small positive constant. If there is a round $\bar{t}$ such that
+$$
+\left| q^{(\bar{t})} - \frac{n}{2} \right| \, \leq \;
+2 \gamma^2 \frac{n}{\mathsf{md}(\bar{\mathbf{c}})}
+\qquad \mbox{ and }\qquad
+c_{1}^{(\bar{t})} \leqslant \gamma (n/\mathsf{md}(\bar{\mathbf{c}}))
+$$
+(where $\gamma$ is an arbitrary positive constant),
+then the plurality $C_{1}$ remains smaller than $2 \gamma (n / \mathsf{md}(\bar{\mathbf{c}}))$
+for the next $\Omega(\mathsf{md}(\bar{\mathbf{c}}))$ rounds w.h.p.
+'''
+context = '''
+[Section 1, p. 2, footnote 1:] As usual, we say that an event $\mathcal{E}_n$ holds
+w.h.p. if $\mathbf{P}\left(\mathcal{E}_n\right)\ge 1 - n^{-\Theta(1)}$.
+
+[Section 2, p. 5:] Let us consider a complete graph of $n$ anonymous nodes (\emph{agents}): each of them is initially
+colored with one out of $k$ possible colors, where $k = k(n) \in [n]$. It is assumed that
+there is an initial \emph{plurality} $c_{1} > n/k$ of agents colored with the \emph{plurality color} $1$. [...]
+Accordingly, at each round $t$, the global state
+of the system can be represented by a \emph{color configuration} $\mathbf{c}^{(t)}=\langle c_1^{(t)},\dots,c_k^{(t)}, q^{(t)}\rangle$ where $c_{i}^{(t)}$ is the number of $i$-colored agents, and $q^{(t)}$ is the number of undecided agents.
+In the sequel, wlog, we will assume that $c_i \geq c_{i+1}$ for any $i \leq k-1$.
+
+The Undecided-State Dynamics works as follows.
+According to the (uniform) gossip model,
+at every round $t \geqslant 0$, each agent $u$ chooses a neighbor $v$ uniformly at random and
+decides to get a new color/state according to the rules in Table 1, [Table 1: an undecided agent that chooses an agent of color $i$ gets color $i$; an agent of color $i$ that chooses an agent of color $j \neq i$ becomes undecided; in all other cases the agent keeps its state.]
+
+[Section 2.1, p. 6:] In the initial state we always have $q^{(0)} = 0$.
+For any time $t \geqslant 0$,
+the execution of one round of the dynamics rule (uniquely) determines the probability distribution of
+the (vectorial) random variable representing the random state at time $t$:
+\[ \mathbf{C}^{(t)}=\langle C_{1}^{(t)},C_{2}^{(t)}, \ldots,C_{k}^{(t)},Q^{(t)}\rangle \]
+[...]
+In general,
+lower-case letters will be used to denote functions of
+the observed color configuration at any specified time.
+Upper-case letters instead will denote \emph{random variables}.
+
+[Section 2.1, p. 7:] [...] recall the definition of \emph{monochromatic distance} (given in the introduction),
+\[ \mathsf{md}(\mathbf{c}) \ = \ \sum_{i=1}^k \, \left(\frac{c_i}{c_{1}}\right)^2 \]
+'''
+notes = '''
+Section 3.5 (middleage.tex), label lem:lb_plateau; Lemma 7 in v1 and v2. The proof uses \mathsf{md}(\bar{\mathbf{c}}) >= 8\gamma^2 ("we simply assumed that md is a sufficiently large constant"). Macros replaced: \genc -> \mathbf{c}, \m -> 1, \mdist -> \mathsf{md}, \genC -> \mathbf{C}. The bracketed summary of Table 1 in the context is not a quotation.
+'''
+
+# ---------------------------------------------------------------------------------------------
+# [BCNPS15] Theorem 11 for the two-colour item (the same theorem is the source of
+# undecided:thm:plurality in verification/sources.toml)
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+item = "undecided:thm:majority"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, R. Silvestri. Plurality consensus in the gossip model"
+venue = "SODA 2015"
+version = "arXiv:1407.2565v2"
+result = "Theorem 11"
+page = 20
+url = "https://arxiv.org/abs/1407.2565v2"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v2 and compared with the PDF of v2; not yet checked by a person"
+statement = '''
+Let $k=O\left( (n/\log n)^{1/3} \right)$
+and let $\bar c$ be any initial configuration such that for any $i\neq 1$
+$c_{1}\geq\left(1+\alpha\right)\cdot c_{i}$ holds, where
+$\alpha$ is an arbitrarily small positive constant.
+Then, w.h.p. after at most $T=O\left(\mathsf{md}(\bar{\mathbf{c}})\cdot\log n\right)$ time steps
+all agents support the initial plurality color.
+'''
+context = '''
+[Section 1, p. 2, footnote 1:] As usual, we say that an event $\mathcal{E}_n$ holds
+w.h.p. if $\mathbf{P}\left(\mathcal{E}_n\right)\ge 1 - n^{-\Theta(1)}$.
+
+[Section 2, p. 5:] Let us consider a complete graph of $n$ anonymous nodes (\emph{agents}): each of them is initially
+colored with one out of $k$ possible colors, where $k = k(n) \in [n]$. It is assumed that
+there is an initial \emph{plurality} $c_{1} > n/k$ of agents colored with the \emph{plurality color} $1$.
+A synchronous protocol for the \emph{plurality problem} is a finite set of local rules (applied by
+every agent) that bring the system
+into the \emph{target} configuration where all agents are colored by $1$.
+[...]
+Accordingly, at each round $t$, the global state
+of the system can be represented by a \emph{color configuration} $\mathbf{c}^{(t)}=\langle c_1^{(t)},\dots,c_k^{(t)}, q^{(t)}\rangle$ where $c_{i}^{(t)}$ is the number of $i$-colored agents, and $q^{(t)}$ is the number of undecided agents.
+In the sequel, wlog, we will assume that $c_i \geq c_{i+1}$ for any $i \leq k-1$.
+
+The Undecided-State Dynamics works as follows.
+According to the (uniform) gossip model,
+at every round $t \geqslant 0$, each agent $u$ chooses a neighbor $v$ uniformly at random and
+decides to get a new color/state according to the rules in Table 1, [Table 1: an undecided agent that chooses an agent of color $i$ gets color $i$; an agent of color $i$ that chooses an agent of color $j \neq i$ becomes undecided; in all other cases the agent keeps its state.]
+
+[Section 2.1, p. 6:] In the initial state we always have $q^{(0)} = 0$.
+
+[Section 2.1, p. 7:] [...] recall the definition of \emph{monochromatic distance} (given in the introduction),
+\[ \mathsf{md}(\mathbf{c}) \ = \ \sum_{i=1}^k \, \left(\frac{c_i}{c_{1}}\right)^2 \]
+'''
+notes = '''
+Section 3.6 (supremacy.tex), label thm:upperB; Theorem 11 in v1 and v2. The blueprint item undecided:thm:majority uses this theorem with k = 2 (no undecided nodes and c_1 >= (1 + alpha) c_2); the paper has no separate two-colour statement. Macros replaced: \m -> 1, \cdist -> \mathsf{md}(\bar{\mathbf{c}}) (paper: \mbox{\textsf{md}}(\bar \genc)), \genc -> \mathbf{c}, \mdist -> \mathsf{md}. The bracketed summary of Table 1 in the context is not a quotation.
+'''
+
+# ---------------------------------------------------------------------------------------------
+# [CGGNPS18] The binary model (def:usd), its expectations (thm:expect) and absorbing states
+# (thm:absorbed)
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+item = "undecided:def:usd"
+paper = "A. Clementi, M. Ghaffari, L. Gualà, E. Natale, F. Pasquale, G. Scornavacca. A tight analysis of the parallel undecided-state dynamics with two colors"
+venue = "MFCS 2018"
+version = "arXiv:1707.05135v3"
+result = "Section 2, U-Dynamics with two colors (Table 1)"
+page = 6
+url = "https://arxiv.org/abs/1707.05135v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+We analyze the parallel version of the dynamics called U-Dynamics in the
+(uniform) $\mathcal{PULL}$ model on the complete graph:
+Starting from an initial configuration where every node supports a color, i.e.
+a value from a set $\Sigma$ of $k$ possible colors, at every round, each node $u$
+pulls the color of a randomly-selected neighbor $v$. If the color of node $v$
+differs from its own color, then node $u$ enters in an \textit{undecided}
+state (an extra state with no color).
+When a node is in the undecided state and pulls a color, it gets that color.
+Finally, a node that pulls either an undecided node or a node with its
+own color remains in its current state.
+
+\begin{tabular}{|c||c|c|c|}
+\hline
+$u\big\backslash v$ & undecided & color $i$ & color $j$\tabularnewline
+\hline
+\hline
+undecided & undecided & $i$ & $j$\tabularnewline
+\hline
+$i$ & $i$ & $i$ & undecided\tabularnewline
+\hline
+$j$ & $j$ & undecided & $j$\tabularnewline
+\hline
+\end{tabular}
+
+Table 1: The update rule of the U-Dynamics where $i,j\in\left[k\right]$ and $i\neq j$.
+
+In this paper we consider the case in which there are two possible colors (say
+color \texttt{Alpha} and color \texttt{Beta}). Let us name $\mathcal{C}$ the space of all
+possible configurations and observe that, since the graph is complete,
+a configuration $\textbf{x} \in \mathcal{C}$ is uniquely determined by fixing the
+number of \texttt{Alpha}-colored nodes and the number of \texttt{Beta}-colored ones,
+say $a(\textbf{x})$ and $b(\textbf{x})$, respectively.
+
+It is convenient to give names also to two other quantities that will appear
+often in the analysis: The number $q(\textbf{x}) = n - a(\textbf{x}) - b(\textbf{x})$ of undecided
+nodes and the difference $s(\textbf{x}) = a(\textbf{x}) - b(\textbf{x})$ called the \textit{bias} of $\textbf{x}$.
+'''
+context = '''
+[Section 1, p. 2:] We study the consensus problem in the \emph{$\mathcal{PULL}$ communication model}
+[13, 17, 23] where, at every round, each active node of a
+communication network contacts one neighbor uniformly at random to pull
+information.
+
+[Section 2, p. 6, footnote 6:] W.l.o.g. we can define $\Sigma = [k]$ where $[k] = \{1,2,\cdots,k\}$
+
+[Section 2, p. 6:] Observe that the U-Dynamics defines a finite-state Markov chain
+$\{\textbf{X}_t \}_{t \geq 0}$ with state space $\mathcal{C}$ and three absorbing states,
+namely, $q = n$, $a = n$, and $b = n$. We call \emph{U-Process} the random
+process obtained by applying the U-Dynamics starting at a given state.
+'''
+notes = '''
+Section 2 (preliminaries.tex), first paragraphs and Table 1. The library's binary model (opinions a, b and the undecided state, every node sampling one node uniformly) is this U-Dynamics with Alpha, Beta written a, b; whether the sampled neighbor may be u itself is not stated. Macros replaced: \threestate -> the text "U-Dynamics" (paper: $\textrm{U-Dynamics}$), \threestateprocess -> the text "U-Process", \pull -> $\mathcal{PULL}$, \colA -> \texttt{Alpha}, \colB -> \texttt{Beta}, \x -> \textbf{x}, \X -> \textbf{X}; the footnote mark after "colors" removed (footnote 6 is in the context); citations replaced by the printed numbers. The paper renders \geq as \geqslant.
+'''
+
+[[source]]
+item = "undecided:thm:expect"
+paper = "A. Clementi, M. Ghaffari, L. Gualà, E. Natale, F. Pasquale, G. Scornavacca. A tight analysis of the parallel undecided-state dynamics with two colors"
+venue = "MFCS 2018"
+version = "arXiv:1707.05135v3"
+result = "Equations (1) to (3) (Section 2)"
+page = 6
+url = "https://arxiv.org/abs/1707.05135v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+From the definition of U-Dynamics it is easy to calculate the following
+expected values (see also Section~3 in [5]):
+\begin{align}
+\mathbf{E}\left[A \, \vert \, \textbf{X}_t = \textbf{x}\right] & = a \left(\frac{a + 2q}{n}\right) \, , \tag{1} \\
+\mathbf{E}\left[Q \, \vert \, \textbf{X}_t = \textbf{x}\right] & = \frac{q^2 + 2ab}{n} \, , \tag{2} \\
+\mathbf{E}\left[S \, \vert \, \textbf{X}_t = \textbf{x}\right] & = \frac{a(a + 2q)}{n} - \frac{b(b + 2q)}{n}
+= s\left(1 + \frac{q}{n}\right) \, . \tag{3}
+\end{align}
+'''
+context = '''
+[Section 2, p. 6:] We analyze the parallel version of the dynamics called U-Dynamics in the
+(uniform) $\mathcal{PULL}$ model on the complete graph:
+Starting from an initial configuration where every node supports a color, i.e.
+a value from a set $\Sigma$ of $k$ possible colors, at every round, each node $u$
+pulls the color of a randomly-selected neighbor $v$. If the color of node $v$
+differs from its own color, then node $u$ enters in an \textit{undecided}
+state (an extra state with no color).
+When a node is in the undecided state and pulls a color, it gets that color.
+Finally, a node that pulls either an undecided node or a node with its
+own color remains in its current state.
+
+In this paper we consider the case in which there are two possible colors (say
+color \texttt{Alpha} and color \texttt{Beta}). Let us name $\mathcal{C}$ the space of all
+possible configurations and observe that, since the graph is complete,
+a configuration $\textbf{x} \in \mathcal{C}$ is uniquely determined by fixing the
+number of \texttt{Alpha}-colored nodes and the number of \texttt{Beta}-colored ones,
+say $a(\textbf{x})$ and $b(\textbf{x})$, respectively.
+
+It is convenient to give names also to two other quantities that will appear
+often in the analysis: The number $q(\textbf{x}) = n - a(\textbf{x}) - b(\textbf{x})$ of undecided
+nodes and the difference $s(\textbf{x}) = a(\textbf{x}) - b(\textbf{x})$ called the \textit{bias} of $\textbf{x}$.
+Notice that any two of the quantities
+$a(\textbf{x}), b(\textbf{x}), q(\textbf{x})$, and $s(\textbf{x})$ uniquely determine the configuration.
+When it will be clear from the context, we will omit $\textbf{x}$ and write $a, b, q$,
+and $s$ instead of $a(\textbf{x}), b(\textbf{x}), q(\textbf{x})$, and $s(\textbf{x})$.
+
+Observe that the U-Dynamics defines a finite-state Markov chain
+$\{\textbf{X}_t \}_{t \geq 0}$ with state space $\mathcal{C}$ and three absorbing states,
+namely, $q = n$, $a = n$, and $b = n$. We call \emph{U-Process} the random
+process obtained by applying the U-Dynamics starting at a given state.
+Once we fix the configuration $\textbf{x}$ at round
+$t$ of the process, i.e. $\textbf{X}_t = \textbf{x}$, we use the capital letters $A,B,Q$, and $S$ to
+refer to the random variables $a(\textbf{X}_{t+1}), b(\textbf{X}_{t+1}), q(\textbf{X}_{t+1})$, $s(\textbf{X}_{t+1})$.
+'''
+notes = '''
+Section 2 (preliminaries.tex), labels exp:a, exp:q, exp:s; the numbers are shown with \tag (the sentence starts on p. 6, the equations are on p. 7). [5] is BCNPS15 (Plurality consensus in the gossip model, SODA 2015). The library's formulas a(n - b + q)/n and b(n - a + q)/n equal a(a + 2q)/n and b(b + 2q)/n since a + b + q = n. Macros replaced: \Ex{}{X} -> \mathbf{E}\left[X\right], \threestate -> the text "U-Dynamics", \threestateprocess -> the text "U-Process", \pull -> $\mathcal{PULL}$, \colA -> \texttt{Alpha}, \colB -> \texttt{Beta}, \x -> \textbf{x}, \X -> \textbf{X}; \cite replaced by the printed number. The PULL model of the introduction is quoted in the undecided:def:usd entry.
+'''
+
+[[source]]
+item = "undecided:thm:absorbed"
+paper = "A. Clementi, M. Ghaffari, L. Gualà, E. Natale, F. Pasquale, G. Scornavacca. A tight analysis of the parallel undecided-state dynamics with two colors"
+venue = "MFCS 2018"
+version = "arXiv:1707.05135v3"
+result = "Section 2, three absorbing states"
+page = 6
+url = "https://arxiv.org/abs/1707.05135v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+Observe that the U-Dynamics defines a finite-state Markov chain
+$\{\textbf{X}_t \}_{t \geq 0}$ with state space $\mathcal{C}$ and three absorbing states,
+namely, $q = n$, $a = n$, and $b = n$.
+'''
+context = '''
+[Section 2, p. 6:] We analyze the parallel version of the dynamics called U-Dynamics in the
+(uniform) $\mathcal{PULL}$ model on the complete graph:
+Starting from an initial configuration where every node supports a color, i.e.
+a value from a set $\Sigma$ of $k$ possible colors, at every round, each node $u$
+pulls the color of a randomly-selected neighbor $v$. If the color of node $v$
+differs from its own color, then node $u$ enters in an \textit{undecided}
+state (an extra state with no color).
+When a node is in the undecided state and pulls a color, it gets that color.
+Finally, a node that pulls either an undecided node or a node with its
+own color remains in its current state.
+
+In this paper we consider the case in which there are two possible colors (say
+color \texttt{Alpha} and color \texttt{Beta}). Let us name $\mathcal{C}$ the space of all
+possible configurations and observe that, since the graph is complete,
+a configuration $\textbf{x} \in \mathcal{C}$ is uniquely determined by fixing the
+number of \texttt{Alpha}-colored nodes and the number of \texttt{Beta}-colored ones,
+say $a(\textbf{x})$ and $b(\textbf{x})$, respectively.
+
+It is convenient to give names also to two other quantities that will appear
+often in the analysis: The number $q(\textbf{x}) = n - a(\textbf{x}) - b(\textbf{x})$ of undecided
+nodes and the difference $s(\textbf{x}) = a(\textbf{x}) - b(\textbf{x})$ called the \textit{bias} of $\textbf{x}$.
+'''
+notes = '''
+Section 2 (preliminaries.tex). The library item states that monochromatic configurations (all nodes in the same state, the all-undecided one included) are fixed points and that the probability of not being monochromatic tends to 0; the paper states the three absorbing states here and does not state almost-sure absorption as a separate result (its Theorem 3.1 gives convergence to a monochromatic configuration within O(log n) rounds w.h.p.). Macros replaced: \threestate -> the text "U-Dynamics", \pull -> $\mathcal{PULL}$, \colA -> \texttt{Alpha}, \colB -> \texttt{Beta}, \x -> \textbf{x}, \X -> \textbf{X}. The paper renders \geq as \geqslant.
+'''
+
+# ---------------------------------------------------------------------------------------------
+# [AAE08] The sequential protocol (def:seq) and Theorems 1 and 2 (thm:seq-conv, thm:seq-maj)
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+item = "undecided:def:seq"
+paper = "D. Angluin, J. Aspnes, D. Eisenstat. A simple population protocol for fast robust approximate majority"
+venue = "Distributed Computing 21(2):87-102, 2008"
+version = "journal version (authors' PDF)"
+result = "Sections 2 and 3, the 3-state protocol"
+page = 3
+url = "https://cs.yale.edu/homes/aspnes/papers/approximate-majority-journal.pdf"
+status = "transcribed by an AI agent from the authors' PDF of the journal version (no LaTeX source available); not yet checked by a person"
+statement = '''
+We analyze the behavior of the following population protocol with states $Q = \{b, x, y\}$. The state $b$ is the \textbf{blank}
+state. Row labels give the initiator's state and column
+labels the responder's state.
+\[
+\begin{array}{cccc}
+  & x & b & y \\
+x & (x, x) & (x, x) & (x, b) \\
+b & (b, x) & (b, b) & (b, y) \\
+y & (y, b) & (y, y) & (y, y)
+\end{array}
+\]
+Note that this protocol is \textbf{one-way}: every interaction
+changes at most the responder's state; thus it can be implemented with one-way communication. Only the interactions $xb$, $yb$, $xy$, and $yx$ change the responder's state;
+we may think of these as the only interactions that consume energy. The \textbf{blank configuration} of all $b$'s is stable, but cannot be reached from any non-blank configuration because no interaction can eliminate the last $x$ or
+$y$. The configurations of all $x$'s and all $y$'s are stable, and
+every non-blank configuration can reach at least one of
+them.
+'''
+context = '''
+[Section 2, p. 2:] A \textbf{population protocol} consists of a finite set of states
+$Q$, a finite set of input symbols $X \subseteq Q$, a finite set
+of output symbols $Y$, an output function $\gamma : Q \to Y$,
+and a \textbf{joint transition function} $\delta : Q \times Q \to Q \times Q$. A population protocol is executed by a fixed finite
+\textbf{population} of agents with states in $Q$. For convenience,
+we assume that each agent has an identity $v \in V$, but
+agents do not know their own identities or others'.
+Initially, each agent is assigned a state according to
+an \textbf{input} $x : V \to X$ that maps agent identities to input
+symbols. In the general population protocol model, there
+is an \textbf{interaction graph}, a directed graph $G = (V, A)$
+without self-loops, whose arcs indicate the possible agent
+interactions that may take place. ($G$ is directed because
+we assume that interacting agents are able to break symmetry.) In this paper, $G$ will always be a complete graph.
+During each execution step, an arc $(v, w)$ is chosen
+uniformly at random from $A$. The ``source'' agent $v$ is
+the \textbf{initiator}, and the ``sink'' agent $w$ is the \textbf{responder}.
+These agents update their states jointly according to $\delta$:
+if $v$ is in state $q_v$ and $w$ is in state $q_w$, the state of $v$
+becomes $\delta_1(q_v, q_w)$, the state of $w$ becomes $\delta_2(q_v, q_w)$,
+where $\delta_i$ gives the $i^{th}$ coordinate of the output of $\delta$. The
+states of all other agents are unchanged.
+
+[Section 3, p. 3:] An intuitive description of the process is that agents
+in state $b$ are undecided, while initiators in states $x$ and $y$
+are attempting to convert responders that they meet to
+adopt their respective states. Such an initiator immediately converts an undecided responder, but only succeeds
+in reducing an opposing responder to undecided status.
+'''
+notes = '''
+Version: the authors' PDF of the journal version (a "Distributed Computing manuscript"), linked from J. Aspnes's publication page. Transcribed from the PDF (two-column layout, read from the rendered pages). The protocol table is typeset in the PDF as a plain array (no rules); entry (row r, column c) is the pair (new initiator state, new responder state) when the initiator is in state r and the responder in state c. The library writes x, y and the blank b as a, b and u. The PDF is the authors' "Distributed Computing manuscript" of the journal version; the numbering of Sections 2 to 5 and Theorems 1 and 2 is the one cited by the library.
+'''
+
+[[source]]
+item = "undecided:thm:seq-conv"
+paper = "D. Angluin, J. Aspnes, D. Eisenstat. A simple population protocol for fast robust approximate majority"
+venue = "Distributed Computing 21(2):87-102, 2008"
+version = "journal version (authors' PDF)"
+result = "Theorem 1"
+page = 10
+url = "https://cs.yale.edu/homes/aspnes/papers/approximate-majority-journal.pdf"
+status = "transcribed by an AI agent from the authors' PDF of the journal version (no LaTeX source available); not yet checked by a person"
+statement = '''
+Let $\tau_*$ be the time at which $x = n$ or $y = n$
+first holds. Then for any fixed $c > 0$ and sufficiently large
+$n$,
+\[
+\Pr\left[\tau_* \geq 6769 n \log n + 6773 c n \log n + 2552 n\right] \leq 5 n^{-c}.
+\]
+'''
+context = '''
+[Section 2, p. 2:] [...] In the general population protocol model, there
+is an \textbf{interaction graph}, a directed graph $G = (V, A)$
+without self-loops, whose arcs indicate the possible agent
+interactions that may take place. [...] In this paper, $G$ will always be a complete graph.
+During each execution step, an arc $(v, w)$ is chosen
+uniformly at random from $A$. The ``source'' agent $v$ is
+the \textbf{initiator}, and the ``sink'' agent $w$ is the \textbf{responder}.
+These agents update their states jointly according to $\delta$ [...]. The
+states of all other agents are unchanged.
+
+[Section 2.1, p. 2:] [...] In addition to the $n$ normal agents
+we allow a population to include $z$ Byzantine agents. [...]
+[Section 2.1, p. 3:] [...] We first
+describe our protocol and analyze its behavior without
+Byzantine agents.
+
+[Section 3, p. 3:] We analyze the behavior of the following population protocol with states $Q = \{b, x, y\}$. The state $b$ is the \textbf{blank}
+state. Row labels give the initiator's state and column
+labels the responder's state.
+\[
+\begin{array}{cccc}
+  & x & b & y \\
+x & (x, x) & (x, x) & (x, b) \\
+b & (b, x) & (b, b) & (b, y) \\
+y & (y, b) & (y, y) & (y, y)
+\end{array}
+\]
+[...] The \textbf{blank configuration} of all $b$'s is stable, but cannot be reached from any non-blank configuration because no interaction can eliminate the last $x$ or
+$y$. The configurations of all $x$'s and all $y$'s are stable, and
+every non-blank configuration can reach at least one of
+them.
+
+[Section 4, p. 3:] We show that, from any non-blank initial configuration,
+the 3-state approximate majority protocol converges to
+either all $x$ tokens or all $y$ tokens within $O(n \log n)$ interactions with high probability. [...] (We
+overload $x$, $y$ and $b$ to denote the number of each token
+in a configuration.)
+'''
+notes = '''
+Section 4.8 (Bounding Total Interactions). Version: the authors' PDF of the journal version (a "Distributed Computing manuscript"), linked from J. Aspnes's publication page. Transcribed from the PDF. The theorem does not restate the hypothesis that the initial configuration is non-blank; the opening sentence of Section 4 (in the context) gives it. Time is counted in interactions (steps). The paper does not define "with high probability" separately and does not fix the base of log.
+'''
+
+[[source]]
+item = "undecided:thm:seq-maj"
+paper = "D. Angluin, J. Aspnes, D. Eisenstat. A simple population protocol for fast robust approximate majority"
+venue = "Distributed Computing 21(2):87-102, 2008"
+version = "journal version (authors' PDF)"
+result = "Theorem 2"
+page = 11
+url = "https://cs.yale.edu/homes/aspnes/papers/approximate-majority-journal.pdf"
+status = "transcribed by an AI agent from the authors' PDF of the journal version (no LaTeX source available); not yet checked by a person"
+statement = '''
+With high probability, the 3-state approximate majority protocol converges to the initial majority
+value if the difference between the initial majority and
+initial minority populations is $\omega(\sqrt{n} \log n)$.
+'''
+context = '''
+[Section 2, p. 2:] [...] In the general population protocol model, there
+is an \textbf{interaction graph}, a directed graph $G = (V, A)$
+without self-loops, whose arcs indicate the possible agent
+interactions that may take place. [...] In this paper, $G$ will always be a complete graph.
+During each execution step, an arc $(v, w)$ is chosen
+uniformly at random from $A$. The ``source'' agent $v$ is
+the \textbf{initiator}, and the ``sink'' agent $w$ is the \textbf{responder}.
+These agents update their states jointly according to $\delta$ [...]. The
+states of all other agents are unchanged.
+
+[Section 2.1, p. 2:] [...] In addition to the $n$ normal agents
+we allow a population to include $z$ Byzantine agents. [...]
+[Section 2.1, p. 3:] [...] We first
+describe our protocol and analyze its behavior without
+Byzantine agents.
+
+[Section 3, p. 3:] We analyze the behavior of the following population protocol with states $Q = \{b, x, y\}$. The state $b$ is the \textbf{blank}
+state. Row labels give the initiator's state and column
+labels the responder's state.
+\[
+\begin{array}{cccc}
+  & x & b & y \\
+x & (x, x) & (x, x) & (x, b) \\
+b & (b, x) & (b, b) & (b, y) \\
+y & (y, b) & (y, y) & (y, y)
+\end{array}
+\]
+[...]
+In Sections 4 and 5, we show that with high probability this protocol (a) converges from any non-blank
+configuration to a stable configuration in $O(n \log n)$ interactions; and (b) correctly computes the initial majority
+$x$ or $y$ value provided $\omega(\sqrt{n} \log n)$ more agents carry
+this value in the starting configuration than carry the
+opposing value.
+
+[Section 4, p. 3:] [...] (We
+overload $x$, $y$ and $b$ to denote the number of each token
+in a configuration.)
+
+[Section 4.8, p. 10, Theorem 1:] Let $\tau_*$ be the time at which $x = n$ or $y = n$
+first holds. Then for any fixed $c > 0$ and sufficiently large
+$n$,
+\[
+\Pr\left[\tau_* \geq 6769 n \log n + 6773 c n \log n + 2552 n\right] \leq 5 n^{-c}.
+\]
+'''
+notes = '''
+Section 5 (Correctness of Approximate Majority). Version: the authors' PDF of the journal version (a "Distributed Computing manuscript"), linked from J. Aspnes's publication page. Transcribed from the PDF. The gap is printed as \omega(\sqrt{n} \log n), with log n outside the square root (as in the abstract and in Section 3). Theorem 1 is included in the context because the library item also bounds the number of interactions (the proof of Theorem 2 refers to Theorem 1 for the convergence time). The paper does not define "with high probability" separately.
+'''
+
+# ---------------------------------------------------------------------------------------------
+# [Survey] Section 6 of the survey: absorption (thm:absorbed) and Theorems 23, 28 and 29, which
+# ROADMAP.md cites for UND-2, UND-1 and UND-3
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+item = "undecided:thm:absorbed"
+paper = "L. Becchetti, A. Clementi, E. Natale. Consensus dynamics: an overview"
+venue = "SIGACT News 51(1), 2020"
+version = "HAL preprint hal-02507613v1"
+result = "Section 6.1, absorbing states"
+page = 23
+url = "https://hal.science/hal-02507613v1"
+status = "transcribed by an AI agent from the PDF of the HAL preprint hal-02507613v1 (no LaTeX source available); not yet checked by a person"
+statement = '''
+It is easy to verify that the process yielded by \textsc{Undecided-State} dynamics is a reversible
+finite Markov chain which admits 3 absorbing monochromatic states: $(n, 0, 0), (0, n, 0), (0, 0, n)$.
+Then, standard arguments on Markov chains shows that, starting from any configuration, with
+probability 1, the system converges to one of these absorbing states in finite time.
+'''
+context = '''
+[Section 6, p. 23:] \textbf{Updating rule of the \textsc{Undecided-State} dynamics.} Let us assume that the set of possible
+colors a node can support is $[k]$ and assume that, at a given round, the generic node $u$ samples
+a random node $v$. Then if the color of $v$ differs from that of $u$, the latter enters the \emph{undecided}
+state, an extra state that an agent can support. When an agent is in the undecided state and
+pulls a color, it gets that color. Finally, an agent that pulls either the undecided color or its own
+color remains in its current state (see Table 1).
+
+\begin{tabular}{|c||c|c|c|}
+\hline
+$u\backslash v$ & undecided & color $i$ & color $j$\\
+\hline
+undecided & undecided & $i$ & $j$\\
+\hline
+$i$ & $i$ & $i$ & undecided\\
+\hline
+$j$ & $j$ & undecided & $j$\\
+\hline
+\end{tabular}
+
+Table 1: The update rule of the \textsc{Undecided-State} dynamics where $i, j \in [k]$ and $i \neq j$ are the
+colors a node can support.
+
+[Section 6.1, p. 23:] In [AAE08], Angluin et al study the \textsc{Undecided-State} dynamics on the complete graph of $n$
+nodes by adopting the asynchronous, sequential model where, at every round, one oriented
+edge $(u, v)$ is chosen uniformly at random and then node $u$ applies the local rule of the dynamics
+by pulling the state of $v$ (according to Table 1).
+The authors provide an unconditional analysis for the binary case (i.e. $|\Sigma| = 2$) when the
+process starts from any possible color configuration, also including undecided nodes. Since
+the system is anonymous and the graph is complete, the configuration (or global state) of the
+process can be represented by a triple $(c_0, c_1, q)$ where $c_i$ is the number of nodes supporting
+color $i$ ($i = 0, 1$) and $q$ is the number of undecided nodes. We call $\mathcal{C}$ the set of all possible
+configurations.
+
+[Section 6.3, p. 27:] If we run the \textsc{Undecided-State} dynamics on the parallel $\mathcal{PULL}$ model, then at every round all
+nodes update their own state. Even though it is easy to verify that the dynamics still achieves
+consensus (with high probability), the evolution of the parallel process significantly departs from
+the sequential one described in the previous subsection.
+'''
+notes = '''
+Transcribed from the PDF (pages are PDF pages; the printed page numbers are one less). PROVENANCE.md cites "the survey, Section 6" for the basic laws of the dynamics; the absorption statement of the survey is in Section 6.1, about the sequential model, and Section 6.3 (in the context) is about the parallel PULL model of the library. The survey's Section 6 gives the update rule but no formula for the one-round expectations, so undecided:thm:expect has no survey entry. The footnote mark after "sequential model" (footnote 16, on the Population-Protocols model) is omitted. "shows" as printed. The survey typesets the dynamics' name in small capitals (\textsc). The published SIGACT News version was not retrieved.
+'''
+
+[[source]]
+items = ["undecided:thm:seq-conv", "undecided:thm:seq-maj"]
+paper = "L. Becchetti, A. Clementi, E. Natale. Consensus dynamics: an overview"
+venue = "SIGACT News 51(1), 2020"
+version = "HAL preprint hal-02507613v1"
+result = "Theorem 23"
+page = 24
+url = "https://hal.science/hal-02507613v1"
+status = "transcribed by an AI agent from the PDF of the HAL preprint hal-02507613v1 (no LaTeX source available); not yet checked by a person"
+statement = '''
+\textbf{Theorem 23} (Sequential \textsc{Undecided-State} dynamics [AAE08]). Assume the
+\textsc{Undecided-State} dynamics starts from an arbitrary configuration$^{17}$ $\mathbf{c} \neq (0, 0, n)$. Then the
+following claims hold.
+\begin{itemize}
+\item Convergence Time. After $O(n \log n)$ rounds (i.e. edge activations), the \textsc{Undecided-State} dynamics converges to a valid monochromatic configuration $\bar{\mathbf{c}} \neq (0, 0, n)$, w.h.p.
+\item Plurality-Preserving Property. If the initial configuration $\mathbf{c}$ has bias $s = \omega(\sqrt{n \log n})$, then
+the \textsc{Undecided-State} dynamics converges to the initial plurality color, w.h.p.
+\item Fault-Tolerance. If the number of Byzantine nodes is $o(\sqrt{n})$, then, the two claims above
+still hold w.h.p.: the \textsc{Undecided-State} dynamics reaches valid consensus and it preserves
+the initial plurality provided that $s = \omega(\sqrt{n \log n})$.
+\end{itemize}
+'''
+context = '''
+[Section 6.1, p. 24, footnote 17:] If the process starts with all nodes in the undecided state, then it clearly stays on this configuration forever.
+
+[Section 2.3, p. 9, footnote 9:] According to the standard definition, we say that a sequence of events $\mathcal{E}_n$, $n = 1, 2, \ldots$ holds \emph{with high
+probability} if $\mathbf{P}\left(\mathcal{E}_n\right) = 1 - \mathcal{O}(1/n^{\lambda})$ for some positive constant $\lambda > 0$.
+
+[Section 2.3, p. 8:] (Validity). The color $v$ must be a valid one, i.e., a color which was initially declared by
+at least one (non-corrupted) node;
+
+[Section 6, p. 23:] \textbf{Updating rule of the \textsc{Undecided-State} dynamics.} Let us assume that the set of possible
+colors a node can support is $[k]$ and assume that, at a given round, the generic node $u$ samples
+a random node $v$. Then if the color of $v$ differs from that of $u$, the latter enters the \emph{undecided}
+state, an extra state that an agent can support. When an agent is in the undecided state and
+pulls a color, it gets that color. Finally, an agent that pulls either the undecided color or its own
+color remains in its current state (see Table 1).
+
+[Section 6.1, p. 23:] In [AAE08], Angluin et al study the \textsc{Undecided-State} dynamics on the complete graph of $n$
+nodes by adopting the asynchronous, sequential model where, at every round, one oriented
+edge $(u, v)$ is chosen uniformly at random and then node $u$ applies the local rule of the dynamics
+by pulling the state of $v$ (according to Table 1).
+The authors provide an unconditional analysis for the binary case (i.e. $|\Sigma| = 2$) when the
+process starts from any possible color configuration, also including undecided nodes. Since
+the system is anonymous and the graph is complete, the configuration (or global state) of the
+process can be represented by a triple $(c_0, c_1, q)$ where $c_i$ is the number of nodes supporting
+color $i$ ($i = 0, 1$) and $q$ is the number of undecided nodes. We call $\mathcal{C}$ the set of all possible
+configurations.
+
+[Section 6.1, p. 24:] In order
+to get the good intuitions here, we observe that when the system lies in configurations with a \emph{large}
+bias $s = |c_1 - c_0|$ and $q = \Theta(n)$, then $s$ increases, in average.
+'''
+notes = '''
+Transcribed from the PDF (pages are PDF pages; the printed page numbers are one less). ROADMAP.md cites "Survey Thm 23" for UND-2; the numbering of the HAL preprint matches. The plurality-preserving claim is printed with the gap \omega(\sqrt{n \log n}), log n under the square root; the primary source [AAE08, Theorem 2] has \omega(\sqrt{n} \log n). The Fault-Tolerance claim has no counterpart in the library items. The theorem body is set in italics in the PDF; the italics are not reproduced. The survey typesets the dynamics' name in small capitals (\textsc). The published SIGACT News version was not retrieved.
+'''
+
+[[source]]
+item = "undecided:thm:majority"
+paper = "L. Becchetti, A. Clementi, E. Natale. Consensus dynamics: an overview"
+venue = "SIGACT News 51(1), 2020"
+version = "HAL preprint hal-02507613v1"
+result = "Theorem 28"
+page = 28
+url = "https://hal.science/hal-02507613v1"
+status = "transcribed by an AI agent from the PDF of the HAL preprint hal-02507613v1 (no LaTeX source available); not yet checked by a person"
+statement = '''
+\textbf{Theorem 28} (Parallel \textsc{Undecided-State} Dynamics [CGPS17, CGG$^+$17]). Let the \textsc{Undecided-State} dynamics start from any configuration $\mathbf{c} \in \mathcal{C}$. Then, the following claims hold.
+\begin{itemize}
+\item Convergence Time. The process converges to a (valid) monochromatic configuration within
+$\mathcal{O}(\log n)$ rounds, w.h.p. Furthermore, if the initial configuration has at least one colored
+node (i.e. $q \leqslant n - 1$), then the process converges to a valid monochromatic configuration
+$\bar{\mathbf{c}} \neq (0, 0, n)$, w.h.p.
+\item Plurality-Preserving Property. If the initial configuration $\mathbf{c}$ has bias $s = \Omega(\sqrt{n \log n})$,
+then the process converges to the plurality color, w.h.p. Furthermore, the result is almost
+tight in a twofold sense: (i) An initial configuration exists, with $s = \Omega(\sqrt{n \log n})$, such
+that the process requires $\Omega(\log n)$ rounds to converge w.h.p., and (ii) there is an initial
+configuration with $s = \Theta(\sqrt{n})$ such that the process converges to the minority color with
+constant probability.
+\end{itemize}
+'''
+context = '''
+[Section 2.1, p. 6:] In the parallel, synchronous model, called (uniform) $\mathcal{GOSSIP}$ nodes share a discrete-time
+global clock. In each round, one edge is selected for every node, independently and uniformly at
+random. Then, every node exchanges one message with its selected partner. Finally, each node
+performs a local computation, possibly resulting in an update of its internal state. Communication can occur in two ways: a node can pull information from its randomly-selected partner,
+or it can push information to it. We mostly consider the first variant, also known as the $\mathcal{PULL}$
+model.
+
+[Section 2.3, p. 9, footnote 9:] According to the standard definition, we say that a sequence of events $\mathcal{E}_n$, $n = 1, 2, \ldots$ holds \emph{with high
+probability} if $\mathbf{P}\left(\mathcal{E}_n\right) = 1 - \mathcal{O}(1/n^{\lambda})$ for some positive constant $\lambda > 0$.
+
+[Section 2.3, p. 8:] (Validity). The color $v$ must be a valid one, i.e., a color which was initially declared by
+at least one (non-corrupted) node;
+
+[Section 6, p. 23:] \textbf{Updating rule of the \textsc{Undecided-State} dynamics.} Let us assume that the set of possible
+colors a node can support is $[k]$ and assume that, at a given round, the generic node $u$ samples
+a random node $v$. Then if the color of $v$ differs from that of $u$, the latter enters the \emph{undecided}
+state, an extra state that an agent can support. When an agent is in the undecided state and
+pulls a color, it gets that color. Finally, an agent that pulls either the undecided color or its own
+color remains in its current state (see Table 1).
+
+[Section 6.1, p. 23:] [...] Since
+the system is anonymous and the graph is complete, the configuration (or global state) of the
+process can be represented by a triple $(c_0, c_1, q)$ where $c_i$ is the number of nodes supporting
+color $i$ ($i = 0, 1$) and $q$ is the number of undecided nodes. We call $\mathcal{C}$ the set of all possible
+configurations.
+
+[Section 6.1, p. 24:] [...] when the system lies in configurations with a \emph{large}
+bias $s = |c_1 - c_0|$ and $q = \Theta(n)$, then $s$ increases, in average.
+
+[Section 6.3, p. 27:] If we run the \textsc{Undecided-State} dynamics on the parallel $\mathcal{PULL}$ model, then at every round all
+nodes update their own state.
+'''
+notes = '''
+Transcribed from the PDF (pages are PDF pages; the printed page numbers are one less). ROADMAP.md cites "Survey Thm 28" for UND-1; the numbering of the HAL preprint matches. In the survey's bibliography, [CGG+17] is arXiv:1707.05135 (the MFCS 2018 paper, whose Theorem 3.2 is the entry of undecided:thm:majority in verification/sources.toml) and [CGPS17] is the DISC 2017 brief announcement. The theorem body is set in italics in the PDF; the italics are not reproduced. The survey typesets the dynamics' name in small capitals (\textsc). The published SIGACT News version was not retrieved.
+'''
+
+[[source]]
+items = ["undecided:thm:plurality", "undecided:thm:lb"]
+paper = "L. Becchetti, A. Clementi, E. Natale. Consensus dynamics: an overview"
+venue = "SIGACT News 51(1), 2020"
+version = "HAL preprint hal-02507613v1"
+result = "Theorem 29"
+page = 30
+url = "https://hal.science/hal-02507613v1"
+status = "transcribed by an AI agent from the PDF of the HAL preprint hal-02507613v1 (no LaTeX source available); not yet checked by a person"
+statement = '''
+\textbf{Theorem 29} ([BCN$^+$16]). let $k = k(n)$ be any function such that $k = O((n/\log n)^{1/3})$, and
+consider any initial configuration $\bar{\mathbf{c}} \in \mathcal{S}$ such that $\bar{c}_1 \geqslant (1 + \alpha)\bar{c}_2$ where $\alpha > 0$ is any arbitrarily-small constant$^{23}$. Then, the following claims hold.
+\begin{itemize}
+\item Convergence towards plurality. The \textsc{Undecided-State} dynamics converges within
+$O(\mathsf{md}(\bar{\mathbf{c}}) \log n)$ rounds towards the plurality color, w.h.p.
+\item Tightness. This result is almost-tight in a strong sense. In particular, for $k = O((n/\log n)^{1/6})$
+and for any initial $k$-colors configurations $\bar{\mathbf{c}}$, the convergence time of the
+\textsc{Undecided-State} dynamics is linear in the monochromatic distance $\mathsf{md}(\bar{\mathbf{c}})$ w.h.p.
+\end{itemize}
+'''
+context = '''
+[Section 6.4, p. 30, footnote 23:] in the multi-color case this is a weak-bias condition that ensures the convergence of the process towards the
+plurality color.
+
+[Section 2.3, p. 9:] We consider a distributed system of $n$ nodes/agents, interacting over an underlying graph
+$G = (V, E)$ according to one of the communication models described in Subsection 2.1. In each
+round, every node supports a color, i.e. an element $i \in \Sigma = \{1, 2, \ldots, k\}$ (with $2 \leqslant k \leqslant n$).
+A configuration of the system is thus a function $c : V \to \Sigma$. When $G$ is the complete graph
+and nodes are anonymous, the state of the system at any round is completely specified by a
+\emph{color configuration} $\mathbf{c} = \langle c_1, \ldots, c_k\rangle$ (where $c_i$ denotes the number of agents supporting color
+$i \in [k]$). There can be an initial \emph{plurality} $c_1$ of agents supporting some \emph{plurality color} (wlog, we
+can assume that color communities are ordered, so that $c_i \geqslant c_{i+1}$ for any $i \leqslant k - 1$).
+
+[Section 2.3, p. 9, footnote 9:] According to the standard definition, we say that a sequence of events $\mathcal{E}_n$, $n = 1, 2, \ldots$ holds \emph{with high
+probability} if $\mathbf{P}\left(\mathcal{E}_n\right) = 1 - \mathcal{O}(1/n^{\lambda})$ for some positive constant $\lambda > 0$.
+
+[Section 2.1, p. 6:] In the parallel, synchronous model, called (uniform) $\mathcal{GOSSIP}$ nodes share a discrete-time
+global clock. In each round, one edge is selected for every node, independently and uniformly at
+random. [...] We mostly consider the first variant, also known as the $\mathcal{PULL}$
+model.
+
+[Section 6, p. 23:] \textbf{Updating rule of the \textsc{Undecided-State} dynamics.} Let us assume that the set of possible
+colors a node can support is $[k]$ and assume that, at a given round, the generic node $u$ samples
+a random node $v$. Then if the color of $v$ differs from that of $u$, the latter enters the \emph{undecided}
+state, an extra state that an agent can support. When an agent is in the undecided state and
+pulls a color, it gets that color. Finally, an agent that pulls either the undecided color or its own
+color remains in its current state (see Table 1).
+
+[Section 6.4, p. 29:] In [BCN$^+$16], Becchetti et Al provide an analysis of the \textsc{Undecided-State} dynamics for
+the multi-color case on the complete graph by assuming a certain initial bias toward a plurality
+color. [...]
+As a first step, Becchetti et al introduce a suitable \emph{distance} $\mathsf{d}(\cdot, \cdot)$ on the set $\mathcal{C}$ of all color
+configurations. It naturally induces a function $\mathsf{md}(\cdot)$, called the \emph{monochromatic distance}, which
+equals the \emph{distance} between any configuration $\mathbf{c}$ and the target configuration:
+\[
+\mathsf{md}(\mathbf{c}) \ = \ \sum_{i=1}^{k} \left(\frac{c_i}{c_1}\right)^2
+\]
+'''
+notes = '''
+Transcribed from the PDF (pages are PDF pages; the printed page numbers are one less). ROADMAP.md cites "Survey Thm 29" for UND-3 (the upper bound, undecided:thm:plurality, and the lower bound, undecided:thm:lb); the numbering of the HAL preprint matches. The theorem body is set in italics in the PDF (with a few words upright in the Tightness item); the italics are not reproduced. As printed: "let" in lower case; the set \mathcal{S} is not defined in the survey (Section 6.4 speaks of the set \mathcal{C} of all color configurations). In the survey's bibliography [BCN+16] is "Stabilizing consensus with many opinions" (SODA 2016); the result is in [BCN+15], "Plurality consensus in the gossip model" (SODA 2015), Theorems 8 and 11, as ROADMAP.md notes. The survey's condition is c_1 >= (1 + alpha) c_2 (with the ordering c_i >= c_{i+1}), the SODA 2015 Theorem 11 states it for every i != 1. The published SIGACT News version was not retrieved.
+'''
