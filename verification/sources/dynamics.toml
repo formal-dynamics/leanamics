@@ -214,3 +214,41 @@ version = "textbook (2009)"
 result = "Theorem 1.1"
 status = "no open copy found; not transcribed"
 notes = "PROVENANCE.md cites Theorem 1.1 for the Hoeffding bound avg_hoeffding (dynamics:thm:concentration) and the MGF and free-parameter Chernoff bounds (dynamics:thm:chernoffmgf; Dynamics/Chernoff.lean cites 'Theorem 1.1 and its proof'). No legal open copy of the book was found (a 2005 draft circulates only on third-party hosts, and its numbering is not known to match the book)."
+
+# Doerr, Goldberg, Minder, Sauerwald, Scheideler: the hitting-time claim. The library cites the
+# SPAA 2011 version (Claim 2.9), of which no open copy was found; the open 2009 version has the
+# corresponding result as Lemma 8.
+
+[[source]]
+item = "dynamics:thm:drifthitting"
+paper = "B. Doerr, L. A. Goldberg, L. Minder, T. Sauerwald, C. Scheideler. Stabilizing consensus with the power of two choices"
+venue = "SPAA 2011"
+version = "SPAA 2011 proceedings"
+result = "Claim 2.9"
+url = "https://doi.org/10.1145/1989493.1989516"
+status = "no open copy found; not transcribed"
+notes = "PROVENANCE.md and dynamics/FORMALIZATION_DIFFERENCES.md cite Claim 2.9 of the SPAA 2011 version, whose text is not openly available (the institutional repository copy is closed access). The next entry quotes the corresponding result of the open 2009 version (Dagstuhl Seminar Proceedings 09371), Lemma 8."
+
+[[source]]
+item = "dynamics:thm:drifthitting"
+paper = "B. Doerr, L. A. Goldberg, L. Minder, T. Sauerwald, C. Scheideler. Stabilizing consensus with the power of two choices"
+venue = "Dagstuhl Seminar Proceedings 09371 (2009)"
+version = "Dagstuhl Sem. Proc. 09371 (2009)"
+result = "Lemma 8"
+page = 6
+url = "https://drops.dagstuhl.de/entities/document/10.4230/DagSemProc.09371.6"
+status = "transcribed by an AI agent from the PDF of the 2009 Dagstuhl version (no LaTeX source available), formulas read from the page image; not yet checked by a person"
+statement = '''
+Consider a Markov Chain $(X_t)_{t=1}^{\infty}$ with state space $\{0, \ldots, m\}$ that has the following properties:
+\begin{itemize}
+\item there are constants $c_1 > 1$ and $c_2 > 0$, such that for any $t \in \mathbb{N}$,
+\[ \Pr[X_{t+1} \geq \min\{m, c_1 X_t\}] \geq 1 - e^{-c_2 X_t}, \]
+\item $X_t = 0 \Rightarrow X_{t+1} \geq 1$ with probability $c_3$ that is greater than some constant $> 0$,
+\end{itemize}
+Then for every constant $c_4 > 0$, there is a time step $t = \mathcal{O}(\log m)$ such that
+\[ \Pr[X_t \geq c_4 \log m] \geq 1 - m^{-2}. \]
+'''
+context = '''
+[Section 2.3, Auxiliary Results for Absorbing Markov Chains, p. 6:] We now prove exponential tail bounds for reaching absorbing states in Markov Chains.
+'''
+notes = "The library cites Claim 2.9 of the SPAA 2011 version (previous entry), with a different numbering and, as the library describes it, a more explicit conclusion: a time $c_5 \\log q + \\log_{c_1}(c_4 \\log q)$ and a probability $1 - q^{-c_6}$. In this 2009 version the state space is $\\{0,\\ldots,m\\}$, the conclusion is a time step $t = \\mathcal{O}(\\log m)$ with probability $1 - m^{-2}$, and the quantity $\\log_{c_1} c_4 \\log m$ appears only in the proof (p. 15). That this lemma is the counterpart of Claim 2.9 was identified by the agent. The trailing comma before 'Then' is as printed. The paper does not fix the base of the logarithm. PDF page 6 is printed page 6."
