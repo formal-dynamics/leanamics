@@ -1,0 +1,1078 @@
+# Source references and original statements of the items of the package median.
+#
+# Same format as verification/sources.toml (see its header for the fields). The items
+# median:thm:tc-lower-strong, median:thm:expander, median:thm:cer-theorem2 and
+# median:thm:tc-plurality have their entries in verification/sources.toml and are not repeated
+# here.
+#
+# Sources:
+#   - B. Doerr, L. A. Goldberg, L. Minder, T. Sauerwald, C. Scheideler, "Stabilizing consensus
+#     with the power of two choices", Dagstuhl Seminar Proceedings 09371 (2009), the version
+#     whose numbering the library follows (open access, CC BY 4.0). No LaTeX source is
+#     available: these entries were transcribed from the PDF, with the formulas written in LaTeX.
+#   - C. Cooper, R. Elsässer, T. Radzik, "The power of two choices in distributed voting",
+#     ICALP 2014, arXiv:1404.7479v1 (LaTeX source).
+#   - R. Elsässer, T. Friedetzky, D. Kaaser, F. Mallmann-Trenn, H. Trinker, arXiv:1602.04667v5
+#     (LaTeX source).
+#   - P. Berenbrink, A. Clementi, R. Elsässer, P. Kling, F. Mallmann-Trenn, E. Natale, "Ignore
+#     or comply? On breaking symmetry in consensus", PODC 2017, arXiv:1702.04921v1 (LaTeX source).
+#
+# All entries were transcribed by an AI agent and compared with the PDF of the same version; none
+# has been checked by a person. Pages are pages of the PDF file of that version (for
+# arXiv:1702.04921v1 the PDF page is the printed page plus one; for the other sources they
+# coincide). Some items correspond to a step inside a proof or to a definition in the text rather
+# than to a numbered result; `result` then says where the passage is.
+
+# ---------------------------------------------------------------------------------------------
+# Doerr, Goldberg, Minder, Sauerwald, Scheideler (Dagstuhl Seminar Proceedings 09371, 2009)
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+item = "median:def:median"
+paper = "B. Doerr, L. A. Goldberg, L. Minder, T. Sauerwald, C. Scheideler. Stabilizing consensus with the power of two choices"
+venue = "Dagstuhl Seminar Proceedings 09371 (2009); later SPAA 2011"
+version = "Dagstuhl Sem. Proc. 09371 (2009)"
+result = "Sections 1.2 and 2.1, median rule"
+page = 4
+url = "https://drops.dagstuhl.de/entities/document/10.4230/DagSemProc.09371.6"
+status = "transcribed by an AI agent from the PDF of the 2009 Dagstuhl version (no LaTeX source available; formulas written in LaTeX) and compared with that PDF; not yet checked by a person"
+statement = '''
+[Section 1.2, p. 4:] We propose a very simple protocol for our model called the \emph{median rule}: In each round, every process $i$ picks two processes $j$ and $k$ uniformly and independently at random among all processes (including itself). It then updates $v_i$ to the \emph{median} of $v_i$, $v_j$ and $v_k$. For example, if $v_i = 10$, $v_j = 12$ and $v_k = 100$, then the new value of $v_i$ is $12$.
+
+[Section 2.1, p. 5:] We have $n$ balls (processes) numbered from $1$ to $n$, and $n$ bins (values) also numbered from $1$ to $n$. Write $b_{0,1}, \ldots, b_{0,n}$ for the initial assignment of each ball to its bin, where the bins are identified with integers in $\mathbb{N}$. So, the ``all-one'' assignment that assigns each ball to a different bin, can be achieved by setting $b_{0,i} = i$ for $1 \le i \le n$.
+
+In the $i$-th iteration the algorithm does the following: Let $I_{i,1}, \ldots, I_{i,n}$ and $J_{i,1}, \ldots, J_{i,n}$ be $2n$ independent random variables, chosen uniformly in $[n] = \{1, \ldots, n\}$. Then the bin assignment of the $i$-th iteration is
+\[ b_{i,j} = \mathrm{median}(b_{i-1,j}, b_{i-1,I_{i,j}}, b_{i-1,J_{i,j}}) \]
+for $j = 1, \ldots, n$. The algorithm has reached a fixed point (has stabilized) in the $i$-th iteration if and only if $b_{i,1} = \cdots = b_{i,n}$.
+'''
+context = '''
+[Section 1.1, p. 3:] In our model we have $n$ processes that are completely interconnected in an anonymous network. [...] Each process $i$ initially has some value $v_i \in \mathbb{N}$ (which is assumed to require only $O(\log n)$ bits for its storage so that values can be efficiently exchanged). The goal is to eventually agree on a common, stable value $v \in \{v_1, \ldots, v_n\}$, that is, afterwards the processes will not deviate from $v$ anymore. We assume that time proceeds in synchronized rounds.
+
+[Section 3, p. 7:] Note that for the two bin-case, the median rule coincides with the \emph{majority rule}, where a balls next bin is chosen to be the majoritary bin of itself and two random balls.
+'''
+notes = "No LaTeX source; transcribed from the PDF. The library's numbering follows this 2009 version; in the SPAA 2011 proceedings the results are renumbered (Theorem 1 is Theorem 1.1, Theorem 21 is Theorem 4.1, the lemmas are numbered differently). 'a balls next bin' and 'majoritary' as printed. The blueprint item also defines 2-Choices on two values, which the Section 3 sentence in the context relates to the median rule."
+
+[[source]]
+item = "median:thm:basic"
+paper = "B. Doerr, L. A. Goldberg, L. Minder, T. Sauerwald, C. Scheideler. Stabilizing consensus with the power of two choices"
+venue = "Dagstuhl Seminar Proceedings 09371 (2009); later SPAA 2011"
+version = "Dagstuhl Sem. Proc. 09371 (2009)"
+result = "Section 2.1, fixed point"
+page = 5
+url = "https://drops.dagstuhl.de/entities/document/10.4230/DagSemProc.09371.6"
+status = "transcribed by an AI agent from the PDF of the 2009 Dagstuhl version (no LaTeX source available; formulas written in LaTeX) and compared with that PDF; not yet checked by a person"
+statement = '''
+The algorithm has reached a fixed point (has stabilized) in the $i$-th iteration if and only if $b_{i,1} = \cdots = b_{i,n}$.
+'''
+context = '''
+[Section 1.1, p. 3:] Each process $i$ initially has some value $v_i \in \mathbb{N}$ [...]. The goal is to eventually agree on a common, stable value $v \in \{v_1, \ldots, v_n\}$, that is, afterwards the processes will not deviate from $v$ anymore.
+
+[Section 1.2, p. 4:] When taking the \emph{mean} of the three values instead of the median, the convergence properties towards a single number have already been formally analyzed [17]. However, with the mean rule we are no longer guaranteed to solve the consensus problem (i.e., one of the initial values wins).
+
+[Section 2.1, p. 5:] We have $n$ balls (processes) numbered from $1$ to $n$, and $n$ bins (values) also numbered from $1$ to $n$. Write $b_{0,1}, \ldots, b_{0,n}$ for the initial assignment of each ball to its bin, where the bins are identified with integers in $\mathbb{N}$. [...] In the $i$-th iteration the algorithm does the following: Let $I_{i,1}, \ldots, I_{i,n}$ and $J_{i,1}, \ldots, J_{i,n}$ be $2n$ independent random variables, chosen uniformly in $[n] = \{1, \ldots, n\}$. Then the bin assignment of the $i$-th iteration is
+\[ b_{i,j} = \mathrm{median}(b_{i-1,j}, b_{i-1,I_{i,j}}, b_{i-1,J_{i,j}}) \]
+for $j = 1, \ldots, n$.
+'''
+notes = "No LaTeX source; transcribed from the PDF. The paper states validity (new values are current values), the range property and almost-sure consensus without a numbered result; this entry gives the passages that define the median rule, the goal of agreeing on one of the initial values and the fixed points. The library attributes the item to the paper as a whole (PROVENANCE.md, first row of the median table)."
+
+[[source]]
+item = "median:thm:expect"
+paper = "B. Doerr, L. A. Goldberg, L. Minder, T. Sauerwald, C. Scheideler. Stabilizing consensus with the power of two choices"
+venue = "Dagstuhl Seminar Proceedings 09371 (2009); later SPAA 2011"
+version = "Dagstuhl Sem. Proc. 09371 (2009)"
+result = "Proof of Lemma 11, E[L_j]"
+page = 15
+url = "https://drops.dagstuhl.de/entities/document/10.4230/DagSemProc.09371.6"
+status = "transcribed by an AI agent from the PDF of the 2009 Dagstuhl version (no LaTeX source available; formulas written in LaTeX) and compared with that PDF; not yet checked by a person"
+statement = '''
+For any ball $i$ let $L_{j,i}$ be the random variables which equals $1$ if ball $i$ is in the left bin after $j$ rounds, and $0$ otherwise. If the ball $i$ was in the left bin in round $j-1$, then writing $p_{j-1} = L_{j-1}/n$, we have $\mathrm{E}[L_{j,i}] = \Pr(L_{j,i} = 1) = 1 - (1 - p_{j-1})^2$. Similarly, if the ball $i$ was in the right bin, we have $\mathrm{E}[L_{j,i}] = p_{j-1}^2$. Then $L_j = \sum_i L_{j,i}$ is the total number of balls in the left bin after $j$ rounds. Then we have
+\[ \mathrm{E}[L_j] = L_{j-1} p_{j-1} (3 - 2p_{j-1}) = n (p_{j-1})^2 (3 - 2p_{j-1}). \]
+'''
+context = '''
+[Section 2.1, p. 5:] In the $i$-th iteration the algorithm does the following: Let $I_{i,1}, \ldots, I_{i,n}$ and $J_{i,1}, \ldots, J_{i,n}$ be $2n$ independent random variables, chosen uniformly in $[n] = \{1, \ldots, n\}$. Then the bin assignment of the $i$-th iteration is
+\[ b_{i,j} = \mathrm{median}(b_{i-1,j}, b_{i-1,I_{i,j}}, b_{i-1,J_{i,j}}) \]
+for $j = 1, \ldots, n$.
+
+[Section 3, p. 7:] In this section, we consider the case with only two bins. [...] Note that for the two bin-case, the median rule coincides with the \emph{majority rule}, where a balls next bin is chosen to be the majoritary bin of itself and two random balls. [...] In the following, let $L_t$ be the number of balls in the left bin at step $t$ and let $R_t$ be the number of balls in the right bin at step $t$.
+'''
+notes = "No LaTeX source; transcribed from the PDF. The paper has no numbered statement of the one-round expectation; this is the computation at the start of the proof of Lemma 11 (two bins), with p = L/n the fraction of balls in the left bin. 'the random variables which equals' and the middle expression L_{j-1} p_{j-1}(3 - 2p_{j-1}) as printed (it equals the right-hand side since L_{j-1} = n p_{j-1})."
+
+[[source]]
+item = "median:thm:threshold"
+paper = "B. Doerr, L. A. Goldberg, L. Minder, T. Sauerwald, C. Scheideler. Stabilizing consensus with the power of two choices"
+venue = "Dagstuhl Seminar Proceedings 09371 (2009); later SPAA 2011"
+version = "Dagstuhl Sem. Proc. 09371 (2009)"
+result = "Lemma 17"
+page = 8
+url = "https://drops.dagstuhl.de/entities/document/10.4230/DagSemProc.09371.6"
+status = "transcribed by an AI agent from the PDF of the 2009 Dagstuhl version (no LaTeX source available; formulas written in LaTeX) and compared with that PDF; not yet checked by a person"
+statement = '''
+If the assignment $(k_i)_{i \in [n]}$ is finer than the assignment $(\tilde{k}_i)_{i \in [n]}$, then the number of iterations of the algorithm needed for convergence with the initial assignment $(k_i)_{i \in [n]}$ upper bounds the number of iterations needed with the initial assignment $(\tilde{k}_i)_{i \in [n]}$. This is true point wise in the probability space and hence applies to both average and high probability running times.
+'''
+context = '''
+[Section 2.1, p. 5:] We have $n$ balls (processes) numbered from $1$ to $n$, and $n$ bins (values) also numbered from $1$ to $n$. [...] In the $i$-th iteration the algorithm does the following: Let $I_{i,1}, \ldots, I_{i,n}$ and $J_{i,1}, \ldots, J_{i,n}$ be $2n$ independent random variables, chosen uniformly in $[n] = \{1, \ldots, n\}$. Then the bin assignment of the $i$-th iteration is
+\[ b_{i,j} = \mathrm{median}(b_{i-1,j}, b_{i-1,I_{i,j}}, b_{i-1,J_{i,j}}) \]
+for $j = 1, \ldots, n$. The algorithm has reached a fixed point (has stabilized) in the $i$-th iteration if and only if $b_{i,1} = \cdots = b_{i,n}$.
+
+[Section 4, p. 8:] In order to be able to reduce our problem with $n$ bins to the one with $2$ bins, we first establish a partial order of \emph{fineness} on the distribution of balls into bins.
+
+[Section 4.1, p. 8:] We say that an initial assignment with $k_i$ balls in bin $i$ ($i \in [n]$) is \emph{finer} than an assignment $(\tilde{k}_i)_{i \in [n]}$, if there is a monotonic function $f : [n] \to [n]$ mapping bins to bins such that
+\[ \tilde{k}_i = \sum_{j \in f^{-1}(i)} k_j \]
+for each $i \in [n]$. Obviously, the ``is finer''-relation induces a partial order on the set of all balls-and-bins-distributions.
+'''
+notes = "No LaTeX source; transcribed from the PDF. The library's threshold reduction (the median commutes with monotone maps, so thresholding at a value gives the binary process for the same samples) is the mechanism behind Lemma 17: thresholding is the monotone map f onto two bins. PROVENANCE.md describes it as 'their reduction to two values'."
+
+[[source]]
+items = ["median:thm:whp", "median:thm:tc-two"]
+paper = "B. Doerr, L. A. Goldberg, L. Minder, T. Sauerwald, C. Scheideler. Stabilizing consensus with the power of two choices"
+venue = "Dagstuhl Seminar Proceedings 09371 (2009); later SPAA 2011"
+version = "Dagstuhl Sem. Proc. 09371 (2009)"
+result = "Lemma 12 (two bins, Case 2)"
+page = 7
+url = "https://drops.dagstuhl.de/entities/document/10.4230/DagSemProc.09371.6"
+status = "transcribed by an AI agent from the PDF of the 2009 Dagstuhl version (no LaTeX source available; formulas written in LaTeX) and compared with that PDF; not yet checked by a person"
+statement = '''
+If there is a step $t$ with $c\sqrt{n \ln n} \le \Delta_t < n/3$ for a sufficiently large constant $c$, then $O(\log n)$ additional rounds of the majority rule suffice to arrive at case 1 w.h.p.
+'''
+context = '''
+[Section 2.2, p. 5:] We write w.h.p. to refer to an event that holds with probability at least $1 - n^{-c}$ for $c > 1$.
+
+[Section 3, p. 7:] In this section, we consider the case with only two bins. [...] We also consider an adversary with the following abilities. In each round after all $n$ balls have made their random choices, the adversary is allowed to change the choices of at most $\sqrt{n}$ balls. [...] Note that for the two bin-case, the median rule coincides with the \emph{majority rule}, where a balls next bin is chosen to be the majoritary bin of itself and two random balls.
+
+In the following, let $L_t$ be the number of balls in the left bin at step $t$ and let $R_t$ be the number of balls in the right bin at step $t$. Let $X_t = \min(L_t, R_t)$ and let $Y_t = \max(L_t, R_t)$. For simplicity, we will assume that $n$ is even. The proof for odd $n$ follows along the same lines. The imbalance at a step $t$ is given by $\Delta_t = (Y_t - X_t)/2$ (which is a positive integer if $n$ is even). The labelled imbalance is given by $\Psi_t = (R_t - L_t)/2$. Based on the imbalance $\Delta_t$ we distinguish between three cases.
+
+\textbf{Case 1: $\Delta_0 \ge n/3$} [...]
+
+[Lemma 11, p. 7:] If $\Delta_0 \ge cn$, where $c > 0$ is any constant, then $O(\log\log n)$ rounds of the majority rule suffice to reach a stable consensus, w.h.p.
+'''
+notes = "No LaTeX source; transcribed from the PDF. The library's two-value result (consensus from a gap of order sqrt(n log n) within O(log n) rounds) is the combination of Lemmas 12 and 11 (Cases 2 and 1 of Section 3); Lemma 11 has its own entry. The paper writes ln in Lemma 12 and log elsewhere. 'a balls next bin' and 'majoritary' as printed. For median:thm:tc-two (two colours of k-party 2-Choices) the library uses the same two-value result."
+
+[[source]]
+items = ["median:thm:whp", "median:thm:tc-two"]
+paper = "B. Doerr, L. A. Goldberg, L. Minder, T. Sauerwald, C. Scheideler. Stabilizing consensus with the power of two choices"
+venue = "Dagstuhl Seminar Proceedings 09371 (2009); later SPAA 2011"
+version = "Dagstuhl Sem. Proc. 09371 (2009)"
+result = "Lemma 11 (two bins, Case 1)"
+page = 7
+url = "https://drops.dagstuhl.de/entities/document/10.4230/DagSemProc.09371.6"
+status = "transcribed by an AI agent from the PDF of the 2009 Dagstuhl version (no LaTeX source available; formulas written in LaTeX) and compared with that PDF; not yet checked by a person"
+statement = '''
+If $\Delta_0 \ge cn$, where $c > 0$ is any constant, then $O(\log\log n)$ rounds of the majority rule suffice to reach a stable consensus, w.h.p.
+'''
+context = '''
+[Section 2.1, p. 5:] The algorithm has reached a fixed point (has stabilized) in the $i$-th iteration if and only if $b_{i,1} = \cdots = b_{i,n}$.
+
+[Section 2.2, p. 5:] We write w.h.p. to refer to an event that holds with probability at least $1 - n^{-c}$ for $c > 1$.
+
+[Section 3, p. 7:] In this section, we consider the case with only two bins. [...] Note that for the two bin-case, the median rule coincides with the \emph{majority rule}, where a balls next bin is chosen to be the majoritary bin of itself and two random balls.
+
+In the following, let $L_t$ be the number of balls in the left bin at step $t$ and let $R_t$ be the number of balls in the right bin at step $t$. Let $X_t = \min(L_t, R_t)$ and let $Y_t = \max(L_t, R_t)$. For simplicity, we will assume that $n$ is even. The proof for odd $n$ follows along the same lines. The imbalance at a step $t$ is given by $\Delta_t = (Y_t - X_t)/2$ (which is a positive integer if $n$ is even).
+
+\textbf{Case 1: $\Delta_0 \ge n/3$}
+'''
+notes = "No LaTeX source; transcribed from the PDF. Used together with Lemma 12 (own entry) for the library's two-value result. 'a balls next bin' and 'majoritary' as printed."
+
+[[source]]
+items = ["median:thm:binary-any", "median:thm:any", "median:thm:of-binary"]
+paper = "B. Doerr, L. A. Goldberg, L. Minder, T. Sauerwald, C. Scheideler. Stabilizing consensus with the power of two choices"
+venue = "Dagstuhl Seminar Proceedings 09371 (2009); later SPAA 2011"
+version = "Dagstuhl Sem. Proc. 09371 (2009)"
+result = "Theorem 1"
+page = 4
+url = "https://drops.dagstuhl.de/entities/document/10.4230/DagSemProc.09371.6"
+status = "transcribed by an AI agent from the PDF of the 2009 Dagstuhl version (no LaTeX source available; formulas written in LaTeX) and compared with that PDF; not yet checked by a person"
+statement = '''
+For any initial state it holds that if no process is ever adversarial, then the median rule reaches a stable consensus in $O(\log n)$ rounds w.h.p.
+'''
+context = '''
+[Section 1.1, p. 3:] In our model we have $n$ processes that are completely interconnected in an anonymous network. [...] Each process $i$ initially has some value $v_i \in \mathbb{N}$ [...]. The goal is to eventually agree on a common, stable value $v \in \{v_1, \ldots, v_n\}$, that is, afterwards the processes will not deviate from $v$ anymore. We assume that time proceeds in synchronized rounds.
+
+[Section 1.2, p. 4:] We propose a very simple protocol for our model called the \emph{median rule}: In each round, every process $i$ picks two processes $j$ and $k$ uniformly and independently at random among all processes (including itself). It then updates $v_i$ to the \emph{median} of $v_i$, $v_j$ and $v_k$.
+
+[Section 2.1, p. 5:] The algorithm has reached a fixed point (has stabilized) in the $i$-th iteration if and only if $b_{i,1} = \cdots = b_{i,n}$.
+
+[Section 2.2, p. 5:] We write w.h.p. to refer to an event that holds with probability at least $1 - n^{-c}$ for $c > 1$.
+'''
+notes = "No LaTeX source; transcribed from the PDF. Theorem 1.1 in the SPAA 2011 proceedings. median:thm:binary-any is the case of two values. median:thm:of-binary (a failure bound for binary configurations gives one for m values, losing a factor m - 1) has no statement in the paper; it is a step of the library's proof of Theorem 1, which goes through the threshold configurations (Lemma 17, see median:thm:threshold) and a union bound (median/FORMALIZATION_DIFFERENCES.md, AnyStart item 3); PROVENANCE.md attributes it to Theorem 1."
+
+[[source]]
+items = ["median:thm:binary-fast", "median:thm:median-fast", "median:thm:odd-split"]
+paper = "B. Doerr, L. A. Goldberg, L. Minder, T. Sauerwald, C. Scheideler. Stabilizing consensus with the power of two choices"
+venue = "Dagstuhl Seminar Proceedings 09371 (2009); later SPAA 2011"
+version = "Dagstuhl Sem. Proc. 09371 (2009)"
+result = "Theorem 21"
+page = 10
+url = "https://drops.dagstuhl.de/entities/document/10.4230/DagSemProc.09371.6"
+status = "transcribed by an AI agent from the PDF of the 2009 Dagstuhl version (no LaTeX source available; formulas written in LaTeX) and compared with that PDF; not yet checked by a person"
+statement = '''
+Assume that each of the $n$ balls is initially assigned uniformly at random to one of the $m$ bins. Then the median rule reaches a stable consensus in the following number of rounds w.h.p.:
+\[
+\begin{array}{ll}
+O(\log m + \log\log n) & \text{if $m$ is odd,} \\
+\Theta(\log n) & \text{if $m$ is even.}
+\end{array}
+\]
+'''
+context = '''
+[Section 1.2, p. 4:] We propose a very simple protocol for our model called the \emph{median rule}: In each round, every process $i$ picks two processes $j$ and $k$ uniformly and independently at random among all processes (including itself). It then updates $v_i$ to the \emph{median} of $v_i$, $v_j$ and $v_k$.
+
+[Section 2.1, p. 5:] We have $n$ balls (processes) numbered from $1$ to $n$, and $n$ bins (values) also numbered from $1$ to $n$. [...] The algorithm has reached a fixed point (has stabilized) in the $i$-th iteration if and only if $b_{i,1} = \cdots = b_{i,n}$.
+
+[Section 2.2, p. 5:] We write w.h.p. to refer to an event that holds with probability at least $1 - n^{-c}$ for $c > 1$.
+
+[Section 5, p. 10:] In this section, we investigate the case where all $n$ balls are initially put independently and randomly into $m$ bins.
+
+[Section 5.1, p. 10:] Without the adversary, we get the following result.
+'''
+notes = "No LaTeX source; transcribed from the PDF. Theorem 4.1 in the SPAA 2011 proceedings. The library formalizes the odd case for exactly equal supports (median:thm:odd-split) and, as steps of its proof, the margin statements median:thm:binary-fast and median:thm:median-fast; the proof of Theorem 21 merges the (m-1)/2 leftmost and rightmost bins into two superbins and lets the middle bin win (p. 10). PROVENANCE.md attributes all three items to Theorem 21 (odd case)."
+
+[[source]]
+item = "median:thm:binary-adv"
+paper = "B. Doerr, L. A. Goldberg, L. Minder, T. Sauerwald, C. Scheideler. Stabilizing consensus with the power of two choices"
+venue = "Dagstuhl Seminar Proceedings 09371 (2009); later SPAA 2011"
+version = "Dagstuhl Sem. Proc. 09371 (2009)"
+result = "Theorem 10"
+page = 7
+url = "https://drops.dagstuhl.de/entities/document/10.4230/DagSemProc.09371.6"
+status = "transcribed by an AI agent from the PDF of the 2009 Dagstuhl version (no LaTeX source available; formulas written in LaTeX) and compared with that PDF; not yet checked by a person"
+statement = '''
+For any initial distribution of the balls, $O(\log n)$ rounds of the majority rule suffice to get $n - O(\sqrt{n})$ balls into the same bin, w.h.p. This holds even if an adversary is allowed to manipulate the random choices of at most $O(\sqrt{n})$ balls.
+'''
+context = '''
+[Section 2.2, p. 5:] We write w.h.p. to refer to an event that holds with probability at least $1 - n^{-c}$ for $c > 1$.
+
+[Section 3, p. 7:] In this section, we consider the case with only two bins. This special case is of more general interest, as the later analysis with more than two bins will use some results of this section.
+
+We also consider an adversary with the following abilities. In each round after all $n$ balls have made their random choices, the adversary is allowed to change the choices of at most $\sqrt{n}$ balls. We prove that despite the adversary, we reach a stable state where one bin contains at least $n - \sqrt{n}$ balls w.~h.~p.
+
+Note that for the two bin-case, the median rule coincides with the \emph{majority rule}, where a balls next bin is chosen to be the majoritary bin of itself and two random balls.
+'''
+notes = "No LaTeX source; transcribed from the PDF. median/README.md cites Theorem 10 for the two-value case with the adversary; PROVENANCE.md cites Theorems 2, 3, 10 and 20 for the row (see the entries of median:thm:median-adv). 'a balls next bin' and 'majoritary' as printed. The Section 3 adversary changes the random choices of balls after they are made; the Section 1.1 adversary changes the states of processes at the beginning of each round (see median:def:adversary)."
+
+[[source]]
+items = ["median:thm:median-adv", "median:thm:binary-adv"]
+paper = "B. Doerr, L. A. Goldberg, L. Minder, T. Sauerwald, C. Scheideler. Stabilizing consensus with the power of two choices"
+venue = "Dagstuhl Seminar Proceedings 09371 (2009); later SPAA 2011"
+version = "Dagstuhl Sem. Proc. 09371 (2009)"
+result = "Theorem 2"
+page = 4
+url = "https://drops.dagstuhl.de/entities/document/10.4230/DagSemProc.09371.6"
+status = "transcribed by an AI agent from the PDF of the 2009 Dagstuhl version (no LaTeX source available; formulas written in LaTeX) and compared with that PDF; not yet checked by a person"
+statement = '''
+For any initial state with a constant number of different values and under any $T$-bounded adversary with $T \le \sqrt{n}$, the median rule reaches an almost stable consensus in $O(\log n)$ rounds w.h.p.
+'''
+context = '''
+[Section 1.1, p. 3:] We use the following strong adversarial model. A $T$-bounded adversary is allowed to know the entire history of the protocol. At the beginning of each round, it may decide to change the state of up to $T$ many of the processes in an arbitrary way subject to the constraint that it can only change the value of a process to one out of the initial set of values $\{v_1, \ldots, v_n\}$. [...]
+
+Of course, in our adversarial model we cannot enforce any more that eventually all processes agree on a stable value. Hence we will only require that there is a round $r$ and value $v \in \{v_1, \ldots, v_n\}$ such that for any round later than $r$, all but up to $O(T)$ processes agree on $v$. We will call this \emph{almost stable consensus}.
+
+[Section 1.2, p. 4:] We propose a very simple protocol for our model called the \emph{median rule}: In each round, every process $i$ picks two processes $j$ and $k$ uniformly and independently at random among all processes (including itself). It then updates $v_i$ to the \emph{median} of $v_i$, $v_j$ and $v_k$.
+
+[Section 2.2, p. 5:] We write w.h.p. to refer to an event that holds with probability at least $1 - n^{-c}$ for $c > 1$.
+'''
+notes = "No LaTeX source; transcribed from the PDF. Theorem 1.1 of the SPAA 2011 proceedings states the main result with the adversary; PROVENANCE.md cites Theorems 2, 3, 10 and 20 of this version for median:thm:binary-adv and median:thm:median-adv together. Two values are a constant number of values, so the theorem also covers median:thm:binary-adv."
+
+[[source]]
+item = "median:thm:median-adv"
+paper = "B. Doerr, L. A. Goldberg, L. Minder, T. Sauerwald, C. Scheideler. Stabilizing consensus with the power of two choices"
+venue = "Dagstuhl Seminar Proceedings 09371 (2009); later SPAA 2011"
+version = "Dagstuhl Sem. Proc. 09371 (2009)"
+result = "Theorem 3"
+page = 5
+url = "https://drops.dagstuhl.de/entities/document/10.4230/DagSemProc.09371.6"
+status = "transcribed by an AI agent from the PDF of the 2009 Dagstuhl version (no LaTeX source available; formulas written in LaTeX) and compared with that PDF; not yet checked by a person"
+statement = '''
+For any initial state with $m$ different values and under any $T$-bounded adversary with $T \le \sqrt{n}$, the median rule reaches an almost stable consensus in $O(\log m \cdot \log\log n + \log n)$ rounds w.h.p.
+'''
+context = '''
+[Section 1.1, p. 3:] We use the following strong adversarial model. A $T$-bounded adversary is allowed to know the entire history of the protocol. At the beginning of each round, it may decide to change the state of up to $T$ many of the processes in an arbitrary way subject to the constraint that it can only change the value of a process to one out of the initial set of values $\{v_1, \ldots, v_n\}$. [...]
+
+Of course, in our adversarial model we cannot enforce any more that eventually all processes agree on a stable value. Hence we will only require that there is a round $r$ and value $v \in \{v_1, \ldots, v_n\}$ such that for any round later than $r$, all but up to $O(T)$ processes agree on $v$. We will call this \emph{almost stable consensus}.
+
+[Section 1.2, p. 4:] We propose a very simple protocol for our model called the \emph{median rule}: In each round, every process $i$ picks two processes $j$ and $k$ uniformly and independently at random among all processes (including itself). It then updates $v_i$ to the \emph{median} of $v_i$, $v_j$ and $v_k$.
+
+[Section 2.2, p. 5:] We write w.h.p. to refer to an event that holds with probability at least $1 - n^{-c}$ for $c > 1$.
+'''
+notes = "No LaTeX source; transcribed from the PDF. Theorem 20 (own entry) is the same result stated in Section 4.3. Theorem 1.1 of the SPAA 2011 proceedings."
+
+[[source]]
+item = "median:thm:median-adv"
+paper = "B. Doerr, L. A. Goldberg, L. Minder, T. Sauerwald, C. Scheideler. Stabilizing consensus with the power of two choices"
+venue = "Dagstuhl Seminar Proceedings 09371 (2009); later SPAA 2011"
+version = "Dagstuhl Sem. Proc. 09371 (2009)"
+result = "Theorem 20"
+page = 10
+url = "https://drops.dagstuhl.de/entities/document/10.4230/DagSemProc.09371.6"
+status = "transcribed by an AI agent from the PDF of the 2009 Dagstuhl version (no LaTeX source available; formulas written in LaTeX) and compared with that PDF; not yet checked by a person"
+statement = '''
+For any $\sqrt{n}$-bounded adversary and $m$ bins, it will take at most $O(\log m \log\log n + \log n)$ rounds until the median rule reaches an almost stable consensus.
+'''
+context = '''
+[Section 1.1, p. 3:] We use the following strong adversarial model. A $T$-bounded adversary is allowed to know the entire history of the protocol. At the beginning of each round, it may decide to change the state of up to $T$ many of the processes in an arbitrary way subject to the constraint that it can only change the value of a process to one out of the initial set of values $\{v_1, \ldots, v_n\}$. [...]
+
+Of course, in our adversarial model we cannot enforce any more that eventually all processes agree on a stable value. Hence we will only require that there is a round $r$ and value $v \in \{v_1, \ldots, v_n\}$ such that for any round later than $r$, all but up to $O(T)$ processes agree on $v$. We will call this \emph{almost stable consensus}.
+
+[Section 2.1, p. 5:] We have $n$ balls (processes) numbered from $1$ to $n$, and $n$ bins (values) also numbered from $1$ to $n$.
+
+[Section 4.3, p. 10:] The following theorem extends our two-bin result to the many-bin case in the presence of an adversary.
+'''
+notes = "No LaTeX source; transcribed from the PDF. The statement does not say 'w.h.p.' (Theorem 3, own entry, states the same bound w.h.p.)."
+
+[[source]]
+item = "median:def:adversary"
+paper = "B. Doerr, L. A. Goldberg, L. Minder, T. Sauerwald, C. Scheideler. Stabilizing consensus with the power of two choices"
+venue = "Dagstuhl Seminar Proceedings 09371 (2009); later SPAA 2011"
+version = "Dagstuhl Sem. Proc. 09371 (2009)"
+result = "Section 1.1, T-bounded adversary"
+page = 3
+url = "https://drops.dagstuhl.de/entities/document/10.4230/DagSemProc.09371.6"
+status = "transcribed by an AI agent from the PDF of the 2009 Dagstuhl version (no LaTeX source available; formulas written in LaTeX) and compared with that PDF; not yet checked by a person"
+statement = '''
+However, if some processes can be corrupted, finding and staying at a consensus is much more tricky. We use the following strong adversarial model. A $T$-bounded adversary is allowed to know the entire history of the protocol. At the beginning of each round, it may decide to change the state of up to $T$ many of the processes in an arbitrary way subject to the constraint that it can only change the value of a process to one out of the initial set of values $\{v_1, \ldots, v_n\}$. This is necessary to stay within the original consensus problem (i.e., the processes agree on one of the initial values) but also reasonable in applications where the values are signed by some outside authority so that the adversary cannot just come up with a value by itself.
+
+Of course, in our adversarial model we cannot enforce any more that eventually all processes agree on a stable value. Hence we will only require that there is a round $r$ and value $v \in \{v_1, \ldots, v_n\}$ such that for any round later than $r$, all but up to $O(T)$ processes agree on $v$. We will call this \emph{almost stable consensus}.
+'''
+context = '''
+[Section 1.1, p. 3:] Each process $i$ initially has some value $v_i \in \mathbb{N}$ [...]. We assume that time proceeds in synchronized rounds.
+
+[Section 3, p. 7:] We also consider an adversary with the following abilities. In each round after all $n$ balls have made their random choices, the adversary is allowed to change the choices of at most $\sqrt{n}$ balls.
+'''
+notes = "No LaTeX source; transcribed from the PDF. The library's adversary acts after the median step of each round (median/README.md); the paper's Section 1.1 adversary acts at the beginning of each round and its Section 3 adversary (two bins) changes the random choices after they are made."
+
+# ---------------------------------------------------------------------------------------------
+# Cooper, Elsässer, Radzik (ICALP 2014, arXiv:1404.7479v1)
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+item = "median:def:graph-voting"
+paper = "C. Cooper, R. Elsässer, T. Radzik. The power of two choices in distributed voting"
+venue = "ICALP 2014"
+version = "arXiv:1404.7479v1"
+result = "Sections 1 and 3, two-sample voting"
+page = 2
+url = "https://arxiv.org/abs/1404.7479v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+[Section 1, p. 2:] To address these issues, we consider a modified version of pull voting in which each vertex $v$ randomly queries two neighbours at each step. On the basis of the sample taken, vertex $v$ revises its opinion as follows. If both neighbours have the same opinion, the calling vertex $v$ adopts this opinion. If the two opinions differ, the calling vertex $v$ retains its current opinion in this round. To distinguish this process from the conventional pull voting, as described above, we use terms {\em single-sample voting} and {\em two-sample voting}.
+
+[Section 3, p. 8:] The $X_v$ are independent $\{0,1\}$ random variables with the expected value depending whether the neighbours are selected with or without replacement:
+\[
+\mathbf{E} X_v(\text{with replacement}) = \left(\frac{d_v^B}{d}\right)^2, \;\;\;
+\mathbf{E} X_v(\text{no replacement}) = \; \frac{(d_v^B)( d_v^B-1)}{d(d-1)}.
+\]
+We give proofs for sampling with replacement.
+'''
+context = '''
+[Section 1, p. 1:] In the beginning each vertex of a connected undirected graph $G=(V,E)$ has an initial opinion. The voting process proceeds synchronously in discrete time steps called rounds. During each round, each vertex independently contacts a random neighbour and adopts the opinion of that neighbour.
+
+[Section 2, p. 4:] Assume that initially each vertex holds one of two opinions. For convenience, $A$ and $B$ will denote the opinions, the two sets of vertices who have these opinions, and the sizes of these sets, depending on the context.
+
+[Section 3, p. 7:] At any step $t$ of the voting process, let $\Delta_{AB}=\Delta_{AB}(t)$ be the number of $A$ vertices converting to $B$ during this step. [...] For a vertex $v$ and a set of vertices $C$, let $d_v^C$ be the number of vertices in $C$ which are adjacent to $v$. For $v \in A$, let $X_v=1$ if $v$ chooses twice in $B$ at step $t$, and 0 otherwise.
+
+[Section 4.1, p. 8:] The condition in Lemma 2 says that the number $E(X,Y)$ of edges between any disjoint large subsets of vertices $X$ and $Y$ is close to the value $dXY/n$ expected in the random regular graph.
+
+[Lemma 5, p. 15:] [...] every superset $S \supseteq B$ of size at most $(1+1/\alpha)B$ spans at most $\alpha d S$ edges (that is, $|E(S)| \le \alpha d S$) [...]
+'''
+notes = "Macros replaced: \\E -> \\mathbf{E}, \\bfrac{a}{b} -> \\left(\\frac{a}{b}\\right), \\set{.} -> \\{.\\}, \\a -> \\alpha. 'Pull voting' in the first context excerpt is the single-sample process the paper starts from. The paper does not define E(X,Y) and E(S) beyond these phrases; the library's edgeCount counts ordered adjacent pairs, so that E(S,S) = 2|E(S)| (median/FORMALIZATION_DIFFERENCES.md, Expander item 2)."
+
+[[source]]
+item = "median:def:lambdaG"
+paper = "C. Cooper, R. Elsässer, T. Radzik. The power of two choices in distributed voting"
+venue = "ICALP 2014"
+version = "arXiv:1404.7479v1"
+result = "Section 2, definition of lambda_G"
+page = 5
+url = "https://arxiv.org/abs/1404.7479v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+We give a similar result for expanders, that is, for a $d$-regular graph $G$ with a small second eigenvalue $\lambda_G = \max \{\lambda_2, |\lambda_n|\}$, where $\lambda_1 \geq \lambda_2 \geq \dots \geq \lambda_n$ are the eigenvalues of the transition matrix $P = (1/d)A$ of a random walk on $G$ and $A$ is the adjacency matrix of $G$.
+'''
+context = '''
+[Lemma 3, p. 8:] Let $G = (V,E)$ be a $d$-regular $n$-vertex graph. Let $1 = \lambda_1 \ge \lambda_2 \ge \cdots \lambda_n \ge -1$ be the eigenvalues of the transition matrix of the random walk on $G$, and let $\lambda = \lambda_G = \max\{ |\lambda_2|, |\lambda_n| \}$.
+'''
+notes = "Macro replaced: \\l -> \\lambda. Section 2 writes max{lambda_2, |lambda_n|} and Lemma 3 writes max{|lambda_2|, |lambda_n|}, as printed; the two agree (lambda_2 < 0 forces lambda_n < 0 with |lambda_n| >= |lambda_2|). 'lambda_2 \\ge \\cdots \\lambda_n' (a missing \\ge) as printed in Lemma 3."
+
+[[source]]
+items = ["median:lem:eml", "median:lem:cer-mixing-prop"]
+paper = "C. Cooper, R. Elsässer, T. Radzik. The power of two choices in distributed voting"
+venue = "ICALP 2014"
+version = "arXiv:1404.7479v1"
+result = "Lemma 3 (Expander Mixing Lemma)"
+page = 8
+url = "https://arxiv.org/abs/1404.7479v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+{\rm (Expander Mixing Lemma~[3]).}
+Let $G = (V,E)$ be a $d$-regular $n$-vertex graph.
+Let $1 = \lambda_1 \ge \lambda_2 \ge \cdots \lambda_n \ge -1$ be the eigenvalues
+of the transition matrix of the random walk on $G$,
+and let $\lambda = \lambda_G = \max\{ |\lambda_2|, |\lambda_n| \}$. Then for all $S, T \subseteq V$,
+\[ \left| E(S,T) - \frac{dST}{n} \right| \; \le \; \lambda d \sqrt{ST}.
+\]
+'''
+context = '''
+[Section 2, p. 4:] For convenience, $A$ and $B$ will denote the opinions, the two sets of vertices who have these opinions, and the sizes of these sets, depending on the context.
+
+[Section 4.1, p. 8:] The condition in Lemma 2 says that the number $E(X,Y)$ of edges between any disjoint large subsets of vertices $X$ and $Y$ is close to the value $dXY/n$ expected in the random regular graph. This condition is of the form as in the Expander Mixing Lemma (stated below as Lemma 3), so Lemma 2 can be immediately applied to expanders (see Corollary 2).
+
+[Lemma 2, p. 8:] Let $G$ be a $d$-regular $n$-vertex connected graph such that
+\begin{equation}
+   \left| E(X,Y) - \frac{dXY}{n} \right| \le \alpha d \sqrt{XY}, \qquad (9)
+\end{equation}
+for each pair $X$ and $Y$ of disjoint subsets of vertices of sizes $Y \ge cn$ and $X \ge (2/3)\alpha c^{3/2} n$.
+
+[Proof of Corollary 2, p. 9:] If $\lambda \le 1/K_1$, then $\lambda \le c^{3/2}/36$ and we can apply Lemma 2 with $c$ and $\alpha = \lambda$. Now Lemmas 2 and 3 imply that [...]
+'''
+notes = "Macros replaced: \\l -> \\lambda, \\a -> \\alpha; printed equation number (9) written as \\qquad (9). Reference [3] is Alon and Chung, Explicit construction of linear sized tolerant networks, Discrete Math. 72 (1988/89). Sets and their sizes share a letter (S T in dST/n is |S||T|). 'lambda_2 \\ge \\cdots \\lambda_n' (a missing \\ge) as printed. median:lem:cer-mixing-prop (lambda_G <= alpha implies hypothesis (9)) is how the proof of Corollary 2 uses Lemma 3."
+
+[[source]]
+item = "median:lem:sparse"
+paper = "C. Cooper, R. Elsässer, T. Radzik. The power of two choices in distributed voting"
+venue = "ICALP 2014"
+version = "arXiv:1404.7479v1"
+result = "Proof of Lemma 6, sparsity of small sets"
+page = 15
+url = "https://arxiv.org/abs/1404.7479v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+This lemma follows from Corollary~4 applied with $c = 1 - (2/5)(1-\lambda)^{-1} > 0$, after checking that $|E(S)| \le (3/10)dS$ whenever $S \le cn$.
+It is shown in~[20] that the conductance of graph $G = (V,E)$ defined as
+\[ \Phi_G = \min_{\emptyset \neq S\subset V} \frac{n E(S,\bar{S})}{d S \bar{S}},
+\]
+is at least $1 - \lambda$.
+This implies that
+$E(S,\bar{S}) \ge (1 - \lambda) dS\bar{S}/n$,
+so for any $S\subseteq V$ of size at most~$cn$,
+\begin{eqnarray*}
+    |E(S)| & = & \frac{1}{2} \left(dS - E(S,\bar{S})\right)
+    \; \le \; \frac{1}{2} d S \left(1 - (1-\lambda) \bar{S}/n\right) \\
+    & \le & \frac{1}{2} d S \left(1 - (1-\lambda)(1-c)\right)
+    \; = \; \frac{3}{10} dS.
+\end{eqnarray*}
+'''
+context = '''
+[Lemma 6, p. 15:] Let $G$ be a $d$-regular $n$-vertex graph with $\lambda = \lambda_G < 3/5$. Then the minority vote $B$ reduces from $(3/13)(3/5 - \lambda)n$ to $\omega$ within $O(\log n)$ steps with probability at least $1-e^{-\Theta(\omega)}$.
+
+[Section 2, p. 5:] [...] a $d$-regular graph $G$ with a small second eigenvalue $\lambda_G = \max \{\lambda_2, |\lambda_n|\}$, where $\lambda_1 \geq \lambda_2 \geq \dots \geq \lambda_n$ are the eigenvalues of the transition matrix $P = (1/d)A$ of a random walk on $G$ and $A$ is the adjacency matrix of $G$.
+
+[Section 4.1, p. 8:] [...] the number $E(X,Y)$ of edges between any disjoint large subsets of vertices $X$ and $Y$ [...]
+
+[Lemma 5, p. 15:] [...] spans at most $\alpha d S$ edges (that is, $|E(S)| \le \alpha d S$) [...]
+'''
+notes = "This passage is the proof of Lemma 6 (it continues onto p. 16); the paper has no separate statement of the sparsity bound. Macros replaced: \\l -> \\lambda, \\brac{x} -> \\left(x\\right). Reference [20] is Jerrum and Sinclair. The library proves its version (sets of at most epsilon n vertices when lambda_G <= 3/5 - epsilon) from the expander mixing lemma (Lemma 3) instead of the conductance bound (median/FORMALIZATION_DIFFERENCES.md, Expander item 6)."
+
+[[source]]
+item = "median:lem:phase2"
+paper = "C. Cooper, R. Elsässer, T. Radzik. The power of two choices in distributed voting"
+venue = "ICALP 2014"
+version = "arXiv:1404.7479v1"
+result = "Lemma 5"
+page = 15
+url = "https://arxiv.org/abs/1404.7479v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+Let $G$ be a $d$-regular $n$-vertex graph with $A$ and $B$ votes,
+where $A > B$.
+Let $0  < \alpha \le 3/10$ and
+$\gamma = \gamma(\alpha) = (1/2)(1 - 2\alpha)(1 - 3\alpha) > 0$.
+If the set $B$  is such that every superset $S \supseteq B$ of size at most $(1+1/\alpha)B$
+spans at most $\alpha d S$ edges
+(that is, $|E(S)| \le \alpha d S$), then
+one voting step reduces $B$
+by at least
+a factor $1 - \gamma$,
+with probability at least $1 - e^{-\tilde{\gamma} B}$, where
+$\tilde{\gamma}$ is some constant bounded away from $0$.
+'''
+context = '''
+[Section 1, p. 2:] [...] we consider a modified version of pull voting in which each vertex $v$ randomly queries two neighbours at each step. On the basis of the sample taken, vertex $v$ revises its opinion as follows. If both neighbours have the same opinion, the calling vertex $v$ adopts this opinion. If the two opinions differ, the calling vertex $v$ retains its current opinion in this round. [...]
+
+[Section 2, p. 4:] For convenience, $A$ and $B$ will denote the opinions, the two sets of vertices who have these opinions, and the sizes of these sets, depending on the context.
+
+[Section 3, p. 8:] We give proofs for sampling with replacement.
+
+[Proof of Corollary 4, p. 15:] For each step, apply Lemma~5 with $\alpha = 3/10$ and $\gamma = \gamma(3/10) > 0$.
+'''
+notes = "Macros replaced: \\a -> \\alpha, \\g -> \\gamma. The library states the lemma at alpha = 3/10 (gamma = 1/50), the value used in the proof of Theorem 4 through Corollary 4."
+
+[[source]]
+item = "median:def:cer-imbalance"
+paper = "C. Cooper, R. Elsässer, T. Radzik. The power of two choices in distributed voting"
+venue = "ICALP 2014"
+version = "arXiv:1404.7479v1"
+result = "Sections 2, 3, 4.3: nu, flows, eta, T_1"
+page = 4
+url = "https://arxiv.org/abs/1404.7479v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+[Section 2, p. 4:] If opinion $A$ is  the majority, then the imbalance $\nu$ (also referred to as the relative difference between the votes, or the advantage of the $A$ vote) is given by $A - B = \nu n$.
+
+[Section 3, p. 7:] At any step $t$ of the voting process, let $\Delta_{AB}=\Delta_{AB}(t)$ be the number of $A$ vertices converting to $B$ during this step. Similarly, let $ \Delta_{BA}$ be the number of $B$ vertices converting to $A$ during step $t$.
+
+[Section 4.3, p. 12:] where $\eta \equiv \eta_{AB} = \alpha n/\sqrt{AB} \le \alpha \sqrt{2/c} \le c/25$.
+
+[Section 4.3, p. 14:] This means that the number of steps required to increase the vote imbalance from $\nu_0$ to $1/2$ is at most $\left\lceil \log_{5/4} (1/(2{\nu_0})) \right\rceil$. [...] Thus the number of steps required to increase the vote imbalance from $1/2$ to $1-2c$ (that is, decrease $\delta_t$ from $1/2$ to $2c$) is at most $\left\lceil \log_{4/3} (1/(4{c})) \;  \right\rceil$.
+'''
+context = '''
+[Section 2, p. 4:] Assume that initially each vertex holds one of two opinions. For convenience, $A$ and $B$ will denote the opinions, the two sets of vertices who have these opinions, and the sizes of these sets, depending on the context.
+
+[Section 3, p. 7:] [...] use the concentration of these two random variables [...] to get a w.h.p. value of $ \Delta=\Delta_{BA}-\Delta_{AB}$, which is the increase of the number of $A$ vertices in this step.
+
+[Section 4.3, p. 12:] Let $c$ and $\alpha$ be as in the statement of the lemma. Let $A$ and $B$ be the voting groups at the beginning of the current step, let $\nu = (A-B)/n$ [...]
+
+[Section 4.3, p. 14:] For $1/2 \le \nu_t \le 1-2c$, we set $\delta_t = 1-\nu_t$ [...]
+'''
+notes = "Macros replaced: \\D -> \\Delta, \\a -> \\alpha, \\d -> \\delta, \\whp -> w.h.p. The paper has no single definition block; the passages are quoted in reading order. The library's T_1(nu, c) is the sum of the two step counts of the proof of Lemma 2."
+
+[[source]]
+item = "median:def:cer-mixing-prop"
+paper = "C. Cooper, R. Elsässer, T. Radzik. The power of two choices in distributed voting"
+venue = "ICALP 2014"
+version = "arXiv:1404.7479v1"
+result = "Lemma 2, hypothesis (9)"
+page = 8
+url = "https://arxiv.org/abs/1404.7479v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+Let $G$ be a $d$-regular $n$-vertex connected graph such that
+\begin{equation}
+   \left| E(X,Y) - \frac{dXY}{n} \right| \le \alpha d \sqrt{XY}, \qquad (9)
+\end{equation}
+for each pair $X$ and $Y$ of disjoint subsets of vertices of
+sizes $Y \ge cn$ and $X \ge (2/3)\alpha c^{3/2} n$.
+'''
+context = '''
+[Lemma 2, p. 8, beginning:] Let $0 < c \le 1/2$, $0 < \alpha \le  c^{3/2}/36$, and $\alpha^2 c^2 n = \Omega(n^\epsilon)$, for a constant $\epsilon > 0$.
+
+[Section 2, p. 4:] For convenience, $A$ and $B$ will denote the opinions, the two sets of vertices who have these opinions, and the sizes of these sets, depending on the context.
+
+[Section 4.1, p. 8:] The condition in Lemma 2 says that the number $E(X,Y)$ of edges between any disjoint large subsets of vertices $X$ and $Y$ is close to the value $dXY/n$ expected in the random regular graph.
+'''
+notes = "Excerpt of the statement of Lemma 2 (the full lemma is in the median:thm:cer-phaseI entry). Macros replaced: \\a -> \\alpha, \\e -> \\epsilon; printed equation number (9) written as \\qquad (9). X and Y denote both the sets and their sizes."
+
+[[source]]
+item = "median:lem:cer-flows-expect"
+paper = "C. Cooper, R. Elsässer, T. Radzik. The power of two choices in distributed voting"
+venue = "ICALP 2014"
+version = "arXiv:1404.7479v1"
+result = "Proof of Lemma 2, (19)-(20) and (24)-(27)"
+page = 12
+url = "https://arxiv.org/abs/1404.7479v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+[p. 12:] {\bf Lower bound on $\Delta_{BA}$.}
+The expectation $\mathbf{E} \Delta_{BA}$, taken over the random selection of neighbours in the current voting step,
+is equal to
+\begin{eqnarray}
+\mathbf{E} \Delta_{BA} & = & \sum_{v \in B} \left(\frac{d_v^A}{d}\right)^2
+  \; \ge \; \frac{1}{Bd^2} \left(\sum_{v \in B} d_v^A\right)^2
+  \; = \; \frac{1}{Bd^2}  \left(E(A,B)\right)^2  \nonumber \\
+  & \ge & \frac{1}{Bd^2}  \left( \frac{dAB}{n} - \alpha d \sqrt{AB} \right)^2
+  \; = \; \frac{A^2B}{n^2} \left(1 - \alpha \frac{n}{\sqrt{AB}}\right)^2  \qquad (19) \\
+  & \ge & \frac{A^2B}{n^2} \left(1 - 2\alpha \frac{n}{\sqrt{AB}}\right)
+  \; = \; \frac{A^2B}{n^2} \left(1 - 2\eta\right), \qquad (20)
+\end{eqnarray}
+where $\eta \equiv \eta_{AB} = \alpha n/\sqrt{AB} \le \alpha \sqrt{2/c} \le c/25$.
+
+[p. 13:] The expectation $\mathbf{E} \Delta_{AB}$, taken over the random selection of neighbours in
+the current voting step, is equal to
+\begin{eqnarray}
+\mathbf{E} \Delta_{AB} & = & \sum_{v \in A} \left(\frac{d_v^B}{d}\right)^2
+   \; = \; \sum_{i=0}^q \sum_{v \in C_i} \left(\frac{d_v^B}{d}\right)^2
+   \; \le \; C_q + \sum_{i=0}^{q-1} \sum_{v \in C_i} \left(\frac{d_v^B}{d}\right)^2  \nonumber \\
+  & \le & C_q + \sum_{i=0}^{q-1} C_i \left(\frac{(dB/n)(1+2^i \eta)}{d}\right)^2
+   \; = \; C_q + \frac{B^2}{n^2} \sum_{i=0}^{q-1} C_i (1+2^{i+1} \eta + 2^{2i} \eta^2)  \qquad (24) \\
+   & = & C_q + \frac{B^2}{n^2}
+                     \left( \sum_{i=0}^{q-1} C_i + C_0 (2\eta + \eta^2)
+                              + \eta\sum_{i=1}^{q-1} 2^{i+1}C_i \left(1 + 2^{i-1} \eta\right)\right) \nonumber \\
+    & \le & C_q + \frac{B^2}{n^2}
+                     \left( A + A(2\eta + \eta^2) +
+                              \eta\sum_{i=1}^{q-1} \frac{A}{2^{i-3}}\left(1 + 2^{i-1} \eta\right)\right) \qquad (25) \\
+  & \le & C_q + \frac{AB^2}{n^2}
+                     \left( 1 + 2\eta + \eta^2 +
+                              8\eta + 4q\eta^2\right) \nonumber \\
+   & \le & C_q + \frac{AB^2}{n^2}
+                     \left( 1 + 11\eta\right) \qquad (26) \\
+   & \le & \frac{AB^2}{n^2} \left( 1 + 15\eta\right). \qquad (27)
+\end{eqnarray}
+'''
+context = '''
+[Lemma 2, p. 8:] Let $0 < c \le 1/2$, $0 < \alpha \le  c^{3/2}/36$, and $\alpha^2 c^2 n = \Omega(n^\epsilon)$, for a constant $\epsilon > 0$. Let $G$ be a $d$-regular $n$-vertex connected graph such that
+\begin{equation}
+   \left| E(X,Y) - \frac{dXY}{n} \right| \le \alpha d \sqrt{XY}, \qquad (9)
+\end{equation}
+for each pair $X$ and $Y$ of disjoint subsets of vertices of sizes $Y \ge cn$ and $X \ge (2/3)\alpha c^{3/2} n$. [...]
+
+[Section 3, p. 7:] At any step $t$ of the voting process, let $\Delta_{AB}=\Delta_{AB}(t)$ be the number of $A$ vertices converting to $B$ during this step. Similarly, let $ \Delta_{BA}$ be the number of $B$ vertices converting to $A$ during step $t$. [...] For a vertex $v$ and a set of vertices $C$, let $d_v^C$ be the number of vertices in $C$ which are adjacent to $v$.
+
+[Section 3, p. 8:] We give proofs for sampling with replacement.
+
+[Section 4.3, p. 12:] Let $c$ and $\alpha$ be as in the statement of the lemma. Let $A$ and $B$ be the voting groups at the beginning of the current step, let $\nu = (A-B)/n$, and assume that for some sufficiently large constant $K$,
+\begin{equation}
+K \alpha \; \le \; \nu \; \le \; 1-2c, \qquad (18)
+\end{equation}
+or equivalently,
+\[
+        cn \; \le \; B \; \le \; \frac{1 - K \alpha}{2}n.
+\]
+[...] The inequality on line (19) is the inequality (9) applied to sets $A$ and $B$ (as $X$ and $Y$).
+
+[Section 4.3, p. 13:] {\bf Upper bound on $\Delta_{AB}$.} Let $q = \lfloor (1/2)\log_2(n^2/(\eta B^2)\rfloor +1$. We partition set $A$ into $q+1$ sets $C_i$, according to the values $d_v^B$: [...]
+'''
+notes = "Steps of the proof of Lemma 2; the paper has no separate statement of the two expectation bounds. Macros replaced: \\D -> \\Delta, \\E -> \\mathbf{E}, \\a -> \\alpha, \\e -> \\epsilon, \\bfrac{a}{b} -> \\left(\\frac{a}{b}\\right), \\brac{x} -> \\left(x\\right); \\label replaced by the printed equation numbers (written as \\qquad (N)). The definition of the sets C_0, ..., C_q (p. 13) is not quoted. The unbalanced parenthesis in the definition of q is as printed."
+
+[[source]]
+item = "median:lem:cer-flows-tail"
+paper = "C. Cooper, R. Elsässer, T. Radzik. The power of two choices in distributed voting"
+venue = "ICALP 2014"
+version = "arXiv:1404.7479v1"
+result = "Proof of Lemma 2, (21) and (28)"
+page = 12
+url = "https://arxiv.org/abs/1404.7479v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+[p. 12:] Therefore,
+\begin{eqnarray}
+\mathbf{Pr}\left( \Delta_{BA} \le  \frac{A^2B}{n^2}(1-3\eta)\right)
+   & \le & \mathbf{Pr}\left( \Delta_{BA} \le (1-\eta) \mathbf{E}\Delta_{BA}\right)
+   \; \le \;      e^{-\eta^2 c n/24}
+   \; \le \;      e^{-\alpha^2 c n/6}.   \qquad (21)
+\end{eqnarray}
+
+[p. 13:] The above bound on $\mathbf{E}\Delta_{AB}$ implies
+\begin{equation}
+\mathbf{Pr}\left( \Delta_{AB} \ge  \frac{AB^2}{n^2}(1+17\eta)\right)
+  \; \le \; \mathbf{Pr}\left( \Delta_{AB} \ge \left(1+\eta\right) \mathbf{E}\Delta_{AB} \right)
+  \; \le \;  e^{-\eta^2 c^2 n/8}
+  \; \le \;  e^{-\alpha^2 c^2 n/2}. \qquad (28)
+\end{equation}
+'''
+context = '''
+[Section 3, p. 7:] At any step $t$ of the voting process, let $\Delta_{AB}=\Delta_{AB}(t)$ be the number of $A$ vertices converting to $B$ during this step. Similarly, let $ \Delta_{BA}$ be the number of $B$ vertices converting to $A$ during step $t$.
+
+[Lemma 2, p. 8:] Let $0 < c \le 1/2$, $0 < \alpha \le  c^{3/2}/36$, and $\alpha^2 c^2 n = \Omega(n^\epsilon)$, for a constant $\epsilon > 0$. Let $G$ be a $d$-regular $n$-vertex connected graph such that (9) [...] for each pair $X$ and $Y$ of disjoint subsets of vertices of sizes $Y \ge cn$ and $X \ge (2/3)\alpha c^{3/2} n$.
+
+[Section 4.3, p. 12:] Let $A$ and $B$ be the voting groups at the beginning of the current step, let $\nu = (A-B)/n$, and assume that for some sufficiently large constant $K$,
+\begin{equation}
+K \alpha \; \le \; \nu \; \le \; 1-2c, \qquad (18)
+\end{equation}
+[...]
+\[ \mathbf{E} \Delta_{BA} \ge \frac{A^2B}{n^2} \left(1 - 2\eta\right), \qquad (20) \]
+where $\eta \equiv \eta_{AB} = \alpha n/\sqrt{AB} \le \alpha \sqrt{2/c} \le c/25$. [...] The second inequality above follows from (4) applied with $\epsilon = \eta$, and the fact that $\mathbf{E}\Delta_{BA} \ge (1/8)cn$ (from (20)). The last inequality in (21) holds because the definition of $\eta$ implies
+\begin{equation}
+ 2\alpha \: \le \eta \le \frac{\alpha}{\sqrt{(1-c)c}}. \qquad (22)
+\end{equation}
+
+[Section 4.3, p. 13:] [...] $\mathbf{E} \Delta_{AB} \le \frac{AB^2}{n^2} \left( 1 + 15\eta\right)$ (27). [...] The second inequality above follows from (5) applied with $\epsilon = \eta$, and the fact that $\mathbf{E}\Delta_{AB} \ge (1/4)c^2n$ (from (20) with $A$ and $B$ swapped).
+
+[Section 3, p. 7, inequalities (4) and (5):] Let $Z=Z_1+Z_2+\cdots Z_N$ be the sum of the independent random variables $0\leq Z_i\leq 1,\,i=1,2,\ldots,N$, $\mathbf{E}(Z_1+Z_2+\cdots+Z_N)=N\mu$, and $0 \le \epsilon \le 1$. Then
+\begin{eqnarray}
+\mathbf{Pr}(Z \leq (1- \epsilon )N\mu) & \leq & e^{-\epsilon^2N\mu/3}, \qquad (4) \\
+\mathbf{Pr}(Z \geq (1+ \epsilon )N\mu )&\leq& e^{-\epsilon^2N\mu/2}. \qquad (5)
+\end{eqnarray}
+'''
+notes = "Steps of the proof of Lemma 2. Macros replaced: \\D -> \\Delta, \\E -> \\mathbf{E}, \\Pr -> \\mathbf{Pr} (the paper's \\mbox{{\\bf Pr}}), \\a -> \\alpha, \\e and \\ep -> \\epsilon, \\m -> \\mu, \\brac{x} -> \\left(x\\right); \\label replaced by the printed equation numbers (written as \\qquad (N)). In the context, the display (20) is shortened to its first and last members."
+
+[[source]]
+item = "median:lem:cer-phaseI-step"
+paper = "C. Cooper, R. Elsässer, T. Radzik. The power of two choices in distributed voting"
+venue = "ICALP 2014"
+version = "arXiv:1404.7479v1"
+result = "Proof of Lemma 2, (29)-(32)"
+page = 14
+url = "https://arxiv.org/abs/1404.7479v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+Therefore, with probability at least $1 - Te^{-\Theta(\alpha^2 c^2 n)} = 1 - e^{-\Theta(\alpha^2 c^2 n)}$,
+for all steps $t= 1,2, \ldots, T = O(\log n)$
+when the size $B_t$ of the $B$-vote is at least $cn$, we have
+\begin{equation}
+ A_{t+1} \; = \: A_t + \Delta_t
+\; \ge \;  A_t + \frac{A_t B_t (A_t - B_t)}{n^2}  - 3 \eta_t n. \qquad (29)
+\end{equation}
+In~(29), substitute $\eta_t = \alpha n /\sqrt{A_t B_t}$, $A_t = n(1+\nu_t)/2$ and
+$B_t = n(1-\nu_t)/2$ to get
+\begin{align}
+  \nu_{t+1} \;\; & \ge \; \nu_t + \frac{1}{2}\nu_t\left(1-\nu_t^2\right) - 12\frac{\alpha}{\sqrt{1-\nu_t^2}}
+       \qquad (30).
+\end{align}
+Thus, while $K \alpha \le \nu_t \le 1/2$, we have
+\begin{align}
+  \nu_{t+1} \;\; & \ge \; \nu_t + \frac{3}{8}\nu_t - 15\alpha
+   \; \ge \; \frac{5}{4}\nu_t. \nonumber
+\end{align}
+This means that the number of steps required to
+increase the vote imbalance from $\nu_0$ to $1/2$ is at most
+$\left\lceil \log_{5/4} (1/(2{\nu_0})) \right\rceil$.
+
+For $1/2 \le \nu_t \le 1-2c$, we set $\delta_t = 1-\nu_t$
+ and~(30) becomes
+\begin{align}
+  \delta_{t+1} \;\; & \le \; \delta_t - \frac{1}{2}(1-\delta_t)\delta_t \left(2-\delta_t\right) + 12\frac{\alpha}{\sqrt{\delta_t(2-\delta_t)}}
+       \qquad (31).
+\end{align}
+Since $2c \le \delta_t \le 1/2$ and $\alpha \le c^{3/2}/36$,
+\begin{align}
+  \delta_{t+1} \;\; & \le \; \delta_t - \frac{3}{8}\delta_t + 9\frac{\alpha}{\sqrt{c}}
+    \; \le \; \frac{3}{4} \delta_t
+       \qquad (32).
+\end{align}
+'''
+context = '''
+[Section 2, p. 4:] If opinion $A$ is  the majority, then the imbalance $\nu$ (also referred to as the relative difference between the votes, or the advantage of the $A$ vote) is given by $A - B = \nu n$.
+
+[Lemma 2, p. 8:] Let $0 < c \le 1/2$, $0 < \alpha \le  c^{3/2}/36$, and $\alpha^2 c^2 n = \Omega(n^\epsilon)$, for a constant $\epsilon > 0$. Let $G$ be a $d$-regular $n$-vertex connected graph such that (9) [...] for each pair $X$ and $Y$ of disjoint subsets of vertices of sizes $Y \ge cn$ and $X \ge (2/3)\alpha c^{3/2} n$.
+
+[Section 4.3, p. 12:] where $\eta \equiv \eta_{AB} = \alpha n/\sqrt{AB} \le \alpha \sqrt{2/c} \le c/25$.
+
+[Section 4.3, p. 14:] {\bf Lower bound on  $\Delta$.} Using (21) and (28), we get the following lower bound on the increase of the $A$-vote: [...] Hence with probability at least $1 - e^{-\Theta(\alpha^2 c^2 n)}$,
+\[ \Delta \ge \frac{AB}{n} \left(\frac{A}{n} (1-3\eta)- \frac{B}{n}(1+17\eta)\right) \ge \frac{AB}{n} \left(\frac{A-B}{n}  - 10\eta\right) \ge \frac{AB(A-B)}{n^2}  - 3 \eta n. \]
+
+[Section 3, p. 7:] [...] $ \Delta=\Delta_{BA}-\Delta_{AB}$, which is the increase of the number of $A$ vertices in this step.
+'''
+notes = "Steps of the proof of Lemma 2. Macros replaced: \\D -> \\Delta, \\a -> \\alpha, \\d -> \\delta, \\e -> \\epsilon, \\brac{x} -> \\left(x\\right); \\label and \\eqref replaced by the printed equation numbers (written as \\qquad (N)). The display of Delta in the context is quoted from the align* environment as one line. The library's one-round statement keeps (30) for one step with the probabilities of (21) and (28)."
+
+[[source]]
+item = "median:thm:cer-phaseI"
+paper = "C. Cooper, R. Elsässer, T. Radzik. The power of two choices in distributed voting"
+venue = "ICALP 2014"
+version = "arXiv:1404.7479v1"
+result = "Lemma 2"
+page = 8
+url = "https://arxiv.org/abs/1404.7479v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+Let $0 < c \le 1/2$, $0 < \alpha \le  c^{3/2}/36$, and $\alpha^2 c^2 n = \Omega(n^\epsilon)$, for
+a constant $\epsilon > 0$.
+Let $G$ be a $d$-regular $n$-vertex connected graph such that
+\begin{equation}
+   \left| E(X,Y) - \frac{dXY}{n} \right| \le \alpha d \sqrt{XY}, \qquad (9)
+\end{equation}
+for each pair $X$ and $Y$ of disjoint subsets of vertices of
+sizes $Y \ge cn$ and $X \ge (2/3)\alpha c^{3/2} n$.
+There exist absolute constants $K$ and $K'$ (independent of $d$, $c$ and $\alpha$) such that,
+if the initial advantage of the $A$-vote in $G$ is
+\begin{equation}
+ \nu_0 \; \ge \; K \alpha, \qquad (10)
+\end{equation}
+then with probability at least $1 - e ^{-\Theta(\alpha^2 c^2 n)}$, the advantage of the $A$-vote
+increases to $1-2c$ (that is, the $B$-vote decreases to $cn$)
+within $K'(\log (1/\nu_0) + \log( 1/c))$ voting steps.
+'''
+context = '''
+[Section 1, p. 2:] [...] we consider a modified version of pull voting in which each vertex $v$ randomly queries two neighbours at each step. On the basis of the sample taken, vertex $v$ revises its opinion as follows. If both neighbours have the same opinion, the calling vertex $v$ adopts this opinion. If the two opinions differ, the calling vertex $v$ retains its current opinion in this round. [...]
+
+[Section 2, p. 4:] Assume that initially each vertex holds one of two opinions. For convenience, $A$ and $B$ will denote the opinions, the two sets of vertices who have these opinions, and the sizes of these sets, depending on the context. If opinion $A$ is  the majority, then the imbalance $\nu$ (also referred to as the relative difference between the votes, or the advantage of the $A$ vote) is given by $A - B = \nu n$.
+
+[Section 3, p. 8:] We give proofs for sampling with replacement.
+
+[Section 4.1, p. 8:] The condition in Lemma 2 says that the number $E(X,Y)$ of edges between any disjoint large subsets of vertices $X$ and $Y$ is close to the value $dXY/n$ expected in the random regular graph.
+'''
+notes = "Macros replaced: \\a -> \\alpha, \\e -> \\epsilon; \\label replaced by the printed equation numbers, written as \\qquad (9) and \\qquad (10). The library states the lemma with K = 120 and an explicit failure probability (median/README.md)."
+
+[[source]]
+item = "median:thm:cer-phaseI"
+paper = "C. Cooper, R. Elsässer, T. Radzik. The power of two choices in distributed voting"
+venue = "ICALP 2014"
+version = "arXiv:1404.7479v1"
+result = "Corollary 2"
+page = 8
+url = "https://arxiv.org/abs/1404.7479v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+For any constant $0 < c < 1/2$,
+there exist constants $K_1$ and $K_2$ (which depend on $c$) such that
+for any regular $n$-vertex graph $G$
+with the initial advantage of the $A$-vote
+$\nu_0 \; \ge \; K_1 \lambda$,
+the minority vote $B$ decreases to $cn$
+within $K_2\log (1/\nu_0))$ voting steps,
+with probability at least $1 - e ^{-\Theta(\lambda^2 n)}$.
+'''
+context = '''
+[Section 2, p. 4:] Assume that initially each vertex holds one of two opinions. For convenience, $A$ and $B$ will denote the opinions, the two sets of vertices who have these opinions, and the sizes of these sets, depending on the context. If opinion $A$ is  the majority, then the imbalance $\nu$ (also referred to as the relative difference between the votes, or the advantage of the $A$ vote) is given by $A - B = \nu n$.
+
+[Section 2, p. 5:] [...] a $d$-regular graph $G$ with a small second eigenvalue $\lambda_G = \max \{\lambda_2, |\lambda_n|\}$, where $\lambda_1 \geq \lambda_2 \geq \dots \geq \lambda_n$ are the eigenvalues of the transition matrix $P = (1/d)A$ of a random walk on $G$ and $A$ is the adjacency matrix of $G$.
+
+[Lemma 3, p. 8:] [...] let $\lambda = \lambda_G = \max\{ |\lambda_2|, |\lambda_n| \}$.
+
+[Section 4.1, p. 8:] Lemmas 2 and 3 imply the following corollary.
+'''
+notes = "Macro replaced: \\l -> \\lambda. The unmatched closing parenthesis in 'K_2 \\log (1/\\nu_0))' is as printed. Here lambda is lambda_G of Lemma 3. Section 7 (p. 20) applies Corollary 2 with c = 1/10; the library uses c = 1/20 (median/README.md)."
+
+# ---------------------------------------------------------------------------------------------
+# Elsässer, Friedetzky, Kaaser, Mallmann-Trenn, Trinker (arXiv:1602.04667v5)
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+item = "median:def:two-choices"
+paper = "R. Elsässer, T. Friedetzky, D. Kaaser, F. Mallmann-Trenn, H. Trinker. Rapid asynchronous plurality consensus (v1 to v4: Efficient k-party voting with two choices)"
+venue = "arXiv:1602.04667"
+version = "arXiv:1602.04667v5"
+result = "Section 1.1 (Model) and Algorithm 1"
+page = 3
+url = "https://arxiv.org/abs/1602.04667v5"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v5 and compared with the PDF of v5; not yet checked by a person"
+statement = '''
+[Section 1.1, p. 3:] We consider the following plurality consensus process on the clique $G=(V,E) = K_n$ of size $n$. Initially, the nodes are partitioned into $k$ groups representing $k$ colors $\mathcal{C}_1, \dots, \mathcal{C}_k$. We will denote the number of nodes having color $\mathcal{C}_{j}$ as $c_j$. We furthermore denote the set of all colors as $C = \left\{\mathcal{C}_1, \dots, \mathcal{C}_k\right\}$. Also, we will occasionally abuse notation and use $\mathcal{C}_i$ to denote the \emph{set} of all vertices having color $\mathcal{C}_i$.
+
+\subsubsection*{Synchronous Model}
+In the synchronous model we assume that the protocol operates in discrete rounds. In each round, the nodes may simultaneously sample other nodes uniformly at random and then simultaneously change their opinion as a function of the observed samples. One prominent example here is the Two-Choices process where in each round every node samples two nodes chosen uniformly at random, with replacement. If the chosen nodes' colors coincide, then the node adopts this color. We denote this process as the \emph{plurality consensus process with two choices}.
+'''
+context = '''
+[Algorithm 1, p. 9, "Distributed Voting Protocol with Two Choices":]
+Algorithm two-choices($G = (V, E)$, color $: V \rightarrow C$)
+  for round $t = 1$ to $|C|\cdot\log{|V|}$
+    at each node $v$ do in parallel
+      let $u_1, u_2 \in N(v)$ uniformly at random
+      if color($u_1$) $=$ color($u_2$) then
+        color($v$) $\gets$ color($u_1$)
+'''
+notes = "Macros replaced: \\TC -> Two-Choices, \\C{j} -> \\mathcal{C}_{j}. Algorithm 1 is typeset with algorithm2e; it is rendered here as indented pseudocode with the paper's keywords. The library's colours lie in any type with decidable equality and twice_i counts the nodes whose two samples both hold colour i (blueprint)."
+
+[[source]]
+item = "median:lem:tc-expect"
+paper = "R. Elsässer, T. Friedetzky, D. Kaaser, F. Mallmann-Trenn, H. Trinker. Rapid asynchronous plurality consensus (v1 to v4: Efficient k-party voting with two choices)"
+venue = "arXiv:1602.04667"
+version = "arXiv:1602.04667v5"
+result = "Section 2.1, Equation (1)"
+page = 10
+url = "https://arxiv.org/abs/1602.04667v5"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v5 and compared with the PDF of v5; not yet checked by a person"
+statement = '''
+Since all nodes perform their choices independently, the first sum $f_{\overline{\mathcal{C}_{i}}i}$ has a binomial distribution with parameters $f_{\overline{\mathcal{C}_{i}}i} \sim B(n-c_i,\,c_i^2/n^2)$. Furthermore, every node of color $\mathcal{C}_{i}$ changes its color away from $\mathcal{C}_{i}$ to any other opinion with probability $p^{\text{away}}_i = \sum_{j\neq i}c_j^2/n^2$. Therefore, the second sum $f_{i\overline{\mathcal{C}_{i}}}$ also has a binomial distribution with parameters $f_{i\overline{\mathcal{C}_{i}}} \sim B(c_i,\,p^{\text{away}}_i)$. That is, we have in expectation
+\begin{equation}
+\mathrm{E}\left[c_i'\right] =c_i + \frac{\left(n-c_i\right)c_i^2}{n^2} - \frac{c_i}{n^2}\sum_{j\neq i}c_j^2 . \qquad (1)
+\end{equation}
+'''
+context = '''
+[Section 1.1, p. 3:] We consider the following plurality consensus process on the clique $G=(V,E) = K_n$ of size $n$. Initially, the nodes are partitioned into $k$ groups representing $k$ colors $\mathcal{C}_1, \dots, \mathcal{C}_k$. We will denote the number of nodes having color $\mathcal{C}_{j}$ as $c_j$. [...] One prominent example here is the Two-Choices process where in each round every node samples two nodes chosen uniformly at random, with replacement. If the chosen nodes' colors coincide, then the node adopts this color.
+
+[Section 2.1, p. 9:] Let $f_{ij}$ denote the random variable denoting the \emph{flow} from color $\mathcal{C}_i$ to color $\mathcal{C}_j$, that is, $f_{ij}$ at a given time step $t$ represents the number of nodes which had color $\mathcal{C}_i$ at the previous time step $t-1$ and switched to color $\mathcal{C}_j$ at time $t$. We will use $c_1', \dots, c_k'$ to denote the number of nodes of corresponding colors after the switching has been performed before the adversary changes $F$ arbitrary nodes.
+
+[Section 2.1, p. 10:] Let $S \subseteq C$ be a set of colors. We will use the random variable $f_{iS}$ to denote the sum of all flows from color $\mathcal{C}_{i}$ to any color in $S$ and $f_{Si}$ to denote the sum of all flows from any color in $S$ to $\mathcal{C}_{i}$. [...] Let $\mathcal{C}_{i}$ be a color and $\overline{\mathcal{C}_{i}}$ be the set of all other colors, defined as $\overline{\mathcal{C}_{i}} = C \setminus \mathcal{C}_{i}$. We observe that after one round the new number of nodes supporting $\mathcal{C}_{i}$ is a random variable
+\begin{equation*}
+c_i' = c_i + \sum_{j \neq i} f_{ji} - \sum_{j \neq i} f_{ij} = c_i + f_{\overline{\mathcal{C}_{i}}i} - f_{i\overline{\mathcal{C}_{i}}} .
+\end{equation*}
+'''
+notes = "Macros replaced: \\C{i} -> \\mathcal{C}_{i}, \\notC{i} -> \\overline{\\mathcal{C}_{i}}, \\ifrac{a}{b} -> a/b, \\Expected{x} -> \\mathrm{E}\\left[x\\right], \\TC -> Two-Choices; \\enspace dropped; \\label replaced by the printed equation number, written as \\qquad (1). The library's further one-round facts (the expected gap (a-b)(1 + (a+b)/n - sum c_i^2/n^2) and its lower bound (a-b)(1 + (a/n)(1 - a/n))) are steps of the proof of Lemma 2.2 (p. 11). Observation 2.1 has its own entry."
+
+[[source]]
+item = "median:lem:tc-expect"
+paper = "R. Elsässer, T. Friedetzky, D. Kaaser, F. Mallmann-Trenn, H. Trinker. Rapid asynchronous plurality consensus (v1 to v4: Efficient k-party voting with two choices)"
+venue = "arXiv:1602.04667"
+version = "arXiv:1602.04667v5"
+result = "Observation 2.1"
+page = 10
+url = "https://arxiv.org/abs/1602.04667v5"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v5 and compared with the PDF of v5; not yet checked by a person"
+statement = '''
+Let $\mathcal{C}_{r}$ and $\mathcal{C}_{s}$ be two colors. It holds that if $c_r \leq c_s $ then $ \mathrm{E}\left[c_r'\right] \leq \mathrm{E}\left[c_s'\right]$.
+'''
+context = '''
+[Section 1.1, p. 3:] We consider the following plurality consensus process on the clique $G=(V,E) = K_n$ of size $n$. Initially, the nodes are partitioned into $k$ groups representing $k$ colors $\mathcal{C}_1, \dots, \mathcal{C}_k$. We will denote the number of nodes having color $\mathcal{C}_{j}$ as $c_j$. [...] One prominent example here is the Two-Choices process where in each round every node samples two nodes chosen uniformly at random, with replacement. If the chosen nodes' colors coincide, then the node adopts this color.
+
+[Section 2.1, p. 9:] We will use $c_1', \dots, c_k'$ to denote the number of nodes of corresponding colors after the switching has been performed before the adversary changes $F$ arbitrary nodes.
+
+[Section 2.1, p. 10:] That is, we have in expectation
+\begin{equation}
+\mathrm{E}\left[c_i'\right] =c_i + \frac{\left(n-c_i\right)c_i^2}{n^2} - \frac{c_i}{n^2}\sum_{j\neq i}c_j^2 . \qquad (1)
+\end{equation}
+Note that these expected values are monotone w.r.t.\ the current size. This is described more formally in the following observation.
+'''
+notes = "Macros replaced: \\C{r} -> \\mathcal{C}_{r}, \\Expected{x} -> \\mathrm{E}\\left[x\\right]."
+
+[[source]]
+item = "median:lem:tc-distance"
+paper = "R. Elsässer, T. Friedetzky, D. Kaaser, F. Mallmann-Trenn, H. Trinker. Rapid asynchronous plurality consensus (v1 to v4: Efficient k-party voting with two choices)"
+venue = "arXiv:1602.04667"
+version = "arXiv:1602.04667v5"
+result = "Lemma 2.2"
+page = 11
+url = "https://arxiv.org/abs/1602.04667v5"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v5 and compared with the PDF of v5; not yet checked by a person"
+statement = '''
+Let $\mathcal{A}$ be the dominating color and $\mathcal{B}$ be the second largest color. Assume that
+$a - b > z \cdot \sqrt{n\log{n}}$. There exists a constant $z$ such that
+$a'-b'>\left(a-b\right)\left(1+a/(4n)\right)$ with high probability.
+'''
+context = '''
+[Section 1.1, p. 3:] We consider the following plurality consensus process on the clique $G=(V,E) = K_n$ of size $n$. Initially, the nodes are partitioned into $k$ groups representing $k$ colors $\mathcal{C}_1, \dots, \mathcal{C}_k$. We will denote the number of nodes having color $\mathcal{C}_{j}$ as $c_j$. [...] W.l.o.g., we assume that colors are ordered in descending order such that $c_1 \geq c_2 \geq \dots \geq c_k$. We will denote the initial plurality color $\mathcal{C}_{1}$ as $\mathcal{A}$ with size $a = c_1$ and we will use $\mathcal{B}$ to denote the second largest color $\mathcal{C}_{2}$ of size $b = c_2$.
+
+[Section 1.1, p. 3, Synchronous Model:] One prominent example here is the Two-Choices process where in each round every node samples two nodes chosen uniformly at random, with replacement. If the chosen nodes' colors coincide, then the node adopts this color.
+
+[Footnote, p. 4:] Throughout this paper, the expression \emph{with high probability} means a probability of at least $1 - n^{-\Omega\left(1\right)}$.
+
+[Section 1.2, p. 5:] That is, we assume that every node of the clique $G = (V,E) = K_n$ has one of $k$ possible opinions at the beginning, where $k = O\left(n^\epsilon\right)$ for some small positive constant $\epsilon$.
+
+[Section 2.1, p. 9:] We will use $c_1', \dots, c_k'$ to denote the number of nodes of corresponding colors after the switching has been performed before the adversary changes $F$ arbitrary nodes. For simplicity of notation, we will assume that in the following the dominating color $\mathcal{C}_{1}$ is denoted as $\mathcal{A}$ with $a = c_1$. Furthermore, we will use $\mathcal{B}$ to denote the second largest color $\mathcal{C}_{2}$ of size $b = c_2$.
+
+[Section 2.1, p. 10:] Observe that if $a \geq \left(1/2 + \varepsilon_{1}\right)n$ for some constant $\varepsilon_{1} > 0$, the process converges within $O\left(\log{n}\right)$ steps with high probability. [...] For the sake of readability we assume in the following that $a \leq n/2$. Furthermore, observe that $a>n/k$, since $\mathcal{A}$ is the largest of $k$ color classes.
+'''
+notes = "Macros replaced: \\A -> \\mathcal{A}, \\B -> \\mathcal{B}, \\C{j} -> \\mathcal{C}_{j}, \\ifrac{a}{b} -> a/b, \\whp -> 'with high probability' (its first use carries the footnote quoted in the context), \\BigO{x} -> O\\left(x\\right), \\BigOmega{x} -> \\Omega\\left(x\\right), \\eps{1} -> \\varepsilon_{1}. The Section 1.2 sentence states the assumption k = O(n^epsilon) of Theorem 1.2, which the proof of the lemma uses (a >= n/k >= n^{1-epsilon}, p. 12). The proof takes z >= 32. The library's version assumes a <= n/2 explicitly and states the failure probability C/n^2."
+
+[[source]]
+item = "median:lem:tc-stochdom"
+paper = "R. Elsässer, T. Friedetzky, D. Kaaser, F. Mallmann-Trenn, H. Trinker. Rapid asynchronous plurality consensus (v1 to v4: Efficient k-party voting with two choices)"
+venue = "arXiv:1602.04667"
+version = "arXiv:1602.04667v5"
+result = "Lemma 2.3"
+page = 12
+url = "https://arxiv.org/abs/1602.04667v5"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v5 and compared with the PDF of v5; not yet checked by a person"
+statement = '''
+Let $\mathcal{A}$ be the dominating color of size $a$ and let $\mathcal{B}$ be the second largest
+color of size $b$. Let $\mathcal{C}_{} \neq \mathcal{A},\mathcal{B}$ be one of the remaining colors of size
+$c$.
+Furthermore, let $\pi : V \rightarrow V$ be a bijection and let $P$
+be the original process. We can couple a process  $P' = P(\pi)$ to the original
+process $P$ such that $c'^{(P)}\leq b'^{(P')}$, where $c'^{(P)}$ is the random variable
+$c'$ in the original process and $b'^{(P')}$ is the random variable $b'$ in
+the coupled process.
+'''
+context = '''
+[Section 1.1, p. 3:] We consider the following plurality consensus process on the clique $G=(V,E) = K_n$ of size $n$. Initially, the nodes are partitioned into $k$ groups representing $k$ colors $\mathcal{C}_1, \dots, \mathcal{C}_k$. We will denote the number of nodes having color $\mathcal{C}_{j}$ as $c_j$. [...] One prominent example here is the Two-Choices process where in each round every node samples two nodes chosen uniformly at random, with replacement. If the chosen nodes' colors coincide, then the node adopts this color.
+
+[Section 2.1, p. 9:] We will use $c_1', \dots, c_k'$ to denote the number of nodes of corresponding colors after the switching has been performed before the adversary changes $F$ arbitrary nodes.
+
+[Section 2.1, p. 12:] To show that the smaller colors $\mathcal{C}_j$ do also not interfere with $\mathcal{A}$ and thus the minimum of the difference between $\mathcal{A}$ and any $\mathcal{C}_j$ increases, we use the following coupling.
+
+At any time step $t$, there exists a bijective function which maps any instance of the two-choices protocol at time $t$ to another instance of the same protocol such that the outcome $c'$ of the first instance is at most the outcome $b'$ of the mapped instance.
+'''
+notes = "Macros replaced: \\A -> \\mathcal{A}, \\B -> \\mathcal{B}, \\C{} -> \\mathcal{C}_{}, \\P{x} -> x^{(P)} and \\PP{x} -> x^{(P')} (the paper sets the superscripts in \\scriptscriptstyle). The library states the lemma as a stochastic domination: if c <= b then P(c' >= t) <= P(b' >= t) for every t (median/README.md)."
+
+[[source]]
+items = ["median:lem:tc-growth-round", "median:lem:tc-growth-phase", "median:lem:tc-finish"]
+paper = "R. Elsässer, T. Friedetzky, D. Kaaser, F. Mallmann-Trenn, H. Trinker. Rapid asynchronous plurality consensus (v1 to v4: Efficient k-party voting with two choices)"
+venue = "arXiv:1602.04667"
+version = "arXiv:1602.04667v5"
+result = "Proof of Theorem 1.2 (end of Section 2.1)"
+page = 14
+url = "https://arxiv.org/abs/1602.04667v5"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v5 and compared with the PDF of v5; not yet checked by a person"
+statement = '''
+Let $\mathcal{A} = \mathcal{C}_{1}$ be the dominant color and $\mathcal{B} = \mathcal{C}_{2}$ the second largest
+color. Assume $a - b \geq z \cdot \sqrt{n\log{n}}$ for a sufficiently large
+constant $z$. From Lemma~2.2 we know that $a' - b' \geq
+\left(a-b\right)\cdot\left(1+a/(4n)\right)$ with high probability.
+Since $\mathcal{B}$ is the second largest color, we obtain from Lemma~2.3 for any remaining color $\mathcal{C}_{j}$ with $j \geq 3$ that with high probability
+$ a' - c_j' \geq a' - b' \geq
+\left(a-b\right)\cdot\left(1+a/(4n)\right)$. [...]
+
+Taking the union bound over all colors, we conclude that the distance between the first color $\mathcal{A}$ and every other color grows in every round by a factor of at least
+$\left(1+a/(4n)\right)$ with high probability. Therefore, after
+$\tau= 4n/a$ rounds, the relative distance between $\mathcal{A}$ and $\mathcal{B}$ doubles with high probability.
+Hence, the required time for $\mathcal{A}$ to reach a size of at least
+$(1/2+\varepsilon_{1})\cdot n$ for a constant $\varepsilon_{1} > 0$ is
+bounded by $O\left(n/a\cdot\log{n}\right)$.
+This bias is large enough that we assume in the following  that all nodes which are not of color $\mathcal{A}$ are of color $\mathcal{B}$.
+In absence of an adversary, we can see that after additional $O\left(\log{n}\right)$
+rounds every node has the same color $\mathcal{A}$, with high probability; see [15].
+'''
+context = '''
+[Section 1.1, p. 3:] We consider the following plurality consensus process on the clique $G=(V,E) = K_n$ of size $n$. Initially, the nodes are partitioned into $k$ groups representing $k$ colors $\mathcal{C}_1, \dots, \mathcal{C}_k$. We will denote the number of nodes having color $\mathcal{C}_{j}$ as $c_j$. [...] W.l.o.g., we assume that colors are ordered in descending order such that $c_1 \geq c_2 \geq \dots \geq c_k$. We will denote the initial plurality color $\mathcal{C}_{1}$ as $\mathcal{A}$ with size $a = c_1$ and we will use $\mathcal{B}$ to denote the second largest color $\mathcal{C}_{2}$ of size $b = c_2$.
+
+[Section 1.1, p. 3, Synchronous Model:] One prominent example here is the Two-Choices process where in each round every node samples two nodes chosen uniformly at random, with replacement. If the chosen nodes' colors coincide, then the node adopts this color.
+
+[Footnote, p. 4:] Throughout this paper, the expression \emph{with high probability} means a probability of at least $1 - n^{-\Omega\left(1\right)}$.
+
+[Section 2.1, p. 10:] Observe that if $a \geq \left(1/2 + \varepsilon_{1}\right)n$ for some constant $\varepsilon_{1} > 0$, the process converges within $O\left(\log{n}\right)$ steps with high probability. This follows from [15] since in the case of $a \geq \left(1/2 + \varepsilon_{1}\right)n$ the process is stochastically dominated by the two color voting process. For the sake of readability we assume in the following that $a \leq n/2$.
+
+[Lemma 2.2, p. 11:] Let $\mathcal{A}$ be the dominating color and $\mathcal{B}$ be the second largest color. Assume that $a - b > z \cdot \sqrt{n\log{n}}$. There exists a constant $z$ such that $a'-b'>\left(a-b\right)\left(1+a/(4n)\right)$ with high probability.
+'''
+notes = "Passage of the proof of Theorem 1.2 (p. 14 to 15), quoted without the paragraph on the adversary (marked [...]) and without the final paragraphs. Macros replaced: \\A -> \\mathcal{A}, \\B -> \\mathcal{B}, \\C{j} -> \\mathcal{C}_{j}, \\ifrac{a}{b} -> a/b, \\eps{1} -> \\varepsilon_{1}, \\whp -> 'with high probability', \\BigO{x} -> O\\left(x\\right); \\autoref{...} rendered as the printed 'Lemma 2.2', 'Lemma 2.3'; \\cite{CER14} rendered as [15] (Cooper, Elsässer, Radzik, ICALP 2014). The library's growth step (factor 1 + a/(8n) up to a = 3n/4) and finishing phase (through the binary median process) are its versions of these two steps (median/README.md)."
+
+[[source]]
+item = "median:lem:tc-basic"
+paper = "R. Elsässer, T. Friedetzky, D. Kaaser, F. Mallmann-Trenn, H. Trinker. Rapid asynchronous plurality consensus (v1 to v4: Efficient k-party voting with two choices)"
+venue = "arXiv:1602.04667"
+version = "arXiv:1602.04667v5"
+result = "Section 2.1, domination by two colours"
+page = 10
+url = "https://arxiv.org/abs/1602.04667v5"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v5 and compared with the PDF of v5; not yet checked by a person"
+statement = '''
+Observe that if $a \geq \left(1/2 + \varepsilon_{1}\right)n$ for some constant
+$\varepsilon_{1} > 0$, the process converges within $O\left(\log{n}\right)$ steps with high probability.
+This follows from [15] since in
+the case of $a \geq \left(1/2 + \varepsilon_{1}\right)n$ the process is
+stochastically dominated by the two color voting process.
+'''
+context = '''
+[Section 1.1, p. 3:] We consider the following plurality consensus process on the clique $G=(V,E) = K_n$ of size $n$. Initially, the nodes are partitioned into $k$ groups representing $k$ colors $\mathcal{C}_1, \dots, \mathcal{C}_k$. We will denote the number of nodes having color $\mathcal{C}_{j}$ as $c_j$. [...] We will denote the initial plurality color $\mathcal{C}_{1}$ as $\mathcal{A}$ with size $a = c_1$ [...]
+
+[Section 1.1, p. 3, Synchronous Model:] One prominent example here is the Two-Choices process where in each round every node samples two nodes chosen uniformly at random, with replacement. If the chosen nodes' colors coincide, then the node adopts this color.
+
+[Footnote, p. 4:] Throughout this paper, the expression \emph{with high probability} means a probability of at least $1 - n^{-\Omega\left(1\right)}$.
+'''
+notes = "No numbered result. Macros replaced: \\eps{1} -> \\varepsilon_{1}, \\BigO{x} -> O\\left(x\\right), \\whp -> 'with high probability'; \\cite{CER14} rendered as [15] (Cooper, Elsässer, Radzik, ICALP 2014). The blueprint item collects elementary facts (consensus is fixed, extinct colours stay extinct, two colours are the median rule) and the node-wise domination of a colour by the binary median process (run_dominates), which the library uses in place of this domination argument; PROVENANCE.md lists run_dominates under this paper. The other facts of the item have no statement in the paper."
+
+# ---------------------------------------------------------------------------------------------
+# Berenbrink, Clementi, Elsässer, Kling, Mallmann-Trenn, Natale (PODC 2017, arXiv:1702.04921v1)
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+item = "median:thm:tc-lower"
+paper = "P. Berenbrink, A. Clementi, R. Elsässer, P. Kling, F. Mallmann-Trenn, E. Natale. Ignore or comply? On breaking symmetry in consensus"
+venue = "PODC 2017"
+version = "arXiv:1702.04921v1"
+result = "Theorem 1 (Simplified), the 2-Choices part"
+page = 4
+url = "https://arxiv.org/abs/1702.04921v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+Starting from an arbitrary configuration, $3$-\textsc{Majority} reaches consensus with
+high probability in $\mathrm{O}\bigl(n^{3/4}\log^{7/8} n \bigr)$ rounds. When
+started from a configuration where each color is supported by at most
+$\mathrm{O}\left(\log n\right)$ nodes, 2-\textsc{Choices} needs with high probability
+$\Omega\left(n / \log n\right)$ rounds to reach consensus.
+'''
+context = '''
+[Section 1, p. 2:] Two further natural and prominent consensus processes are the \emph{2-\textsc{Choices}} and the \emph{$3$-\textsc{Majority}} process. Their corresponding update rules, as executed synchronously by each node, are as follows:
+\begin{itemize}
+\item 2-\textsc{Choices}: Sample two nodes independently and uniformly at random. If the samples have the same color, adopt it. Otherwise, ignore them and keep your current color.
+\end{itemize}
+
+[Section 2.1, p. 6:] We consider the \emph{consensus problem} on the complete graph of $n$ nodes. Initially, each node supports one opinion (or color) from the set $[k] := \{1, 2, \dots, k\}$, where $k \leq n$. Nodes interact in synchronous, discrete rounds using the \emph{Uniform Pull} mechanism [DGHILSSST87]. That is, during every round each node can ask the opinion of a constant number of random neighbors. Given these opinions, it updates its own opinion according to some fixed update rule. The goal of the system is to reach \emph{consensus} (a configuration where all nodes support the same opinion).
+
+[Section 1.2, p. 4:] The following theorem states slightly simplified versions of our upper and lower bounds (see Theorem 4 and Theorem 5 for the detailed statements).
+'''
+notes = "Theorem 1 is labelled '(Simplified)'. The library formalizes the 2-Choices half only (PROVENANCE.md). Macros replaced: \\hmajority{3} -> $3$-\\textsc{Majority}, \\twochoice -> 2-\\textsc{Choices}, \\LDAUOmicron[small]{x} -> \\mathrm{O}\\bigl(x\\bigr), \\LDAUOmicron{x} -> \\mathrm{O}\\left(x\\right), \\LDAUOmega{x} -> \\Omega\\left(x\\right); in the context \\intcc{k} -> [k], \\set{.} -> \\{.\\}, \\coloneqq -> :=, \\cite{DGHILSSST87} rendered as the printed key. The paper gives no explicit definition of 'with high probability'; Theorem 5 states its failure probability as at most 1/n. The 3-Majority rule of the itemize (second bullet) is not quoted. PDF page 4 is printed page 3."
+
+[[source]]
+items = ["median:lem:tc-escape", "median:lem:tc-few-changes"]
+paper = "P. Berenbrink, A. Clementi, R. Elsässer, P. Kling, F. Mallmann-Trenn, E. Natale. Ignore or comply? On breaking symmetry in consensus"
+venue = "PODC 2017"
+version = "arXiv:1702.04921v1"
+result = "Proof of Theorem 5 (App. A.8), one colour"
+page = 19
+url = "https://arxiv.org/abs/1702.04921v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+Let $T_i=\min \{ t\geq 0 ~|~ c_i(t) > \ell' \}$.
+For any fixed opinion $i\leq k$ we show that $\Pr\left[T_i < n/(\gamma \ell')\right] \leq
+1/n^{2}$, so that, by a union bound over all opinions and using that $T=\min \{
+T_i ~|~i\leq k\}$, we obtain $\Pr\left[T < n/(\gamma \ell')\right] \leq 1/n$.
+Intuitively, we would like to show that, conditioning on $c_i  \leq \ell'$, the
+expected number of nodes joining opinion $i$ is dominated by a binomial
+distribution with parameters $n$ and $p = (\ell'/n)^2$.
+[...]
+Formally, process $\mathcal P$ is defined as follows. $P(0):=\ell$ and $P(t+1)
+=P(t)+\sum_{j \leq n} X_j^{(t)}$, where $X_j^{(t)}$ is a Bernoulli random variable with
+$\Pr\left[X_i=1\right] = p$ and, by a standard coupling, it
+is $1$ whenever node $j$ sees two times color $i$ at round $t$ (note that the latter event
+happens with probability at most $p$ for any $t<T_i$).
+By definition, if $t<T_i$ it holds $c_i(t)\leq \ell'$, which implies that the probability that any node in the original process gets opinion $i$ is at most $p$. Thus, we can couple
+2-\textsc{Choices} and $P$ for $t\leq T_i$ so that $c_i(t) \leq P(t)$.
+'''
+context = '''
+[Theorem 5, p. 10:] Let $\gamma$ be a sufficiently large constant. Consider the 2-\textsc{Choices} process starting from any initial configuration $c \in \mathcal{C}$. Let $\ell := \max_i c_i(0)$ be the support of the largest color. Then, for $\ell' := \max\{ 2\ell, \gamma \log n\}$, it holds with high probability that no color has a support larger than $\ell'$ for $n/(\gamma \ell')$ rounds. In symbols,
+\begin{equation}
+    \Pr\left[ \max_i\hspace{2pt} c_i(t)   > \ell'\text{ for some }  t< \frac{n}{\gamma\ell'}\right] \leq \frac 1n. \qquad (8)
+\end{equation}
+
+[Section 1, p. 2:] 2-\textsc{Choices}: Sample two nodes independently and uniformly at random. If the samples have the same color, adopt it. Otherwise, ignore them and keep your current color.
+
+[Section 2.1, p. 6:] We describe the system state after any round by an $n$-dimensional integral vector $c = (c_i)_{i \in [n]} \in \mathbb{N}_0^n$ with $\sum_{ i \in [n] } c_i = n$. Here, the $i$-th component $c_i \in \mathbb{N}_0$ corresponds to the number of nodes supporting opinion $i$. [...] We use $\mathcal{C} := \{ c\in\mathbb{N}_0^n \mid \sum_{ i \in [k] } c_i = n \}$ to denote the set of all possible configurations.
+'''
+notes = "Opening of the full proof of Theorem 5 (Appendix A.8, PDF p. 19, printed p. 18); the [...] omits three sentences on why per-round Chernoff bounds are weak and on the plan of the majorizing process. The paper then bounds P(t_0) - P(0) ~ Bin(t_0 n, p) by a Chernoff bound. Macros replaced: \\Pr{X} -> \\Pr\\left[X\\right] (auxkling.sty), \\twochoice -> 2-\\textsc{Choices}, \\coloneqq -> :=, \\N_0 -> \\mathbb{N}_0, \\intoo{.} -> (.), \\intcc{n} -> [n], \\set{.} -> \\{.\\} (with | -> \\mid). 'Pr[X_i = 1]' (index i where X_j^{(t)} is meant) as printed. The library bounds one colour by an exponential supermartingale instead of the binomial domination (PROVENANCE.md; median/FORMALIZATION_DIFFERENCES.md); median:lem:tc-few-changes holds the facts it uses (the number of nodes that see colour i twice is a sum of n independent Bernoulli variables of parameter (c_i/n)^2)."
