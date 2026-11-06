@@ -1,0 +1,1056 @@
+# Source references and original statements of the blueprint items of package `averaging`.
+#
+# Same format as `verification/sources.toml` (see its header for the fields). The entries of
+# `averaging:thm:strong` (Find your place, Theorem 3.2), `averaging:thm:opp-31` (Average whenever
+# you meet, Theorem 3.1), `averaging:thm:opp-41` (Theorem 4.1) and `averaging:thm:opp-42`
+# (Lemma 4.2) are in `verification/sources.toml` and are not repeated here; this file adds the
+# other numbered results these items are attributed to.
+#
+# Sources:
+# - L. Becchetti, A. Clementi, E. Natale, Consensus dynamics: an overview, SIGACT News 51(1),
+#   2020 (the Survey), transcribed from the PDF of the HAL preprint hal-02507613v1 (no LaTeX
+#   source available).
+# - L. Lovász, Random walks on graphs: a survey (1993), Theorem 5.1: the open copy on the
+#   author's web page could not be retrieved by the transcribing agent, so its entry gives the
+#   reference and the numbered result only (no statement, no context).
+# - S. Boyd, A. Ghosh, B. Prabhakar, D. Shah, Randomized gossip algorithms, IEEE Trans. Inf.
+#   Theory 52(6), 2006, transcribed from the PDF of the published version on the first author's
+#   web page (no LaTeX source available).
+# - L. Becchetti, A. Clementi, E. Natale, F. Pasquale, L. Trevisan, Find your place (SODA 2017),
+#   arXiv:1511.03927v4, and L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale,
+#   P. Raghavendra, L. Trevisan, Average whenever you meet (ESA 2018), arXiv:1703.05045v3,
+#   transcribed from the arXiv LaTeX sources and compared with the PDFs of the same versions.
+#
+# All entries were written by an AI agent; none has been checked by a person. Macros of the
+# papers are replaced by standard LaTeX, as listed in `notes`. Pages are pages of the PDF of the
+# named version (for the HAL preprint, the PDF page is the printed page plus one, because of the
+# HAL cover page; for the IEEE version, PDF page 1 is journal page 2508, and the locations in its
+# `context` excerpts give journal pages). Equation numbers of displays are written as `\qquad (n)`.
+
+# ---------------------------------------------------------------------------------------------
+# The Survey (Becchetti, Clementi, Natale 2020), Section 7
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+item = "averaging:def:avg"
+paper = "L. Becchetti, A. Clementi, E. Natale. Consensus dynamics: an overview"
+venue = "SIGACT News 51(1), 2020"
+version = "HAL preprint hal-02507613v1"
+result = "Definition 30"
+page = 31
+url = "https://hal.science/hal-02507613v1"
+status = "transcribed by an AI agent from the PDF of the HAL preprint hal-02507613v1 (no LaTeX source available; text extracted with pdftotext and read against the rendered page); not yet checked by a person"
+statement = '''
+[\textsc{Averaging} dynamics on $\mathcal{LOCAL}$]
+\begin{itemize}
+\item (Initialization). At round $t = 0$ every node $v \in V$ independently samples its value from $\{-1, +1\}$ uniformly at random;
+\item (Updating rule). In each subsequent round $t \geqslant 1$, every node $u \in V$ updates its value $x_u$ to the average of the values of its neighbors at the end of the previous round.
+\end{itemize}
+'''
+context = '''
+[Section 7.1, p. 31:] In the $\mathcal{LOCAL}$ communication model, the averaging dynamics can be defined as follows.
+
+[Section 7.1, Notation and preliminaries, p. 31:] We use the following notation in the remainder of this section. Whatever the communication model, we denote by $\mathbf{x}^{(t)}$ the global state of the \textsc{Averaging} dynamics at time $t$, i.e., the vector of values held by the nodes at time $t$. In particular, we let $\mathbf{x}^{(0)} = \mathbf{x}$ for simplicity. [...] For the rest of this section, we refer to an undirected graph $G = (V, E)$ with $n$ nodes. We denote by $d(v)$ $v$'s degree and we let $m = \sum_v d(v)$.
+
+[Section 7.2, Theorem 32 (Convergence, see Section 1 of [L+93]), p. 32:] The random walk on $G$ is ergodic, whenever $G$ is not bipartite. Moreover, the corresponding stationary distribution is given by the vector $\boldsymbol{\pi}$ defined as:
+\[ \boldsymbol{\pi}(v) = \frac{d(v)}{2m}, \forall v \in V. \]
+
+[Section 7.2, p. 32:] As a result, for every $\mathbf{x} \in \mathbb{R}^n$, $P^t \mathbf{x}$ converges to $\alpha \mathbf{1}$, where $\alpha = \sum_v \boldsymbol{\pi}(v)\mathbf{x}(v)$. Hence, the \textsc{Averaging} dynamics achieves consensus on the (generally weighted) average of the values they initially hold.
+'''
+notes = "Attribution: the blueprint item (avgStep, avgIter, degAvg) names no numbered source; averaging/FORMALIZATION_DIFFERENCES.md lists Section 7.1 (Definitions 30, 31) among the sources of the AVG-1 part and refers to Definition 30 (item 7), and the item is used by averaging:thm:conv, which PROVENANCE.md attributes to Survey Section 7.2. The context quotes the Survey's alpha = sum_v pi(v) x(v), the counterpart of degAvg. Version: the published SIGACT News version could not be retrieved; the numbering of the HAL preprint (Section 7.2, Definitions 30 and 31, Theorems 32 and 33, equations (2) to (5)) matches the numbers the library cites. Pages are PDF pages (printed page plus one). The definition title is shown in brackets; the name is set in small caps (\\textsc{Averaging}) and LOCAL in calligraphic letters in the PDF. Kept as printed: m = sum_v d(v) in the notation paragraph (with pi(v) = d(v)/2m in Theorem 32; averaging/FORMALIZATION_DIFFERENCES.md, AVG-1 item 5, discusses it). [L+93] is L. Lovász, Random walks on graphs: a survey."
+
+[[source]]
+items = ["averaging:thm:conv", "averaging:thm:bip"]
+paper = "L. Becchetti, A. Clementi, E. Natale. Consensus dynamics: an overview"
+venue = "SIGACT News 51(1), 2020"
+version = "HAL preprint hal-02507613v1"
+result = "Section 7.2, 'Random walks and Consensus'"
+page = 32
+url = "https://hal.science/hal-02507613v1"
+status = "transcribed by an AI agent from the PDF of the HAL preprint hal-02507613v1 (no LaTeX source available; text extracted with pdftotext and read against the rendered page); not yet checked by a person"
+statement = '''
+In the $\mathcal{LOCAL}$ model, the \textsc{Averaging} dynamics is perhaps one of the simplest, yet most interesting examples of a linear dynamics. In the first place, it always converges when the underlying graph $G$ is connected and not bipartite. In more detail, it converges to the global average of the initial values if the graph is regular and to a weighted global average if it isn't, the weight of each node/value being the corresponding entry of the main left eigenvector of $G$'s transition matrix [BGPS06, Sha09].
+
+[...]
+While proving ergodicity requires some (small) extra work, one can immediately check that $\boldsymbol{\pi}$ above is a stationary distribution for $P$, i.e., it satisfies $\boldsymbol{\pi}^T P = \boldsymbol{\pi}^T$, which in turn implies that $\boldsymbol{\pi}$ is a left eigenvector of $P$, with $\lambda_1(P) = 1$ as the associated eigenvalue. On the other hand, the vector $\mathbf{1} = (1, \ldots, 1)^T$ is a trivial, right eigenvector of $P$ associated to $\lambda_1(P) = 1$. These two facts imply that, whenever $G$ is not bipartite, $P^T$ converges to $\boldsymbol{\pi}^T \mathbf{1}$ as $t \to \infty$. As a result, for every $\mathbf{x} \in \mathbb{R}^n$, $P^t \mathbf{x}$ converges to $\alpha \mathbf{1}$, where $\alpha = \sum_v \boldsymbol{\pi}(v)\mathbf{x}(v)$. Hence, the \textsc{Averaging} dynamics achieves consensus on the (generally weighted) average of the values they initially hold.
+'''
+context = '''
+[Section 7.1, Definition 30 (Averaging dynamics on LOCAL), p. 31:] (Initialization). At round $t = 0$ every node $v \in V$ independently samples its value from $\{-1, +1\}$ uniformly at random; (Updating rule). In each subsequent round $t \geqslant 1$, every node $u \in V$ updates its value $x_u$ to the average of the values of its neighbors at the end of the previous round.
+
+[Section 7.1, Notation and preliminaries, p. 31:] Whatever the communication model, we denote by $\mathbf{x}^{(t)}$ the global state of the \textsc{Averaging} dynamics at time $t$, i.e., the vector of values held by the nodes at time $t$. In particular, we let $\mathbf{x}^{(0)} = \mathbf{x}$ for simplicity. [...] Finally, given an $n \times n$ matrix $M$, we denote by $\lambda_1(M) \geqslant \ldots \geqslant \lambda_n(M)$ its eigenvalues. For the rest of this section, we refer to an undirected graph $G = (V, E)$ with $n$ nodes. We denote by $d(v)$ $v$'s degree and we let $m = \sum_v d(v)$.
+
+[Section 7.2, the omitted part of the statement, p. 32:] Seeing this is relatively simple if we consider that a single step of the \textsc{Averaging} dynamics amounts to applying the transition matrix $P$ of $G$ to the current global state. $P$ operates as the random walk process on $G$ by left multiplication, and as the \textsc{Averaging} dynamics by right multiplication. So, the global state of the system after $t$ steps of the \textsc{Averaging} dynamics is
+\[ \mathbf{x}^{(t)} = P\mathbf{x}^{(t-1)} = \cdots = P^t \mathbf{x}^{(0)}. \]
+If $G$ is undirected and non-bipartite very interesting properties hold: i) the Markov chain described by $P$ is ergodic; ii) as a consequence, as $t \to \infty$, $P^t$ converges to a rank one matrix, whose rows are copies of $P$'s main left eigenvector; iii) the mixing time of this Markov chain crucially depends on $\lambda_2(P)$. In more detail, the following results holds:
+Theorem 32 (Convergence, see Section 1 of [L+93]). The random walk on $G$ is ergodic, whenever $G$ is not bipartite. Moreover, the corresponding stationary distribution is given by the vector $\boldsymbol{\pi}$ defined as:
+\[ \boldsymbol{\pi}(v) = \frac{d(v)}{2m}, \forall v \in V. \]
+
+[Section 7.2, footnote 24, p. 32:] Recall that, if $G = (V, E)$ is an undirected graph (possibly with multiple edges and self loops), $A$ its adjacency matrix and $d_i$ the degree of node $i$, the transition matrix of (the random walk on) $G$ is the matrix $P = D^{-1} A$, where $D$ is the diagonal matrix such that $D_{i,i} = d_i$. $P_{i,j} = (1/d_i) \cdot A_{i,j}$ is thus the probability of going from $i$ to $j$ in one-step of the random walk on $G$.
+'''
+notes = "The paragraph 'Random walks and Consensus' of Section 7.2 is about the convergence of the Averaging dynamics. PROVENANCE.md attributes both Averaging.tendsto_degAvg (averaging:thm:conv) and Averaging.not_tendsto_of_colorable (averaging:thm:bip) to 'Classical (survey §7.2)'. The Survey states no result for bipartite graphs; its only text about them is the non-bipartite hypothesis quoted here. Footnote markers 24 to 27 are omitted; footnote 26 (after 'as t to infinity') reads 'The algebraic argument is relatively easy, but beyond the scope of this survey.', footnote 27 (after 'initially hold') says that the final common value is in general not one of the initial values. Kept as printed: 'P^T converges to pi^T 1' (the passage is about P^t), 'results holds', m = sum_v d(v) in the notation paragraph. Version and pages as in the averaging:def:avg entry of this file (HAL preprint, numbering matches the library; PDF page = printed page plus one). [BGPS06] is Boyd, Ghosh, Prabhakar, Shah 2006; [Sha09] is D. Shah, Gossip algorithms (2009); [L+93] is L. Lovász, Random walks on graphs: a survey."
+
+[[source]]
+item = "averaging:def:walk"
+paper = "L. Becchetti, A. Clementi, E. Natale. Consensus dynamics: an overview"
+venue = "SIGACT News 51(1), 2020"
+version = "HAL preprint hal-02507613v1"
+result = "Section 7.2, footnote 24, Theorems 32, 33"
+page = 32
+url = "https://hal.science/hal-02507613v1"
+status = "transcribed by an AI agent from the PDF of the HAL preprint hal-02507613v1 (no LaTeX source available; text extracted with pdftotext and read against the rendered page); not yet checked by a person"
+statement = '''
+[Footnote 24:] Recall that, if $G = (V, E)$ is an undirected graph (possibly with multiple edges and self loops), $A$ its adjacency matrix and $d_i$ the degree of node $i$, the transition matrix of (the random walk on) $G$ is the matrix $P = D^{-1} A$, where $D$ is the diagonal matrix such that $D_{i,i} = d_i$. $P_{i,j} = (1/d_i) \cdot A_{i,j}$ is thus the probability of going from $i$ to $j$ in one-step of the random walk on $G$.
+
+[Theorem 32, second sentence:] Moreover, the corresponding stationary distribution is given by the vector $\boldsymbol{\pi}$ defined as:
+\[ \boldsymbol{\pi}(v) = \frac{d(v)}{2m}, \forall v \in V. \]
+
+[Theorem 33, first sentence:] Let $\lambda = \max\{|\lambda_2(P)|, |\lambda_n(P)|\}$.
+'''
+context = '''
+[Section 7.1, Notation and preliminaries, p. 31:] Finally, given an $n \times n$ matrix $M$, we denote by $\lambda_1(M) \geqslant \ldots \geqslant \lambda_n(M)$ its eigenvalues. For the rest of this section, we refer to an undirected graph $G = (V, E)$ with $n$ nodes. We denote by $d(v)$ $v$'s degree and we let $m = \sum_v d(v)$.
+
+[Section 7.2, Theorem 32 (Convergence, see Section 1 of [L+93]), p. 32:] The random walk on $G$ is ergodic, whenever $G$ is not bipartite. Moreover, the corresponding stationary distribution is given by the vector $\boldsymbol{\pi}$ defined as: $\boldsymbol{\pi}(v) = \frac{d(v)}{2m}, \forall v \in V$.
+
+[Section 7.2, p. 32, after Theorem 32:] one can immediately check that $\boldsymbol{\pi}$ above is a stationary distribution for $P$, i.e., it satisfies $\boldsymbol{\pi}^T P = \boldsymbol{\pi}^T$, which in turn implies that $\boldsymbol{\pi}$ is a left eigenvector of $P$, with $\lambda_1(P) = 1$ as the associated eigenvalue.
+'''
+notes = "Footnote 24 defines the transition matrix P; Theorems 32 and 33 give pi and lambda. The statement collects the three places where the Survey defines the objects of the item: P (footnote 24, attached to the sentence 'a single step of the Averaging dynamics amounts to applying the transition matrix P of G to the current global state'), pi (Theorem 32) and lambda (Theorem 33). The Survey does not mention the symmetric matrix N = D^{-1/2} A D^{-1/2} of the blueprint item. Kept as printed: m = sum_v d(v) in the notation paragraph, while pi(v) = d(v)/2m (averaging/FORMALIZATION_DIFFERENCES.md, AVG-1 item 5, discusses it). Version and pages as in the averaging:def:avg entry of this file. [L+93] is L. Lovász, Random walks on graphs: a survey."
+
+[[source]]
+item = "averaging:lem:walk-bridges"
+paper = "L. Becchetti, A. Clementi, E. Natale. Consensus dynamics: an overview"
+venue = "SIGACT News 51(1), 2020"
+version = "HAL preprint hal-02507613v1"
+result = "Section 7.2"
+page = 32
+url = "https://hal.science/hal-02507613v1"
+status = "transcribed by an AI agent from the PDF of the HAL preprint hal-02507613v1 (no LaTeX source available; text extracted with pdftotext and read against the rendered page); not yet checked by a person"
+statement = '''
+Seeing this is relatively simple if we consider that a single step of the \textsc{Averaging} dynamics amounts to applying the transition matrix $P$ of $G$ to the current global state. $P$ operates as the random walk process on $G$ by left multiplication, and as the \textsc{Averaging} dynamics by right multiplication. So, the global state of the system after $t$ steps of the \textsc{Averaging} dynamics is
+\[ \mathbf{x}^{(t)} = P\mathbf{x}^{(t-1)} = \cdots = P^t \mathbf{x}^{(0)}. \]
+
+[...]
+As for the speed of convergence, this crucially depends on the spectrum of $P$. Note that, for every $t$, $P^t_{uv}$ is the probability that a random walk started at $u$ is at node $v$ after $t$ steps.
+'''
+context = '''
+[Section 7.1, Definition 30 (Averaging dynamics on LOCAL), p. 31:] (Initialization). At round $t = 0$ every node $v \in V$ independently samples its value from $\{-1, +1\}$ uniformly at random; (Updating rule). In each subsequent round $t \geqslant 1$, every node $u \in V$ updates its value $x_u$ to the average of the values of its neighbors at the end of the previous round.
+
+[Section 7.1, Notation and preliminaries, p. 31:] Whatever the communication model, we denote by $\mathbf{x}^{(t)}$ the global state of the \textsc{Averaging} dynamics at time $t$, i.e., the vector of values held by the nodes at time $t$. In particular, we let $\mathbf{x}^{(0)} = \mathbf{x}$ for simplicity.
+
+[Section 7.2, footnote 24, p. 32:] Recall that, if $G = (V, E)$ is an undirected graph (possibly with multiple edges and self loops), $A$ its adjacency matrix and $d_i$ the degree of node $i$, the transition matrix of (the random walk on) $G$ is the matrix $P = D^{-1} A$, where $D$ is the diagonal matrix such that $D_{i,i} = d_i$. $P_{i,j} = (1/d_i) \cdot A_{i,j}$ is thus the probability of going from $i$ to $j$ in one-step of the random walk on $G$.
+'''
+notes = "The entry quotes x^(t) = P^t x^(0) and P^t_uv as a random walk probability. Cited by averaging/FORMALIZATION_DIFFERENCES.md (AVG-1 item 8) for walkMatrix_pow_apply and avgIter_eq_walkMatrix_pow_mulVec. The omitted part (between the two quoted passages, Theorem 32 and the convergence discussion) is quoted in the entry of averaging:thm:conv. The Survey has no counterpart of charpoly_walkMatrix (P and D^{-1/2} A D^{-1/2} have the same characteristic polynomial). Version and pages as in the averaging:def:avg entry of this file."
+
+[[source]]
+item = "averaging:thm:lovasz"
+paper = "L. Becchetti, A. Clementi, E. Natale. Consensus dynamics: an overview"
+venue = "SIGACT News 51(1), 2020"
+version = "HAL preprint hal-02507613v1"
+result = "Theorem 33"
+page = 32
+url = "https://hal.science/hal-02507613v1"
+status = "transcribed by an AI agent from the PDF of the HAL preprint hal-02507613v1 (no LaTeX source available; text extracted with pdftotext and read against the rendered page); not yet checked by a person"
+statement = '''
+[Convergence time, see Theorem 5.1 of [L+93]]
+Let $\lambda = \max\{|\lambda_2(P)|, |\lambda_n(P)|\}$. For every $u, v \in V$ and for every $t \geqslant 0$ we have:
+\[ |P^t_{uv} - \boldsymbol{\pi}(v)| \leqslant \sqrt{\frac{d(v)}{d(v)}}\lambda^t. \]
+'''
+context = '''
+[Section 7.1, Notation and preliminaries, p. 31:] Finally, given an $n \times n$ matrix $M$, we denote by $\lambda_1(M) \geqslant \ldots \geqslant \lambda_n(M)$ its eigenvalues. For the rest of this section, we refer to an undirected graph $G = (V, E)$ with $n$ nodes. We denote by $d(v)$ $v$'s degree and we let $m = \sum_v d(v)$.
+
+[Section 7.2, footnote 24, p. 32:] Recall that, if $G = (V, E)$ is an undirected graph (possibly with multiple edges and self loops), $A$ its adjacency matrix and $d_i$ the degree of node $i$, the transition matrix of (the random walk on) $G$ is the matrix $P = D^{-1} A$, where $D$ is the diagonal matrix such that $D_{i,i} = d_i$. $P_{i,j} = (1/d_i) \cdot A_{i,j}$ is thus the probability of going from $i$ to $j$ in one-step of the random walk on $G$.
+
+[Section 7.2, Theorem 32 (Convergence, see Section 1 of [L+93]), p. 32:] The random walk on $G$ is ergodic, whenever $G$ is not bipartite. Moreover, the corresponding stationary distribution is given by the vector $\boldsymbol{\pi}$ defined as:
+\[ \boldsymbol{\pi}(v) = \frac{d(v)}{2m}, \forall v \in V. \]
+
+[Section 7.2, p. 32, just before Theorem 33:] As for the speed of convergence, this crucially depends on the spectrum of $P$. Note that, for every $t$, $P^t_{uv}$ is the probability that a random walk started at $u$ is at node $v$ after $t$ steps. The following result hold:
+'''
+notes = "The theorem title is shown in brackets. Kept as printed: the factor sqrt(d(v)/d(v)) (the library states sqrt(d(v)/d(u)), following Lovász's Theorem 5.1; averaging/FORMALIZATION_DIFFERENCES.md, AVG-1 item 2), 'The following result hold', and m = sum_v d(v) in the notation paragraph while pi(v) = d(v)/2m (FORMALIZATION_DIFFERENCES.md, AVG-1 item 5). The Survey states no hypothesis on G inside Theorem 33; the surrounding paragraph is about connected non-bipartite graphs. [L+93] is L. Lovász, Random walks on graphs: a survey (see the separate entry for its Theorem 5.1). Version and pages as in the averaging:def:avg entry of this file."
+
+[[source]]
+items = ["averaging:lem:lambda-lt-one", "averaging:cor:avg-rate"]
+paper = "L. Becchetti, A. Clementi, E. Natale. Consensus dynamics: an overview"
+venue = "SIGACT News 51(1), 2020"
+version = "HAL preprint hal-02507613v1"
+result = "Section 7.2, remark after Theorem 33"
+page = 32
+url = "https://hal.science/hal-02507613v1"
+status = "transcribed by an AI agent from the PDF of the HAL preprint hal-02507613v1 (no LaTeX source available; text extracted with pdftotext and read against the rendered page); not yet checked by a person"
+statement = '''
+Unless $G$ is bipartite, $\lambda < 1$. In particular, this implies exponential convergence speed, whenever $\lambda$ is bounded away from 1 by a (possibly small) constant.
+'''
+context = '''
+[Section 7.1, Notation and preliminaries, p. 31:] Finally, given an $n \times n$ matrix $M$, we denote by $\lambda_1(M) \geqslant \ldots \geqslant \lambda_n(M)$ its eigenvalues. For the rest of this section, we refer to an undirected graph $G = (V, E)$ with $n$ nodes. We denote by $d(v)$ $v$'s degree and we let $m = \sum_v d(v)$.
+
+[Section 7.2, p. 32:] So, the global state of the system after $t$ steps of the \textsc{Averaging} dynamics is
+\[ \mathbf{x}^{(t)} = P\mathbf{x}^{(t-1)} = \cdots = P^t \mathbf{x}^{(0)}. \]
+
+[Section 7.2, footnote 24, p. 32:] [...] the transition matrix of (the random walk on) $G$ is the matrix $P = D^{-1} A$, where $D$ is the diagonal matrix such that $D_{i,i} = d_i$.
+
+[Section 7.2, Theorem 32, p. 32:] The random walk on $G$ is ergodic, whenever $G$ is not bipartite. Moreover, the corresponding stationary distribution is given by the vector $\boldsymbol{\pi}$ defined as: $\boldsymbol{\pi}(v) = \frac{d(v)}{2m}, \forall v \in V$.
+
+[Section 7.2, p. 32:] As a result, for every $\mathbf{x} \in \mathbb{R}^n$, $P^t \mathbf{x}$ converges to $\alpha \mathbf{1}$, where $\alpha = \sum_v \boldsymbol{\pi}(v)\mathbf{x}(v)$.
+
+[Section 7.2, Theorem 33 (Convergence time, see Theorem 5.1 of [L+93]), p. 32:] Let $\lambda = \max\{|\lambda_2(P)|, |\lambda_n(P)|\}$. For every $u, v \in V$ and for every $t \geqslant 0$ we have:
+\[ |P^t_{uv} - \boldsymbol{\pi}(v)| \leqslant \sqrt{\frac{d(v)}{d(v)}}\lambda^t. \]
+'''
+notes = "This is the Survey's only text on the rate of the averaging dynamics: it has no displayed bound for x^(t). averaging:lem:lambda-lt-one formalizes the first sentence (for connected graphs, averaging/FORMALIZATION_DIFFERENCES.md, AVG-1 item 6); averaging:cor:avg-rate ('Rate of the averaging dynamics' in averaging/README.md) is the consequence of Theorem 33 for x^(t) = P^t x^(0) that FORMALIZATION_DIFFERENCES.md (AVG-1 item 7) describes. Kept as printed in Theorem 33: sqrt(d(v)/d(v)) (see the entry of averaging:thm:lovasz). Version and pages as in the averaging:def:avg entry of this file. [L+93] is L. Lovász, Random walks on graphs: a survey."
+
+[[source]]
+items = ["averaging:def:edge-matrix", "averaging:lem:edge-matrix"]
+paper = "L. Becchetti, A. Clementi, E. Natale. Consensus dynamics: an overview"
+venue = "SIGACT News 51(1), 2020"
+version = "HAL preprint hal-02507613v1"
+result = "Equation (2)"
+page = 33
+url = "https://hal.science/hal-02507613v1"
+status = "transcribed by an AI agent from the PDF of the HAL preprint hal-02507613v1 (no LaTeX source available; text extracted with pdftotext and read against the rendered page); not yet checked by a person"
+statement = '''
+In more detail, it is easy to see [BGPS06] that, if edge $(i, j)$ is selected for communication in the $t$-step we have:
+\[ W(t) = I - \frac{(\mathbf{e}_i - \mathbf{e}_j)(\mathbf{e}_i - \mathbf{e}_j)^T}{2}, \qquad (2) \]
+where $I$ is the identiy matrix and $\mathbf{e}_h$ denotes the $h$-th canonical vector.
+'''
+context = '''
+[Section 7.1, Definition 31 (Averaging(delta) on the random sequential model), p. 31:] In the random sequential case, a node performs some action whenever it is one of the endpoints of the edge selected for communication in the current step.
+Definition 31 (\textsc{Averaging}$(\delta)$ on the random sequential model). Let $\delta \in (0, 1)$ be the parameter measuring the weight given to the neighbor's value.
+\begin{itemize}
+\item (Initialization). If it is the first time $u$ is active, then pick $x_u \in \{-1, +1\}$ u.a.r.
+\item (Updating rule). Send $x_u$ to the other endpoint of the active edge and then update $x_u := (1 - \delta)x_u + \delta r$, where $r$ is the value received from the other endpoint.
+\end{itemize}
+
+[Section 7.2, p. 33:] The picture changes completely in process over the random sequential model described in Definition 30. Here, the global state $\mathbf{x}^{(t)}$ at time $t$ depends on the global state at time $t - 1$ according to a non-homogeneous Markov chain. In more detail, we have:
+\[ \mathbf{x}^{(t)} = W(t)\mathbf{x}^{(t-1)}, \]
+where $W(t)$ is a matrix that corresponds to the averaging between the end nodes of the edge that is selected for communication in the $t$-th step.
+
+[Section 7.2, footnote 28, p. 33:] We remind the reader that we focus on the case $\delta = 1/2$.
+
+[Section 7.2, p. 33, after equation (3):] A few remarks are in order: i) the $W(t)$'s are independent and identically distributed random variables, their distribution corresponding to the one over the edges that defines the random sequential process; ii) each $W(t)$ is a doubly stochastic matrix; iii) it is easy to see that $W^{(t)}$ is a (doubly) stochastic matrix that defines a non-homogeneous Markov chain.
+'''
+notes = "Cited by averaging/README.md ('Edge step W (equation (2)), doubly stochastic, W^T W = W') for Sequential.edgeMatrix (averaging:def:edge-matrix) and for edgeMatrix_mulVec, edgeMatrix_mem_doublyStochastic, transpose_edgeMatrix_mul_self (averaging:lem:edge-matrix). The Survey's remark ii) is its text on double stochasticity; it does not state W^T W = W (see the entry of Boyd et al., equations (26) to (29)). Footnote marker 28 (after 'In more detail') and 29 (after 'random variables'; it reads 'If edges are selected independently across different time steps as we assume.') omitted. Kept as printed: 'identiy', 'in the t-step', 'in process over the random sequential model described in Definition 30' (the random sequential model is Definition 31). [BGPS06] is Boyd, Ghosh, Prabhakar, Shah 2006. Version and pages as in the averaging:def:avg entry of this file."
+
+[[source]]
+item = "averaging:def:edge-matrix"
+paper = "L. Becchetti, A. Clementi, E. Natale. Consensus dynamics: an overview"
+venue = "SIGACT News 51(1), 2020"
+version = "HAL preprint hal-02507613v1"
+result = "Equation (3)"
+page = 33
+url = "https://hal.science/hal-02507613v1"
+status = "transcribed by an AI agent from the PDF of the HAL preprint hal-02507613v1 (no LaTeX source available; text extracted with pdftotext and read against the rendered page); not yet checked by a person"
+statement = '''
+As a result we have:
+\[ \mathbf{x}^{(t)} = W(t)W(t-1) \cdots W(1)\mathbf{x}^{(0)}, \qquad (3) \]
+where each $W(i)$ has the form (2) and corresponds to the edge sampled in the $i$-th step. We let $W^{(t)} = W(t)W(t-1) \cdots W(1)$ in the remainder.
+'''
+context = '''
+[Section 7.2, p. 33:] In more detail, we have:
+\[ \mathbf{x}^{(t)} = W(t)\mathbf{x}^{(t-1)}, \]
+where $W(t)$ is a matrix that corresponds to the averaging between the end nodes of the edge that is selected for communication in the $t$-th step. In more detail, it is easy to see [BGPS06] that, if edge $(i, j)$ is selected for communication in the $t$-step we have:
+\[ W(t) = I - \frac{(\mathbf{e}_i - \mathbf{e}_j)(\mathbf{e}_i - \mathbf{e}_j)^T}{2}, \qquad (2) \]
+where $I$ is the identiy matrix and $\mathbf{e}_h$ denotes the $h$-th canonical vector.
+
+[Section 7.2, p. 33, after equation (3):] A few remarks are in order: i) the $W(t)$'s are independent and identically distributed random variables, their distribution corresponding to the one over the edges that defines the random sequential process; [...]
+
+[Section 7.2, footnote 29, p. 33:] If edges are selected independently across different time steps as we assume.
+'''
+notes = "Cited by the doc comment of Sequential.seqRun ('Equation (3)'), part of averaging:def:edge-matrix. Kept as printed: 'identiy', 'in the t-step'. Version and pages as in the averaging:def:avg entry of this file."
+
+[[source]]
+items = ["averaging:thm:mean-step", "averaging:def:edge-matrix"]
+paper = "L. Becchetti, A. Clementi, E. Natale. Consensus dynamics: an overview"
+venue = "SIGACT News 51(1), 2020"
+version = "HAL preprint hal-02507613v1"
+result = "Equation (4)"
+page = 33
+url = "https://hal.science/hal-02507613v1"
+status = "transcribed by an AI agent from the PDF of the HAL preprint hal-02507613v1 (no LaTeX source available; text extracted with pdftotext and read against the rendered page); not yet checked by a person"
+statement = '''
+The expectation $\mathbf{E}[W(t)] = W$ of course does not depend on $t$, while it depends on $G$'s transition matrix in a simple way, namely:
+\[ W = I - \frac{1}{2n}\bar{D} + \frac{P + P^T}{2n}. \qquad (4) \]
+Here, $\bar{D}$ is the diagonal matrix such that $\bar{D}_{ii} = \sum_{j=1}^{n} (P_{ij} + P_{ji})$.
+'''
+context = '''
+[Section 7.1, Notation and preliminaries, p. 31:] For the rest of this section, we refer to an undirected graph $G = (V, E)$ with $n$ nodes.
+
+[Section 7.2, footnote 24, p. 32:] Recall that, if $G = (V, E)$ is an undirected graph (possibly with multiple edges and self loops), $A$ its adjacency matrix and $d_i$ the degree of node $i$, the transition matrix of (the random walk on) $G$ is the matrix $P = D^{-1} A$, where $D$ is the diagonal matrix such that $D_{i,i} = d_i$.
+
+[Section 7.2, p. 33:] In more detail, we have: $\mathbf{x}^{(t)} = W(t)\mathbf{x}^{(t-1)}$, where $W(t)$ is a matrix that corresponds to the averaging between the end nodes of the edge that is selected for communication in the $t$-th step. In more detail, it is easy to see [BGPS06] that, if edge $(i, j)$ is selected for communication in the $t$-step we have:
+\[ W(t) = I - \frac{(\mathbf{e}_i - \mathbf{e}_j)(\mathbf{e}_i - \mathbf{e}_j)^T}{2}, \qquad (2) \]
+where $I$ is the identiy matrix and $\mathbf{e}_h$ denotes the $h$-th canonical vector. [...] A few remarks are in order: i) the $W(t)$'s are independent and identically distributed random variables, their distribution corresponding to the one over the edges that defines the random sequential process; ii) each $W(t)$ is a doubly stochastic matrix; [...]
+
+[Section 7.2, footnote 28, p. 33:] We remind the reader that we focus on the case $\delta = 1/2$.
+'''
+notes = "Cited by averaging/README.md and PROVENANCE.md ('equations (4)-(5)') for Sequential.avg_expect_edgeMatrix and avg_edgeMatrix (averaging:thm:mean-step), and by the doc comment of Sequential.gossipMeanMatrix ('The right-hand side of equation (4)'), part of averaging:def:edge-matrix. As printed, the expected matrix is written W, without an overline, and the Survey does not say which law on the edges gives (4); it attributes the computation to [BGPS06], whose law (a uniformly random node i contacts j with probability P_ij) is quoted in the entry of Boyd et al., equations (24) and (25) (averaging/FORMALIZATION_DIFFERENCES.md, AVG-1 item 9, discusses the two laws). Version and pages as in the averaging:def:avg entry of this file."
+
+[[source]]
+item = "averaging:thm:mean-step"
+paper = "L. Becchetti, A. Clementi, E. Natale. Consensus dynamics: an overview"
+venue = "SIGACT News 51(1), 2020"
+version = "HAL preprint hal-02507613v1"
+result = "Equation (5)"
+page = 33
+url = "https://hal.science/hal-02507613v1"
+status = "transcribed by an AI agent from the PDF of the HAL preprint hal-02507613v1 (no LaTeX source available; text extracted with pdftotext and read against the rendered page); not yet checked by a person"
+statement = '''
+If $G$ is a regular graph, the above expressione simplifies to
+\[ W = \left(1 - \frac{1}{n}\right) I + \frac{1}{n} P. \qquad (5) \]
+'''
+context = '''
+[Section 7.2, footnote 24, p. 32:] Recall that, if $G = (V, E)$ is an undirected graph (possibly with multiple edges and self loops), $A$ its adjacency matrix and $d_i$ the degree of node $i$, the transition matrix of (the random walk on) $G$ is the matrix $P = D^{-1} A$, where $D$ is the diagonal matrix such that $D_{i,i} = d_i$.
+
+[Section 7.2, p. 33, the expression referred to:] The expectation $\mathbf{E}[W(t)] = W$ of course does not depend on $t$, while it depends on $G$'s transition matrix in a simple way, namely:
+\[ W = I - \frac{1}{2n}\bar{D} + \frac{P + P^T}{2n}. \qquad (4) \]
+Here, $\bar{D}$ is the diagonal matrix such that $\bar{D}_{ii} = \sum_{j=1}^{n} (P_{ij} + P_{ji})$.
+
+[Section 7.2, p. 33:] [...] if edge $(i, j)$ is selected for communication in the $t$-step we have: $W(t) = I - \frac{(\mathbf{e}_i - \mathbf{e}_j)(\mathbf{e}_i - \mathbf{e}_j)^T}{2}$ (2).
+'''
+notes = "Cited for Sequential.gossipMeanMatrix_of_isRegular and meanMatrix_of_isRegular (averaging:thm:mean-step). Kept as printed: 'expressione'; the expected matrix is written W, without an overline. Version and pages as in the averaging:def:avg entry of this file."
+
+[[source]]
+item = "averaging:thm:moments"
+paper = "L. Becchetti, A. Clementi, E. Natale. Consensus dynamics: an overview"
+venue = "SIGACT News 51(1), 2020"
+version = "HAL preprint hal-02507613v1"
+result = "Section 7.3.2, 'First moment analysis'"
+page = 37
+url = "https://hal.science/hal-02507613v1"
+status = "transcribed by an AI agent from the PDF of the HAL preprint hal-02507613v1 (no LaTeX source available; text extracted with pdftotext and read against the rendered page); not yet checked by a person"
+statement = '''
+We next discuss the expected evolution of $\mathbf{x}^{(t)}$ under the action of the \textsc{Averaging}$(\delta)$ dynamics. For simplicity of exposition, in the remainder we assume $G$ is regular. Again, we set $\mathbf{x}^{(0)} = \mathbf{x}$, with $\mathbf{x}$ realized according to the initialization step in Algorithm 31. When $G$ is regular, we have
+\[ \mathbf{E}\left[\mathbf{x}^{(t)}\right] = W^t \mathbf{x}, \]
+with $W$ given from (5).
+'''
+context = '''
+[Section 7.1, Definition 31 (Averaging(delta) on the random sequential model), p. 31:] Let $\delta \in (0, 1)$ be the parameter measuring the weight given to the neighbor's value. (Initialization). If it is the first time $u$ is active, then pick $x_u \in \{-1, +1\}$ u.a.r. (Updating rule). Send $x_u$ to the other endpoint of the active edge and then update $x_u := (1 - \delta)x_u + \delta r$, where $r$ is the value received from the other endpoint.
+
+[Section 7.2, p. 33:] As a result we have:
+\[ \mathbf{x}^{(t)} = W(t)W(t-1) \cdots W(1)\mathbf{x}^{(0)}, \qquad (3) \]
+where each $W(i)$ has the form (2) and corresponds to the edge sampled in the $i$-th step. [...] A few remarks are in order: i) the $W(t)$'s are independent and identically distributed random variables, their distribution corresponding to the one over the edges that defines the random sequential process; [...] The expectation $\mathbf{E}[W(t)] = W$ of course does not depend on $t$ [...] If $G$ is a regular graph, the above expressione simplifies to
+\[ W = \left(1 - \frac{1}{n}\right) I + \frac{1}{n} P. \qquad (5) \]
+
+[Section 7.2, footnote 28, p. 33:] We remind the reader that we focus on the case $\delta = 1/2$.
+'''
+notes = "Cited by averaging/README.md ('First moment (Section 7.3.2)') for Sequential.expList_seqRun. The Survey does not display the second-moment identities of the item (E[W^T W] = E[W] and E||Wx||^2 = x^T W x); see the entry of Boyd et al., equations (26) to (29). Kept as printed: 'Algorithm 31' (Definition 31), 'expressione'. Version and pages as in the averaging:def:avg entry of this file."
+
+# ---------------------------------------------------------------------------------------------
+# Lovász 1993 (not retrieved)
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+item = "averaging:thm:lovasz"
+paper = "L. Lovász. Random walks on graphs: a survey"
+venue = "Combinatorics, Paul Erdős is Eighty, Vol. 2, Bolyai Society Mathematical Studies, 1993"
+version = "author's copy on L. Lovász's web page"
+result = "Theorem 5.1"
+url = "https://web.cs.elte.hu/~lovasz/randwalk-papers.html"
+status = "open copy exists at the author's web page but could not be retrieved by the transcribing agent (the server did not answer); not transcribed"
+notes = "Cited by the blueprint (Section 'Rate of convergence'), averaging/README.md, PROVENANCE.md and averaging/FORMALIZATION_DIFFERENCES.md (AVG-1 item 2) as the source of the Survey's Theorem 33 (see the Survey entry of this item). FORMALIZATION_DIFFERENCES.md states that the library's factor sqrt(d(v)/d(u)) is Lovász's; this was not checked against a copy."
+
+# ---------------------------------------------------------------------------------------------
+# Boyd, Ghosh, Prabhakar, Shah 2006
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+items = ["averaging:def:edge-matrix", "averaging:lem:edge-matrix"]
+paper = "S. Boyd, A. Ghosh, B. Prabhakar, D. Shah. Randomized gossip algorithms"
+venue = "IEEE Transactions on Information Theory 52(6), 2006"
+version = "IEEE Trans. Inf. Theory 52(6), 2006"
+result = "Equation (2), Section I-A"
+page = 2
+url = "https://web.stanford.edu/~boyd/papers/pdf/gossip.pdf"
+status = "transcribed by an AI agent from the PDF of the published version (no LaTeX source available; the PDF's text layer omits most of the mathematics, so the formulas were read from the rendered pages); not yet checked by a person"
+statement = '''
+The asynchronous algorithm associated with $P$, denoted by $\mathcal{A}(P)$, is described as follows: In the $k$th time slot, let node $i$'s clock tick and let it contact some neighboring node $j$ with probability $P_{ij}$. At this time, both nodes set their values equal to the average of their current values. Formally, let $x(k)$ denote the vector of values at the end of the time slot $k$. Then
+\[ x(k) = W(k)x(k-1) \qquad (1) \]
+where with probability $\frac{1}{n}P_{ij}$ (the probability that the $i$th node's clock ticks is $1/n$, and the probability that it contacts node $j$ is $P_{ij}$) the random matrix $W(k)$ is
+\[ W_{ij} = I - \frac{(e_i - e_j)(e_i - e_j)^T}{2} \qquad (2) \]
+where $e_i = [0 \ \ldots \ 0 \ 1 \ 0 \ \ldots 0]^T$ is an $n \times 1$ unit vector with the $i$th component equal to $1$.
+'''
+context = '''
+[Section I-A, p. 2509:] Consider a connected graph $G = (V, E)$, where the vertex set $V$ contains $n$ nodes and $E$ is the edge set. The $i$th component of the vector $x(0) = [x_1(0), \ldots, x_n(0)]^T$ represents the initial value at node $i$. Let $x_{\mathrm{ave}} = \sum_i x_i(0)/n$ be the average of the entries of $x(0)$. Our goal is to compute $x_{\mathrm{ave}}$ in a distributed manner.
+Asynchronous time model: Each node has a clock which ticks at the times of a rate 1 Poisson process. Thus, the inter-tick times at each node are rate 1 exponentials, independent across nodes and over time. Equivalently, this corresponds to a single clock ticking according to a rate $n$ Poisson process at times $Z_k$, $k \geq 1$, where $\{Z_{k+1} - Z_k\}$ are i.i.d. exponentials of rate $n$. Let $I_k \in \{1, \ldots, n\}$ denote the node whose clock ticked at time $Z_k$. Clearly, the $I_k$ are i.i.d. variables distributed uniformly over $\{1, \ldots, n\}$. We discretize time according to clock ticks since these are the only times at which the value of $x(\cdot)$ changes. [...]
+Algorithm $\mathcal{A}(P)$: We consider a particular class of time-invariant gossip algorithms, denoted by $\mathcal{A}$. An algorithm in this class is characterized by an $n \times n$ matrix $P = [P_{ij}]$ of nonnegative entries with the condition that $P_{ij} > 0$ only if $(i, j) \in E$. For technical reasons, we assume that $P$ is a stochastic matrix with its largest eigenvalue equal to 1, and all remaining $n - 1$ eigenvalues strictly less than 1 in magnitude. [...]
+
+[Section III-A, p. 2512:] Note that $W(k)$ are doubly stochastic matrices for all $(i, j)$.
+
+[Section III-A, p. 2513:] It is not an accident that $W(k)^T W(k) = W(k)$: each $W_{ij}$ is a projection matrix, which projects a vector $x$ onto the subspace $x_i = x_j$. The entries of $x$ except the $i$ and $j$th stay unchanged, and $x_i$ and $x_j$ average their values. Since every projection matrix $Q$ satisfies $Q^2 = Q$, and $W_{ij}$ are symmetric, we have $W_{ij}^T W_{ij} = W_{ij}$.
+'''
+notes = "Equation (2) is the asynchronous algorithm A(P). Version: the published version (IEEE Trans. Inf. Theory 52(6):2508-2530, June 2006), PDF on S. Boyd's web page. The blueprint section 'Sequential averaging' names this paper as the source of the Survey's equations (4) and (5); averaging/FORMALIZATION_DIFFERENCES.md (AVG-1) cites it for the edge step and its properties. The page field is the PDF page (journal page 2509). Kept as printed: '0 1 0 ...0' without a space before the last 0. The definition of A(P) quoted in the context goes on: '(Such a matrix can always be found if the underlying graph is connected and nonbipartite; we will assume that the network graph G satisfies these conditions for the remainder of the paper.)'."
+
+[[source]]
+items = ["averaging:thm:mean-step", "averaging:def:edge-matrix"]
+paper = "S. Boyd, A. Ghosh, B. Prabhakar, D. Shah. Randomized gossip algorithms"
+venue = "IEEE Transactions on Information Theory 52(6), 2006"
+version = "IEEE Trans. Inf. Theory 52(6), 2006"
+result = "Equations (24) and (25)"
+page = 6
+url = "https://web.stanford.edu/~boyd/papers/pdf/gossip.pdf"
+status = "transcribed by an AI agent from the PDF of the published version (no LaTeX source available; the PDF's text layer omits most of the mathematics, so the formulas were read from the rendered pages); not yet checked by a person"
+statement = '''
+Computing $W$:
+Let $W$ denote the expected value of $W(0)$ (which is the same as $E[W(k)]$)
+\[ W = \frac{1}{n}\sum_{i,j} P_{ij} W_{ij}. \qquad (24) \]
+Then, the entries of $W$ are as follows:
+1) for $i \neq j$, $W_{ij} = \frac{P_{ij} + P_{ji}}{2n}$ and
+2) $W_{ii} = 1 - \frac{\left[\sum_{j=1}^{n} (P_{ij} + P_{ji})\right] - 2P_{ii}}{2n}$.
+This yields the $W$ defined in (7), that is,
+\[ W = I - \frac{1}{2n}D + \frac{P + P^T}{2n} \qquad (25) \]
+where $D = \mathrm{diag}([D_1 \cdots D_n])$ is the diagonal matrix with entries
+\[ D_i = \left(\sum_{j=1}^{n} [P_{ij} + P_{ji}]\right). \]
+Note that if $P = P^T$, then $P$ is doubly stochastic. This implies that $D_i = 2$, which in turn means that $W = (1 - 1/n)I + (1/n)P$.
+'''
+context = '''
+[Section I-A, p. 2509, Algorithm A(P):] An algorithm in this class is characterized by an $n \times n$ matrix $P = [P_{ij}]$ of nonnegative entries with the condition that $P_{ij} > 0$ only if $(i, j) \in E$. For technical reasons, we assume that $P$ is a stochastic matrix with its largest eigenvalue equal to 1, and all remaining $n - 1$ eigenvalues strictly less than 1 in magnitude. [...] The asynchronous algorithm associated with $P$, denoted by $\mathcal{A}(P)$, is described as follows: In the $k$th time slot, let node $i$'s clock tick and let it contact some neighboring node $j$ with probability $P_{ij}$. At this time, both nodes set their values equal to the average of their current values.
+
+[Section III-A, p. 2512:] Recall that under algorithm $\mathcal{A}(P)$
+\[ x(k+1) = W(k+1)x(k) \qquad (21) \]
+where, with probability $\frac{1}{n}P_{ij}$, the random matrix $W(k)$ is
+\[ W_{ij} = I - \frac{(e_i - e_j)(e_i - e_j)^T}{2}. \qquad (22) \]
+
+[Section I-C, Theorem 3, p. 2510 to 2511, where equation (7) is introduced:] The averaging time $T_{\mathrm{ave}}(\epsilon, P)$ of the asynchronous algorithm $\mathcal{A}(P)$ (in terms of number of clock ticks) is bounded as follows: [(5) and (6)] where
+\[ W \triangleq I - \frac{1}{2n}D + \frac{P + P^T}{2n} \qquad (7) \]
+and $D$ is the diagonal matrix with entries $D_i = \sum_{j=1}^{n} [P_{ij} + P_{ji}]$.
+'''
+notes = "Equations (24) and (25) are in Section III-A, 'Computing W', and give the matrix of equation (7). Version: the published version (IEEE Trans. Inf. Theory 52(6):2508-2530, June 2006), PDF on S. Boyd's web page. The source the blueprint names for the Survey's equation (4) (blueprint section 'Sequential averaging'; averaging/FORMALIZATION_DIFFERENCES.md, AVG-1 item 9). The page field is the PDF page (journal page 2513). Kept as printed: the expected matrix is written W without an overline in (7), (24) and (25) (Section II-A writes the mean of the matrices W(t) as an overlined W); in item 1) W_ij denotes an entry of the expected matrix, while in (22) and (24) W_ij is the matrix of one step. The last sentence is the paper's counterpart of the Survey's equation (5)."
+
+[[source]]
+items = ["averaging:lem:edge-matrix", "averaging:thm:moments"]
+paper = "S. Boyd, A. Ghosh, B. Prabhakar, D. Shah. Randomized gossip algorithms"
+venue = "IEEE Transactions on Information Theory 52(6), 2006"
+version = "IEEE Trans. Inf. Theory 52(6), 2006"
+result = "Equations (26) to (29)"
+page = 6
+url = "https://web.stanford.edu/~boyd/papers/pdf/gossip.pdf"
+status = "transcribed by an AI agent from the PDF of the published version (no LaTeX source available; the PDF's text layer omits most of the mathematics, so the formulas were read from the rendered pages); not yet checked by a person"
+statement = '''
+Computing the second moment $E[y(k)^T y(k)]$:
+With probability $\frac{P_{ij}}{n}$, the edge $(i, j)$ is chosen to average, that is, $W(k) = W_{ij}$. Then
+\[ W(k)^T W(k) = \left(I - \frac{(e_i - e_j)(e_i - e_j)^T}{2}\right)^2 \qquad (26) \]
+\[ = \left(I - \frac{(e_i - e_j)(e_i - e_j)^T}{2}\right) \qquad (27) \]
+\[ = W(k). \qquad (28) \]
+It is not an accident that $W(k)^T W(k) = W(k)$: each $W_{ij}$ is a projection matrix, which projects a vector $x$ onto the subspace $x_i = x_j$. The entries of $x$ except the $i$ and $j$th stay unchanged, and $x_i$ and $x_j$ average their values. Since every projection matrix $Q$ satisfies $Q^2 = Q$, and $W_{ij}$ are symmetric, we have $W_{ij}^T W_{ij} = W_{ij}$.
+Since (28) holds for each instance of the random matrix $W$, we have
+\[ E[W(0)^T W(0)] = E[W(0)] = W. \qquad (29) \]
+'''
+context = '''
+[Section I-A, p. 2509:] The asynchronous algorithm associated with $P$, denoted by $\mathcal{A}(P)$, is described as follows: In the $k$th time slot, let node $i$'s clock tick and let it contact some neighboring node $j$ with probability $P_{ij}$. At this time, both nodes set their values equal to the average of their current values. Formally, let $x(k)$ denote the vector of values at the end of the time slot $k$. Then $x(k) = W(k)x(k-1)$ (1) where with probability $\frac{1}{n}P_{ij}$ [...] the random matrix $W(k)$ is
+\[ W_{ij} = I - \frac{(e_i - e_j)(e_i - e_j)^T}{2} \qquad (2) \]
+where $e_i = [0 \ \ldots \ 0 \ 1 \ 0 \ \ldots 0]^T$ is an $n \times 1$ unit vector with the $i$th component equal to $1$.
+
+[Section III-A, p. 2512 to 2513:] Note that $W(k)$ are doubly stochastic matrices for all $(i, j)$. [...] Given our assumptions on the matrix of transition probabilities $P$, we can conclude from the previous section that $x(k) \to x_{\mathrm{ave}}\mathbf{1}$. We want to find out how fast $x_k$ converges; in particular, we want to obtain probabilistic bounds on $y(k) = x(k) - x_{\mathrm{ave}}\mathbf{1}$.
+
+[Section III-A, p. 2513, 'Computing W':] Let $W$ denote the expected value of $W(0)$ (which is the same as $E[W(k)]$)
+\[ W = \frac{1}{n}\sum_{i,j} P_{ij} W_{ij}. \qquad (24) \]
+'''
+notes = "Equations (26) to (29) are in Section III-A, 'Computing the second moment'. Version: the published version (IEEE Trans. Inf. Theory 52(6):2508-2530, June 2006), PDF on S. Boyd's web page. averaging/FORMALIZATION_DIFFERENCES.md (AVG-1 item 12) cites this paper for E[W^T W] = E[W] ('since W is a symmetric projection'), the identity of Sequential.avg_transpose_edgeMatrix_mul_self (averaging:thm:moments); the projection identity W_ij^T W_ij = W_ij is transpose_edgeMatrix_mul_self (averaging:lem:edge-matrix). The paper's edge law is that of A(P) (a uniformly random node i contacts j with probability P_ij); the library states the identities for a uniformly random oriented edge. The page field is the PDF page (journal page 2513). Kept as printed: W without an overline in (29)."
+
+# ---------------------------------------------------------------------------------------------
+# Find your place (Becchetti, Clementi, Natale, Pasquale, Trevisan), arXiv:1511.03927v4
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+item = "averaging:def:clustered"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, L. Trevisan. Find your place: simple distributed algorithms for community detection"
+venue = "SODA 2017 / SIAM J. Comput. 2020"
+version = "arXiv:1511.03927v4"
+result = "Definition 3.1"
+page = 7
+url = "https://arxiv.org/abs/1511.03927v4"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v4 and compared with the PDF of v4; not yet checked by a person"
+statement = '''
+[Clustered Regular Graph] A $(2n,d,b)$-clustered regular graph $G = ((V_1,V_2),E)$ is a graph over vertex set $V_1 \cup V_2$, with $|V_1|=|V_2|=n$ and such that: (i) Every node has degree $d$ and (ii) Every node in cluster $V_1$ has $b$ neighbors in cluster $V_2$ and every node in $V_2$ has $b$ neighbors in $V_1$.
+'''
+context = '''
+[Section 2, p. 6:] Let $G = \left((V_1, V_2), E\right)$ be a graph with $V_1 \cap V_2 = \emptyset$.
+
+[Section 2, p. 6:] Let $G=(V,E)$ be an undirected graph (possibly with multiple edges and self loops), $A$ its adjacency matrix and $d_i$ the degree of node $i$. The transition matrix of (the random walk on) $G$ is the matrix $P = D^{-1} A$, where $D$ is the diagonal matrix such that $D_{i,i} = d_i$. $P_{i,j} = (1/d_i) \cdot A_{i,j}$ is thus the probability of going from $i$ to $j$ in one-step of the random walk on $G$. $P$ operates as the random walk process on $G$ by left multiplication, and as the \textsc{Averaging} dynamics by right multiplication. For $i = 1, 2$, define $\mathbf{1}_{V_i}$, as the $|V|$-dimensional vector, whose $j$-th component is $1$ if $j\in V_i$, it is $0$ otherwise. If $(V_1, V_2)$ is a bipartition of the nodes with $|V_1| = |V_2| = n$, we define the partition indicator vector $\boldsymbol{\chi} = \mathbf{1}_{V_1} - \mathbf{1}_{V_2}$. If $\mathbf{x}$ is the initial vector of values, after $t$ rounds of the \textsc{Averaging} dynamics the vector of values at time $t$ is $\mathbf{x}^{(t)} = P^t \mathbf{x}$.
+
+[Section 2, p. 7:] In what follows we always denote by $\lambda_1 \geqslant \ldots \geqslant \lambda_{2n}$ the eigenvalues of $P$. Recall that, since $P$ is a stochastic matrix we have $\lambda_1 = 1$ and $\lambda_{2n} \geqslant -1$, moreover for all graphs that are connected and not bipartite it holds that $\lambda_2 < 1$ and $\lambda_{2n} > -1$. We denote by $\lambda$ the largest, in absolute value, among all but the first two eigenvalues, namely $\lambda = \max\left\{ | \lambda_i | \,:\, i = 3, 4, \dots, 2n \right\}$.
+
+[Section 3, p. 7:] If $G$ is $d$-regular then $P = (1/d) A$ is a real symmetric matrix and $P$ and $A$ have the same set of eigenvectors.
+
+[Section 3, p. 7, after Definition 3.1:] We know that $\mathbf{1}$ is an eigenvector of $P$ with eigenvalue $1$, and it is easy to see that the partition indicator vector $\boldsymbol{\chi}$ is an eigenvector of $P$ with eigenvalue $1 - 2b/d$ (see Observation A.3 in Appendix A).
+'''
+notes = "Cited by averaging/README.md ('Definition 3.1, chi, P, lambda, coloring rule, strong reconstruction') and the doc comment of IsClusteredRegular. The coloring rule and strong reconstruction (also named by this item) are in the entry 'Section 2' below; T(n, delta) = reconstructionTime has no counterpart in the paper (averaging/FORMALIZATION_DIFFERENCES.md, AVG-2 item 5). The definition title is shown in brackets. Macros replaced: \\bone -> \\mathbf{1}, \\bchi -> \\boldsymbol{\\chi}, \\bx -> \\mathbf{x}, \\avg -> \\textsc{Averaging}; the paper's preamble typesets \\geq as \\geqslant, written here as \\geqslant. Numbering: as in the existing entry of averaging:thm:strong (verification/sources.toml), v3 and v4 share the numbering the library cites."
+
+[[source]]
+item = "averaging:def:clustered"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, L. Trevisan. Find your place: simple distributed algorithms for community detection"
+venue = "SODA 2017 / SIAM J. Comput. 2020"
+version = "arXiv:1511.03927v4"
+result = "Section 2, protocol and reconstruction definitions"
+page = 6
+url = "https://arxiv.org/abs/1511.03927v4"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v4 and compared with the PDF of v4; not yet checked by a person"
+statement = '''
+Distributed block reconstruction. Let $G = \left((V_1, V_2), E\right)$ be a graph with $V_1 \cap V_2 = \emptyset$. A weak (block) reconstruction is a two-coloring of the nodes that separates $V_1$ and $V_2$ up to a small fraction of the nodes. Formally, we define an $\varepsilon$-weak reconstruction as a map $f \,:\, V_1 \cup V_2 \rightarrow \{ \texttt{red}, \texttt{blue} \}$ such that there are two subsets $W_1 \subseteq V_1$ and $W_2 \subseteq V_2$ with $|W_1 \cup W_2| \geqslant (1 - \varepsilon) |V_1 \cup V_2|$ and $f(W_1) \cap f(W_2) = \emptyset$. When $\varepsilon = 0$ we say that $f$ is a strong reconstruction.
+
+[...]
+\textsc{Averaging} protocol:
+\begin{description}
+\item[Rademacher initialization:] At round $t = 0$ every node $v \in V$ independently samples its value from $\{- 1, +1\}$ uniformly at random;
+\item[Updating rule:] At each subsequent round $t \geqslant 1$, every node $v \in V$
+\begin{enumerate}
+\item (\textsc{Averaging} dynamics) Updates its value $\mathbf{x}^{(t)}(v)$ to the average of the values of its neighbors at the end of the previous round
+\item (Coloring) If $\mathbf{x}^{(t)}(v) \geqslant \mathbf{x}^{(t-1)}(v)$ then $v$ sets $\texttt{color}^{(t)}(v) = \texttt{blue}$ otherwise $v$ sets $\texttt{color}^{(t)}(v) = \texttt{red}$.
+\end{enumerate}
+\end{description}
+'''
+context = '''
+[Section 2, p. 6, between the two quoted parts:] Given a graph $G = \left((V_1, V_2), E\right)$, the block reconstruction problem requires computing an $\varepsilon$-reconstruction of $G$. In this paper, we propose the following distributed protocol. It is based on the averaging dynamics and produces a coloring of the nodes at the end of every round. In the next two sections we show that, within $\mathcal{O}(\log n)$ rounds, the coloring computed by the algorithm we propose achieves strong reconstruction of the two blocks in the case of clustered regular graphs and weak reconstruction in the case of clustered non-regular graphs.
+
+[Section 2, p. 6:] If $\mathbf{x}$ is the initial vector of values, after $t$ rounds of the \textsc{Averaging} dynamics the vector of values at time $t$ is $\mathbf{x}^{(t)} = P^t \mathbf{x}$.
+'''
+notes = "The entry quotes the Averaging protocol (coloring rule) and the definitions of weak and strong reconstruction. Cited by averaging/README.md ('coloring rule, strong reconstruction') and the doc comments of color and IsStrongReconstruction ('Section 2'). The protocol is a framed box in the PDF; its paragraph label 'Distributed block reconstruction.' is bold. Macros replaced: \\bx -> \\mathbf{x}, \\avg -> \\textsc{Averaging}, \\bigO -> \\mathcal{O}; the preamble typesets \\epsilon as \\varepsilon and \\geq as \\geqslant, written here directly. The source writes \\textit{weak reconstruction}, \\textit{strong reconstruction} (italics dropped here)."
+
+[[source]]
+item = "averaging:lem:c1"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, L. Trevisan. Find your place: simple distributed algorithms for community detection"
+venue = "SODA 2017 / SIAM J. Comput. 2020"
+version = "arXiv:1511.03927v4"
+result = "Lemma C.1"
+page = 19
+url = "https://arxiv.org/abs/1511.03927v4"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v4 and compared with the PDF of v4; not yet checked by a person"
+statement = '''
+Assume we run the \textsc{Averaging} dynamics in a $(2n, d, b)$-clustered regular graph $G$ (see Definition 3.1) with any initial vector $\mathbf{x} \in \{ -1,1\}^{2n}$. If $\lambda < 1 - 2b/d$ then there are reals $\alpha_1,\alpha_2$ such that at every round $t$ we have
+\[ \mathbf{x}^{(t)} = \alpha_1 \mathbf{1} + \alpha_2 \lambda_2^t \boldsymbol{\chi} + \mathbf{e}^{(t)} \ \ \mbox{ where } \ \left\| \mathbf{e}^{(t)} \right\|_\infty \leqslant \lambda^t \sqrt {2n} \, . \]
+'''
+context = '''
+[Section 3, Definition 3.1 (Clustered Regular Graph), p. 7:] A $(2n,d,b)$-clustered regular graph $G = ((V_1,V_2),E)$ is a graph over vertex set $V_1 \cup V_2$, with $|V_1|=|V_2|=n$ and such that: (i) Every node has degree $d$ and (ii) Every node in cluster $V_1$ has $b$ neighbors in cluster $V_2$ and every node in $V_2$ has $b$ neighbors in $V_1$.
+
+[Section 2, p. 6:] The transition matrix of (the random walk on) $G$ is the matrix $P = D^{-1} A$, where $D$ is the diagonal matrix such that $D_{i,i} = d_i$. [...] If $(V_1, V_2)$ is a bipartition of the nodes with $|V_1| = |V_2| = n$, we define the partition indicator vector $\boldsymbol{\chi} = \mathbf{1}_{V_1} - \mathbf{1}_{V_2}$. If $\mathbf{x}$ is the initial vector of values, after $t$ rounds of the \textsc{Averaging} dynamics the vector of values at time $t$ is $\mathbf{x}^{(t)} = P^t \mathbf{x}$.
+
+[Section 2, p. 7:] In what follows we always denote by $\lambda_1 \geqslant \ldots \geqslant \lambda_{2n}$ the eigenvalues of $P$. [...] We denote by $\lambda$ the largest, in absolute value, among all but the first two eigenvalues, namely $\lambda = \max\left\{ | \lambda_i | \,:\, i = 3, 4, \dots, 2n \right\}$. Unless otherwise specified, the norm of a vector $\mathbf{x}$ is the $\ell_2$ norm $\| \mathbf{x} \| := \sqrt{\sum_i (\mathbf{x}(i))^2}$ [...]
+
+[Section 3, p. 7:] If $G$ is $d$-regular then $P = (1/d) A$ is a real symmetric matrix and $P$ and $A$ have the same set of eigenvectors.
+
+[Proof of Lemma C.1, p. 19:] where $1 = \lambda_1 > \lambda_2 = 1 - 2b/d > \lambda_3 \geqslant \cdots \geqslant \lambda_{2n}$ are the eigenvalues of $P$ [...] where we set $\alpha_1 = \frac{1}{2n}\langle \mathbf{1}, \mathbf{x} \rangle$ and $\alpha_2 = \frac{1}{2n} \langle \boldsymbol{\chi}, \mathbf{x} \rangle$.
+'''
+notes = "Cited by PROVENANCE.md and averaging/README.md for abs_avgIter_sub_le; the item also contains avgIter_eq_transitionMatrix_pow_mulVec (the sentence 'x^(t) = P^t x' of Section 2, quoted in the context) and transitionMatrix_mulVec_clusterIndicator (Observation A.3, separate entry). The statement names lambda_2 without defining it; the context quotes the proof's identification lambda_2 = 1 - 2b/d and its definitions of alpha_1, alpha_2. Macros replaced: \\avg -> \\textsc{Averaging}, \\bone -> \\mathbf{1}, \\bchi -> \\boldsymbol{\\chi}, \\be -> \\mathbf{e}, \\bx -> \\mathbf{x}; \\leq and \\geq are typeset as \\leqslant and \\geqslant by the preamble, written here directly. Numbering: Lemma C.1 in v4 (as cited by PROVENANCE.md)."
+
+[[source]]
+item = "averaging:lem:c1"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, L. Trevisan. Find your place: simple distributed algorithms for community detection"
+venue = "SODA 2017 / SIAM J. Comput. 2020"
+version = "arXiv:1511.03927v4"
+result = "Observation A.3"
+page = 17
+url = "https://arxiv.org/abs/1511.03927v4"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v4 and compared with the PDF of v4; not yet checked by a person"
+statement = '''
+If $G$ is a $(2n,d,b)$-clustered regular graph with clusters $V_1$ and $V_2$ and $\boldsymbol{\chi} = \mathbf{1}_{V_1} - \mathbf{1}_{V_2}$ is the partition indicator vector, then $\boldsymbol{\chi}$ is an eigenvector of the transition matrix $P$ of $G$ with eigenvalue $1- 2b/d$.
+'''
+context = '''
+[Section 3, Definition 3.1 (Clustered Regular Graph), p. 7:] A $(2n,d,b)$-clustered regular graph $G = ((V_1,V_2),E)$ is a graph over vertex set $V_1 \cup V_2$, with $|V_1|=|V_2|=n$ and such that: (i) Every node has degree $d$ and (ii) Every node in cluster $V_1$ has $b$ neighbors in cluster $V_2$ and every node in $V_2$ has $b$ neighbors in $V_1$.
+
+[Section 2, p. 6:] The transition matrix of (the random walk on) $G$ is the matrix $P = D^{-1} A$, where $D$ is the diagonal matrix such that $D_{i,i} = d_i$. [...] For $i = 1, 2$, define $\mathbf{1}_{V_i}$, as the $|V|$-dimensional vector, whose $j$-th component is $1$ if $j\in V_i$, it is $0$ otherwise.
+
+[Section 3, p. 7:] If $G$ is $d$-regular then $P = (1/d) A$ is a real symmetric matrix and $P$ and $A$ have the same set of eigenvectors.
+'''
+notes = "Cited by averaging/README.md for transitionMatrix_mulVec_clusterIndicator. Macros replaced: \\bchi -> \\boldsymbol{\\chi}, \\bone -> \\mathbf{1}."
+
+[[source]]
+item = "averaging:thm:core"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, L. Trevisan. Find your place: simple distributed algorithms for community detection"
+venue = "SODA 2017 / SIAM J. Comput. 2020"
+version = "arXiv:1511.03927v4"
+result = "Inequality (3), proof outline of Theorem 3.2"
+page = 8
+url = "https://arxiv.org/abs/1511.03927v4"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v4 and compared with the PDF of v4; not yet checked by a person"
+statement = '''
+From (2), we have that $\mathtt{sgn}\left( \mathbf{x}^{(t-1)}(u) - \mathbf{x}^{(t)}(u) \right) = \mathtt{sgn}\left(\alpha_2 \boldsymbol{\chi}(u) \right)$ whenever
+\[ \left| \alpha_2 \lambda_2^{t-1} (1 - \lambda_2) \right| > \left| \mathbf{e}^{(t-1)}(u) - \mathbf{e}^{(t)}(u) \right| \qquad (3) \]
+From (1) we have that $\left| \mathbf{e}^{(t)}(u) \right| \leqslant \lambda^t \sqrt{2n}$, thus (3) is satisfied for all $t$ such that
+\[ t - 1 \geqslant \log \left(\frac{2 \sqrt{2n}}{|\alpha_2| (1 - \lambda_2)} \right) \cdot \frac{1}{\log\left(\lambda_2 / \lambda \right)}\,. \]
+'''
+context = '''
+[Section 2, p. 7:] In what follows we always denote by $\lambda_1 \geqslant \ldots \geqslant \lambda_{2n}$ the eigenvalues of $P$. [...] We denote by $\lambda$ the largest, in absolute value, among all but the first two eigenvalues, namely $\lambda = \max\left\{ | \lambda_i | \,:\, i = 3, 4, \dots, 2n \right\}$.
+
+[Section 3, p. 7, after Definition 3.1:] We know that $\mathbf{1}$ is an eigenvector of $P$ with eigenvalue $1$, and it is easy to see that the partition indicator vector $\boldsymbol{\chi}$ is an eigenvector of $P$ with eigenvalue $1 - 2b/d$ (see Observation A.3 in Appendix A). We first show that, if $1 - 2b/d$ happens to be the second eigenvalue, after $t$ rounds of the \textsc{Averaging} dynamics, the configuration $\mathbf{x}^{(t)}$ is close to a linear combination of $\mathbf{1}$ and $\boldsymbol{\chi}$. Formally, if $\lambda < 1 - 2b/d$ we prove (see Lemma C.1 in Appendix C) that there are reals $\alpha_1,\alpha_2$ such that for every $t$
+\[ \mathbf{x}^{(t)} = \alpha_1 \mathbf{1} + \alpha_2 \lambda_2^t \boldsymbol{\chi} + \mathbf{e}^{(t)} \ \ \mbox{ where } \ \left\| \mathbf{e}^{(t)} \right\|_\infty \leqslant \lambda^t \sqrt {2n} \, . \qquad (1) \]
+Informally speaking, the equation above naturally ``suggested'' the choice of the coloring rule in the \textsc{Averaging} protocol, once we considered the difference of two consecutive values of any node $u$, i.e.,
+\[ \mathbf{x}^{(t-1)}(u) - \mathbf{x}^{(t)}(u) = \alpha_2 \lambda_2^{t-1} (1 - \lambda_2) \boldsymbol{\chi}(u) + \mathbf{e}^{(t-1)}(u) - \mathbf{e}^{(t)}(u) \, . \qquad (2) \]
+
+[Theorem 3.2 (Strong reconstruction), p. 7:] Let $G = ((V_1, V_2),E)$ be a connected $(2n,d,b)$-clustered regular graph with $1 - 2b/d > (1+\delta) \lambda$ for an arbitrarily-small constant $\delta > 0$. Then the \textsc{Averaging} protocol produces a strong reconstruction within $\mathcal{O}(\log n)$ rounds, w.h.p.
+
+[Proof of Lemma C.1, p. 19:] we set $\alpha_1 = \frac{1}{2n}\langle \mathbf{1}, \mathbf{x} \rangle$ and $\alpha_2 = \frac{1}{2n} \langle \boldsymbol{\chi}, \mathbf{x} \rangle$.
+'''
+notes = "Cited by averaging/README.md ('Theorem 3.2, deterministic part (inequality (3))') for sign_avgIter_sub_eq, exists_sign_avgIter_sub_clusters, isStrongReconstruction_color and reconstructionTime_le. The statement is a passage of the paper's 'Outline of Proof' of Theorem 3.2 (no numbered statement of its own). The references 'From (2)' and 'From (1)' are the source's \\eqref{eq:diffregular} and \\eqref{eq:metaregular}, written here with the numbers the PDF gives these displays; in the PDF of v4 all these cross-references (and 'in (3)' before Theorem 3.2) print as '(3)', as printed. Macros replaced: \\texttt{sgn} -> \\mathtt{sgn}, \\bx -> \\mathbf{x}, \\bchi -> \\boldsymbol{\\chi}, \\be -> \\mathbf{e}, \\bone -> \\mathbf{1}, \\avg -> \\textsc{Averaging}, \\strong -> 'strong reconstruction', \\bigO -> \\mathcal{O}; \\leq and \\geq are typeset as \\leqslant and \\geqslant by the preamble, written here directly."
+
+[[source]]
+item = "averaging:lem:b1"
+paper = "L. Becchetti, A. Clementi, E. Natale, F. Pasquale, L. Trevisan. Find your place: simple distributed algorithms for community detection"
+venue = "SODA 2017 / SIAM J. Comput. 2020"
+version = "arXiv:1511.03927v4"
+result = "Lemma B.1"
+page = 18
+url = "https://arxiv.org/abs/1511.03927v4"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v4 and compared with the PDF of v4; not yet checked by a person"
+statement = '''
+If we pick $\mathbf{x}$ uniformly at random in $\{-1,1\}^{2n}$ then, for any $\delta >0$ and any fixed vector $\mathbf{w} \in \{-1,1\}^{2n}$ with $\pm 1$ entries, it holds
+\[ \mathbf{P}\left( \big| \langle (1/ \sqrt{2n})\, \mathbf{w} ,\, \mathbf{x} \rangle \big| \leqslant \delta \right) \leqslant \mathcal{O}(\delta). \]
+'''
+context = '''
+[Appendix B, p. 18, before the lemma:] For the analysis of the \textsc{Averaging} dynamics on both regular and non-regular graphs, it is important to understand the distribution of the projection of $\mathbf{x}$ on $\mathbf{1}$ and $\boldsymbol{\chi}$, that is (up to scaling) the distribution of the inner products $\langle \mathbf{x}, \mathbf{1} \rangle$ and $\langle \mathbf{x}, \boldsymbol{\chi} \rangle$. In particular we are going to use the following bound.
+
+[Proof of Lemma B.1, p. 18:] Since $\mathbf{x}$ is a vector of independent and uniformly distributed random variables in $\{-1,1\}$, both $\langle \mathbf{x}, \boldsymbol{\chi} \rangle$ and $\langle \mathbf{x} , \mathbf{1} \rangle$ have the distribution of a sum of $2n$ Rademacher random variables. Such a sum takes the value $2k-2n$ with probability $\frac{1}{2^n} \binom{2n}{k}$, and so every possible value has probability at most $\frac{1}{2^n}\binom{2n}{n} \approx \frac{1}{\sqrt {2\pi n}}$. Consequently, if $R$ is the sum of $2n$ Rademacher random variables, we have $\mathbf{P}\left( |R| \leqslant \delta \sqrt {2n}\right) \leqslant \mathcal{O}(\delta)$.
+
+[Outline of proof of Theorem 3.2, p. 8, how the lemma is used:] This implies that $|\alpha_2| = \frac{1}{2n} \langle \boldsymbol{\chi} , \mathbf{x} \rangle \geqslant n^{-\gamma}$, for some positive constant $\gamma$, w.h.p. (see Lemma B.1).
+
+[Section 2, p. 6:] we define the partition indicator vector $\boldsymbol{\chi} = \mathbf{1}_{V_1} - \mathbf{1}_{V_2}$.
+'''
+notes = "Cited by PROVENANCE.md and averaging/README.md ('Lemma B.1 (exact form)') for prob_dotProduct_clusterIndicator_eq_zero and choose_div_four_pow_le: the blueprint's exact count P(<x, chi> = 0) = C(2n,n)/4^n is the point-probability step of the proof quoted in the context (averaging/FORMALIZATION_DIFFERENCES.md, AVG-2 item 6). The display is an equation environment in the source and is printed without a number in the PDF of v4. Kept as printed: the factor 1/2^n in the proof, and '|alpha_2| = (1/2n) <chi, x>' without absolute value on the right. Macros replaced: \\pr{}{X} -> \\mathbf{P}\\left(X\\right), \\bx -> \\mathbf{x}, \\bw -> \\mathbf{w}, \\bchi -> \\boldsymbol{\\chi}, \\bone -> \\mathbf{1}, \\avg -> \\textsc{Averaging}, \\bigO -> \\mathcal{O}; \\leq and \\geq are typeset as \\leqslant and \\geqslant by the preamble, written here directly. The factors 1/2^n in the quoted proof of Lemma B.1 are as printed."
+
+# ---------------------------------------------------------------------------------------------
+# Average whenever you meet (Becchetti, Clementi, Manurangsi, Natale, Pasquale, Raghavendra,
+# Trevisan), arXiv:1703.05045v3
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+item = "averaging:def:opp"
+paper = "L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale, P. Raghavendra, L. Trevisan. Average whenever you meet: opportunistic protocols for community detection"
+venue = "ESA 2018"
+version = "arXiv:1703.05045v3"
+result = "Algorithm 1"
+page = 7
+url = "https://arxiv.org/abs/1703.05045v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+\textsc{Averaging}$(\delta)$ (for a node $u$ that is one of the two endpoints of an active edge)
+\begin{description}
+\item[Initialization:] If it is the first time $u$ is active, then pick $\mathbf{x}_u \in \{-1, +1\}$ u.a.r.
+\item[Update:] Send $\mathbf{x}_u$ to the other endpoint of the active edge and then update $\mathbf{x}_u := (1-\delta) \mathbf{x}_u + \delta r$, where $r$ is the value received from the other endpoint.
+\end{description}
+Algorithm 1: Updating rule for a node $u$ of an active edge, where $\delta \in (0,1)$ is the parameter measuring the weight given to the neighbor's value
+'''
+context = '''
+[Section 2, p. 7, before Algorithm 1:] We study the weighted version of the Averaging process described in the introduction. In each round, one edge of the graph is sampled uniformly at random and the two endpoints of the sampled edge execute the following algorithm.
+
+[Section 3, p. 8:] In this section, we analyze the expected behaviour of Algorithm \textsc{Averaging}$(1/2)$ on an almost-regular graph $G$ (see Definition 2.1). The evolution of the resulting process can be formally described by the recursion $\mathbf{x}^{(t+1)} = W_t \cdot \mathbf{x}^{(t)}$, where $W_t = (W_t(i,j))$ is the random matrix that defines the updates of the values at round $t$ [...]
+'''
+notes = "Cited by averaging/README.md ('Algorithm 1, first activations by deferred decisions') and PROVENANCE.md. The algorithm is a framed box in the PDF with the caption 'Algorithm 1: ...' below it. The library models Averaging(1/2) only (averaging/FORMALIZATION_DIFFERENCES.md, AVG-3 item 3). Macros replaced: \\aveproc -> \\textsc{Averaging}, \\bx -> \\mathbf{x}. Numbering: v3, as cited by PROVENANCE.md and FORMALIZATION_DIFFERENCES.md."
+
+[[source]]
+item = "averaging:lem:opp-model"
+paper = "L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale, P. Raghavendra, L. Trevisan. Average whenever you meet: opportunistic protocols for community detection"
+venue = "ESA 2018"
+version = "arXiv:1703.05045v3"
+result = "Section 3, footnote 11 (deferred decisions)"
+page = 8
+url = "https://arxiv.org/abs/1703.05045v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+[Section 3, after equation (1):] and the initial random vector $\mathbf{x}^{(0)}$ is uniformly distributed in $\{-1,1\}^n$.
+
+[Footnote 11:] Notice that, since each node chooses value $\pm 1$ with probability $1/2$ the first time it is active, by using the principle of deferred decisions we can assume there exists an ``initial'' random vector $\mathbf{x}^{(0)}$ uniformly distributed in $\{-1,+1\}^n$.
+'''
+context = '''
+[Section 2, p. 7:] We study the weighted version of the Averaging process described in the introduction. In each round, one edge of the graph is sampled uniformly at random and the two endpoints of the sampled edge execute the following algorithm.
+
+[Algorithm 1, p. 7:] \textsc{Averaging}$(\delta)$ (for a node $u$ that is one of the two endpoints of an active edge). Initialization: If it is the first time $u$ is active, then pick $\mathbf{x}_u \in \{-1, +1\}$ u.a.r. Update: Send $\mathbf{x}_u$ to the other endpoint of the active edge and then update $\mathbf{x}_u := (1-\delta) \mathbf{x}_u + \delta r$, where $r$ is the value received from the other endpoint.
+
+[Section 3, p. 8:] In this section, we analyze the expected behaviour of Algorithm \textsc{Averaging}$(1/2)$ on an almost-regular graph $G$ (see Definition 2.1). The evolution of the resulting process can be formally described by the recursion $\mathbf{x}^{(t+1)} = W_t \cdot \mathbf{x}^{(t)}$, where $W_t = (W_t(i,j))$ is the random matrix that defines the updates of the values at round $t$, i.e., [equation (1), see the entry 'Equation (1)' of averaging:thm:opp-first]
+
+[Section 3, p. 8:] Notice that random matrices $\{ W_t \,:\, t \geqslant 0 \}$ are independent and identically distributed [...]
+'''
+notes = "Cited by the doc comment of oppRun_getD ('Deferred decisions (Section 3)') and by averaging/README.md ('Algorithm 1, first activations by deferred decisions'). The paper has no text for the other parts of the item (a uniform dart gives a uniform edge; conservation of the sum of the values). Footnote marker 11 is placed after the first quoted sentence. Macros replaced: \\bx -> \\mathbf{x}, \\aveproc -> \\textsc{Averaging}; \\geq is typeset as \\geqslant by the preamble."
+
+[[source]]
+item = "averaging:thm:opp-first"
+paper = "L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale, P. Raghavendra, L. Trevisan. Average whenever you meet: opportunistic protocols for community detection"
+venue = "ESA 2018"
+version = "arXiv:1703.05045v3"
+result = "Equation (1)"
+page = 8
+url = "https://arxiv.org/abs/1703.05045v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+The evolution of the resulting process can be formally described by the recursion $\mathbf{x}^{(t+1)} = W_t \cdot \mathbf{x}^{(t)}$, where $W_t = (W_t(i,j))$ is the random matrix that defines the updates of the values at round $t$, i.e.,
+\[ W_t(i,j) = \left\{ \begin{array}{cl} 0 & \mbox{ if } i \neq j \mbox{ and } \{i,j\} \mbox{ is not sampled (at round $t$),} \\ 1/2 & \begin{array}{l} \mbox{if $i = j$ and an edge with endpoint $i$ is sampled} \\ \mbox{or $i \neq j$ and edge $\{i,j\}$ is sampled,} \end{array} \\ 1 & \mbox{ if } i = j \mbox{ and } i \mbox{ is not an endpoint of sampled edge.} \end{array} \right. \qquad (1) \]
+'''
+context = '''
+[Section 2, p. 7:] We study the weighted version of the Averaging process described in the introduction. In each round, one edge of the graph is sampled uniformly at random and the two endpoints of the sampled edge execute the following algorithm. [Algorithm 1: \textsc{Averaging}$(\delta)$, Update: Send $\mathbf{x}_u$ to the other endpoint of the active edge and then update $\mathbf{x}_u := (1-\delta) \mathbf{x}_u + \delta r$, where $r$ is the value received from the other endpoint.]
+
+[Section 3, p. 8:] In this section, we analyze the expected behaviour of Algorithm \textsc{Averaging}$(1/2)$ on an almost-regular graph $G$ (see Definition 2.1).
+
+[Appendix C.1, p. 26:] From the fact that random matrix $W \sim \mathcal{W}$ defined by one step of our averaging process is symmetric and idempotent ($W^\intercal W = W$) we get the following upper bound [...]
+'''
+notes = "Cited by averaging/README.md ('Equations (1), (2), Observation A.2, equation (15)') and the doc comment of stepMatrix. The doc comments of stepMatrix_isSymm and stepMatrix_mul_self cite the proof of Lemma C.1, whose opening sentence (quoted in the context) states that W is symmetric and idempotent. Observation A.1 (p. 21) restates the same matrix. Macros replaced: \\bx -> \\mathbf{x}, \\aveproc -> \\textsc{Averaging}, \\cM -> \\mathcal{W}."
+
+[[source]]
+item = "averaging:thm:opp-first"
+paper = "L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale, P. Raghavendra, L. Trevisan. Average whenever you meet: opportunistic protocols for community detection"
+venue = "ESA 2018"
+version = "arXiv:1703.05045v3"
+result = "Equation (2)"
+page = 8
+url = "https://arxiv.org/abs/1703.05045v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+Notice that random matrices $\{ W_t \,:\, t \geqslant 0 \}$ are independent and identically distributed and simple calculus shows that their expectation can be expressed as (see Observation A.2 in the Appendix):
+\[ \overline{W} := \mathbb{E}\left[W_t\right] = I - \frac{1}{2m} L \, , \qquad (2) \]
+where $L = D - A$ is the Laplacian matrix of $G$. Matrix $\overline{W}$ is thus symmetric and doubly-stochastic. We denote its eigenvalues as $\bar{\lambda}_1, \dots, \bar{\lambda}_n$, with $1 = \bar{\lambda}_1 \geqslant \bar{\lambda}_2 \geqslant \cdots \bar{\lambda}_n \geqslant -1\,.$
+'''
+context = '''
+[Section 2, p. 7:] In each round, one edge of the graph is sampled uniformly at random and the two endpoints of the sampled edge execute the following algorithm.
+
+[Section 2, p. 7:] For a graph $G$ with $n$ nodes and adjacency matrix $A$, [...] where $D$ is the diagonal matrix with the degrees of the nodes.
+
+[Section 3, p. 8:] The evolution of the resulting process can be formally described by the recursion $\mathbf{x}^{(t+1)} = W_t \cdot \mathbf{x}^{(t)}$, where $W_t = (W_t(i,j))$ is the random matrix that defines the updates of the values at round $t$, i.e., [equation (1)]
+
+[Appendix A.2, p. 21:] $A$ is the adjacency matrix of the clustered graph $G((V_1,V_2); E)$, with $|V_h|=n/2$, $m = |E|$ and $m_{1,2}= |E(V_1,V_2)|$ is the number of edges in the cut $(V_1,V_2)$; $D$ is the diagonal matrix with the degrees of nodes; $L = D - A$ is the Laplacian matrix; [...]
+'''
+notes = "Cited by averaging/README.md and the doc comments of meanStepMatrix, avg_stepMatrix, meanStepMatrix_isSymm, meanStepMatrix_mem_doublyStochastic and avg_edgeAvg. The paper defines m = |E| in Appendix A.2 (quoted). Kept as printed: '\\cdots \\bar{\\lambda}_n' without a relation sign. Macros replaced: \\avgW -> \\overline{W}, \\Expec{}{X} -> \\mathbb{E}\\left[X\\right]; \\geq is typeset as \\geqslant by the preamble, written here directly."
+
+[[source]]
+item = "averaging:thm:opp-first"
+paper = "L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale, P. Raghavendra, L. Trevisan. Average whenever you meet: opportunistic protocols for community detection"
+venue = "ESA 2018"
+version = "arXiv:1703.05045v3"
+result = "Observation A.2"
+page = 21
+url = "https://arxiv.org/abs/1703.05045v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+The expectation of $W$ is
+\[ \overline{W} := \mathbb{E}\left[W\right] = I - \frac{1}{2m} L \, . \]
+'''
+context = '''
+[Appendix A.2, p. 21:] We consider here Algorithm \textsc{Averaging}$(\delta)$ assuming $\delta = 1/2$ and recall the main notations:
+\begin{itemize}
+\item $A$ is the adjacency matrix of the clustered graph $G((V_1,V_2); E)$, with $|V_h|=n/2$, $m = |E|$ and $m_{1,2}= |E(V_1,V_2)|$ is the number of edges in the cut $(V_1,V_2)$;
+\item $D$ is the diagonal matrix with the degrees of nodes;
+\item $L = D - A$ is the Laplacian matrix;
+\item $\mathcal{L} = D^{-1/2} L D^{-1/2}$is the normalized Laplacian;
+\item $P = D^{-1} A$ is the transition matrix;
+\item For each node $i = 1, \dots, n$, we name $d_i = a_i + b_i$ the degree of node $i$, where $a_i$ is the number of neighbors in its own block and $b_i$ is the number of neighbors in the other block
+\end{itemize}
+
+[Observation A.1, p. 21:] Let $W = (W(i,j)) \sim \mathcal{W}$ be the random matrix of one step of the averaging process, then
+\[ w_{i,j} = \left\{ \begin{array}{cl} 0 & \mbox{ if } i \neq j \mbox{ and } \{i,j\} \mbox{ not sampled} \\ 1/2 & \mbox{ if $i = j$ and some edge incident on $i$ sampled or $i \neq j$ and edge $\{i,j\}$ sampled} \\ 1 & \mbox{ if } i = j \mbox{ and } i \mbox{ not incident to a sampled edge. } \end{array} \right. \]
+
+[Section 2, p. 7:] In each round, one edge of the graph is sampled uniformly at random [...]
+'''
+notes = "Cited by averaging/README.md and the doc comment of avg_stepMatrix ('Observation A.2, equation (2)'). Kept as printed: 'D^{-1/2}is' without a space in the list, and 'w_{i,j}' for the entries of W in Observation A.1. Macros replaced: \\avgW -> \\overline{W}, \\Expec{}{X} -> \\mathbb{E}\\left[X\\right], \\aveproc -> \\textsc{Averaging}, \\cM -> \\mathcal{W}."
+
+[[source]]
+item = "averaging:thm:opp-first"
+paper = "L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale, P. Raghavendra, L. Trevisan. Average whenever you meet: opportunistic protocols for community detection"
+venue = "ESA 2018"
+version = "arXiv:1703.05045v3"
+result = "Observation A.6 (equation (15))"
+page = 23
+url = "https://arxiv.org/abs/1703.05045v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+Since the random edges sequentially selected by the process are mutually independent, the expected state of the process at time $t$ can be written as :
+\[ \mathbb{E}\left[\mathbf{x}^{(t)}\right] \, = \ \mathbb{E}\left[W_t\cdot \ldots \cdot W_1 \cdot \mathbf{x}\right] = \left(\mathbb{E}\left[W\right]\right)^{t} \mathbf{x} \, = \, \overline{W}^t \cdot \mathbf{x} \, . \qquad (15) \]
+'''
+context = '''
+[Section 3, p. 8:] The evolution of the resulting process can be formally described by the recursion $\mathbf{x}^{(t+1)} = W_t \cdot \mathbf{x}^{(t)}$, where $W_t = (W_t(i,j))$ is the random matrix that defines the updates of the values at round $t$ [...] Notice that random matrices $\{ W_t \,:\, t \geqslant 0 \}$ are independent and identically distributed and simple calculus shows that their expectation can be expressed as (see Observation A.2 in the Appendix):
+\[ \overline{W} := \mathbb{E}\left[W_t\right] = I - \frac{1}{2m} L \, , \qquad (2) \]
+where $L = D - A$ is the Laplacian matrix of $G$.
+
+[Section 2, p. 7:] In each round, one edge of the graph is sampled uniformly at random [...]
+'''
+notes = "Cited by averaging/README.md ('equation (15)') for expList_avgRun. Kept as printed: the space before the colon in 'written as :'. Macros replaced: \\Expec{}{X} -> \\mathbb{E}\\left[X\\right], \\bx -> \\mathbf{x}, \\avgW -> \\overline{W}."
+
+[[source]]
+item = "averaging:def:opp-clustered"
+paper = "L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale, P. Raghavendra, L. Trevisan. Average whenever you meet: opportunistic protocols for community detection"
+venue = "ESA 2018"
+version = "arXiv:1703.05045v3"
+result = "Definition 2.2"
+page = 8
+url = "https://arxiv.org/abs/1703.05045v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+[Clustered regular graphs] Let $n \geqslant 2$ be an even integer and $d$ and $b$ two positive integers such that $2 b < d < n$. An $(n,d,b)$-clustered regular graph $G = ((V_1,V_2),E)$ is a graph over node set $V = V_1 \cup V_2$, with $|V_1|=|V_2|=n/2$ and such that: (i) Every node has degree $d$ and (ii) Every node in $V_1$ has $b$ neighbors in $V_2$ and every node in $V_2$ has $b$ neighbors in $V_1$.
+'''
+context = '''
+[Section 2, p. 7:] For a graph $G$ with $n$ nodes and adjacency matrix $A$, let $0 = \lambda_{1} \leqslant \cdots \leqslant \lambda_{n}$ be the eigenvalues of the normalized Laplacian $\mathcal{L} = I - D^{-1/2}AD^{-1/2}$, where $D$ is the diagonal matrix with the degrees of the nodes.
+
+[Section 2, p. 8, after Definition 2.2:] We remark that if a graph is clustered regular then we easily get that the indicator vector $\boldsymbol{\chi}$ of the cut $(V_1, V_2)$ is an eigenvector of $\mathcal{L}$ with eigenvalue $\frac {2b}d$; If we further assume that $\lambda_3 > \frac{2b}d$, then $\boldsymbol{\chi}$ is an eigenvector of $\lambda_2$.
+
+[Section 4.1, p. 11:] For $(n,d,b)$-clustered regular graphs, these facts and our preliminary remarks in Section 2 further imply $\bar{\lambda}_2 = 1 - \lambda_2/n = 1 - 2b/dn$ whenever $\lambda_3 > \frac{2b}{d}$ while, very importantly, the partition indicator vector $\boldsymbol{\chi}$ turns out to be the eigenvector of $\overline{W}$ corresponding to $\bar{\lambda}_2$ (see (2)).
+'''
+notes = "Cited by averaging/README.md ('Definition 2.2, chi, Q_1, Q_2, Q_3...n (equation (7)), lambda_3') and the doc comment of IsClusteredRegular. The printed text calls chi 'the indicator vector of the cut (V_1, V_2)' and 'the partition indicator vector' without a formula (the formula chi = 1_{V_1} - 1_{V_2} appears only in commented-out parts of the source). The paper uses lambda_2, lambda_3 for eigenvalues of the normalized Laplacian (quoted); the library takes lambda_3 as a Rayleigh-quotient lower bound (averaging/FORMALIZATION_DIFFERENCES.md, AVG-3 item 4). The definition title is shown in brackets. Kept as printed: 'eigenvector of lambda_2', '1 - 2b/dn'. Macros replaced: \\bchi -> \\boldsymbol{\\chi}, \\lapl -> \\mathcal{L}, \\avgW -> \\overline{W}; \\geq and \\leqs are typeset as \\geqslant and \\leqslant, written here directly."
+
+[[source]]
+item = "averaging:def:opp-clustered"
+paper = "L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale, P. Raghavendra, L. Trevisan. Average whenever you meet: opportunistic protocols for community detection"
+venue = "ESA 2018"
+version = "arXiv:1703.05045v3"
+result = "Equation (7)"
+page = 11
+url = "https://arxiv.org/abs/1703.05045v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+For the sake of readability, we here denote by $\mathbf{y}^{(t)} = Q_2 \mathbf{x}^{(t)}$ the component of the state vector in the eigenspace of the second eigenvalue of $\overline{W}$, while $\mathbf{z}^{(t)} = Q_{3 \cdots n} \mathbf{x}^{(t)}$ denotes $\mathbf{x}^{(t)}$'s projection onto the subspace orthogonal to $\mathbf{1}$ and $\boldsymbol{\chi}$. If we also set $\mathbf{x}_{\|} = Q_1 \mathbf{x}^{(0)}$, we can write:
+\[ \mathbf{x}^{(t)} = \mathbf{x}_{\|} + \mathbf{y}^{(t)} + \mathbf{z}^{(t)}. \qquad (7) \]
+'''
+context = '''
+[Section 4.1, p. 10 to 11:] Restriction to $(n,d,b)$-clustered regular graphs simplifies the analysis of the \textsc{Averaging} dynamics. When $G$ is regular, $\overline{W}$ defined in (2) can be written as
+\[ \overline{W} = \left( 1 - \frac 1n \right) I + \frac 1n \, P = I - \frac 1n \, \mathcal{L} \]
+This obviously implies that $\overline{W}$ and $\mathcal{L}$ share the same eigenvectors, while every eigenvalue $\lambda_i$ of $\mathcal{L}$ corresponds to an eigenvalue $\bar{\lambda}_i = 1- \lambda_i/n$ of $\overline{W}$. For $(n,d,b)$-clustered regular graphs, these facts and our preliminary remarks in Section 2 further imply $\bar{\lambda}_2 = 1 - \lambda_2/n = 1 - 2b/dn$ whenever $\lambda_3 > \frac{2b}{d}$ while, very importantly, the partition indicator vector $\boldsymbol{\chi}$ turns out to be the eigenvector of $\overline{W}$ corresponding to $\bar{\lambda}_2$ (see (2)).
+
+[Section 3, p. 8 to 9:] \[ \overline{W} := \mathbb{E}\left[W_t\right] = I - \frac{1}{2m} L \, , \qquad (2) \] where $L = D - A$ is the Laplacian matrix of $G$. Matrix $\overline{W}$ is thus symmetric and doubly-stochastic. We denote its eigenvalues as $\bar{\lambda}_1, \dots, \bar{\lambda}_n$, with $1 = \bar{\lambda}_1 \geqslant \bar{\lambda}_2 \geqslant \cdots \bar{\lambda}_n \geqslant -1\,.$
+
+[Proof of Lemma C.2, p. 27:] $Q_2$ is the projector along the direction of $\mathbf{v}_2 = \boldsymbol{\chi} / \| \boldsymbol{\chi} \|$, which in turn is $L$'s second eigenvector.
+'''
+notes = "Cited by averaging/README.md for projOne, projCut, projRest. The paper does not define Q_1, Q_2, Q_{3...n} further; the context quotes the only other sentence about Q_2. Macros replaced: \\by -> \\mathbf{y}, \\bz -> \\mathbf{z}, \\bx -> \\mathbf{x}, \\bv -> \\mathbf{v}, \\bone -> \\mathbf{1}, \\bchi -> \\boldsymbol{\\chi}, \\avgW -> \\overline{W}, \\lapl -> \\mathcal{L}, \\aveproc -> \\textsc{Averaging}, \\Expec{}{X} -> \\mathbb{E}\\left[X\\right]."
+
+[[source]]
+item = "averaging:thm:opp-31"
+paper = "L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale, P. Raghavendra, L. Trevisan. Average whenever you meet: opportunistic protocols for community detection"
+venue = "ESA 2018"
+version = "arXiv:1703.05045v3"
+result = "Section 4.1, spectrum of W on clustered graphs"
+page = 10
+url = "https://arxiv.org/abs/1703.05045v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+Restriction to $(n,d,b)$-clustered regular graphs simplifies the analysis of the \textsc{Averaging} dynamics. When $G$ is regular, $\overline{W}$ defined in (2) can be written as
+\[ \overline{W} = \left( 1 - \frac 1n \right) I + \frac 1n \, P = I - \frac 1n \, \mathcal{L} \]
+This obviously implies that $\overline{W}$ and $\mathcal{L}$ share the same eigenvectors, while every eigenvalue $\lambda_i$ of $\mathcal{L}$ corresponds to an eigenvalue $\bar{\lambda}_i = 1- \lambda_i/n$ of $\overline{W}$. For $(n,d,b)$-clustered regular graphs, these facts and our preliminary remarks in Section 2 further imply $\bar{\lambda}_2 = 1 - \lambda_2/n = 1 - 2b/dn$ whenever $\lambda_3 > \frac{2b}{d}$ while, very importantly, the partition indicator vector $\boldsymbol{\chi}$ turns out to be the eigenvector of $\overline{W}$ corresponding to $\bar{\lambda}_2$ (see (2)). As a consequence, the orthogonal component $\mathbf{f}_\perp$ in (4) is $\mathbf{0}$ in this case.
+'''
+context = '''
+[Section 2, Definition 2.2 (Clustered regular graphs), p. 8:] Let $n \geqslant 2$ be an even integer and $d$ and $b$ two positive integers such that $2 b < d < n$. An $(n,d,b)$-clustered regular graph $G = ((V_1,V_2),E)$ is a graph over node set $V = V_1 \cup V_2$, with $|V_1|=|V_2|=n/2$ and such that: (i) Every node has degree $d$ and (ii) Every node in $V_1$ has $b$ neighbors in $V_2$ and every node in $V_2$ has $b$ neighbors in $V_1$.
+
+[Section 2, p. 7 to 8:] For a graph $G$ with $n$ nodes and adjacency matrix $A$, let $0 = \lambda_{1} \leqslant \cdots \leqslant \lambda_{n}$ be the eigenvalues of the normalized Laplacian $\mathcal{L} = I - D^{-1/2}AD^{-1/2}$, where $D$ is the diagonal matrix with the degrees of the nodes. [...] We remark that if a graph is clustered regular then we easily get that the indicator vector $\boldsymbol{\chi}$ of the cut $(V_1, V_2)$ is an eigenvector of $\mathcal{L}$ with eigenvalue $\frac {2b}d$; If we further assume that $\lambda_3 > \frac{2b}d$, then $\boldsymbol{\chi}$ is an eigenvector of $\lambda_2$.
+
+[Section 3, p. 8 to 9:] \[ \overline{W} := \mathbb{E}\left[W_t\right] = I - \frac{1}{2m} L \, , \qquad (2) \] where $L = D - A$ is the Laplacian matrix of $G$. [...] We denote its eigenvalues as $\bar{\lambda}_1, \dots, \bar{\lambda}_n$, with $1 = \bar{\lambda}_1 \geqslant \bar{\lambda}_2 \geqslant \cdots \bar{\lambda}_n \geqslant -1\,.$
+
+[Section 3, p. 9, equation (4):] \[ \mathbb{E}\left[\mathbf{x}^{(t)}_u\right] = \alpha_1 + \alpha_2 \bar{\lambda}_2^t \left[ \boldsymbol{\chi}_u + \sqrt{n}\, \mathbf{f}_{\perp,u} \right] + \mathbf{e}^{(t)}_u, \qquad (4) \] where $\left\|\mathbf{e}^{(t)} \right\| \leqslant \bar{\lambda}_3^t \sqrt{n}$.
+
+[Appendix A.2, p. 21:] $P = D^{-1} A$ is the transition matrix
+'''
+notes = "Section 4.1 gives the spectrum of W on clustered regular graphs. Cited by the doc comment of meanStepMatrix_mulVec_cutVec ('Section 4.1: W chi = (1 - lambda_2/n) chi'), part of averaging:thm:opp-31. Kept as printed: '1 - 2b/dn' (for 1 - 2b/(dn)), 'eigenvector of lambda_2'. Macros replaced: \\avgW -> \\overline{W}, \\lapl -> \\mathcal{L}, \\bchi -> \\boldsymbol{\\chi}, \\bfied -> \\mathbf{f}, \\bzero -> \\mathbf{0}, \\bx -> \\mathbf{x}, \\be -> \\mathbf{e}, \\aveproc -> \\textsc{Averaging}, \\Expec{}{X} -> \\mathbb{E}\\left[X\\right]; \\geq and \\leqs typeset as \\geqslant and \\leqslant, written here directly."
+
+[[source]]
+item = "averaging:thm:opp-31"
+paper = "L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale, P. Raghavendra, L. Trevisan. Average whenever you meet: opportunistic protocols for community detection"
+venue = "ESA 2018"
+version = "arXiv:1703.05045v3"
+result = "Equation (12)"
+page = 15
+url = "https://arxiv.org/abs/1703.05045v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+Fortunately for us, it is rather simple to see that, for a fixed $\mathbf{y}^{(0)}$, $\mathbb{E}[\mathbf{y}^{(t)}]$ can be computed exactly; in particular,
+\[ \mathbb{E}[\mathbf{y}^{(t)}] = \left(1 - \frac{2 \delta \lambda_2}{n}\right)^t \mathbf{y}^{(0)}. \qquad (12) \]
+'''
+context = '''
+[Section 5, p. 14:] In this section, we extend our study to the lazy averaging algorithm \textsc{Averaging}$(\delta)$ where $\delta < 1/2$. Similar to the previous section, we assume that the underlying graph $G$ is an $(n, d, b)$-clustered regular graph and $\lambda_3 > \lambda_2 = 2b/d$.
+
+[Section 4.1, p. 11:] For the sake of readability, we here denote by $\mathbf{y}^{(t)} = Q_2 \mathbf{x}^{(t)}$ the component of the state vector in the eigenspace of the second eigenvalue of $\overline{W}$, while $\mathbf{z}^{(t)} = Q_{3 \cdots n} \mathbf{x}^{(t)}$ denotes $\mathbf{x}^{(t)}$'s projection onto the subspace orthogonal to $\mathbf{1}$ and $\boldsymbol{\chi}$. If we also set $\mathbf{x}_{\|} = Q_1 \mathbf{x}^{(0)}$, we can write: $\mathbf{x}^{(t)} = \mathbf{x}_{\|} + \mathbf{y}^{(t)} + \mathbf{z}^{(t)}$ (7).
+
+[Algorithm 1, p. 7:] \textsc{Averaging}$(\delta)$ [...] Update: Send $\mathbf{x}_u$ to the other endpoint of the active edge and then update $\mathbf{x}_u := (1-\delta) \mathbf{x}_u + \delta r$, where $r$ is the value received from the other endpoint.
+'''
+notes = "Cited by the doc comment of expList_projCut ('Equation (12) with delta = 1/2'), part of averaging:thm:opp-31. The paper states (12) in Section 5.1, about Averaging(delta) with delta < 1/2; the library uses it with delta = 1/2. Macros replaced: \\E -> \\mathbb{E}, \\by -> \\mathbf{y}, \\bz -> \\mathbf{z}, \\bx -> \\mathbf{x}, \\bone -> \\mathbf{1}, \\bchi -> \\boldsymbol{\\chi}, \\avgW -> \\overline{W}, \\aveproc -> \\textsc{Averaging}."
+
+[[source]]
+item = "averaging:thm:opp-31"
+paper = "L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale, P. Raghavendra, L. Trevisan. Average whenever you meet: opportunistic protocols for community detection"
+venue = "ESA 2018"
+version = "arXiv:1703.05045v3"
+result = "Lemma B.1"
+page = 23
+url = "https://arxiv.org/abs/1703.05045v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+[Main decomposition] Let $\mathbf{x} \in \{-1,1\}^n$ be an arbitrary initial vector of values and, for $h = 1, 2$, let $\mu_h = \mu_h(\mathbf{x}) = (2/n) \sum_{i \in V_h} \mathbf{x}(i)$ be the average of the initial values in block $h$. The expected vector of values at round $t$ conditional on the initial vector being $\mathbf{x}$ can be written as
+\[ \mathbb{E}\left[\mathbf{x}^{(t)} \,|\, \mathbf{x}^{(0)} = \mathbf{x}\right] = \alpha_1 \mathbf{1} + \alpha_2 \bar{\lambda}_2^t \boldsymbol{\chi} + \alpha_2 \sqrt{n} \, \bar{\lambda}_2^t \mathbf{f}_\perp + \mathbf{e}^{(t)} \, , \]
+where
+\[ \alpha_1 = \frac{\mu_1 + \mu_2}{2} \, , \qquad\quad \alpha_2 = \frac{1}{\|\mathbf{f} - \mathbf{f}_\perp\|^2} \left( \frac{\mu_1 - \mu_2}{2} - \frac{\langle \mathbf{x}, \mathbf{f}_\perp\rangle}{\sqrt{n}} \right) \]
+and, moreover,
+\[ \left\|\mathbf{e}^{(t)} \right\| \leqslant \bar{\lambda}_3^t \sqrt{n} \, . \]
+'''
+context = '''
+[Section 3, p. 8 to 9:] \[ \overline{W} := \mathbb{E}\left[W_t\right] = I - \frac{1}{2m} L \, , \qquad (2) \] where $L = D - A$ is the Laplacian matrix of $G$. Matrix $\overline{W}$ is thus symmetric and doubly-stochastic. We denote its eigenvalues as $\bar{\lambda}_1, \dots, \bar{\lambda}_n$, with $1 = \bar{\lambda}_1 \geqslant \bar{\lambda}_2 \geqslant \cdots \bar{\lambda}_n \geqslant -1\,.$
+
+[Section 3, outline of proof of Theorem 3.1, p. 9:] In Lemma B.1, we decompose $\mathbb{E}\left[\mathbf{x}^{(t)}\right]$ into its components along the first two eigenvectors of $\overline{W}$ and into the corresponding orthogonal component $\mathbf{e}^{(t)}$ (note that $\overline{W}$ admits an orthonormal eigenvector basis since it is symmetric). We further decompose the component along the second eigenvector of $\overline{W}$ into its component parallel to the partition indicator vector ($\alpha_2 \bar{\lambda}_2^t \boldsymbol{\chi}$) and into the corresponding orthogonal one ($\alpha_2 \sqrt{n} \, \bar{\lambda}_2^t \mathbf{f}_\perp$).
+
+[Proof of Lemma B.1, p. 23:] Let $1 = \bar{\lambda}_1 > \bar{\lambda}_2 \geqslant \cdots \geqslant \bar{\lambda}_n$ be the eigenvalues of $\overline{W}$ and let $\mathbf{w}_1 = \mathbf{1} / \sqrt{n}, \mathbf{w}_2, \dots, \mathbf{w}_n$ be a basis of orthonormal eigenvectors of $\overline{W}$ [...] Since $\mathbf{w}_2 = (\mathbf{f} - \mathbf{f}_\perp) / \| \mathbf{f} - \mathbf{f}_\perp \|$ we have that [...] $\frac{\langle \mathbf{x}, \mathbf{f} \rangle}{\sqrt{n}} [...] = \frac{\langle \mathbf{x}, \boldsymbol{\chi} \rangle}{n}$ [...]
+
+[Section 4.1, p. 11:] For $(n,d,b)$-clustered regular graphs, [...] the partition indicator vector $\boldsymbol{\chi}$ turns out to be the eigenvector of $\overline{W}$ corresponding to $\bar{\lambda}_2$ (see (2)). As a consequence, the orthogonal component $\mathbf{f}_\perp$ in (4) is $\mathbf{0}$ in this case.
+'''
+notes = "Cited by averaging/README.md ('Theorem 3.1 on clustered regular graphs (Lemmas B.1, B.3, B.4)') and the doc comment of expList_avgRun_decomp ('Lemma B.1 (main decomposition) on a clustered regular graph'); the library states the clustered regular case, where f_perp = 0 (Section 4.1, quoted). The paper does not define f and f_perp in a displayed definition; the context quotes the sentences that determine them (f has <x, f>/sqrt(n) = <x, chi>/n, i.e. f = chi/sqrt(n), and f - f_perp is its component along w_2). The lemma title is shown in brackets. Macros replaced: \\bx -> \\mathbf{x}, \\bone -> \\mathbf{1}, \\bchi -> \\boldsymbol{\\chi}, \\bfied -> \\mathbf{f}, \\be -> \\mathbf{e}, \\bw -> \\mathbf{w}, \\avgW -> \\overline{W}, \\Expec{}{X} -> \\mathbb{E}\\left[X\\right]; \\leq and \\geq typeset as \\leqslant and \\geqslant, written here directly."
+
+[[source]]
+item = "averaging:thm:opp-31"
+paper = "L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale, P. Raghavendra, L. Trevisan. Average whenever you meet: opportunistic protocols for community detection"
+venue = "ESA 2018"
+version = "arXiv:1703.05045v3"
+result = "Lemma B.3"
+page = 24
+url = "https://arxiv.org/abs/1703.05045v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+[Monotonicity property] Let $G$ be a connected graph, let $\bar{\lambda}_i$ for $i = 1, \dots, n$ be the eigenvalues of matrix $\overline{W}$, let $\varepsilon$ be such that $0 < \varepsilon < 1$, and let $\mathbf{x} \in \{-1,1\}^n$ be an arbitrary initial vector such that $|\alpha_2| = |\alpha_2(\mathbf{x})| > 0$. Then, for every node $u \notin B_\varepsilon$ and for any round $t$ such that $t \geqslant 3 \log \left(\frac{n}{1-\varepsilon} \right) / \log(\bar{\lambda}_2 /\bar{\lambda}_3)$, it holds that
+\[ \mathbf{sgn}\left( \mathbb{E}\left[\mathbf{x}^{(t-1)}_u \,|\, \mathbf{x}^{(0)} = \mathbf{x}\right] - \mathbb{E}\left[\mathbf{x}^{(t)}_u \,|\, \mathbf{x}^{(0)} = \mathbf{x}\right] \right) = \mathbf{sgn}\left( \alpha_2 \boldsymbol{\chi}_u \right) \ . \qquad (19) \]
+'''
+context = '''
+[Section 3, p. 9:] We denote its eigenvalues as $\bar{\lambda}_1, \dots, \bar{\lambda}_n$, with $1 = \bar{\lambda}_1 \geqslant \bar{\lambda}_2 \geqslant \cdots \bar{\lambda}_n \geqslant -1\,.$ [$\overline{W} = \mathbb{E}[W_t] = I - \frac{1}{2m} L$, equation (2)]
+
+[Lemma B.1 (Main decomposition), p. 23:] Let $\mathbf{x} \in \{-1,1\}^n$ be an arbitrary initial vector of values and, for $h = 1, 2$, let $\mu_h = \mu_h(\mathbf{x}) = (2/n) \sum_{i \in V_h} \mathbf{x}(i)$ be the average of the initial values in block $h$. The expected vector of values at round $t$ conditional on the initial vector being $\mathbf{x}$ can be written as
+\[ \mathbb{E}\left[\mathbf{x}^{(t)} \,|\, \mathbf{x}^{(0)} = \mathbf{x}\right] = \alpha_1 \mathbf{1} + \alpha_2 \bar{\lambda}_2^t \boldsymbol{\chi} + \alpha_2 \sqrt{n} \, \bar{\lambda}_2^t \mathbf{f}_\perp + \mathbf{e}^{(t)} \, , \]
+where $\alpha_1 = \frac{\mu_1 + \mu_2}{2}$, $\alpha_2 = \frac{1}{\|\mathbf{f} - \mathbf{f}_\perp\|^2} \left( \frac{\mu_1 - \mu_2}{2} - \frac{\langle \mathbf{x}, \mathbf{f}_\perp\rangle}{\sqrt{n}} \right)$ and, moreover, $\left\|\mathbf{e}^{(t)} \right\| \leqslant \bar{\lambda}_3^t \sqrt{n}$.
+
+[Definition B.1 (Bad nodes), p. 24:] We say a node $u \in [n]$ is $\varepsilon$-bad if $|\mathbf{f}_{\perp,u}| \geqslant \varepsilon/\sqrt n$, for some $\varepsilon > 0$ and we call $B_\varepsilon$ the set of $\varepsilon$-bad nodes.
+
+[Section 4.1, p. 11:] For $(n,d,b)$-clustered regular graphs, [...] the partition indicator vector $\boldsymbol{\chi}$ turns out to be the eigenvector of $\overline{W}$ corresponding to $\bar{\lambda}_2$ (see (2)). As a consequence, the orthogonal component $\mathbf{f}_\perp$ in (4) is $\mathbf{0}$ in this case.
+'''
+notes = "Cited by averaging/README.md and the doc comment of monotone_criterion ('Lemma B.3 (monotonicity property) on a clustered regular graph, where no node is bad'). The paper does not state the base of log. The lemma title is shown in brackets. Macros replaced: \\sgn -> \\mathbf{sgn}, \\Expec{}{X} -> \\mathbb{E}\\left[X\\right], \\bx -> \\mathbf{x}, \\bchi -> \\boldsymbol{\\chi}, \\bfied -> \\mathbf{f}, \\be -> \\mathbf{e}, \\bone -> \\mathbf{1}, \\avgW -> \\overline{W}; \\geq and \\leq typeset as \\geqslant and \\leqslant, written here directly."
+
+[[source]]
+item = "averaging:thm:opp-31"
+paper = "L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale, P. Raghavendra, L. Trevisan. Average whenever you meet: opportunistic protocols for community detection"
+venue = "ESA 2018"
+version = "arXiv:1703.05045v3"
+result = "Lemma B.4"
+page = 25
+url = "https://arxiv.org/abs/1703.05045v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+[Sign property] Let $G$ be a connected graph, let $\bar{\lambda}_i$ for $i = 1, \dots, n$ be the eigenvalues of matrix $\overline{W}$, let $\varepsilon$ be such that $0 < \varepsilon < 1$, and let $\mathbf{x} \in \{-1,1\}^n$ be an arbitrary initial vector such that $\alpha_1 = \alpha_1(\mathbf{x})$ and $\alpha_2 = \alpha_2(\mathbf{x})$ satisfy $|\alpha_2| > 2 |\alpha_1| / (1-\varepsilon)$. Then, for every node $u \notin B_\varepsilon$ and for any round $t$ such that
+\[ \frac{1}{\log(1/\bar{\lambda}_3)} \log (n / |\alpha_1|) \leqslant t \leqslant \frac{1}{\log (1/\bar{\lambda}_2)} \log\left(\frac{|\alpha_2|(1 - \varepsilon)}{2 |\alpha_1|}\right) \]
+it holds that $\mathbf{sgn}\left( \mathbb{E}\left[\mathbf{x}^{(t)}_u \,|\, \mathbf{x}^{(0)} = \mathbf{x}\right] \right) = \mathbf{sgn}\left( \alpha_2 \boldsymbol{\chi}_u \right)$.
+'''
+context = '''
+[Section 3, p. 9:] We denote its eigenvalues as $\bar{\lambda}_1, \dots, \bar{\lambda}_n$, with $1 = \bar{\lambda}_1 \geqslant \bar{\lambda}_2 \geqslant \cdots \bar{\lambda}_n \geqslant -1\,.$ [$\overline{W} = \mathbb{E}[W_t] = I - \frac{1}{2m} L$, equation (2)]
+
+[Lemma B.1 (Main decomposition), p. 23:] Let $\mathbf{x} \in \{-1,1\}^n$ be an arbitrary initial vector of values and, for $h = 1, 2$, let $\mu_h = \mu_h(\mathbf{x}) = (2/n) \sum_{i \in V_h} \mathbf{x}(i)$ be the average of the initial values in block $h$. The expected vector of values at round $t$ conditional on the initial vector being $\mathbf{x}$ can be written as
+\[ \mathbb{E}\left[\mathbf{x}^{(t)} \,|\, \mathbf{x}^{(0)} = \mathbf{x}\right] = \alpha_1 \mathbf{1} + \alpha_2 \bar{\lambda}_2^t \boldsymbol{\chi} + \alpha_2 \sqrt{n} \, \bar{\lambda}_2^t \mathbf{f}_\perp + \mathbf{e}^{(t)} \, , \]
+where $\alpha_1 = \frac{\mu_1 + \mu_2}{2}$, $\alpha_2 = \frac{1}{\|\mathbf{f} - \mathbf{f}_\perp\|^2} \left( \frac{\mu_1 - \mu_2}{2} - \frac{\langle \mathbf{x}, \mathbf{f}_\perp\rangle}{\sqrt{n}} \right)$ and, moreover, $\left\|\mathbf{e}^{(t)} \right\| \leqslant \bar{\lambda}_3^t \sqrt{n}$.
+
+[Definition B.1 (Bad nodes), p. 24:] We say a node $u \in [n]$ is $\varepsilon$-bad if $|\mathbf{f}_{\perp,u}| \geqslant \varepsilon/\sqrt n$, for some $\varepsilon > 0$ and we call $B_\varepsilon$ the set of $\varepsilon$-bad nodes.
+
+[Section 4.1, p. 11:] For $(n,d,b)$-clustered regular graphs, [...] the partition indicator vector $\boldsymbol{\chi}$ turns out to be the eigenvector of $\overline{W}$ corresponding to $\bar{\lambda}_2$ (see (2)). As a consequence, the orthogonal component $\mathbf{f}_\perp$ in (4) is $\mathbf{0}$ in this case.
+'''
+notes = "Cited by averaging/README.md and the doc comment of sign_criterion ('Lemma B.4 (sign property) on a clustered regular graph, where no node is bad'). The paper does not state the base of log. The lemma title is shown in brackets. Macros replaced: \\sgn -> \\mathbf{sgn}, \\Expec{}{X} -> \\mathbb{E}\\left[X\\right], \\bx -> \\mathbf{x}, \\bchi -> \\boldsymbol{\\chi}, \\bfied -> \\mathbf{f}, \\be -> \\mathbf{e}, \\bone -> \\mathbf{1}, \\avgW -> \\overline{W}; \\geq and \\leq typeset as \\geqslant and \\leqslant, written here directly."
+
+[[source]]
+item = "averaging:lem:opp-onestep"
+paper = "L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale, P. Raghavendra, L. Trevisan. Average whenever you meet: opportunistic protocols for community detection"
+venue = "ESA 2018"
+version = "arXiv:1703.05045v3"
+result = "Lemma C.2"
+page = 26
+url = "https://arxiv.org/abs/1703.05045v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+Let $\mathbf{x} = \mathbf{x}_{\|} + \mathbf{y} +\mathbf{z} \in [-1,1]^n$ be an arbitrary vector of states. After one step of Algorithm 1 it holds that
+\[ \mathbb{E}\left[\lVert\mathbf{y}^{(t+1)}\rVert^{2} \,|\, \mathbf{x}^{(t)} = \mathbf{x}\right] \geqslant \left(1-\frac{2\lambda_{2}}{n}\right)\lVert\mathbf{y}\rVert^{2}. \]
+Moreover, if the underlying graph $G$ is an $(n, d, b)$-clustered regular graph with $\lambda_2 = 2b/d = o(\lambda_3 / \log n)$ we also have that
+\[ \mathbb{E}\left[\lVert\mathbf{y}^{(t+1)}\rVert^{2} \,|\, \mathbf{x}^{(t)} = \mathbf{x}\right] \leqslant \left(1-\frac{2\lambda_{2}}{n}\right)\lVert\mathbf{y}\rVert^{2} + 2 \frac{\lambda_{2}}{n^{2}}\left(\lVert\mathbf{y}\rVert^{2} + \lVert\mathbf{z}\rVert^{2}\right). \]
+'''
+context = '''
+[Section 2, p. 7:] For a graph $G$ with $n$ nodes and adjacency matrix $A$, let $0 = \lambda_{1} \leqslant \cdots \leqslant \lambda_{n}$ be the eigenvalues of the normalized Laplacian $\mathcal{L} = I - D^{-1/2}AD^{-1/2}$, where $D$ is the diagonal matrix with the degrees of the nodes.
+
+[Section 2, Definition 2.2 (Clustered regular graphs), p. 8:] Let $n \geqslant 2$ be an even integer and $d$ and $b$ two positive integers such that $2 b < d < n$. An $(n,d,b)$-clustered regular graph $G = ((V_1,V_2),E)$ is a graph over node set $V = V_1 \cup V_2$, with $|V_1|=|V_2|=n/2$ and such that: (i) Every node has degree $d$ and (ii) Every node in $V_1$ has $b$ neighbors in $V_2$ and every node in $V_2$ has $b$ neighbors in $V_1$.
+
+[Section 4.1, p. 11:] For the sake of readability, we here denote by $\mathbf{y}^{(t)} = Q_2 \mathbf{x}^{(t)}$ the component of the state vector in the eigenspace of the second eigenvalue of $\overline{W}$, while $\mathbf{z}^{(t)} = Q_{3 \cdots n} \mathbf{x}^{(t)}$ denotes $\mathbf{x}^{(t)}$'s projection onto the subspace orthogonal to $\mathbf{1}$ and $\boldsymbol{\chi}$. If we also set $\mathbf{x}_{\|} = Q_1 \mathbf{x}^{(0)}$, we can write: $\mathbf{x}^{(t)} = \mathbf{x}_{\|} + \mathbf{y}^{(t)} + \mathbf{z}^{(t)}$ (7).
+
+[Appendix C.1, p. 26:] For readability sake, in the following proofs of this section we use $\mathbf{y}'$ and $\mathbf{z}'$ for random variables $\mathbf{y}^{(t+1)}$ and $\mathbf{z}^{(t+1)}$ conditional on the state at round $t$ being $\mathbf{x}^{(t)} = \mathbf{x} = \mathbf{x}_{\|} + \mathbf{y} + \mathbf{z}$.
+
+[Section 2, p. 7, and Algorithm 1:] In each round, one edge of the graph is sampled uniformly at random and the two endpoints of the sampled edge execute the following algorithm. [\textsc{Averaging}$(\delta)$; Appendix C concerns $\delta = 1/2$, Section 4: 'We next provide a second moment analysis of the \textsc{Averaging}$(\delta)$ with $\delta = 1/2$'.]
+'''
+notes = "Cited by averaging/README.md ('Lemmas C.2, C.3 (one round)') and the doc comment of avg_cutDev_edgeAvg_le. The library's one-round bound for the cut component is in a different form (with a reference gamma; averaging/FORMALIZATION_DIFFERENCES.md, AVG-3 item 6). Macros replaced: \\norm{v} -> \\lVert v\\rVert, \\Expec{}{X} -> \\mathbb{E}\\left[X\\right], \\bx -> \\mathbf{x}, \\by -> \\mathbf{y}, \\bz -> \\mathbf{z}, \\bone -> \\mathbf{1}, \\bchi -> \\boldsymbol{\\chi}, \\avgW -> \\overline{W}, \\lapl -> \\mathcal{L}, \\aveproc -> \\textsc{Averaging}; \\leq and \\geq are typeset as \\leqslant and \\geqslant by the preamble, written here directly. 'Algorithm 1' is the source's \\ref{algo:sparse_update}."
+
+[[source]]
+item = "averaging:lem:opp-onestep"
+paper = "L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale, P. Raghavendra, L. Trevisan. Average whenever you meet: opportunistic protocols for community detection"
+venue = "ESA 2018"
+version = "arXiv:1703.05045v3"
+result = "Lemma C.3"
+page = 28
+url = "https://arxiv.org/abs/1703.05045v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+Let $\mathbf{x} = \mathbf{x}_{\|} + \mathbf{y} +\mathbf{z} \in [-1,1]^n$ be an arbitrary vector of states. After one step of Algorithm 1 it holds that
+\[ \mathbb{E}\left[\lVert\mathbf{z}^{(t+1)}\rVert \,|\, \mathbf{x}^{(t)} = \mathbf{x}\right]^{2} \leqslant \frac{\lambda_{2}}{n}\lVert\mathbf{y}\rVert^{2} + \left(1-\frac{\lambda_{3}}{n}\right)\lVert\mathbf{z}\rVert^{2}. \]
+'''
+context = '''
+[Section 2, p. 7:] For a graph $G$ with $n$ nodes and adjacency matrix $A$, let $0 = \lambda_{1} \leqslant \cdots \leqslant \lambda_{n}$ be the eigenvalues of the normalized Laplacian $\mathcal{L} = I - D^{-1/2}AD^{-1/2}$, where $D$ is the diagonal matrix with the degrees of the nodes.
+
+[Section 4.1, p. 11:] For the sake of readability, we here denote by $\mathbf{y}^{(t)} = Q_2 \mathbf{x}^{(t)}$ the component of the state vector in the eigenspace of the second eigenvalue of $\overline{W}$, while $\mathbf{z}^{(t)} = Q_{3 \cdots n} \mathbf{x}^{(t)}$ denotes $\mathbf{x}^{(t)}$'s projection onto the subspace orthogonal to $\mathbf{1}$ and $\boldsymbol{\chi}$. If we also set $\mathbf{x}_{\|} = Q_1 \mathbf{x}^{(0)}$, we can write: $\mathbf{x}^{(t)} = \mathbf{x}_{\|} + \mathbf{y}^{(t)} + \mathbf{z}^{(t)}$ (7).
+
+[Appendix C.1, p. 26:] For readability sake, in the following proofs of this section we use $\mathbf{y}'$ and $\mathbf{z}'$ for random variables $\mathbf{y}^{(t+1)}$ and $\mathbf{z}^{(t+1)}$ conditional on the state at round $t$ being $\mathbf{x}^{(t)} = \mathbf{x} = \mathbf{x}_{\|} + \mathbf{y} + \mathbf{z}$.
+
+[Proof of Lemma C.3, p. 28:] From Pythagoras' Theorem and Lemmas C.1 and C.2, we get
+\[ \mathbb{E}\left[\lVert\mathbf{z}'\rVert^{2}\right] = \mathbb{E}\left[\lVert\mathbf{y}'+\mathbf{z}'\rVert^{2}\right]-\mathbb{E}\left[\lVert\mathbf{y}'\rVert^{2}\right] \leqslant [\ldots] = \frac{\lambda_{2}}{n}\lVert\mathbf{y}\rVert^{2}+\left(1-\frac{\lambda_{3}}{n}\right) \lVert\mathbf{z}\rVert^{2}. \]
+
+[Lemma C.1, p. 26:] Let $\mathbf{x} = \mathbf{x}_{\|} + \mathbf{y} +\mathbf{z} \in [-1,1]^n$ be an arbitrary vector of states. After one step of Algorithm 1 it holds that
+\[ \mathbb{E}\left[\lVert\mathbf{y}^{(t+1)}+\mathbf{z}^{(t+1)}\rVert^{2} \,|\, \mathbf{x}^{(t)} = \mathbf{x}\right] \leqslant \left(1-\frac{\lambda_{2}}{n}\right)\lVert\mathbf{y}\rVert^{2} + \left(1-\frac{\lambda_{3}}{n}\right)\lVert\mathbf{z}\rVert^{2}. \]
+'''
+notes = "Cited by averaging/README.md ('Lemmas C.2, C.3 (one round)') and the doc comment of avg_restSq_edgeAvg_le. Kept as printed: the left-hand side is the square of the conditional expectation of the norm, E[||z^(t+1)|| | x^(t) = x]^2 (source: \\Expec{}{\\norm{\\bz^{(t+1)}} \\,|\\, \\bx^{(t)} = \\bx}^{2}); the proof (quoted in the context) bounds E[||z'||^2]. Lemma C.1 is quoted because the proof uses it; its own proof starts from E||W(y+z)||^2 = (y+z)^T (I - L/n)(y+z), the identity behind avg_sum_sq_edgeAvg. Macros replaced: \\norm{v} -> \\lVert v\\rVert, \\Expec{}{X} -> \\mathbb{E}\\left[X\\right], \\bx -> \\mathbf{x}, \\by -> \\mathbf{y}, \\bz -> \\mathbf{z}, \\bone -> \\mathbf{1}, \\bchi -> \\boldsymbol{\\chi}, \\avgW -> \\overline{W}, \\lapl -> \\mathcal{L}; \\leq typeset as \\leqslant, written here directly. 'Algorithm 1' is the source's \\ref{algo:sparse_update}."
+
+[[source]]
+item = "averaging:thm:opp-41"
+paper = "L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale, P. Raghavendra, L. Trevisan. Average whenever you meet: opportunistic protocols for community detection"
+venue = "ESA 2018"
+version = "arXiv:1703.05045v3"
+result = "Lemma C.4"
+page = 28
+url = "https://arxiv.org/abs/1703.05045v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+Let $G$ be an $(n,d,b)$-clustered regular graph with $\lambda_2 = \frac{2b}{d} = o\left(\lambda_3 / \log n \right)$. For every starting state $\mathbf{x}^{(0)} \in \{-1, +1\}^n$ and for every $t \in \mathbb{N}$ it holds that
+\[ \mathbb{E}\left[\lVert\mathbf{z}^{\left(t\right)}\rVert^{2}\right] \leqslant \frac{\lambda_{2}}{\lambda_{3}}\left(1-\frac{\lambda_{2}}{n}\right)^{-t} \mathbb{E}\left[\lVert\mathbf{y}^{\left(t\right)}\rVert^{2}\right] +\left(1-\frac{\lambda_{3}}{n}\right)^{t} \mathbb{E}\left[\|\mathbf{z}^{(0)}\|^2\right] \, . \]
+'''
+context = '''
+[Section 2, p. 7:] For a graph $G$ with $n$ nodes and adjacency matrix $A$, let $0 = \lambda_{1} \leqslant \cdots \leqslant \lambda_{n}$ be the eigenvalues of the normalized Laplacian $\mathcal{L} = I - D^{-1/2}AD^{-1/2}$, where $D$ is the diagonal matrix with the degrees of the nodes.
+
+[Section 2, Definition 2.2 (Clustered regular graphs), p. 8:] Let $n \geqslant 2$ be an even integer and $d$ and $b$ two positive integers such that $2 b < d < n$. An $(n,d,b)$-clustered regular graph $G = ((V_1,V_2),E)$ is a graph over node set $V = V_1 \cup V_2$, with $|V_1|=|V_2|=n/2$ and such that: (i) Every node has degree $d$ and (ii) Every node in $V_1$ has $b$ neighbors in $V_2$ and every node in $V_2$ has $b$ neighbors in $V_1$.
+
+[Section 4.1, p. 11:] For the sake of readability, we here denote by $\mathbf{y}^{(t)} = Q_2 \mathbf{x}^{(t)}$ the component of the state vector in the eigenspace of the second eigenvalue of $\overline{W}$, while $\mathbf{z}^{(t)} = Q_{3 \cdots n} \mathbf{x}^{(t)}$ denotes $\mathbf{x}^{(t)}$'s projection onto the subspace orthogonal to $\mathbf{1}$ and $\boldsymbol{\chi}$. If we also set $\mathbf{x}_{\|} = Q_1 \mathbf{x}^{(0)}$, we can write: $\mathbf{x}^{(t)} = \mathbf{x}_{\|} + \mathbf{y}^{(t)} + \mathbf{z}^{(t)}$ (7).
+
+[Appendix C.1, p. 28, before the lemma:] Finally, by unrolling the double recursion, we get that the expected squared norm of $\mathbf{z}$ and $\mathbf{y}$ at round $t$ satisfy the following inequality.
+'''
+notes = "Cited by averaging/README.md ('Lemma C.4 (unrolled recursions)') and the blueprint title of averaging:thm:opp-41 ('Second moment analysis, Lemma C.4 and Theorem 4.1'); Theorem 4.1 has its own entry in verification/sources.toml. The 'double recursion' is Lemmas C.2 and C.3 (see the entries of averaging:lem:opp-onestep). Macros replaced: \\norm{v} -> \\lVert v\\rVert, \\Expec{}{X} -> \\mathbb{E}\\left[X\\right], \\bx -> \\mathbf{x}, \\by -> \\mathbf{y}, \\bz -> \\mathbf{z}, \\bone -> \\mathbf{1}, \\bchi -> \\boldsymbol{\\chi}, \\avgW -> \\overline{W}, \\lapl -> \\mathcal{L}; \\leq typeset as \\leqslant, written here directly."
+
+[[source]]
+item = "averaging:thm:opp-main"
+paper = "L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale, P. Raghavendra, L. Trevisan. Average whenever you meet: opportunistic protocols for community detection"
+venue = "ESA 2018"
+version = "arXiv:1703.05045v3"
+result = "Definition 2.3"
+page = 8
+url = "https://arxiv.org/abs/1703.05045v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+[Weak Reconstruction] A function $f: V \rightarrow \{\pm 1\}$ is said to be an $\varepsilon$-weak reconstruction of $G$ if subsets $W_1 \subseteq V_1$ and $W_2 \subseteq V_2$ exist, each of size at least $(1 - \varepsilon)n/2$, such that $f(W_1) \cap f(W_2) = \emptyset$.
+'''
+context = '''
+[Section 2, Definition 2.2 (Clustered regular graphs), p. 8:] Let $n \geqslant 2$ be an even integer and $d$ and $b$ two positive integers such that $2 b < d < n$. An $(n,d,b)$-clustered regular graph $G = ((V_1,V_2),E)$ is a graph over node set $V = V_1 \cup V_2$, with $|V_1|=|V_2|=n/2$ and such that: (i) Every node has degree $d$ and (ii) Every node in $V_1$ has $b$ neighbors in $V_2$ and every node in $V_2$ has $b$ neighbors in $V_1$.
+
+[Section 2, p. 8, before Definition 2.3:] We next recall the notion of weak reconstruction [BCN+17].
+'''
+notes = "Cited by averaging/README.md ('Definitions 4.1, 2.3 | IsGood, IsWeakReconstruction'); IsWeakReconstruction is part of averaging:thm:opp-main (the library's labelling by signs is described in averaging/FORMALIZATION_DIFFERENCES.md, AVG-3 item 9). [BCN+17] is the Find your place paper (SODA 2017). The definition title is shown in brackets. The source writes \\emph{$\\varepsilon$-weak reconstruction} (italics dropped here)."
+
+[[source]]
+item = "averaging:thm:opp-main"
+paper = "L. Becchetti, A. Clementi, P. Manurangsi, E. Natale, F. Pasquale, P. Raghavendra, L. Trevisan. Average whenever you meet: opportunistic protocols for community detection"
+venue = "ESA 2018"
+version = "arXiv:1703.05045v3"
+result = "Lemma A.1"
+page = 21
+url = "https://arxiv.org/abs/1703.05045v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+[Projection on the first two eigenvectors] For all $\varepsilon \in (0,1)$, for a random $\mathbf{x} \in \{-1,1\}^n$, with probability at least $1-\mathcal{O}(\varepsilon)$ we have,
+\begin{align*}
+& \mathbb{P}\left[|\mathbf{x} \cdot \mathbf{1} \pm \mathbf{x} \cdot \boldsymbol{\chi}| \geqslant \varepsilon \cdot \sqrt{n}\right] \geqslant 1 - \mathcal{O}(\varepsilon) \quad \text{and}\\
+& \mathbb{P}\left[|\mathbf{x} \cdot \mathbf{1}| \leqslant |\mathbf{x} \cdot \boldsymbol{\chi}| - \varepsilon \cdot \sqrt{n} \,\,|\,\, |\mathbf{x} \cdot \mathbf{1} \pm \mathbf{x} \cdot \boldsymbol{\chi}| \geqslant \varepsilon \cdot \sqrt{n}\right] = \frac{1}{2} .
+\end{align*}
+'''
+context = '''
+[Section 2, Definition 2.2 (Clustered regular graphs), p. 8:] [...] An $(n,d,b)$-clustered regular graph $G = ((V_1,V_2),E)$ is a graph over node set $V = V_1 \cup V_2$, with $|V_1|=|V_2|=n/2$ [...]
+
+[Section 2, p. 8, after Definition 2.2:] We remark that if a graph is clustered regular then we easily get that the indicator vector $\boldsymbol{\chi}$ of the cut $(V_1, V_2)$ is an eigenvector of $\mathcal{L}$ with eigenvalue $\frac {2b}d$ [...]
+
+[Proof of Lemma A.1, p. 21:] Note that $\mathbf{x} \cdot (\mathbf{1} + \boldsymbol{\chi}) = 2 \mathbf{x} \cdot \mathbf{1}_{V_1}$ and $\mathbf{x} \cdot (\mathbf{1} - \boldsymbol{\chi}) = 2 \mathbf{x} \cdot \mathbf{1}_{V_2}$. [...] Since $\mathbf{x} \cdot \mathbf{1}$ and $\mathbf{x} \cdot \boldsymbol{\chi}$ are independent sums of Rademacher random variables, they have the same chances of being positive or negative, thus with probability at least $\frac{1}{2}$ we will have $|\mathbf{x} \cdot \mathbf{1}| \leqslant |\mathbf{x} \cdot \boldsymbol{\chi}|$.
+'''
+notes = "Cited by PROVENANCE.md (Lemma A.1) and averaging/README.md ('Sign of the values over the phase (Section 4.2, Lemma A.1)') for sign_phase; averaging/FORMALIZATION_DIFFERENCES.md (AVG-3 item 9) describes the form of the lemma the library uses. The lemma title is shown in brackets. Kept as printed: 'with probability at least 1 - O(epsilon) we have,' before two probability statements. The proof's identities x.(1 + chi) = 2 x.1_{V_1} and x.(1 - chi) = 2 x.1_{V_2} show that chi = 1_{V_1} - 1_{V_2} here. Macros replaced: \\Prob{}{X} -> \\mathbb{P}\\left[X\\right], \\bx -> \\mathbf{x}, \\bone -> \\mathbf{1}, \\bchi -> \\boldsymbol{\\chi}, \\lapl -> \\mathcal{L}, \\bigO -> \\mathcal{O}; the preamble typesets \\epsilon as \\varepsilon and \\geq, \\leq as \\geqslant, \\leqslant, written here directly."

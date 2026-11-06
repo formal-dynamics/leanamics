@@ -1,0 +1,641 @@
+# Source references and original statements of the blueprint items of package `voter`.
+#
+# Same format as `verification/sources.toml` (see its header for the fields). The entries of
+# `voter:thm:bgkm-two` and `voter:thm:bgkm-sq` are in `verification/sources.toml` and are not
+# repeated here.
+#
+# Sources:
+# - Y. Hassin, D. Peleg, Information and Computation 171 (2001). The open copy on the
+#   publisher's site could not be retrieved by the transcribing agent, so its entries give the
+#   reference and the numbered result only (no statement, no context).
+# - L. Becchetti, A. Clementi, E. Natale, Consensus dynamics: an overview, SIGACT News 51(1),
+#   2020, transcribed from the PDF of the HAL preprint hal-02507613v1 (no LaTeX source).
+# - P. Berenbrink, G. Giakkoupis, A.-M. Kermarrec, F. Mallmann-Trenn, ICALP 2016, and
+#   V. Kanade, F. Mallmann-Trenn, T. Sauerwald, SODA 2019, transcribed from the arXiv LaTeX
+#   sources and compared with the PDFs of the same versions.
+# - D. Coppersmith, P. Tetali, P. Winkler, SIAM J. Discrete Math. 1993: no open copy found.
+# - The neutral Wright-Fisher model, which the library calls classical without citing a work.
+#
+# All entries were written by an AI agent; none has been checked by a person. Macros of the
+# papers are replaced by standard LaTeX, as listed in `notes`. Pages are pages of the PDF of the
+# named version (for the HAL preprint, the PDF page is the printed page plus one, because of the
+# HAL cover page).
+
+# ---------------------------------------------------------------------------------------------
+# Hassin and Peleg 2001 (not retrieved)
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+items = ["voter:def:step", "voter:lem:product"]
+paper = "Y. Hassin, D. Peleg. Distributed probabilistic polling and applications to proportionate agreement"
+venue = "Information and Computation 171(2):248-268, 2001"
+version = "journal version (DOI 10.1006/inco.2001.3088)"
+result = "Section 2.1"
+url = "https://doi.org/10.1006/inco.2001.3088"
+status = "open copy on the publisher's site (Elsevier open archive) not retrievable by the transcribing agent; not transcribed"
+notes = "The library cites Section 2.1 for the synchronous copying round and for the product formula of the transition probabilities P_{ab} (voter/README.md, voter/FORMALIZATION_DIFFERENCES.md, Section 1.1)."
+
+[[source]]
+item = "voter:thm:stationary"
+paper = "Y. Hassin, D. Peleg. Distributed probabilistic polling and applications to proportionate agreement"
+venue = "Information and Computation 171(2):248-268, 2001"
+version = "journal version (DOI 10.1006/inco.2001.3088)"
+result = "Section 2.2, before Lemma 2.2"
+url = "https://doi.org/10.1006/inco.2001.3088"
+status = "open copy on the publisher's site (Elsevier open archive) not retrievable by the transcribing agent; not transcribed"
+notes = "The library cites the existence of the stationary distribution recalled before Lemma 2.2. voter/FORMALIZATION_DIFFERENCES.md (Sections 1.1 and 2.5) cites the 'Preamble to Lemma 2.2' and says the paper, on p. 253, cites Motwani and Raghavan for a unique stationary distribution; PROVENANCE.md lists the shared-library result as standard."
+
+[[source]]
+items = ["voter:lem:21", "voter:lem:propagation"]
+paper = "Y. Hassin, D. Peleg. Distributed probabilistic polling and applications to proportionate agreement"
+venue = "Information and Computation 171(2):248-268, 2001"
+version = "journal version (DOI 10.1006/inco.2001.3088)"
+result = "Lemma 2.1"
+url = "https://doi.org/10.1006/inco.2001.3088"
+status = "open copy on the publisher's site (Elsevier open archive) not retrievable by the transcribing agent; not transcribed"
+notes = "voter:lem:propagation formalizes the propagation argument of the proof of Lemma 2.1 (monochromatic edge, then growth of a monochromatic region); voter/FORMALIZATION_DIFFERENCES.md, Section 2.1, quotes that proof (p. 252)."
+
+[[source]]
+item = "voter:lem:22"
+paper = "Y. Hassin, D. Peleg. Distributed probabilistic polling and applications to proportionate agreement"
+venue = "Information and Computation 171(2):248-268, 2001"
+version = "journal version (DOI 10.1006/inco.2001.3088)"
+result = "Lemma 2.2"
+url = "https://doi.org/10.1006/inco.2001.3088"
+status = "open copy on the publisher's site (Elsevier open archive) not retrievable by the transcribing agent; not transcribed"
+
+[[source]]
+item = "voter:lem:23"
+paper = "Y. Hassin, D. Peleg. Distributed probabilistic polling and applications to proportionate agreement"
+venue = "Information and Computation 171(2):248-268, 2001"
+version = "journal version (DOI 10.1006/inco.2001.3088)"
+result = "Lemma 2.3"
+url = "https://doi.org/10.1006/inco.2001.3088"
+status = "open copy on the publisher's site (Elsevier open archive) not retrievable by the transcribing agent; not transcribed"
+
+[[source]]
+item = "voter:thm:21"
+paper = "Y. Hassin, D. Peleg. Distributed probabilistic polling and applications to proportionate agreement"
+venue = "Information and Computation 171(2):248-268, 2001"
+version = "journal version (DOI 10.1006/inco.2001.3088)"
+result = "Theorem 2.1"
+url = "https://doi.org/10.1006/inco.2001.3088"
+status = "open copy on the publisher's site (Elsevier open archive) not retrievable by the transcribing agent; not transcribed"
+notes = "The uniform-sampling case is restated as Theorem 4 of the survey of Becchetti, Clementi and Natale (separate entry below, transcribed)."
+
+[[source]]
+items = ["voter:cor:22", "voter:thm:lazy"]
+paper = "Y. Hassin, D. Peleg. Distributed probabilistic polling and applications to proportionate agreement"
+venue = "Information and Computation 171(2):248-268, 2001"
+version = "journal version (DOI 10.1006/inco.2001.3088)"
+result = "Corollary 2.2"
+url = "https://doi.org/10.1006/inco.2001.3088"
+status = "open copy on the publisher's site (Elsevier open archive) not retrievable by the transcribing agent; not transcribed"
+notes = "voter:thm:lazy cites Corollary 2.2 for the degree weights d_i/2m of the lazy voter (docstring of Voter.lazyNeighbor_consensus_probability); its main attribution is the Remark on p. 254 (entry below)."
+
+[[source]]
+item = "voter:cor:22"
+paper = "Y. Hassin, D. Peleg. Distributed probabilistic polling and applications to proportionate agreement"
+venue = "Information and Computation 171(2):248-268, 2001"
+version = "journal version (DOI 10.1006/inco.2001.3088)"
+result = "Section 4.3.1 (regular graphs)"
+url = "https://doi.org/10.1006/inco.2001.3088"
+status = "open copy on the publisher's site (Elsevier open archive) not retrievable by the transcribing agent; not transcribed"
+notes = "voter/FORMALIZATION_DIFFERENCES.md, Section 1.1, cites Section 4.3.1 for Voter.regular_consensus_probability (consensus probability on a d-regular graph equals the initial white fraction x/n)."
+
+[[source]]
+item = "voter:thm:colors"
+paper = "Y. Hassin, D. Peleg. Distributed probabilistic polling and applications to proportionate agreement"
+venue = "Information and Computation 171(2):248-268, 2001"
+version = "journal version (DOI 10.1006/inco.2001.3088)"
+result = "Section 2.3 (multiple colors)"
+url = "https://doi.org/10.1006/inco.2001.3088"
+status = "open copy on the publisher's site (Elsevier open archive) not retrievable by the transcribing agent; not transcribed"
+
+[[source]]
+items = ["voter:thm:selfloop", "voter:lem:kernel-propagation", "voter:thm:lazy", "voter:thm:wright-fisher"]
+paper = "Y. Hassin, D. Peleg. Distributed probabilistic polling and applications to proportionate agreement"
+venue = "Information and Computation 171(2):248-268, 2001"
+version = "journal version (DOI 10.1006/inco.2001.3088)"
+result = "Remark, p. 254"
+url = "https://doi.org/10.1006/inco.2001.3088"
+status = "open copy on the publisher's site (Elsevier open archive) not retrievable by the transcribing agent; not transcribed"
+notes = "The library cites this remark for self-loops making Theorem 2.1 hold without nonbipartiteness. PROVENANCE.md and voter/README.md cite the Remark on p. 254 for these items; voter/FORMALIZATION_DIFFERENCES.md, Section 2.6, quotes it, but that quotation was not compared with the paper by the transcribing agent. voter:thm:wright-fisher is also attributed to classical Wright-Fisher fixation (entry at the end of this file)."
+
+[[source]]
+item = "voter:lem:cycle"
+paper = "Y. Hassin, D. Peleg. Distributed probabilistic polling and applications to proportionate agreement"
+venue = "Information and Computation 171(2):248-268, 2001"
+version = "journal version (DOI 10.1006/inco.2001.3088)"
+result = "Figure 1"
+url = "https://doi.org/10.1006/inco.2001.3088"
+status = "open copy on the publisher's site (Elsevier open archive) not retrievable by the transcribing agent; not transcribed"
+notes = "The library cites Figure 1 for the alternating coloring of a bipartite graph. Attribution from voter/FORMALIZATION_DIFFERENCES.md, Section 1.1."
+
+[[source]]
+items = ["voter:lem:duality", "voter:thm:coalescing-dual", "voter:lem:duality-general", "voter:def:pairwalk", "voter:lem:meeting", "voter:thm:consensus-time"]
+paper = "Y. Hassin, D. Peleg. Distributed probabilistic polling and applications to proportionate agreement"
+venue = "Information and Computation 171(2):248-268, 2001"
+version = "journal version (DOI 10.1006/inco.2001.3088)"
+result = "Section 2.4"
+url = "https://doi.org/10.1006/inco.2001.3088"
+status = "open copy on the publisher's site (Elsevier open archive) not retrievable by the transcribing agent; not transcribed"
+notes = "The library cites Section 2.4 for the time bounds (duality with coalescing random walks, the complete graph). voter/README.md cites 'Section 2.4 on the complete graph' and 'Section 2.4, any sampling kernel' for these items, ROADMAP.md (VOT-3) cites 'Hassin-Peleg Section 2.4' together with Theorems 6 and 7 of the survey (entries below, transcribed)."
+
+[[source]]
+items = ["voter:thm:hp24", "voter:thm:hp25-plain"]
+paper = "Y. Hassin, D. Peleg. Distributed probabilistic polling and applications to proportionate agreement"
+venue = "Information and Computation 171(2):248-268, 2001"
+version = "journal version (DOI 10.1006/inco.2001.3088)"
+result = "Theorem 2.4"
+url = "https://doi.org/10.1006/inco.2001.3088"
+status = "open copy on the publisher's site (Elsevier open archive) not retrievable by the transcribing agent; not transcribed"
+notes = "The library formalizes Theorem 2.4 in tail form (voter/FORMALIZATION_DIFFERENCES.md, Sections 4.2 and 4.3); voter:thm:hp25-plain contains Voter.plain_disagreement_le, listed there as 'Theorem 2.4, tail form'."
+
+[[source]]
+items = ["voter:lem:hitting", "voter:thm:meeting-lazy", "voter:lem:plain-drift"]
+paper = "Y. Hassin, D. Peleg. Distributed probabilistic polling and applications to proportionate agreement"
+venue = "Information and Computation 171(2):248-268, 2001"
+version = "journal version (DOI 10.1006/inco.2001.3088)"
+result = "Fact 2.3"
+url = "https://doi.org/10.1006/inco.2001.3088"
+status = "open copy on the publisher's site (Elsevier open archive) not retrievable by the transcribing agent; not transcribed"
+notes = "The library formalizes the lazy uniform case of Fact 2.3 as a commute bound for hitting times defined by their Laplacian system (Voter.hitting_add_hitting_le), and applies it to the double cover in voter:lem:plain-drift (Voter.doubleCover_hitting_le, 'Fact 2.3 on the double cover')."
+
+[[source]]
+items = ["voter:thm:meeting-lazy", "voter:thm:meeting-plain", "voter:lem:plain-drift", "voter:lem:double-cover-connected", "voter:def:double-cover"]
+paper = "Y. Hassin, D. Peleg. Distributed probabilistic polling and applications to proportionate agreement"
+venue = "Information and Computation 171(2):248-268, 2001"
+version = "journal version (DOI 10.1006/inco.2001.3088)"
+result = "Lemma 2.4"
+url = "https://doi.org/10.1006/inco.2001.3088"
+status = "open copy on the publisher's site (Elsevier open archive) not retrievable by the transcribing agent; not transcribed"
+notes = "The library cites Lemma 2.4 for the meeting time of two random walks, through the bipartite double cover. voter/FORMALIZATION_DIFFERENCES.md, Section 4.3, attributes the double cover to the proof of Lemma 2.4, its connectivity to Lemma 2.4 ('implicit'), and the drift of the potential to the Tetali-Winkler reduction in that proof. For lazy walks the library replaces the argument of Lemma 2.4 by Proposition B.9 of Kanade, Mallmann-Trenn and Sauerwald (entry below)."
+
+[[source]]
+items = ["voter:thm:hp25", "voter:thm:hp25-plain"]
+paper = "Y. Hassin, D. Peleg. Distributed probabilistic polling and applications to proportionate agreement"
+venue = "Information and Computation 171(2):248-268, 2001"
+version = "journal version (DOI 10.1006/inco.2001.3088)"
+result = "Theorem 2.5"
+url = "https://doi.org/10.1006/inco.2001.3088"
+status = "open copy on the publisher's site (Elsevier open archive) not retrievable by the transcribing agent; not transcribed"
+notes = "Theorem 8 of the survey of Becchetti, Clementi and Natale is the other source of these items (entry below, transcribed)."
+
+# ---------------------------------------------------------------------------------------------
+# Becchetti, Clementi, Natale, Consensus dynamics: an overview (HAL preprint)
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+items = ["voter:thm:21", "voter:cor:22", "voter:thm:colors"]
+paper = "L. Becchetti, A. Clementi, E. Natale. Consensus dynamics: an overview"
+venue = "SIGACT News 51(1), 2020"
+version = "HAL preprint hal-02507613v1"
+result = "Theorem 4"
+page = 11
+url = "https://hal.science/hal-02507613v1"
+status = "transcribed by an AI agent from the PDF of the HAL preprint hal-02507613v1 (no LaTeX source available; text extracted with pdftotext and read against the rendered page); not yet checked by a person"
+statement = '''
+[Proportionate Agreement [HP01]]
+Let $i$ be any color and $e_i^{(0)}$ be the volume of the nodes that support color $i$ at $t = 0$; formally, $e_i^{(0)} = \{\sum_{u : c^{(0)}(u) = i} d_u\}$. Then, $\frac{e_i^{(0)}}{2m}$ is the probability that the \textsc{Voter} dynamics converges to the monochromatic configuration in which all nodes supports color $i$.
+'''
+context = '''
+[Section 3, p. 9:] The Voter Model, which for consistency we call here \textsc{Voter} dynamics, is arguably the simplest \emph{nontrivial} dynamics: at each round, every node copies tha state of a neighbor sampled uniformly at random.
+[Section 3, p. 10:] More formally, let $G(V,E)$ be a connected graph with node set $V$ (of cardinality $n$) and edge set $E$ (of cardinality $m$). Let $\Sigma$ be a palette of colors of size $n$. Let $d(u)$ be the number of neighbours of $u \in V$.
+\textbf{Definition 3} (\textsc{Voter} dynamics). The Voter Model $\{X_t\}_t$ on $G$ is the discrete time Markov process where the state space is the set of color functions $c : V \mapsto \Sigma$ and its time evolution is determined by the following elementary dynamics (denoted as \textsc{Voter} dynamics):
+\begin{itemize}
+\item Each node initially supports a color in $\Sigma$;
+\item In each round one node is selected uniformly at random and it adopts the color of a neighbour sampled uniformly at random.
+\end{itemize}
+The \emph{asynchronous} version of the \textsc{Voter} dynamics, in which at each round only one node chosen uniformly at random updates its state, has long been studied in statistical mechanics as a model for consensus formation in population of spinless individuals [KRBN10, Lig12, Ald13].
+The study of the synchronous version of the model, in which all nodes update their state, has been first considered in Distributed Computing in [HP01] as a proportionate agreement protocol. The \emph{Proportionate Agreement} problem is defined as follows. Given a network of $n$ nodes, where each node is initially supporting a color out of a set of $k$ possibilities, we require the system to eventually reach a configuration in which every node is supporting the same color and, moreover, the final color should equal $i$ with a probability proportional to the volume of the initial set of nodes supporting $i$, for each $i \in [k]$.
+[Footnote 10, p. 10:] The \emph{volume} of a set of nodes $S$ is defined as the sum of the degrees of nodes in $S$, in formulas $\mathrm{vol}(S) := \sum_{u \in S} d_u$. In the general case of weighted graphs, we further have that $d_u$ equals the sum of the weights of the edges incidents to $u$, namely $d_u := \sum_{v \sim u} w(u,v)$.
+[Section 3.1, p. 10:] [HP01] answered this question by providing, via an elegant martingale argument, the guarantee for employing the \textsc{Voter} dynamics as a protocol for the \emph{Proportionate Agreement} problem, in which we want the system to reach consensus on color $i$ with probability proportional to the volume of the set of nodes initially supporting color $i$.
+'''
+notes = "Cited by ROADMAP.md (VOT-1: 'Hassin-Peleg 2001; Survey Thm 4'). The theorem is the uniform-neighbour case (stationary weights d_u/2m) of Hassin and Peleg's Theorem 2.1 and Corollary 2.2, for one color among several (their Section 2.3). Version: the published SIGACT News version could not be retrieved; the numbering of the HAL preprint (Definition 3, Theorem 4, Definition 5, Theorems 6 to 8, all in Section 3) matches the numbers the library cites. Pages are PDF pages (printed page plus one). The theorem title is shown in brackets. The name of the dynamics is set in small caps in the PDF, rendered as \\textsc{Voter}; 'Voter Model' in Definition 3 is in plain italics. Kept as printed: the set braces around the sum defining e_i^{(0)}, 'nodes supports', 'tha state'. As printed, the second bullet of Definition 3 updates one node per round, and the following paragraph calls this the asynchronous version; Hassin and Peleg's process, cited in the next paragraph, is synchronous."
+
+[[source]]
+item = "voter:def:pairwalk"
+paper = "L. Becchetti, A. Clementi, E. Natale. Consensus dynamics: an overview"
+venue = "SIGACT News 51(1), 2020"
+version = "HAL preprint hal-02507613v1"
+result = "Definition 5 (Coalescing Random Walks)"
+page = 11
+url = "https://hal.science/hal-02507613v1"
+status = "transcribed by an AI agent from the PDF of the HAL preprint hal-02507613v1 (no LaTeX source available; text extracted with pdftotext and read against the rendered page); not yet checked by a person"
+statement = '''
+The \emph{Coalescing Random Walks} process (for short CRW) on $G$ is a discrete time Markov process defined as follows:
+\begin{itemize}
+\item Each node initially holds one token.
+\item In each round, each node sends all its tokens to a neighbor chosen uniformly at random.
+\end{itemize}
+'''
+context = '''
+[Section 3, p. 10:] More formally, let $G(V,E)$ be a connected graph with node set $V$ (of cardinality $n$) and edge set $E$ (of cardinality $m$). Let $\Sigma$ be a palette of colors of size $n$. Let $d(u)$ be the number of neighbours of $u \in V$.
+[Section 3.1, p. 11, after Definition 5 and Figure 2:] The term \emph{coalescing} in the name of the CRW process refers to the fact that, as soon as too tokens happen to be located on the same node, they will move together in the following rounds. Hence, we can imagine that they have ``coalesced''.
+It is easy to see that, by the process' definition, all tokens in the CRW process are eventually located on a single node. The first occurrence of the latter event is thus referred to as the \emph{coalescing time}.
+'''
+notes = "The library cites 'Survey Definition 5 with two tokens' in the docstring of Voter.pairWalk. Version: the published SIGACT News version could not be retrieved; the numbering of the HAL preprint matches the numbers the library cites. Page is the PDF page (printed p. 10). Kept as printed: 'too tokens'. Figure 2 (a diagram) is not reproduced; its caption says that the CRW process read from left to right and the Voter dynamics read from right to left share the same random choices."
+
+[[source]]
+items = ["voter:lem:duality", "voter:lem:duality-general", "voter:thm:consensus-time"]
+paper = "L. Becchetti, A. Clementi, E. Natale. Consensus dynamics: an overview"
+venue = "SIGACT News 51(1), 2020"
+version = "HAL preprint hal-02507613v1"
+result = "Theorem 6"
+page = 12
+url = "https://hal.science/hal-02507613v1"
+status = "transcribed by an AI agent from the PDF of the HAL preprint hal-02507613v1 (no LaTeX source available; text extracted with pdftotext and read against the rendered page); not yet checked by a person"
+statement = '''
+[\textsc{Voter} dynamics vs CWR]
+Let $\tau$ be the first round such that the \textsc{Voter} dynamics reaches consensus and let $\tau'$ be the first round such that all the tokens of the CWR process are on the same node. A coupling between the \textsc{Voter} dynamics and the CWR process exists such that $\tau = \tau'$.
+'''
+context = '''
+[Section 3, p. 9:] The Voter Model, which for consistency we call here \textsc{Voter} dynamics, is arguably the simplest \emph{nontrivial} dynamics: at each round, every node copies tha state of a neighbor sampled uniformly at random.
+[Section 3, p. 10:] More formally, let $G(V,E)$ be a connected graph with node set $V$ (of cardinality $n$) and edge set $E$ (of cardinality $m$). Let $\Sigma$ be a palette of colors of size $n$. Let $d(u)$ be the number of neighbours of $u \in V$.
+\textbf{Definition 3} (\textsc{Voter} dynamics). The Voter Model $\{X_t\}_t$ on $G$ is the discrete time Markov process where the state space is the set of color functions $c : V \mapsto \Sigma$ and its time evolution is determined by the following elementary dynamics (denoted as \textsc{Voter} dynamics):
+\begin{itemize}
+\item Each node initially supports a color in $\Sigma$;
+\item In each round one node is selected uniformly at random and it adopts the color of a neighbour sampled uniformly at random.
+\end{itemize}
+The \emph{asynchronous} version of the \textsc{Voter} dynamics, in which at each round only one node chosen uniformly at random updates its state, has long been studied in statistical mechanics as a model for consensus formation in population of spinless individuals [KRBN10, Lig12, Ald13].
+The study of the synchronous version of the model, in which all nodes update their state, has been first considered in Distributed Computing in [HP01] as a proportionate agreement protocol. [...]
+As usual, when the system reaches a configuration in which every node is supporting the same color, we say that the system has reached \emph{Consensus}.
+[Section 3.1, p. 11:] \textbf{Definition 5.} The \emph{Coalescing Random Walks} process (for short CRW) on $G$ is a discrete time Markov process defined as follows:
+\begin{itemize}
+\item Each node initially holds one token.
+\item In each round, each node sends all its tokens to a neighbor chosen uniformly at random.
+\end{itemize}
+[...] The term \emph{coalescing} in the name of the CRW process refers to the fact that, as soon as too tokens happen to be located on the same node, they will move together in the following rounds. Hence, we can imagine that they have ``coalesced''.
+It is easy to see that, by the process' definition, all tokens in the CRW process are eventually located on a single node. The first occurrence of the latter event is thus referred to as the \emph{coalescing time}. In fact, the following theorem draws a direct correspondence between the convergence time of the \textsc{Voter} dynamics and the coalescing time of the CRW process, allowing to study either of them by investigating the other (for a proof see e.g. Lemma 4 in [BCE+17]).
+'''
+notes = "Cited by ROADMAP.md (VOT-3: 'Survey Thms 6-7; Hassin-Peleg Section 2.4') and by the docstring of Voter.iterate_disagreement_le_pairWalk ('Survey Theorem 6'). Version: the published SIGACT News version could not be retrieved; the numbering of the HAL preprint matches the numbers the library cites. Page is the PDF page (printed p. 11). The theorem title is shown in brackets. Kept as printed: both 'CRW' and 'CWR' for the coalescing process, 'too tokens', 'tha state'. As printed, the second bullet of Definition 3 updates one node per round, and the following paragraph calls this the asynchronous version."
+
+[[source]]
+item = "voter:thm:consensus-time"
+paper = "L. Becchetti, A. Clementi, E. Natale. Consensus dynamics: an overview"
+venue = "SIGACT News 51(1), 2020"
+version = "HAL preprint hal-02507613v1"
+result = "Theorem 7"
+page = 12
+url = "https://hal.science/hal-02507613v1"
+status = "transcribed by an AI agent from the PDF of the HAL preprint hal-02507613v1 (no LaTeX source available; text extracted with pdftotext and read against the rendered page); not yet checked by a person"
+statement = '''
+[Color evolution on the complete graph]
+Let $G$ be the complete graph, where each node has also a self-loop. Starting from an arbitrary initial configuration $\mathbf{c}$ on $G$, the \textsc{Voter} dynamics reaches a configuration $c'$ having at most $k$ remaining colors w.h.p. in $\mathcal{O}(\frac{n}{k}\log n)$ rounds.
+'''
+context = '''
+[Section 2.3, p. 9:] We consider a distributed system of $n$ nodes/agents, interacting over an underlying graph $G = (V,E)$ according to one of the communication models described in Subsection 2.1. In each round, every node supports a color, i.e. an element $i \in \Sigma = \{1, 2, \ldots, k\}$ (with $2 \leqslant k \leqslant n$). A configuration of the system is thus a function $c : V \to \Sigma$. When $G$ is the complete graph and nodes are anonymous, the state of the system at any round is completely specified by a \emph{color configuration} $\mathbf{c} = \langle c_1, \ldots, c_k \rangle$ (where $c_i$ denotes the number of agents supporting color $i \in [k]$).
+[Footnote 9, p. 9:] According to the standard definition, we say that a sequence of events $\mathcal{E}_n$, $n = 1, 2, \ldots$ holds \emph{with high probability} if $\mathbf{P}(\mathcal{E}_n) = 1 - \mathcal{O}(1/n^{\lambda})$ for some positive constant $\lambda > 0$.
+[Section 3, p. 9:] The Voter Model, which for consistency we call here \textsc{Voter} dynamics, is arguably the simplest \emph{nontrivial} dynamics: at each round, every node copies tha state of a neighbor sampled uniformly at random.
+[Section 3, p. 10:] More formally, let $G(V,E)$ be a connected graph with node set $V$ (of cardinality $n$) and edge set $E$ (of cardinality $m$). Let $\Sigma$ be a palette of colors of size $n$. Let $d(u)$ be the number of neighbours of $u \in V$.
+\textbf{Definition 3} (\textsc{Voter} dynamics). The Voter Model $\{X_t\}_t$ on $G$ is the discrete time Markov process where the state space is the set of color functions $c : V \mapsto \Sigma$ and its time evolution is determined by the following elementary dynamics (denoted as \textsc{Voter} dynamics):
+\begin{itemize}
+\item Each node initially supports a color in $\Sigma$;
+\item In each round one node is selected uniformly at random and it adopts the color of a neighbour sampled uniformly at random.
+\end{itemize}
+The \emph{asynchronous} version of the \textsc{Voter} dynamics, in which at each round only one node chosen uniformly at random updates its state, has long been studied in statistical mechanics as a model for consensus formation in population of spinless individuals [KRBN10, Lig12, Ald13].
+The study of the synchronous version of the model, in which all nodes update their state, has been first considered in Distributed Computing in [HP01] as a proportionate agreement protocol. [...]
+As usual, when the system reaches a configuration in which every node is supporting the same color, we say that the system has reached \emph{Consensus}.
+[Section 3.1, p. 12, before the theorem:] As an example, by combining Theorem 6 with the application of drift analysis techniques to the CWR process, we obtain the following theorem that provides the time after which at most $k$ colors are still ``alive'' (for a proof, see e.g. Lemma 3 in [BCE+17]).
+'''
+notes = "Cited by PROVENANCE.md and ROADMAP.md (VOT-3: 'Survey Thms 6-7'); the library's item is the case k = 1 (consensus), with explicit constant 2 n log n and probability at least 1 - 1/n. Theorem 6 is in the previous entry. Version: the published SIGACT News version could not be retrieved; the numbering of the HAL preprint matches the numbers the library cites. Page is the PDF page (printed p. 11). The theorem title is shown in brackets; the configuration is printed bold (\\mathbf{c}) and the reached configuration c' in plain italics. The survey does not state the base of log. Kept as printed: 'tha state'. As printed, the second bullet of Definition 3 updates one node per round, and the following paragraph calls this the asynchronous version."
+
+[[source]]
+items = ["voter:thm:hp25", "voter:thm:hp25-plain"]
+paper = "L. Becchetti, A. Clementi, E. Natale. Consensus dynamics: an overview"
+venue = "SIGACT News 51(1), 2020"
+version = "HAL preprint hal-02507613v1"
+result = "Theorem 8"
+page = 12
+url = "https://hal.science/hal-02507613v1"
+status = "transcribed by an AI agent from the PDF of the HAL preprint hal-02507613v1 (no LaTeX source available; text extracted with pdftotext and read against the rendered page); not yet checked by a person"
+statement = '''
+[Convergence time on general topologies]
+Let $G$ be any connected undirected graph. Starting from an arbitrary initial configuration $c$ on $G$, the \textsc{Voter} dynamics reaches consensus w.h.p. in $\mathcal{O}(n^3 \log n)$ rounds.
+'''
+context = '''
+[Footnote 9, p. 9:] According to the standard definition, we say that a sequence of events $\mathcal{E}_n$, $n = 1, 2, \ldots$ holds \emph{with high probability} if $\mathbf{P}(\mathcal{E}_n) = 1 - \mathcal{O}(1/n^{\lambda})$ for some positive constant $\lambda > 0$.
+[Section 3, p. 9:] The Voter Model, which for consistency we call here \textsc{Voter} dynamics, is arguably the simplest \emph{nontrivial} dynamics: at each round, every node copies tha state of a neighbor sampled uniformly at random.
+[Section 3, p. 10:] More formally, let $G(V,E)$ be a connected graph with node set $V$ (of cardinality $n$) and edge set $E$ (of cardinality $m$). Let $\Sigma$ be a palette of colors of size $n$. Let $d(u)$ be the number of neighbours of $u \in V$.
+\textbf{Definition 3} (\textsc{Voter} dynamics). The Voter Model $\{X_t\}_t$ on $G$ is the discrete time Markov process where the state space is the set of color functions $c : V \mapsto \Sigma$ and its time evolution is determined by the following elementary dynamics (denoted as \textsc{Voter} dynamics):
+\begin{itemize}
+\item Each node initially supports a color in $\Sigma$;
+\item In each round one node is selected uniformly at random and it adopts the color of a neighbour sampled uniformly at random.
+\end{itemize}
+The \emph{asynchronous} version of the \textsc{Voter} dynamics, in which at each round only one node chosen uniformly at random updates its state, has long been studied in statistical mechanics as a model for consensus formation in population of spinless individuals [KRBN10, Lig12, Ald13].
+The study of the synchronous version of the model, in which all nodes update their state, has been first considered in Distributed Computing in [HP01] as a proportionate agreement protocol. [...]
+As usual, when the system reaches a configuration in which every node is supporting the same color, we say that the system has reached \emph{Consensus}.
+[Section 3.1, p. 12, before the theorem:] More generally, by combining Theorem 6 with results on the \emph{meeting time} of random walks on general graphs [TW93], we obtain the following general bound on the convergence time of the \textsc{Voter} dynamics.
+[Theorem 6, p. 12:] Let $\tau$ be the first round such that the \textsc{Voter} dynamics reaches consensus and let $\tau'$ be the first round such that all the tokens of the CWR process are on the same node. A coupling between the \textsc{Voter} dynamics and the CWR process exists such that $\tau = \tau'$.
+'''
+notes = "Cited by PROVENANCE.md, ROADMAP.md (VOT-6) and the blueprint. The library formalizes it for the lazy voter on every connected graph (voter:thm:hp25) and for the plain voter on connected nonbipartite graphs (voter:thm:hp25-plain); see voter/FORMALIZATION_DIFFERENCES.md, Section 4.1. Version: the published SIGACT News version could not be retrieved; the numbering of the HAL preprint matches the numbers the library cites. Page is the PDF page (printed p. 11). The theorem title is shown in brackets. The survey does not state the base of log. Kept as printed: 'tha state', 'CWR'. As printed, the second bullet of Definition 3 updates one node per round, and the following paragraph calls this the asynchronous version; Theorem 8 does not say which version it refers to. The CWR process is Definition 5 (p. 11): each node initially holds one token, and in each round each node sends all its tokens to a neighbor chosen uniformly at random."
+
+# ---------------------------------------------------------------------------------------------
+# Berenbrink, Giakkoupis, Kermarrec, Mallmann-Trenn, ICALP 2016 (arXiv:1603.01895v2)
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+item = "voter:def:conductance"
+paper = "P. Berenbrink, G. Giakkoupis, A.-M. Kermarrec, F. Mallmann-Trenn. Bounds on the voter model in dynamic networks"
+venue = "ICALP 2016"
+version = "arXiv:1603.01895v2"
+result = "Section 2, definitions"
+page = 5
+url = "https://arxiv.org/abs/1603.01895v2"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v2 and compared with the PDF of v2; not yet checked by a person"
+statement = '''
+Let $G = (V,E)$.
+For a fixed set $S\subseteq V$ we define $cut(S,V\setminus S)$ to be the set of edges between the sets $S\subseteq V$ and $V\setminus S$ and let $\lambda_{u}$ be the number of neighbours of $u$ in $V\setminus S$. Let
+ $\operatorname{vol}(S)=\sum_{u\in S} d_u.$
+The \emph{conductance} of $G$ is defined as
+$$\phi=\phi(G)=\min \left\{ \tfrac{\sum_{u \in U} \lambda_{u}}{\operatorname{vol}(U)}\colon U\subset V \text{ with } 0 < \operatorname{vol}(U) \leq m\right\}.$$
+We note $1/n^2 \leq \phi \leq 1$.
+We denote by $v_t^{(i)}$ the set of nodes that have opinion $i$ after the first $t$ rounds and $t\geq0$. If we refer to the random variable we use $V_t^{(i)}$ instead.
+[...]
+Let $s_t$ denote the set having the smaller volume, i.e., $s_t = v^{(0)}_t$ if $\operatorname{vol}(v^{(0)}_t)\leq \operatorname{vol}(v^{(1)}_t)$, and $s_t = v^{(1)}_t$ otherwise. Note that we use $s_t, v^{(0)}_t$ and $v_t^{(1)}$ whenever the state at time $t$ is fixed, and $S_t, V^{(0)}_t$ and $V_t^{(1)}$ for the corresponding random variables.
+For $u\in v^{(0)}_t$, $\lambda_{u,t}$ is the number of neighbours of $u$ in $V\setminus v^1(t)$ and for $u\in v^{(1)}_t$, $\lambda_{u,t}$ is the number of neighbours of $u$ in $V\setminus v^{(0)}_t$; $d_u$ is the degree of $u$ (the degrees do not change over time).
+[...]
+We define $$\Psi(S_{t}) = \sqrt{\operatorname{vol}(S_t)}.$$
+'''
+context = '''
+[Section 1, p. 2:] We show that consensus is reached with constant probability after $\tau$ rounds, where $\tau$ is the first round such that the sum of conductances up to round $\tau$ is at least $m /d_{min}$, where $m$ is the number of edges. For static graphs the above bound simplifies to $O(m/(d_{min} \cdot \phi))$, where $d_{min}$ is the minimum degree.
+[Section 1.2, p. 3:] Our protocols work in synchronous steps. The consensus time $T$ is defined at the first time step at which all nodes have the same opinion.
+[...] In every synchronous time step every node chooses a neighbour u.a.r. and adopts its opinion with probability $1/2$.
+[Footnote 2:] The factor of $1/2$ ensures that the process converges on bipartite graphs.
+We assume that the dynamic graphs $\mathcal{G}=G_1, G_2,\ldots$ are generated by an adversary. We assume that each graph has $n$ nodes and the nodes are numbered from $1$ to $n$. The sequence of conductances $\phi_1,\phi_2,\ldots$ is given in advance, as well as a degree sequence $d_1,d_2,\ldots, d_n$.
+The adversary is now allowed to create every graph $G_i$ by redistributing the edges of the graph. The constraints are that each graph $G_i$ has to have conductance $\phi_i$ and node $j$ has to have degree $d_j$ (the degrees of the nodes do not change over time).
+Note that the sequence of the conductances is fixed and, hence, cannot be regarded as a random variable in the following.
+For the redistribution of the edges we assume that the adversary knows the distribution of all opinions during all previous rounds.
+[Section 2, p. 5, between the excerpts of the statement:] First we show Theorem 1.1 for $\kappa=2$ (two opinions), which we call $0$ and $1$ in the following. Then we generalise the result to an arbitrary number of opinions. We model the system with a Markov chain $M_{t\ge 0}=(V^{(0)}_t,V^{(1)}_t)_{t\ge 0}$.
+[Theorem 1.1, p. 3:] Assume $\kappa \leq n$ opinions are arbitrarily distributed over the nodes of $G_1$.
+'''
+notes = "The entry quotes the Section 2 definitions of volume, conductance, the sets v_t^(i) and s_t, lambda_{u,t} and the potential Psi. The item covers Voter.vol, conductance, discordant, minority, potential and dynamicLazy (voter/README.md: 'BGKM16 Section 2'); dynamicLazy is the dynamic graph model of Section 1.2, quoted in the context. Macros replaced: \\vol -> \\operatorname{vol}, \\de -> d, \\dmin -> d_{min}, \\pot{t} -> \\Psi(S_{t}). A commented-out alternative definition of the conductance (with |cut(U, V \\setminus U)| and vol(V)/2) is dropped. Kept as printed: 'v^1(t)' (elsewhere v^{(1)}_t). The number of edges m is defined in the introduction (quoted) and again in the proof of Lemma 2.1 ('We define $m$ as the number of edges.'). The minority opinion is called 0 in the proofs ('W.l.o.g. we assume that opinion $0$ is the minority opinion', proof of Lemma 2.1)."
+
+[[source]]
+item = "voter:lem:bgkm-21"
+paper = "P. Berenbrink, G. Giakkoupis, A.-M. Kermarrec, F. Mallmann-Trenn. Bounds on the voter model in dynamic networks"
+venue = "ICALP 2016"
+version = "arXiv:1603.01895v2"
+result = "Lemma 2.1"
+page = 5
+url = "https://arxiv.org/abs/1603.01895v2"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v2 and compared with the PDF of v2; not yet checked by a person"
+statement = '''
+Assume $s_t\not= \emptyset$ and $\kappa=2$.
+ Then
+    \begin{equation*}
+        \mathbf{E}[\Psi(S_{t+1}) \mid S_t=s_t] \leq \Psi(s_{t}) - \frac{\sum_{u \in V} \lambda_{u,t}\cdot d_u}{32\cdot (\Psi(s_{t}))^3}.
+    \end{equation*}
+'''
+context = '''
+[Section 1.2, p. 3:] Our protocols work in synchronous steps. The consensus time $T$ is defined at the first time step at which all nodes have the same opinion.
+[...] In every synchronous time step every node chooses a neighbour u.a.r. and adopts its opinion with probability $1/2$.
+[...] The constraints are that each graph $G_i$ has to have conductance $\phi_i$ and node $j$ has to have degree $d_j$ (the degrees of the nodes do not change over time).
+[Theorem 1.1, p. 3:] Assume $\kappa \leq n$ opinions are arbitrarily distributed over the nodes of $G_1$.
+[Section 2, p. 5:] Let $G = (V,E)$. [...] Let $\operatorname{vol}(S)=\sum_{u\in S} d_u.$ [...]
+We denote by $v_t^{(i)}$ the set of nodes that have opinion $i$ after the first $t$ rounds and $t\geq0$. If we refer to the random variable we use $V_t^{(i)}$ instead.
+First we show Theorem 1.1 for $\kappa=2$ (two opinions), which we call $0$ and $1$ in the following. [...]
+Let $s_t$ denote the set having the smaller volume, i.e., $s_t = v^{(0)}_t$ if $\operatorname{vol}(v^{(0)}_t)\leq \operatorname{vol}(v^{(1)}_t)$, and $s_t = v^{(1)}_t$ otherwise. Note that we use $s_t, v^{(0)}_t$ and $v_t^{(1)}$ whenever the state at time $t$ is fixed, and $S_t, V^{(0)}_t$ and $V_t^{(1)}$ for the corresponding random variables.
+For $u\in v^{(0)}_t$, $\lambda_{u,t}$ is the number of neighbours of $u$ in $V\setminus v^1(t)$ and for $u\in v^{(1)}_t$, $\lambda_{u,t}$ is the number of neighbours of $u$ in $V\setminus v^{(0)}_t$; $d_u$ is the degree of $u$ (the degrees do not change over time).
+[...] We define $$\Psi(S_{t}) = \sqrt{\operatorname{vol}(S_t)}.$$
+'''
+notes = "Macros replaced: \\Exp -> \\mathbf{E}, \\pot{t+1} -> \\Psi(S_{t+1}), \\potfixed{t} -> \\Psi(s_{t}), \\de -> d, \\vol -> \\operatorname{vol}. The equation label and a LaTeX comment inside the display are dropped. Kept as printed: the sum over all u in V in the statement (the last line of the proof, p. 6, has the sum over u in v^{(0)}, the minority side; see voter/FORMALIZATION_DIFFERENCES.md, Section 5.1), and 'v^1(t)' in the definition of lambda_{u,t}. The conductance form formalized by Voter.potential_drift_conductance is inequality (4) in the proof of Lemma 2.2 (next entry)."
+
+[[source]]
+item = "voter:lem:bgkm-21"
+paper = "P. Berenbrink, G. Giakkoupis, A.-M. Kermarrec, F. Mallmann-Trenn. Bounds on the voter model in dynamic networks"
+venue = "ICALP 2016"
+version = "arXiv:1603.01895v2"
+result = "Inequality (4) in the proof of Lemma 2.2"
+page = 7
+url = "https://arxiv.org/abs/1603.01895v2"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v2 and compared with the PDF of v2; not yet checked by a person"
+statement = '''
+From the definition of $\Psi(s_{t})$ and $\phi_t$ it follows for all $t$ that
+$\Psi(s_{t})^2=\sum_{u \in v^{(0)}} d_u=\mbox{vol$(v^{(0)})$}$ and
+$\phi_t\le \sum_{u \in v^{(0)}}\lambda_{u,t}/\mbox{vol$(v^{(0)})$}$.
+Hence,
+$ \Psi(s_{t})^2 \cdot \phi_t\cdot d_{min}\leq \sum_{u \in v^{(0)}}\lambda_{u,t}\cdot d_u. $
+Together with
+Lemma 2.1 we derive for $s_t\not= \emptyset$
+\begin{equation*}
+        \mathbf{E}[\Psi(S_{t+1}) \mid S_t = s_t ] \leq
+        \Psi(s_{t}) - \frac{\sum_{u \in V} \lambda_{u,t}\cdot d_u}{32\cdot(\Psi(s_{t}))^3}
+        \leq \Psi(s_{t}) - \frac{d_{min}\cdot \phi_t}{32\cdot \Psi(s_{t})}. \qquad (4)
+\end{equation*}
+'''
+context = '''
+[Section 1, p. 2:] [...] $m$ is the number of edges. For static graphs the above bound simplifies to $O(m/(d_{min} \cdot \phi))$, where $d_{min}$ is the minimum degree.
+[Section 1.2, p. 3:] Our protocols work in synchronous steps. [...] In every synchronous time step every node chooses a neighbour u.a.r. and adopts its opinion with probability $1/2$.
+[...] The constraints are that each graph $G_i$ has to have conductance $\phi_i$ and node $j$ has to have degree $d_j$ (the degrees of the nodes do not change over time).
+[Theorem 1.1, p. 3:] Let $\phi_t$ be a lower bound on the conductance at time step $t$.
+[Section 2, p. 5:] For a fixed set $S\subseteq V$ we define $cut(S,V\setminus S)$ to be the set of edges between the sets $S\subseteq V$ and $V\setminus S$ and let $\lambda_{u}$ be the number of neighbours of $u$ in $V\setminus S$. Let $\operatorname{vol}(S)=\sum_{u\in S} d_u.$
+The \emph{conductance} of $G$ is defined as
+$$\phi=\phi(G)=\min \left\{ \tfrac{\sum_{u \in U} \lambda_{u}}{\operatorname{vol}(U)}\colon U\subset V \text{ with } 0 < \operatorname{vol}(U) \leq m\right\}.$$
+[...] We denote by $v_t^{(i)}$ the set of nodes that have opinion $i$ after the first $t$ rounds and $t\geq0$. If we refer to the random variable we use $V_t^{(i)}$ instead.
+[...] Let $s_t$ denote the set having the smaller volume, i.e., $s_t = v^{(0)}_t$ if $\operatorname{vol}(v^{(0)}_t)\leq \operatorname{vol}(v^{(1)}_t)$, and $s_t = v^{(1)}_t$ otherwise. [...]
+For $u\in v^{(0)}_t$, $\lambda_{u,t}$ is the number of neighbours of $u$ in $V\setminus v^1(t)$ and for $u\in v^{(1)}_t$, $\lambda_{u,t}$ is the number of neighbours of $u$ in $V\setminus v^{(0)}_t$; $d_u$ is the degree of $u$ (the degrees do not change over time).
+[...] We define $$\Psi(S_{t}) = \sqrt{\operatorname{vol}(S_t)}.$$
+[Proof of Lemma 2.1, p. 5:] W.l.o.g. we assume that opinion $0$ is the minority opinion, i.e. $0 < \operatorname{vol}(V^{(0)}_t)\leq \operatorname{vol}(V^{(1)}_t)$.
+[Lemma 2.1, p. 5:] Assume $s_t\not= \emptyset$ and $\kappa=2$. Then
+$$\mathbf{E}[\Psi(S_{t+1}) \mid S_t=s_t] \leq \Psi(s_{t}) - \frac{\sum_{u \in V} \lambda_{u,t}\cdot d_u}{32\cdot (\Psi(s_{t}))^3}.$$
+'''
+notes = "This is the first part of the proof of Lemma 2.2, not a numbered result; the item's Voter.potential_drift_conductance is 'the display at the start of the proof of Lemma 2.2' (voter/FORMALIZATION_DIFFERENCES.md, Section 5.1). Macros replaced: \\Exp -> \\mathbf{E}, \\pot{t+1} -> \\Psi(S_{t+1}), \\potfixed{t} -> \\Psi(s_{t}), \\de -> d, \\dmin -> d_{min}, \\vol -> \\operatorname{vol}; \\ref{lem:technical-st} rendered as 2.1 and the numbered equation as an unnumbered display ending in (4), as the PDF prints it. LaTeX comments dropped. Kept as printed: the middle term with the sum over all u in V."
+
+[[source]]
+item = "voter:lem:indep"
+paper = "P. Berenbrink, G. Giakkoupis, A.-M. Kermarrec, F. Mallmann-Trenn. Bounds on the voter model in dynamic networks"
+venue = "ICALP 2016"
+version = "arXiv:1603.01895v2"
+result = "Lemma A.1"
+page = 20
+url = "https://arxiv.org/abs/1603.01895v2"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v2 and compared with the PDF of v2; not yet checked by a person"
+statement = '''
+Let $X_i$ and $Y_i$ be the random variables defined in the proof of Lemma 2.1.
+Let $f(\cdot)$ be a concave and continuous function.
+We have \\$E\left[f\left(\sum_i X_i\right)\right]\leq E\left[f\left(\sum_i Y_i\right)\right]. $
+'''
+context = '''
+[Section 1.2, p. 3:] In every synchronous time step every node chooses a neighbour u.a.r. and adopts its opinion with probability $1/2$.
+[Section 2, p. 5:] We denote by $v_t^{(i)}$ the set of nodes that have opinion $i$ after the first $t$ rounds and $t\geq0$. If we refer to the random variable we use $V_t^{(i)}$ instead. [...]
+For $u\in v^{(0)}_t$, $\lambda_{u,t}$ is the number of neighbours of $u$ in $V\setminus v^1(t)$ and for $u\in v^{(1)}_t$, $\lambda_{u,t}$ is the number of neighbours of $u$ in $V\setminus v^{(0)}_t$; $d_u$ is the degree of $u$ (the degrees do not change over time).
+[Proof of Lemma 2.1, pp. 5-6:] W.l.o.g. we assume that opinion $0$ is the minority opinion, i.e. $0 < \operatorname{vol}(V^{(0)}_t)\leq \operatorname{vol}(V^{(1)}_t)$. To simplify the notation we omit the index $t$ in this proof and write $v^{(0)}$ instead of $v_t{(0)}$, $v^{(1)}$ for $V\setminus v^{(0)}_t$, and $\lambda_u$ instead of $\lambda_{u,t}$. [...]
+Now we define
+$$
+  X_u=\left\{\begin{array}{ll} d_u & w.p. \ \frac{\lambda_u}{2\cdot d_u}\ if\ u\in v^{(1)}\\
+-d_u & w.p.\ \frac{\lambda_u}{2\cdot d_u}\ if\ u\in v^{(0)}\\
+         0 & otherwise\end{array}
+\right.
+$$
+and $\Delta=\sum_{u\in V}X_u$.
+Note that we have $\Delta=\operatorname{vol}(V^{(0)}_{t+1}) - \operatorname{vol}(v^{(0)}) $ [...]
+Instead, we define a family of random variables which is closely related to $X_u$.
+$$
+     Y_u=\left\{\begin{array}{ll} \lambda_u & w.p.\ \tfrac{1}{2}\quad if\ u\in v^{(1)} \\
+-d_u & w.p.\ \tfrac{\lambda_u}{2\cdot d_u}\ \ if\ u\in v^{(0)}\\
+  0 & otherwise\end{array}\right.
+$$
+Similarly, we define $\Delta'= \sum_{u\in V} Y(u) $.
+'''
+notes = "The blueprint item also contains generic facts on independent coordinates (resampling one coordinate, additivity of centred second and third moments); only the replacement step is attributed to Lemma A.1. The third-moment identity used in the proof of Lemma 2.1 is Lemma A.2 of the paper, which the library does not cite. Macros replaced: \\de -> d, \\vol -> \\operatorname{vol}; \\ref{lem:technical-st} rendered as 2.1 (the PDF prints 'Lemma 2.1'). A commented-out first line of the lemma ('Let X_1, ..., X_k and Y_1, ..., Y_k be a sets of independent variables.') is dropped; the printed lemma does not state independence. Kept as printed: 'v_t{(0)}', 'Y(u)', plain E in the lemma (bold E elsewhere), and the '\\\\' line break before the inequality. The horizontal spacing \\mspace{37mu} and \\mspace{10mu} in the cases of Y_u is replaced by \\quad and a space. The remaining text of the cases (w.p., if, otherwise) is in math mode in the source, as printed in the PDF."
+
+[[source]]
+items = ["voter:thm:bgkm-many", "voter:thm:bgkm-min"]
+paper = "P. Berenbrink, G. Giakkoupis, A.-M. Kermarrec, F. Mallmann-Trenn. Bounds on the voter model in dynamic networks"
+venue = "ICALP 2016"
+version = "arXiv:1603.01895v2"
+result = "Theorem 1.1"
+page = 3
+url = "https://arxiv.org/abs/1603.01895v2"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v2 and compared with the PDF of v2; not yet checked by a person"
+statement = '''
+[upper bound]
+Consider the Standard Voter model and in the dynamic graph model. Assume
+$\kappa \leq n$ opinions are arbitrarily distributed over the nodes of $G_1$.
+Let $\phi_t$ be a lower bound on the conductance at time step $t$.
+Let $b>0$ be a suitable chosen constant.
+Then, with a probability of $1/2$ we
+have that $T\le \min\{\tau,\tau'\}$, where
+\begin{enumerate}[(i)]
+\item $\tau$ is the first round so that
+$\sum_{t=1}^\tau \phi_t \geq b \cdot m/d_{min}$. \emph{(part 1)}
+\item $\tau'$ is the first round so that $\sum_{t=1}^{\tau'} \phi_t^2 \geq b \cdot n \log n.$ \phantom{2}\emph{(part 2)}
+\end{enumerate}
+For static graphs ($G_{i+1}=G_i$ for all $i$), we have $T\leq \min \{m/(d_{min} \cdot \phi), n\log n/\phi^2\}$.
+'''
+context = '''
+[Section 1, p. 2:] We show that consensus is reached with constant probability after $\tau$ rounds, where $\tau$ is the first round such that the sum of conductances up to round $\tau$ is at least $m /d_{min}$, where $m$ is the number of edges. For static graphs the above bound simplifies to $O(m/(d_{min} \cdot \phi))$, where $d_{min}$ is the minimum degree.
+[Section 1.2, p. 3:] Our protocols work in synchronous steps. The consensus time $T$ is defined at the first time step at which all nodes have the same opinion.
+[...] In every synchronous time step every node chooses a neighbour u.a.r. and adopts its opinion with probability $1/2$.
+[Footnote 2:] The factor of $1/2$ ensures that the process converges on bipartite graphs.
+We assume that the dynamic graphs $\mathcal{G}=G_1, G_2,\ldots$ are generated by an adversary. We assume that each graph has $n$ nodes and the nodes are numbered from $1$ to $n$. The sequence of conductances $\phi_1,\phi_2,\ldots$ is given in advance, as well as a degree sequence $d_1,d_2,\ldots, d_n$.
+The adversary is now allowed to create every graph $G_i$ by redistributing the edges of the graph. The constraints are that each graph $G_i$ has to have conductance $\phi_i$ and node $j$ has to have degree $d_j$ (the degrees of the nodes do not change over time).
+Note that the sequence of the conductances is fixed and, hence, cannot be regarded as a random variable in the following.
+For the redistribution of the edges we assume that the adversary knows the distribution of all opinions during all previous rounds.
+[Section 2, p. 5:] Let $G = (V,E)$.
+For a fixed set $S\subseteq V$ we define $cut(S,V\setminus S)$ to be the set of edges between the sets $S\subseteq V$ and $V\setminus S$ and let $\lambda_{u}$ be the number of neighbours of $u$ in $V\setminus S$. Let $\operatorname{vol}(S)=\sum_{u\in S} d_u.$
+The \emph{conductance} of $G$ is defined as
+$$\phi=\phi(G)=\min \left\{ \tfrac{\sum_{u \in U} \lambda_{u}}{\operatorname{vol}(U)}\colon U\subset V \text{ with } 0 < \operatorname{vol}(U) \leq m\right\}.$$
+'''
+notes = "The whole theorem is quoted: voter:thm:bgkm-many formalizes part (i) for any number of opinions on static graphs (with Lemma 2.3, next entry), voter:thm:bgkm-min both parts together. The same statement is quoted, without the theorem title, in the entries of voter:thm:bgkm-two and voter:thm:bgkm-sq in verification/sources.toml. The optional theorem title is shown in brackets. Macros replaced: \\dmin -> d_{min}. LaTeX comments inside the statement dropped ('%generation' after 'dynamic graph', and a commented-out line on tau = infinity). The paper does not state the base of log. Same numbering in v1."
+
+[[source]]
+item = "voter:thm:bgkm-many"
+paper = "P. Berenbrink, G. Giakkoupis, A.-M. Kermarrec, F. Mallmann-Trenn. Bounds on the voter model in dynamic networks"
+venue = "ICALP 2016"
+version = "arXiv:1603.01895v2"
+result = "Lemma 2.3"
+page = 8
+url = "https://arxiv.org/abs/1603.01895v2"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v2 and compared with the PDF of v2; not yet checked by a person"
+statement = '''
+Fix a phase $t$ and assume $c=129$ and $\ell_t > 1$. The expected number of phases before the number of opinions drops to $5/6\cdot \ell_t$ is bounded by
+$6c \cdot \operatorname{vol}(V)/(\ell_t\cdot d_{min})$.
+'''
+context = '''
+[Section 1, p. 2:] [...] $d_{min}$ is the minimum degree.
+[Section 1.2, p. 3:] Our protocols work in synchronous steps. The consensus time $T$ is defined at the first time step at which all nodes have the same opinion.
+[...] In every synchronous time step every node chooses a neighbour u.a.r. and adopts its opinion with probability $1/2$.
+[Theorem 1.1, p. 3:] Assume $\kappa \leq n$ opinions are arbitrarily distributed over the nodes of $G_1$. Let $\phi_t$ be a lower bound on the conductance at time step $t$. [...]
+(i) $\tau$ is the first round so that $\sum_{t=1}^\tau \phi_t \geq b \cdot m/d_{min}$.
+[Section 2, p. 5:] Let $\operatorname{vol}(S)=\sum_{u\in S} d_u.$
+[Proof of Part 1 of Theorem 1.1, p. 8:] We divide the $\tau$ rounds into phases. Phase $i$ starts at time $\tau_i=\min \{ t: \sum_{j=1}^t \phi_j \geq 2i \} $ for $i\geq 0$ and ends at $\tau_{i+1}-1$. Since $\phi_j \leq 1$ for all $j\geq 0$ we have $\tau_0 < \tau_1 < \dots$ and $\sum_{j=\tau_i}^{\tau_{i+1}} \phi_j \geq 1$ for $i\geq 0$. Let $\ell_t$ be the number of distinct opinions at the beginning of phase $t$. Hence, $\ell_0=\kappa$.
+We show in Lemma 2.3 below that the expected number of phases before the number of opinions drops by a factor of $5/6$ is bounded by $6c \cdot \operatorname{vol}(V)/(\ell_t\cdot d_{min})$.
+'''
+notes = "Macros replaced: \\vol -> \\operatorname{vol}, \\dmin -> d_{min}; \\ref{fraction} rendered as 2.3. The lemma follows the proof of Part 1 of Theorem 1.1, which defines the phases (quoted in the context). Its proof says 'with probability 1/2' after Markov's inequality; see voter/FORMALIZATION_DIFFERENCES.md, Section 5.1, for the probability 1/3 used in the formalization. Same numbering in v1."
+
+[[source]]
+item = "voter:lem:bgkm-mul"
+paper = "P. Berenbrink, G. Giakkoupis, A.-M. Kermarrec, F. Mallmann-Trenn. Bounds on the voter model in dynamic networks"
+venue = "ICALP 2016"
+version = "arXiv:1603.01895v2"
+result = "Proof of Lemma 2.4"
+page = 8
+url = "https://arxiv.org/abs/1603.01895v2"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v2 and compared with the PDF of v2; not yet checked by a person"
+statement = '''
+Hence, for $s_t\not=\emptyset $ we have
+$$\mathbf{E}[\Psi(S_{t+1}) -\Psi(s_{t}) \mid S_t=s_t] \leq - \frac{ \Psi(s_{t}) \cdot(\phi_t)^2}{32n}.$$
+Note that $\mathbf{E}[\Psi(S_{t+1}) \mid S_t=\emptyset ] = 0=(1- \frac{ (\phi_t)^2}{32n})\cdot \mathbf{E}[\Psi(\emptyset)].$ Hence, for all $t\geq 1$ we get $$\mathbf{E}[\Psi(S_{t+1})]=\mathbf{E}[\mathbf{E}[\Psi(S_{t+1}) \mid S_t=s_t ]] \leq \left(1- \frac{ (\phi_t)^2}{32n}\right)\cdot E[\Psi(s_{t})].$$
+[...]
+By definition of $\tau'$, and from the observation $\Psi(S_{0})\leq n$ we get that $\mathbf{E}[\Psi(S_{\tau'})]\leq n^{-2}.$
+[...]
+where we used that $\min \{\Psi(S) : S\subseteq V: S \not=\emptyset\} \geq 1$.
+'''
+context = '''
+[Section 1.2, p. 3:] Our protocols work in synchronous steps. The consensus time $T$ is defined at the first time step at which all nodes have the same opinion.
+[...] In every synchronous time step every node chooses a neighbour u.a.r. and adopts its opinion with probability $1/2$.
+[...] We assume that each graph has $n$ nodes and the nodes are numbered from $1$ to $n$. [...] The constraints are that each graph $G_i$ has to have conductance $\phi_i$ and node $j$ has to have degree $d_j$ (the degrees of the nodes do not change over time).
+[Theorem 1.1, p. 3:] Let $\phi_t$ be a lower bound on the conductance at time step $t$. [...]
+(ii) $\tau'$ is the first round so that $\sum_{t=1}^{\tau'} \phi_t^2 \geq b \cdot n \log n.$
+[Section 2, p. 5:] For a fixed set $S\subseteq V$ we define $cut(S,V\setminus S)$ to be the set of edges between the sets $S\subseteq V$ and $V\setminus S$ and let $\lambda_{u}$ be the number of neighbours of $u$ in $V\setminus S$. Let $\operatorname{vol}(S)=\sum_{u\in S} d_u.$
+The \emph{conductance} of $G$ is defined as
+$$\phi=\phi(G)=\min \left\{ \tfrac{\sum_{u \in U} \lambda_{u}}{\operatorname{vol}(U)}\colon U\subset V \text{ with } 0 < \operatorname{vol}(U) \leq m\right\}.$$
+[...] Let $s_t$ denote the set having the smaller volume, i.e., $s_t = v^{(0)}_t$ if $\operatorname{vol}(v^{(0)}_t)\leq \operatorname{vol}(v^{(1)}_t)$, and $s_t = v^{(1)}_t$ otherwise. Note that we use $s_t, v^{(0)}_t$ and $v_t^{(1)}$ whenever the state at time $t$ is fixed, and $S_t, V^{(0)}_t$ and $V_t^{(1)}$ for the corresponding random variables. [...]
+We define $$\Psi(S_{t}) = \sqrt{\operatorname{vol}(S_t)}.$$
+[Lemma 2.4, p. 8:] Assume $\kappa=2$. We have
+$\Pr\left(T \leq \tau' \right) \geq 1/n^2.$
+In particular, if the graph is static with conductance $\phi$, then $\Pr\big(T \leq \frac{96\cdot n\log n}{\phi^2 }\big) \geq 1-1/n^2$.
+'''
+notes = "The entry quotes the multiplicative potential drop and the bounds on Psi from the proof of Lemma 2.4. Not a numbered result: the item formalizes steps of the proof of Lemma 2.4 (voter/README.md: 'BGKM16 Lemma 2.4 (multiplicative drift)'). The first display is at the bottom of p. 8, the rest on p. 9. The first omission [...] is the recursion with the arithmetic-geometric mean step, the second the display (6). Macros replaced: \\Exp -> \\mathbf{E}, \\pot{t} -> \\Psi(S_{t}), \\potfixed{t} -> \\Psi(s_{t}), \\vol -> \\operatorname{vol}. Kept as printed: plain E in 'E[\\Psi(s_{t})]' (bold E elsewhere), and the printed statement of Lemma 2.4 with '\\geq 1/n^2' in its first claim (see voter/FORMALIZATION_DIFFERENCES.md, Section 5.5). The paper does not state the base of log. Same numbering in v1."
+
+# ---------------------------------------------------------------------------------------------
+# Kanade, Mallmann-Trenn, Sauerwald, SODA 2019 (arXiv:1611.02460v4)
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+items = ["voter:lem:sequential", "voter:thm:meeting-lazy"]
+paper = "V. Kanade, F. Mallmann-Trenn, T. Sauerwald. On coalescence time in graphs: When is coalescing as fast as meeting?"
+venue = "SODA 2019"
+version = "arXiv:1611.02460v4"
+result = "Proposition B.9"
+page = 70
+url = "https://arxiv.org/abs/1611.02460v4"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v4 and compared with the PDF of v4; not yet checked by a person"
+statement = '''
+For any graph $G=(V,E)$ and $u,v \in V$ we have
+\[
+ (\min_{u'\in V} t_{\operatorname{hit}}( \pi, u') + t_{\operatorname{hit}}(u,v)-t_{\operatorname{hit}}(\pi, v))/2 \leq t_{\operatorname{meet}}(u,v)
+\leq 2(\max_{u'\in V} t_{\operatorname{hit}}(\pi, u')+t_{\operatorname{hit}}(u,v)-t_{\operatorname{hit}}(\pi, v) ).
+\]
+Consequently, for any graph we have $t_{\operatorname{meet}} \leq 4t_{\operatorname{hit}}$ and for any vertex transitive graph $G$ we have $t_{\operatorname{hit}}/2 \leq t_{\operatorname{meet}}\leq 2t_{\operatorname{hit}}$.
+'''
+context = '''
+[Section 2, p. 12:] Throughout the paper, let $G = (V, E)$ denote an undirected, connected graph with $|V| = n$ and $|E| = m$. For a node $u \in V$, $\deg(u)$ denotes the degree of $u$ and $N(u)=\{ v \colon (u,v) \in E\}$ the \emph{neighborhood} of $u$. [...]
+Unless stated otherwise, all random walks are assumed to be discrete-time (indexed by natural numbers) and lazy, \textit{i.e.,} if $P$ denotes the $n \times n$ transition matrix of the random walk, $p_{u,u} = 1/2$, $p_{u,v} = 1/(2\deg(u))$ for any edge $(u,v) \in E$ and $p_{u,v}= 0$ otherwise. [...]
+By $\pi$ we denote the \emph{stationary distribution}, which satisfies $\pi(u)=\deg(u)/(2m)$ for all $u\in V$.
+[...] We write $T_{\operatorname{hit}}(u,v)$ to denote the first time-step $t \geq 0$ at which a random walk starting at $u$ hits $v$. In particular, $T_{\operatorname{hit}}(u,u)=0$.
+[p. 13:] The \emph{hitting time} $t_{\operatorname{hit}}(u,v)=\mathbb{E}\left[\,T_{\operatorname{hit}}(u,v)\,\right]$ of any pair of nodes $u,v\in V$ is the expected time required for a random walk starting at $u$ to hit $v$. Thus, $t_{\operatorname{hit}}(u,v)$ is the expectation of $T_{\operatorname{hit}}(u,v)$.
+The hitting time of a graph $t_{\operatorname{hit}}=\max_{u,v} t_{\operatorname{hit}}(u,v)$ is the maximum over all such pairs.
+For $A \subseteq V$, we use $t_{\operatorname{hit}}(u,A)$, to denote the expected time required for a random walk starting to $u$ to hit some node in the set $A$. Furthermore, we define $t_{\operatorname{hit}}(\pi,u)=\sum_{v\in V}t_{\operatorname{hit}}(v,u)\cdot \pi(v)$. [...]
+Let $t_{\operatorname{meet}}(u,v)$ denote the expected time when two random walks starting at $u$ and $v$ first arrive at the same node at the same time, [...]. Finally, let $t_{\operatorname{meet}} = \max_{u,v} t_{\operatorname{meet}}(u,v)$ denoted the worst-case expected meeting time.
+[Appendix B.2, p. 70:] In this section we prove the following proposition which can be seen as an analogous version of [AF02, Proposition 14.5] in discrete time.
+'''
+notes = "The library cites 'SODA 2019 (arXiv:1611.02460), Proposition B.9' (blueprint, voter/FORMALIZATION_DIFFERENCES.md, Section 4.1, docstring of Voter.iterate_outside_succ_le). The appendices are in the full version only (the source switches to 'of the full paper' in the extended abstract), so the numbering is that of the arXiv version; v4 (1 November 2018, the latest) is used, and its numbering matches; v1 to v3 were not checked. voter:lem:sequential formalizes the sequential random walks that the proof of Proposition B.9 introduces (p. 70: X_t moves w.p. 1/(2|N(X_t)|) to each neighbour when t is even and stays otherwise, Y_t likewise when t is odd), not the proposition itself. Macros replaced: \\thit -> t_{\\operatorname{hit}}, \\tmeet -> t_{\\operatorname{meet}}, \\hit -> T_{\\operatorname{hit}}, \\E{x} -> \\mathbb{E}\\left[\\,x\\,\\right], \\ifrac{a}{b} -> a/b, \\ie -> \\textit{i.e.,}. The citation key AF14 is printed as [AF02]. Kept as printed: 'starting to u', 'denoted the worst-case'."
+
+# ---------------------------------------------------------------------------------------------
+# Coppersmith, Tetali, Winkler 1993 (no open copy found)
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+items = ["voter:lem:sequential", "voter:thm:meeting-lazy", "voter:lem:plain-drift"]
+paper = "D. Coppersmith, P. Tetali, P. Winkler. Collisions among random walks on a graph"
+venue = "SIAM Journal on Discrete Mathematics 6(3):363-374, 1993"
+version = "journal version (DOI 10.1137/0406029)"
+result = "meeting-time potential"
+url = "https://doi.org/10.1137/0406029"
+status = "no open copy found; not transcribed"
+notes = "The library cites the potential for the meeting time of two random walks, with no numbered result. The blueprint and docstrings attribute to this paper the potential Z_{x,y} - E_pi T_y used for the meeting time ('Sequential meeting time from a potential (Coppersmith-Tetali-Winkler)', Voter.seqSurvival_mul_le; Voter.meetingPotential; Voter.plainPotential on the double cover)."
+
+# ---------------------------------------------------------------------------------------------
+# Neutral Wright-Fisher model (classical)
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+items = ["voter:thm:wright-fisher", "voter:def:wf-counts", "voter:thm:wf-counts"]
+paper = "Neutral Wright-Fisher model (classical; the library cites no specific work)"
+result = "classical neutral fixation (no work cited)"
+status = "the library cites no specific work ('Wright-Fisher fixation is classical', PROVENANCE.md; ROADMAP.md VOT-2: 'classical'); not transcribed"
+notes = "The library cites the count chain X_{t+1} ~ Bin(n, X_t/n) and neutral fixation (an allele with x of n copies fixes with probability x/n). voter/FORMALIZATION_DIFFERENCES.md, Section 3.1: 'The classical neutral Wright-Fisher model is the count chain X_{t+1} ~ Bin(n, X_t / n).' The library obtains fixation from the voter theorem through the Remark on p. 254 of Hassin and Peleg (entry above)."

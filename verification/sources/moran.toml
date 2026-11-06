@@ -1,0 +1,479 @@
+# Source references and original statements of the blueprint items of package `moran`.
+#
+# Same format as `verification/sources.toml` (see its header for the fields): one [[source]]
+# table per (item, numbered result of the source).
+#
+# The entries below were transcribed by an AI agent. None of the sources has a LaTeX source
+# except Antal, Redner and Sood (arXiv:q-bio/0601031v2): the other statements were transcribed
+# from the PDFs (Lieberman, Hauert and Nowak 2005: the published Supplementary Notes and an
+# author manuscript of the main text; Moran 1959: a scan of the journal pages; Broom and
+# Rychtar 2008: the copy of City Research Online), as said in each `status`. Each `notes`
+# lists the notation replaced and the printed oddities kept. No entry has been checked by a
+# person.
+
+# Lieberman, Hauert, Nowak, Nature 433 (2005).
+
+[[source]]
+items = ["moran:thm:isothermal", "moran:thm:neutral"]
+paper = "E. Lieberman, C. Hauert, M. A. Nowak. Evolutionary dynamics on graphs"
+venue = "Nature 433:312-316 (2005)"
+version = "published Supplementary Notes"
+result = "Theorem 2 (Isothermal Theorem)"
+page = 5
+url = "https://static-content.springer.com/esm/art%3A10.1038%2Fnature03204/MediaObjects/41586_2005_BFnature03204_MOESM1_ESM.pdf"
+status = "transcribed by an AI agent from the published Supplementary Notes PDF (no LaTeX source exists) and compared with the rendered pages of that PDF; the main-text excerpts of the context come from an author manuscript dated November 2004 (the published article is not openly accessible and was not compared); not yet checked by a person"
+statement = '''
+\textbf{Theorem 2.} \emph{(Isothermal Theorem.) $G$ is $\rho$-equivalent to the Moran process $\Leftrightarrow$ $G$ is isothermal, e.g., $W$ is doubly-stochastic.}
+'''
+context = '''
+[Main text, author manuscript, p. 2:] Consider a homogeneous population of size $N$. At each time step an individual is chosen for reproduction with a probability proportional to its fitness. The offspring replaces a randomly chosen individual. In this so-called Moran process (Fig 1a), the population size remains constant. Suppose all the resident individuals are identical and one new mutant is introduced. The new mutant has relative fitness $r$, as compared to the residents, whose fitness is 1. The fixation probability of the new mutant is
+\[ \rho_1 = \frac{1-1/r}{1-1/r^N}. \qquad (1) \]
+[Main text, author manuscript, pp. 2-3:] We introduce population structure as follows. Individuals are labelled $i = 1, 2, ...N$. The probability that individual $i$ places its offspring into position $j$ is given by $w_{ij}$. Thus the individuals can be thought of as occupying the vertices of a graph. The matrix $W = [w_{ij}]$ determines the structure of the graph (Fig 1b). If $w_{ij} = 0$ and $w_{ji} = 0$ then the vertices $i$ and $j$ are not connected. In each iteration, an individual $i$ is chosen for reproduction with a probability proportional to its fitness. The resulting offspring will occupy vertex $j$ with probability $w_{ij}$. Note that $W$ is a stochastic matrix, which means that all its rows sum to 1. We want to calculate the fixation probability $\rho$ of a randomly placed mutant.
+[Main text, author manuscript, p. 3:] There is an even wider class of graphs whose fixation probability is $\rho_1$. Let $T_i = \sum_j w_{ij}$ be the temperature of vertex $i$. A vertex is \emph{hot} if it is replaced often and \emph{cold} if it is replaced rarely. The `isothermal theorem' states that an evolutionary graph has fixation probability $\rho_1$ if and only if all vertices have the same temperature. Fig 2d gives an example of an isothermal graph where $W$ is not symmetric. Isothermality is equivalent to the requirement that $W$ is doubly stochastic, which means that each row and each column sums to one.
+[Supplementary Notes, p. 1:] Let $G$ be a graph whose adjacency matrix is given by $W$. Let $\mathbf{P}\subset\mathbf{V}$ be the set of vertices occupied by a mutant at some iteration. $\mathbf{P}$ represents a state of the typical Markov chain $E_G$ which arises on an evolutionary graph. Analogously, the states $P = \{1, 2, ...N\}$ are the typical states of the Moran process $M$.
+
+(For two types of individuals, the states of the explicit Markov chain $E_G$ are the $2^n$ possible arrangements of mutants on the graph. The transition probability between two states $\mathbf{P}$, $\mathbf{P}'$ is 0 unless $| \mathbf{P}\setminus \mathbf{P}' | = 1$ or vice versa. Otherwise, if $\mathbf{P}\setminus \mathbf{P}' = v^*$, then the probability of a transition from $\mathbf{P}$ to $\mathbf{P}'$ is
+\[ \frac{\sum_{v\in G\setminus \mathbf{P}} w(v,v^*)}{N + | \mathbf{P} | (r-1)} \]
+where the numerator is the sum of the weights of edges entering v* from vertices outside $\mathbf{P}$. Similarly, the probability of a transition from $\mathbf{P}'$ to $\mathbf{P}$ is
+\[ \frac{\sum_{v\in\mathbf{P}'} w(v,v^*)}{N + | \mathbf{P}' | (r-1)} \]
+In practice, the resulting matrix is large and not very sparse. Consequently, it can be difficult to work with directly, and we will not revisit it in the course of these notes.)
+[Supplementary Notes, p. 2:] \textbf{Definition 1.} A graph $G$ is $\rho$-equivalent to the Moran process if the cardinality map f($\mathbf{P}$) $= | \mathbf{P} |$ from the states of $E_G$ to the states of $M$ preserves the ultimate fixation probabilities of the states. Equivalently, we need
+\[ \rho(r, G, P, N) = \frac{1-1/r^P}{1-1/r^N} \]
+where $\rho(r, G, P, N)$ is the probability that a mutant of fitness r on a graph G, given any initial population of size P, eventually reaches the fixation population of N. (Note that this function is often undefined: on most graphs, different initial conditions with the same number of mutants have different fixation probabilities.)
+
+Note that eq (1) is obtained in the case $P = 1$.
+[Supplementary Notes, p. 2:] We now provide a necessary and sufficient condition for $\rho$-equivalence to the Moran process for the case of an arbitrary weighted digraph $G$. The isothermal theorem for stochastic matrices is obtained as a corollary. First we state the definition of a circulation.
+
+\textbf{Definition 2.} The matrix W defines a circulation $\leftrightarrow$
+\[ \forall i, \sum_j w_{ij} = \sum_j w_{ji} \]
+This is precisely the statement that the graph $G_W$ satisfies
+\[ \forall v \in G, w_o(v) = w_i(v) \]
+where $w_o$ and $w_i$ represent the sum of the weights entering and leaving v.
+[Supplementary Notes, p. 3:] \textbf{Theorem 1.} \emph{(Circulation Theorem.) The following are equivalent:
+(1) $G$ is a circulation.
+(2) $| \mathbf{P} |$ performs a random walk with forward bias $r$ and absorbing states at $\{0, N\}$.
+(3) $G$ is $\rho$-equivalent to the Moran process
+(4)
+\[ \rho(r, G, P, P') = \frac{1-1/r^P}{1-1/r^{P'}} \]
+where $\rho(r, G, P, P')$ is the probability that a mutant of fitness $r$ on a graph $G$ given any initial condition with $P$ mutants eventually reaches a mutant population of $P'$.}
+[Supplementary Notes, p. 5, just before Theorem 2:] The isothermal result is just a corollary.
+'''
+notes = "The Supplementary Notes are those of doi:10.1038/nature03204. No LaTeX source exists: the statement and the Supplementary Notes excerpts were transcribed from the published PDF into LaTeX (bold P and V as printed; 'e.g.' in Theorem 2, the lower-case n in '2^n' and the order 'entering and leaving' in Definition 2 kept as printed; the set difference, printed as a backslash, is written \\setminus). The published main text is behind the publisher's paywall, so the main-text excerpts are from an author manuscript dated November 2004 (43 pages, hosted on a course page of the Harvard Mathematics Department: https://legacy-www.math.harvard.edu/archive/153_fall_04/Additional_reading_material/evolutionary%20graph%20theory.pdf); they may differ from the published text, which was not compared. In that manuscript the temperature reads T_i = sum_j w_ij (as printed there), and its own copy of the Supplementary Notes states Theorem 2 as 'Given a stochastic matrix W, G_W is rho-equivalent to the Moran process <=> G_W is isothermal.' The Supplementary Notes do not state the case r = 1 separately (the formula of Definition 1 is 0/0 at r = 1); moran:thm:neutral is listed here because PROVENANCE.md attributes it to this paper together with Moran 1959 (see the entry for Eq. (3) of Moran 1959). For an undirected graph with weights w_ij = 1/(degree of i) on its edges, Broom and Rychtar (Proc. R. Soc. A 464, 2008, Theorem 3.1) show that a simple connected graph is isothermal if and only if it is regular."
+
+[[source]]
+item = "moran:def:moran"
+paper = "E. Lieberman, C. Hauert, M. A. Nowak. Evolutionary dynamics on graphs"
+venue = "Nature 433:312-316 (2005)"
+version = "author manuscript, November 2004"
+result = "Main text, model (Fig. 1b)"
+page = 2
+url = "https://legacy-www.math.harvard.edu/archive/153_fall_04/Additional_reading_material/evolutionary%20graph%20theory.pdf"
+status = "transcribed by an AI agent from the PDF of an author manuscript (no LaTeX source; the published article is not openly accessible and was not compared) and checked against the rendered pages; not yet checked by a person"
+statement = '''
+We introduce population structure as follows. Individuals are labelled $i = 1, 2, ...N$. The probability that individual $i$ places its offspring into position $j$ is given by $w_{ij}$. Thus the individuals can be thought of as occupying the vertices of a graph. The matrix $W = [w_{ij}]$ determines the structure of the graph (Fig 1b). If $w_{ij} = 0$ and $w_{ji} = 0$ then the vertices $i$ and $j$ are not connected. In each iteration, an individual $i$ is chosen for reproduction with a probability proportional to its fitness. The resulting offspring will occupy vertex $j$ with probability $w_{ij}$. Note that $W$ is a stochastic matrix, which means that all its rows sum to 1. We want to calculate the fixation probability $\rho$ of a randomly placed mutant.
+'''
+context = '''
+[p. 2:] Consider a homogeneous population of size $N$. At each time step an individual is chosen for reproduction with a probability proportional to its fitness. The offspring replaces a randomly chosen individual. In this so-called Moran process (Fig 1a), the population size remains constant. Suppose all the resident individuals are identical and one new mutant is introduced. The new mutant has relative fitness $r$, as compared to the residents, whose fitness is 1.
+[p. 11, legend of Figure 1:] Models of evolution. \textbf{a}, The Moran process describes stochastic evolution of a finite population of constant size. In each time step, an individual is chosen for reproduction with a probability proportional to its fitness; a second individual is chosen for death. The offspring of the first individual replaces the second. \textbf{b}, In the setting of evolutionary graph theory, individuals occupy the vertices of a graph. In each time step, an individual is selected with a probability proportional to its fitness; the weights of the outgoing edges determine the probabilities that the corresponding neighbor will be replaced by the resulting offspring. The process is described by a stochastic matrix $W$, where $w_{ij}$ denotes the probability that an offspring of individual $i$ will replace individual $j$. In a more general setting, at each time step, an edge $ij$ is selected with a probability proportional to its weight and the fitness of the individual at its tail. The Moran process is the special case of a complete graph with identical weights.
+[p. 11, legend of Figure 2:] Whenever the weights of edges are not shown, a weight of one is distributed evenly across all those edges emerging from a given vertex.
+'''
+notes = "The entry quotes the evolutionary graph model of the main text (Fig. 1b). The author manuscript (dated November 2004) is hosted on a course page of the Harvard Mathematics Department (see `url`); the published main text is not openly accessible and was not compared. The published main text (Nature 433:312-316) is behind the publisher's paywall; this manuscript (43 pages: main text, references, figure legends, figures, and two copies of a draft of the Supplementary Notes) may differ from it. The process on an undirected graph with w_ij = 1/(number of edges at i) for each edge ij is the setting of Broom and Rychtar 2008, Section 2 (see the entries for that paper)."
+
+[[source]]
+item = "moran:thm:moran"
+paper = "E. Lieberman, C. Hauert, M. A. Nowak. Evolutionary dynamics on graphs"
+venue = "Nature 433:312-316 (2005)"
+version = "author manuscript, November 2004"
+result = "Main text, Eq. (1)"
+page = 2
+url = "https://legacy-www.math.harvard.edu/archive/153_fall_04/Additional_reading_material/evolutionary%20graph%20theory.pdf"
+status = "transcribed by an AI agent from the PDF of an author manuscript (no LaTeX source; the published article is not openly accessible and was not compared) and checked against the rendered page; not yet checked by a person"
+statement = '''
+Consider a homogeneous population of size $N$. At each time step an individual is chosen for reproduction with a probability proportional to its fitness. The offspring replaces a randomly chosen individual. In this so-called Moran process (Fig 1a), the population size remains constant. Suppose all the resident individuals are identical and one new mutant is introduced. The new mutant has relative fitness $r$, as compared to the residents, whose fitness is 1. The fixation probability of the new mutant is
+\[ \rho_1 = \frac{1-1/r}{1-1/r^N}. \qquad (1) \]
+'''
+context = '''
+[p. 11, legend of Figure 1:] \textbf{a}, The Moran process describes stochastic evolution of a finite population of constant size. In each time step, an individual is chosen for reproduction with a probability proportional to its fitness; a second individual is chosen for death. The offspring of the first individual replaces the second. [...] The Moran process is the special case of a complete graph with identical weights.
+'''
+notes = "The author manuscript (dated November 2004) is hosted on a course page of the Harvard Mathematics Department (see `url`); the published main text is not openly accessible and was not compared. Eq. (1) is for one initial mutant; the Supplementary Notes (Definition 1, see the entry for moran:thm:isothermal) give the formula (1 - 1/r^P)/(1 - 1/r^N) for P initial mutants. The main text cites Moran 1958 (Proc. Camb. Philos. Soc. 54) for the Moran process. See also the entry for Eq. (2) of Moran 1959."
+
+[[source]]
+items = ["moran:thm:star-amplifier", "moran:thm:star-limit"]
+paper = "E. Lieberman, C. Hauert, M. A. Nowak. Evolutionary dynamics on graphs"
+venue = "Nature 433:312-316 (2005)"
+version = "author manuscript, November 2004"
+result = "Main text, the star (rho_2)"
+page = 4
+url = "https://legacy-www.math.harvard.edu/archive/153_fall_04/Additional_reading_material/evolutionary%20graph%20theory.pdf"
+status = "transcribed by an AI agent from the PDF of an author manuscript (no LaTeX source; the published article is not openly accessible and was not compared) and checked against the rendered page; not yet checked by a person"
+statement = '''
+The star structure (Fig 3a) consists of a center that is connected with each vertex on the periphery. All the peripheral vertices are connected only with the center. For large $N$, the fixation probability of a randomly placed mutant on the star is $\rho_2 = (1-1/r^2)/(1-1/r^{2N})$. Thus, any selective difference $r$ is amplified to $r^2$. The star acts as evolutionary amplifier, favoring advantageous mutants and inhibiting disadvantageous mutants. The balance tilts towards selection, and against drift.
+'''
+context = '''
+[p. 2:] Consider a homogeneous population of size $N$. At each time step an individual is chosen for reproduction with a probability proportional to its fitness. The offspring replaces a randomly chosen individual. In this so-called Moran process (Fig 1a), the population size remains constant. Suppose all the resident individuals are identical and one new mutant is introduced. The new mutant has relative fitness $r$, as compared to the residents, whose fitness is 1. The fixation probability of the new mutant is
+\[ \rho_1 = \frac{1-1/r}{1-1/r^N}. \qquad (1) \]
+[pp. 2-3:] We introduce population structure as follows. Individuals are labelled $i = 1, 2, ...N$. The probability that individual $i$ places its offspring into position $j$ is given by $w_{ij}$. [...] In each iteration, an individual $i$ is chosen for reproduction with a probability proportional to its fitness. The resulting offspring will occupy vertex $j$ with probability $w_{ij}$. Note that $W$ is a stochastic matrix, which means that all its rows sum to 1. We want to calculate the fixation probability $\rho$ of a randomly placed mutant.
+[p. 4:] Thus, it is easy to construct graphs that foster drift and suppress selection. Is it possible to suppress drift and amplify selection? Can we find structures where the fixation probability of advantageous mutants exceeds $\rho_1$?
+[p. 11, legend of Figure 2:] Whenever the weights of edges are not shown, a weight of one is distributed evenly across all those edges emerging from a given vertex.
+[p. 12, legend of Figure 3:] Selection amplifiers have remarkable symmetry properties. As the number of leaves and the number of vertices in each leaf grows large, these amplifiers dramatically increase the apparent fitness of advantageous mutants: a mutant with fitness $r$ on an amplifier of parameter $K$ will fare as well as a mutant of fitness $r^K$ in the Moran process. \textbf{a}, The star structure is a $K = 2$ amplifier.
+'''
+notes = "The entry quotes the paragraph of the main text on the star (rho_2). The author manuscript (dated November 2004) is hosted on a course page of the Harvard Mathematics Department (see `url`); the published main text is not openly accessible and was not compared. The paper gives no definition of 'amplifier' beyond the sentences quoted. N is the population size, so a star with N vertices has N - 1 leaves. Broom and Rychtar 2008 (Section 5) quote this formula as (1 - 1/r^2)/(1 - 1/r^{2n}) with n the number of leaves (see their entries)."
+
+# Moran, J. Austral. Math. Soc. 1 (1959), and Moran, Proc. Camb. Phil. Soc. 54 (1958).
+
+[[source]]
+items = ["moran:thm:moran", "moran:thm:selection-fixation"]
+paper = "P. A. P. Moran. The survival of a mutant gene under selection"
+venue = "J. Austral. Math. Soc. 1:121-126 (1959)"
+version = "journal version (scanned PDF)"
+result = "Eq. (2)"
+page = 3
+url = "https://doi.org/10.1017/S1446788700025155"
+status = "transcribed by an AI agent from the page images of the journal's scanned PDF (no LaTeX source; the OCR text layer was not used); not yet checked by a person"
+statement = '''
+The process is now identical with that of the gambler's ruin problem (Feller [2]) from which we see that if $\pi \neq \frac12$ the probability of $a$ not surviving is
+\[ (2) \qquad P_0 = \frac{\left(\frac{1-\pi}{\pi}\right)^{2n} - \left(\frac{1-\pi}{\pi}\right)^{k_0}}{\left(\frac{1-\pi}{\pi}\right)^{2n} - 1} = 1 - P_{2n} \]
+where $k_0$ is the initial value of $k$.
+'''
+context = '''
+[p. 121:] In the present note we give an exact solution starting from any initial number of mutants in a model in which the generations overlap. This model was introduced for other purposes in a previous paper (Moran [6]). We suppose we have a population of $2n$ haploid individuals in which $k_0$ are initially of the mutant type $a$ and the rest $A$. The development of the process takes place in continuous time and each individual has a life time with a negative exponential distribution whose parameter depends only on whether the individual is $a$ or $A$. The state of the system at any time $t$
+[p. 122:] is then defined by the number, $k$, of mutant individuals. When an individual dies it is immediately replaced by a new individual which is the offspring of the population immediately before the death. We can introduce selection into this model in two different ways.
+[p. 122, first method (selection through the lifetimes, with parameters $\lambda_1$ for $a$ and $\lambda_2$ for $A$), after the death probabilities:] The individual born as a replacement is chosen at random from the gametic output of the previously existing generation and so the probability that it is $a$ is $k(2n)^{-1}$, and that it is $A$ is $(2n-k)(2n)^{-1}$.
+
+We may now consider the discrete Markov chain embedded in this continuous process defined for those discrete instants of time at which a birth-death event occurs. This chain has $2n+1$ states defined by the integer $k (k = 0, 1, \cdots 2n)$ and transition probabilities $p_{ij}$ from state $i$ to state $j$ given by the formulae
+\begin{align*}
+p_{k,k-1} &= \lambda_2 k(2n-k)(2n)^{-1}\{\lambda_2 k + \lambda_1(2n-k)\}^{-1}.\\
+p_{k,k+1} &= \lambda_1 k(2n-k)(2n)^{-1}\{\lambda_2 k + \lambda_1(2n-k)\}^{-1}.\\
+p_{k,k} &= 1 - p_{k,k-1} - p_{k,k+1}.
+\end{align*}
+[p. 122:] In the second method of introducing selection we suppose that all individuals have the same negative exponential lifetime distribution so that when a death occurs the probability that it is the death of an $a$-individual is $k(2n)^{-1}$, and of an $A$ individual $(2n-k)(2n)^{-1}$. If the relative reproductive powers of the two kinds of gamete have the ratio $\mu_1\mu_2^{-1}$ the probability of the birth of an $a$-individual is $\mu_1 k\{\mu_1 k + \mu_2(2n-k)\}^{-1}$, and of an $A$ individual $\mu_2(2n-k)\{\mu_1 k + \mu_2(2n-k)\}^{-1}$. The transition probabilities of the embedded Markov chain are then
+\begin{align*}
+p_{k,k-1} &= \mu_2 k(2n-k)(2n)^{-1}\{\mu_1 k + \mu_2(2n-k)\}^{-1}.\\
+p_{k,k+1} &= \mu_1 k(2n-k)(2n)^{-1}\{\mu_1 k + \mu_2(2n-k)\}^{-1}.\\
+p_{k,k} &= 1 - p_{k,k-1} - p_{k,k+1}.
+\end{align*}
+[p. 123:] We notice that in both this and the former case the ratio $p_{k,k+1}(p_{k,k-1})^{-1}$ is constant, being $\mu_1\mu_2^{-1}$ and $\lambda_1\lambda_2^{-1}$ respectively. This suggests that we now embed another chain in this one by considering only those jumps of the process at which $k$ changes its value. Writing $\pi = \lambda_1(\lambda_1+\lambda_2)^{-1}$ or $\mu_1(\mu_1+\mu_2)^{-1}$ we thus get a process in which the transition probabilities are
+\[ (1) \qquad \begin{cases} p_{k,k-1} = 1-\pi. \\ p_{k,k} = 0. \\ p_{k,k+1} = \pi. \end{cases} \]
+If we now start the process with an initial value $k_0$ the probabilities of ultimate absorption $P_0$, $P_{2n}$, in the two absorbing states $(k = 0, 2n)$ will be the same as in the original continuous process. $P_0$ and $P_{2n}$ are in fact the probabilities of the mutant form not surviving, and surviving, respectively. When $\pi > \frac12$, $a$ has a selective advantage and when $\pi < \frac12$, a selective disadvantage.
+'''
+notes = "Scanned journal pages 121-126 are pages 1-6 of the PDF; `page` is the PDF page (journal p. 123). The PDF is freely accessible on Cambridge Core. Notation as printed: the population size is 2n, inverses are written (.)^{-1}. In the first method the mutant's lifetime density is printed as \\lambda_1^{-1} exp -(\\lambda_1^{-1} t) dt, so \\lambda_1 is a mean lifetime. With r = \\mu_1\\mu_2^{-1} (second method, selection on reproduction) one has (1 - \\pi)/\\pi = 1/r, so Eq. (2) gives P_{2n} = (1 - r^{-k_0})/(1 - r^{-2n}). The free access of this article was confirmed from outside any institutional network."
+
+[[source]]
+items = ["moran:thm:neutral", "moran:thm:moran-counts-fixation"]
+paper = "P. A. P. Moran. The survival of a mutant gene under selection"
+venue = "J. Austral. Math. Soc. 1:121-126 (1959)"
+version = "journal version (scanned PDF)"
+result = "Eq. (3)"
+page = 3
+url = "https://doi.org/10.1017/S1446788700025155"
+status = "transcribed by an AI agent from the page images of the journal's scanned PDF (no LaTeX source; the OCR text layer was not used); not yet checked by a person"
+statement = '''
+When $\pi = \frac12$ ($\lambda_1 = \lambda_2$ or $\mu_1 = \mu_2$) it is known that
+\[ (3) \qquad P_{2n} = k_0(2n)^{-1} = 1 - P_0. \]
+(3) also follows at once when we observe that $E(k_{t+1} - k_t | k_t) = 0$ and so
+\[ k_0 = E(k_t) = (2n)P_{2n}. \]
+'''
+context = '''
+[p. 121:] We suppose we have a population of $2n$ haploid individuals in which $k_0$ are initially of the mutant type $a$ and the rest $A$. The development of the process takes place in continuous time and each individual has a life time with a negative exponential distribution whose parameter depends only on whether the individual is $a$ or $A$. The state of the system at any time $t$
+[p. 122:] is then defined by the number, $k$, of mutant individuals. When an individual dies it is immediately replaced by a new individual which is the offspring of the population immediately before the death. We can introduce selection into this model in two different ways.
+[p. 122:] In the second method of introducing selection we suppose that all individuals have the same negative exponential lifetime distribution so that when a death occurs the probability that it is the death of an $a$-individual is $k(2n)^{-1}$, and of an $A$ individual $(2n-k)(2n)^{-1}$. If the relative reproductive powers of the two kinds of gamete have the ratio $\mu_1\mu_2^{-1}$ the probability of the birth of an $a$-individual is $\mu_1 k\{\mu_1 k + \mu_2(2n-k)\}^{-1}$, and of an $A$ individual $\mu_2(2n-k)\{\mu_1 k + \mu_2(2n-k)\}^{-1}$. The transition probabilities of the embedded Markov chain are then
+\begin{align*}
+p_{k,k-1} &= \mu_2 k(2n-k)(2n)^{-1}\{\mu_1 k + \mu_2(2n-k)\}^{-1}.\\
+p_{k,k+1} &= \mu_1 k(2n-k)(2n)^{-1}\{\mu_1 k + \mu_2(2n-k)\}^{-1}.\\
+p_{k,k} &= 1 - p_{k,k-1} - p_{k,k+1}.
+\end{align*}
+[p. 123:] Writing $\pi = \lambda_1(\lambda_1+\lambda_2)^{-1}$ or $\mu_1(\mu_1+\mu_2)^{-1}$ we thus get a process in which the transition probabilities are
+\[ (1) \qquad \begin{cases} p_{k,k-1} = 1-\pi. \\ p_{k,k} = 0. \\ p_{k,k+1} = \pi. \end{cases} \]
+If we now start the process with an initial value $k_0$ the probabilities of ultimate absorption $P_0$, $P_{2n}$, in the two absorbing states $(k = 0, 2n)$ will be the same as in the original continuous process. $P_0$ and $P_{2n}$ are in fact the probabilities of the mutant form not surviving, and surviving, respectively.
+'''
+notes = "Scanned journal pages 121-126 are pages 1-6 of the PDF; `page` is the PDF page (journal p. 123). Notation as printed: population size 2n, inverses written (.)^{-1}; \\lambda_1, \\lambda_2 are the lifetime parameters of the first method (selection through the lifetimes). With \\mu_1 = \\mu_2 the chain of the second method moves from k to k - 1 and to k + 1 with probability k(2n - k)(2n)^{-2} each, which is the neutral Moran chain. moran:thm:neutral (regular graphs) is listed here because PROVENANCE.md attributes it to Lieberman, Hauert, Nowak 2005 and Moran 1959; moran:thm:moran-counts-fixation is the k/n law for the count chains of Moran's model, which this equation states for Moran's chain."
+
+[[source]]
+items = ["moran:def:selection-counts", "moran:thm:selection-jump"]
+paper = "P. A. P. Moran. The survival of a mutant gene under selection"
+venue = "J. Austral. Math. Soc. 1:121-126 (1959)"
+version = "journal version (scanned PDF)"
+result = "pp. 122-123 and Eq. (1)"
+page = 2
+url = "https://doi.org/10.1017/S1446788700025155"
+status = "transcribed by an AI agent from the page images of the journal's scanned PDF (no LaTeX source; the OCR text layer was not used); not yet checked by a person"
+statement = '''
+In the second method of introducing selection we suppose that all individuals have the same negative exponential lifetime distribution so that when a death occurs the probability that it is the death of an $a$-individual is $k(2n)^{-1}$, and of an $A$ individual $(2n-k)(2n)^{-1}$. If the relative reproductive powers of the two kinds of gamete have the ratio $\mu_1\mu_2^{-1}$ the probability of the birth of an $a$-individual is $\mu_1 k\{\mu_1 k + \mu_2(2n-k)\}^{-1}$, and of an $A$ individual $\mu_2(2n-k)\{\mu_1 k + \mu_2(2n-k)\}^{-1}$. The transition probabilities of the embedded Markov chain are then
+\begin{align*}
+p_{k,k-1} &= \mu_2 k(2n-k)(2n)^{-1}\{\mu_1 k + \mu_2(2n-k)\}^{-1}.\\
+p_{k,k+1} &= \mu_1 k(2n-k)(2n)^{-1}\{\mu_1 k + \mu_2(2n-k)\}^{-1}.\\
+p_{k,k} &= 1 - p_{k,k-1} - p_{k,k+1}.
+\end{align*}
+We notice that in both this and the former case the ratio $p_{k,k+1}(p_{k,k-1})^{-1}$ is constant, being $\mu_1\mu_2^{-1}$ and $\lambda_1\lambda_2^{-1}$ respectively. This suggests that we now embed another chain in this one by considering only those jumps of the process at which $k$ changes its value. Writing $\pi = \lambda_1(\lambda_1+\lambda_2)^{-1}$ or $\mu_1(\mu_1+\mu_2)^{-1}$ we thus get a process in which the transition probabilities are
+\[ (1) \qquad \begin{cases} p_{k,k-1} = 1-\pi. \\ p_{k,k} = 0. \\ p_{k,k+1} = \pi. \end{cases} \]
+If we now start the process with an initial value $k_0$ the probabilities of ultimate absorption $P_0$, $P_{2n}$, in the two absorbing states $(k = 0, 2n)$ will be the same as in the original continuous process.
+'''
+context = '''
+[p. 121:] In the present note we give an exact solution starting from any initial number of mutants in a model in which the generations overlap. This model was introduced for other purposes in a previous paper (Moran [6]). We suppose we have a population of $2n$ haploid individuals in which $k_0$ are initially of the mutant type $a$ and the rest $A$. The development of the process takes place in continuous time and each individual has a life time with a negative exponential distribution whose parameter depends only on whether the individual is $a$ or $A$. The state of the system at any time $t$
+[p. 122:] is then defined by the number, $k$, of mutant individuals. When an individual dies it is immediately replaced by a new individual which is the offspring of the population immediately before the death. We can introduce selection into this model in two different ways.
+[p. 122, first method (selection through the lifetimes, with parameters $\lambda_1$ for $a$ and $\lambda_2$ for $A$):] We may now consider the discrete Markov chain embedded in this continuous process defined for those discrete instants of time at which a birth-death event occurs. This chain has $2n+1$ states defined by the integer $k (k = 0, 1, \cdots 2n)$ and transition probabilities $p_{ij}$ from state $i$ to state $j$ given by the formulae
+\begin{align*}
+p_{k,k-1} &= \lambda_2 k(2n-k)(2n)^{-1}\{\lambda_2 k + \lambda_1(2n-k)\}^{-1}.\\
+p_{k,k+1} &= \lambda_1 k(2n-k)(2n)^{-1}\{\lambda_2 k + \lambda_1(2n-k)\}^{-1}.\\
+p_{k,k} &= 1 - p_{k,k-1} - p_{k,k+1}.
+\end{align*}
+'''
+notes = "Pages 122-123 describe the second method of selection. Scanned journal pages 121-126 are pages 1-6 of the PDF; `page` is the PDF page (journal p. 122). Notation as printed (population size 2n, inverses written (.)^{-1}). The dying individual is drawn among all 2n individuals and the newborn's type from the whole population, so the newborn may replace its own parent's position; the chain (1) is the jump chain (only the jumps at which k changes). With r = \\mu_1\\mu_2^{-1}, \\pi = r/(1 + r)."
+
+[[source]]
+item = "moran:def:moran-counts"
+paper = "P. A. P. Moran. Random processes in genetics"
+venue = "Proc. Camb. Phil. Soc. 54:60-71 (1958)"
+result = "the model with overlapping generations (Moran model)"
+url = "https://doi.org/10.1017/S0305004100033193"
+status = "no open copy found; not transcribed"
+notes = "The article is offered only for purchase or institutional access on Cambridge Core; no author, repository or other open copy was found. Moran 1959 (J. Austral. Math. Soc. 1:121-126), which is openly accessible, recalls this model ('This model was introduced for other purposes in a previous paper (Moran [6])') and gives its embedded chain; with equal parameters it is the neutral chain with steps k(2n - k)(2n)^{-2} (see the entries for moran:def:selection-counts and Eq. (3) of Moran 1959)."
+
+# Antal, Redner, Sood, Phys. Rev. Lett. 96 (2006).
+
+[[source]]
+item = "moran:def:pull"
+paper = "T. Antal, S. Redner, V. Sood. Evolutionary dynamics on degree-heterogeneous graphs"
+venue = "Phys. Rev. Lett. 96:188104 (2006)"
+version = "arXiv:q-bio/0601031v2"
+result = "biased voter model (VM) and Eq. (1)"
+page = 1
+url = "https://arxiv.org/abs/q-bio/0601031v2"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v2 and compared with the PDF of v2; not yet checked by a person"
+statement = '''
+\texttt{Biased Voter Model (VM):} An individual dies with probability inversely proportional to its fitness, and is then replaced by the offspring of a randomly-chosen neighbor. Equivalently, death occurs randomly and replacement is proportional to the fitness of the donor. We implement the VM by updating a randomly-chosen genotype $\mathbf{0}$ with probability 1, while the fitter genotype $\mathbf{1}$ is updated with a probability $1-s$. Each individual in this death-first/birth-second process can equivalently be viewed as a voter that adopts the opinion of a randomly-selected neighbor [9, 10, 11].
+
+We first study the evolution in VM dynamics. We symbolically represent the state of the system by $\eta$. In an elemental time interval $\delta t$ we choose a random node $x$. If the genotype at this node at time $t$, denoted as $\eta^t(x)$, equals $\mathbf{0}$, then node $x$ is updated by choosing a random neighbor $y$ and setting $\eta^{(t+\delta t)}(x)=\eta^t(y)$ (Fig. 1). However if $\eta^t(x) = \mathbf{1}$, the VM update is implemented with probability $1-s$. This update rule can be written as
+\begin{equation}
+\mathbf{P}[\eta\to\eta_x]=
+\sum_y \frac{A_{x y}}{Nk_x}\Big\{[1-\eta(x)]\eta(y)
++(1-s)\eta(x)[1-\eta(y)]\Big\}, \qquad (1)
+\end{equation}
+where $\eta_x$ denotes the state obtained from $\eta$ by changing only the genotype at node $x$. The first term describes the update step for the case where $(\eta(x),\eta(y))= (\mathbf{0},\mathbf{1})$ and $x, y$ are connected. Each of the nearest neighbors $y$ of $x$ may be selected with probability $A_{xy}/k_x$. Here $A_{xy}$ is the adjacency matrix whose elements equal 1 if $xy$ are connected and zero otherwise. The second term in Eq. (1) is explained analogously.
+'''
+context = '''
+[p. 1:] At each update event, two individuals from a total population $N$ are chosen at random. One individual replicates while the other dies and is replaced by the newly-born offspring, so that $N$ remains constant. A selective advantage, or fitness, also exists in which each each individual may be a unit-fitness genotype $\mathbf{1}$ or genotype $\mathbf{0}$ with lower fitness $1-s$, with $0<s<1$. These fitnesses determine the replication or death rates of each individual.
+[p. 1:] We consider three evolutionary models, distinguished by the order in which a pair individuals replicate and die:
+[p. 1, after the definitions of LD and VM:] \texttt{Biased Invasion Process (IP):} In this birth-first/death-second process, a randomly-chosen individual replicates with probability proportional to its fitness, and its offspring then replaces an individual at a randomly-chosen neighboring node [4, 5, 8].
+[p. 1:] One genotype ultimately replacing all other genotypes in the population is termed fixation. An important, and easily checked fact is that these evolutionary models are equivalent on degree-regular graphs
+[p. 3:] Here a randomly-selected individual reproduces with probability proportional to its fitness; hence the transition probability is
+\begin{equation}
+\mathbf{P}[\eta\to\eta_x]=
+\sum_y \frac{A_{x y}}{Nk_y}\Big\{[1-\eta(x)]\eta(y)
++(1-s)\eta(x)[1-\eta(y)]\Big\}, \qquad (16)
+\end{equation}
+Notice an essential difference between VM and IP dynamics. In the VM the transition rate is proportional to the inverse degree $k_x$ of the node of the disappearing genotype [Eq. (1)], while in the IP the transition rate is proportional to the inverse degree $k_y$ of the node of the reproducing genotype [Eq. (16)].
+'''
+notes = "Macros replaced: {\\bf 0}, {\\bf 1}, {\\bf P} by \\mathbf{...}, {\\tt ...} by \\texttt{...}, \\eqref{...} by the equation numbers of the PDF, \\cite by the reference numbers of the PDF; equation numbers written as '(n)' after the display; '\\!' spacing removed. 'each each' and 'a pair individuals' as printed. v1 (January 2006) has different wording in the introduction and model definitions; v2 (11 May 2006) is the revised version; the journal version (Phys. Rev. Lett. 96, 188104) is not openly accessible and was not compared. The neutral case is s = 0."
+
+[[source]]
+items = ["moran:def:repro", "moran:thm:pushpull-invariance"]
+paper = "T. Antal, S. Redner, V. Sood. Evolutionary dynamics on degree-heterogeneous graphs"
+venue = "Phys. Rev. Lett. 96:188104 (2006)"
+version = "arXiv:q-bio/0601031v2"
+result = "Eq. (7) and the conserved quantities (pp. 2, 4)"
+page = 2
+url = "https://arxiv.org/abs/q-bio/0601031v2"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v2 and compared with the PDF of v2; not yet checked by a person"
+statement = '''
+For degree-heterogeneous graphs, the conserved quantity for neutral dynamics ($s=0$) is the average degree-weighted density $\omega_1$ [11, 12], where the degree-weighted moments are
+\begin{equation}
+  \omega_{n} = \frac{1}{N\mu_{n}} \sum_x k_x^n \eta(x) = \frac{1}{\mu_{n}} \sum_k k^n n_k \rho_k\,, \qquad (7)
+\end{equation}
+while the overall density $\rho$ of genotype $\mathbf{1}$ is no longer conserved.
+
+[p. 2, after Eq. (8):] Notice that $\omega$ is conserved in the absence of selection ($s=0$) a feature that ultimately stems from the update rate being inversely proportional to node degree [Eq. (1)].
+
+[p. 4:] In contrast to the VM, the conserved quantity in the unbiased IP is $\omega_{-1}$, the inverse degree-weighted frequency.
+'''
+context = '''
+[p. 1:] A selective advantage, or fitness, also exists in which each each individual may be a unit-fitness genotype $\mathbf{1}$ or genotype $\mathbf{0}$ with lower fitness $1-s$, with $0<s<1$.
+[p. 1, Eq. (1), VM transition probability:]
+\begin{equation}
+\mathbf{P}[\eta\to\eta_x]=
+\sum_y \frac{A_{x y}}{Nk_x}\Big\{[1-\eta(x)]\eta(y)
++(1-s)\eta(x)[1-\eta(y)]\Big\}, \qquad (1)
+\end{equation}
+where $\eta_x$ denotes the state obtained from $\eta$ by changing only the genotype at node $x$. [...] Here $A_{xy}$ is the adjacency matrix whose elements equal 1 if $xy$ are connected and zero otherwise.
+[p. 2:] For degree-heterogeneous graphs, the density $\rho_k$ of genotype $\mathbf{1}$ at nodes of degree $k$ increases by $1/N_k$ with probability $\mathbf{F}_k(\eta)$ and decreases by $1/N_k$ with probability $\mathbf{B}_k(\eta)$ in an elemental update
+[p. 2:] where the moments of the degree distribution are defined by $\mu_n \equiv N^{-1} \sum_x k_x^n = \sum_k k^n n_k$.
+[p. 2:] The existence of this new conservation law suggests that we study the time evolution of the expectation value of $\omega_1$ which we henceforth denote as $\omega$ for notational simplicity. Since $\omega(\eta_x) = \omega(\eta) + k_x(1-2\eta(x))/\mu_1 N$,
+\begin{align*}
+\partial_t\omega &= \frac{1}{\delta t}\sum_x
+\left[\omega(\eta_x) - \omega(\eta)\right]\mathbf{P}[\eta\to\eta_x]\\
+&= \frac{s}{\mu_1 N}\sum_{x,y}A_{x y} \eta(x)(1-\eta(y)) = s \alpha\,. \qquad (8)
+\end{align*}
+[p. 2, definition of $\alpha$ (Eq. (4)), stated for degree-regular graphs:] the total number $\alpha$ of active links between different genotypes
+\[ \alpha = \frac{1}{N \mu_1} \sum_{x,y} A_{xy} \eta(x) [1-\eta(y)] \,, \qquad (4) \]
+[p. 3, Eq. (16), IP transition probability:] Here a randomly-selected individual reproduces with probability proportional to its fitness; hence the transition probability is
+\begin{equation}
+\mathbf{P}[\eta\to\eta_x]=
+\sum_y \frac{A_{x y}}{Nk_y}\Big\{[1-\eta(x)]\eta(y)
++(1-s)\eta(x)[1-\eta(y)]\Big\}, \qquad (16)
+\end{equation}
+[p. 4:] from which low-order moments obey the equations of motion:
+\begin{align*}
+\partial_t \omega_{-1} &= \frac{s}{\mu_1 \mu_{-1}} \rho(1-\rho) \,,\\
+\partial_t \rho &= \rho - \omega + s \omega(1-\rho)\,, \\
+\partial_t \omega &= \frac{\mu_2}{\mu_1}[\rho-\omega_2 + s \omega_2(1-\rho)]\,.
+\end{align*}
+'''
+notes = "Macros replaced: {\\bf 0}, {\\bf 1}, {\\bf F}, {\\bf B}, {\\bf P} by \\mathbf{...}, \\eqref{...} by the equation numbers of the PDF, \\cite by the reference numbers of the PDF; equation numbers written as '(n)' after the display; '\\!' spacing removed. 'each each' as printed. N_k is the number of nodes of degree k and n_k = N_k/N their fraction (from \\delta\\rho_k = 1/N_k = 1/(N n_k) after Eq. (3)). The equations of motion on p. 4 are derived for degree-uncorrelated graphs (mean-field), from \\partial_t\\rho_k = (k/\\mu_1)[\\rho - \\rho_k + s\\rho_k(1-\\rho)]. 'Conserved' refers to the expectation value over the dynamics (the paper studies 'the time evolution of the expectation value of \\omega_1'). Same version remarks as for moran:def:pull."
+
+[[source]]
+item = "moran:thm:pushpull"
+paper = "T. Antal, S. Redner, V. Sood. Evolutionary dynamics on degree-heterogeneous graphs"
+venue = "Phys. Rev. Lett. 96:188104 (2006)"
+version = "arXiv:q-bio/0601031v2"
+result = "Eqs. (14), (15) (VM) and (19), (20) (IP)"
+page = 3
+url = "https://arxiv.org/abs/q-bio/0601031v2"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v2 and compared with the PDF of v2; not yet checked by a person"
+statement = '''
+The solution to $G\Phi=0$, with $G$ given by Eq. (12) is
+\begin{equation}
+\Phi(\omega) = \frac{1-e^{-sN_{\mathrm{eff}}\omega /(1-s/2)\,}}{1-e^{-sN_{\mathrm{eff}}/(1-s/2)}}\,. \qquad (14)
+\end{equation}
+[...] Eq. (14) also provides the fixation probability when the system starts with a single mutant at a node of degree $k$:
+\begin{equation}
+\Phi_1 =
+\begin{cases}
+k/(N\mu_{1}) & s\ll 1/N_{\mathrm{eff}}\,; \\
+sk\mu_1/\mu_2 & 1/N_{\mathrm{eff}} \ll s\ll 1\,.
+\end{cases} \qquad (15)
+\end{equation}
+
+[p. 4, IP:] from which, in close analogy with our previous analysis of the VM, the fixation probability is
+\begin{equation}
+\Phi(\omega_{-1}) = \frac{1-e^{-sN\omega_{-1}/(1-s/2)}}{1-e^{-sN/(1-s/2)}}. \qquad (19)
+\end{equation}
+From Eq. (19), the effective population size $N_{\mathrm{eff}}$ equals $N$, contrary to VM dynamics (Eq. (14)). More strikingly, the fixation probability of a single mutant acquires the non-trivial dependence of the degree $k$ of the occupied node (Fig. 4)
+\begin{equation}
+\Phi_1=
+\begin{cases}
+1/(Nk\mu_{-1}) & s\ll 1/N \,; \\
+s/(k\mu_{-1}) & 1/N \ll s \ll 1\,.
+\end{cases} \qquad (20)
+\end{equation}
+'''
+context = '''
+[p. 1:] A selective advantage, or fitness, also exists in which each each individual may be a unit-fitness genotype $\mathbf{1}$ or genotype $\mathbf{0}$ with lower fitness $1-s$, with $0<s<1$.
+[p. 1:] \texttt{Biased Voter Model (VM):} An individual dies with probability inversely proportional to its fitness, and is then replaced by the offspring of a randomly-chosen neighbor. [...] \texttt{Biased Invasion Process (IP):} In this birth-first/death-second process, a randomly-chosen individual replicates with probability proportional to its fitness, and its offspring then replaces an individual at a randomly-chosen neighboring node [4, 5, 8].
+[p. 2:] We seek the fixation probability $\Phi$ to the state consisting entirely of genotype $\mathbf{1}$ as a function of the initial densities of $\mathbf{1}$. This probability obeys the backward Kolmogorov equation $G\Phi=0$ [14], subject to the boundary conditions $\Phi(0)=0$ and $\Phi(1)=1$. In the diffusion approximation, the generator $G$ of this equation may be expressed as a sum of the changes in $\rho_k$ over all $k$,
+[p. 2:] where the moments of the degree distribution are defined by $\mu_n \equiv N^{-1} \sum_x k_x^n = \sum_k k^n n_k$.
+[p. 2:] For degree-heterogeneous graphs, the conserved quantity for neutral dynamics ($s=0$) is the average degree-weighted density $\omega_1$ [11, 12], where the degree-weighted moments are
+\[ \omega_{n} = \frac{1}{N\mu_{n}} \sum_x k_x^n \eta(x) = \frac{1}{\mu_{n}} \sum_k k^n n_k \rho_k\,, \qquad (7) \]
+[...] we study the time evolution of the expectation value of $\omega_1$ which we henceforth denote as $\omega$ for notational simplicity.
+[p. 2:] To evaluate the expression in Eq. (8) we make the mean-field assumption that the degrees of connected nodes in the graph are uncorrelated. Thus we replace the elements of the adjacency matrix by their expected values, $A_{x y} = k_x k_y/\mu_1 N$.
+[p. 2:] We now determine the fixation probability simply by replacing the $\rho_k$ by $\omega$ in the forward and backward rates $\mathbf{F}$ and $\mathbf{B}$ in Eqs. (9). In a similar vein, we replace the derivative $\partial_k$ by $(k n_k/\mu_1)\partial_{\omega}$ [11]. Then the generator in Eq. (3) becomes [...]
+\[ G = \omega(1-\omega)\left[ s\partial_{\omega} + \frac{\mu_2}{\mu_1^2 N}\left(1-\frac{s}{2}\right)\partial^2_{\omega}\right]\,. \qquad (12) \]
+[p. 3:] Apart from an overall constant for the time scale, this generator is identical to that of degree-regular graphs (5) if we replace $N$ by an effective population size $N_{\mathrm{eff}} \equiv N\mu_1^2/\mu_2$.
+[p. 4:] In contrast to the VM, the conserved quantity in the unbiased IP is $\omega_{-1}$, the inverse degree-weighted frequency. For the biased IP, $\omega_{-1}$ becomes the most slowly changing quantity (see Fig. 2). Hence we transform all derivatives with respect to $\rho_k$ in the generator to derivatives with respect to $\omega_{-1}$ to yield
+\[ G = \frac{\omega_{-1}(1-\omega_{-1})}{\mu_1 \mu_{-1}} \left[ s\frac{\partial}{\partial \omega_{-1}} + \frac{1}{N}(1-\frac{s}{2})\frac{\partial^2}{\partial \omega_{-1}^2}\right]\,, \qquad (18) \]
+'''
+notes = "Macros replaced: {\\bf 0}, {\\bf 1}, {\\bf F}, {\\bf B} by \\mathbf{...}, {\\tt ...} by \\texttt{...}, \\eqref{...} and \\ref{...} by the numbers of the PDF, \\cite by the reference numbers of the PDF; equation numbers written as '(n)' after the display; {\\rm eff} written \\mathrm{eff}. The '[...]' in the statement omits the paragraph on Fig. 3 between Eqs. (14) and (15). 'each each' as printed. The IP analysis uses the degree-uncorrelated rates of Eq. (17). For s = 0 the continuum solutions (14) and (19) reduce to \\Phi = \\omega_1 and \\Phi = \\omega_{-1}; the paper states the single-mutant values only in the regimes of Eqs. (15) and (20). Same version remarks as for moran:def:pull."
+
+# Broom, Rychtar, Proc. R. Soc. A 464 (2008).
+
+[[source]]
+items = ["moran:thm:star", "moran:thm:star-sum"]
+paper = "M. Broom, J. Rychtář. An analysis of the fixation probability of a mutant on special classes of non-directed graphs"
+venue = "Proc. R. Soc. A 464(2098):2609-2627 (2008)"
+version = "City Research Online eprint 979"
+result = "Section 5, unnumbered displays"
+page = 9
+url = "https://openaccess.city.ac.uk/id/eprint/979/"
+status = "transcribed by an AI agent from the PDF of the City Research Online copy (no LaTeX source; the publisher's version could not be retrieved by the transcribing agent and was not compared) and checked against the rendered pages; not yet checked by a person"
+statement = '''
+We can use (5.3) and (5.2) to inductively calculate $P^\emptyset_1, P^0_2, P^\emptyset_2, \ldots$ as a function of $P^0_1$ to get
+\[ P^0_i = P^0_1 \cdot \left(1 + \frac{n}{n+r}\sum_{j=1}^{i-1}\left(\frac{n+r}{r(nr+1)}\right)^j\right) \]
+Since $P^0_n = 1$, we get
+\[ P^0_1 = \frac{1}{1 + \frac{n}{n+r}\sum_{j=1}^{n-1}\left(\frac{n+r}{r(nr+1)}\right)^j} \]
+Since, by (5.1) and (5.2),
+\begin{align*}
+P^0_0 &= \frac{r}{r+n}P^0_1\\
+P^\emptyset_1 &= \frac{nr}{nr+1}P^0_1
+\end{align*}
+we get that the average fixation probability for a mutant is
+\[ \varrho = \frac{n \frac{nr}{nr+1} + \frac{r}{r+n}}{(n+1)\cdot\left(1 + \frac{n}{n+r}\sum_{j=1}^{n-1}\left(\frac{n+r}{r(nr+1)}\right)^j\right)} \]
+'''
+context = '''
+[Section 2, p. 2:] Let $G = (V,E)$ be a finite, undirected and connected graph, where $V$ is the set of vertices and $E$ is the set of edges. We assume that the graph is simple, i.e. no vertex is connected to itself. We study evolutionary dynamics as described in Lieberman et al. (2005), see also Nowak (2006). We treat the dynamics as a discrete time Markov chain. At the beginning, a vertex is chosen uniformly at random and replaced by a mutant with fitness $r$, all remaining vertices having fitness 1.
+
+If the mutants already inhabit precisely the vertices in the set $C \subset V$, then in the next step the mutants will inhabit vertices in either
+1) a set $C\cup\{j\}$, $j \notin C$, provided a) a vertex $i \in C$ was chosen for reproduction and b) it placed its offspring into vertex $j$; or
+2) a set $C\setminus\{i\}$, $i \in C$, provided a) a vertex $j \notin C$ was selected for reproduction and b) it placed its offspring into $i$; or
+[Section 2, p. 3:] 3) a set $C$, provided an individual from $C$ ($V\setminus C$) replaces another individual from $C$ ($V\setminus C$).
+
+The states $\emptyset$ and $V$ are the absorbing points of the dynamics. The transition probabilities of the above Markov chain are determined by a) the probability that a given vertex will be selected for reproduction and b) the probability that, once selected, it places its offspring into another given vertex.
+
+We set the fitness of an individual at vertex $i$ as $f_i \in \{1, r\}$, where $f_i = r$ means that the individual is a mutant. An individual at $i$ is selected for reproduction with probability
+\[ s_i = \frac{f_i}{\sum_{j\in V} f_j}. \qquad (2.1) \]
+The graph structure is represented by a matrix $W = (w_{ij})$, where $w_{ij}$ is the probability of replacing a vertex $j$ by a copy of a vertex $i$, provided vertex $i$ was selected for reproduction,
+\[ w_{ij} = \begin{cases} \frac{1}{e_i}, & \text{if $i$ and $j$ are connected,}\\ 0, & \text{otherwise,} \end{cases} \]
+where $e_i$ is the number of edges incident to the vertex $i$, so that edges have equal weights.
+
+Let $P_C$ denote the probability of mutant fixation given mutants currently inhabit a set $C$. The rules of the dynamics yield, see Lieberman et al. (2005),
+\[ P_C = \frac{\sum_{i\in C}\sum_{j\notin C}\left(r w_{ij} P_{C\cup\{j\}} + w_{ji} P_{C\setminus\{i\}}\right)}{r\sum_{i\in C}\sum_{j\notin C} w_{ij} + \sum_{i\in C}\sum_{j\notin C} w_{ji}} \qquad (2.2) \]
+with $P_\emptyset = 0$ and $P_V = 1$.
+[Section 5, p. 7:] In this section we consider a star - a non-directed graph with $N = n+1$ vertices labeled $0, 1, \ldots, n$ where the only edges are between vertices $0$ and $i$, $i = 1, \ldots, n$. The vertex $0$ is called a centre and the vertices $1, \ldots, n$ can be called the leaves. The automorphism group is isomorphic to the group of permutations on leaves and the state of the dynamics can be described by the number of mutants at the leaves and by an indicator of whether or not there is a mutant at the centre. See figure 3 for a scheme of the dynamics. Let $P^0_i$ ($P^\emptyset_i$, respectively) denote the probability of fixation given there are $i$ mutants at the leaves and there is a (there is no, respectively) mutant at the centre. The rules of the dynamics yield the following system of $2n+1$ equations.
+[Section 5, p. 8:]
+\begin{align*}
+P^0_i &= \frac{r}{r+n}P^0_{i+1} + \frac{n}{r+n}P^\emptyset_i \qquad (5.1)\\
+P^\emptyset_i &= \frac{nr}{nr+1}P^0_i + \frac{1}{nr+1}P^\emptyset_{i-1} \qquad (5.2)
+\end{align*}
+for $i = 0, \ldots, n$ with boundary conditions $P^\emptyset_0 = 0$ and $P^0_n = 1$. The equation (5.1) can be rearranged to
+\[ P^0_i = P^0_{i-1} + \frac{n}{r}(P^0_{i-1} - P^\emptyset_{i-1}) \qquad (5.3) \]
+'''
+notes = "The entry quotes the unnumbered displays of Section 5 for P^0_i, P^0_1, P^0_0, P^empty_1 and the average fixation probability. City Research Online labels the eprint 'unspecified version'. City Research Online labels this copy 'unspecified version'; its pages are marked 'Article submitted to Royal Society'. No LaTeX source; transcribed from the PDF into LaTeX. Pages are those of the City PDF, whose first page is a repository cover sheet: printed page p of the paper is PDF page p + 1 (the statement is on printed p. 8, Section 5 starts on printed p. 7, Section 2 on printed pp. 2-3; the bracketed pages in the context are printed pages). The publisher's site refused the plain download (HTTP 403), so this copy (possibly the submitted version) was not compared with the published one. As printed: '\\varrho' for the average, 'labeled', the range 'i = 0, ..., n' for (5.1) and (5.2) (which use P^0_{n+1} and P^\\emptyset_{-1} at the ends). P^0_i has the mutant at the centre: the boundary conditions and the text say so."
+
+[[source]]
+item = "moran:thm:star-limit"
+paper = "M. Broom, J. Rychtář. An analysis of the fixation probability of a mutant on special classes of non-directed graphs"
+venue = "Proc. R. Soc. A 464(2098):2609-2627 (2008)"
+version = "City Research Online eprint 979"
+result = "Section 5, display for large n"
+page = 9
+url = "https://openaccess.city.ac.uk/id/eprint/979/"
+status = "transcribed by an AI agent from the PDF of the City Research Online copy (no LaTeX source; the publisher's version could not be retrieved by the transcribing agent and was not compared) and checked against the rendered pages; not yet checked by a person"
+statement = '''
+Notice that for large $n$ we get
+\[ \varrho \approx \frac{1}{1 + \sum_{j=1}^{n-1}\frac{1}{r^{2j}}} = \frac{1-\frac{1}{r^2}}{1-\frac{1}{r^{2n}}} \]
+which means that we are recovering the formula (1.2) from Lieberman \emph{et al.} (2005).
+'''
+context = '''
+[Section 1, p. 2:] In homogeneous populations the probability of fixation in a population with $N$ individuals (and so $N$ vertices) is given by the Moran probability
+\[ P_{Moran} = \frac{1-1/r}{1-1/r^N} \qquad (1.1) \]
+where resident individuals have baseline fitness 1 and mutants have fitness $r$ (each individual being chosen as the reproducing individual with probability proportional to its fitness).
+[Section 1, p. 2:] We use symmetries to reduce the number of equations to $2n+1$ for a star with $N = n+1$ vertices. In Lieberman et al. (2005), the approximation of the fixation probability for stars for large $n$ was given by
+\[ P = \frac{1-1/r^2}{1-1/r^{2n}} \qquad (1.2) \]
+Here we find the exact fixation probabilities for any $r$ and $n$.
+[Section 5, p. 7:] In this section we consider a star - a non-directed graph with $N = n+1$ vertices labeled $0, 1, \ldots, n$ where the only edges are between vertices $0$ and $i$, $i = 1, \ldots, n$. The vertex $0$ is called a centre and the vertices $1, \ldots, n$ can be called the leaves. [...] Let $P^0_i$ ($P^\emptyset_i$, respectively) denote the probability of fixation given there are $i$ mutants at the leaves and there is a (there is no, respectively) mutant at the centre.
+[Section 5, p. 8:] we get that the average fixation probability for a mutant is
+\[ \varrho = \frac{n \frac{nr}{nr+1} + \frac{r}{r+n}}{(n+1)\cdot\left(1 + \frac{n}{n+r}\sum_{j=1}^{n-1}\left(\frac{n+r}{r(nr+1)}\right)^j\right)} \]
+'''
+notes = "The entry quotes the unnumbered display of Section 5 for the average fixation probability for large n. City Research Online labels the eprint 'unspecified version'. City Research Online labels this copy 'unspecified version'; its pages are marked 'Article submitted to Royal Society'. No LaTeX source; transcribed from the PDF into LaTeX. Pages: `page` is the PDF page (printed p. 8; the City PDF has a cover sheet, so printed page p is PDF page p + 1); the bracketed pages in the context are printed pages. The model (Section 2) is quoted in the entry for moran:thm:star. As printed: (1.2) has 2n (n leaves) where Lieberman, Hauert and Nowak write 2N (N vertices). The publisher's version could not be retrieved (HTTP 403) and was not compared."
+
+[[source]]
+item = "moran:thm:star-amplifier"
+paper = "M. Broom, J. Rychtář. An analysis of the fixation probability of a mutant on special classes of non-directed graphs"
+venue = "Proc. R. Soc. A 464(2098):2609-2627 (2008)"
+version = "City Research Online eprint 979"
+result = "Abstract and Figure 4"
+page = 2
+url = "https://openaccess.city.ac.uk/id/eprint/979/"
+status = "transcribed by an AI agent from the PDF of the City Research Online copy (no LaTeX source; the publisher's version could not be retrieved by the transcribing agent and was not compared) and checked against the rendered pages; not yet checked by a person"
+statement = '''
+Finally we investigate our chosen classes numerically, and discuss a number of features of the graphs; for example we find the fixation probabilities for different initial starting positions and observe that average fixation probabilities are always increased for advantageous mutants as compared against those of unstructured populations.
+'''
+context = '''
+[Abstract, p. 1:] In this paper we follow the model of Lieberman et al. [Lieberman, E., Hauert, C., Nowak, M.A. 2005 Evolutionary dynamics on graphs. Nature 43 (3), 312--316] of evolutionary dynamics on a graph. We investigate the case of non-directed equally weighted graphs and find solutions for the fixation probability of a single mutant in two classes of simple graphs.
+[Section 1, p. 2:] In homogeneous populations the probability of fixation in a population with $N$ individuals (and so $N$ vertices) is given by the Moran probability
+\[ P_{Moran} = \frac{1-1/r}{1-1/r^N} \qquad (1.1) \]
+where resident individuals have baseline fitness 1 and mutants have fitness $r$ (each individual being chosen as the reproducing individual with probability proportional to its fitness).
+[Section 5, p. 8:] we get that the average fixation probability for a mutant is
+\[ \varrho = \frac{n \frac{nr}{nr+1} + \frac{r}{r+n}}{(n+1)\cdot\left(1 + \frac{n}{n+r}\sum_{j=1}^{n-1}\left(\frac{n+r}{r(nr+1)}\right)^j\right)} \]
+[Section 5, p. 8:] Figure 4 contains illustrations of the results for fixation probability and a comparison with the formula (1.2) and with the fixation for a Moran process (1.1).
+[Section 5, p. 9, caption of Figure 4:] The mean fixation probability for a star (middle curve) and comparison to $P_{Moran}$ given in (1.1) (lowest curve) and formula (1.2) (upper curve). This comparison is shown in a) for a range of values of $n$ and $r = 1.5$, and in b) for a range of values of $r$ and $n = 10$.
+'''
+notes = "The abstract states a numerical observation. City Research Online labels the eprint 'unspecified version'. City Research Online labels this copy 'unspecified version'; its pages are marked 'Article submitted to Royal Society'. No LaTeX source; transcribed from the PDF into LaTeX. The abstract is on PDF page 2 (printed p. 1, after the repository cover sheet); the bracketed pages in the context are printed pages. The statement covers the two classes of graphs of the paper (stars and lines); the paper states no theorem on amplification. As printed: 'Nature 43 (3)' in the abstract's reference. The publisher's version could not be retrieved (HTTP 403) and was not compared."

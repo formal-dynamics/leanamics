@@ -1,0 +1,1154 @@
+# Source references and original statements of the items of package crn/.
+#
+# Same format as verification/sources.toml (see its header for the fields). Sources:
+#   CRN-1: Anderson and Kurtz (2011), Doty (SODA 2014), Gillespie (1977), Angluin, Aspnes and
+#          Eisenstat (2008), Cardelli and Csikász-Nagy (2012);
+#   CRN-3: Angluin, Aspnes, Diamadi, Fischer and Peralta (2006), Angluin, Aspnes, Eisenstat and
+#          Ruppert (2007), Angluin, Aspnes and Eisenstat (PODC 2006), Chen, Doty and Soloveichik
+#          (2014);
+#   CRN-4: Mertzios, Nikoletseas, Raptopoulos and Spirakis (ICALP 2014, arXiv:1404.7671v1);
+#   CRN-5: Gąsieniec, Hamilton, Martin, Spirakis and Stachowiak (OPODIS 2016).
+# The MNRS14 entries already in verification/sources.toml (crn:thm:ambassador,
+# crn:thm:three-states, crn:lem:hall, crn:thm:am-graph, crn:thm:am-half) are not repeated here.
+#
+# All entries were transcribed by an AI agent; `status` says from which copy and whether it was
+# compared with a PDF. No entry has been checked by a person. Excerpts quoted from a proof are
+# marked as such in `result`; they are the source's wording of the claim the item formalizes.
+
+# ---------------------------------------------------------------------------------------------
+# CRN-1: chemical reaction networks and population protocols
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+item = "crn:def:crn"
+paper = "D. F. Anderson, T. G. Kurtz. Continuous time Markov chain models for chemical reaction networks"
+venue = "Design and Analysis of Biomolecular Circuits (H. Koeppl et al., eds.), Springer, 2011"
+version = "author preprint"
+result = "Section 3, reaction networks"
+page = 15
+url = "https://people.math.wisc.edu/~dfanderson/papers/SURVEY_AndKurtz.pdf"
+status = "transcribed by an AI agent from the PDF of the author preprint (text extraction, formulas checked on the rendered page); no LaTeX source available; not yet checked by a person"
+statement = '''
+We consider a \emph{network} of $r_0$ chemical reactions involving $s_0$ chemical species, $S_1, \ldots, S_{s_0}$,
+\[
+\sum_{i=1}^{s_0} \nu_{ik} S_i \rightharpoonup \sum_{i=1}^{s_0} \nu'_{ik} S_i, \qquad k = 1, \ldots, r_0,
+\]
+where the $\nu_{ik}$ and $\nu'_{ik}$ are nonnegative integers. Let the components of $X(t)$ give the numbers of molecules of each species in the system at time $t$. Let $\nu_k$ be the vector whose $i$th component is $\nu_{ik}$, the number of molecules of the $i$th chemical species consumed in the $k$th reaction, and let $\nu'_k$ be the vector whose $i$th component is $\nu'_{ik}$, the number of molecules of the $i$th species produced by the $k$th reaction. Let $\lambda_k(x)$ be the rate at which the $k$th reaction occurs, that is, it gives the propensity/intensity of the $k$th reaction as a function of the numbers of molecules of the chemical species.
+If the $k$th reaction occurs at time $t$, the new state becomes
+\[
+X(t) = X(t-) + \nu'_k - \nu_k .
+\]
+'''
+notes = '''The copy read is the authors' preprint of the chapter (pp. 3-42 of the book), hosted on the first author's homepage; page numbers are those of this PDF (44 pages), not of the book. The reaction arrow is printed as a right harpoon, rendered \rightharpoonup. The library's reactions are the case of two reactants and two products (A + B -> C + D), see FORMALIZATION_DIFFERENCES.md.'''
+
+[[source]]
+items = ["crn:def:propensity", "crn:lem:propensity"]
+paper = "D. Doty. Timing in chemical reaction networks"
+venue = "SODA 2014"
+version = "arXiv:1304.0872v1"
+result = "Section 2.2, propensities"
+page = 6
+url = "https://arxiv.org/abs/1304.0872v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+The kinetic behavior of a CRN is described by a continuous-time Markov process, whose states are configurations of the CRN, as follows.
+Given a fixed volume $v > 0$ and current configuration $\vec{c}$, the \emph{propensity} of a unimolecular reaction $\beta : X \overset{k}{\to} \ldots$ in configuration $\vec{c}$ is $\rho(\vec{c}, \beta) = k \vec{c}(X)$.
+The propensity of a bimolecular reaction $\beta : X + Y \overset{k}{\to} \ldots$, where $X \neq Y$, is $\rho(\vec{c}, \beta) = \frac{k}{v} \vec{c}(X) \vec{c}(Y)$.
+The propensity of a bimolecular reaction $\beta : X + X \overset{k}{\to} \ldots$ is $\rho(\vec{c}, \beta) = \frac{k}{v} \frac{\vec{c}(X) (\vec{c}(X) - 1)}{2}$.
+'''
+context = '''
+[Section 2.1, p. 5:] Given a finite set of chemical species $\Lambda$, a \emph{reaction} over $\Lambda$ is a triple $\beta = ( \vec{r},\vec{p},k ) \in \mathbb{N}^\Lambda \times \mathbb{N}^\Lambda \times \mathbb{R}^+$, specifying the stoichiometry of the reactants and products, respectively, and the \emph{rate constant} $k$.
+For instance, given $\Lambda=\{A,B,C\}$, the reaction $A+2B \overset{4.7}{\to} A+3C$ is the triple $((1,2,0),(1,0,3),4.7).$
+A \emph{(finite) chemical reaction network (CRN)} is a pair $\mathcal{C}=(\Lambda,R)$, where $\Lambda$ is a finite set of chemical \emph{species}, and $R$ is a finite set of reactions over $\Lambda$.
+A \emph{configuration} of a CRN $\mathcal{C}=(\Lambda,R)$ is a vector $\vec{c} \in \mathbb{N}^\Lambda$.
+[Section 2.2, p. 6:] A reaction is \emph{unimolecular} if it has one reactant and \emph{bimolecular} if it has two reactants.
+We assume no higher-order reactions occur.
+'''
+notes = '''arXiv v1 is the only arXiv version; the library cites the SODA 2014 paper, Section 2, and its section numbering matches. Macros replaced: \vc -> \vec{c}, \vr -> \vec{r}, \vp -> \vec{p}, \N -> \mathbb{N}, \R -> \mathbb{R}, \calC -> \mathcal{C}. The footnotes after "We assume no higher-order reactions occur." and after the X + X propensity are omitted (the second reads: "Intuitively, rho(c, beta) without the k and v terms counts the number of ways that reactants can collide in order to react (with unimolecular reactants "colliding" with only themselves)."). The library takes the volume v = 1 and writes the X + X propensity as k C(x_X, 2), which is the same quantity. The paper attributes the kinetic model to Gillespie 1977 (see the entry below).'''
+
+[[source]]
+items = ["crn:def:propensity", "crn:lem:propensity"]
+paper = "D. T. Gillespie. Exact stochastic simulation of coupled chemical reactions"
+venue = "J. Phys. Chem. 81(25):2340-2361, 1977"
+version = "J. Phys. Chem. 1977"
+result = "combinatorial propensity"
+status = "no open copy found; not transcribed"
+notes = '''The library cites Gillespie (1977) for the combinatorial form k prod_a C(x_a, nu_a) of the propensity. The article is published by the American Chemical Society and is not open access; no author copy was found (copies found online are on university course pages, not hosted by the author or the publisher). Doty (SODA 2014), Section 2.2, gives the same form (previous entry).'''
+
+[[source]]
+item = "crn:def:jump"
+paper = "D. Doty. Timing in chemical reaction networks"
+venue = "SODA 2014"
+version = "arXiv:1304.0872v1"
+result = "Section 2.2, the next reaction"
+page = 6
+url = "https://arxiv.org/abs/1304.0872v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+The propensity function determines the evolution of the system as follows.
+The time until the next reaction occurs is an exponential random variable with rate $\rho(\vec{c}) = \sum_{\beta \in R} \rho(\vec{c}, \beta)$.
+The probability that next reaction will be a particular $\beta_{\text{next}}$ is $\frac{\rho(\vec{c},\beta_{\text{next}})}{\rho(\vec{c})}$.
+'''
+context = '''
+[Section 2.1, p. 5:] A \emph{(finite) chemical reaction network (CRN)} is a pair $\mathcal{C}=(\Lambda,R)$, where $\Lambda$ is a finite set of chemical \emph{species}, and $R$ is a finite set of reactions over $\Lambda$.
+A \emph{configuration} of a CRN $\mathcal{C}=(\Lambda,R)$ is a vector $\vec{c} \in \mathbb{N}^\Lambda$.
+[Section 2.1, p. 5:] Given a configuration $\vec{c}$ and reaction $\beta=(\vec{r},\vec{p},k)$, we say that $\beta$ is \emph{applicable} to $\vec{c}$ if $\mathbf{r} \leq \vec{c}$ (i.e., $\vec{c}$ contains enough of each of the reactants for the reaction to occur).
+If $\beta$ is applicable to $\vec{c}$, then write $\beta(\vec{c})$ to denote the configuration $\vec{c} + \mathbf{p} - \mathbf{r}$ (i.e., the configuration that results from applying reaction $\beta$ to $\vec{c}$).
+[Section 2.2, p. 6:] The kinetic behavior of a CRN is described by a continuous-time Markov process, whose states are configurations of the CRN, as follows.
+Given a fixed volume $v > 0$ and current configuration $\vec{c}$, the \emph{propensity} of a unimolecular reaction $\beta : X \overset{k}{\to} \ldots$ in configuration $\vec{c}$ is $\rho(\vec{c}, \beta) = k \vec{c}(X)$.
+The propensity of a bimolecular reaction $\beta : X + Y \overset{k}{\to} \ldots$, where $X \neq Y$, is $\rho(\vec{c}, \beta) = \frac{k}{v} \vec{c}(X) \vec{c}(Y)$.
+The propensity of a bimolecular reaction $\beta : X + X \overset{k}{\to} \ldots$ is $\rho(\vec{c}, \beta) = \frac{k}{v} \frac{\vec{c}(X) (\vec{c}(X) - 1)}{2}$.
+'''
+notes = '''Macros replaced: \vc -> \vec{c}, \vr -> \vec{r}, \vp -> \vec{p}, \bfr -> \mathbf{r}, \bfp -> \mathbf{p}, \N -> \mathbb{N}, \calC -> \mathcal{C}. "The probability that next reaction" as printed. The paper does not say what happens when rho(c) = 0 (no applicable reaction); the library makes such configurations absorbing (FORMALIZATION_DIFFERENCES.md, CRN-1, item 6).'''
+
+[[source]]
+item = "crn:def:jump"
+paper = "D. F. Anderson, T. G. Kurtz. Continuous time Markov chain models for chemical reaction networks"
+venue = "Design and Analysis of Biomolecular Circuits (H. Koeppl et al., eds.), Springer, 2011"
+version = "author preprint"
+result = "Section 2.4, eq. (2.10), embedded chain"
+page = 12
+url = "https://people.math.wisc.edu/~dfanderson/papers/SURVEY_AndKurtz.pdf"
+status = "transcribed by an AI agent from the PDF of the author preprint (text extraction, formulas checked against the layout of the page); no LaTeX source available; not yet checked by a person"
+statement = '''
+Specializing to continuous-time Markov chains and defining
+\[
+\lambda_0(x) = \sum_l \lambda_l(x), \qquad q_l(x) = \sum_{i=1}^{l} \lambda_i(x)/\lambda_0(x),
+\]
+the equations become
+\begin{align*}
+R_0(t) &= Y\Big(\int_0^t \lambda_0(X(s))\,ds\Big) \qquad (2.10)\\
+X(t) &= X(0) + \sum_l \zeta_l \int_0^t \mathbf{1}_{(q_{l-1}(X(s-)),\, q_l(X(s-))]}(\xi_{R_0(s-)})\,dR_0(s).
+\end{align*}
+This representation is commonly used for simulation, see section 2.6.
+'''
+context = '''
+[Section 2.2, p. 7:] More generally, a continuous time Markov chain $X$ taking values in $\mathbb{Z}^d$ is specified by giving its transition intensities (propensities in much of the chemical physics literature) $\lambda_l$ that determine
+\[
+P\{X(t+\Delta t) - X(t) = \zeta_l \mid \mathcal{F}^X_t\} \approx \lambda_l(X(t))\Delta t, \qquad (2.5)
+\]
+for the different possible jumps $\zeta_l \in \mathbb{Z}^d$, where $\mathcal{F}^X_t$ is the $\sigma$-algebra generated by $X$ (all the information available from the observation of the process up to time $t$).
+[Section 2.2, p. 8:] [...] we write
+\[
+X(t) = X(0) + \sum_l \zeta_l Y_l\Big(\int_0^t \lambda_l(X(s))\,ds\Big), \qquad (2.6)
+\]
+where the $Y_l$ are independent unit Poisson processes.
+[Section 2.4, p. 11:] Let $Y$ be a unit Poisson process and $\xi_0, \xi_1, \ldots$ be independent, uniform $[0,1]$ random variables that are independent of $Y$, and set $q_0 = 0$ [...].
+[Section 2.6, p. 14:] The stochastic equations (2.6) and (2.10) suggest methods of simulating continuous-time Markov chains, and these methods are, in fact, well known. Equation (2.6) corresponds to the next reaction (next jump) method as defined by Gibson and Bruck [19].
+The algorithm obtained by simulating (2.10) is known variously as the embedded chain method or Gillespie's [20, 21] direct method or the stochastic simulation algorithm (SSA).
+[Section 3, p. 16:] To simplify notation, we will write $\zeta_k = \nu'_k - \nu_k$.
+'''
+notes = '''Page numbers are those of the author preprint (44 pages). In (2.10), the jump of the chain at a jump of R_0 is zeta_l with probability q_l - q_{l-1} = lambda_l(x)/lambda_0(x): this is the jump chain the library formalizes (Protocol.lean cites Anderson and Kurtz 2011 for it). [...] marks omitted text. The equation number (2.10) is printed at the first line of the display. Section 2.4 is titled "Thinning of counting processes".'''
+
+[[source]]
+item = "crn:thm:crn1"
+paper = "D. Doty. Timing in chemical reaction networks"
+venue = "SODA 2014"
+version = "arXiv:1304.0872v1"
+result = "Section 1.2, protocols and kinetics"
+page = 2
+url = "https://arxiv.org/abs/1304.0872v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+Multiple semantic models may be overlaid on this syntactic definition, but the randomized model studied by Angluin, Aspnes, and Eisenstat [3], in which the next two agents to interact are selected uniformly at random, coincides precisely with the model of stochastic chemical kinetics, so long as the CRN's reactions each have two reactants and two products, i.e., $q_1 + q_2 \to r_1 + r_2$.
+'''
+context = '''
+[Section 1.2, p. 2:] A population protocol consists of a set of $n$ agents with finite state set $\Lambda$ (where we imagine $n \gg |\Lambda|$), together with a transition function $\delta:\Lambda^2\to\Lambda^2$, with $(r_1,r_2)=\delta(q_1,q_2)$ indicating that if two agents in states $q_1$ and $q_2$ interact, then they change to states $r_1$ and $r_2$, respectively.
+[Section 2.1, p. 5:] Given a finite set of chemical species $\Lambda$, a \emph{reaction} over $\Lambda$ is a triple $\beta = ( \vec{r},\vec{p},k ) \in \mathbb{N}^\Lambda \times \mathbb{N}^\Lambda \times \mathbb{R}^+$, specifying the stoichiometry of the reactants and products, respectively, and the \emph{rate constant} $k$.
+A \emph{(finite) chemical reaction network (CRN)} is a pair $\mathcal{C}=(\Lambda,R)$, where $\Lambda$ is a finite set of chemical \emph{species}, and $R$ is a finite set of reactions over $\Lambda$.
+A \emph{configuration} of a CRN $\mathcal{C}=(\Lambda,R)$ is a vector $\vec{c} \in \mathbb{N}^\Lambda$.
+[Section 2.2, p. 6:] Given a fixed volume $v > 0$ and current configuration $\vec{c}$, [...]
+The propensity of a bimolecular reaction $\beta : X + Y \overset{k}{\to} \ldots$, where $X \neq Y$, is $\rho(\vec{c}, \beta) = \frac{k}{v} \vec{c}(X) \vec{c}(Y)$.
+The propensity of a bimolecular reaction $\beta : X + X \overset{k}{\to} \ldots$ is $\rho(\vec{c}, \beta) = \frac{k}{v} \frac{\vec{c}(X) (\vec{c}(X) - 1)}{2}$.
+[...]
+The time until the next reaction occurs is an exponential random variable with rate $\rho(\vec{c}) = \sum_{\beta \in R} \rho(\vec{c}, \beta)$.
+The probability that next reaction will be a particular $\beta_{\text{next}}$ is $\frac{\rho(\vec{c},\beta_{\text{next}})}{\rho(\vec{c})}$.
+'''
+notes = '''No numbered result: the theorem formalizes the correspondence that this sentence states informally (the library's PROVENANCE row cites Anderson and Kurtz 2011 for CRNs as Markov chains and Gillespie 1977 and Doty, SODA 2014, Section 2, for the propensity; this sentence of Section 1.2 is the statement of the correspondence in those sources). [3] is the paper's numbering of Angluin, Aspnes, Eisenstat, "Fast computation by population protocols with a leader", Distributed Computing 21(3), 2008. A footnote after "two products" is omitted ("This turns out not to be a significant restriction on CRNs; see the introduction of [CDS12] for a discussion of the issue.", with CDS12 the paper's reference to Chen, Doty, Soloveichik). The paper does not fix how a reaction with given reactants is chosen when several reactions share them; the library draws a uniformly random reaction (FORMALIZATION_DIFFERENCES.md, CRN-1, item 3). Macros replaced as in the crn:def:jump entry.'''
+
+[[source]]
+item = "crn:def:am"
+paper = "D. Angluin, J. Aspnes, D. Eisenstat. A simple population protocol for fast robust approximate majority"
+venue = "Distributed Computing 21(2):87-102, 2008"
+version = "author manuscript"
+result = "Section 3, the 3-state protocol"
+page = 3
+url = "https://cs.yale.edu/homes/aspnes/papers/approximate-majority-journal.pdf"
+status = "transcribed by an AI agent from the PDF of the authors' Distributed Computing manuscript (text extraction); no LaTeX source available; not yet checked by a person"
+statement = '''
+We analyze the behavior of the following population protocol with states $Q = \{b, x, y\}$. The state $b$ is the blank state. Row labels give the initiator's state and column labels the responder's state.
+\[
+\begin{array}{c|ccc}
+ & x & b & y \\ \hline
+x & (x, x) & (x, x) & (x, b) \\
+b & (b, x) & (b, b) & (b, y) \\
+y & (y, b) & (y, y) & (y, y)
+\end{array}
+\]
+Note that this protocol is one-way: every interaction changes at most the responder's state; thus it can be implemented with one-way communication. Only the interactions $xb$, $yb$, $xy$, and $yx$ change the responder's state; we may think of these as the only interactions that consume energy.
+'''
+context = '''
+[Section 2, p. 2:] A population protocol consists of a finite set of states $Q$, a finite set of input symbols $X \subseteq Q$, a finite set of output symbols $Y$, an output function $\gamma : Q \to Y$, and a joint transition function $\delta : Q \times Q \to Q \times Q$. [...]
+During each execution step, an arc $(v, w)$ is chosen uniformly at random from $A$. The ``source'' agent $v$ is the initiator, and the ``sink'' agent $w$ is the responder. These agents update their states jointly according to $\delta$: if $v$ is in state $q_v$ and $w$ is in state $q_w$, the state of $v$ becomes $\delta_1(q_v, q_w)$, the state of $w$ becomes $\delta_2(q_v, q_w)$, where $\delta_i$ gives the $i$th coordinate of the output of $\delta$. The states of all other agents are unchanged.
+'''
+notes = '''The copy read is the authors' manuscript of the Distributed Computing article ("Distributed Computing manuscript No."), from J. Aspnes's homepage; it was not compared with the published article. The table is transcribed from the text extraction of the PDF (rows and columns in the printed order x, b, y). In the context, A is the arc set of the interaction graph, which in this paper "will always be a complete graph". The library's network writes the four state-changing interactions as the reactions X + Y -> X + B, X + Y -> Y + B, B + X -> X + X, B + Y -> Y + Y (unordered reactants), with X, Y, B for x, y, b.'''
+
+[[source]]
+item = "crn:def:am"
+paper = "L. Cardelli, A. Csikász-Nagy. The cell cycle switch computes approximate majority"
+venue = "Scientific Reports 2:656, 2012"
+version = "Sci. Rep. 2:656"
+result = "Eq. (1), the AM network"
+page = 3
+url = "https://www.nature.com/articles/srep00656"
+status = "transcribed by an AI agent from the published PDF (open access; text extraction with the reaction symbols decoded); no LaTeX source available; not yet checked by a person"
+statement = '''
+The AM (Approximate Majority) network is depicted by an abbreviated graphical notation in figure 1B.1, which is explained in figure 1E,F. Namely, a pair of `pinched arrows' between a pair of species such as $x$,$y$ represents four reactions with a common intermediate species $b$ (specific to the pair $x$,$y$): the intermediate species is omitted. The AM network therefore consists of 4 reactions (of mass action kinetics):
+\[
+\begin{array}{lll}
+x + y \to y + b & \text{catalytic in } y & \\
+b + y \to y + y & \text{autocatalytic in } y & \qquad (1)\\
+y + x \to x + b & \text{catalytic in } x & \\
+b + x \to x + x & \text{autocatalytic in } x &
+\end{array}
+\]
+for some intermediate $b$.
+'''
+context = '''
+[Introduction, p. 1:] The AM algorithm computes the majority of two finite populations by converting the minority population into the majority population, so that a single population results; it uses a third `undecided' state of the population, from where autocatalysis can drive the individuals into either of the final states.
+'''
+notes = '''Published version (open access). In the text extraction "+" and "->" come out as "z" and "?"; they are rendered here as + and \to. The equation number (1) is printed at the middle of the four reactions. The library cites this paper for the approximate-majority network (ApproximateMajority.lean); its four reactions, written with unordered reactants, are the library's X + Y -> X + B, X + Y -> Y + B, B + X -> X + X, B + Y -> Y + Y.'''
+
+# ---------------------------------------------------------------------------------------------
+# CRN-3: stably computable predicates
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+item = "crn:def:protocol"
+paper = "D. Angluin, J. Aspnes, Z. Diamadi, M. J. Fischer, R. Peralta. Computation in networks of passively mobile finite-state sensors"
+venue = "Distributed Computing 18(4):235-253, 2006"
+version = "manuscript of 2005-10-17"
+result = "Section 3.1, population protocols"
+page = 3
+url = "https://cs.yale.edu/homes/aspnes/papers/podc04passive-dc.pdf"
+status = "transcribed by an AI agent from the PDF of the authors' journal manuscript dated October 17, 2005 (text extraction, checked on the rendered page); not yet checked by a person"
+statement = '''
+A \textbf{population protocol} $\mathcal{A}$ consists of finite \textbf{input and output alphabets} $X$ and $Y$, a finite set of \textbf{states} $Q$, an \textbf{input function} $I : X \to Q$ mapping inputs to states, an \textbf{output function} $O : Q \to Y$ mapping states to outputs, and a \textbf{transition function} $\delta : Q \times Q \to Q \times Q$ on pairs of states. If $\delta(p,q) = (p',q')$, we call $(p,q) \mapsto (p',q')$ a \textbf{transition}, and we define $\delta_1(p,q) = p'$ and $\delta_2(p,q) = q'$.
+
+A \textbf{population} $\mathcal{P}$ consists of a set $A$ of $n$ \textbf{agents} together with an irreflexive relation $E \subseteq A \times A$ that we interpret as the directed edges of an \textbf{interaction graph}. $E$ describes which agents may interact during the computation. Intuitively, an edge $(u,v) \in E$ means that $u$ and $v$ are able to interact, with $u$ playing the role of \textbf{initiator} and $v$ playing the role of \textbf{responder} in the interaction. [...] Though most of the present paper concerns the case in which $E$ consists of all ordered pairs of distinct elements from $A$, which is termed the \textbf{complete interaction graph}, we give definitions appropriate for general $E$.
+
+A \textbf{population configuration} is a mapping $C : A \to Q$ specifying the state of each member of the population. Let $C$ and $C'$ be population configurations, and let $u, v$ be distinct agents. We say that $C$ goes to $C'$ via \textbf{encounter} $e = (u,v)$, denoted $C \xrightarrow{e} C'$, if
+\begin{align*}
+C'(u) &= \delta_1(C(u), C(v))\\
+C'(v) &= \delta_2(C(u), C(v))\\
+C'(w) &= C(w) \text{ for all } w \in A - \{u, v\}.
+\end{align*}
+We say that $C$ can go to $C'$ in one step, denoted $C \to C'$, if $C \xrightarrow{e} C'$ for some encounter $e \in E$, and we call $C \to C'$ a \textbf{transition}. We write $C \xrightarrow{*} C'$ if there is a sequence of configurations $C = C_0, C_1, \ldots, C_k = C'$, such that $C_i \to C_{i+1}$ for all $i$, $0 \le i < k$, in which case we say that $C'$ is \textbf{reachable} from $C$.
+'''
+notes = '''The library cites the published article (Distributed Computing 18, 2006), Section 3.1; the open copy read is the authors' journal manuscript of October 17, 2005, from J. Aspnes's homepage, whose Section 3 has the same section numbers as the library's citations (the published article was not available to compare). Script letters (the protocol and the population) are rendered \mathcal{A}, \mathcal{P}; bold defined terms as \textbf. Footnote 1 after "agents" is omitted ("Note that we distinguish typographically between a protocol \mathcal{A} and an agent set A."). [...] marks two omitted sentences on the asymmetry of the roles and a paragraph with an example. The library's standard populations use the complete interaction graph (Section 3.3, see crn:def:stable).'''
+
+[[source]]
+item = "crn:def:stable"
+paper = "D. Angluin, J. Aspnes, Z. Diamadi, M. J. Fischer, R. Peralta. Computation in networks of passively mobile finite-state sensors"
+venue = "Distributed Computing 18(4):235-253, 2006"
+version = "manuscript of 2005-10-17"
+result = "Sections 3.2-3.4, stable computation"
+page = 4
+url = "https://cs.yale.edu/homes/aspnes/papers/podc04passive-dc.pdf"
+status = "transcribed by an AI agent from the PDF of the authors' journal manuscript dated October 17, 2005 (text extraction); not yet checked by a person"
+statement = '''
+[Section 3.2, p. 4:] A configuration $C$ is said to be \textbf{output-stable} if $y_{C'} = y_C$ for all $C'$ reachable from $C$. Note that we do not require that $C' = C$, only that the output be the same. An infinite computation \textbf{converges} if it contains an output-stable configuration $C$, in which case we say that it converges (or stabilizes) to output $y = y_C$. [...] We say a protocol $\mathcal{A}$ is \textbf{always-convergent} if every computation on every input $x$ converges. [...]
+An always-convergent population protocol $\mathcal{A}$ running in a population $\mathcal{P}$ \textbf{stably computes} an input-output relation $R_{\mathcal{A}}$ as follows. For each $x \in \mathcal{X}$ and $y \in \mathcal{Y}$, $R_{\mathcal{A}}(x,y)$ holds iff there is a computation of $\mathcal{A}$ beginning in configuration $C_x$ that stabilizes to output $y$. In the special case that $R_{\mathcal{A}}$ is single-valued, we write $F_{\mathcal{A}}(x) = y$ for $R_{\mathcal{A}}(x,y)$ and say that $\mathcal{A}$ stably computes the function $F_{\mathcal{A}}$.
+
+[Section 3.4, p. 6:] Let $E_I$ be an input encoding convention over $D_I$, and let $E_O$ be the all-agents predicate output convention. We say that protocol $\mathcal{A}$ \textbf{stably computes a predicate} on $D_I$ if $\mathcal{A}$ stably computes a total function $G_{\mathcal{A}} : D_I \to D_O$ and $G_{\mathcal{A}}(u) \ne \bot$ for any $u \in D_I$. Thus, every computation of $\mathcal{A}$ converges to an output in which all agents have the same output value 0 or 1.
+'''
+context = '''
+[Section 3.1, p. 3:] An \textbf{execution} is a finite or infinite sequence of population configurations $C_0, C_1, C_2, \ldots$ such that for each $i$, $C_i \to C_{i+1}$. An infinite execution is \textbf{fair} if for every possible transition $C \to C'$, if $C$ occurs infinitely often in the execution, then $C'$ occurs infinitely often. A \textbf{computation} is an infinite fair execution.
+[Section 3.2, p. 4:] Formally, an \textbf{input assignment} is a function $x : A \to X$, where $A$ is the set of agents in the population. We let $\mathcal{X} = X^A$ denote the set of all input assignments. The input assignment determines the initial configuration of the protocol. Namely, if $x \in \mathcal{X}$, then the protocol begins in configuration $C_x$, where $C_x(w) = I(x(w))$ for all agents $w$.
+An \textbf{output assignment} is a function $y : A \to Y$. We let $\mathcal{Y} = Y^A$ denote the set of all output assignments. Each configuration $C$ determines an output assignment $y_C$, where $y_C(w) = O(C(w))$ for all agents $w$.
+[Section 3.3, p. 4:] We now define a family of populations $\{\mathcal{P}_n\}_{n \in \mathbb{N}}$ of particular interest. Let $\mathcal{P}_n$ be the population of size $n$ consisting of the complete interaction graph on the specific agent set $A_n = \{1, \ldots, n\}$. We call $A_n$ the \textbf{standard agent set} and $\mathcal{P}_n$ the \textbf{standard population} of size $n$.
+[Section 3.4, p. 4-5:] We say that $\mathcal{A}$ stably computes $S_{\mathcal{A}}$ if $\mathcal{A}$ is always-convergent and representative independent. [...]
+The \textbf{symbol-count input convention} assumes an arbitrary input alphabet $X = \{\sigma_1, \ldots, \sigma_k\}$ and $D_I = \mathbb{N}^k$. The $k$-tuple represented by an assignment $x \in \mathcal{X}$ is $E_I(x) = (n_1, \ldots, n_k)$, where $n_i$ is the number of agents to which $x$ assigns $\sigma_i$. Note that the $k$-tuple $(n_1, \ldots, n_k)$ is only representable in a population of size $n = \sum_i n_i$.
+[Section 3.4, p. 5:] \textbf{Predicates.} A predicate can be regarded as a function whose output is a truth value. The \textbf{all-agents predicate output convention} assumes $Y = \{0,1\}$ and requires every agent to agree on the output. Formally, let $\mathbf{0}(w) = 0$ and $\mathbf{1}(w) = 1$ be constant output assignments in $\mathcal{Y}$, and let $D_O = \{\mathrm{false}, \mathrm{true}, \bot\}$. We define
+\[
+E_O(y) = \begin{cases} \mathrm{false} & \text{if } y = \mathbf{0}\\ \mathrm{true} & \text{if } y = \mathbf{1}\\ \bot & \text{otherwise.}\end{cases}
+\]
+Thus, every output assignment in which the agents do not agree represents $\bot$.
+'''
+notes = '''Same copy as crn:def:protocol (journal manuscript of October 17, 2005; the library cites the published article, Sections 3.2-3.4, whose section numbers the manuscript shares). The statement is given by excerpts in reading order, [...] marking omitted text. Script letters rendered \mathcal; the bold 0 and 1 of the constant output assignments rendered \mathbf. Lemma 1 (Section 3.1) shows that the configurations occurring infinitely often in a computation form a final strongly connected component of the transition graph; the library uses the reachability form of stable computation instead (see the AAER07 and AAE06 entries and FORMALIZATION_DIFFERENCES.md, CRN-3, item 1).'''
+
+[[source]]
+item = "crn:def:stable"
+paper = "D. Angluin, J. Aspnes, D. Eisenstat, E. Ruppert. The computational power of population protocols"
+venue = "Distributed Computing 20(4):279-304, 2007"
+version = "arXiv:cs/0608084v1"
+result = "Section 4, stable computation"
+page = 6
+url = "https://arxiv.org/abs/cs/0608084v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+A configuration $c$ is \textbf{output stable with output} $b$ if $O(c) = b$ and for every $d$ such that $c \stackrel{*}{\rightarrow} d$, $O(d) = b$.
+We define $\mathcal{S}_b$ to be the set of configurations that are output stable with output $b$, for $b \in \{0,1\}$, and define $\mathcal{S} = \mathcal{S}_0 \cup \mathcal{S}_1$ to be the set of all \textbf{output stable} configurations.
+[...]
+A fair execution $c_0,c_1,\ldots$ \textbf{converges with output $b$} if there exists an $m$ such that for all $j \ge m$, the function $O$ is defined on $c_j$ and $O(c_j) = b$.
+In particular, a fair execution converges with output $b$ if and only if it reaches an output stable configuration with output $b$.
+A protocol is \textbf{well-specified} if, for all initial configurations $c_0 \in I(\operatorname{Pop}(\Sigma))$, there exists a $b$ such that all fair executions $c_0,c_1,\ldots$ converge with output $b$.
+In a well-specified protocol, every fair execution starting from an input configuration converges with an output that is determined by that input configuration.
+A well-specified protocol induces a predicate $\psi : \operatorname{Pop}(\Sigma) \rightarrow \{0,1\}$.
+We say that this protocol \textbf{stably computes} $\psi$.
+'''
+context = '''
+[Section 1.1, p. 2:] Semilinearity is strongly tied to the notion of stable computation, in which a correct and stable output configuration must always be reachable at any step of the computation.
+[Section 3, p. 5:] Next we define the set of \textbf{populations} on $E$:
+\[ \operatorname{Pop}(E) := \mathbb{N}^E \setminus \{0\}. \]
+[Section 4, p. 6:] In each of the models we consider, a \textbf{protocol} can be considered as determining five components: a countable set $\mathcal{C}$ of \textbf{configurations}; a set of \textbf{input symbols} $\Sigma$; a binary relation $\rightarrow$ on $\mathcal{C}$ that captures when the first configuration \textbf{can reach} the second in one step; a function $I:\operatorname{Pop}(\Sigma)\rightarrow\mathcal{C}$ that takes inputs to \textbf{initial} configurations; and a partial function $O:\mathcal{C}\rightarrow\{0,1\}$ that gives the \textbf{output} of each configuration on which it is defined.
+We take $\stackrel{*}{\rightarrow}$ to be the reflexive-transitive closure of $\rightarrow$.
+We say $c'$ is \textbf{reachable} from $c$ if $c \stackrel{*}{\rightarrow} c'$.
+[Section 4, p. 6:] An \textbf{execution} is a (finite or infinite) sequence of configurations $c_0,c_1,\ldots$ such that for all $j$, we have $c_j \rightarrow c_{j+1}$.
+An execution $c_0,c_1,\ldots$ is \textbf{fair} if for all $c' \in \mathcal{C}$, either there exist infinitely many $j$ such that $c_j = c'$ or there exists $j$ such that $c_j \not\stackrel{*}{\rightarrow} c'$.
+[Section 5.1, p. 7:] $O(c) := b$ if for all $q\in Q$, $c(q) \ge 1 \Rightarrow o(q) = b$.
+'''
+notes = '''The library cites AAER07 for the reachability form of stable computation (StableBasic.lean, FORMALIZATION_DIFFERENCES.md CRN-3 item 1): the paper's definition is through fair executions (statement), and the reachability reading is the sentence of Section 1.1 quoted first in the context. Macros replaced: \concept{.} -> \textbf{.}, \globaloutputmap -> O, \localoutputmap -> o, \reaches -> \stackrel{*}{\rightarrow}, \stable -> \mathcal{S}, \configs -> \mathcal{C}, \inputsymbols -> \Sigma, \predicate -> \psi, \Population -> \operatorname{Pop}, \N -> \mathbb{N}; "c_j \not\reaches c'" rendered \not\stackrel{*}{\rightarrow}. [...] marks omitted text. The last context line is the output map of the two-way model (Section 5.1, "Two-way"; c is a multiset of states, o the individual output function). Section numbers are those of the PDF (the LaTeX source has unnumbered labels).'''
+
+[[source]]
+item = "crn:thm:boolean"
+paper = "D. Angluin, J. Aspnes, Z. Diamadi, M. J. Fischer, R. Peralta. Computation in networks of passively mobile finite-state sensors"
+venue = "Distributed Computing 18(4):235-253, 2006"
+version = "manuscript of 2005-10-17"
+result = "Lemma 6 (Lemma 3 in the article)"
+page = 7
+url = "https://cs.yale.edu/homes/aspnes/papers/podc04passive-dc.pdf"
+status = "transcribed by an AI agent from the PDF of the authors' journal manuscript dated October 17, 2005 (text extraction); not yet checked by a person"
+statement = '''
+\textbf{Lemma 6} Let $X$ be an input set, and let $E_I$ be an input encoding convention over domain $D_I$. Let $F$ and $G$ be predicates over $D_I$ that are stably computable by population protocols over $X$. Let $\xi$ be any 2-place Boolean function. Then the predicate $\xi(F, G)$ is stably computable by a population protocol with input set $X$.
+'''
+context = '''
+[Section 3.4, p. 4:] In order to use population protocols to compute on other domains, we need suitable input and output encoding conventions. An \textbf{input encoding convention} for domain $D_I$ is a function $E_I : \mathcal{X} \to D_I$, and an \textbf{output encoding convention} for $D_O$ is a function $E_O : \mathcal{Y} \to D_O$.
+[Section 3.4, p. 6:] Let $E_I$ be an input encoding convention over $D_I$, and let $E_O$ be the all-agents predicate output convention. We say that protocol $\mathcal{A}$ \textbf{stably computes a predicate} on $D_I$ if $\mathcal{A}$ stably computes a total function $G_{\mathcal{A}} : D_I \to D_O$ and $G_{\mathcal{A}}(u) \ne \bot$ for any $u \in D_I$. Thus, every computation of $\mathcal{A}$ converges to an output in which all agents have the same output value 0 or 1.
+'''
+notes = '''The library cites the published article's numbering (Lemma 3, Section 4.1); the open copy read is the authors' journal manuscript of October 17, 2005, where the same statement is Lemma 6 of Section 4.1 "Boolean closure of population predicates". The correspondence is by content (the published article was not available to compare). Script letters rendered \mathcal. The definitions of stable computation are quoted in the crn:def:stable entry.'''
+
+[[source]]
+item = "crn:thm:boolean"
+paper = "D. Angluin, J. Aspnes, Z. Diamadi, M. J. Fischer, R. Peralta. Computation in networks of passively mobile finite-state sensors"
+venue = "Distributed Computing 18(4):235-253, 2006"
+version = "manuscript of 2005-10-17"
+result = "Corollary 7 (Corollary 2 in the article)"
+page = 7
+url = "https://cs.yale.edu/homes/aspnes/papers/podc04passive-dc.pdf"
+status = "transcribed by an AI agent from the PDF of the authors' journal manuscript dated October 17, 2005 (text extraction); not yet checked by a person"
+statement = '''
+\textbf{Corollary 7} Any Boolean formula over stably computable predicates with a common input set $X$ is stably computable.
+'''
+context = '''
+[Section 4.1, p. 7:] \textbf{Lemma 6} Let $X$ be an input set, and let $E_I$ be an input encoding convention over domain $D_I$. Let $F$ and $G$ be predicates over $D_I$ that are stably computable by population protocols over $X$. Let $\xi$ be any 2-place Boolean function. Then the predicate $\xi(F, G)$ is stably computable by a population protocol with input set $X$.
+'''
+notes = '''The library cites the published article's numbering (Corollary 2); in the authors' journal manuscript of October 17, 2005 (the open copy read) it is Corollary 7, proved "by repeated application of Lemma 6". The correspondence is by content. The definitions of stable computation are quoted in the crn:def:stable entry.'''
+
+[[source]]
+items = ["crn:thm:threshold", "crn:thm:remainder"]
+paper = "D. Angluin, J. Aspnes, Z. Diamadi, M. J. Fischer, R. Peralta. Computation in networks of passively mobile finite-state sensors"
+venue = "Distributed Computing 18(4):235-253, 2006"
+version = "manuscript of 2005-10-17"
+result = "Lemma 11 (Lemma 5 in the article)"
+page = 8
+url = "https://cs.yale.edu/homes/aspnes/papers/podc04passive-dc.pdf"
+status = "transcribed by an AI agent from the PDF of the authors' journal manuscript dated October 17, 2005 (text extraction); not yet checked by a person"
+statement = '''
+\textbf{Lemma 11} Let $X = \{\sigma_1, \ldots, \sigma_k\}$ be an arbitrary input alphabet. Let $a_i$, $c$, and $m$ be integer constants with $m \ge 2$. Then the following predicates on non-negative integers $x_1, \ldots, x_k$ are stably computable in the family of standard populations under the symbol-count input convention:
+\begin{enumerate}
+\item $\sum_i a_i x_i < c$.
+\item $\sum_i a_i x_i \equiv c \pmod{m}$.
+\end{enumerate}
+'''
+context = '''
+[Section 3.3, p. 4:] Let $\mathcal{P}_n$ be the population of size $n$ consisting of the complete interaction graph on the specific agent set $A_n = \{1, \ldots, n\}$. We call $A_n$ the \textbf{standard agent set} and $\mathcal{P}_n$ the \textbf{standard population} of size $n$.
+[Section 3.4, p. 5:] The \textbf{symbol-count input convention} assumes an arbitrary input alphabet $X = \{\sigma_1, \ldots, \sigma_k\}$ and $D_I = \mathbb{N}^k$. The $k$-tuple represented by an assignment $x \in \mathcal{X}$ is $E_I(x) = (n_1, \ldots, n_k)$, where $n_i$ is the number of agents to which $x$ assigns $\sigma_i$. Note that the $k$-tuple $(n_1, \ldots, n_k)$ is only representable in a population of size $n = \sum_i n_i$.
+[Section 3.4, p. 6:] We say that protocol $\mathcal{A}$ \textbf{stably computes a predicate} on $D_I$ if $\mathcal{A}$ stably computes a total function $G_{\mathcal{A}} : D_I \to D_O$ and $G_{\mathcal{A}}(u) \ne \bot$ for any $u \in D_I$. Thus, every computation of $\mathcal{A}$ converges to an output in which all agents have the same output value 0 or 1.
+'''
+notes = '''Item 1 is crn:thm:threshold, item 2 is crn:thm:remainder. The library cites the published article's numbering, Lemma 5 (and notes that it is Lemma 11 in the authors' 2005 journal manuscript, the open copy read here). In the manuscript the lemma is in Section 4.3. The protocols of the proof start every agent with output bit 0 (input map sigma_i -> (1, 0, a_i)); see FORMALIZATION_DIFFERENCES.md, CRN-3, items 2, 4 and 5, for the population of one agent, the form >= c and the modulus.'''
+
+[[source]]
+item = "crn:def:semilinear"
+paper = "D. Angluin, J. Aspnes, Z. Diamadi, M. J. Fischer, R. Peralta. Computation in networks of passively mobile finite-state sensors"
+venue = "Distributed Computing 18(4):235-253, 2006"
+version = "manuscript of 2005-10-17"
+result = "Section 4.2 and proof of Theorem 12"
+page = 8
+url = "https://cs.yale.edu/homes/aspnes/papers/podc04passive-dc.pdf"
+status = "transcribed by an AI agent from the PDF of the authors' journal manuscript dated October 17, 2005 (text extraction); not yet checked by a person"
+statement = '''
+[Section 4.2, p. 8:] The predicates definable in Presburger arithmetic are closely related to the semilinear sets. A set $L \subseteq \mathbb{N}^k$ is \textbf{linear} if there are vectors $v_0, v_1, \ldots, v_m \in \mathbb{N}^k$ such that
+\[ L = \{ v_0 + \kappa_1 v_1 + \ldots + \kappa_m v_m \mid \kappa_1, \ldots, \kappa_m \in \mathbb{N} \}. \]
+A set is \textbf{semilinear} if it is the finite union of linear sets.
+
+\textbf{Theorem 8 (Ginsburg and Spanier)} A subset of $\mathbb{N}^k$ is semilinear iff it is definable in Presburger arithmetic.
+
+[Section 4.2, p. 8:] \textbf{Theorem 10 (Presburger)} Every definable predicate of Presburger arithmetic can be defined in the extended language by a quantifier-free formula.
+
+[Proof of Theorem 12, p. 10:] Given a Presburger formula $\Phi$, apply Theorem 10 to convert it to a quantifier-free formula $\Phi'$ over the extended language described in Section 4.2. This formula $\Phi'$ will be a Boolean formula over predicates that can be written in one of the following three forms:
+\begin{align*}
+\sum a_i x_i + c_1 &< \sum b_i x_i + c_2 \qquad (1)\\
+\sum a_i x_i + c_1 &= \sum b_i x_i + c_2 \qquad (2)\\
+\sum a_i x_i + c_1 &\equiv_m \sum b_i x_i + c_2 \qquad (3)
+\end{align*}
+'''
+context = '''
+[Section 4.2, p. 7:] Presburger arithmetic is the first-order theory of the integers under addition and less than. [...] The usual definition of Presburger arithmetic considers a first-order logical language with one function symbol ``$+$'', constants ``0'' and ``1'', predicate symbols ``$=$'' and ``$<$'', the usual logical operators of ``$\wedge$'', ``$\vee$'', and ``$\neg$'', variables $x_1, x_2, \ldots$, and quantifiers ``$\forall$'' and ``$\exists$''. Formulas are interpreted with quantifiers ranging over the integers.
+[Section 4.2, p. 8:] Let $m$ be a constant, and let $\equiv_m$ be the 2-place predicate such that $x \equiv_m y$ holds iff $x \equiv y \pmod{m}$. [...] Let \textbf{extended Presburger arithmetic} result from augmenting Presburger arithmetic with relation symbols $\equiv_m$ denoting equivalence modulo $m$, for $m \ge 2$.
+'''
+notes = '''No single definition in the source: the library defines its class as the Boolean combinations of threshold predicates sum a_i x_i < c and remainder predicates sum a_i x_i = c (mod m), following the proof of Theorem 5 of the published article (Theorem 12 of the manuscript read here), where the equalities (2) are written as conjunctions of two inequalities and (1), (3) are rewritten as sum d_i x_i < c and sum d_i x_i =_m c. Theorems 8 and 10 of the manuscript are Theorems 3 and 4 of the published article in the library's citations (StableSemilinear.lean); correspondence by content. That the class equals the semilinear predicates is not proved in the library (FORMALIZATION_DIFFERENCES.md, CRN-3, item 6). The excerpts are given in reading order, [...] marking omitted text.'''
+
+[[source]]
+item = "crn:thm:semilinear"
+paper = "D. Angluin, J. Aspnes, Z. Diamadi, M. J. Fischer, R. Peralta. Computation in networks of passively mobile finite-state sensors"
+venue = "Distributed Computing 18(4):235-253, 2006"
+version = "manuscript of 2005-10-17"
+result = "Theorem 12 (Theorem 5 in the article)"
+page = 10
+url = "https://cs.yale.edu/homes/aspnes/papers/podc04passive-dc.pdf"
+status = "transcribed by an AI agent from the PDF of the authors' journal manuscript dated October 17, 2005 (text extraction); not yet checked by a person"
+statement = '''
+\textbf{Theorem 12} Any Presburger-definable predicate on nonnegative integers is stably computable in the family of standard populations under the symbol-count input convention.
+'''
+context = '''
+[Section 3.3, p. 4:] Let $\mathcal{P}_n$ be the population of size $n$ consisting of the complete interaction graph on the specific agent set $A_n = \{1, \ldots, n\}$. We call $A_n$ the \textbf{standard agent set} and $\mathcal{P}_n$ the \textbf{standard population} of size $n$.
+[Section 3.4, p. 5:] The \textbf{symbol-count input convention} assumes an arbitrary input alphabet $X = \{\sigma_1, \ldots, \sigma_k\}$ and $D_I = \mathbb{N}^k$. The $k$-tuple represented by an assignment $x \in \mathcal{X}$ is $E_I(x) = (n_1, \ldots, n_k)$, where $n_i$ is the number of agents to which $x$ assigns $\sigma_i$.
+[Section 4.2, p. 8:] A formula $\phi(x_1, \ldots, x_k)$ with free variables $x_1, \ldots, x_k$ defines a predicate $F_\phi : \mathbb{Z}^k \to \{0, 1\}$ as follows: For integers $u_1, \ldots, u_k$, $F_\phi(u_1, \ldots, u_k) = 1$ if $\phi(x_1, \ldots, x_k)$ evaluates to true when $x_1, \ldots, x_k$ are interpreted as $u_1, \ldots, u_k$, respectively, and $F_\phi(u_1, \ldots, u_k) = 0$ otherwise.
+[Section 4.2, p. 8:] A set $L \subseteq \mathbb{N}^k$ is \textbf{linear} if there are vectors $v_0, v_1, \ldots, v_m \in \mathbb{N}^k$ such that $L = \{ v_0 + \kappa_1 v_1 + \ldots + \kappa_m v_m \mid \kappa_1, \ldots, \kappa_m \in \mathbb{N} \}$. A set is \textbf{semilinear} if it is the finite union of linear sets.
+\textbf{Theorem 8 (Ginsburg and Spanier)} A subset of $\mathbb{N}^k$ is semilinear iff it is definable in Presburger arithmetic.
+'''
+notes = '''The library cites the published article's numbering (Theorem 5, with Lemmas 3 and 5); in the authors' journal manuscript of October 17, 2005 (the open copy read) it is Theorem 12 of Section 4.3, correspondence by content. The library proves the theorem for its class of Boolean combinations of threshold and remainder predicates and shows that their truth sets are semilinear (see crn:def:semilinear and FORMALIZATION_DIFFERENCES.md, CRN-3, item 6). The definition of stably computing a predicate is quoted in the crn:def:stable entry.'''
+
+[[source]]
+item = "crn:def:crn-stable"
+paper = "H.-L. Chen, D. Doty, D. Soloveichik. Deterministic function computation with chemical reaction networks"
+venue = "Natural Computing 13(4):517-534, 2014"
+version = "arXiv:1204.4176v3"
+result = "Section 2.2, chemical reaction deciders"
+page = 8
+url = "https://arxiv.org/abs/1204.4176v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+A \emph{chemical reaction decider} (CRD) is a tuple $\mathcal{D}=(\Lambda,R,\Sigma,\Upsilon,\phi,\sigma)$, where $(\Lambda,R)$ is a CRN, $\Sigma \subseteq \Lambda$ is the \emph{set of input species}, $\Upsilon \subseteq \Lambda$ is the set of \emph{voters}, $\phi:\Upsilon\to\{0,1\}$ is the \emph{(Boolean) output function}, and $\sigma \in \mathbb{N}^{\Lambda \setminus \Sigma}$ is the \emph{initial context}.
+An input to $\mathcal{D}$ will be a vector $\vec{i}_0\in\mathbb{N}^\Sigma$ (equivalently, $\vec{i}_0\in\mathbb{N}^k$ if we write $\Sigma = \{X_1,\ldots,X_k\}$ and assign $X_i$ to represent the $i$'th coordinate).
+Thus a CRD together with an input vector defines an initial configuration $\vec{i}$ defined by $\vec{i}(X) = \vec{i}_0(X)$ if $X \in \Sigma$, and $\vec{i}(X) = \sigma(X)$ otherwise.
+We say that such a configuration is a \emph{valid initial configuration}, i.e., $\vec{i} \upharpoonright (\Lambda \setminus \Sigma) = \sigma$.
+
+We extend $\phi$ to a partial function $\Phi:\mathbb{N}^\Lambda \dashrightarrow \{0,1\}$ as follows.
+$\Phi(\vec{c})$ is undefined if either $\vec{c}(X) = 0$ for all $X \in \Upsilon$, or if there exist $X_0,X_1 \in \Upsilon$ such that $\vec{c}(X_0) > 0$, $\vec{c}(X_1) > 0$, $\phi(X_0)=0$ and $\phi(X_1)=1$.
+Otherwise, there exists $b\in\{0,1\}$ such that $(\forall X \in \Upsilon) (\vec{c}(X)>0 \implies \phi(X)=b)$; in this case, the \emph{output} $\Phi(\vec{c})$ of configuration $\vec{c}$ is $b$.
+
+A configuration $\vec{c}$ is \emph{output stable} if $\Phi(\vec{c})$ is defined and, for all $\vec{c}'$ such that $\vec{c} \to^* \vec{c}'$, $\Phi(\vec{c}') = \Phi(\vec{c})$.
+We say a CRD $\mathcal{D}$ \emph{stably decides} the predicate $\psi:\mathbb{N}^\Sigma \to \{0,1\}$ if, for any valid initial configuration $\vec{i} \in \mathbb{N}^\Lambda$ with $\vec{i} \upharpoonright \Sigma = \vec{i}_0$, for all configurations $\vec{c}\in\mathbb{N}^\Lambda$, $\vec{i} \to^* \vec{c}$ implies $\vec{c}\to^*\vec{c}'$ such that $\vec{c}'$ is output stable and $\Phi(\vec{c}') = \psi(\vec{i}_0)$.
+Note that this condition implies that no incorrect output stable configuration is reachable from $\vec{i}$.
+We say that $\mathcal{D}$ \emph{stably decides} a set $A\in\mathbb{N}^k$ if it stably decides its indicator function.
+'''
+context = '''
+[Section 2.1, p. 7:] A \emph{(finite) chemical reaction network (CRN)} is a pair $N=(\Lambda,R)$, where $\Lambda$ is a finite set of chemical \emph{species}, and $R$ is a finite set of reactions over $\Lambda$.
+A \emph{configuration} of a CRN $N=(\Lambda,R)$ is a vector $\vec{c} \in \mathbb{N}^\Lambda$.
+[Section 2.1, p. 7:] Given a configuration $\vec{c}$ and reaction $\alpha=\left\langle \mathbf{r}, \mathbf{p} \right\rangle$, we say that $\alpha$ is \emph{applicable} to $\vec{c}$ if $\mathbf{r} \leq \vec{c}$ (i.e., $\vec{c}$ contains enough of each of the reactants for the reaction to occur).
+If $\alpha$ is applicable to $\vec{c}$, then write $\alpha(\vec{c})$ to denote the configuration $\vec{c} + \mathbf{p} - \mathbf{r}$ (i.e., the configuration that results from applying reaction $\alpha$ to $\vec{c}$).
+If $\vec{c}'=\alpha(\vec{c})$ for some reaction $\alpha \in R$, we write $\vec{c} \to_N \vec{c}'$, or merely $\vec{c} \to \vec{c}'$ when $N$ is clear from context.
+[...]
+If a finite execution sequence starts with $\vec{c}$ and ends with $\vec{c}'$, we write $\vec{c} \to_N^* \vec{c}'$, or merely $\vec{c} \to^* \vec{c}'$ when the CRN $N$ is clear from context.
+In this case, we say that $\vec{c}'$ is \emph{reachable} from $\vec{c}$.
+'''
+notes = '''arXiv v3 (January 2013) is the latest arXiv version; the library cites the Natural Computing article, Sections 2.1-2.2, and Theorem 2.1, which match the section and theorem numbers of v3 (the journal version was not compared). Macros replaced: \calD -> \mathcal{D}, \vi -> \vec{i}, \vc -> \vec{c}, \bfr -> \mathbf{r}, \bfp -> \mathbf{p}, \pair{a}{b} -> \left\langle a, b \right\rangle, \rest -> \upharpoonright, \N -> \mathbb{N}. "a set A \in N^k" as printed. Footnote 2, after "voters", is omitted; it reads: "The definitions of [3] assume that Upsilon = Lambda (i.e., every species votes). However, it is not hard to show that we may assume there are only two voting species, L^0 and L^1, [...]" ([3] = Angluin, Aspnes, Eisenstat, PODC 2006). The library uses the convention of [3]: every species votes, no initial context (leaderless), an injective input map, and the zero input excluded (FORMALIZATION_DIFFERENCES.md, CRN-3, item 9); see also the next entry.'''
+
+[[source]]
+item = "crn:def:crn-stable"
+paper = "D. Angluin, J. Aspnes, D. Eisenstat. Stably computable predicates are semilinear"
+venue = "PODC 2006, pp. 292-299"
+version = "PODC 2006 proceedings"
+result = "Sections 2.1-2.2, stable computation"
+page = 3
+url = "https://cs.yale.edu/homes/aspnes/papers/podc2006-proceedings.pdf"
+status = "transcribed by an AI agent from the PDF of the proceedings version on J. Aspnes's homepage (text extraction); no LaTeX source available; not yet checked by a person"
+statement = '''
+[Section 2.2:] We now define what it means for a protocol to stably compute a predicate. For $j = 0, 1$ we define
+\[ S_j := \{ c \in C \mid \text{if } c \to c' \text{ then } \gamma(c') = \{j\} \}. \]
+Then $S := S_0 \cup S_1$ is the set of output stable configurations. Let $\psi$ be a predicate on $W$, that is, a mapping from $W$ to $\{0, 1\}$. The support of $\psi$ is $\psi^{-1}(1)$, that is, the set of inputs that $\psi$ maps to 1. The given protocol stably computes $\psi$ if for all $x \in W$ and for all $c \in C$, if $x \to c$ there exists $c' \in S_{\psi(x)}$ such that $c \to c'$. That is, if input $x$ reaches any configuration $c$, then there is a configuration $c'$ reachable from $c$ that is output stable and has output $\psi(x)$. This incorporates the notion of a fair computation[2]. A predicate $\psi$ is stably computable if there exists a protocol that stably computes $\psi$.
+'''
+context = '''
+[Section 2.1, p. 3:] A \textbf{protocol} is a 4-tuple $(Q, -\to, -\Sigma, \gamma)$, with the following components. $Q$ is a finite set of \textbf{states}, which generalize both states and messages from previous models. A \textbf{configuration} is a nonempty multiset of states. We identify $C := \mathbb{N}^Q \setminus \{0\}$, the set of nonzero $|Q|$-tuples of nonnegative integers indexed by $Q$, with the set of all configurations. The usual inclusion ordering on $C$ is denoted $\le$.
+The \textbf{reachability relation} $\to$ is an ordering on $C$. Specifically, we require that $\to$ be a reflexive, transitive relation that respects addition in $\mathbb{N}^Q$; that is $c \to c'$ implies $c + d \to c' + d$ for all $c, c' \in C$ and $d \in \mathbb{N}^Q$. Intuitively, that $\to$ respects addition implies that interactions can take place in the presence of other agents. Note that unlike in the standard population protocol model, a configuration may reach configurations with different cardinality.
+$\Sigma \subseteq Q$ is a finite set of \textbf{input symbols}. An \textbf{input} is a nonempty multiset of input symbols. Analogously, we identify $W := \mathbb{N}^\Sigma \setminus \{0\}$ with the set of all inputs. Finally, $\gamma$ is an \textbf{output function}, mapping $Q$ to $\{0, 1\}$. We extend $\gamma$ to map $C$ to nonempty subsets of $\{0, 1\}$ in the obvious manner by defining
+\[ \gamma(c) := \{ j \in \{0, 1\} \mid \exists q \in Q : \gamma(q) = j \text{ and } c[q] \ge 1 \}. \]
+'''
+notes = '''Proceedings version (8 pages) as hosted by the second author. The library cites this paper for the "every species votes" convention of its stable decision by a network (StableCrn.lean): an output-stable configuration is one in which every present state has the same output. Both sections are on p. 3. [2] is the paper's reference to Angluin, Aspnes, Diamadi, Fischer, Peralta (PODC 2004). "fair computation[2]" (no space) as printed. The 4-tuple is printed "(Q, - ->, -Sigma, gamma)", with a minus sign before the arrow and before Sigma; kept as printed. Bold defined terms rendered \textbf.'''
+
+[[source]]
+item = "crn:thm:transfer"
+paper = "H.-L. Chen, D. Doty, D. Soloveichik. Deterministic function computation with chemical reaction networks"
+venue = "Natural Computing 13(4):517-534, 2014"
+version = "arXiv:1204.4176v3"
+result = "Theorem 2.1"
+page = 9
+url = "https://arxiv.org/abs/1204.4176v3"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v3 and compared with the PDF of v3; not yet checked by a person"
+statement = '''
+\textbf{Theorem 2.1} ([3]). A set $A \subseteq \mathbb{N}^k$ is stably decidable by a CRD if and only if it is semilinear.
+'''
+context = '''
+[Section 2, p. 5:] A set $A \subseteq \mathbb{N}^k$ is \emph{linear} if there exist vectors $\vec{b},\vec{u}_1,\ldots,\vec{u}_p \in\mathbb{N}^k$ such that
+\[ A=\left\{\ \left. \vec{b} + n_1 \vec{u}_1 + \ldots + n_p \vec{u}_p \ \right|\ n_1,\ldots,n_p\in\mathbb{N} \ \right\}. \]
+$A$ is \emph{semilinear} if it is a finite union of linear sets.
+[Section 2.2, p. 8:] We say a CRD $\mathcal{D}$ \emph{stably decides} the predicate $\psi:\mathbb{N}^\Sigma \to \{0,1\}$ if, for any valid initial configuration $\vec{i} \in \mathbb{N}^\Lambda$ with $\vec{i} \upharpoonright \Sigma = \vec{i}_0$, for all configurations $\vec{c}\in\mathbb{N}^\Lambda$, $\vec{i} \to^* \vec{c}$ implies $\vec{c}\to^*\vec{c}'$ such that $\vec{c}'$ is output stable and $\Phi(\vec{c}') = \psi(\vec{i}_0)$. [...] We say that $\mathcal{D}$ \emph{stably decides} a set $A\in\mathbb{N}^k$ if it stably decides its indicator function.
+[Section 2.2, p. 9:] The model they use is defined in a slightly different way. They study \emph{population protocols}, a distributed computing model in which a fixed-size set of agents, each having a state from a finite set, undergo successive pairwise interactions, the two agents updating their states upon interacting. This is equivalent to chemical reaction networks in which all reactions have exactly two reactants and two products.
+'''
+notes = '''The library cites the "if" direction (every semilinear set is stably decidable) together with Theorem 5 of AADFP06 (StableCrn.lean) for its theorem that every stably computable predicate, and every Boolean combination of threshold and remainder predicates, is stably decided by a count-conserving bimolecular CRN; the last context sentence is the paper's statement that population protocols are CRNs with two reactants and two products. [3] is the paper's numbering of Angluin, Aspnes, Eisenstat, "Stably computable predicates are semilinear", PODC 2006. The full definition of a CRD and of its output is in the first crn:def:crn-stable entry. Macros replaced as there, and \setl{a}{b} -> \left\{\ \left. a \ \right|\ b \ \right\}. "a set A \in N^k" as printed.'''
+
+# ---------------------------------------------------------------------------------------------
+# CRN-4: majority on graphs with very small local memory (MNRS14, arXiv numbering)
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+item = "crn:def:graph-stable"
+paper = "G. B. Mertzios, S. E. Nikoletseas, C. L. Raptopoulos, P. G. Spirakis. Determining majority in networks with local interactions and very small local memory"
+venue = "ICALP 2014"
+version = "arXiv:1404.7671v1"
+result = "Section 2, stable computation on graphs"
+page = 4
+url = "https://arxiv.org/abs/1404.7671v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+Given the probabilistic scheduler, a population protocol \emph{computes} a (possibly partial) function ${g: X^V \to Y}$ with error probability at most $\epsilon$, if for all $x \in g^{-1}(Y)$, the population eventually reaches a configuration $C$ that satisfies the following properties with probability at least $1-\epsilon$: (a) all agents agree on the correct output, i.e.~$g(x) = \gamma(C(v))$ for all $v \in V$ and (b) this is also true for every configuration reachable from $C$.
+Furthermore, a population protocol \emph{stably computes} a (possibly partial) function $g: X^V \to Y$ if, for \emph{every} fair scheduler, the population eventually reaches a configuration $C$ that satisfies both the above properties (a) and (b).
+'''
+context = '''
+[Section 2, p. 3:] A \emph{population protocol} consists of a finite set $Q$ of states/types, a finite set of input symbols $X$, an input function $\iota :X\rightarrow Q$, a finite set of output symbols $Y$, an output function $\gamma: Q \to Y$, and a joint transition function $\delta: Q \times Q \to Q \times Q$. If, for any pair of states $q_1, q_2 \in Q$, $\delta(q_a, q_b) = (q'_a, q'_b)$ implies that $\delta(q_b, q_a) = (q'_b, q'_a)$, then the population protocol is called \emph{symmetric}. A population protocol is executed by a fixed finite \emph{population} of agents with types in $Q$. We assume that each agent has an identity $v \in V$, but agents are oblivious to their own identity and to identities of agents they interact with.
+[Section 2, p. 3:] Initially, each agent is assigned a type according to an \emph{input} $x: V \to X$ that maps agent identities to input symbols. In the general population protocol model, agents are identified with the vertices of an \emph{interaction graph}, whose edges indicate the possible agent interactions that may take place. Here, an interaction graph is a simple connected graph $G$ (i.e.~without loops or multiple edges), which can be directed or undirected. A function $C: V \to Q$ is called a \emph{configuration}. We will say that the population protocol reaches configuration $C$ at time $t$ if, for every agent $v$ in the population, the state of $v$ at time $t$ is $C(v)$.
+[Section 2, p. 3:] In the original model, agents do not send messages or share memory; instead, an interaction between two agents updates both of their types according to a joint transition function (which can be also represented by a table). Interactions between agents are planned by a scheduler under a general ``fairness'' condition; the actual mechanism for choosing which agents interact is abstracted away. The fairness condition states that for any two configurations $C, C'$, if $C$ occurs infinitely often and $C'$ is reachable from $C$, then $C'$ also occurs infinitely often.
+[Section 2, p. 4:] In this paper, we consider a special case of a fair scheduler, namely the \emph{probabilistic scheduler}, which is defined on directed graphs as follows. During each execution step, a directed edge $(v, u) \in E$ is chosen uniformly at random from $E$, where $v$ (i.e.~the tail of $(v, u)$) is called the \emph{initiator} and $u$ (i.e.~the head of $(v, u)$) is called the \emph{responder} of the interaction. Then, agents $v$ and $u$ update their types jointly according to $\delta$. [...] The probabilistic scheduler is defined on undirected graphs similarly, by replacing every undirected edge $\{v, u\}$ by the two directed edges $(v, u)$ and $(u, v)$.
+[Section 2.2, p. 4:] For two configurations $C, C'$, we will say that $C'$ is \emph{directly reachable from $C$} (or reachable in one step from $C$) if there is $(v, u) \in E$, such that $(C'(v), C'(u)) = \delta(C(v), C(u))$ and $C'(w) = C(w)$, for all $w \in V \backslash \{v, u\}$.
+'''
+notes = '''Footnote 6 after "states/types" omitted ("In the original formulation of population protocols these are called states, but we chose to also use the term type in order to avoid confusion with the states in a Markov chain."). "for any pair of states q_1, q_2 ... delta(q_a, q_b)" as printed. [...] marks omitted text. The library states stable computation in reachability form (every configuration reachable from the initial one can reach an output-stable configuration with the right output), with a domain for partial functions, on undirected connected graphs (FORMALIZATION_DIFFERENCES.md, CRN-4).'''
+
+[[source]]
+item = "crn:def:majority"
+paper = "G. B. Mertzios, S. E. Nikoletseas, C. L. Raptopoulos, P. G. Spirakis. Determining majority in networks with local interactions and very small local memory"
+venue = "ICALP 2014"
+version = "arXiv:1404.7671v1"
+result = "Section 1, the majority problem"
+page = 1
+url = "https://arxiv.org/abs/1404.7671v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+One of the most natural computational problems in many physical systems is to compute the \emph{majority}, i.e.~to determine accurately which type of an element of the system appears more frequently.
+'''
+context = '''
+[Section 1.1, p. 2:] In this paper we study the majority problem in an \emph{arbitrary} underlying interaction graph $G$, where initially every vertex has two possible states (red and green).
+[Section 4, p. 7:] In this section we introduce a symmetric population protocol with $4$ states (called the \emph{ambassador protocol}) which, given an \emph{arbitrary} undirected graph $G=(V,E)$ as the underlying interaction graph of the population, \emph{stably computes} the majority of the types of the vertices of $G$ (even if the majority differs only by one from the minority).
+[Theorem 2, p. 8:] Given any (un)directed graph, if there exists initially a majority, then the $4$-state ambassador protocol stably computes the initial majority value.
+'''
+notes = '''The paper has no formal definition of the majority function; these are the sentences that define it. The library's majority is "red has more agents than green" with red the output true, on the domain of inputs without a tie ("if there exists initially a majority").'''
+
+[[source]]
+item = "crn:def:ambassador"
+paper = "G. B. Mertzios, S. E. Nikoletseas, C. L. Raptopoulos, P. G. Spirakis. Determining majority in networks with local interactions and very small local memory"
+venue = "ICALP 2014"
+version = "arXiv:1404.7671v1"
+result = "Section 4 and Figure 1, ambassador protocol"
+page = 7
+url = "https://arxiv.org/abs/1404.7671v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+In this section we introduce a symmetric population protocol with $4$ states (called the \emph{ambassador protocol}) which, given an \emph{arbitrary} undirected graph $G=(V,E)$ as the underlying interaction graph of the population, \emph{stably computes} the majority of the types of the vertices of $G$ (even if the majority differs only by one from the minority). Assuming that the input symbols are $g$ (for green) and $r$ (for red), the set of states in the ambassador protocol is $Q=\{(g,0),(g,1),(r,0),(r,1)\}$. The input function $\iota $ is such that $\iota(g)=(g,1)$ and $\iota(r)=(r,1)$. The output function $\gamma$ is such that $\gamma((g,i))=g$ and $\gamma((r,i))=r$, where $i \in \{0,1\}$. Finally, for simplicity of the presentation, we present the transition function $\delta$ in the form of a table in Figure 1.
+\[
+\begin{array}{|c|c|c|c|c|}
+\hline
+u \backslash v & (g,0) & (g,1) & (r,0) & (r,1) \\ \hline
+(g,0) & - & \left( (g,1),(g,0)\right) & - & \left((r,1),(r,0)\right) \\ \hline
+(g,1) & \left( (g,0),(g,1)\right) & - & \left((g,0),(g,1)\right) & \left((g,0),(r,0)\right) \\ \hline
+(r,0) & - & \left( (g,1),(g,0)\right) & - & \left( (r,1),(r,0)\right) \\ \hline
+(r,1) & \left( (r,0),(r,1)\right) & \left( (r,0),(g,0)\right) & \left((r,0),(r,1)\right) & - \\ \hline
+\end{array}
+\]
+Figure 1: The transition matrix of the ambassador model.
+
+The transition matrix of Figure 1 can be interpreted as follows. Every row and every column is labeled by a state of $Q$. The cell that belongs to the row labeled with state $q_{1} \in Q$ and to the column labeled with state $q_{2}\in Q$ has either the symbol ``$-$'' or an ordered pair of states $(q'_1, q'_2) \in Q \times Q$. In the cases where this cell has the ordered pair $(q'_1, q'_2)$, then $\delta (q_1,q_2)=(q'_1, q'_2)$, otherwise $\delta (q_1, q_2) = (q_1, q_2)$. Note that the ambassador protocol is defined on undirected interaction graphs, i.e.~in every interaction there is no initiator or responder. That is, whenever $\delta (q_1, q_2)=(q'_1, q'_2)$ then $\delta (q_2, q_1)=(q'_2, q'_1)$.
+'''
+context = '''
+[Section 4, p. 7:] The main idea of the ambassador protocol can be described as follows. The first component of the state of a vertex $u$ denotes the color of $u$. [...] Furthermore, if the second component of the state of $u$ is $1$ (resp. $0$), this is interpreted as ``$u$ has an ambassador'' (resp. ``$u$ has no ambassador''). [...]
+\begin{itemize}
+\item Assume that $u$ and $v$ have different colors. If both $u$ and $v$ have an ambassador, then they both keep their own colors in the next step, but both their ambassadors disappear (they die during their battle as they are equally ``strong''). If $u$ has an ambassador and $v$ has no ambassador, then $v$ takes the color of $u$ in the next step and the ambassador now moves from $u$ to $v$ (the ambassador wins the battle, as there is no opponent, and leaves vertex $u$ to conquer vertex $v$). If both $u$ and $v$ have no ambassador then their state remains the same at the next step (in this case no battle can take place).
+\item Assume that both $u$ and $v$ have the same color; then they both maintain their color in the next step. If they both have (or if they both do not have) an ambassador, then their state remains the same at the next step (there is no battle whenever there is no ambassador, or between ambassadors of the same color). If one of them (say $u$) has an ambassador and the other one (say $v$) does not have one, then the ambassador moves from $u$ to $v$.
+\end{itemize}
+'''
+notes = '''The table is the LaTeX array of the source with spacing commands removed; it was compared cell by cell with the PDF (Figure 1, p. 7). In the PDF the caption reads "Fig. 1. The transition matrix of the ambassador model." In the omitted sentence of the first context paragraph, "whenever u is at state (q,i) (resp. (r,i))" has (q,i) as printed. [...] marks omitted text. The library's states are pairs (color, ambassador bit) with red = true (FORMALIZATION_DIFFERENCES.md, CRN-4).'''
+
+[[source]]
+item = "crn:lem:amb-invariant"
+paper = "G. B. Mertzios, S. E. Nikoletseas, C. L. Raptopoulos, P. G. Spirakis. Determining majority in networks with local interactions and very small local memory"
+venue = "ICALP 2014"
+version = "arXiv:1404.7671v1"
+result = "Proof of Theorem 2, the invariant"
+page = 8
+url = "https://arxiv.org/abs/1404.7671v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+One of the crucial invariants of the protocol is that, at any step during its execution the difference between the number of ambassadors of the majority and the minority equals the difference between the initial majority and the initial minority. Indeed, whenever ambassadors disappear, they disappear in pairs, i.e.~one from each color.
+'''
+context = '''
+[Section 4, p. 7:] Assuming that the input symbols are $g$ (for green) and $r$ (for red), the set of states in the ambassador protocol is $Q=\{(g,0),(g,1),(r,0),(r,1)\}$. The input function $\iota $ is such that $\iota(g)=(g,1)$ and $\iota(r)=(r,1)$. The output function $\gamma$ is such that $\gamma((g,i))=g$ and $\gamma((r,i))=r$, where $i \in \{0,1\}$. Finally, for simplicity of the presentation, we present the transition function $\delta$ in the form of a table in Figure 1.
+[Section 4, p. 7:] Furthermore, if the second component of the state of $u$ is $1$ (resp. $0$), this is interpreted as ``$u$ has an ambassador'' (resp. ``$u$ has no ambassador'').
+'''
+notes = '''Quoted from the proof of Theorem 2 (no separate lemma in the paper). Figure 1 is quoted in the crn:def:ambassador entry. The library states the invariant as: the number of ambassadors of each color starts at the input count (every agent starts with an ambassador, iota(c) = (c,1)) and never increases, and the difference red minus green never changes.'''
+
+[[source]]
+item = "crn:lem:amb-steps"
+paper = "G. B. Mertzios, S. E. Nikoletseas, C. L. Raptopoulos, P. G. Spirakis. Determining majority in networks with local interactions and very small local memory"
+venue = "ICALP 2014"
+version = "arXiv:1404.7671v1"
+result = "Proof of Theorem 2, the two steps"
+page = 8
+url = "https://arxiv.org/abs/1404.7671v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+For any $k, \ell \geq 0$ denote by $\mathcal{C}_{k, \ell}$ the set of configurations of $G$ with $k$ red ambassadors and $\ell $ green ambassadors. [...]
+Therefore, since $G$ is connected and $k,\ell \geq 1$ by assumption, for every configuration in $\mathcal{C}_{k,\ell }$ there exists a chain of transitions that lead to a configuration in $\mathcal{C}_{k-1,\ell -1}$. That is, every configuration in $\mathcal{C}_{k,\ell }$ \emph{can lead} to a configuration in $\mathcal{C}_{k-1,\ell -1}$.
+[...]
+Note now that, once $G$ has a configuration in $\mathcal{C}_{k-\ell ,0}$, it will stay for ever at a configuration in $\mathcal{C}_{k-\ell ,0}$, since no ambassador can disappear any more. Furthermore note by the definition of the ambassador protocol (cf. Figure~1) that for every configuration in $\mathcal{C}_{k,\ell }$ there exists a chain of transitions that lead to a configuration where all vertices are colored with the color of the initial majority (regardless of whether they have an ambassador or not).
+'''
+context = '''
+[Proof of Theorem 2, p. 8:] First recall that, whenever a vertex $u$ with a red ambassador interacts with a vertex $v$ that has a green ambassador, both the number of red and green ambassadors decrease by one (cf. Figure 1). Furthermore recall that, whenever a vertex $u$ with an ambassador (of any color) interacts with a vertex $v$ that has no ambassador, the ambassador of $u$ is moved to vertex $v$ (and $v$ receives the color of $u$).
+[Proof of Theorem 2, p. 8:] Assume that the interaction graph $G$ has $n$ vertices and that the initial majority has cardinality $k$ and the initial minority has cardinality $\ell $, where $k>\ell \geq 1$. Then, as we proved above, $G$ will be led to a configuration in $\mathcal{C}_{k-i,\ell -i}$, for every $i=1,2,\ldots ,\ell $. That is, $G$ will be led in finite steps to a configuration in $\mathcal{C}_{k-\ell ,0}$, i.e.~to a configuration where all $k-\ell \geq 1$ ambassadors are of the color of the initial majority.
+'''
+notes = '''Quoted from the proof of Theorem 2 (no separate lemma in the paper); [...] marks omitted text. In the last sentence of the statement the configurations are written C_{k,l} as printed, in the paragraph about configurations of C_{k-l,0} (all ambassadors of the majority color); the library's second step assumes that all ambassadors have the same color b and that there is one. LaTeX line breaks inside $\mathcal{C}_{...}$ (lines ending in %) were joined. Figure 1 is quoted in the crn:def:ambassador entry.'''
+
+[[source]]
+item = "crn:lem:graph-extend"
+paper = "G. B. Mertzios, S. E. Nikoletseas, C. L. Raptopoulos, P. G. Spirakis. Determining majority in networks with local interactions and very small local memory"
+venue = "ICALP 2014"
+version = "arXiv:1404.7671v1"
+result = "Proof of Theorem 1, ignoring two agents"
+page = 7
+url = "https://arxiv.org/abs/1404.7671v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+Suppose now that we have a population $V' = V \cup \{v, u\}$, i.e.~$V'$ consists of $V$ together with two extra agents $v$ and $u$ (where $u, v \notin V$). [...]
+But starting at $C'_1$ it is possible to follow the sequence of transitions $T_1$ (i.e.~ignoring agents $v$ and $u$ during these steps), thus reaching a configuration $C'$ where all agents in $V' \backslash \{v, u\}$ are of type $q_1$ and agents $v$ and $u$ remain of type $r$.
+'''
+context = '''
+[Proof of Theorem 1, p. 7:] In other words, there is a sequence of transitions $T_1$ (equivalently, there is a sequence of pairs of agents picked by the scheduler) that transforms configuration $C_1$ to the configuration where all agents are of type $q_1$.
+[Proof of Theorem 1, p. 7:] Consider also the following two initial configurations: (a) $C'_1 = (R_1, G_1 \cup \{v, u\})$ and (b) $C'_2 = (R_2, G_2 \cup \{v, u\})$. In particular, in configuration $C'_1$, agents in $R_1$ are of type $r$ and agents in $G_1 \cup \{v, u\}$ are of type $g$.
+'''
+notes = '''Quoted from the proof of Theorem 1 (no separate lemma in the paper); [...] marks omitted text. "agents v and u remain of type r" as printed (in C'_1 they are of type g). The library's lemma is the general form of this step: reachability transfers along an injective map of agents that preserves edges, the other agents being frozen.'''
+
+[[source]]
+item = "crn:def:am-graph"
+paper = "G. B. Mertzios, S. E. Nikoletseas, C. L. Raptopoulos, P. G. Spirakis. Determining majority in networks with local interactions and very small local memory"
+venue = "ICALP 2014"
+version = "arXiv:1404.7671v1"
+result = "Section 2.1, eq. (1)"
+page = 4
+url = "https://arxiv.org/abs/1404.7671v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+Angluin et al.~[2] proposed a population protocol for computing majority with high probability (whp) in the case where the interaction graph is a clique. Their protocol uses just 3 types $Q = \{b, g, r\}$. For convenience, we will sometimes refer to these types as the \emph{blank, green} and \emph{red} type respectively. The joint transition function $\delta$ is given by:
+\begin{equation}
+\delta(x, y) = \left\{
+\begin{array}{ll}
+	(x, x), & \quad \textrm{if $x=y$ or $y = b$} \\
+	(x, b), & \quad \textrm{if $(x, y) \in \{(g, r), (r, g)\}$}.
+\end{array}
+\right. \tag{1}
+\end{equation}
+'''
+context = '''
+[Section 2, p. 4:] In this paper, we consider a special case of a fair scheduler, namely the \emph{probabilistic scheduler}, which is defined on directed graphs as follows. During each execution step, a directed edge $(v, u) \in E$ is chosen uniformly at random from $E$, where $v$ (i.e.~the tail of $(v, u)$) is called the \emph{initiator} and $u$ (i.e.~the head of $(v, u)$) is called the \emph{responder} of the interaction. Then, agents $v$ and $u$ update their types jointly according to $\delta$. In particular, if $v$ is of type $q_v$ and $u$ is of type $q_u$, the type of $v$ (respectively $u$) becomes $q_v'$ (respectively $q_u'$), where $(q_v', q_u') = \delta(q_v, q_u)$. The types of all other agents remain unchanged. The probabilistic scheduler is defined on undirected graphs similarly, by replacing every undirected edge $\{v, u\}$ by the two directed edges $(v, u)$ and $(u, v)$. That is, in an undirected graph $G$, the probabilistic scheduler selects first an undirected edge uniformly at random and then it selects equiprobably one of its endpoint as the initiator.
+'''
+notes = '''[2] is the paper's numbering of Angluin, Aspnes, Eisenstat, "A simple population protocol for fast robust approximate majority", Distributed Computing 21 (2008) (the crn:def:am entry quotes its table). The equation number (1) was added as \tag{1} as in the PDF. Eq. (1) as printed does not list the pairs with x = b and y not b; in the table of AAE08 these interactions change nothing, and so does the library's rule. The library's species X, Y, B correspond to r (or g), g (or r) and b; in its Theorem 4 statement the majority is Y, the paper's g (FORMALIZATION_DIFFERENCES.md, CRN-4).'''
+
+[[source]]
+item = "crn:def:winprob"
+paper = "G. B. Mertzios, S. E. Nikoletseas, C. L. Raptopoulos, P. G. Spirakis. Determining majority in networks with local interactions and very small local memory"
+venue = "ICALP 2014"
+version = "arXiv:1404.7671v1"
+result = "Proof of Theorem 4, eq. (18)"
+page = 10
+url = "https://arxiv.org/abs/1404.7671v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+Assume without loss of generality that the initial majority is of type $g$ (green), i.e.~$|G_0| \geq |R_0|$. The state space of the Markov chain $\mathcal{M}$ describing the evolution of the protocol will be the set $\mathcal{S} = \{(A, B): A, B \subseteq V, A\cap B = \emptyset\}$. In particular, when $\mathcal{M}$ is in state $(A, B)$ at time $t$, we will write that $(R_t, G_t) = (A, B)$, and this will mean that the subset of vertices $A$ (respectively $B$) is of type $r$ (respectively $g$). It is also evident that the set of vertices $V-(A\cup B)$ is of type $b$. It then follows that the majority protocol in [2] fails to correctly identify type $g$ as the initial majority if $\mathcal{M}$ eventually reaches state $(V, \emptyset)$; we will then say that the \emph{initial minority wins} (whereas in the opposite case we will say that the \emph{initial majority wins}). Since the initial placement of individuals on the vertices of the graph is random and the initial minority is of type $r$, we also have that
+\[
+\Pr\{\textrm{initial minority wins}\} = \sum_{S \subseteq V: |S| = |G_0|} \frac{1}{{n \choose |G_0|}} \Pr\{\textrm{$(V, \emptyset)$ reached} | (R_0, G_0) = (V-S, S)\}. \qquad (18)
+\]
+'''
+context = '''
+[Theorem 4, p. 10:] For any strongly connected directed graph $G$, if the initial assignment of individuals to the vertices of $G$ is random, then the majority protocol described in [2] correctly identifies the initial majority with probability at least $\frac{1}{2}$.
+[Section 2.2, p. 4:] Specifically for the model of [2], we denote by $W_t$ (respectively $R_t$ and $G_t$) the set of agents in state $b$ (respectively $r$ and $g$) at time $t$.
+'''
+notes = '''Quoted from the proof of Theorem 4. Macros replaced: {\cal M} -> \mathcal{M}, {\cal S} -> \mathcal{S}; \cite{AAE08} rendered [2] (the paper's numbering). The equation number (18) is the PDF's. "the majority protocol in [2] fails to correctly identify type g as the initial majority if M eventually reaches state (V, emptyset)" as printed. The library defines win_t(s), the probability over a uniform m-subset S of agents of type Y (the paper's g) and over the scheduler that every agent is s at time t, and the convergence probability as its supremum over t; the paper's "(V, emptyset) reached" is its limit.'''
+
+[[source]]
+item = "crn:lem:am-coupling"
+paper = "G. B. Mertzios, S. E. Nikoletseas, C. L. Raptopoulos, P. G. Spirakis. Determining majority in networks with local interactions and very small local memory"
+venue = "ICALP 2014"
+version = "arXiv:1404.7671v1"
+result = "Proof of Theorem 4, eqs. (19)-(20)"
+page = 10
+url = "https://arxiv.org/abs/1404.7671v1"
+status = "transcribed by an AI agent from the arXiv LaTeX source of v1 and compared with the PDF of v1; not yet checked by a person"
+statement = '''
+Consider now a fixed choice of $S$ in the above sum and an arbitrary set $A \subseteq S$ of size $|A| = |R_0| = |V - S|$ (notice that it is always possible to find such a set $A$, since $|S| \geq |V-S|$, by assumption). Then we have
+\begin{align*}
+\Pr\{\textrm{$(V, \emptyset)$ reached} | (R_0, G_0) = (V-S, S) \} & \leq \Pr\{\textrm{$(V, \emptyset)$ reached} | (R_0, G_0) = (V-A, A) \} \qquad (19)\\
+& = \Pr\{\textrm{$(\emptyset, V)$ reached} | (R_0, G_0) = (A, V-A) \}. \qquad (20)
+\end{align*}
+For the inequality we used the fact that $V-S \subseteq V-A$ and that increasing the initial number of agents of type $r$ increases the probability that agents of type $r$ win. For the equality we used the fact that the protocol is symmetric for types $g$ and $r$.
+'''
+context = '''
+[Proof of Theorem 4, p. 10:] The state space of the Markov chain $\mathcal{M}$ describing the evolution of the protocol will be the set $\mathcal{S} = \{(A, B): A, B \subseteq V, A\cap B = \emptyset\}$. In particular, when $\mathcal{M}$ is in state $(A, B)$ at time $t$, we will write that $(R_t, G_t) = (A, B)$, and this will mean that the subset of vertices $A$ (respectively $B$) is of type $r$ (respectively $g$). It is also evident that the set of vertices $V-(A\cup B)$ is of type $b$.
+[Section 2.1, p. 4:] The joint transition function $\delta$ is given by:
+\[
+\delta(x, y) = \left\{
+\begin{array}{ll}
+	(x, x), & \quad \textrm{if $x=y$ or $y = b$} \\
+	(x, b), & \quad \textrm{if $(x, y) \in \{(g, r), (r, g)\}$}.
+\end{array}
+\right. \qquad (1)
+\]
+'''
+notes = '''Quoted from the proof of Theorem 4 (eqnarray rendered as align*, equation numbers as in the PDF). The paper states the monotonicity and the symmetry without proof; the library proves the monotonicity at every finite time by a monotone coupling for the order Y < B < X, and the symmetry by exchanging X and Y (FORMALIZATION_DIFFERENCES.md, CRN-4). Macros replaced: {\cal M}, {\cal S} -> \mathcal{M}, \mathcal{S}.'''
+
+# ---------------------------------------------------------------------------------------------
+# CRN-5: deterministic exact majority and plurality (GHMSS16)
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+item = "crn:def:em-marks"
+paper = "L. Gąsieniec, D. Hamilton, R. Martin, P. G. Spirakis, G. Stachowiak. Deterministic population protocols for exact majority and plurality"
+venue = "OPODIS 2016, LIPIcs 70, 14:1-14:14"
+version = "LIPIcs.OPODIS.2016.14"
+result = "Section 1, the model"
+page = 2
+url = "https://doi.org/10.4230/LIPIcs.OPODIS.2016.14"
+status = "transcribed by an AI agent from the published PDF (open access, CC-BY; text extraction); no LaTeX source available; not yet checked by a person"
+statement = '''
+When two entities engage in interaction they mutually access their local states and, on the conclusion of the encounter, their states get updated according to the global (shared) transition function. In the asynchronous model, also adopted in this paper, the order of interactions in consecutive rounds is unpredictable but fair, i.e., none of the pairs of entities can be starved from interaction. [...] A population protocol terminates if all participating entities eventually agree on some value represented by dedicated states, independently of the order of interactions. This value can reflect the colour or the size of selected majority [6, 7, 9, 23], the identity of the leader [2, 1, 19], but also completion of more complex tasks such as network formation [25], counting [26], and others.
+'''
+context = '''
+[Section 1, p. 1:] The model of population protocols adopted in this paper was proposed first in the seminal paper by Angluin et al. [5] and popularised later in [7]. Their model provides a suitable theoretical framework for studying pairwise interactions within a large collection of anonymous (indistinguishable) entities, also referred to as agents, equipped with little computational power. The entities are modelled as finite state machines.
+[Section 5, p. 10:] At first we describe a protocol for the relative majority which only finds the winner $l^*[0..k-1]$. This is done by marking all entities possessing this colour with the winning label.
+'''
+notes = '''The paper has no formal definition of stable computation; these are its sentences on the model (Section 1 runs over pp. 1-2; the statement is on p. 2). [...] marks an omitted sentence on the probabilistic model. [5] is the paper's reference to Angluin, Aspnes, Diamadi, Fischer, Peralta (Distributed Computing 2006). The library uses the reachability form of stable computation of CRN-3 with outputs in any type, possibly depending on the agent's own input ("stably marks"), to cover Theorems 3, 6 and 7 (FORMALIZATION_DIFFERENCES.md, CRN-5, item 1).'''
+
+[[source]]
+item = "crn:def:em-static"
+paper = "L. Gąsieniec, D. Hamilton, R. Martin, P. G. Spirakis, G. Stachowiak. Deterministic population protocols for exact majority and plurality"
+venue = "OPODIS 2016, LIPIcs 70, 14:1-14:14"
+version = "LIPIcs.OPODIS.2016.14"
+result = "Section 2, Figs. 1 and 2"
+page = 4
+url = "https://doi.org/10.4230/LIPIcs.OPODIS.2016.14"
+status = "transcribed by an AI agent from the published PDF (open access, CC-BY; text extraction, Figures 1 and 2 read from the rendered page); no LaTeX source available; not yet checked by a person"
+statement = '''
+[Section 2, p. 4:] Initially each entity $a \in A$ obtains its original colour $c_a$, being one of the three available denoted by integers $-1$, $0$, and $1$. Thus, the main goal in our reformulation of majority protocols is to determine whether there are more 1's than $(-1)$'s (green domination), more $(-1)$'s than 1's (red domination), or whether there is a tie between the two. In other words, our majority protocols aim at determining the sign of the expression:
+\[ \sum_{a \in A} c_a . \]
+[p. 5:] If this sign is positive, there are more 1's, if negative, there are more $(-1)$'s, and if the sum is 0, we report equivalence between the two competing colours. During the communication process each entity $a \in A$ has an attributed \emph{state} $s_a$. [...]
+Throughout the computation process the entities can be in one of the three \emph{strong states} $[-1], [0]$, and $[1]$ or the three weak states $\langle -1 \rangle, \langle 0 \rangle, \langle 1 \rangle$. In the begining, each entity $a \in A$ with attributed colour $c_a = x$ is in state $[x]$. With each state $s$ we associate a weight $w(s)$ such that $w([x]) = x$ and $w(\langle x \rangle) = 0$. This association is illustrated by the table in Fig. 1.
+In due course, when two entities $a, b \in A$ interact the shared \emph{transition function} determines their resulting states. And, in particular, if an entity in a strong state $[x]$ meets another in a weak state $\langle y \rangle$, the weak state becomes $\langle x \rangle$ and the strong state remains unchanged. If during a meeting a strong state $[x]$, for $x \ne 0$, meets $[0]$ then only state $[0]$ is changed to $\langle x \rangle$. Finally, if $[1]$ interacts with $[-1]$ both states are changed to $[0]$. Other type of encounters does not change the states of entities. The respective shared transition function is illustrated by the table in Fig. 2.
+
+Figure 1 (The states and their weights):
+\[
+\begin{array}{|l|c|} \hline
+\text{state } s & \text{weight } w(s) \\ \hline
+[-1] & -1 \\
+{[0]}, \langle -1 \rangle, \langle 0 \rangle, \langle 1 \rangle & 0 \\
+{[1]} & 1 \\ \hline
+\end{array}
+\]
+Figure 2 (The transition table for static majority protocol with ties):
+\[
+\begin{array}{|c|cccccc|} \hline
+s_a \backslash s_b & [-1] & [0] & [1] & \langle -1 \rangle & \langle 0 \rangle & \langle 1 \rangle \\ \hline
+[-1] & ([-1],[-1]) & ([-1],\langle -1 \rangle) & ([0],[0]) & ([-1],\langle -1 \rangle) & ([-1],\langle -1 \rangle) & ([-1],\langle -1 \rangle) \\
+{[0]} & (\langle -1 \rangle,[-1]) & ([0],[0]) & (\langle 1 \rangle,[1]) & ([0],\langle 0 \rangle) & ([0],\langle 0 \rangle) & ([0],\langle 0 \rangle) \\
+{[1]} & ([0],[0]) & ([1],\langle 1 \rangle) & ([1],[1]) & ([1],\langle 1 \rangle) & ([1],\langle 1 \rangle) & ([1],\langle 1 \rangle) \\
+\langle -1 \rangle & (\langle -1 \rangle,[-1]) & (\langle 0 \rangle,[0]) & (\langle 1 \rangle,[1]) & (\langle -1 \rangle,\langle -1 \rangle) & (\langle -1 \rangle,\langle 0 \rangle) & (\langle -1 \rangle,\langle 1 \rangle) \\
+\langle 0 \rangle & (\langle -1 \rangle,[-1]) & (\langle 0 \rangle,[0]) & (\langle 1 \rangle,[1]) & (\langle 0 \rangle,\langle -1 \rangle) & (\langle 0 \rangle,\langle 0 \rangle) & (\langle 0 \rangle,\langle 1 \rangle) \\
+\langle 1 \rangle & (\langle -1 \rangle,[-1]) & (\langle 0 \rangle,[0]) & (\langle 1 \rangle,[1]) & (\langle 1 \rangle,\langle -1 \rangle) & (\langle 1 \rangle,\langle 0 \rangle) & (\langle 1 \rangle,\langle 1 \rangle) \\ \hline
+\end{array}
+\]
+'''
+context = '''
+[Section 2, p. 4:] This section reformulates the algorithm for majority presented in [5].
+'''
+notes = '''The prose rules and the tables are on pp. 4-5 (the tables at the top of p. 5). Angle brackets are rendered \langle x \rangle; "begining" as printed. [...] marks an omitted sentence on the knowledge of entities. Braces {[0]} only protect the brackets in LaTeX arrays. The tables were transcribed from the rendered page and cross-checked against the column-by-column text extraction; the library's notes record that the table of Fig. 2 agrees with the rules of the text in all entries. [5] is the paper's reference to Angluin, Aspnes, Diamadi, Fischer, Peralta.'''
+
+[[source]]
+item = "crn:lem:em-static"
+paper = "L. Gąsieniec, D. Hamilton, R. Martin, P. G. Spirakis, G. Stachowiak. Deterministic population protocols for exact majority and plurality"
+venue = "OPODIS 2016, LIPIcs 70, 14:1-14:14"
+version = "LIPIcs.OPODIS.2016.14"
+result = "Lemma 1"
+page = 5
+url = "https://doi.org/10.4230/LIPIcs.OPODIS.2016.14"
+status = "transcribed by an AI agent from the published PDF (open access, CC-BY; text extraction, checked on the rendered page); no LaTeX source available; not yet checked by a person"
+statement = '''
+\textbf{Lemma 1} (Invariant 1). Initially, the sum $S = \sum_{a \in A} w(s_a)$ equals to $\sum_{a \in A} c_a$, and its value remains unchanged during the computation process.
+'''
+context = '''
+[Section 2, p. 5:] Throughout the computation process the entities can be in one of the three \emph{strong states} $[-1], [0]$, and $[1]$ or the three weak states $\langle -1 \rangle, \langle 0 \rangle, \langle 1 \rangle$. In the begining, each entity $a \in A$ with attributed colour $c_a = x$ is in state $[x]$. With each state $s$ we associate a weight $w(s)$ such that $w([x]) = x$ and $w(\langle x \rangle) = 0$.
+'''
+notes = '''The rules of the protocol are quoted in the crn:def:em-static entry. "equals to" as printed.'''
+
+[[source]]
+item = "crn:lem:em-static"
+paper = "L. Gąsieniec, D. Hamilton, R. Martin, P. G. Spirakis, G. Stachowiak. Deterministic population protocols for exact majority and plurality"
+venue = "OPODIS 2016, LIPIcs 70, 14:1-14:14"
+version = "LIPIcs.OPODIS.2016.14"
+result = "Lemma 2"
+page = 5
+url = "https://doi.org/10.4230/LIPIcs.OPODIS.2016.14"
+status = "transcribed by an AI agent from the published PDF (open access, CC-BY; text extraction, checked on the rendered page); no LaTeX source available; not yet checked by a person"
+statement = '''
+\textbf{Lemma 2} (Invariant 2). The value of the sum $R = \sum_{a \in A} |w(s_a)|$ decreases monotonically throughout the communication process and it stabilises eventually on the value $R_{\mathrm{fin}} = |S|$.
+'''
+context = '''
+[Section 2, p. 5:] With each state $s$ we associate a weight $w(s)$ such that $w([x]) = x$ and $w(\langle x \rangle) = 0$.
+[Lemma 1, p. 5:] Initially, the sum $S = \sum_{a \in A} w(s_a)$ equals to $\sum_{a \in A} c_a$, and its value remains unchanged during the computation process.
+'''
+notes = '''The rules of the protocol are quoted in the crn:def:em-static entry. "decreases monotonically" as printed (the proof says the number of strong states [1], [-1] "can only decrease"); the library states that R does not increase and that a configuration with R = |S| is reachable.'''
+
+[[source]]
+item = "crn:thm:em-static"
+paper = "L. Gąsieniec, D. Hamilton, R. Martin, P. G. Spirakis, G. Stachowiak. Deterministic population protocols for exact majority and plurality"
+venue = "OPODIS 2016, LIPIcs 70, 14:1-14:14"
+version = "LIPIcs.OPODIS.2016.14"
+result = "Theorem 3"
+page = 6
+url = "https://doi.org/10.4230/LIPIcs.OPODIS.2016.14"
+status = "transcribed by an AI agent from the published PDF (open access, CC-BY; text extraction, checked on the rendered page); no LaTeX source available; not yet checked by a person"
+statement = '''
+\textbf{Theorem 3.} The population protocol presented in this section computes majority and returns equality if neither of the colours dominates the other.
+'''
+context = '''
+[Section 2, p. 4:] Initially each entity $a \in A$ obtains its original colour $c_a$, being one of the three available denoted by integers $-1$, $0$, and $1$. Thus, the main goal in our reformulation of majority protocols is to determine whether there are more 1's than $(-1)$'s (green domination), more $(-1)$'s than 1's (red domination), or whether there is a tie between the two. In other words, our majority protocols aim at determining the sign of the expression: $\sum_{a \in A} c_a$.
+[Section 2, p. 5:] Throughout the computation process the entities can be in one of the three \emph{strong states} $[-1], [0]$, and $[1]$ or the three weak states $\langle -1 \rangle, \langle 0 \rangle, \langle 1 \rangle$. In the begining, each entity $a \in A$ with attributed colour $c_a = x$ is in state $[x]$. With each state $s$ we associate a weight $w(s)$ such that $w([x]) = x$ and $w(\langle x \rangle) = 0$.
+[Section 2, p. 5:] In due course, when two entities $a, b \in A$ interact the shared \emph{transition function} determines their resulting states. And, in particular, if an entity in a strong state $[x]$ meets another in a weak state $\langle y \rangle$, the weak state becomes $\langle x \rangle$ and the strong state remains unchanged. If during a meeting a strong state $[x]$, for $x \ne 0$, meets $[0]$ then only state $[0]$ is changed to $\langle x \rangle$. Finally, if $[1]$ interacts with $[-1]$ both states are changed to $[0]$. Other type of encounters does not change the states of entities.
+[Section 2, p. 5:] \textbf{Observation} If the sum $S$ is negative, it declares majority of reds (denoted by $-1$), positive $S$ indicates majority of greens (denoted by 1), otherwise $S$ refers to the tie.
+'''
+notes = '''The output of a state is not defined explicitly in Section 2; the proof of Theorem 3 reads it from the strong and weak states ("will recolour all entities accordingly", "change states in all other entities to <0>"), and the library takes the output of [x] and <x> to be x. The model (fair asynchronous scheduler) is quoted in the crn:def:em-marks entry; the full transition table (Fig. 2) in the crn:def:em-static entry.'''
+
+[[source]]
+item = "crn:def:em-dynamic"
+paper = "L. Gąsieniec, D. Hamilton, R. Martin, P. G. Spirakis, G. Stachowiak. Deterministic population protocols for exact majority and plurality"
+venue = "OPODIS 2016, LIPIcs 70, 14:1-14:14"
+version = "LIPIcs.OPODIS.2016.14"
+result = "Section 3, Figs. 3 and 4"
+page = 6
+url = "https://doi.org/10.4230/LIPIcs.OPODIS.2016.14"
+status = "transcribed by an AI agent from the published PDF (open access, CC-BY; text extraction, Figures 3 and 4 read from the rendered page); no LaTeX source available; not yet checked by a person"
+statement = '''
+[Section 3, p. 6:] The population protocol presented below determines whether there are more original 1's, more $(-1)$'s, or there is a tie after the last intervention of the external force. For the purpose of our protocol each entity $a \in A$ must store its original colour $c_a \in \{-1, 0, 1\}$, and this stored colour can be altered only by the external force at any time. Besides the colour, the entity maintains a state $s_a$ governed by the shared transition function. More formally, an entity's knowledge refers to the pair $(c_a, s_a)$. We define five strong states: $[-2], [-1], [0], [1], [2]$, and three weak states $\langle -1 \rangle, \langle 0 \rangle, \langle 1 \rangle$. Before the protocol is initiated, if $c_a = x$ we set $s_a = [x]$. On the conclusion all entities are in state
+\begin{itemize}
+\item $[1]$, $[2]$ or $\langle 1 \rangle$ if there are more 1's than $(-1)$'s,
+\item $[-1]$, $[-2]$ or $\langle -1 \rangle$ if there are less 1's than $(-1)$'s, and
+\item $[0]$ or $\langle 0 \rangle$ when there is a tie.
+\end{itemize}
+We define the weight function, $w(s)$, on a state $s$ as $w([x]) = x$ and $w(\langle x \rangle) = 0$, see the table in Fig. 3.
+[...] When the colour $c_a$ is changed to $c'_a = c_a + \delta$, the state is changed from $s_a$ to $s'_a = [w(s_a) + \delta]$. Note that this rule preserves both invariants 1 and 2. This is illustrated by the table to the right in Fig. 3 describing how states are changed when $c_a = 1$ is changed to $c'_a = -1$, or vice-versa. In this table we do not consider, for example, combinations of states $s_a = [-1], [-2]$ with colour $c_a = 1$ because of the invariant 2.
+
+[Section 3, p. 7:] In what follows we describe what happens to the states when two entities $a, b \in A$ interact. If a strong state $[1]$ or $[2]$ meets a weak state $\langle y \rangle$ or $[0]$, then this second state becomes $\langle 1 \rangle$. If a strong state $[-1]$ or $[-2]$ meets a weak state $\langle y \rangle$ or $[0]$, then the latter state becomes $\langle -1 \rangle$. If a strong state $[0]$ meets a weak state, the weak state is changed to $\langle 0 \rangle$. If $[1]$ meets $[-1]$ or $[2]$ meets $[-2]$, they are both changed to $[0]$. If $[2]$ meets $[-1]$, they are changed to $[1]$ and $[0]$ respectively. If $[-2]$ meets $[1]$, they are changed to $[-1]$ and $[0]$ respectively. Other encounters do not result in state alteration. This is illustrated by the table in Fig. 4 which does not take into account encounters between entities where both are in weak states, because they do not result in state alteration.
+
+Figure 3 (The weight function $w(s)$ and the state transition rules when recolouring occurs by an external force):
+\[
+\begin{array}{|c|c|} \hline
+s & w(s) \\ \hline
+[-2] & -2 \\
+{[-1]} & -1 \\
+{[0]}, \langle -1 \rangle, \langle 0 \rangle, \langle 1 \rangle & 0 \\
+{[1]} & 1 \\
+{[2]} & 2 \\ \hline
+\end{array}
+\qquad
+\begin{array}{|c|c|} \hline
+s_a,\ c_a = 1 \text{ changes to } c'_a = -1 & s'_a \\ \hline
+[0], \langle -1 \rangle, \langle 0 \rangle, \langle 1 \rangle & [-2] \\
+{[1]} & [-1] \\
+{[2]} & [0] \\ \hline
+s_a,\ c_a = -1 \text{ changes to } c'_a = 1 & s'_a \\ \hline
+[0], \langle -1 \rangle, \langle 0 \rangle, \langle 1 \rangle & [2] \\
+{[-1]} & [1] \\
+{[-2]} & [0] \\ \hline
+\end{array}
+\]
+Figure 4 (The state transition table for interacting entities for dynamic majority):
+\[
+\begin{array}{|c|ccccc|} \hline
+s_a \backslash s_b & [-2] & [-1] & [0] & [1] & [2] \\ \hline
+[-2] & ([-2],[-2]) & ([-2],[-1]) & ([-2],\langle -1 \rangle) & ([-1],\langle -1 \rangle) & ([0],[0]) \\
+{[-1]} & ([-1],[-2]) & ([-1],[-1]) & ([-1],\langle -1 \rangle) & ([0],[0]) & (\langle 1 \rangle,[1]) \\
+{[0]} & (\langle -1 \rangle,[-2]) & (\langle -1 \rangle,[-1]) & ([0],[0]) & (\langle 1 \rangle,[1]) & (\langle 1 \rangle,[2]) \\
+{[1]} & (\langle -1 \rangle,[-1]) & ([0],[0]) & (\langle 1 \rangle,[1]) & ([1],[1]) & ([1],[2]) \\
+{[2]} & ([0],[0]) & ([1],\langle 1 \rangle) & ([2],\langle 1 \rangle) & ([2],[1]) & ([2],[2]) \\
+\text{weak} & (\langle -1 \rangle,[-2]) & (\langle -1 \rangle,[-1]) & (\langle 0 \rangle,[0]) & (\langle 1 \rangle,[1]) & (\langle 1 \rangle,[2]) \\ \hline
+\end{array}
+\]
+'''
+context = '''
+[Section 3, p. 6:] In this section we consider a variant of population protocols in which the original colours (attributes) of entities could be altered by an external force for some unspecified, however limited, period of time. After this initial period, the relevant population protocol is expected to eventually stabilize.
+[Section 3, p. 6:] We assume that an entity is aware when its original colour changes, and is able to modify its current state as a result, but such a change is again governed by common state transition rules for all entities. We also assume that it is not possible for the external force to alter the original colour of an entity while it is simultaneously interacting with another entity.
+[Section 5, p. 11:] 3. An array $s[0..k-1]$ representing states $s[i]$ in $k$ independent instances of protocol $P_2(i)$ associated with colours $c[i]$. The computations with respect to $P_2(i)$ are performed only if the two interacting entities have the same label prefix $l[0..i-1]$. Otherwise protocol $P_2(i)$ is not executed.
+'''
+notes = '''[...] marks the omitted statement of the two invariants (quoted in the crn:def:em-dyninv entry). The tables were transcribed from the rendered page 7 and cross-checked against the column-by-column text extraction. As printed, the table of Fig. 4 and the rules of the text give different states in five entries: row [-2], column [1] and row [1], column [-2] (([-1], <-1>) and (<-1>, [-1]) against [-1] and [0] in the text), row [2], column [-1] and row [-1], column [2] (([1], <1>) and (<1>, [1]) against [1] and [0]), and row [1], column [0] ((<1>, [1]) against [1] meeting [0] turning the second state into <1>). The library follows the rules of the text, and lets the protocol run separately in groups for Section 5 (last context excerpt); FORMALIZATION_DIFFERENCES.md, CRN-5, "Details of the source", explains the choice.'''
+
+[[source]]
+item = "crn:def:em-dyninv"
+paper = "L. Gąsieniec, D. Hamilton, R. Martin, P. G. Spirakis, G. Stachowiak. Deterministic population protocols for exact majority and plurality"
+venue = "OPODIS 2016, LIPIcs 70, 14:1-14:14"
+version = "LIPIcs.OPODIS.2016.14"
+result = "Section 3, invariants 1 and 2"
+page = 6
+url = "https://doi.org/10.4230/LIPIcs.OPODIS.2016.14"
+status = "transcribed by an AI agent from the published PDF (open access, CC-BY; text extraction, checked on the rendered page); no LaTeX source available; not yet checked by a person"
+statement = '''
+During execution of the majority protocol we maintain two invariants:
+\begin{enumerate}
+\item $\sum_{a \in A} c_a = \sum_{a \in A} w(s_a)$, and
+\item for each $a \in A$, $|w(s_a) - c_a| \le 1$.
+\end{enumerate}
+The two invariants are preserved thanks to carefully crafted state transition rules and counterparting alterations of an entity's state caused by changes of the original colour $c_a$ imposed by the external force.
+'''
+context = '''
+[Section 3, p. 6:] We define five strong states: $[-2], [-1], [0], [1], [2]$, and three weak states $\langle -1 \rangle, \langle 0 \rangle, \langle 1 \rangle$. Before the protocol is initiated, if $c_a = x$ we set $s_a = [x]$. [...]
+We define the weight function, $w(s)$, on a state $s$ as $w([x]) = x$ and $w(\langle x \rangle) = 0$, see the table in Fig. 3.
+'''
+notes = '''The library states the invariants group by group (for the groups of Section 5) and adds a third one, that every group contains a strong state, which the final argument of Section 3 uses in the tie case (FORMALIZATION_DIFFERENCES.md, CRN-5, "Details of the source").'''
+
+[[source]]
+item = "crn:lem:em-dynamic"
+paper = "L. Gąsieniec, D. Hamilton, R. Martin, P. G. Spirakis, G. Stachowiak. Deterministic population protocols for exact majority and plurality"
+venue = "OPODIS 2016, LIPIcs 70, 14:1-14:14"
+version = "LIPIcs.OPODIS.2016.14"
+result = "Lemma 4"
+page = 7
+url = "https://doi.org/10.4230/LIPIcs.OPODIS.2016.14"
+status = "transcribed by an AI agent from the published PDF (open access, CC-BY; text extraction, checked on the rendered page); no LaTeX source available; not yet checked by a person"
+statement = '''
+\textbf{Lemma 4.} The invariants 1 and 2 are preserved during execution of the majority protocol.
+'''
+context = '''
+[Section 3, p. 6:] During execution of the majority protocol we maintain two invariants:
+1. $\sum_{a \in A} c_a = \sum_{a \in A} w(s_a)$, and
+2. for each $a \in A$, $|w(s_a) - c_a| \le 1$.
+[Section 3, p. 6:] When the colour $c_a$ is changed to $c'_a = c_a + \delta$, the state is changed from $s_a$ to $s'_a = [w(s_a) + \delta]$.
+'''
+notes = '''The proof treats both the interactions and the changes of colour by the external force. The states, weights and interaction rules are quoted in the crn:def:em-dynamic entry.'''
+
+[[source]]
+item = "crn:lem:em-dynamic"
+paper = "L. Gąsieniec, D. Hamilton, R. Martin, P. G. Spirakis, G. Stachowiak. Deterministic population protocols for exact majority and plurality"
+venue = "OPODIS 2016, LIPIcs 70, 14:1-14:14"
+version = "LIPIcs.OPODIS.2016.14"
+result = "Lemma 5"
+page = 8
+url = "https://doi.org/10.4230/LIPIcs.OPODIS.2016.14"
+status = "transcribed by an AI agent from the published PDF (open access, CC-BY; text extraction, checked on the rendered page); no LaTeX source available; not yet checked by a person"
+statement = '''
+\textbf{Lemma 5.} The value of $R = \sum_a |w(s_a)|$ does not increase after the last intervention of the external force. Moreover the value of $R$ stabilises when eventually there are no two entities $a, b \in A$ such that $w(s_a) > 0$ and $w(s_b) < 0$.
+'''
+context = '''
+[Section 3, p. 6:] We define the weight function, $w(s)$, on a state $s$ as $w([x]) = x$ and $w(\langle x \rangle) = 0$, see the table in Fig. 3.
+'''
+notes = '''No proof is printed. The states and interaction rules are quoted in the crn:def:em-dynamic entry. The library proves that R does not increase along interactions inside groups and that a configuration without opposite weights in a group is reachable.'''
+
+[[source]]
+item = "crn:thm:em-dynamic"
+paper = "L. Gąsieniec, D. Hamilton, R. Martin, P. G. Spirakis, G. Stachowiak. Deterministic population protocols for exact majority and plurality"
+venue = "OPODIS 2016, LIPIcs 70, 14:1-14:14"
+version = "LIPIcs.OPODIS.2016.14"
+result = "Section 3, after Lemma 5"
+page = 8
+url = "https://doi.org/10.4230/LIPIcs.OPODIS.2016.14"
+status = "transcribed by an AI agent from the published PDF (open access, CC-BY; text extraction, checked on the rendered page); no LaTeX source available; not yet checked by a person"
+statement = '''
+Due to Lemma 5 the majority process stabilises in three possibile configurations with respect to $C_{\mathrm{fin}} \stackrel{\mathrm{def}}{=} \sum_{a \in A} c_a$ (where $c_a$ is referring to the final colour of the entity $a$, after any external forces have stopped changing the colours of entities). If on the conclusion $C_{\mathrm{fin}} > 0$, there must be some entities in states $[1]$ or $[2]$ which would earlier ensure that all weak states and the state $[0]$ are switched to $\langle 1 \rangle$. If $C_{\mathrm{fin}} < 0$, there must be some entities in states $[-1]$ or $[-2]$ which would earlier ensure that all weak states and the state $[0]$ are switched to $\langle -1 \rangle$. However, if on the conclusion $C_{\mathrm{fin}} = 0$, there are no entities in states $[x]$ with $x \ne 0$ and the last entity that reached state $[0]$ will have a chance to alter all weak states to $\langle 0 \rangle$.
+'''
+context = '''
+[Section 3, p. 6:] In this section we consider a variant of population protocols in which the original colours (attributes) of entities could be altered by an external force for some unspecified, however limited, period of time. After this initial period, the relevant population protocol is expected to eventually stabilize.
+[Section 3, p. 6:] The population protocol presented below determines whether there are more original 1's, more $(-1)$'s, or there is a tie after the last intervention of the external force. [...] On the conclusion all entities are in state
+$[1]$, $[2]$ or $\langle 1 \rangle$ if there are more 1's than $(-1)$'s,
+$[-1]$, $[-2]$ or $\langle -1 \rangle$ if there are less 1's than $(-1)$'s, and
+$[0]$ or $\langle 0 \rangle$ when there is a tie.
+[Lemma 5, p. 8:] The value of $R = \sum_a |w(s_a)|$ does not increase after the last intervention of the external force. Moreover the value of $R$ stabilises when eventually there are no two entities $a, b \in A$ such that $w(s_a) > 0$ and $w(s_b) < 0$.
+'''
+notes = '''No numbered result: the conclusion of Section 3 is this paragraph. "possibile" as printed. The definition symbol over "=" is printed "def" above the equals sign. The library's output of a state is the sign of its weight for strong states and x for <x>, and the theorem covers every finite interleaving of interactions and colour changes, and the protocol without the external force.'''
+
+[[source]]
+item = "crn:def:em-drive"
+paper = "L. Gąsieniec, D. Hamilton, R. Martin, P. G. Spirakis, G. Stachowiak. Deterministic population protocols for exact majority and plurality"
+venue = "OPODIS 2016, LIPIcs 70, 14:1-14:14"
+version = "LIPIcs.OPODIS.2016.14"
+result = "Sections 3 to 5, P2 as a subroutine"
+page = 6
+url = "https://doi.org/10.4230/LIPIcs.OPODIS.2016.14"
+status = "transcribed by an AI agent from the published PDF (open access, CC-BY; text extraction); no LaTeX source available; not yet checked by a person"
+statement = '''
+[Section 3, p. 6:] We assume that an entity is aware when its original colour changes, and is able to modify its current state as a result, but such a change is again governed by common state transition rules for all entities. We also assume that it is not possible for the external force to alter the original colour of an entity while it is simultaneously interacting with another entity.
+We use the protocol we propose here as a subroutine in more structurally complex population protocols for the absolute majority in Section 4, and for the relative majority in Section 5.
+[Section 4, p. 8:] We recall that protocol $P_2$ assumes full knowledge of entities and it is using two types of state transitions: (1) imposed by the external force and altering original colours associated with entities, and (2) caused by the interaction with other entities in the population.
+[Section 5, p. 11:] 3. An array $s[0..k-1]$ representing states $s[i]$ in $k$ independent instances of protocol $P_2(i)$ associated with colours $c[i]$. The computations with respect to $P_2(i)$ are performed only if the two interacting entities have the same label prefix $l[0..i-1]$. Otherwise protocol $P_2(i)$ is not executed. We emphasise here that computations in $P_2(i)$ can change values $c[i-1]$ whose change in turn cause alteration of states $s[i-1]$. Also, changes in $c[i]$ can change $c[i-1]$.
+'''
+context = '''
+[Section 3, p. 6:] When the colour $c_a$ is changed to $c'_a = c_a + \delta$, the state is changed from $s_a$ to $s'_a = [w(s_a) + \delta]$.
+[Section 4, p. 8:] The absolute majority algorithm presented here is a combination of the static majority protocol introduced in Section 2, and later referred to as $P_1$, as well as the dynamic majority protocol from Section 3, from now on referred to as $P_2$.
+'''
+notes = '''No single definition in the paper: the composition is described in these places (Sections 3, 4 and 5; the last excerpt is item 3 of the memory organisation of Section 5, pp. 10-11). The library's driven protocol runs a protocol D together with a copy of P_2 whose colours are a function of the D-state, inside groups that D never changes, with the recolouring in the same encounter that changes a colour.'''
+
+[[source]]
+item = "crn:thm:em-drive"
+paper = "L. Gąsieniec, D. Hamilton, R. Martin, P. G. Spirakis, G. Stachowiak. Deterministic population protocols for exact majority and plurality"
+venue = "OPODIS 2016, LIPIcs 70, 14:1-14:14"
+version = "LIPIcs.OPODIS.2016.14"
+result = "Section 4.1 and proof of Theorem 6"
+page = 9
+url = "https://doi.org/10.4230/LIPIcs.OPODIS.2016.14"
+status = "transcribed by an AI agent from the published PDF (open access, CC-BY; text extraction); no LaTeX source available; not yet checked by a person"
+statement = '''
+[Section 4.1, p. 9:] Note that all protocols described above run simultaneously right from the beginning, and, in particular, protocol $P_2$ works at least for some time on unstable data. Nevertheless, as the bits generated by protocols $P_1$ eventually stabilise, thanks to protocol $P_2$'s tolerance of dynamic changes, the absolute majority (if such exists) is confirmed.
+[Proof of Theorem 6, p. 10:] The above proof works due to the established fact that $P_2$ tolerates dynamic changes in the input colours.
+'''
+context = '''
+[Section 3, p. 6:] In this section we consider a variant of population protocols in which the original colours (attributes) of entities could be altered by an external force for some unspecified, however limited, period of time. After this initial period, the relevant population protocol is expected to eventually stabilize.
+[Section 3, p. 6:] We use the protocol we propose here as a subroutine in more structurally complex population protocols for the absolute majority in Section 4, and for the relative majority in Section 5.
+[Section 3, p. 8:] Due to Lemma 5 the majority process stabilises in three possibile configurations with respect to $C_{\mathrm{fin}} \stackrel{\mathrm{def}}{=} \sum_{a \in A} c_a$ (where $c_a$ is referring to the final colour of the entity $a$, after any external forces have stopped changing the colours of entities).
+'''
+notes = '''No numbered result: the paper uses the composition step informally, in Section 4.1 and in the proofs of Theorems 6 and 7 (Section 5.1, Stabilisation Stage 1, uses it stage by stage). The library states it once: along every execution of the driven protocol the invariants of Section 3 hold, and if the driver stably marks the agents with their eventual colours, the driven protocol stably marks every agent with the sign of the eventual colour sum of its group. "possibile" as printed.'''
+
+[[source]]
+item = "crn:def:em-absolute"
+paper = "L. Gąsieniec, D. Hamilton, R. Martin, P. G. Spirakis, G. Stachowiak. Deterministic population protocols for exact majority and plurality"
+venue = "OPODIS 2016, LIPIcs 70, 14:1-14:14"
+version = "LIPIcs.OPODIS.2016.14"
+result = "Section 4, Algorithm Absolute-Majority"
+page = 8
+url = "https://doi.org/10.4230/LIPIcs.OPODIS.2016.14"
+status = "transcribed by an AI agent from the published PDF (open access, CC-BY; text extraction); no LaTeX source available; not yet checked by a person"
+statement = '''
+[Section 4, p. 8:] In the remaining part of the paper we work under the assumption that the population is coloured with an arbitrary number $C$ of colours, where $2^{k-1} < C \le 2^k$, for some integer $k \ge 1$ that is known to all entities. Each colour is denoted by a $k$-bit label $l[0..k-1]$, and single labels are attributed to entities with the relevant colours. As in previous sections, we interpret the individual bits $l[i]$ in this label as $-1$ or $1$, rather than more standard 0 or 1. [...]
+
+\textbf{Memory organisation.} Each entity uses $O(k)$ bits of memory to accommodate:
+\begin{enumerate}
+\item The $k$-bit label $l[0..k-1]$ representing the original colour of the entity,
+\item An array $s[0..k-1]$ representing $k$ independent instances of protocol $P_1$, and
+\item An instance of protocol $P_2$ with the external force based on $k$ instances of $P_1$.
+\end{enumerate}
+For the purpose of our algorithm we define $k$ independent instances of static majority protocols $P_1(i)$, for $i = 0, \ldots, k-1$, such that colours competing in $P_1(i)$ refer to the bits $l[i]$ drawn from each entity in the population. [...]
+
+[Section 4.1, p. 9:] \textbf{Algorithm Absolute-Majority}
+
+\emph{Initialisation Stage}
+\begin{enumerate}
+\item Before execution of the algorithm, each entity $a \in A$ sets for itself $s[i] = [1]$ if $l[i] = 1$ and $[-1]$ otherwise, for all $i = 0, .., k-1$. This choice refers to the belief that its original colour $c_a$ is in majority. And, indeed, each entity initially adopts an extra colour 1 (denoting membership in the majority) for the purpose of protocol $P_2$.
+\item Later, during pairwise interactions between entities, the current states in $s[i]$ get updated by the relevant majority protocols $P_1(i)$, for each $i = 0, \ldots, k-1$ independently. And if at any time the contents of $s[i]$ and $l[i]$ do not reflect its initial setting, the belief of the entity changes to $-1$. However, this belief becomes 1 again as soon as the consistency between bits in $s[0..k-1]$ and $l[0..k-1]$ is restored. This consistency measure determines actions of the external force in protocol $P_2$.
+\end{enumerate}
+\emph{Stabilisation Stage}
+\begin{enumerate}
+\item At first, the majority algorithm stabilises on all protocols $P_1(i)$, for $i = 0, \ldots, k-1$, which allows each entity to establish the final relationship between the corresponding bits in $s[0..k-1]$ and $l[0..k-1]$. This, in turn, determines the extra colour (1 or $-1$) of the entity adopted for the purpose of protocol $P_2$.
+\item When eventually protocol $P_2$ also terminates and concludes with colour 1 in majority, all entities receive confirmation that the final states in $s[0..k-1]$ refer to the absolute majority colour $l^*[0..k-1]$. Otherwise, the entities learn that none of the colours is in the absolute majority.
+\end{enumerate}
+'''
+context = '''
+[Section 4, p. 8:] In this section we present an asymptotically optimal $O(k)$-bit population protocol computing absolute majority, i.e., answering whether there exists a colour which dominates all the remaining colours in the population taken together.
+[Section 4, pp. 8-9:] Assume $l^*[0..k-1]$ is a $k$-bit label of the colour of the absolute majority in the population. One can observe that when the majority protocols stabilise, for all $i = 0, \ldots, k-1$, each bit $l^*[i]$ must be in majority reported by $P_1(i)$ via entry $s[i]$.
+'''
+notes = '''[...] marks omitted text. "for all i = 0, .., k - 1" as printed. The library reads "the contents of s[i] and l[i] do not reflect its initial setting" as: the colour for P_2 is 1 iff every copy P_1(i) currently reports the agent's own bit l[i], a reported tie counting as inconsistent; its output is the reported label if P_2 reports 1 and none otherwise (FORMALIZATION_DIFFERENCES.md, CRN-5, item 4).'''
+
+[[source]]
+item = "crn:thm:em-absolute"
+paper = "L. Gąsieniec, D. Hamilton, R. Martin, P. G. Spirakis, G. Stachowiak. Deterministic population protocols for exact majority and plurality"
+venue = "OPODIS 2016, LIPIcs 70, 14:1-14:14"
+version = "LIPIcs.OPODIS.2016.14"
+result = "Theorem 6"
+page = 9
+url = "https://doi.org/10.4230/LIPIcs.OPODIS.2016.14"
+status = "transcribed by an AI agent from the published PDF (open access, CC-BY; text extraction, checked on the rendered page); no LaTeX source available; not yet checked by a person"
+statement = '''
+\textbf{Theorem 6.} Algorithm Absolute-Majority computes absolute majority on populations with at most $2^k$ colours with the help of $O(k)$ memory bits in each entity.
+'''
+context = '''
+[Section 4, p. 8:] In the remaining part of the paper we work under the assumption that the population is coloured with an arbitrary number $C$ of colours, where $2^{k-1} < C \le 2^k$, for some integer $k \ge 1$ that is known to all entities. Each colour is denoted by a $k$-bit label $l[0..k-1]$, and single labels are attributed to entities with the relevant colours.
+[Section 4, p. 8:] In this section we present an asymptotically optimal $O(k)$-bit population protocol computing absolute majority, i.e., answering whether there exists a colour which dominates all the remaining colours in the population taken together.
+'''
+notes = '''The algorithm is quoted in the crn:def:em-absolute entry. The library states the theorem as: all agents eventually and forever output the colour held by more than half of the agents, or none if there is no such colour, with 2^k 6^k 8 <= 2^(4k+3) states (exact state count instead of O(k) bits).'''
+
+[[source]]
+item = "crn:def:em-relative"
+paper = "L. Gąsieniec, D. Hamilton, R. Martin, P. G. Spirakis, G. Stachowiak. Deterministic population protocols for exact majority and plurality"
+venue = "OPODIS 2016, LIPIcs 70, 14:1-14:14"
+version = "LIPIcs.OPODIS.2016.14"
+result = "Section 5, Algorithm Relative-Majority"
+page = 10
+url = "https://doi.org/10.4230/LIPIcs.OPODIS.2016.14"
+status = "transcribed by an AI agent from the published PDF (open access, CC-BY; text extraction); no LaTeX source available; not yet checked by a person"
+statement = '''
+[Section 5, p. 10:] The relative majority problem refers to the task of finding the most frequent colour in the population. Note that there can be more than one colour that is the most frequent. In such case the colour with the latest in the lexicographical order label $l^*[0..k-1]$ is declared as the winner. [...]
+Stages are enumerated by descending numbers from the lowest stage $k-1$ to the highest 0. In stage $i$, for all $i = k-1, .., 0$, two colours are in the same group if their $k$-bit labels $l[0..k-1]$ share $i$-bit prefix $l[0..i-1]$ (in stage 0 all labels form one group). In this stage agents in one group aim at finding the majority colour label in each group.
+
+\textbf{Memory organisation.} Each entity $a \in A$ uses $O(k)$ bits of memory to accommodate:
+\begin{enumerate}
+\item The $k$-bit label $l[0..k-1]$ representing the original colour of the entity. This colour is fixed (never changed) throughout the computation process.
+\item The $k$-bit label $c[0..k-1]$ represents current colours $c[i]$ of the entity in each consecutive stage $i$, with the decreasing index $i = k-1, .., 0$. On the conclusion of stage $i$, if label $l[0..k-1]$ is declared as the winner in the group of labels with prefix $l[0..i]$, the value $c[i]$ equals to $\pm 1$, otherwise $c[i] = 0$. All entities with the winning colour $l[0..k-1]$ in its group in higher stage $i-1$ have the value $c[i]$ set to $l[i]$. Before the stabilisation of $P_2(i-1)$ the value $c[i]$ reflects the current belief of the entity about this value.
+\item An array $s[0..k-1]$ representing states $s[i]$ in $k$ independent instances of protocol $P_2(i)$ associated with colours $c[i]$. The computations with respect to $P_2(i)$ are performed only if the two interacting entities have the same label prefix $l[0..i-1]$. Otherwise protocol $P_2(i)$ is not executed. We emphasise here that computations in $P_2(i)$ can change values $c[i-1]$ whose change in turn cause alteration of states $s[i-1]$. Also, changes in $c[i]$ can change $c[i-1]$.
+\end{enumerate}
+
+[Section 5.1, p. 11:] \textbf{Algorithm Relative-Majority}
+
+\emph{Initialisation Stage}
+Before execution of the algorithm, each entity sets $c[i] = l[i]$ and $s[i] = [1]$ if $c[i] = 1$ and $[-1]$ otherwise, for all $i = 0, .., k-1$.
+
+\emph{Stabilisation Stage}
+\begin{enumerate}
+\item The algorithm stabilises first on protocol $P_1(k-1)$, as at the beginning of the pipeline there is no external force, and then subsequently on protocols $P_2(k-2), P_2(k-3), \ldots, P_2(0)$.
+\item An entity believes that its colour wins on stage $i$ if, either $c[i] = -1$ and $s[i] \in \{[-1], [-2], \langle -1 \rangle\}$, or $c[i] = 1$ and $s[i] \in \{[0], [1], [2], \langle 0 \rangle, \langle 1 \rangle\}$. The states $[0], \langle 0 \rangle$ correspond to a tie and in this case the lexicographically larger label becomes the winner. If the entity believes its label $l[0..k-1]$ is the winner in stage $i$, it sets $c[i-1] = l[i-1]$ and adjusts $s[i-1]$ as specified in protocol $P_2(i-1)$ if $c[i-1]$ gets changed. If, to the contrary, the entity believes it did not win, it sets $c[i-1] = 0$ and also adjusts $s[i-1]$ should change occur in $c[i-1]$. Note, that in both cases changes in $c[i-1]$ are propagated to $c[i-2]$ and further on.
+\item Eventually protocol $P_2(0)$ stabilizes. At that time entities that win in stage 0 hold the winning majority colour.
+\end{enumerate}
+'''
+context = '''
+[Section 5, p. 10:] As in Section 4, in this section we assume that the population is attributed with an arbitrary number $C$ of colours, where $2^{k-1} < C \le 2^k$, for some integer $k \ge 1$ that is known to all entities. Each colour is denoted by a $k$-bit label $l[0..k-1]$, where $l[i] \in \{-1, 1\}$.
+[Section 5, p. 10:] At first we describe a protocol for the relative majority which only finds the winner $l^*[0..k-1]$. This is done by marking all entities possessing this colour with the winning label. In this setting, the colour in the relative majority always exists.
+[Section 5, p. 10:] In each stage the winning colours perform pairwise duels via majority protocols to reduce the number of winners by half.
+'''
+notes = '''Memory organisation spans pp. 10-11. [...] marks omitted text. "i = k - 1, .., 0" as printed. The library derives the colours c[i] from the label and the states of the stages above i instead of storing them, uses P_2 with constant colours at stage k - 1 (the text writes P_1(k - 1) in Stabilisation Stage 1), and breaks ties in favour of the lexicographically largest label with l[0] the most significant bit (FORMALIZATION_DIFFERENCES.md, CRN-5, item 5).'''
+
+[[source]]
+item = "crn:lem:em-duel"
+paper = "L. Gąsieniec, D. Hamilton, R. Martin, P. G. Spirakis, G. Stachowiak. Deterministic population protocols for exact majority and plurality"
+venue = "OPODIS 2016, LIPIcs 70, 14:1-14:14"
+version = "LIPIcs.OPODIS.2016.14"
+result = "Proof of Theorem 7, the inductive step"
+page = 11
+url = "https://doi.org/10.4230/LIPIcs.OPODIS.2016.14"
+status = "transcribed by an AI agent from the published PDF (open access, CC-BY; text extraction, checked on the rendered page); no LaTeX source available; not yet checked by a person"
+statement = '''
+Now let $i > k-1$ be a stage number. By inductive hypothesis in some time $t_{i+1}$, protocols $P_2(i+1)$ stabilize and states $s[i+1]$ stop being changed. They indicate unique winning $k$-bit colours in groups corresponding to each prefix $l[0..i]$. So, since $t_{i+1}$ colours $c[i]$ are $\pm 1$ for these winners, 0 for others and do not change anymore. Thus, in some later time $t_i$, protocols $P_2(i)$ stabilize and states $s[i]$ cease being changed. From the formulation of the protocol these final states $s[i]$ determine the winning $k$-bit colours in groups corresponding to prefixes $l[0..i-1]$.
+'''
+context = '''
+[Section 5.1, p. 11:] An entity believes that its colour wins on stage $i$ if, either $c[i] = -1$ and $s[i] \in \{[-1], [-2], \langle -1 \rangle\}$, or $c[i] = 1$ and $s[i] \in \{[0], [1], [2], \langle 0 \rangle, \langle 1 \rangle\}$. The states $[0], \langle 0 \rangle$ correspond to a tie and in this case the lexicographically larger label becomes the winner.
+[Section 5, p. 10:] The relative majority problem refers to the task of finding the most frequent colour in the population. Note that there can be more than one colour that is the most frequent. In such case the colour with the latest in the lexicographical order label $l^*[0..k-1]$ is declared as the winner.
+'''
+notes = '''Quoted from the proof of Theorem 7. "let i > k - 1" as printed; the library reads it as i < k - 1 (FORMALIZATION_DIFFERENCES.md, CRN-5, "Details of the source"). The library's lemma is the combinatorial core of this step: once the stages above i have stabilized, the duel of stage i between the winners of the two groups extending a prefix p selects the winner of the group of p, and the winner of the whole population is the plurality colour. The algorithm is quoted in the crn:def:em-relative entry.'''
+
+[[source]]
+item = "crn:thm:em-relative"
+paper = "L. Gąsieniec, D. Hamilton, R. Martin, P. G. Spirakis, G. Stachowiak. Deterministic population protocols for exact majority and plurality"
+venue = "OPODIS 2016, LIPIcs 70, 14:1-14:14"
+version = "LIPIcs.OPODIS.2016.14"
+result = "Theorem 7"
+page = 11
+url = "https://doi.org/10.4230/LIPIcs.OPODIS.2016.14"
+status = "transcribed by an AI agent from the published PDF (open access, CC-BY; text extraction, checked on the rendered page); no LaTeX source available; not yet checked by a person"
+statement = '''
+\textbf{Theorem 7.} Algorithm Relative-Majority computes relative majority on population with at most $2^k$ colours with the help of $O(k)$ memory bits in each entity.
+'''
+context = '''
+[Section 5, p. 10:] As in Section 4, in this section we assume that the population is attributed with an arbitrary number $C$ of colours, where $2^{k-1} < C \le 2^k$, for some integer $k \ge 1$ that is known to all entities. Each colour is denoted by a $k$-bit label $l[0..k-1]$, where $l[i] \in \{-1, 1\}$.
+[Section 5, p. 10:] The relative majority problem refers to the task of finding the most frequent colour in the population. Note that there can be more than one colour that is the most frequent. In such case the colour with the latest in the lexicographical order label $l^*[0..k-1]$ is declared as the winner.
+[Section 5, p. 10:] At first we describe a protocol for the relative majority which only finds the winner $l^*[0..k-1]$. This is done by marking all entities possessing this colour with the winning label. In this setting, the colour in the relative majority always exists. The case in which the uniqueness of the majority colour is required is commented later in Section 5.2.
+[Section 1.2, p. 4:] In Section 5 we propose a multistage $O(k)$-bit protocol for relative majority, where all most frequent colours eventually become aware of their dominance, and all nodes learn about the most frequent colour with the largest label.
+'''
+notes = '''The algorithm is quoted in the crn:def:em-relative entry. The library formalizes the theorem as the protocol of Section 5.1 computes it: eventually and forever every agent outputs whether its own colour is the winner (it marks the agents of the winning colour), with 2^k 8^k = 2^(4k) states; dissemination of the winner's label to all agents (Section 1.2) and the uniqueness mechanism of Section 5.2 are not formalized (FORMALIZATION_DIFFERENCES.md, CRN-5, item 6).'''

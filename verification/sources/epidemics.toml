@@ -1,0 +1,1616 @@
+# Source references and original statements of the items of the package `epidemics`.
+#
+# Same format as `verification/sources.toml` (see its header for the fields). This file adds
+# the items of `epidemics` that `verification/sources.toml` does not cover, and further numbered
+# results for some items it covers (for example Theorem E.1 for epidemics:thm:subcritical); it
+# repeats none of its (item, result) pairs.
+#
+# Statements and contexts were transcribed by an AI agent: from the arXiv LaTeX sources when
+# they exist (macros of the papers replaced by standard LaTeX, as listed in `notes`), otherwise
+# from the PDF of the named version. Every entry says in `status` what was compared with the
+# PDF. No person has checked any of them yet. Entries without `statement` are references to
+# sources of which no open copy was found.
+#
+# Sources, in the order of the blueprint:
+#   Kempe, Kleinberg, Tardos, KDD 2003 (the live-edge coupling)
+#   Becchetti, Clementi, Denni, Pasquale, Trevisan, Ziccardi, arXiv:2103.16398v3
+#   Krivelevich, Sudakov, arXiv:1201.6529v4
+#   Hethcote, SIAM Review 2000 (no open copy found)
+#   Wormald 1999, Theorem 5.1; Kurtz 1970 (no open copy found); Hoeffding 1963 (no open copy found)
+#   Karp, Schindelhauer, Shenker, Vöcking, FOCS 2000
+#   Doerr, Kostrygin, arXiv:2303.11150v1
+#   Cooper, Radzik, Rivera, arXiv:1602.05768v2
+
+# ---------------------------------------------------------------------------------------------
+# Kempe, Kleinberg, Tardos, KDD 2003: Reed-Frost (Independent Cascade) and the live-edge graph.
+
+[[source]]
+item = "epidemics:def:reedfrost"
+paper = "D. Kempe, J. Kleinberg, É. Tardos. Maximizing the spread of influence through a social network"
+venue = "KDD 2003"
+version = "KDD 2003 (authors' PDF)"
+result = "Section 1, Independent Cascade Model"
+page = 2
+url = "https://www.cs.cornell.edu/home/kleinber/kdd03-inf.pdf"
+status = "AI agent: typed from the KDD 2003 PDF; not checked by a person"
+statement = '''
+The conceptually simplest model of this type
+is what one could call the Independent Cascade Model, investigated recently in the context of marketing by Goldenberg, Libai,
+and Muller [13, 14]. We again start with an initial set of active
+nodes $A_0$, and the process unfolds in discrete steps according to
+the following randomized rule. When node $v$ first becomes active
+in step $t$, it is given a single chance to activate each currently inactive neighbor $w$; it succeeds with a probability $p_{v,w}$ --- a parameter
+of the system --- independently of the history thus far. (If $w$ has
+multiple newly activated neighbors, their attempts are sequenced in
+an arbitrary order.) If $v$ succeeds, then $w$ will become active in step
+$t + 1$; but whether or not $v$ succeeds, it cannot make any further attempts to activate $w$ in subsequent rounds. Again, the process runs
+until no more activations are possible.
+'''
+notes = "No LaTeX source is available; typed from the PDF. Citations [13, 14] are the paper's numbering (Goldenberg, Libai, Muller). The Reed-Frost process is the case of equal probabilities p_{v,w} = p (see the Definition A.2 entry of arXiv:2103.16398 for this item). The library cites the KDD 2003 version; the journal version is Theory of Computing 11 (2015)."
+
+[[source]]
+items = ["epidemics:cor:final", "epidemics:thm:perc"]
+paper = "D. Kempe, J. Kleinberg, É. Tardos. Maximizing the spread of influence through a social network"
+venue = "KDD 2003"
+version = "KDD 2003 (authors' PDF)"
+result = "Claim 2.3"
+page = 4
+url = "https://www.cs.cornell.edu/home/kleinber/kdd03-inf.pdf"
+status = "AI agent: typed from the KDD 2003 PDF; not checked by a person"
+statement = '''
+A node $x$ ends up active if and only if there is a
+path from some node in $A$ to $x$ consisting entirely of live edges.
+(We will call such a path a live-edge path.)
+'''
+context = '''
+[Section 1, p. 2:] We again start with an initial set of active
+nodes $A_0$, and the process unfolds in discrete steps according to
+the following randomized rule. When node $v$ first becomes active
+in step $t$, it is given a single chance to activate each currently inactive neighbor $w$; it succeeds with a probability $p_{v,w}$ --- a parameter
+of the system --- independently of the history thus far. [...] If $v$ succeeds, then $w$ will become active in step
+$t + 1$; but whether or not $v$ succeeds, it cannot make any further attempts to activate $w$ in subsequent rounds. Again, the process runs
+until no more activations are possible.
+[Section 2, p. 4:] Continuing this reasoning, we can in fact assume that for each pair of neighbors $(v, w)$ in the graph, a coin of
+bias $p_{v,w}$ is flipped at the very beginning of the process (independently of the coins for all other pairs of neighbors), and the result is
+stored so that it can be later checked in the event that $v$ is activated
+while $w$ is still inactive.
+With all the coins flipped in advance, the process can be viewed
+as follows. The edges in $G$ for which the coin flip indicated an
+activation will be successful are declared to be live; the remaining
+edges are declared to be blocked. If we fix the outcomes of the coin
+flips and then initially activate a set $A$, it is clear how to determine
+the full set of active nodes at the end of the cascade process:
+'''
+notes = "No LaTeX source is available; typed from the PDF. Claim 2.3 is stated for fixed coin outcomes (pathwise), in the Independent Cascade Model. For thm:perc the distributional consequence is used: with random coins, the probability that x ends up active is the probability of a live-edge path from A (the paper uses it through sigma(A) = sum_X Prob[X] sigma_X(A))."
+
+# ---------------------------------------------------------------------------------------------
+# Becchetti, Clementi, Denni, Pasquale, Trevisan, Ziccardi, arXiv:2103.16398v3.
+
+[[source]]
+item = "epidemics:def:reedfrost"
+paper = "L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccardi. Percolation and Epidemic Processes in One-Dimensional Small-World Networks"
+venue = "arXiv preprint"
+version = "arXiv:2103.16398v3"
+result = "Definitions A.1 and A.2"
+page = 17
+url = "https://arxiv.org/abs/2103.16398v3"
+status = "AI agent: from v3 LaTeX, compared with v3 PDF; not checked by a person"
+statement = '''
+Definition A.1 (The Bond Percolation process). Given a graph $G = (V,E)$, and given, for every edge $e \in E$, a
+\emph{percolation probability} $p(e) \in [0,1]$, the \emph{bond percolation}  process consists to
+\emph{remove} each edge $e \in E$, independently, with probability $1-p(e)$.
+The random subgraph, called the \emph{percolation graph} $G_p=(V,E_p)$, is
+defined by the edges that are not removed (i.e. they are activated), i.e., $E_p = \{ e \in E \, : \,
+\mbox{edge $e$ is not removed} \}$. Given an initial subset $A_0 \subseteq V$ of
+\emph{active} nodes, for every integer $t \leq n-1$, we define the random
+subset $A_{t}$ of  $t$-active nodes as the subset of nodes that are at distance
+$t$ from $A_{0}$ in the percolation graph $G_p=(V,E_p)$, i.e., $A_{t} =
+N_{G_{p}}^{t}(A_{0})$. Finally, the subset of all active nodes from $A_{0}$ is
+the subset $N^*_{G_p}(A_0)$.
+
+Definition A.2 ($\mathrm{IC}$ and RF protocols). Given a graph $G = (V,E)$, an assignment of \emph{transmission probabilities} $\{
+p(e) \}_{e\in E}$ to the edges of $G$, and a non-empty set $I_0 \subseteq V$ of
+initially infectious nodes (that will also be called {\em initiators} or
+{\em sources} since they have the information/virus since the very beginning), the {\em Independent Cascade} (for short, $\mathrm{IC}$) protocol defines the
+stochastic process $\{S_t,I_t,R_t\}_{t\geq 0}$ on $G$, where $S_t,I_t,R_t$ are three
+sets of vertices, respectively called \emph{susceptible}, \emph{infectious}, and \emph{recovered},
+which form a partition of $V$ and that are defined as follows.
+\begin{itemize}
+     \item At time $t=0$ we have $R_0 = \emptyset$ and $S_0 = V-I_0$.
+     \item At time $t\geq 1$:
+     \begin{itemize}
+         \item $R_t = R_{t-1} \cup I_{t-1}$, that is, the nodes that were
+         infected at the previous step become recovered.
+         \item Independently for each edge $e = \{ u,v\}$ such that $u \in
+         I_{t-1}$ and $v\in S_{t-1}$, with probability $p(e)$ the event that
+         ``$u$ transmits the infection (i.e. a copy of the source message) to $v$ at time $t$'' takes place. The
+         set $I_t$ is the set of all vertices $v\in S_{t-1}$ such that for at
+         least one neighbor $u \in I_{t-1}$ the event that $u$ transmits the
+         infection to $v$ takes place as described above.
+         \item $S_t = S_{t-1} - I_t$
+     \end{itemize}
+ \end{itemize}
+The process stabilizes when $I_t = \emptyset$.\\ The Reed-Frost SIR protocol (for
+short, \emph{RF Protocol}) is the special case of the $\mathrm{IC}$ protocol in which all transmission probabilities
+are the same.
+'''
+context = '''
+[Appendix A.1, p. 17:] Given a symmetric graph $G = (V,E)$, we define $|V| = n$ and, for
+any node $v \in V$, we denote $N(v)$ as its neighborhood in $G$ and $d(v) =
+|N(v)| $ as  its degree.  The distance $d_{G}(S,v)$ from the set $S$ to the
+node $v$ is the length of the shortest path among all paths from any node in
+$S$ to $v$ in $G$, if no such path exists $d_{G}(S,v) = + \infty$, if $v \in
+S$, $d_{G}(S,v) = 0$. [...]
+Given a  graph $G = (V, E)$, for any subset $S \subseteq V$ and node $v \in V$,
+and for any integer $i \leq n-1$, we  let $N^{(i)}_{G}(S)$ be the subset of
+nodes that are at distance $i$ from $S$, i.e. $N^{(i)}_{G}(S) = \{v \in V \mid
+d_{G}(S,v) = i\}$. Moreover, the set of nodes that are  within finite distance
+from $S$, i.e. that are reachable from $S$, will be denoted as $N^*_{G}(S)$.
+'''
+notes = "The paper redefines \\le, \\leq as \\leqslant and \\ge, \\geq as \\geqslant (printed slanted); they are kept as \\le, \\leq, \\ge, \\geq. Definition A.1 is on p. 17, Definition A.2 on p. 18. Labels 'Definition A.1 (...)' and 'Definition A.2 (...)' added to separate the two. Macros replaced: \\IC -> $\\mathrm{IC}$, \\SIR -> SIR. The footnote after 'initially infectious' is omitted: 'we use here the term infectious for two reasons: to emphasize that the node is both informed and active and, moreover, to be consistent with the literature in mathematical epidemiology.' Definition A.1 writes N^{t}_{G_p} where the notation paragraph writes N^{(i)}_G, as printed."
+
+[[source]]
+item = "epidemics:thm:layers"
+paper = "L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccardi. Percolation and Epidemic Processes in One-Dimensional Small-World Networks"
+venue = "arXiv preprint"
+version = "arXiv:2103.16398v3"
+result = "Appendix A.2, text before Theorem A.3"
+page = 18
+url = "https://arxiv.org/abs/2103.16398v3"
+status = "AI agent: from v3 LaTeX, compared with v3 PDF; not checked by a person"
+statement = '''
+If we consider the set $I_t$ of nodes that are infectious at time $t$ in a graph
+$G=(V,E)$ according to the IC protocol with transmission
+probabilities $\{ p(e) \}_{e\in E} $ and with initiator set $I_0$, we see that
+such a set has precisely the same distribution as the set of nodes at distance
+$t$ from $I_0$ in the percolation graph $G_p$ generated by the bond percolation process with  probabilities $\{ p(e)
+\}_{e\in E}$ (see Definition A.1). Furthermore, the set of recovered nodes $R_t$ is distributed
+precisely like the set of nodes at distance $< t$ from $I_0$ in $G_p$.
+'''
+context = '''
+[Definition A.1, p. 17:] Given a graph $G = (V,E)$, and given, for every edge $e \in E$, a
+\emph{percolation probability} $p(e) \in [0,1]$, the \emph{bond percolation}  process consists to
+\emph{remove} each edge $e \in E$, independently, with probability $1-p(e)$.
+The random subgraph, called the \emph{percolation graph} $G_p=(V,E_p)$, is
+defined by the edges that are not removed [...].
+[Definition A.2, p. 18:] [...] the {\em Independent Cascade} (for short, $\mathrm{IC}$) protocol defines the
+stochastic process $\{S_t,I_t,R_t\}_{t\geq 0}$ on $G$ [...]
+\begin{itemize}
+     \item At time $t=0$ we have $R_0 = \emptyset$ and $S_0 = V-I_0$.
+     \item At time $t\geq 1$:
+     \begin{itemize}
+         \item $R_t = R_{t-1} \cup I_{t-1}$, that is, the nodes that were
+         infected at the previous step become recovered.
+         \item Independently for each edge $e = \{ u,v\}$ such that $u \in
+         I_{t-1}$ and $v\in S_{t-1}$, with probability $p(e)$ the event that
+         ``$u$ transmits the infection (i.e. a copy of the source message) to $v$ at time $t$'' takes place. The
+         set $I_t$ is the set of all vertices $v\in S_{t-1}$ such that for at
+         least one neighbor $u \in I_{t-1}$ the event that $u$ transmits the
+         infection to $v$ takes place as described above.
+         \item $S_t = S_{t-1} - I_t$
+     \end{itemize}
+ \end{itemize}
+[...] The Reed-Frost SIR protocol (for
+short, \emph{RF Protocol}) is the special case of the $\mathrm{IC}$ protocol in which all transmission probabilities
+are the same.
+[Appendix A.1, p. 17:] The distance $d_{G}(S,v)$ from the set $S$ to the
+node $v$ is the length of the shortest path among all paths from any node in
+$S$ to $v$ in $G$, if no such path exists $d_{G}(S,v) = + \infty$, if $v \in
+S$, $d_{G}(S,v) = 0$.
+'''
+notes = "The paper redefines \\le, \\leq as \\leqslant and \\ge, \\geq as \\geqslant (printed slanted); they are kept as \\le, \\leq, \\ge, \\geq. Unnumbered claim of the text, stated as a distributional equivalence; the paper formalizes it as Theorem A.3 (see the thm:perc entry of verification/sources.toml). The \\ref to the bond percolation definition is rendered as 'Definition A.1'. Similar statement in the introduction (p. 2): 'the set of nodes infected in the first t steps (that is, the union of infectious and recovered nodes at time t) has the same distribution as the set of nodes reachable in the percolation graph G_p from I_0 in at most t steps'."
+
+[[source]]
+item = "epidemics:thm:subcritical"
+paper = "L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccardi. Percolation and Epidemic Processes in One-Dimensional Small-World Networks"
+venue = "arXiv preprint"
+version = "arXiv:2103.16398v3"
+result = "Theorem E.1"
+page = 41
+url = "https://arxiv.org/abs/2103.16398v3"
+status = "AI agent: from v3 LaTeX, compared with v3 PDF; not checked by a person"
+statement = '''
+Let $G = (V,E)$ be a graph of maximum degree $d$ and let $s$ be a vertex in
+$V$.  If $p = (1-\varepsilon)/(d-1)$ for some $\varepsilon$ such that $1 > \varepsilon > 0$, then the
+probability that the connected component of $s$ in the percolation graph $G_p$
+of $G$ has size $> t$ is at most $\exp(-\Omega(\varepsilon^2 t))$. Furthermore,
+w.h.p., all connected components of $G_p$ have size $\mathcal{O}(\varepsilon^{-2}
+\log n)$.
+'''
+context = '''
+[Section 2.1, p. 4, footnote:] As usual, we say that an event
+$\mathcal{E}_n$ occurs \emph{with high probability} if $\mathbf{Pr} \left( \mathcal{E}_n \right)
+\geq 1-(1/n)^{\Omega(1)}$.
+[Section 1, p. 2:] Given a graph $G=(V,E)$ and a bond percolation probability $p$, the bond percolation process is to subsample a random graph $G_p= (V,E_p)$ by independently choosing each edge of $G$ to be included in $E_p$ with probability $p$ and to be omitted with probability $1-p$. We will call $G_p$ the {\em percolation graph} of $G$.
+[Appendix E, p. 41:] In this section, we analyze the percolation process in regular graphs and prove Theorem 2.3.
+'''
+notes = "The paper redefines \\le, \\leq as \\leqslant and \\ge, \\geq as \\geqslant (printed slanted); they are kept as \\le, \\leq, \\ge, \\geq. Untitled theorem in the paper (Appendix E, 'Regular Graphs Below the Threshold'). Macros replaced: \\bigO -> \\mathcal{O}, \\Prc{.} -> \\mathbf{Pr} \\left( . \\right). The proof states the tail as exp(-epsilon^2 t/3) ('By Chernoff bounds this happens with probability exp(-epsilon^2 t/3)'). The paper's statement assumes p = (1-epsilon)/(d-1). The other numbered result of this item, Theorem 2.3, is in verification/sources.toml."
+
+[[source]]
+item = "epidemics:cor:subcritical"
+paper = "L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccardi. Percolation and Epidemic Processes in One-Dimensional Small-World Networks"
+venue = "arXiv preprint"
+version = "arXiv:2103.16398v3"
+result = "Section 2.2, remark after Theorem 2.5"
+page = 6
+url = "https://arxiv.org/abs/2103.16398v3"
+status = "AI agent: from v3 LaTeX, compared with v3 PDF; not checked by a person"
+statement = '''
+On the other hand, the second claims of the above two theorems are   simple consequences of   the corresponding  claims  of Theorems 2.1 and 2.2.
+As for general bounded-degree graphs, from Theorem 2.3, we can recover an  upper bound on the critical value of $p$ for the RF process
+equivalent to that of Claim 2 of  Theorem 2.3  (we omit here the formal statement).
+'''
+context = '''
+[Theorem 2.3, p. 5:] Let $G=(V,E)$ be a graph of maximum degree $d$, $\varepsilon >0$ be an
+arbitrary positive number, $p < (1-\varepsilon)/(d-1)$  be a bond percolation  probability, and $I_0$ be a subset of $V$.
+  Consider the percolation graph $G_p$.  Then,
+w.h.p.,  all the connected components of $G_p$ have size $\mathcal{O}_{\varepsilon}(\log n)$.
+[Theorem 2.4, claim 2, p. 5:] If $p<\frac{\sqrt{c^{2} + 6c +1}-c-1}{2c} - \varepsilon$,  w.h.p. the process will stop within $\mathcal{O}_\varepsilon(\log n)$ time steps, and the number of recovered nodes at the end of the process will be
+$\mathcal{O}_\varepsilon(|I_0|\log n)$.
+[Section 2.1, p. 4, footnote:] As usual, we say that an event
+$\mathcal{E}_n$ occurs \emph{with high probability} if $\mathbf{Pr} \left( \mathcal{E}_n \right)
+\geq 1-(1/n)^{\Omega(1)}$.
+[Section 2.2, p. 5:] As remarked in Section 1, bond percolation with percolation probability   $p$ is equivalent to the   Reed-Frost   process (for short, RF process) with transmission probability $p$.
+'''
+notes = "The paper redefines \\le, \\leq as \\leqslant and \\ge, \\geq as \\geqslant (printed slanted); they are kept as \\le, \\leq, \\ge, \\geq. The 'above two theorems' are Theorems 2.4 and 2.5 (the RF process on SWG(n,c/n) and on 3-SWG(n)). The \\ref's are rendered by their numbers. 'Claim 2 of Theorem 2.3' is as printed (Theorem 2.3 has a single claim). Macros: \\bigO -> \\mathcal{O}, \\Prc -> \\mathbf{Pr}. The paper gives no formal statement here; the library's Lean statement (and the Erdos-Renyi part, Theorem 2.3 applied to K_n) is the formalization's own. Theorem 2.3 itself is the verification/sources.toml entry of this item."
+
+[[source]]
+item = "epidemics:def:swg"
+paper = "L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccardi. Percolation and Epidemic Processes in One-Dimensional Small-World Networks"
+venue = "arXiv preprint"
+version = "arXiv:2103.16398v3"
+result = "Definitions 1.1 and 1.2"
+page = 3
+url = "https://arxiv.org/abs/2103.16398v3"
+status = "AI agent: from v3 LaTeX, compared with v3 PDF; not checked by a person"
+statement = '''
+Definition 1.1 ($1$-Dimensional Small-World Graphs - $\mathcal{SWG}(n,q)$).
+For every  $n \geq 3$ and $0 \leq q \leq 1$, the distribution $\mathcal{SWG}(n,q)$ is sampled
+by generating a one-dimensional small-world graph $G=(V,E)$, where $|V|=n$, $E
+= E_1 \cup E_2$, $(V,E_1)$ is a cycle, and $E_2$ is the set of random edges, called \emph{bridges}, of
+an Erd\H{o}s-R\'enyi random graph ${\mathcal G}_{n,q}$.
+
+Definition 1.2 ($3$-regular $1$-Dimensional  Small-World Graphs - 3-$\mathcal{SWG}(n)$).
+For every  even $n \geq 4$, the distribution  3-$\mathcal{SWG}(n)$ is sampled by generating
+a one-dimensional small-world graph  $G=(V, E)$, where $|V|=n$, $E = E_1 \cup
+E_2$, $(V,E_1)$ is a cycle, and $E_2$ is the set of edges, called \emph{bridges},  of a uniformly chosen
+perfect matching on $V$.
+'''
+context = '''
+[Section 1, p. 3:] the distribution of \emph{one-dimensional small-world graphs} with parameter $q$ on $n$ vertices is just the union of a cycle with $n$ vertices with an Erd\H{o}s-R\'enyi random graph $\mathcal{G}_{n,q}$, in which edges are sampled independently and each pair of nodes has probability $q$ of being an edge.
+[Section 1, p. 4:] In the definition of 3-$\mathcal{SWG}(n)$, we allow edges of the perfect matching to belong
+to $E_1$. If this happens, only edges in $E_2-E_1$ are called bridges. The
+graphs sampled from 3-$\mathcal{SWG}(n)$ have maximum degree 3, and every node has degree 3
+or $2$.
+[Theorem 2.1, p. 4, claim 2:] If  $p<\frac{\sqrt{c^{2} + 6c +1}-c-1}{2c} - \varepsilon$,  w.h.p.  all the connected components of  $G_p$ have size $\mathcal{O}_{\varepsilon}(\log n)$.
+[Section 2.1, p. 4:] We highlight  the sharp result
+  on the $\mathcal{SWG}(n,c/n)$ model for the case $c = 1$:
+similarly to the regular 3-$\mathcal{SWG}(n)$ model, each node here has one bridge
+edge in average, and the obtained critical value for the percolation probability
+$p$ turns out to be $\sqrt{2}-1$.
+'''
+notes = "The paper redefines \\le, \\leq as \\leqslant and \\ge, \\geq as \\geqslant (printed slanted); they are kept as \\le, \\leq, \\ge, \\geq. Labels 'Definition 1.1' and 'Definition 1.2' added; the titles are the paper's. Macros replaced: \\SWG -> $\\mathcal{SWG}(n,q)$, \\SWGm -> \\mathcal{SWG}, \\SWGreg -> 3-$\\mathcal{SWG}(n)$, \\Erdos -> Erd\\H{o}s-R\\'enyi, \\bigO -> \\mathcal{O}. Definition 1.1 is on p. 3, Definition 1.2 on p. 3 to 4. The paper defines no name for the threshold (sqrt(c^2+6c+1)-c-1)/(2c); it appears in Theorems 2.1 and 2.4 (excerpt in context). The library's p* and its characterization as the root of c p (1 + p) = 1 - p are the formalization's."
+
+[[source]]
+item = "epidemics:cor:swg3-sub"
+paper = "L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccardi. Percolation and Epidemic Processes in One-Dimensional Small-World Networks"
+venue = "arXiv preprint"
+version = "arXiv:2103.16398v3"
+result = "Theorem 2.2 (claim 2)"
+page = 4
+url = "https://arxiv.org/abs/2103.16398v3"
+status = "AI agent: from v3 LaTeX, compared with v3 PDF; not checked by a person"
+statement = '''
+Let $V$ be a set of $n$ vertices  and $p>0$ be a bond percolation  probability. Sample a graph $G=(V, E_1 \cup E_2)$ from the 3-$\mathcal{SWG}(n)$ distribution,  and consider the percolation graph $G_p$. For any constant $\varepsilon>0$:
+\begin{enumerate}
+\item If $p>1/2+\varepsilon$, w.h.p.  a subset of nodes of size $\Omega_\varepsilon(n)$ exists   that induces  a  connected  subgraph (i.e. a \emph{giant} connected component)  of $G_p$;
+\item If $p<1/2-\varepsilon$, w.h.p. all the connected components of  $G_p$ have size $\mathcal{O}_{\varepsilon}(\log n)$.
+\end{enumerate}
+'''
+context = '''
+[Definition 1.2, p. 3:] For every  even $n \geq 4$, the distribution  3-$\mathcal{SWG}(n)$ is sampled by generating
+a one-dimensional small-world graph  $G=(V, E)$, where $|V|=n$, $E = E_1 \cup
+E_2$, $(V,E_1)$ is a cycle, and $E_2$ is the set of edges, called \emph{bridges},  of a uniformly chosen
+perfect matching on $V$.
+[Section 2.1, p. 4, footnote:] As usual, we say that an event
+$\mathcal{E}_n$ occurs \emph{with high probability} if $\mathbf{Pr} \left( \mathcal{E}_n \right)
+\geq 1-(1/n)^{\Omega(1)}$.
+[Section 2.1, p. 5:] Also in the above theorem, the probabilities are taken over the randomness of $G$ and  over the randomness of the percolation process process. The second claim is a special case of the following more general result of ours. [Theorem 2.3]
+'''
+notes = "The paper redefines \\le, \\leq as \\leqslant and \\ge, \\geq as \\geqslant (printed slanted); they are kept as \\le, \\leq, \\ge, \\geq. Theorem title: 'Percolation on the 3-SWG(n) model'. The formalized part is claim 2 (item 2). Macros replaced: \\SWGreg -> 3-$\\mathcal{SWG}(n)$, \\bigO -> \\mathcal{O}, \\Prc -> \\mathbf{Pr}. 'percolation process process' is as printed. Theorem 2.3 is quoted in the epidemics:thm:subcritical entry of verification/sources.toml."
+
+[[source]]
+item = "epidemics:cor:swg-rf"
+paper = "L. Becchetti, A. Clementi, R. Denni, F. Pasquale, L. Trevisan, I. Ziccardi. Percolation and Epidemic Processes in One-Dimensional Small-World Networks"
+venue = "arXiv preprint"
+version = "arXiv:2103.16398v3"
+result = "Theorems 2.4 and 2.5 (claim 2)"
+page = 5
+url = "https://arxiv.org/abs/2103.16398v3"
+status = "AI agent: from v3 LaTeX, compared with v3 PDF; not checked by a person"
+statement = '''
+Theorem 2.4 (The RF process  on the $\mathcal{SWG}(n,q)$ model).
+Let $V$ be a set of $n$ vertices, $I_0 \subseteq V$ be a set of source nodes, and $p>0$ a constant probability. For any constant
+$c>0$,  sample a graph $G=(V, E_1 \cup E_2)$ from the $\mathcal{SWG}(n,c/n)$ distribution, and run the RF process with transmission probability $p$ over $G$ from $I_0$. For every $\varepsilon>0$, we have the following:
+\begin{enumerate}
+\item  If $p > \frac{\sqrt{c^{2} + 6c +1}-c-1}{2c} + \varepsilon$, with
+probability $\Omega_\varepsilon(1)$ a subset of  $\Omega_\varepsilon(n)$ nodes  will be infectious within time $\mathcal{O}_\varepsilon(\log n)$, even if $|I_0| = 1$. Moreover, if
+$|I_0|\geq\beta_\varepsilon\log n$ for a sufficiently large constant
+$\beta_\varepsilon$ (that depends only on $\varepsilon$),
+then the above event occurs  \emph{w.h.p.};
+\item If $p<\frac{\sqrt{c^{2} + 6c +1}-c-1}{2c} - \varepsilon$,  w.h.p. the process will stop within $\mathcal{O}_\varepsilon(\log n)$ time steps, and the number of recovered nodes at the end of the process will be
+$\mathcal{O}_\varepsilon(|I_0|\log n)$.
+\end{enumerate}
+
+Theorem 2.5 (The RF process on the   3-$\mathcal{SWG}(n)$ model).
+Let $V$ be a set of $n$ vertices, $I_0 \subseteq V$ be a set of source nodes, and $p>0$ be a bond percolation  probability. Sample a graph $G=(V, E_1 \cup E_2)$ from the 3-$\mathcal{SWG}(n)$ distribution,  and run the RF protocol with transmission-probability $p$ over $G$ from $I_0$. For every $\varepsilon>0$, we have the following:
+\begin{enumerate}
+\item If $p>1/2+\varepsilon$, with probability $\Omega_{\varepsilon}(1)$, a subset of  $\Omega_\varepsilon(n)$ nodes  will be infectious within time $\mathcal{O}_\varepsilon( n)$, even if $|I_0| = 1$. Moreover, if
+$|I_0|\geq\beta_\varepsilon\log n$ for a sufficiently large constant
+$\beta_\varepsilon$ (that depends on $\varepsilon$ but not on $n$),
+then the above event occurs  \emph{w.h.p.};
+\item If $p<\frac{\sqrt{c^{2} + 6c +1}-c-1}{2c} - \varepsilon$, then, w.h.p.,
+  the process will stop within $O_\varepsilon(\log n)$ time steps, and the number of recovered nodes at the end of the process will be  $O_\varepsilon(|I_0|\log n)$.
+\end{enumerate}
+'''
+context = '''
+[Section 1, p. 2:] In a network SIR model, we represent people as nodes of a graph, and contacts between people as edges, and we have a probability $p$ that each contact between an infectious person and a susceptible one transmits the infection. The Reed-Frost process, which is the simplest SIR network model,   proceeds through synchronous time steps, the infectious state lasts for only one time step, and the graph does not change with time.
+[Definition A.2, p. 18:] [...] The Reed-Frost SIR protocol (for
+short, \emph{RF Protocol}) is the special case of the $\mathrm{IC}$ protocol in which all transmission probabilities
+are the same.
+[Definition 1.1, p. 3:] For every  $n \geq 3$ and $0 \leq q \leq 1$, the distribution $\mathcal{SWG}(n,q)$ is sampled
+by generating a one-dimensional small-world graph $G=(V,E)$, where $|V|=n$, $E
+= E_1 \cup E_2$, $(V,E_1)$ is a cycle, and $E_2$ is the set of random edges, called \emph{bridges}, of
+an Erd\H{o}s-R\'enyi random graph ${\mathcal G}_{n,q}$.
+[Definition 1.2, p. 3:] For every  even $n \geq 4$, the distribution  3-$\mathcal{SWG}(n)$ is sampled by generating
+a one-dimensional small-world graph  $G=(V, E)$, where $|V|=n$, $E = E_1 \cup
+E_2$, $(V,E_1)$ is a cycle, and $E_2$ is the set of edges, called \emph{bridges},  of a uniformly chosen
+perfect matching on $V$.
+[Section 2.1, p. 4, footnote:] As usual, we say that an event
+$\mathcal{E}_n$ occurs \emph{with high probability} if $\mathbf{Pr} \left( \mathcal{E}_n \right)
+\geq 1-(1/n)^{\Omega(1)}$.
+[Section 2.2, p. 6:] On the other hand, the second claims of the above two theorems are   simple consequences of   the corresponding  claims  of Theorems 2.1 and 2.2.
+'''
+notes = "The paper redefines \\le, \\leq as \\leqslant and \\ge, \\geq as \\geqslant (printed slanted); they are kept as \\le, \\leq, \\ge, \\geq. Two theorems in one entry; the labels 'Theorem 2.4' and 'Theorem 2.5' are added, the titles are the paper's. The formalized parts are the two claims 2. Claim 2 of Theorem 2.5 is printed with the SWG(n,c/n) threshold (sqrt(c^2+6c+1)-c-1)/(2c), while claim 2 of Theorem 2.2, of which it is said to be a consequence, has 1/2; the library uses 1/2 - epsilon (see FORMALIZATION_DIFFERENCES.md). Both theorems are on p. 5. Macros replaced: \\SWGm -> \\mathcal{SWG}, \\SWG -> $\\mathcal{SWG}(n,q)$, \\SWGreg -> 3-$\\mathcal{SWG}(n)$, \\bigO -> \\mathcal{O}, \\Prc -> \\mathbf{Pr}; Theorem 2.5 writes O_epsilon (plain O) in claim 2, as printed."
+
+# ---------------------------------------------------------------------------------------------
+# Krivelevich, Sudakov, arXiv:1201.6529v4.
+
+[[source]]
+item = "epidemics:lem:ks1"
+paper = "M. Krivelevich, B. Sudakov. The phase transition in random graphs: a simple proof"
+venue = "Random Structures & Algorithms 43 (2013)"
+version = "arXiv:1201.6529v4"
+result = "Lemma 1 (2)"
+page = 3
+url = "https://arxiv.org/abs/1201.6529v4"
+status = "AI agent: from v4 LaTeX, compared with v4 PDF; not checked by a person"
+statement = '''
+Let $\epsilon>0$ be a small enough constant. Consider the sequence
+$\bar{X}=(X_i)_{i=1}^N$ of i.i.d. Bernoulli random variables with
+parameter $p$.
+\begin{enumerate}
+\item Let $p=\frac{1-\epsilon}{n}$.  Let $k=\frac{7}{\epsilon^2}\ln
+n$. Then \textbf{whp} there is no interval of length $kn$ in $[N]$, in which
+at least $k$ of the random variables $X_i$ take value 1.
+\item Let $p=\frac{1+\epsilon}{n}$. Let $N_0=\frac{\epsilon
+n^2}{2}$. Then \textbf{whp} $\left|\sum_{i=1}^{N_0} X_i
+-\frac{\epsilon(1+\epsilon)n}{2}\right|\le n^{2/3}$.
+\end{enumerate}
+'''
+context = '''
+[Section 1, p. 1, footnote:] We say that an event  $\mathcal{E}_n$ occurs with high
+probability, or \textbf{whp} for brevity, in the probability space $G(n,p)$
+if $\lim_{n\rightarrow\infty}Pr[G\sim G(n,p)\in \mathcal{E}_n]=1$.
+[Section 1, p. 2:] Our notation is fairly standard. We set $N=\binom{n}{2}$. Floor and
+ceiling signs will be systematically omitted for the sake of clarity
+of presentation.
+'''
+notes = "Full statement of Lemma 1; the item formalizes item 2 with Chernoff bounds instead of Chebyshev's inequality, as suggested in the paper's Discussion, item 1 ('using a Chernoff-type bound for the tales of the binomial random variable instead of the Chebyshev inequality would allow to claim in the second part of Lemma 1 that the sum ... is close to epsilon(1+epsilon)n/2 with probability exponentially close to 1'). Macro \\whp ({\\bf whp}) replaced by \\textbf{whp}, {\\cal E} by \\mathcal{E}."
+
+[[source]]
+item = "epidemics:def:dfs"
+paper = "M. Krivelevich, B. Sudakov. The phase transition in random graphs: a simple proof"
+venue = "Random Structures & Algorithms 43 (2013)"
+version = "arXiv:1201.6529v4"
+result = "Section 2, the DFS"
+page = 2
+url = "https://arxiv.org/abs/1201.6529v4"
+status = "AI agent: from v4 LaTeX, compared with v4 PDF; not checked by a person"
+statement = '''
+Recall that the DFS (Depth First Search) is a graph search algorithm
+that visits all vertices of a (directed or undirected) graph
+$G=(V,E)$ as follows. It maintains three sets of vertices, letting
+$S$ be the set of vertices whose exploration is complete, $T$ be the
+set of unvisited vertices, and $U=V\setminus(S\cup T)$, where the
+vertices of $U$ are kept in a stack (the last in, first out data
+structure). It is also assumed that some order $\sigma$ on the
+vertices of $G$ is fixed, and the algorithm prioritizes vertices
+according to $\sigma$. The algorithm starts with $S=U=\emptyset$ and
+$T=V$, and runs till $U\cup T=\emptyset$. At each round of the
+algorithm, if the set $U$ is non-empty, the algorithm queries $T$
+for neighbors of the last vertex $v$ that has been added to $U$,
+scanning $T$ according to $\sigma$. If $v$ has a neighbor $u$  in
+$T$, the algorithm deletes $u$ from $T$ and inserts it into $U$. If
+$v$ does not have a neighbor in $T$, then $v$ is popped out of $U$
+and is moved to $S$. If $U$ is empty, the algorithm chooses the
+first vertex of $T$ according to $\sigma$, deletes it from $T$ and
+pushes it into $U$. In order to complete the exploration of the
+graph, whenever the sets $U$ and $T$ have both become empty (at this
+stage the connected component structure of $G$ has already been
+revealed), we make the algorithm query all remaining pairs of
+vertices in $S=V$, not queried before.
+
+Observe that the DFS algorithm starts revealing a connected
+component $C$ of $G$ at the moment the first vertex of $C$ gets into
+(empty beforehand) $U$ and completes discovering all of $C$ when $U$
+becomes empty again. We call a period of time between two
+consecutive emptyings of $U$ an {\em epoch}, each epoch corresponds
+to one connected component of $G$.
+'''
+context = '''
+[Section 2, p. 3:] We will run the DFS on a random input $G\sim G(n,p)$, fixing the
+order $\sigma$ on $V(G)=[n]$ to be the identity permutation. When
+the DFS algorithm is fed with a sequence of i.i.d. Bernoulli($p$)
+random variables $\bar{X}=(X_i)_{i=1}^N$, so that is gets its $i$-th
+query answered positively if $X_i=1$ and answered negatively
+otherwise, the so obtained graph is clearly distributed according to
+$G(n,p)$.
+[Section 1, p. 2:] We set $N=\binom{n}{2}$.
+'''
+notes = "Definition in the text, pp. 2 to 3 (two paragraphs). 'so that is gets' (context) is as printed. No paper macros in the statement."
+
+[[source]]
+item = "epidemics:lem:dfs"
+paper = "M. Krivelevich, B. Sudakov. The phase transition in random graphs: a simple proof"
+venue = "Random Structures & Algorithms 43 (2013)"
+version = "arXiv:1201.6529v4"
+result = "Section 2, properties of the DFS"
+page = 3
+url = "https://arxiv.org/abs/1201.6529v4"
+status = "AI agent: from v4 LaTeX, compared with v4 PDF; not checked by a person"
+statement = '''
+The following properties of the DFS algorithm will be relevant to
+us:
+\begin{itemize}
+\item at each round of the algorithm one vertex moves, either from
+$T$ to $U$, or from $U$ to $S$;
+\item at any stage of the algorithm, it has been revealed already
+that the graph $G$ has no edges between the current set $S$ and the
+current set $T$;
+\item the set $U$ always spans a path (indeed, when a vertex $u$ is
+added to $U$, it happens because $u$ is a neighbor of the last
+vertex $v$ in $U$; thus, $u$ augments the path spanned by $U$, of
+which $v$ is the last vertex).
+\end{itemize}
+[...] In particular, observe crucially that as long as $T\ne\emptyset$,
+every positive answer to a query results in a vertex being moved
+from $T$ to $U$, and thus after $t$ queries and assuming
+$T\ne\emptyset$ still, we have $|S\cup U|\ge \sum_{i=1}^t X_i$. (The
+last inequality is strict in fact as the first vertex of each
+connected component is moved from $T$ to $U$ ``for free", i.e.,
+without need to get a positive answer to a query.) On the other
+hand, since the addition of every vertex, but the first one in a
+connected component, to $U$ is caused by a positive answer to a
+query, we have at time $t$: $|U|\le 1+\sum_{i=1}^t X_i$.
+'''
+context = '''
+[Section 2, p. 2:] It maintains three sets of vertices, letting
+$S$ be the set of vertices whose exploration is complete, $T$ be the
+set of unvisited vertices, and $U=V\setminus(S\cup T)$, where the
+vertices of $U$ are kept in a stack (the last in, first out data
+structure). [...] The algorithm starts with $S=U=\emptyset$ and
+$T=V$, and runs till $U\cup T=\emptyset$. At each round of the
+algorithm, if the set $U$ is non-empty, the algorithm queries $T$
+for neighbors of the last vertex $v$ that has been added to $U$,
+scanning $T$ according to $\sigma$. If $v$ has a neighbor $u$  in
+$T$, the algorithm deletes $u$ from $T$ and inserts it into $U$. If
+$v$ does not have a neighbor in $T$, then $v$ is popped out of $U$
+and is moved to $S$. If $U$ is empty, the algorithm chooses the
+first vertex of $T$ according to $\sigma$, deletes it from $T$ and
+pushes it into $U$. In order to complete the exploration of the
+graph, whenever the sets $U$ and $T$ have both become empty [...], we make the algorithm query all remaining pairs of
+vertices in $S=V$, not queried before.
+[...] We call a period of time between two
+consecutive emptyings of $U$ an {\em epoch}, each epoch corresponds
+to one connected component of $G$.
+[Section 2, p. 3:] When
+the DFS algorithm is fed with a sequence of i.i.d. Bernoulli($p$)
+random variables $\bar{X}=(X_i)_{i=1}^N$, so that is gets its $i$-th
+query answered positively if $X_i=1$ and answered negatively
+otherwise, the so obtained graph is clearly distributed according to
+$G(n,p)$.
+'''
+notes = "Observations of the text, not a numbered result. The '[...]' in the statement skips the paragraph on feeding the DFS with i.i.d. Bernoulli variables (quoted in context). The closing quotes ``for free\" are as printed. The item's other claims (each pair queried at most once; when an epoch starts, all pairs between the explored set and the rest have been queried) have no explicit counterpart in this text."
+
+[[source]]
+item = "epidemics:lem:deferred"
+paper = "M. Krivelevich, B. Sudakov. The phase transition in random graphs: a simple proof"
+venue = "Random Structures & Algorithms 43 (2013)"
+version = "arXiv:1201.6529v4"
+result = "Section 2, the DFS fed with Bernoulli answers"
+page = 3
+url = "https://arxiv.org/abs/1201.6529v4"
+status = "AI agent: from v4 LaTeX, compared with v4 PDF; not checked by a person"
+statement = '''
+We will run the DFS on a random input $G\sim G(n,p)$, fixing the
+order $\sigma$ on $V(G)=[n]$ to be the identity permutation. When
+the DFS algorithm is fed with a sequence of i.i.d. Bernoulli($p$)
+random variables $\bar{X}=(X_i)_{i=1}^N$, so that is gets its $i$-th
+query answered positively if $X_i=1$ and answered negatively
+otherwise, the so obtained graph is clearly distributed according to
+$G(n,p)$. Thus, studying the component structure of $G$ can be
+reduced to studying the properties of the random sequence $\bar{X}$.
+'''
+context = '''
+[Section 1, p. 2:] We set $N=\binom{n}{2}$.
+[Section 2, p. 2:] At each round of the
+algorithm, if the set $U$ is non-empty, the algorithm queries $T$
+for neighbors of the last vertex $v$ that has been added to $U$,
+scanning $T$ according to $\sigma$. [...] In order to complete the exploration of the
+graph, whenever the sets $U$ and $T$ have both become empty (at this
+stage the connected component structure of $G$ has already been
+revealed), we make the algorithm query all remaining pairs of
+vertices in $S=V$, not queried before.
+'''
+notes = "The blueprint names no source for this item; it is in the Krivelevich-Sudakov section, and this passage is where the paper uses the principle (for the DFS only, without naming it). The library item is a general statement about adaptive queries. 'so that is gets' is as printed."
+
+# ---------------------------------------------------------------------------------------------
+# Hethcote, SIAM Review 2000 (Kermack-McKendrick SIR model).
+
+[[source]]
+items = ["epidemics:def:km", "epidemics:thm:km-basic", "epidemics:thm:km-threshold", "epidemics:thm:km-final", "epidemics:thm:km-peak"]
+paper = "H. W. Hethcote. The mathematics of infectious diseases"
+venue = "SIAM Review 42(4) (2000) 599-653"
+version = "SIAM Rev. 42(4) (2000)"
+result = "System (2.2) and Theorem 2.1"
+url = "https://doi.org/10.1137/S0036144500371907"
+status = "no open copy found; not transcribed"
+notes = "No copy on an author page, arXiv or an open-access site was found. Copies posted on third-party course and workshop pages exist; they were not used. The blueprint also cites Kermack and McKendrick (1927) for the model."
+
+# ---------------------------------------------------------------------------------------------
+# Kurtz's law of large numbers: Wormald 1999, Theorem 5.1; Kurtz 1970; Hoeffding 1963.
+
+[[source]]
+item = "epidemics:thm:kurtz"
+paper = "N. C. Wormald. The differential equation method for random graph processes and greedy algorithms"
+venue = "Lectures on Approximation and Randomized Algorithms (M. Karoński, H. J. Prömel, eds.), PWN, Warsaw, 1999, pp. 73-155"
+version = "lecture notes, author's PDF"
+result = "Theorem 5.1"
+page = 35
+url = "https://users.monash.edu.au/~nwormald/papers/de.pdf"
+status = "AI agent: typed from the notes' PDF; not checked by a person"
+statement = '''
+For $1 \le l \le a$, where $a$ is fixed, let $y_l : S^{(n)+} \to \mathbb{R}$ and $f_l : \mathbb{R}^{a+1} \to \mathbb{R}$, such
+that for some constant $C_0$ and all $l$, $|y_l(h_t)| < C_0 n$ for all $h_t \in S^{(n)+}$ for all $n$. Let $Y_l(t)$
+denote the random counterpart of $y_l(h_t)$. Assume the following three conditions hold, where
+in (ii) and (iii) $D$ is some bounded connected open set containing the closure of
+\[
+\{(0, z_1, \ldots, z_a) : \mathbf{P}(Y_l(0) = z_l n, 1 \le l \le a) \neq 0 \text{ for some } n\} .
+\]
+\begin{itemize}
+\item[(i)] (Boundedness hypothesis.) For some functions $\beta = \beta(n) \ge 1$ and $\gamma = \gamma(n)$, the probability that
+\[ \max_{1 \le l \le a} |Y_l(t + 1) - Y_l(t)| \le \beta, \]
+conditional upon $H_t$, is at least $1 - \gamma$ for $t < T_D$.
+\item[(ii)] (Trend hypothesis.) For some function $\lambda_1 = \lambda_1(n) = o(1)$, for all $l \le a$
+\[ | \mathbf{E}(Y_l(t + 1) - Y_l(t) \mid H_t) - f_l(t/n, Y_1(t)/n, \ldots, Y_a(t)/n) | \le \lambda_1 \]
+for $t < T_D$.
+\item[(iii)] (Lipschitz hypothesis.) Each function $f_l$ is continuous, and satisfies a Lipschitz condition, on
+\[ D \cap \{(t, z_1, \ldots, z_a) : t \ge 0\}, \]
+with the same Lipschitz constant for each $l$.
+\end{itemize}
+Then the following are true.
+\begin{itemize}
+\item[(a)] For $(0, \hat z_1, \ldots, \hat z_a) \in D$ the system of differential equations
+\[ \frac{dz_l}{dx} = f_l(x, z_1, \ldots, z_a), \qquad l = 1, \ldots, a \]
+has a unique solution in $D$ for $z_l : \mathbb{R} \to \mathbb{R}$ passing through
+\[ z_l(0) = \hat z_l, \]
+$1 \le l \le a$, and which extends to points arbitrarily close to the boundary of $D$;
+\item[(b)] Let $\lambda > \lambda_1 + C_0 n\gamma$ with $\lambda = o(1)$. For a sufficiently large constant $C$, with probability
+$1 - O(n\gamma + \frac{\beta}{\lambda} \exp(-\frac{n\lambda^3}{\beta^3}))$,
+\begin{equation}
+Y_l(t) = nz_l(t/n) + O(\lambda n) \tag{5.1}
+\end{equation}
+uniformly for $0 \le t \le \sigma n$ and for each $l$, where $z_l(x)$ is the solution in (a) with $\hat z_l =
+\frac{1}{n} Y_l(0)$, and $\sigma = \sigma(n)$ is the supremum of those $x$ to which the solution can be extended
+before reaching within $\ell^\infty$-distance $C\lambda$ of the boundary of $D$.
+\end{itemize}
+'''
+context = '''
+[Section 5.1, p. 34:] The random processes are any discrete
+time random processes. Such a process is a probability space which can be conveniently
+denoted by $(Q_0, Q_1, \ldots)$ where each $Q_i$ takes values in some set $S$. The elements of the space
+are sequences $(q_0, q_1, \ldots)$ where each $q_i \in S$. We use $h_t$ to denote $(q_0, q_1, \ldots, q_t)$, the history
+of the process up to time $t$.
+Consider a sequence of random processes indexed by $n$, $n = 1, 2, \ldots$. Thus $q_t = q_t^{(n)}$
+and $S = S^{(n)}$, but for simplicity the dependence on $n$ is usually dropped from the notation.
+Asymptotics, denoted by the notations $o$ and $O$, are for $n \to \infty$ but uniform over all other
+variables. $S^{(n)+}$ denotes the set of all $h_t = (q_0, \ldots, q_t)$ where each $q_i \in S^{(n)}$, $t = 0, 1, \ldots$.
+We say that a function $f(u_1, \ldots, u_j)$ satisfies a Lipschitz condition on $D \subseteq \mathbb{R}^j$ if a constant
+$L > 0$ exists with the property that
+\[ |f(u_1, \ldots, u_j) - f(v_1, \ldots, v_j)| \le L \max_{1 \le i \le j} |u_i - v_i| \]
+for all $(u_1, \ldots, u_j)$ and $(v_1, \ldots, v_j)$ in $D$. We call $L$ a Lipschitz constant for $f$, and note that
+$\max_{1 \le i \le j} |u_i - v_i|$ is the distance between $(u_1, \ldots, u_j)$ and $(v_1, \ldots, v_j)$ in the $\ell^\infty$ metric. [...]
+For variables $Y_1, \ldots, Y_a$ defined on the components of the process, and $D \subseteq \mathbb{R}^{a+1}$, define
+the stopping time $T_D(Y_1, \ldots, Y_a)$ to be the minimum $t$ such that $(t/n, Y_1(t)/n, \ldots, Y_a(t)/n) \notin D$. This is written as $T_D$ when $Y_1, \ldots, Y_a$ are understood from the context.
+[Section 5.1, p. 35:] In the statement of the theorem, ``uniformly'' refers to the convergence implicit in the $o()$
+terms.
+[Section 1.3.2, p. 6:] We use the notation $\mathbf{P}$ (probability), $\mathbf{E}$ (expectation), $\mathrm{Var}$ (variance) and u.a.r. (uniformly at
+random).
+'''
+notes = "No LaTeX source is available; typed from the page images of the PDF. Version: the lecture notes on the author's web page ('Notes on lectures given at the Summer School on Randomized Algorithms at Antonin, Poland in 1997', 72 pages), not compared with the 1999 book printing; page numbers are those of this PDF. Typeset from the PDF: the hypotheses (i) to (iii) and conclusions (a), (b) are rendered with \\item[...], \\mathbb{R} stands for the PDF's double-struck R, the equation number (5.1) is shown with \\tag. H_t, the random history up to time t, is used without a separate definition in this excerpt. The library states its own law of large numbers for the uniformized SIR chain (discrete time, an explicit exponential bound), whose statements were reviewed against this theorem (README); see FORMALIZATION_DIFFERENCES.md. The theorem is followed by a Note on a version with a number of variables depending on n."
+
+[[source]]
+items = ["epidemics:thm:kurtz", "epidemics:def:kurtz"]
+paper = "T. G. Kurtz. Solutions of ordinary differential equations as limits of pure jump Markov processes"
+venue = "Journal of Applied Probability 7(1) (1970) 49-58"
+version = "J. Appl. Probab. 7(1) (1970)"
+result = "no result number cited"
+url = "https://doi.org/10.2307/3212147"
+status = "no open copy found; not transcribed"
+notes = "The library cites the paper for the law of large numbers (blueprint section 'Kurtz's law of large numbers for SIR, in discrete time'); no open copy was found, so the numbered result was not identified."
+
+[[source]]
+item = "epidemics:lem:azuma"
+paper = "W. Hoeffding. Probability inequalities for sums of bounded random variables"
+venue = "Journal of the American Statistical Association 58(301) (1963) 13-30"
+version = "J. Amer. Statist. Assoc. 58 (1963)"
+result = "Theorem 2"
+url = "https://doi.org/10.1080/01621459.1963.10500830"
+status = "no open copy found; not transcribed"
+notes = "Cited in the doc comment of Dynamics.expList_azuma ('Azuma 1967; Hoeffding 1963, Theorem 2, for independent summands'). The other citation, K. Azuma, Weighted sums of certain dependent random variables, Tohoku Math. J. 19 (1967) 357-367, is open access but is cited without a result number and was not transcribed. The library's lemma is a maximal form for martingale increments along i.i.d. uniform rounds."
+
+# ---------------------------------------------------------------------------------------------
+# Karp, Schindelhauer, Shenker, Vöcking, FOCS 2000 (PULL and PUSH-PULL, library RumorSpread).
+
+[[source]]
+item = "epidemics:def:pull"
+paper = "R. Karp, C. Schindelhauer, S. Shenker, B. Vöcking. Randomized rumor spreading"
+venue = "FOCS 2000"
+version = "FOCS 2000 (coauthor's PDF)"
+result = "Sections 1.2 and 2"
+page = 2
+url = "https://archive.cone.informatik.uni-freiburg.de/pubs/rumor.pdf"
+status = "AI agent: typed from the FOCS 2000 PDF; not checked by a person"
+statement = '''
+[Section 1.2, p. 2:] Let $V$ denote the set of players. The communication
+graph $G_t = (V, E_t \subseteq V \times V)$ of round $t \geq 1$ is obtained
+by a distributed, randomized process. In each round, each
+player $u$ chooses a communication partner $v$ from $V$ at random and $u$ \emph{calls} $v$. Unless otherwise stated, we assume that
+all players choose their communication partners independently and uniformly at random from $V$.
+[...]
+In round $t$, the rumor and other information can be exchanged in both directions along the edges of $G_t$. Whenever a connection is established between two players, each
+one of them (if holding the rumor) has to decide whether
+to transmit the rumor to the other player, typically without knowing whether this player has received the rumor already. Regarding the flow of information, we distinguish
+between push and pull transmissions. Assume player $u$ calls
+player $v$.
+\begin{itemize}
+\item The rumor is \emph{pushed} If $u$ tells $v$ the rumor.
+\item The rumor is \emph{pulled} if $v$ tells $u$ the rumor.
+\end{itemize}
+[Section 2, p. 4:] Now consider a \emph{pull scheme} in which only called players send the rumor towards the calling players.
+[...] In order to combine the predictability of the push scheme
+with the quadratic-shrinking property of the pull scheme,
+we simply send the rumor in both directions whenever possible. In detail, our \emph{push\&pull scheme} works as follows.
+The creator of the rumor initiates a time-counter with 0 representing the \emph{age} of the rumor. The age is incremented in
+every round and distributed with the rumor. In every round
+every informed player pushes and pulls unless the age of
+the rumor is higher than $t_{\max} = \log_3 n + O(\ln \ln n)$.
+'''
+context = '''
+[Section 2, p. 4:] Consider a \emph{push scheme} in which every informed
+player, in every round, forwards the rumor to the player
+it calls until all players are informed.
+'''
+notes = "No LaTeX source is available; typed from the page images of the PDF. Sections 1.2 (the random phone call model) and 2 (push, pull and push&pull schemes). Excerpts of the text (the paper has no numbered definitions); 'pushed If' is as printed. Players choose partners uniformly from V, so self-calls are allowed; the library's RumorSpread model draws partners among the other n - 1 nodes (blueprint section on PULL and PUSH-PULL). The library's push-pull runs without the age counter."
+
+[[source]]
+item = "epidemics:thm:pull"
+paper = "R. Karp, C. Schindelhauer, S. Shenker, B. Vöcking. Randomized rumor spreading"
+venue = "FOCS 2000"
+version = "FOCS 2000 (coauthor's PDF)"
+result = "Theorem 2.1"
+page = 4
+url = "https://archive.cone.informatik.uni-freiburg.de/pubs/rumor.pdf"
+status = "AI agent: typed from the FOCS 2000 PDF; not checked by a person"
+statement = '''
+The simple push\&pull-scheme informs all
+players in time $\log_3 n + O(\ln \ln n)$ using $O(n \ln \ln n)$ messages
+w.h.p.
+'''
+context = '''
+[Section 1, p. 1, footnote 1:] The term with high probability (w.h.p.) means with probability at least
+$1 - O(n^{-\alpha})$ for an arbitrary constant $\alpha > 0$.
+[Section 1.2, p. 2:] Let $V$ denote the set of players. [...] In each round, each
+player $u$ chooses a communication partner $v$ from $V$ at random and $u$ \emph{calls} $v$. Unless otherwise stated, we assume that
+all players choose their communication partners independently and uniformly at random from $V$.
+[Section 1.2, p. 3:] Assume player $u$ calls player $v$.
+\begin{itemize}
+\item The rumor is \emph{pushed} If $u$ tells $v$ the rumor.
+\item The rumor is \emph{pulled} if $v$ tells $u$ the rumor.
+\end{itemize}
+[Section 2, p. 4:] In detail, our \emph{push\&pull scheme} works as follows.
+The creator of the rumor initiates a time-counter with 0 representing the \emph{age} of the rumor. The age is incremented in
+every round and distributed with the rumor. In every round
+every informed player pushes and pulls unless the age of
+the rumor is higher than $t_{\max} = \log_3 n + O(\ln \ln n)$. In the
+following theorem, we assume the uniform distribution and
+a perfect interconnection without failures.
+'''
+notes = "No LaTeX source is available; typed from the page image of the PDF. The theorem is about push-pull only. For pull alone the paper says in Section 2, informally, that after O(ln n) rounds, w.h.p., about n/2 players are informed and that the shrinking phase then takes Theta(ln ln n) rounds. The library's item proves O(log n) bounds (with explicit constants, partners among the other n - 1 nodes) for PULL and PUSH-PULL."
+
+# ---------------------------------------------------------------------------------------------
+# Doerr, Kostrygin, arXiv:2303.11150v1 (long version of the ICALP 2017 paper).
+
+[[source]]
+item = "epidemics:def:rumor-process"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Definitions 6, 7 and 8"
+page = 16
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "AI agent: from v1 LaTeX, compared with v1 PDF; not checked by a person"
+statement = '''
+Definition 6 (Homogeneous rumor spreading process).
+  We always assume that we have $n$ nodes. Each node can be either \emph{informed} or \emph{uninformed}. We assume that the process starts with exactly one node being informed. Uninformed nodes may become informed, but an informed node never can become uninformed. We consider a discrete time process, so the process can be partitioned into \emph{rounds}. In each round each uninformed node can become informed. Whenever a round starts with $k$ nodes being informed, then the probability for each uninformed node to become informed is some number $p_k$, which only depends on the number $k$ of the informed nodes at the beginning of the round.
+
+Definition 7 (Covariance numbers).
+For a given homogeneous rumor spreading process and $k \in [1..n-1]$ let $c_k$ be the smallest number such that whenever a round starts with $k$ informed nodes and for any two uninformed nodes $x_1, x_2$, the indicator random variables $X_1, X_2$ for the events that these nodes become informed in this round satisfy \[\operatorname{Cov}[X_1,X_2] \le c_k.\]
+
+Definition 8 (Rumor spreading times).
+  Consider a homogeneous rumor spreading process. For all $t = 0, 1, \dots$ denote by $I_t$ the number of informed nodes at the end of the $t$-th round ($I_0 := 1$). Let $k \le m \le n$. By $T(k,m)$ we denote the time it takes to increase the number of informed nodes from $k$ to $m$ or more, that is,
+    \[
+        T(k,m) = \min\{ t-s | I_s = k \operatorname{ and } I_t \ge m \}.
+    \]
+    We call $T(1,n)$ the rumor spreading time of the process.
+'''
+context = '''
+[Appendix B.1, p. 16:] The above definition is relatively abstract and, in principle, could be simply phrased as a Markov process on the number $k \in [1..n]$ of informed nodes. [...] the definition covers all processes regarded in the literature as long as they are memoryless (the events in the current round depend only on which nodes are informed) and symmetric (only the numbers of informed and uninformed nodes is relevant, but not which nodes these are).
+The main insight of this work is that we can mostly ignore the particular structure of a rumor spreading process and only work with the \emph{success probabilities} $p_k$ and the \emph{covariance numbers} $c_k$ defines as follows.
+'''
+notes = "Three definitions in one entry; labels added, titles are the paper's. Definitions 6 and 7 are on p. 16, Definition 8 on p. 17. Macros replaced: \\Cov -> \\operatorname{Cov}. Section 3 (p. 8) has the same text as Definitions 1 and 2. 'defines as follows' (context) is as printed."
+
+[[source]]
+item = "epidemics:def:rumor-conditions"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Definitions 9 and 11"
+page = 19
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "AI agent: from v1 LaTeX, compared with v1 PDF; not checked by a person"
+statement = '''
+Definition 9 (upper exponential growth conditions).
+    Let $\gamma_n$ be bounded between two positive constants.
+    Let $a, b, c \ge 0$ and $0 < f < 1$ with $af<1$.
+    We say that a homogeneous epidemic protocol satisfies the \emph{upper exponential growth conditions} in $[1,fn[$ if for any $n \in \mathbb{N}$ big enough the following properties are satisfied for any $k < fn$.
+    \begin{enumerate}
+        \item[(i)] $p_k \ge \gamma_n \tfrac{k}{n} \cdot \left(1- a\tfrac{k}{n} - \tfrac{b}{\ln n}\right)$.
+        \item[(ii)] $c_k \le c\tfrac{k}{n^2}$.
+    \end{enumerate}
+
+Definition 11 (upper exponential shrinking conditions).
+    Let $\rho_n$ be bounded between two positive constants.
+	Let $0 < g < 1$ and $a, c \in \mathbb{R}_{\ge0}$ such that $e^{-{\rho_n}} + ag < 1$.
+	We say that a homogeneous epidemic protocol satisfies \emph{the upper exponential shrinking conditions} if for any $n \in \mathbb{N}$ big enough, the following properties are satisfied, for all $u = n-k \le gn$.
+	\begin{enumerate}
+		\item[(i)]
+			$1-p_k = 1-p_{n-u} \le e^{-{\rho_n}} + a\frac{u}{n}$;
+		\item[(ii)]
+			$c_k = c_{n-u} \le \frac{c}{u}$.
+	\end{enumerate}
+'''
+context = '''
+[Definition 6, p. 16:] Whenever a round starts with $k$ nodes being informed, then the probability for each uninformed node to become informed is some number $p_k$, which only depends on the number $k$ of the informed nodes at the beginning of the round.
+[Definition 7, p. 16:] For a given homogeneous rumor spreading process and $k \in [1..n-1]$ let $c_k$ be the smallest number such that whenever a round starts with $k$ informed nodes and for any two uninformed nodes $x_1, x_2$, the indicator random variables $X_1, X_2$ for the events that these nodes become informed in this round satisfy \[\operatorname{Cov}[X_1,X_2] \le c_k.\]
+'''
+notes = "Two definitions in one entry; labels added, titles are the paper's. Definition 9 is on p. 19, Definition 11 on p. 27. Macros replaced: \\Pk -> p_k, \\Ck -> c_k, \\N -> \\mathbb{N}, \\R -> \\mathbb{R}, \\Cov -> \\operatorname{Cov}; the enumerate labels (i), (ii) are written explicitly. 'Homogeneous epidemic protocol' is the paper's term here for a homogeneous rumor spreading process (Definition 6). The Section 3 versions (Definitions 3 and 4, pp. 8 to 9) state upper and lower conditions together."
+
+[[source]]
+item = "epidemics:lem:rumor-variance"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Lemma 9"
+page = 14
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "AI agent: from v1 LaTeX, compared with v1 PDF; not checked by a person"
+statement = '''
+    Let a random variables $X = \sum_{i=1}^n X_i$, where $X_i$ are indicator random variables.
+    Suppose, for any $i \ne j$ we have $\operatorname{Cov}[X_i,X_j] \le c$ for some constant $c$.
+    Then $\operatorname{Var}[X] \le \mathbb{E}[X] + cn^2$.
+'''
+context = '''
+[Appendix A, p. 14:] In this section, for the sake of completeness, we collect some elementary facts which are well-known.
+'''
+notes = "Untitled lemma of Appendix A.1 ('Variance. Chebyshev's and Cantelli's Inequalities'). 'Let a random variables' is as printed. Macros replaced: \\Cov -> \\operatorname{Cov}, \\Var -> \\operatorname{Var}, \\E -> \\mathbb{E}. The library applies it to the uninformed nodes of one round (n - |S| indicators)."
+
+[[source]]
+item = "epidemics:lem:rumor-connect"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Lemma 19"
+page = 17
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "AI agent: from v1 LaTeX, compared with v1 PDF; not checked by a person"
+statement = '''
+	Consider a homogeneous rumor spreading process. Let $0 < \ell < m < n$ and $0 < p < 1$. Suppose for any number $\ell \le k < m$, we have $p_{k} \ge p$.
+    Then
+    \begin{enumerate}
+	    \item[(i)] $\mathbb{P}[T(\ell, m) > r] \le \tfrac{n-\ell}{n-m} \cdot (1-p)^r$.
+    	\item[(ii)] $\mathbb{E}[T(\ell,m)] \le \frac{n-\ell}{n-m} \cdot \frac1{p}\,.$
+    \end{enumerate}
+'''
+context = '''
+[Definition 6, p. 16:] We always assume that we have $n$ nodes. Each node can be either \emph{informed} or \emph{uninformed}. We assume that the process starts with exactly one node being informed. Uninformed nodes may become informed, but an informed node never can become uninformed. We consider a discrete time process, so the process can be partitioned into \emph{rounds}. In each round each uninformed node can become informed. Whenever a round starts with $k$ nodes being informed, then the probability for each uninformed node to become informed is some number $p_k$, which only depends on the number $k$ of the informed nodes at the beginning of the round.
+[Definition 8, p. 17:] For all $t = 0, 1, \dots$ denote by $I_t$ the number of informed nodes at the end of the $t$-th round ($I_0 := 1$). Let $k \le m \le n$. By $T(k,m)$ we denote the time it takes to increase the number of informed nodes from $k$ to $m$ or more, that is,
+    \[
+        T(k,m) = \min\{ t-s | I_s = k \operatorname{ and } I_t \ge m \}.
+    \]
+'''
+notes = "Macros replaced: \\Pr (redefined by the paper) -> \\mathbb{P}, \\Expect -> \\mathbb{E}; enumerate labels written explicitly. Lemma 4 (Section 3, p. 10) states the same with the two claims in the other order."
+
+[[source]]
+item = "epidemics:lem:rumor-jump"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Lemma 20"
+page = 18
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "AI agent: from v1 LaTeX, compared with v1 PDF; not checked by a person"
+statement = '''
+    Let $f, p \in ]0,1[$ and $c > 0$.
+    Suppose that for any $k < fn$ we have $p_k \le p$ and $c_k \le \tfrac{c}{n}$.
+    Then there exists $f' \in ]f,1[$ such that with probability $1-O\left(\tfrac1n\right)$ at the end of some round the number of informed nodes will be between $fn$ and $f'n$.
+'''
+context = '''
+[Definition 6, p. 16:] We always assume that we have $n$ nodes. [...] We assume that the process starts with exactly one node being informed. Uninformed nodes may become informed, but an informed node never can become uninformed. [...] Whenever a round starts with $k$ nodes being informed, then the probability for each uninformed node to become informed is some number $p_k$, which only depends on the number $k$ of the informed nodes at the beginning of the round.
+[Definition 7, p. 16:] For a given homogeneous rumor spreading process and $k \in [1..n-1]$ let $c_k$ be the smallest number such that whenever a round starts with $k$ informed nodes and for any two uninformed nodes $x_1, x_2$, the indicator random variables $X_1, X_2$ for the events that these nodes become informed in this round satisfy \[\operatorname{Cov}[X_1,X_2] \le c_k.\]
+[Appendix B.1, p. 18, before the lemma:] In this case, the following lemma allows to argue that an arbitrarily small, but still constant fraction of uninformed nodes will be reached at some time.
+'''
+notes = "Macro \\Odn-style O\\left(\\tfrac1n\\right) kept as written. The proof works with one round from k < fn informed nodes and any f' in ]f + p(1-f), 1[, and ends with 'the probability that the process jumps over the interval [fn, f'n] is O(1/n)'. The library formalizes that one-round estimate and a path form (see FORMALIZATION_DIFFERENCES.md and the blueprint remark after this item). Lemma 5 (Section 3, p. 10) has the same statement."
+
+[[source]]
+item = "epidemics:thm:rumor-growth"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Theorem 1 (upper bounds)"
+page = 9
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "AI agent: from v1 LaTeX, compared with v1 PDF; not checked by a person"
+statement = '''
+  If a homogeneous rumor spreading process satisfies the upper (lower) exponential growth conditions in $[1,fn[$, then there are constants $A', \alpha'>0$ such that
+    \begin{align*}
+    	&\mathbb{E}[T(1, fn)] \underset{(\ge)}{\le} \log_{1+\gamma_n} n \underset{(-)}{+} O(1), \\
+    	&\mathbb{P}[T(1, fn) \underset{(\le)}{\ge} \log_{1+\gamma_n} n \underset{(-)}{+} r] \le A' \exp(-\alpha'r) \, \mbox{ for  all $r \in \mathbb{N}$}.
+    \end{align*}
+  When the lower exponential growth conditions are satisfied, then also there is an $f' \in ]f,1[$ such that with probability $1-O\left(\tfrac1n\right)$ at most $f'n$ nodes are informed at the end of round $T(1,fn)$.
+'''
+context = '''
+[Section 3, p. 7:] In this work, we consider only \emph{homogeneous rumor spreading processes} characterized as follows. We always assume that we have $n$ nodes. Each node can be either \emph{informed} or \emph{uninformed}. We assume that the process starts with exactly one node being informed. Uninformed nodes may become informed, but an informed node never becomes uninformed. We consider a discrete time process, so the process can be partitioned into \emph{rounds}. In each round each uninformed node can become informed. Whenever a round starts with $k$ nodes being informed, then the probability for each uninformed node to become informed is some number $p_k$, which only depends on the number $k$ of informed nodes at the beginning of the round.
+[Definition 1, p. 8:] For a given homogeneous rumor spreading process and $k \in [1..n-1]$ let $c_k$ be the smallest number such that whenever a round starts with $k$ informed nodes and for any two uninformed nodes $x_1, x_2$, the indicator random variables $X_1, X_2$ for the events that these nodes become informed in this round satisfy \[\operatorname{Cov}[X_1,X_2] \le c_k.\]
+[Definition 2, p. 8:] Consider a homogeneous rumor spreading process. For all $t = 0, 1, \dots$ denote by $I_t$ the number of informed nodes at the end of the $t$-th round ($I_0 := 1$). Let $k \le m \le n$. By $T(k,m)$ we denote the time it takes to increase the number of informed nodes from $k$ to $m$ or more, that is,
+    \[
+        T(k,m) = \min\{ t-s | I_s = k \operatorname{ and } I_t \ge m \}.
+    \]
+[Definition 3, p. 8:] Let $\gamma_n$ be bounded between two positive constants. Let $a, b, c \ge 0$ and $0 < f < 1$.
+    We say that a homogeneous rumor spreading process satisfies the \emph{upper (respectively lower) exponential growth conditions} in $[1,fn[$ if for any $n \in \mathbb{N}$ big enough the following properties are satisfied for any $k < fn$.
+    (i) $p_k \ge \gamma_n \tfrac{k}{n} \cdot \left(1- a\tfrac{k}{n} - \tfrac{b}{\ln n}\right)$ (respectively $p_k \le \gamma_n \tfrac{k}{n} \cdot \left(1+ a\tfrac{k}{n} + \tfrac{b}{\ln n}\right)$).
+    (ii) $c_k \le c\tfrac{k}{n^2}$.
+    In the case of the upper exponential growth condition, we also require $af<1$.
+'''
+notes = "Section 3 summary of Theorems 21 and 27 (the library cites it as 'Theorem 1 / Theorem 21'); the item formalizes the upper bounds. The underset (>=), (-), (<=) mark the lower-bound variant. Macros replaced: \\Expect -> \\mathbb{E}, \\Pr -> \\mathbb{P}, \\Pk -> p_k, \\Ck -> c_k, \\N -> \\mathbb{N}, \\Cov -> \\operatorname{Cov}; enumerate of Definition 3 flattened to (i), (ii). Theorem 21 is the verification/sources.toml entry of this item."
+
+[[source]]
+item = "epidemics:thm:rumor-shrinking"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Theorem 2 (upper bounds)"
+page = 9
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "AI agent: from v1 LaTeX, compared with v1 PDF; not checked by a person"
+statement = '''
+	If a homogeneous rumor spreading process satisfies the upper (lower) exponential shrinking conditions, then there are $A' \alpha' > 0$ such that
+	\begin{align*}
+		&\mathbb{E}[T(n-\lfloor g n \rfloor, n)] \underset{(\ge)}{\le} \tfrac1{\rho_n}\ln n \underset{(-)}{+} O(1),\\
+		&\mathbb{P}[T(n-\lfloor g n \rfloor, n) \underset{(\le)}{\ge} \tfrac1{\rho_n}\ln n \underset{(-)}{+} r] \le A'\exp(-\alpha'r)\, \mbox{ for all $r \in \mathbb{N}$}.
+  \end{align*}
+'''
+context = '''
+[Section 3, p. 7:] Whenever a round starts with $k$ nodes being informed, then the probability for each uninformed node to become informed is some number $p_k$, which only depends on the number $k$ of informed nodes at the beginning of the round.
+[Definition 1, p. 8:] For a given homogeneous rumor spreading process and $k \in [1..n-1]$ let $c_k$ be the smallest number such that whenever a round starts with $k$ informed nodes and for any two uninformed nodes $x_1, x_2$, the indicator random variables $X_1, X_2$ for the events that these nodes become informed in this round satisfy \[\operatorname{Cov}[X_1,X_2] \le c_k.\]
+[Definition 2, p. 8:] For all $t = 0, 1, \dots$ denote by $I_t$ the number of informed nodes at the end of the $t$-th round ($I_0 := 1$). Let $k \le m \le n$. By $T(k,m)$ we denote the time it takes to increase the number of informed nodes from $k$ to $m$ or more, that is,
+    \[
+        T(k,m) = \min\{ t-s | I_s = k \operatorname{ and } I_t \ge m \}.
+    \]
+[Definition 4, p. 9:] Let $\rho_n$ be bounded between two positive constants. Let $0 < g < 1$, and $a, c \in \mathbb{R}_{\ge0}$.
+	We say that a homogeneous rumor spreading process satisfies the \emph{upper (respectively lower) exponential shrinking conditions} if for any $n \in \mathbb{N}$ big enough, the following properties are satisfied for all $u = n-k \le gn$.
+	(i) $1-p_k = 1-p_{n-u} \le e^{-\rho_n} + a\frac{u}{n}$\, (respectively $1-p_k = 1-p_{n-u} \ge e^{-\rho_n} - a\frac{u}{n}$).
+	(ii) $c_k = c_{n-u} \le \frac{c}{u}$.
+	For the upper exponential shrinking conditions, we also assume that $e^{-\rho_n} + ag < 1$.
+'''
+notes = "Section 3 summary of Theorems 31 and 38 (the library cites it as 'Theorem 2 / Theorem 31'); the item formalizes the upper bounds. '$A' \\alpha' > 0$' (without comma) is as printed. Macros replaced: \\Expect -> \\mathbb{E}, \\Pr -> \\mathbb{P}, \\N -> \\mathbb{N}, \\R -> \\mathbb{R}, \\Cov -> \\operatorname{Cov}; enumerate of Definition 4 flattened. Theorem 31 is the verification/sources.toml entry of this item."
+
+[[source]]
+item = "epidemics:thm:rumor-double"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Theorem 3 (upper bounds)"
+page = 10
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "AI agent: from v1 LaTeX, compared with v1 PDF; not checked by a person"
+statement = '''
+	If a homogeneous rumor spreading process satisfies the upper (lower) double exponential shrinking conditions, then there are $A', \alpha' > 0$ and $R$ (depending on $\alpha$) such that
+	\begin{align*}
+		&\mathbb{E}[T(n-\lfloor g n \rfloor, n)] \underset{(\ge)}{\le} \log_\ell \ln n \underset{(-)}{+} O(1),\\
+		&\mathbb{P}[T(n-\lfloor g n \rfloor, n) \ge \log_\ell \ln n + r] \le O(n^{-\alpha'r+A'})\, \mbox{ for all $r \in \mathbb{N}$},\\
+		\mbox{(}&\mathbb{P}[T(n-\lfloor g n \rfloor, n) \le \log_\ell \ln n - R] \le O(n^{-1+2\ell\alpha})\mbox{)}.
+  \end{align*}
+'''
+context = '''
+[Section 3, p. 7:] Whenever a round starts with $k$ nodes being informed, then the probability for each uninformed node to become informed is some number $p_k$, which only depends on the number $k$ of informed nodes at the beginning of the round.
+[Definition 1, p. 8:] For a given homogeneous rumor spreading process and $k \in [1..n-1]$ let $c_k$ be the smallest number such that whenever a round starts with $k$ informed nodes and for any two uninformed nodes $x_1, x_2$, the indicator random variables $X_1, X_2$ for the events that these nodes become informed in this round satisfy \[\operatorname{Cov}[X_1,X_2] \le c_k.\]
+[Definition 2, p. 8:] For all $t = 0, 1, \dots$ denote by $I_t$ the number of informed nodes at the end of the $t$-th round ($I_0 := 1$). Let $k \le m \le n$. By $T(k,m)$ we denote the time it takes to increase the number of informed nodes from $k$ to $m$ or more, that is,
+    \[
+        T(k,m) = \min\{ t-s | I_s = k \operatorname{ and } I_t \ge m \}.
+    \]
+[Definition 5, p. 9:] Let $g \in ]0,1]$, $\ell > 1$, and $a, c \in \mathbb{R}_{\ge0}$ such that $ag^{\ell-1} < 1$.
+	We say that a homogeneous rumor spreading process satisfies the \emph{upper (respectively lower) double exponential shrinking conditions}
+	if for any $n$ big enough the following properties are satisfied for all $u = n-k \in [1, gn]$.
+	(i) $1-p_{n-u} \le a\left(\tfrac{u}{n}\right)^{\ell-1}$\, (respectively $1-p_{n-u} \ge a\left(\tfrac{u}{n}\right)^{\ell-1}$).
+	(ii) $c_{n-u} \le c \tfrac{n}{u^2}$.
+'''
+notes = "Section 3 summary of Theorems 43 and 48 (the library cites Theorem 43 as 'Theorem 3, upper bounds'). Definition 5 has no parameter alpha and covers u in [1, gn], while the statement mentions alpha, as printed; Definition 13 and Theorem 43 (the verification/sources.toml entry of this item) use u in [n^{1-alpha}, gn] and a separate hypothesis for u <= n^{1-alpha}. Macros replaced: \\Expect -> \\mathbb{E}, \\Pr -> \\mathbb{P}, \\N -> \\mathbb{N}, \\R -> \\mathbb{R}, \\Cov -> \\operatorname{Cov}; enumerate of Definition 5 flattened."
+
+[[source]]
+item = "epidemics:thm:rumor-total"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Theorems 21 and 31 with Lemma 19"
+page = 19
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "AI agent: from v1 LaTeX, compared with v1 PDF; not checked by a person"
+statement = '''
+Theorem 21. Consider a homogeneous epidemic protocol satisfying the upper exponential growth conditions in $[1,fn[$.
+    Then there exist constant $A', \alpha'$ such that
+    \begin{eqnarray*}
+    	&& \mathbb{E}[T(1, fn)] \le \log_{1+\gamma_n} n + O(1), \\
+		&& \mathbb{P}[T(1,fn) > \log_{1+\gamma_n} n + r] \le A' e^{-\alpha' r} \, \mbox{for any $r \in N$}.
+    \end{eqnarray*}
+
+Lemma 19. Consider a homogeneous rumor spreading process. Let $0 < \ell < m < n$ and $0 < p < 1$. Suppose for any number $\ell \le k < m$, we have $p_{k} \ge p$.
+    Then
+    (i) $\mathbb{P}[T(\ell, m) > r] \le \tfrac{n-\ell}{n-m} \cdot (1-p)^r$.
+    (ii) $\mathbb{E}[T(\ell,m)] \le \frac{n-\ell}{n-m} \cdot \frac1{p}\,.$
+
+Theorem 31. Consider a homogeneous epidemic protocol satisfying the upper exponential shrinking conditions.
+  Then there are constant $A', \alpha' > 0$ such that
+	\begin{eqnarray*}
+		&& \mathbb{E}[T(n-\lfloor g n \rfloor, n)] \le \tfrac1{\rho_n}\ln n + O(1), \\
+		&& \mathbb{P}[T(n-\lfloor g n \rfloor, n) > \tfrac1{\rho_n}\ln n + r] \le A' e^{-\alpha r}\,
+			\mbox{ for all $r \in \mathbb{N}$}.
+	\end{eqnarray*}
+'''
+context = '''
+[Definition 6, p. 16:] Whenever a round starts with $k$ nodes being informed, then the probability for each uninformed node to become informed is some number $p_k$, which only depends on the number $k$ of the informed nodes at the beginning of the round.
+[Definition 7, p. 16:] [...] let $c_k$ be the smallest number such that whenever a round starts with $k$ informed nodes and for any two uninformed nodes $x_1, x_2$, the indicator random variables $X_1, X_2$ for the events that these nodes become informed in this round satisfy \[\operatorname{Cov}[X_1,X_2] \le c_k.\]
+[Definition 8, p. 17:] For all $t = 0, 1, \dots$ denote by $I_t$ the number of informed nodes at the end of the $t$-th round ($I_0 := 1$). Let $k \le m \le n$. By $T(k,m)$ we denote the time it takes to increase the number of informed nodes from $k$ to $m$ or more, that is,
+    \[
+        T(k,m) = \min\{ t-s | I_s = k \operatorname{ and } I_t \ge m \}.
+    \]
+    We call $T(1,n)$ the rumor spreading time of the process.
+[Definition 9, p. 19:] Let $\gamma_n$ be bounded between two positive constants.
+    Let $a, b, c \ge 0$ and $0 < f < 1$ with $af<1$.
+    We say that a homogeneous epidemic protocol satisfies the \emph{upper exponential growth conditions} in $[1,fn[$ if for any $n \in \mathbb{N}$ big enough the following properties are satisfied for any $k < fn$.
+    (i) $p_k \ge \gamma_n \tfrac{k}{n} \cdot \left(1- a\tfrac{k}{n} - \tfrac{b}{\ln n}\right)$.
+    (ii) $c_k \le c\tfrac{k}{n^2}$.
+[Definition 11, p. 27:] Let $\rho_n$ be bounded between two positive constants.
+	Let $0 < g < 1$ and $a, c \in \mathbb{R}_{\ge0}$ such that $e^{-{\rho_n}} + ag < 1$.
+	We say that a homogeneous epidemic protocol satisfies \emph{the upper exponential shrinking conditions} if for any $n \in \mathbb{N}$ big enough, the following properties are satisfied, for all $u = n-k \le gn$.
+	(i) $1-p_k = 1-p_{n-u} \le e^{-{\rho_n}} + a\frac{u}{n}$;
+	(ii) $c_k = c_{n-u} \le \frac{c}{u}$.
+[Section 3.4, p. 10:] While often these above described three regimes suffice to fully analyze a rumor spreading process, occasionally it is necessary or convenient to separately regard a constant number of rounds between the growth and the shrinking regime. This is achieved by the following two lemmas.
+'''
+notes = "The paper does not state the composed total time as a theorem; the item composes Theorem 21 (p. 19), Lemma 19 (p. 17) and Theorem 31 (p. 28), quoted here in the order of the process, with labels added. Theorem 21 writes '$r \\in N$' (plain N) and Theorem 31 writes '$A' e^{-\\alpha r}$', as printed. Macros replaced: \\Expect -> \\mathbb{E}, \\Pr -> \\mathbb{P}, \\Pk -> p_k, \\Ck -> c_k, \\N -> \\mathbb{N}, \\R -> \\mathbb{R}, \\Cov -> \\operatorname{Cov}; enumerates flattened. Section 4 (p. 10) applies the composition to push: 'All growth conditions are satisfied at least up to k = n/2 informed nodes and all shrinking conditions are satisfied at least for u <= n/2 uninformed nodes, so we do not need the intermediate lemmas.'"
+
+[[source]]
+item = "epidemics:def:rumor-double"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Definition 13, second hypothesis of Theorem 43"
+page = 34
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "AI agent: from v1 LaTeX, compared with v1 PDF; not checked by a person"
+statement = '''
+Definition 13 (upper double exponential shrinking conditions).
+	Let $g, \alpha \in [0,1]$, $\ell > 1$, and $a, c \in \mathbb{R}_{\ge0}$ such that $ag^{\ell-1} < 1$.
+	We say that a homogeneous epidemic protocol satisfies \emph{the upper double exponential shrinking conditions}
+	if for any $n$ big enough, the following properties are satisfied for all $u \in [n^{1-\alpha}, gn]$.
+	\begin{enumerate}
+		\item[(i)] $1-p_{n-u} \le a\left(\tfrac{u}{n}\right)^{\ell-1}$.
+		\item[(ii)] $c_{n-u} \le c \tfrac{n}{u^2}$.
+	\end{enumerate}
+
+[Theorem 43, second hypothesis, p. 35:] Suppose further that there exists $\tau > 0$ such that $1-p_{n-u} \le n^{-\tau}$ for all $u \le n^{1-\alpha}$.
+'''
+context = '''
+[Definition 6, p. 16:] Whenever a round starts with $k$ nodes being informed, then the probability for each uninformed node to become informed is some number $p_k$, which only depends on the number $k$ of the informed nodes at the beginning of the round.
+[Definition 7, p. 16:] [...] let $c_k$ be the smallest number such that whenever a round starts with $k$ informed nodes and for any two uninformed nodes $x_1, x_2$, the indicator random variables $X_1, X_2$ for the events that these nodes become informed in this round satisfy \[\operatorname{Cov}[X_1,X_2] \le c_k.\]
+[Appendix B.4.1, p. 34:] In the definition above, we cover the rounds starting with a number of uninformed nodes between $n^{1-\alpha}$ and $gn$. While, by taking $\alpha=1$ this would allow to analyze the process until all nodes are informed, it turns out that the crucial part is reduce the number of uninformed nodes from $\Theta(n)$ to $n^{1-\alpha}$ for an arbitrarily small constant $\alpha$. For $u \in [1,n^{1-\alpha}]$, the double exponential shrinking conditions can be relaxed: the covariance condition is no longer needed and it is sufficient to bound uniformly the probability of a node to stay uninformed by $n^{-\tau}$, for some $\tau < 1$.
+'''
+notes = "Label 'Definition 13 (...)' added, title is the paper's; the second hypothesis of Theorem 43 is what the library calls fast finishing. Macros replaced: \\R -> \\mathbb{R}, \\Cov -> \\operatorname{Cov}; enumerate labels written explicitly. 'is reduce' (context) is as printed. Theorem 43 itself is the verification/sources.toml entry of epidemics:thm:rumor-double."
+
+[[source]]
+item = "epidemics:thm:rumor-total-double"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Theorems 21 and 43 with Lemma 19"
+page = 19
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "AI agent: from v1 LaTeX, compared with v1 PDF; not checked by a person"
+statement = '''
+Theorem 21. Consider a homogeneous epidemic protocol satisfying the upper exponential growth conditions in $[1,fn[$.
+    Then there exist constant $A', \alpha'$ such that
+    \begin{eqnarray*}
+    	&& \mathbb{E}[T(1, fn)] \le \log_{1+\gamma_n} n + O(1), \\
+		&& \mathbb{P}[T(1,fn) > \log_{1+\gamma_n} n + r] \le A' e^{-\alpha' r} \, \mbox{for any $r \in N$}.
+    \end{eqnarray*}
+
+Lemma 19. Consider a homogeneous rumor spreading process. Let $0 < \ell < m < n$ and $0 < p < 1$. Suppose for any number $\ell \le k < m$, we have $p_{k} \ge p$.
+    Then
+    (i) $\mathbb{P}[T(\ell, m) > r] \le \tfrac{n-\ell}{n-m} \cdot (1-p)^r$.
+    (ii) $\mathbb{E}[T(\ell,m)] \le \frac{n-\ell}{n-m} \cdot \frac1{p}\,.$
+
+Theorem 43. Consider a homogeneous epidemic protocol satisfying the upper double exponential shrinking conditions in $[n^{-\alpha},g]$.
+	Suppose further that there exists $\tau > 0$ such that $1-p_{n-u} \le n^{-\tau}$ for all $u \le n^{1-\alpha}$.
+
+	Then there exist constant $A', \alpha' > 0$ such that
+	\begin{eqnarray*}
+		&& \mathbb{E}[T(\lceil (1-g)n \rceil,n)] \le \log_\ell \ln n + O(1), \\
+		&& \mathbb{P}[T(\lceil (1-g)n \rceil,n) \ge \log_\ell \ln n + r] \le O(n^{-\alpha' r+A'})\, \mbox{ for all $r \in \mathbb{N}$}.
+	\end{eqnarray*}
+'''
+context = '''
+[Definition 6, p. 16:] Whenever a round starts with $k$ nodes being informed, then the probability for each uninformed node to become informed is some number $p_k$, which only depends on the number $k$ of the informed nodes at the beginning of the round.
+[Definition 7, p. 16:] [...] let $c_k$ be the smallest number such that whenever a round starts with $k$ informed nodes and for any two uninformed nodes $x_1, x_2$, the indicator random variables $X_1, X_2$ for the events that these nodes become informed in this round satisfy \[\operatorname{Cov}[X_1,X_2] \le c_k.\]
+[Definition 8, p. 17:] For all $t = 0, 1, \dots$ denote by $I_t$ the number of informed nodes at the end of the $t$-th round ($I_0 := 1$). Let $k \le m \le n$. By $T(k,m)$ we denote the time it takes to increase the number of informed nodes from $k$ to $m$ or more, that is,
+    \[
+        T(k,m) = \min\{ t-s | I_s = k \operatorname{ and } I_t \ge m \}.
+    \]
+    We call $T(1,n)$ the rumor spreading time of the process.
+[Definition 9, p. 19:] Let $\gamma_n$ be bounded between two positive constants.
+    Let $a, b, c \ge 0$ and $0 < f < 1$ with $af<1$.
+    We say that a homogeneous epidemic protocol satisfies the \emph{upper exponential growth conditions} in $[1,fn[$ if for any $n \in \mathbb{N}$ big enough the following properties are satisfied for any $k < fn$.
+    (i) $p_k \ge \gamma_n \tfrac{k}{n} \cdot \left(1- a\tfrac{k}{n} - \tfrac{b}{\ln n}\right)$.
+    (ii) $c_k \le c\tfrac{k}{n^2}$.
+[Definition 13, p. 34:] Let $g, \alpha \in [0,1]$, $\ell > 1$, and $a, c \in \mathbb{R}_{\ge0}$ such that $ag^{\ell-1} < 1$.
+	We say that a homogeneous epidemic protocol satisfies \emph{the upper double exponential shrinking conditions}
+	if for any $n$ big enough, the following properties are satisfied for all $u \in [n^{1-\alpha}, gn]$.
+	(i) $1-p_{n-u} \le a\left(\tfrac{u}{n}\right)^{\ell-1}$.
+	(ii) $c_{n-u} \le c \tfrac{n}{u^2}$.
+'''
+notes = "The paper does not state this composed total time as a theorem; the item composes Theorem 21 (p. 19), Lemma 19 (p. 17) and Theorem 43 (p. 35), quoted in the order of the process, with labels added. '$r \\in N$' (plain N) in Theorem 21 is as printed. Macros replaced: \\Expect -> \\mathbb{E}, \\Pr -> \\mathbb{P}, \\Pk -> p_k, \\Ck -> c_k, \\N -> \\mathbb{N}, \\R -> \\mathbb{R}, \\Cov -> \\operatorname{Cov}; enumerates flattened."
+
+[[source]]
+item = "epidemics:def:rumor-protocols"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Appendix C, push, pull and push-pull"
+page = 39
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "AI agent: from v1 LaTeX, compared with v1 PDF; not checked by a person"
+statement = '''
+[Appendix C, p. 39:] We stick to the usual convention that for rumor spreading in complete graphs we allow that nodes call themselves, that is, the random communication partner is chosen uniformly at random from all nodes.
+[Appendix C.1, p. 39:] In the push protocol, in each round each node knowing the rumor calls a random neighbor and gossips the rumor to it.
+[Appendix C.2, p. 40:] The pull protocol is dual to the push protocol in the sense that now in each round, each uninformed node calls a random neighbor and becomes informed if the latter was informed.
+[Appendix C.3, p. 41:] In the push-pull protocol, both informed and uninformed nodes contact a random neighbor in each round. If one of the two partners of such a conversation is informed, then also the other one becomes informed.
+'''
+notes = "Definitions in the text, not numbered. The paper adds: 'By replacing all (1-1/n) terms with (1-1/(n-1)), the elementary proofs below can easily be transformed to the setting where nodes only call random neighbors in the complete graph.' The library defines one round of calls for all nodes and the three update rules on it."
+
+[[source]]
+item = "epidemics:lem:rumor-protocol-conditions"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Section 4, the basic protocols"
+page = 10
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "AI agent: from v1 LaTeX, compared with v1 PDF; not checked by a person"
+statement = '''
+For the \emph{basic push, pull, and push-pull protocols}, we easily observe that all covariances to be regarded are negative or zero: Knowing that one uninformed node $x_1$ becomes informed in the current round has no influence on the pull call of another uninformed node $x_2$. When the protocol has push calls and $x_1$ was informed via a push call, then this event makes it slightly less likely that $x_2$ becomes informed via a push call, simply because at least one informed node is occupied with calling $x_1$.
+
+The success probabilities $p_k$ are easy to compute right from the protocol definition. When $k$ nodes are informed, then the probabilities that an uninformed node becomes informed are
+\begin{equation*}
+p_k =
+\begin{cases}
+1 - (1-1/n)^k\, &\mbox{ for the push protocol,}\\
+k/n\, &\mbox{ for the pull protocol,}\\
+p_k = 1 - (1-1/n)^k \frac{n-k}n\, &\mbox{ for the push-pull protocol.}
+\end{cases}
+\end{equation*}
+Using elementary estimates like $1 - k/n \le (1-1/n)^k \le 1 - k/n + k^2/2n^2$, we see that the push and pull protocols satisfy the exponential growth conditions with $\gamma_n = 1$, whereas the push-pull protocol does the same with $\gamma_n = 2$. The push protocol satisfies the exponential shrinking conditions with $\rho_n=1$. The pull and push-pull protocols satisfy the double exponential shrinking conditions with $\ell = 2$. All growth conditions are satisfied at least up to $k = n/2$ informed nodes and all shrinking conditions are satisfied at least for $u \le n/2$ uninformed nodes, so we do not need the intermediate lemmas.
+'''
+context = '''
+[Section 4, p. 10:] Since it does not make a difference, to ease the notation we always assume that nodes call random nodes, that is, including themselves.
+[Definition 7, p. 16:] For a given homogeneous rumor spreading process and $k \in [1..n-1]$ let $c_k$ be the smallest number such that whenever a round starts with $k$ informed nodes and for any two uninformed nodes $x_1, x_2$, the indicator random variables $X_1, X_2$ for the events that these nodes become informed in this round satisfy \[\operatorname{Cov}[X_1,X_2] \le c_k.\]
+[Definition 9, p. 19:] [...] (i) $p_k \ge \gamma_n \tfrac{k}{n} \cdot \left(1- a\tfrac{k}{n} - \tfrac{b}{\ln n}\right)$. (ii) $c_k \le c\tfrac{k}{n^2}$.
+[Definition 11, p. 27:] [...] for all $u = n-k \le gn$. (i) $1-p_k = 1-p_{n-u} \le e^{-{\rho_n}} + a\frac{u}{n}$; (ii) $c_k = c_{n-u} \le \frac{c}{u}$.
+[Definition 13, p. 34:] [...] for all $u \in [n^{1-\alpha}, gn]$. (i) $1-p_{n-u} \le a\left(\tfrac{u}{n}\right)^{\ell-1}$. (ii) $c_{n-u} \le c \tfrac{n}{u^2}$.
+'''
+notes = "Section 4 paragraphs (pp. 10 to 11); 'p_k =' inside the third case of the display is as printed. The proofs of Theorems 51 to 53 (Appendix C) give the parameters used there: push with gamma_n = 1, f = 1, b = c = 0, a = 1 (upper growth) and 1/e <= 1 - p_{n-u} <= 1/e + (2/e)(u/n) (shrinking from gn = n/2); pull with p_k = k/n, gamma_n = 1, f = 1, a = b = c = 0, and l = 2, g = 1, alpha = 0, a = 1, c = 0. The library's parameters are listed in the blueprint item and FORMALIZATION_DIFFERENCES.md."
+
+[[source]]
+item = "epidemics:thm:rumor-protocols-lower"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Theorems 51, 52, 53"
+page = 39
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "AI agent: from v1 LaTeX, compared with v1 PDF; not checked by a person"
+statement = '''
+Theorem 51. The expected rumor spreading time of the push protocol on the complete graph with $n$ vertices is $\log_2 n + \ln n \pm O(1)$.
+
+Theorem 52. The expected rumor spreading time of the pull protocol on the complete graph with $n$ vertices is $\log_2 n + \log_2 \ln n \pm O(1)$.
+
+Theorem 53. The expected rumor spreading time of the push-pull protocol on the complete graph with $n$ vertices is $\log_3n + \log_2\ln n \pm O(1)$.
+'''
+context = '''
+[Definition 8, p. 17:] Consider a homogeneous rumor spreading process. For all $t = 0, 1, \dots$ denote by $I_t$ the number of informed nodes at the end of the $t$-th round ($I_0 := 1$). Let $k \le m \le n$. By $T(k,m)$ we denote the time it takes to increase the number of informed nodes from $k$ to $m$ or more, that is,
+    \[
+        T(k,m) = \min\{ t-s | I_s = k \operatorname{ and } I_t \ge m \}.
+    \]
+    We call $T(1,n)$ the rumor spreading time of the process.
+[Appendix C, p. 39:] We stick to the usual convention that for rumor spreading in complete graphs we allow that nodes call themselves, that is, the random communication partner is chosen uniformly at random from all nodes.
+[Appendix C.1, p. 39:] In the push protocol, in each round each node knowing the rumor calls a random neighbor and gossips the rumor to it.
+[Appendix C.2, p. 40:] The pull protocol is dual to the push protocol in the sense that now in each round, each uninformed node calls a random neighbor and becomes informed if the latter was informed.
+[Appendix C.3, p. 41:] In the push-pull protocol, both informed and uninformed nodes contact a random neighbor in each round. If one of the two partners of such a conversation is informed, then also the other one becomes informed.
+'''
+notes = "Same three statements as the epidemics:thm:rumor-protocols entry of verification/sources.toml; this item is the lower halves ('- O(1)'). Labels added. Theorem 51 is on p. 39, Theorems 52 and 53 on p. 41. The paper states expected times only; the library adds lower tails. The proofs derive the lower halves from Theorems 27, 38 and 48."
+
+[[source]]
+item = "epidemics:lem:rumor-lower-growth"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Theorem 27"
+page = 24
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "AI agent: from v1 LaTeX, compared with v1 PDF; not checked by a person"
+statement = '''
+	Consider a homogeneous epidemic protocol satisfying the lower exponential growth conditions in $[1,fn[$. Then there are constant $A', \alpha'>0$ such that
+	\begin{eqnarray*}
+    &&\mathbb{E}[T(1, fn)] \ge \log_{1+\gamma_n} n - O(1),\\
+    &&\mathbb{P}[T(1, fn) \le \log_{1+\gamma_n} n - r] \le A' \exp(-\alpha'r)\, \mbox{ for all $r \in \mathbb{N}$}.
+  \end{eqnarray*}
+  In addition there exists $f' \in ]f,1[$ such that with probability $1-O\left(\tfrac1n\right)$ there are at most $f'n$ informed nodes after $T(1,fn)$ rounds.
+'''
+context = '''
+[Definition 10 (lower exponential growth conditions), p. 24:] Let $\gamma_n$ be bounded between two positive constants and let $a, b, c \ge 0$ and $0 < f < 1$.
+    We say that a homogeneous epidemic protocol satisfies the \emph{lower exponential growth conditions} in $[1,fn[$ if for any $n \in \mathbb{N}$ big enough, the following properties are satisfied for any $k < fn$.
+    (i) $p_k \le \gamma_n \tfrac{k}{n} \cdot \left(1 + a\tfrac{k}{n} + \tfrac{b}{\ln n}\right)$.
+    (ii) $c_k \le c\tfrac{k}{n^2}$.
+[Definition 6, p. 16:] Whenever a round starts with $k$ nodes being informed, then the probability for each uninformed node to become informed is some number $p_k$, which only depends on the number $k$ of the informed nodes at the beginning of the round.
+[Definition 7, p. 16:] [...] let $c_k$ be the smallest number such that whenever a round starts with $k$ informed nodes and for any two uninformed nodes $x_1, x_2$, the indicator random variables $X_1, X_2$ for the events that these nodes become informed in this round satisfy \[\operatorname{Cov}[X_1,X_2] \le c_k.\]
+[Definition 8, p. 17:] For all $t = 0, 1, \dots$ denote by $I_t$ the number of informed nodes at the end of the $t$-th round ($I_0 := 1$). Let $k \le m \le n$. By $T(k,m)$ we denote the time it takes to increase the number of informed nodes from $k$ to $m$ or more, that is,
+    \[
+        T(k,m) = \min\{ t-s | I_s = k \operatorname{ and } I_t \ge m \}.
+    \]
+'''
+notes = "Untitled theorem (its optional title is commented out in the source). The library does not formalize Theorem 27: for push, pull and push-pull it bounds the growth phase by the first moment instead (README: the instances 'replace Theorem 27 and Lemma 20'); the doc comments cite 'Theorem 27 for push / pull / push-pull'. Macros replaced: \\Expect -> \\mathbb{E}, \\Pr -> \\mathbb{P}, \\N -> \\mathbb{N}, \\Cov -> \\operatorname{Cov}; enumerate of Definition 10 flattened."
+
+[[source]]
+item = "epidemics:lem:rumor-lower-round"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Lemmas 39 and 49"
+page = 32
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "AI agent: from v1 LaTeX, compared with v1 PDF; not checked by a person"
+statement = '''
+Lemma 39. For any $u > gn$ and $u \in \mathbb{N}$,
+	\begin{equation}
+		\mathbb{P}[Y(u) \le E_0(u)] \le q(u) := \tfrac{e^{-{\rho_n}}+c}{A^2} \cdot \tfrac1{u^{1-2B}} \notag.
+	\end{equation}
+
+Lemma 49. For any fraction of uninformed nodes $\varepsilon \in [n^{-\alpha}, g]$,
+    \begin{equation}
+        \mathbb{P}\left[y(\varepsilon) \le \tfrac12E(\varepsilon)\right] \le \tfrac{4+4c}{a^2 \varepsilon^2 n} \le q := \tfrac{4+4c}{a^2}n^{2\alpha\ell-1} \notag.
+    \end{equation}
+'''
+context = '''
+[Definition 12 (lower exponential shrinking conditions), p. 31:] Let $\rho_n$ be bounded between two positive constants.
+	Let $0 < g < 1$ and $a, c \in \mathbb{R}_{\ge0}$.
+	We say that a homogeneous epidemic protocol satisfies \emph{the lower exponential shrinking conditions} if for any $n \in \mathbb{N}$ big enough, the following properties are satisfied, for all $u \le gn$ (resp. $k \in [n-\lfloor gn \rfloor, n]$).
+	(i) $1 - p_k = 1-p_{n-u} \ge e^{-{\rho_n}} - a\frac{u}{n}$;
+	(ii) $c_k = c_{n-u} \le \frac{c}{u}$.
+[Appendix B.3.4, p. 32:] Let $Y(u)$ be the number of uninformed nodes at the end of the round with $u$ uninformed ones.
+From the exponential shrinking conditions it follows that
+\begin{equation}
+	\mathbb{E}[Y(u)] \ge E(u) := u \left(e^{-{\rho_n}} - a\tfrac{u}{n}\right) \notag.
+\end{equation}
+We define the \emph{target value} in the same way as for the upper bound.
+\begin{equation}
+	E_0(u) := E(u) - Au^{1-B},
+\end{equation}
+where $A>0$ and $B \in ]0,1/2[$ are some constants chosen uniformly for all values of $u$ and $n$.
+[Definition 14 (lower double exponential shrinking conditions), p. 37:] Let $g, \alpha \in ]0,1]$ and $\ell > 1$.
+	Let $a, c \in \mathbb{R}_{\ge0}$.
+	We say that a homogeneous epidemic protocol satisfies \emph{the lower double exponential shrinking conditions} if for any $n$ big enough, the following properties are satisfied for all $u \in [n^{1-\alpha},gn]$.
+	(i) $1-p_{n-u} \ge a\left(\tfrac{u}{n}\right)^{\ell-1}$.
+	(ii) $c_{n-u} \le c\tfrac{n}{u^2}$.
+[Appendix B.5.2, p. 37:] Let again $y(\varepsilon)$ denote the fraction of uninformed nodes at the end of a round started with $\varepsilon n$ uninformed ones.
+The double exponential shrinking conditions state that
+\begin{equation}
+    \mathbb{E}[y(\varepsilon)] \ge E(\varepsilon) := a\varepsilon^\ell \notag.
+\end{equation}
+The next lemma gives that with good probability, $y(\varepsilon)$ is at least the \emph{target} value $E(\varepsilon)/2$.
+[Appendix B.5.2, p. 37, after Lemma 49:] We also assume that $\alpha< \tfrac1{2\ell}$ so that $q=n^{-\Theta(1)}$.
+'''
+notes = "Two lemmas in one entry; labels added. Lemma 39 is on p. 32 (exponential shrinking, lower bound), Lemma 49 on p. 37 (double exponential shrinking, lower bound). Lemma 39 reads 'For any u > gn', as printed. The equation number of E_0(u) (label eq:def-E0-lower-expshr) is not shown here. Macros replaced: \\Pr -> \\mathbb{P}, \\Expect -> \\mathbb{E}, \\N -> \\mathbb{N}, \\R -> \\mathbb{R}, \\eps -> \\varepsilon. The doc comments cite 'Lemma 39 for push' and 'Lemma 49 for pull / push-pull'; the library's one-round bounds are explicit versions for the instances."
+
+[[source]]
+item = "epidemics:thm:rumor-lower-final-push"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Theorem 38"
+page = 31
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "AI agent: from v1 LaTeX, compared with v1 PDF; not checked by a person"
+statement = '''
+	Consider a homogeneous epidemic protocol satisfying the lower exponential shrinking conditions (see definition above). There is a constant $g' \in ]0, 1[$ and further constants $A', \alpha'>0$ such that for any positive $g < g'$,
+	\begin{align*}
+		&\mathbb{E}[T(n-\lfloor gn \rfloor, n)] \ge \tfrac1{\rho_n}\ln n + O(1),\\
+		&\mathbb{P}[T(n-\lfloor gn \rfloor, n) \le \tfrac1{\rho_n}\ln n - r] \le A' \exp(-\alpha'r)\, \mbox{ for all $r \in \mathbb{N}$}.\\
+	\end{align*}
+'''
+context = '''
+[Definition 12 (lower exponential shrinking conditions), p. 31:] Let $\rho_n$ be bounded between two positive constants.
+	Let $0 < g < 1$ and $a, c \in \mathbb{R}_{\ge0}$.
+	We say that a homogeneous epidemic protocol satisfies \emph{the lower exponential shrinking conditions} if for any $n \in \mathbb{N}$ big enough, the following properties are satisfied, for all $u \le gn$ (resp. $k \in [n-\lfloor gn \rfloor, n]$).
+	(i) $1 - p_k = 1-p_{n-u} \ge e^{-{\rho_n}} - a\frac{u}{n}$;
+	(ii) $c_k = c_{n-u} \le \frac{c}{u}$.
+[Definition 6, p. 16:] Whenever a round starts with $k$ nodes being informed, then the probability for each uninformed node to become informed is some number $p_k$, which only depends on the number $k$ of the informed nodes at the beginning of the round.
+[Definition 7, p. 16:] [...] let $c_k$ be the smallest number such that whenever a round starts with $k$ informed nodes and for any two uninformed nodes $x_1, x_2$, the indicator random variables $X_1, X_2$ for the events that these nodes become informed in this round satisfy \[\operatorname{Cov}[X_1,X_2] \le c_k.\]
+[Definition 8, p. 17:] For all $t = 0, 1, \dots$ denote by $I_t$ the number of informed nodes at the end of the $t$-th round ($I_0 := 1$). Let $k \le m \le n$. By $T(k,m)$ we denote the time it takes to increase the number of informed nodes from $k$ to $m$ or more, that is,
+    \[
+        T(k,m) = \min\{ t-s | I_s = k \operatorname{ and } I_t \ge m \}.
+    \]
+'''
+notes = "Theorem title: 'lower bound of spreading time'. The expectation bound is printed '>= (1/rho_n) ln n + O(1)'. Macros replaced: \\Expect -> \\mathbb{E}, \\Pr -> \\mathbb{P}, \\N -> \\mathbb{N}, \\R -> \\mathbb{R}, \\Cov -> \\operatorname{Cov}; enumerate of Definition 12 flattened. The library does not formalize Theorem 38 in general: for push (doc comment 'Theorem 38 for push') it bounds the final phase from any number u of uninformed nodes by a lower envelope along explicit targets, which the blueprint says replace the recursive targets u_{j+1} = E_0(u_j) of Lemma 40 (p. 32)."
+
+[[source]]
+item = "epidemics:thm:rumor-lower-final-double"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Theorem 48"
+page = 37
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "AI agent: from v1 LaTeX, compared with v1 PDF; not checked by a person"
+statement = '''
+	Consider a homogeneous epidemic protocol satisfying the lower double exponential shrinking conditions in the interval $[n^{1-\alpha},gn]$. Let $r$ be a sufficiently large constant (possibly depending on $\alpha$). Then,
+	\begin{align*}
+		&\mathbb{E}[T(n-\lceil gn \rceil, n-\lfloor n^{1-\alpha} \rfloor)] \ge \log_\ell \ln n + O(1),\\
+		&\mathbb{P}[T(n-\lceil gn \rceil, n-\lfloor n^{1-\alpha} \rfloor) \le \log_\ell \ln n - r] \le O(n^{-1+2\alpha\ell}),
+	\end{align*}
+'''
+context = '''
+[Definition 14 (lower double exponential shrinking conditions), p. 37:] Let $g, \alpha \in ]0,1]$ and $\ell > 1$.
+	Let $a, c \in \mathbb{R}_{\ge0}$.
+	We say that a homogeneous epidemic protocol satisfies \emph{the lower double exponential shrinking conditions} if for any $n$ big enough, the following properties are satisfied for all $u \in [n^{1-\alpha},gn]$.
+	(i) $1-p_{n-u} \ge a\left(\tfrac{u}{n}\right)^{\ell-1}$.
+	(ii) $c_{n-u} \le c\tfrac{n}{u^2}$.
+[Definition 6, p. 16:] Whenever a round starts with $k$ nodes being informed, then the probability for each uninformed node to become informed is some number $p_k$, which only depends on the number $k$ of the informed nodes at the beginning of the round.
+[Definition 7, p. 16:] [...] let $c_k$ be the smallest number such that whenever a round starts with $k$ informed nodes and for any two uninformed nodes $x_1, x_2$, the indicator random variables $X_1, X_2$ for the events that these nodes become informed in this round satisfy \[\operatorname{Cov}[X_1,X_2] \le c_k.\]
+[Definition 8, p. 17:] For all $t = 0, 1, \dots$ denote by $I_t$ the number of informed nodes at the end of the $t$-th round ($I_0 := 1$). Let $k \le m \le n$. By $T(k,m)$ we denote the time it takes to increase the number of informed nodes from $k$ to $m$ or more, that is,
+    \[
+        T(k,m) = \min\{ t-s | I_s = k \operatorname{ and } I_t \ge m \}.
+    \]
+[Appendix B.5.2, p. 37:] We also assume that $\alpha< \tfrac1{2\ell}$ so that $q=n^{-\Theta(1)}$.
+'''
+notes = "Untitled theorem. The display ends with a comma, as printed. Macros replaced: \\Expect -> \\mathbb{E}, \\Pr -> \\mathbb{P}, \\R -> \\mathbb{R}, \\Cov -> \\operatorname{Cov}; enumerate of Definition 14 flattened. The library proves the final phases of pull and push-pull with l = 2 (doc comments 'Theorem 48 for pull / push-pull') by a lower envelope along the targets eps_{j+1} = E(eps_j)/2, with the exponent -1/2 in place of -1 + 2 alpha l (blueprint)."
+
+[[source]]
+item = "epidemics:lem:rumor-lower-generic"
+paper = "B. Doerr, A. Kostrygin. Randomized rumor spreading revisited"
+venue = "ICALP 2017 (long version arXiv:2303.11150)"
+version = "arXiv:2303.11150v1"
+result = "Lemmas 42 and 50"
+page = 33
+url = "https://arxiv.org/abs/2303.11150v1"
+status = "AI agent: from v1 LaTeX, compared with v1 PDF; not checked by a person"
+statement = '''
+Lemma 42. If the process is in phase $j < J-1$, then the probability that it "leapfrogs" phase $j+1$ (i.e., proceeds to phase $j+2$ or further in current round) is at most $q(u_j)$.
+
+Lemma 50. If the process starts in phase $j$, $j < J$, then the probability that after one round it is in phase $j+2$ or higher is at most $q$.
+'''
+context = '''
+[Appendix B.3.4, p. 32, exponential shrinking, lower bound:] Let $Y(u)$ be the number of uninformed nodes at the end of the round with $u$ uninformed ones.
+From the exponential shrinking conditions it follows that
+\begin{equation}
+	\mathbb{E}[Y(u)] \ge E(u) := u \left(e^{-{\rho_n}} - a\tfrac{u}{n}\right) \notag.
+\end{equation}
+We define the \emph{target value} in the same way as for the upper bound.
+\begin{equation}
+	E_0(u) := E(u) - Au^{1-B},
+\end{equation}
+where $A>0$ and $B \in ]0,1/2[$ are some constants chosen uniformly for all values of $u$ and $n$.
+[Lemma 39, p. 32:] For any $u > gn$ and $u \in \mathbb{N}$,
+	\begin{equation}
+		\mathbb{P}[Y(u) \le E_0(u)] \le q(u) := \tfrac{e^{-{\rho_n}}+c}{A^2} \cdot \tfrac1{u^{1-2B}} \notag.
+	\end{equation}
+[Appendix B.3.5, p. 32:] We define the sequence $u_j$ recursively by
+\begin{equation}
+	u_0 := gn, \qquad u_{j+1} := E_0(u_j) \notag.
+\end{equation}
+[Corollary 41, p. 33:] There exists $J = \tfrac1{\rho_n} \ln n + O(1)$ such that $u_J > 1$ for any $n$ big enough.
+[p. 33:] By definition, the $u_j$ form a non-decreasing sequence.
+We say that the rumor spreading process is in phase $j$, $j \in \{0,\ldots,J-1\}$, if the number of informed nodes is in $[u_{j+1}, u_j[$.
+[Appendix B.5.2, p. 37, double exponential shrinking, lower bound:] Let again $y(\varepsilon)$ denote the fraction of uninformed nodes at the end of a round started with $\varepsilon n$ uninformed ones.
+The double exponential shrinking conditions state that
+\begin{equation}
+    \mathbb{E}[y(\varepsilon)] \ge E(\varepsilon) := a\varepsilon^\ell \notag.
+\end{equation}
+[Lemma 49, p. 37:] For any fraction of uninformed nodes $\varepsilon \in [n^{-\alpha}, g]$,
+    \begin{equation}
+        \mathbb{P}\left[y(\varepsilon) \le \tfrac12E(\varepsilon)\right] \le \tfrac{4+4c}{a^2 \varepsilon^2 n} \le q := \tfrac{4+4c}{a^2}n^{2\alpha\ell-1} \notag.
+    \end{equation}
+[Appendix B.5.3, p. 37:] Let us define the sequence $\varepsilon_j$ recursively by
+\begin{equation}
+    \varepsilon_0 := g, \quad \varepsilon_{j+1} := \tfrac12E(\varepsilon_j) \notag.
+\end{equation}
+[p. 38:] There exists $J = \log_\ell \ln n + O(1)$ such that $\varepsilon_J > n^{-\alpha}$.
+As before, we say that the process is in phase $j$ if the fraction $\varepsilon$ of uninformed nodes is in $]\varepsilon_{j+1}, \varepsilon_j]$.
+'''
+notes = "Two lemmas in one entry; labels added. Lemma 42 (p. 33) is untitled and unlabelled in the source; Lemma 50 is on p. 38. 'the number of informed nodes is in [u_{j+1}, u_j[' (the u_j count uninformed nodes) and 'non-decreasing' are as printed; Lemma 39 reads 'For any u > gn', as printed. The observation giving J for the double exponential phases is unnumbered. Macros replaced: \\Pr -> \\mathbb{P}, \\Expect -> \\mathbb{E}, \\N -> \\mathbb{N}, \\eps -> \\varepsilon. The library item is a round-by-round lower envelope for any observable of a Markov kernel (the 'round-by-round form' of these lemmas), plus two joining tools that have no counterpart here."
+
+# ---------------------------------------------------------------------------------------------
+# Cooper, Radzik, Rivera, arXiv:1602.05768v2.
+
+[[source]]
+items = ["epidemics:def:choices", "epidemics:def:cobra"]
+paper = "C. Cooper, T. Radzik, N. Rivera. The coalescing-branching random walk on expanders and the dual epidemic process"
+venue = "PODC 2016"
+version = "arXiv:1602.05768v2"
+result = "Section 1, COBRA and BIPS"
+page = 2
+url = "https://arxiv.org/abs/1602.05768v2"
+status = "AI agent: from v2 LaTeX, compared with v2 PDF; not checked by a person"
+statement = '''
+\textbf{Coalescing Branching Random Walk (COBRA):} Consider a graph $G = (V,E)$ and an integer $k \geq 1$. Let $C \subseteq V$ and consider the set process $(C_t)_{t \geq 0}$ with $C_0 = C$
+and $C_{t+1}$ is defined as follows. Let $C_t$ be the vertices chosen at round $t$ (not necessarily for the first time).
+Each vertex $v \in C_t$ independently chooses $k$ neighbours uniformly at random with replacement and all the chosen vertices belong to $C_{t+1}$.
+
+\textbf{Biased Infection with Persistent Source (BIPS):} Consider a graph $G = (V,E)$ and an integer $k \geq 1$. Consider a vertex $v$ which is the source of an infection. We consider the process $A_t$ defined by $A_0 = \{v\}$. Given $A_t$ each vertex $u \in V$, other than $v$,  independently and uniformly with replacement selects $k$ neighbours and becomes a member of $A_{t+1}$ if and only if at least one of the selected neighbours is in $A_t$. Additionally, $v \in A_t$ for all $t \geq 0$.
+We call $A_t$ the infected set at time $t$. Observe the source $v$ is always infected.
+Finally, if $A_0 = \{v\}$ then it is clear that $v$ is the source of the infection process.
+'''
+context = '''
+[Section 1, p. 2:] At the start of a round each vertex containing information ``pushes'' this information to
+$k$ randomly selected neighbours, then it stops passing the information until it receives the information again.
+At the end of a round if a vertex receives information from two or more vertices,
+then the information coalesces into one.
+'''
+notes = "The COBRA definition is on p. 2, the BIPS definition on p. 3. No paper macros in the statement. The duality (Theorem 4) runs BIPS from other initial sets A_0 with the same source v; the library's BIPS starts from any A_0 and keeps v infected, and its rounds give every vertex k samples."
+
+[[source]]
+item = "epidemics:def:lambda"
+paper = "C. Cooper, T. Radzik, N. Rivera. The coalescing-branching random walk on expanders and the dual epidemic process"
+venue = "PODC 2016"
+version = "arXiv:1602.05768v2"
+result = "Section 1, definition of lambda"
+page = 3
+url = "https://arxiv.org/abs/1602.05768v2"
+status = "AI agent: from v2 LaTeX, compared with v2 PDF; not checked by a person"
+statement = '''
+Let $G$ be a connected $n$-vertex $r$-regular graph with adjacency matrix $A(G)$
+and random-walk transition matrix $P=A(G)/r$. Let $\lambda_1, \lambda_2,...,\lambda_n$
+be the eigenvalues of the transition matrix ordered in a non-increasing sequence.
+Thus $\lambda_1=1$, $\lambda_n \ge -1$. Let
+$\lambda=\lambda_{\max}=\max_{i=2,...,n} |\lambda_i|$ be the second largest eigenvalue (in absolute value).
+If the graph $G$ is not bipartite, then $\lambda <1$.
+'''
+notes = "Macro \\l replaced by \\lambda. The library defines lambda = max(lambda_2, |lambda_n|) for the sorted eigenvalues of P, and 0 if n < 2."
+
+[[source]]
+items = ["epidemics:lem:crr-growth", "epidemics:lem:crr-spectral"]
+paper = "C. Cooper, T. Radzik, N. Rivera. The coalescing-branching random walk on expanders and the dual epidemic process"
+venue = "PODC 2016"
+version = "arXiv:1602.05768v2"
+result = "Lemma 1"
+page = 6
+url = "https://arxiv.org/abs/1602.05768v2"
+status = "AI agent: from v2 LaTeX, compared with v2 PDF; not checked by a person"
+statement = '''
+Let $G$ be a connected $r$-regular graph on $n$ vertices,
+with $\lambda < 1 $ where $\lambda$ is the absolute second eigenvalue of the random-walk  transition matrix.
+Let $A_t$ be the size of the infected set after step $t$ of the BIPS process with $k=2$, then
+\begin{eqnarray*}
+\mathbf{E}(|A_{t+1}|\mid A_t = A)
+  &\geq&
+|A| (1 +(1-\lambda^2)(1-|A|/{n})).
+\end{eqnarray*}
+'''
+context = '''
+[Section 1, p. 3:] Let $G$ be a connected $n$-vertex $r$-regular graph with adjacency matrix $A(G)$
+and random-walk transition matrix $P=A(G)/r$. Let $\lambda_1, \lambda_2,...,\lambda_n$
+be the eigenvalues of the transition matrix ordered in a non-increasing sequence.
+Thus $\lambda_1=1$, $\lambda_n \ge -1$. Let
+$\lambda=\lambda_{\max}=\max_{i=2,...,n} |\lambda_i|$ be the second largest eigenvalue (in absolute value).
+[Section 1, p. 3:] \textbf{Biased Infection with Persistent Source (BIPS):} Consider a graph $G = (V,E)$ and an integer $k \geq 1$. Consider a vertex $v$ which is the source of an infection. We consider the process $A_t$ defined by $A_0 = \{v\}$. Given $A_t$ each vertex $u \in V$, other than $v$,  independently and uniformly with replacement selects $k$ neighbours and becomes a member of $A_{t+1}$ if and only if at least one of the selected neighbours is in $A_t$. Additionally, $v \in A_t$ for all $t \geq 0$.
+[Section 1, Notation, p. 4:] For a vertex $x\in V$, $N(x)$ denotes the set of neighbours of $x$
+and $d(x) = |N(x)|$. More generally,
+for $A \subseteq V$, $d_A(x) = |N(x) \cap A|$.
+We also define $d(A) = \sum_{x \in A} d(x)$. If there is no ambiguity, we write $A$ in place of $|A|$.
+'''
+notes = "Macros replaced: \\E -> \\mathbf{E}, \\BIPS -> BIPS; the commented-out alternative bound and the \\label of the display are dropped, and the display (unnumbered in the PDF) is written with eqnarray*. For lem:crr-spectral: the item is the inequality at the end of the proof of Lemma 1 (equation (7), p. 6), which bounds sum_x P(x,A)^2 = ||P 1_A||^2, with P(x,A) = d_A(x)/r, by (1 - lambda^2)|A|^2/n + lambda^2 |A|; it is not a separate result of the paper. For lem:crr-growth: the one-round MGF and Chernoff bounds of the item are used in the proofs of Lemmas 2 and 3 (equations (12) and (18)), not stated as results."
+
+[[source]]
+item = "epidemics:thm:crr-phases"
+paper = "C. Cooper, T. Radzik, N. Rivera. The coalescing-branching random walk on expanders and the dual epidemic process"
+venue = "PODC 2016"
+version = "arXiv:1602.05768v2"
+result = "Lemmas 2, 3 and 4"
+page = 8
+url = "https://arxiv.org/abs/1602.05768v2"
+status = "AI agent: from v2 LaTeX, compared with v2 PDF; not checked by a person"
+statement = '''
+Lemma 2. Let $G$ be a connected $r$-regular graph on $n$ vertices,
+with $\lambda=\lambda(n) < 1$, and let $m \leq n/2$.
+Then with probability at least $1-\mathcal{O}(1/n^C)$, we have that $A_t > m$
+for some $t \le T$, where
+$T = 13m/(1-\lambda) + 24C\log(n)/(1-\lambda)^2$.
+
+Lemma 3. Let $G$ be a connected $n$-vertex $r$-regular graph with $\lambda<1$. Suppose that $|A_t| \geq K \log(n)/(1-\lambda)^2$, with $K = 4000$. Then the BIPS process infects at least $9/10$ of the whole graph in $\mathcal{O}(\log(n)/(1-\lambda))$ extra rounds with probability at least $1-\mathcal{O}(1/n^3)$.
+
+Lemma 4. Let $G$ be a connected $n$-vertex $r$-regular graph with $1-\lambda \gg \sqrt{\log(n)/n}$.
+With probability at least $1-n^{-5}$, after
+ $T \le 8\log(n)/(1-\lambda)$ rounds the BIPS process infects the whole graph.
+'''
+context = '''
+[Section 4, p. 7:] Consider a BIPS process $A_t$ with source $v$ on a graph $G$. Thus at $t=0$, $A_0=\{v\}$.
+[Section 5, p. 10:] In this section we analyze the growth of $A_t$ in the BIPS process
+from $A_{t'}= \Theta(\log n/(1-\lambda)^2)$ up to $A_{t''}=n$.
+We start by applying Lemma 2
+with $m=K \log(n)/(1-\lambda)^2$, for some (large) constant $K$, to have w.h.p.
+$A_t \ge K \log n/(1-\lambda)^2$ for some $t=\mathcal{O}(\log n /(1-\lambda)^3)$.
+Lemma 3 shows that from this point additional
+$\mathcal{O}(\log(n)/(1-\lambda))$ rounds bring the infection size $A_t$ up to at least $(9/10)n$ w.h.p.
+Lemma 4 shows that when $A_t$ becomes $\ge (9/10)n$, then
+w.h.p. the whole graph becomes infected at some point within the subsequent
+$\mathcal{O}(\log(n)/(1-\lambda))$ rounds.
+[Section 1, p. 2, footnote:] ``With high probability,'' which means in this paper probability at most $n^{-c}$,
+for some positive constant $c$.
+[Section 1, p. 3:] \textbf{Biased Infection with Persistent Source (BIPS):} Consider a graph $G = (V,E)$ and an integer $k \geq 1$. Consider a vertex $v$ which is the source of an infection. We consider the process $A_t$ defined by $A_0 = \{v\}$. Given $A_t$ each vertex $u \in V$, other than $v$,  independently and uniformly with replacement selects $k$ neighbours and becomes a member of $A_{t+1}$ if and only if at least one of the selected neighbours is in $A_t$. Additionally, $v \in A_t$ for all $t \geq 0$.
+[Section 1, p. 3:] Let
+$\lambda=\lambda_{\max}=\max_{i=2,...,n} |\lambda_i|$ be the second largest eigenvalue (in absolute value).
+[Section 1, p. 3, footnote of Theorem 1:] $(1-\lambda) \ge  C\sqrt{(\log n)/n}$ for some suitably large constant $C$.
+'''
+notes = "Three lemmas in one entry; labels added. Lemma 2 is on p. 8, Lemmas 3 and 4 on p. 10. Lemma 4's statement does not repeat the hypothesis |A_t| >= (9/10)n, which is in the Section 5 introduction (context) and in its proof (A_0 >= qn, q = 9/10); a commented-out line of the source has it. The w.h.p. footnote reads 'probability at most n^{-c}', as printed. Lemma 1 (the expected growth) is used with k = 2. In Lemma 2, C is a free constant of the statement. Macros replaced: \\BIPS -> BIPS, \\bigO -> \\mathcal{O}, \\whp -> w.h.p., \\l -> \\lambda. The library proves the three lemmas for an abstract growth process with rate c (BIPS with c = 1 - lambda), with some constants differing in the proofs of Lemmas 3 and 4 (FORMALIZATION_DIFFERENCES.md)."
+
+[[source]]
+items = ["epidemics:thm:duality-kernels", "epidemics:thm:crr-coin"]
+paper = "C. Cooper, T. Radzik, N. Rivera. The coalescing-branching random walk on expanders and the dual epidemic process"
+venue = "PODC 2016"
+version = "arXiv:1602.05768v2"
+result = "Theorem 4"
+page = 5
+url = "https://arxiv.org/abs/1602.05768v2"
+status = "AI agent: from v2 LaTeX, compared with v2 PDF; not checked by a person"
+statement = '''
+Let $G$ be a connected regular graph and consider the COBRA and BIPS processes on $G$ with parameter $k \ge 1$.
+For each $v \in V$, $C \subseteq V$ and $t \geq 0$ we have
+$$\widehat{\mathbf{P}}(\mathrm{Hit}_C(v)> t| C_0 = C) \;\; = \; \; \mathbf{P}(C \cap  A_t = \emptyset| A_0 = v).$$
+'''
+context = '''
+[Section 1, p. 4:] For a connected graph $G=(V,E)$, denote $\mathrm{Hit}_C(v) = \min\{t: v \in C_t, C_0=C\}$ the hitting time of vertex $v$ for a COBRA process starting from $C$.
+[Section 1, p. 2:] \textbf{Coalescing Branching Random Walk (COBRA):} Consider a graph $G = (V,E)$ and an integer $k \geq 1$. Let $C \subseteq V$ and consider the set process $(C_t)_{t \geq 0}$ with $C_0 = C$
+and $C_{t+1}$ is defined as follows. Let $C_t$ be the vertices chosen at round $t$ (not necessarily for the first time).
+Each vertex $v \in C_t$ independently chooses $k$ neighbours uniformly at random with replacement and all the chosen vertices belong to $C_{t+1}$.
+[Section 1, p. 3:] \textbf{Biased Infection with Persistent Source (BIPS):} Consider a graph $G = (V,E)$ and an integer $k \geq 1$. Consider a vertex $v$ which is the source of an infection. We consider the process $A_t$ defined by $A_0 = \{v\}$. Given $A_t$ each vertex $u \in V$, other than $v$,  independently and uniformly with replacement selects $k$ neighbours and becomes a member of $A_{t+1}$ if and only if at least one of the selected neighbours is in $A_t$. Additionally, $v \in A_t$ for all $t \geq 0$.
+[Section 2, p. 5:] To avoid confusion, we use the notation $\mathbf{P}( \cdot)$ for probabilities in the BIPS process, and
+$\widehat{\mathbf{P}}(\cdot)$ in the COBRA process.
+To simplify notation, we will write ``$A_0 = v$'' for the frequently appearing condition ``$A_0 = \{ v \}$.''
+'''
+notes = "Same statement as the epidemics:thm:duality entry of verification/sources.toml. thm:duality-kernels states it as a duality of the one-round kernels (COBRA stopped at v, BIPS with source v); thm:crr-coin states it for the processes with branching factor 1 + p/q, for which the paper has no separate duality statement (it says that the proof of Theorem 3 follows from the proof of Theorem 1). Macros replaced: \\Prob -> \\mathbf{P}, \\wh -> \\widehat, \\Hit -> \\mathrm{Hit}, \\COBRA/\\BIPS -> COBRA/BIPS."
+
+[[source]]
+item = "epidemics:thm:crr-coin"
+paper = "C. Cooper, T. Radzik, N. Rivera. The coalescing-branching random walk on expanders and the dual epidemic process"
+venue = "PODC 2016"
+version = "arXiv:1602.05768v2"
+result = "Corollary 1"
+page = 7
+url = "https://arxiv.org/abs/1602.05768v2"
+status = "AI agent: from v2 LaTeX, compared with v2 PDF; not checked by a person"
+statement = '''
+Let $A_t$ be the size of the infected set after step $t$ of the BIPS process with expected branching factor
+$k=1+\rho$, then
+\begin{eqnarray*}
+\mathbf{E}(|A_{t+1}\mid |A_t = A) &\geq&
+|A| (1+\rho(1-\lambda^2 )(1-{|A|}/{n})).
+\end{eqnarray*}
+'''
+context = '''
+[Section 3, p. 7:] The following corollary is easily obtained from the proof of Lemma 1.
+In a BIPS process with
+$k=1+\rho$,  each vertex contacts one randomly chosen neighbour,
+and with probability $\rho>0$ randomly chooses a second neighbour, with replacement.
+[Lemma 1, p. 6:] Let $G$ be a connected $r$-regular graph on $n$ vertices,
+with $\lambda < 1 $ where $\lambda$ is the absolute second eigenvalue of the random-walk  transition matrix.
+Let $A_t$ be the size of the infected set after step $t$ of the BIPS process with $k=2$, then
+\begin{eqnarray*}
+\mathbf{E}(|A_{t+1}|\mid A_t = A)
+  &\geq&
+|A| (1 +(1-\lambda^2)(1-|A|/{n})).
+\end{eqnarray*}
+[Section 1, p. 3:] Let
+$\lambda=\lambda_{\max}=\max_{i=2,...,n} |\lambda_i|$ be the second largest eigenvalue (in absolute value).
+'''
+notes = "The left-hand side '\\mathbf{E}(|A_{t+1}\\mid |A_t = A)' (bars misplaced) is as printed. The corollary inherits the hypotheses of Lemma 1 (connected r-regular G, lambda < 1). Macros replaced: \\E -> \\mathbf{E}, \\r -> \\rho, \\BIPS -> BIPS; the commented-out alternative bound is dropped. The library takes rho = p/q rational (a vertex uses its second sample iff its coin in {0, ..., q-1} is < p)."
+
+[[source]]
+item = "epidemics:thm:crr-coin"
+paper = "C. Cooper, T. Radzik, N. Rivera. The coalescing-branching random walk on expanders and the dual epidemic process"
+venue = "PODC 2016"
+version = "arXiv:1602.05768v2"
+result = "Theorem 3"
+page = 4
+url = "https://arxiv.org/abs/1602.05768v2"
+status = "AI agent: from v2 LaTeX, compared with v2 PDF; not checked by a person"
+statement = '''
+Let $G$ be a connected $n$-vertex $r$-regular graph with $\lambda<1$ constant and let $v \in V(G)$. Provided  $\rho > 0$ constant, for all $v \in V$, the cover time of $G$ by the COBRA process with branching factor $1+\rho$ and $C_0 = \{v\}$ is $\mathbf{cov}(v)=\mathcal{O}(\log(n))$ rounds in expectation and with high probability.
+'''
+context = '''
+[Section 1, p. 4:] Suppose that at the start of each step, each particle divides in two with probability $\rho$.
+This gives an expected branching factor of $1+\rho$. The following result shows that any constant $\rho>0$ will do. The proof of Theorem 3 follows from the
+proof of Theorem 1, by using Corollary 1 of Lemma 1 in Section 3.
+[Section 1, p. 2:] \textbf{Coalescing Branching Random Walk (COBRA):} Consider a graph $G = (V,E)$ and an integer $k \geq 1$. Let $C \subseteq V$ and consider the set process $(C_t)_{t \geq 0}$ with $C_0 = C$
+and $C_{t+1}$ is defined as follows. Let $C_t$ be the vertices chosen at round $t$ (not necessarily for the first time).
+Each vertex $v \in C_t$ independently chooses $k$ neighbours uniformly at random with replacement and all the chosen vertices belong to $C_{t+1}$.
+For $C_0 = \{ u \}$, let $\mathbf{cov}(u) = \min\{ T: \bigcup_{t=1}^{T} C_t = V\}$
+be the number of steps needed for the COBRA process
+to visit all vertices of the graph $G$ starting from vertex $u$; and let $\mathrm{COV}(u) = \mathbf{E}(\mathbf{cov}(u))$.
+[Section 1, p. 3:] Let
+$\lambda=\lambda_{\max}=\max_{i=2,...,n} |\lambda_i|$ be the second largest eigenvalue (in absolute value).
+[Section 1, p. 2, footnote:] ``With high probability,'' which means in this paper probability at most $n^{-c}$,
+for some positive constant $c$.
+'''
+notes = "Macros replaced: \\r -> \\rho, \\cov -> \\mathbf{cov}, \\COV -> \\mathrm{COV}, \\COBRA -> COBRA, \\bigO -> \\mathcal{O}, \\E -> \\mathbf{E}, \\l -> \\lambda; the \\ref's are rendered by their numbers. 'let v in V(G)' and 'for all v in V' both appear, as printed. The w.h.p. footnote reads 'probability at most n^{-c}', as printed. The library states the bound for n >= N with lambda <= lambda_0 < 1 and rho in [rho_0, 1]."
+
+[[source]]
+item = "epidemics:def:coin"
+paper = "C. Cooper, T. Radzik, N. Rivera. The coalescing-branching random walk on expanders and the dual epidemic process"
+venue = "PODC 2016"
+version = "arXiv:1602.05768v2"
+result = "Sections 1 and 3, branching factor 1 + rho"
+page = 4
+url = "https://arxiv.org/abs/1602.05768v2"
+status = "AI agent: from v2 LaTeX, compared with v2 PDF; not checked by a person"
+statement = '''
+[Section 1, p. 4:] Suppose that at the start of each step, each particle divides in two with probability $\rho$.
+This gives an expected branching factor of $1+\rho$.
+[Section 3, p. 7:] In a BIPS process with
+$k=1+\rho$,  each vertex contacts one randomly chosen neighbour,
+and with probability $\rho>0$ randomly chooses a second neighbour, with replacement.
+'''
+context = '''
+[Section 1, p. 2:] \textbf{Coalescing Branching Random Walk (COBRA):} Consider a graph $G = (V,E)$ and an integer $k \geq 1$. Let $C \subseteq V$ and consider the set process $(C_t)_{t \geq 0}$ with $C_0 = C$
+and $C_{t+1}$ is defined as follows. Let $C_t$ be the vertices chosen at round $t$ (not necessarily for the first time).
+Each vertex $v \in C_t$ independently chooses $k$ neighbours uniformly at random with replacement and all the chosen vertices belong to $C_{t+1}$.
+[Section 1, p. 3:] \textbf{Biased Infection with Persistent Source (BIPS):} [...] Given $A_t$ each vertex $u \in V$, other than $v$,  independently and uniformly with replacement selects $k$ neighbours and becomes a member of $A_{t+1}$ if and only if at least one of the selected neighbours is in $A_t$. Additionally, $v \in A_t$ for all $t \geq 0$.
+'''
+notes = "Definitions in the text, not numbered. Macros replaced: \\r -> \\rho, \\BIPS -> BIPS. The library takes rho = p/q: every vertex gets two neighbour samples and a uniform coin in {0, ..., q-1}, and uses its second sample iff the coin is < p."
