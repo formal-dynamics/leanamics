@@ -20,7 +20,7 @@
 #
 # The entries below were transcribed by an AI agent from the arXiv LaTeX sources (macros of
 # the papers replaced by standard LaTeX, as listed in `notes`). None has been compared with the
-# PDF yet.
+# PDF yet. Further entries, per package, are in `verification/sources/<package>.toml`.
 
 # Group 1: package plurality (SPAA 2014, PODC 2017, SODA 2016) and median:thm:tc-lower-strong.
 

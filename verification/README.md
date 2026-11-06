@@ -123,14 +123,18 @@ number of reviewers.
 `sources.toml` and the per-package files `sources/<package>.toml` (same format; separate files so
 that several people can transcribe in parallel) give, per item, the source reference (paper, version, numbered result, page)
 and, when available, the original statement transcribed from the source, with the definitions it
-depends on (`context`). The header of the file describes the fields. The first entries cover the
-headline results that `PROVENANCE.md` lists from papers on arXiv; they were transcribed by an AI
-agent from the arXiv LaTeX sources (statements only) and are marked "transcribed from the arXiv
-LaTeX source, not yet compared with the PDF". When you compare one with the PDF, change its
-`status` (for example to "compared with the PDF of arXiv v2 by Ada Lovelace, 2026-11-10"); the
-status is not part of the hash, so this does not make checks stale. Papers that are not on arXiv
-(Hassin and Peleg 2001; Doerr et al., SPAA 2011; the OPODIS 2016 exact-majority paper; the
-classical results) have no entry yet.
+depends on (`context`). The header of `sources.toml` describes the fields.
+
+All entries were made by AI agents, from the arXiv LaTeX sources or from open copies of the
+papers (author pages, open archives, open-access proceedings), and their `status` says exactly
+what was done, for example "transcribed from the arXiv LaTeX source of v2 and compared with the
+PDF of v2; not yet checked by a person". When no open copy was found (some books, and papers such
+as Hassin and Peleg 2001 or Coppersmith, Tetali and Winkler 1993), the entry gives the reference
+only, without `statement`, and its status says so: compare those items with the paper itself
+(basis `paper`). Items that are lemmas of the formalization, with no counterpart in a source, have
+no entry. When you compare an entry with the paper, change its `status` (for example to "compared
+with the PDF of arXiv v2 by Ada Lovelace, 2026-11-10"); the status is not part of the hash, so
+this does not make checks stale.
 
 ## Asking Lean
 
