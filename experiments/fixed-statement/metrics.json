@@ -1,0 +1,271 @@
+[
+ {
+  "id": "voter",
+  "target": "voter consensus time",
+  "agent": "grok-4.7 (Grok command-line agent)",
+  "sessions": [
+   {
+    "session": "01a0f277-37ff-7372-bc22-2a4493350c2f",
+    "start": "2026-09-30T13:18:14.711000+00:00",
+    "end": "2026-09-30T13:49:59.949000+00:00",
+    "seconds": 1905.2,
+    "tool_calls": 151,
+    "tokens": 10652110,
+    "model_calls": 83,
+    "cache_read": 10235136,
+    "continues": null
+   }
+  ],
+  "seconds": 1905.2,
+  "span_seconds": 1905.2,
+  "tool_calls": 151,
+  "tokens": 10652110,
+  "model_calls": 83,
+  "cache_read_share": 0.9609
+ },
+ {
+  "id": "isothermal",
+  "target": "isothermal theorem",
+  "agent": "grok-4.7 (Grok command-line agent)",
+  "sessions": [
+   {
+    "session": "01a0f2da-4dfb-7603-b527-b229ad97d8dd",
+    "start": "2026-09-30T15:06:28.366000+00:00",
+    "end": "2026-09-30T16:24:03.690000+00:00",
+    "seconds": 4655.3,
+    "tool_calls": 407,
+    "tokens": 20015053,
+    "model_calls": 168,
+    "cache_read": 18997632,
+    "continues": null
+   }
+  ],
+  "seconds": 4655.3,
+  "span_seconds": 4655.3,
+  "tool_calls": 407,
+  "tokens": 20015053,
+  "model_calls": 168,
+  "cache_read_share": 0.9492
+ },
+ {
+  "id": "push-pull",
+  "target": "push vs pull fixation",
+  "agent": "grok-4.7 (Grok command-line agent)",
+  "sessions": [
+   {
+    "session": "01a0f39a-7190-72a2-ac81-41761c37b2d9",
+    "start": "2026-09-30T18:36:20.392000+00:00",
+    "end": "2026-09-30T19:08:59.870000+00:00",
+    "seconds": 1959.5,
+    "tool_calls": 179,
+    "tokens": 9239665,
+    "model_calls": 85,
+    "cache_read": 8846976,
+    "continues": null
+   }
+  ],
+  "seconds": 1959.5,
+  "span_seconds": 1959.5,
+  "tool_calls": 179,
+  "tokens": 9239665,
+  "model_calls": 85,
+  "cache_read_share": 0.9575
+ },
+ {
+  "id": "reed-frost",
+  "target": "Reed--Frost/percolation",
+  "agent": "grok-4.7 (Grok command-line agent)",
+  "sessions": [
+   {
+    "session": "01a0f866-c60a-79f3-bb42-6afb9088f1d9",
+    "start": "2026-10-01T16:58:00.242000+00:00",
+    "end": "2026-10-01T17:24:26.029000+00:00",
+    "seconds": 1585.8,
+    "tool_calls": 162,
+    "tokens": 11379746,
+    "model_calls": 87,
+    "cache_read": 11081984,
+    "continues": null
+   }
+  ],
+  "seconds": 1585.8,
+  "span_seconds": 1585.8,
+  "tool_calls": 162,
+  "tokens": 11379746,
+  "model_calls": 87,
+  "cache_read_share": 0.9738
+ },
+ {
+  "id": "undecided",
+  "target": "undecided-state basics",
+  "agent": "grok-4.7 (Grok command-line agent)",
+  "sessions": [
+   {
+    "session": "01a0fbc3-38d5-7653-b445-573b0481f9f8",
+    "start": "2026-10-02T08:37:50.577000+00:00",
+    "end": "2026-10-02T09:04:23.423000+00:00",
+    "seconds": 1592.8,
+    "tool_calls": 108,
+    "tokens": 7044544,
+    "model_calls": 57,
+    "cache_read": 6604032,
+    "continues": null
+   }
+  ],
+  "seconds": 1592.8,
+  "span_seconds": 1592.8,
+  "tool_calls": 108,
+  "tokens": 7044544,
+  "model_calls": 57,
+  "cache_read_share": 0.9375
+ },
+ {
+  "id": "averaging",
+  "target": "averaging convergence",
+  "agent": "grok-4.7 (Grok command-line agent)",
+  "sessions": [
+   {
+    "session": "01a0fbc3-38d0-7341-939c-b96191942fe0",
+    "start": "2026-10-02T08:37:50.574000+00:00",
+    "end": "2026-10-02T09:44:00.078000+00:00",
+    "seconds": 3969.5,
+    "tool_calls": 412,
+    "tokens": 18709679,
+    "model_calls": 167,
+    "cache_read": 17900800,
+    "continues": null
+   }
+  ],
+  "seconds": 3969.5,
+  "span_seconds": 3969.5,
+  "tool_calls": 412,
+  "tokens": 18709679,
+  "model_calls": 167,
+  "cache_read_share": 0.9568
+ },
+ {
+  "id": "median-basics",
+  "target": "median basics",
+  "agent": "GLM-5.3 (Mistral Vibe agent)",
+  "sessions": [
+   {
+    "session": "1cb992ef-f942-78e8-c986-74e83132f95f",
+    "start": "2026-10-02T19:24:27.554386+00:00",
+    "end": "2026-10-02T19:41:36.130524+00:00",
+    "seconds": 1028.6,
+    "tool_calls": 48,
+    "tokens": 3389907,
+    "model_calls": 45,
+    "cache_read": null,
+    "continues": null
+   },
+   {
+    "session": "c07fb0d3-b80c-ddef-406f-61c66ad46a99",
+    "start": "2026-10-02T19:42:28.534367+00:00",
+    "end": "2026-10-02T19:42:40.805612+00:00",
+    "seconds": 12.3,
+    "tool_calls": 0,
+    "tokens": 196025,
+    "model_calls": 2,
+    "cache_read": null,
+    "continues": null
+   },
+   {
+    "session": "7f62cc2d-5866-175b-4da7-d6116ae2bc98",
+    "start": "2026-10-02T21:04:46.284031+00:00",
+    "end": "2026-10-02T21:06:39.457406+00:00",
+    "seconds": 113.2,
+    "tool_calls": 21,
+    "tokens": 353583,
+    "model_calls": 13,
+    "cache_read": null,
+    "continues": null
+   },
+   {
+    "session": "968bc6a1-eca1-591d-986f-f43b119d085f",
+    "start": "2026-10-02T21:08:47.594057+00:00",
+    "end": "2026-10-02T21:17:58.933297+00:00",
+    "seconds": 551.3,
+    "tool_calls": 31,
+    "tokens": 2195946,
+    "model_calls": 25,
+    "cache_read": null,
+    "continues": null
+   },
+   {
+    "session": "0e6de702-4168-e0ac-2d04-e926c87b0b04",
+    "start": "2026-10-02T21:22:00.102195+00:00",
+    "end": "2026-10-02T21:27:33.724756+00:00",
+    "seconds": 333.6,
+    "tool_calls": 32,
+    "tokens": 1067803,
+    "model_calls": 24,
+    "cache_read": null,
+    "continues": null
+   }
+  ],
+  "seconds": 2039.0,
+  "span_seconds": 7386.2,
+  "tool_calls": 132,
+  "tokens": 7203264,
+  "model_calls": 109,
+  "cache_read_share": null
+ },
+ {
+  "id": "two-choices",
+  "target": "2-Choices w.h.p.",
+  "agent": "GLM-5.3 (Mistral Vibe agent)",
+  "sessions": [
+   {
+    "session": "5bc51868-fde8-aa1a-e15b-e2a17f7b3ae8",
+    "start": "2026-10-03T10:50:19.496545+00:00",
+    "end": "2026-10-03T12:04:02.276042+00:00",
+    "seconds": 4422.8,
+    "tool_calls": 123,
+    "tokens": 25623211,
+    "model_calls": 110,
+    "cache_read": null,
+    "continues": null
+   },
+   {
+    "session": "61f6f09b-31f1-206a-dc0e-e2a17f7b3ae8",
+    "start": "2026-10-03T12:04:30.594428+00:00",
+    "end": "2026-10-03T12:17:21.118651+00:00",
+    "seconds": 770.5,
+    "tool_calls": 72,
+    "tokens": 5792599,
+    "model_calls": 41,
+    "cache_read": null,
+    "continues": "5bc51868-fde8-aa1a-e15b-e2a17f7b3ae8"
+   },
+   {
+    "session": "03943182-1810-2329-33d0-b0ba1c2f498a",
+    "start": "2026-10-03T12:20:37.661969+00:00",
+    "end": "2026-10-03T13:00:14.023154+00:00",
+    "seconds": 2376.4,
+    "tool_calls": 66,
+    "tokens": 13991099,
+    "model_calls": 59,
+    "cache_read": null,
+    "continues": null
+   },
+   {
+    "session": "14433dc3-a0a4-7318-9139-137b8c27b33b",
+    "start": "2026-10-03T13:02:04.010587+00:00",
+    "end": "2026-10-03T13:04:23.112493+00:00",
+    "seconds": 139.1,
+    "tool_calls": 15,
+    "tokens": 356243,
+    "model_calls": 14,
+    "cache_read": null,
+    "continues": null
+   }
+  ],
+  "seconds": 7708.8,
+  "span_seconds": 8043.6,
+  "tool_calls": 276,
+  "tokens": 45763152,
+  "model_calls": 224,
+  "cache_read_share": null
+ }
+]

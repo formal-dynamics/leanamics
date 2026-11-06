@@ -1,0 +1,47 @@
+{
+ "id": "voter",
+ "target": "voter consensus time",
+ "agent": "grok-4.7 (Grok command-line agent)",
+ "package": "voter",
+ "namespace": "Voter",
+ "baseline": "7fcb31f4b2eebf4a208d227693bec17d9e16fedd",
+ "accepted": "81ad0433ab7679bc349f396819ca537568eb8c7f",
+ "file": "voter/Voter/Coalescence.lean",
+ "defs": [
+  "runRounds",
+  "backward",
+  "disagreement",
+  "wfKernel"
+ ],
+ "theorems": [
+  "runRounds_eq_comp",
+  "disagreement_runRounds_eq_zero",
+  "disagreement_eq_survival",
+  "iterate_wfKernel_eq_expList",
+  "expList_backward_ne",
+  "iterate_disagreement_le",
+  "voter_consensus_whp"
+ ],
+ "pinned_files": [],
+ "keywords": [
+  "def",
+  "theorem",
+  "lemma"
+ ],
+ "context": [],
+ "reviewed": [],
+ "allowed": "^(voter/Voter/.+\\.lean|voter/Voter\\.lean|voter/VOT3_PROGRESS\\.md)$",
+ "scan": [
+  "voter/Voter",
+  "voter/Voter.lean"
+ ],
+ "prompts": [
+  "prompts/voter.md"
+ ],
+ "logs": {
+  "kind": "grok",
+  "sessions": [
+   "01a0f277-37ff-7372-bc22-2a4493350c2f"
+  ]
+ }
+}

@@ -1,0 +1,49 @@
+{
+ "id": "push-pull",
+ "target": "push vs pull fixation",
+ "agent": "grok-4.7 (Grok command-line agent)",
+ "package": "moran",
+ "namespace": "Moran",
+ "baseline": "e58cb5538e500ff19420e1e1febab6ebb3606f18",
+ "accepted": "e91b59868eb7189de5652c38728a6598c3366039",
+ "file": "moran/Moran/PushPull.lean",
+ "defs": [
+  "pullWeight",
+  "pullDist",
+  "pullKernel",
+  "pushValue",
+  "pullValue"
+ ],
+ "theorems": [
+  "pull_weight_nonneg",
+  "pull_weight_sum_one",
+  "push_value_invariant",
+  "pull_value_invariant",
+  "pull_unfixed_tendsto",
+  "push_fixation",
+  "pull_fixation"
+ ],
+ "pinned_files": [],
+ "keywords": [
+  "def",
+  "abbrev",
+  "theorem",
+  "lemma"
+ ],
+ "context": [],
+ "reviewed": [],
+ "allowed": "^(moran/Moran/(?!Isothermal\\.lean$).+\\.lean|moran/VOT4_PROGRESS\\.md)$",
+ "scan": [
+  "moran/Moran",
+  "moran/Moran.lean"
+ ],
+ "prompts": [
+  "prompts/push-pull.md"
+ ],
+ "logs": {
+  "kind": "grok",
+  "sessions": [
+   "01a0f39a-7190-72a2-ac81-41761c37b2d9"
+  ]
+ }
+}

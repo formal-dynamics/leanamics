@@ -1,0 +1,72 @@
+{
+ "id": "two-choices",
+ "target": "2-Choices w.h.p.",
+ "agent": "GLM-5.3 (Mistral Vibe agent)",
+ "package": "median",
+ "namespace": "Median",
+ "baseline": "de9326723d2f44fb06e9771699eb3ac5f7ce4451",
+ "accepted": "2f8db8c6e6b74243e225a77f35451c328db88caf",
+ "file": "median/Median/Binary.lean",
+ "defs": [],
+ "theorems": [
+  "consensus_whp"
+ ],
+ "pinned_files": [
+  "median/Median/Defs.lean"
+ ],
+ "pinned_file_defs": [
+  "med3",
+  "Config",
+  "Round",
+  "step",
+  "run",
+  "ones",
+  "Consensus",
+  "notConsensus",
+  "kernel"
+ ],
+ "keywords": [
+  "def",
+  "abbrev",
+  "structure",
+  "theorem",
+  "lemma"
+ ],
+ "context": [
+  "variable",
+  "namespace",
+  "open ",
+  "import"
+ ],
+ "reviewed": [
+  "import Median.BinaryAssembly"
+ ],
+ "allowed": "^(median/Median/Binary[A-Za-z0-9_]*\\.lean|median/PROGRESS\\.md)$",
+ "scan": [
+  "median/Median/Binary*.lean"
+ ],
+ "prompts": [
+  "prompts/two-choices-1.md",
+  "prompts/two-choices-2-assembly.md",
+  "prompts/two-choices-3-final.md"
+ ],
+ "logs": {
+  "kind": "vibe",
+  "sessions": [
+   "5bc51868-fde8-aa1a-e15b-e2a17f7b3ae8",
+   "61f6f09b-31f1-206a-dc0e-e2a17f7b3ae8",
+   "03943182-1810-2329-33d0-b0ba1c2f498a",
+   "14433dc3-a0a4-7318-9139-137b8c27b33b"
+  ],
+  "not_counted": [
+   {
+    "session": "2b9e4fbf-5bce-0e9e-b685-bead3770350a",
+    "reason": "earlier attempt on a different statement (consensus from a 3/5 majority, pinned in dbe73d6), before the re-pin in de93267"
+   },
+   {
+    "session": "27f5fe36-327d-496b-7420-1a60089e2b34",
+    "reason": "earlier attempt on a different statement (consensus from a 3/5 majority, pinned in dbe73d6), before the re-pin in de93267"
+   }
+  ]
+ }
+}

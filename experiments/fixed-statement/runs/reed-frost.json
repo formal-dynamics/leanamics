@@ -1,0 +1,52 @@
+{
+ "id": "reed-frost",
+ "target": "Reed--Frost/percolation",
+ "agent": "grok-4.7 (Grok command-line agent)",
+ "package": "epidemics",
+ "namespace": "Epidemics",
+ "baseline": "fa012438ef8eb47ef464748179b0cfd08c935e62",
+ "accepted": "431cec2a23146f0769db8e0662bb0f4629ba5521",
+ "file": "epidemics/Epidemics/ReedFrost.lean",
+ "defs": [
+  "perc",
+  "SIR",
+  "step",
+  "run",
+  "setDist",
+  "bernoulli",
+  "coins"
+ ],
+ "theorems": [
+  "infected_iff",
+  "recovered_iff",
+  "extinct",
+  "final_recovered_iff",
+  "coins_prob_open",
+  "prob_infected_eq_prob_connected",
+  "extinct_of_dist_lt"
+ ],
+ "pinned_files": [],
+ "keywords": [
+  "def",
+  "abbrev",
+  "structure",
+  "theorem",
+  "lemma"
+ ],
+ "context": [],
+ "reviewed": [],
+ "allowed": "^(epidemics/Epidemics/.+\\.lean|epidemics/EPI1_PROGRESS\\.md)$",
+ "scan": [
+  "epidemics/Epidemics",
+  "epidemics/Epidemics.lean"
+ ],
+ "prompts": [
+  "prompts/reed-frost.md"
+ ],
+ "logs": {
+  "kind": "grok",
+  "sessions": [
+   "01a0f866-c60a-79f3-bb42-6afb9088f1d9"
+  ]
+ }
+}

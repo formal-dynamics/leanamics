@@ -1,0 +1,57 @@
+{
+ "id": "undecided",
+ "target": "undecided-state basics",
+ "agent": "grok-4.7 (Grok command-line agent)",
+ "package": "undecided",
+ "namespace": "Undecided",
+ "baseline": "cb62f0491ffc9bd132b65650e62761011c7c6aac",
+ "accepted": "5c232a4b5b33d6571e226c12a05cf27e5c4fdcb6",
+ "file": "undecided/Undecided/Basic.lean",
+ "defs": [
+  "Op",
+  "update",
+  "Config",
+  "step",
+  "count",
+  "Mono",
+  "notMono",
+  "kernel"
+ ],
+ "theorems": [
+  "expected_count_a",
+  "expected_count_b",
+  "expected_count_u",
+  "expected_bias",
+  "step_of_mono",
+  "absorbed"
+ ],
+ "pinned_files": [],
+ "keywords": [
+  "def",
+  "abbrev",
+  "structure",
+  "inductive",
+  "theorem",
+  "lemma"
+ ],
+ "context": [
+  "variable",
+  "namespace",
+  "open "
+ ],
+ "reviewed": [],
+ "allowed": "^(undecided/Undecided/.+\\.lean|undecided/PROGRESS\\.md)$",
+ "scan": [
+  "undecided/Undecided",
+  "undecided/Undecided.lean"
+ ],
+ "prompts": [
+  "prompts/undecided.md"
+ ],
+ "logs": {
+  "kind": "grok",
+  "sessions": [
+   "01a0fbc3-38d5-7653-b445-573b0481f9f8"
+  ]
+ }
+}
