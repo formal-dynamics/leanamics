@@ -1814,6 +1814,78 @@ paper_caption: >-
   references for every cell: project website.
 
 # ------------------------------------------------------------------------------------------------
+# The table of the paper (`scripts/dictionary_tex.py --formal`): only what the library proves.
+# One entry per row, naming the row and giving the short LaTeX of the cells whose correspondence
+# is a Lean theorem or holds by definition in the library (see each row's `leanamics` summary);
+# other cells, and rows with no formal correspondence, are left out of the paper. `lean` lists
+# the declarations that establish the entry; each must be in the row's `leanamics.correspondence`.
+paper_formal:
+  - row: wright-fisher
+    dc: 'synchronous pull voter on $K_n$ with self-loops'
+    popgen: 'neutral Wright--Fisher'
+    relation: 'same chain (on counts)'
+    cite: {dc: [HassinPeleg2001], popgen: [Wright1931]}
+    lean: [Voter.transition_wfKernel_lumps]
+  - row: moran-death-birth
+    dc: 'sequential pull / push voter on a graph'
+    popgen: 'neutral Moran, death--Birth / Birth--death'
+    relation: 'same chain; on $K_n$, counts: jump chain of Moran''s'
+    cite: {dc: [BecchettiClementiNatale2020], popgen: [HindersinTraulsen2015]}
+    lean: [Moran.pullKernel, Moran.moranKernel_one_eq_pullKernel, Moran.moranCountKernel_sameJumpChain]
+  - row: moran-selection
+    dc: 'push voter, sender chosen $\propto$ fitness'
+    popgen: 'Moran Birth--death, fitness $r$'
+    relation: 'same chain; on $K_n$, counts: jump chain of Moran''s'
+    cite: {popgen: [Moran1959, LiebermanHauertNowak2005]}
+    lean: [Moran.moranKernel, Moran.moranSelectionCountKernel_sameJumpChain]
+  - row: coalescing
+    dc: 'voter $\Leftrightarrow$ coalescing random walks'
+    popgen: 'Wright--Fisher lineages (on $K_n$)'
+    physics: 'coalescing random walks (dual)'
+    relation: 'dual'
+    cite: {dc: [HassinPeleg2001], physics: [Swart2017]}
+    lean: [Voter.transition_dual, Voter.runRounds_eq_comp]
+  - row: three-majority
+    dc: '3-Majority, two opinions, $K_n$ with self-loops'
+    popgen: 'conformist transmission, three models, $D{=}1$'
+    relation: 'same chain (on counts)'
+    cite: {dc: [BecchettiEtAl2014], popgen: [BoydRicherson1985]}
+    lean: [Plurality.binKernel_lumps]
+  - row: two-choices
+    dc: '2-Choices, two opinions'
+    relation: 'mean field (that of 3-Majority)'
+    cite: {dc: [DoerrEtAl2011]}
+    lean: [Median.kernel_meanField]
+  - row: population-protocols
+    dc: 'randomized population protocol (draws a pair and a reaction)'
+    crn: '$A{+}B\to C{+}D$, common rate'
+    relation: 'jump chain'
+    cite: {dc: [AngluinEtAl2006], crn: [Doty2014]}
+    lean: [Crn.ppStepKernel_sameJumpChain, Crn.jumpKernel_eq_ppKernel]
+  - row: reed-frost
+    dc: 'Independent Cascade'
+    epi: 'Reed--Frost SIR'
+    physics: 'bond percolation'
+    relation: 'one definition; percolation: coupling'
+    cite: {dc: [KempeKleinbergTardos2003], epi: [DraiefGaneshMassoulie2008], physics: [BroadbentHammersley1957]}
+    lean: [Epidemics.infected_iff, Epidemics.prob_infected_eq_prob_connected]
+  - row: cobra-bips
+    dc: 'COBRA walk'
+    epi: 'BIPS (SIS type)'
+    relation: 'dual'
+    cite: {dc: [DuttaEtAl2013], epi: [CooperRadzikRivera2016]}
+    lean: [Epidemics.cobra_bips_duality, Epidemics.cobra_bips_dual]
+
+paper_formal_caption: >-
+  Correspondences proved in Lean or holding by definition in the library: in each row, the names
+  of related processes in each field (--: none in this table). Relation: \emph{same chain}: one
+  transition kernel, on configurations or, where stated, on the numbers of individuals of each type
+  (a lumping); \emph{one definition}: one Lean definition named after both fields; \emph{jump chain}: the same chain once the steps that leave the state unchanged are
+  removed; \emph{dual}: a duality; \emph{coupling}: a pathwise coupling; \emph{mean field}: the
+  same expected one-step map; a field name restricts a relation to its column. The project
+  website lists further correspondences known from the literature, with their formal status.
+
+
 # References. `in_paper_bib: true` marks keys of the paper's bibliography; the others carry BibTeX
 # fields when the paper's table cites them. Identifiers were checked against Crossref (DataCite
 # for LIPIcs, Open Library for ISBNs, arXiv for preprints); years are those of the volume.
